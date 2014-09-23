@@ -12,6 +12,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group, User
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core import mail
 
 from django.core.cache import cache
 from pytz import UTC
@@ -25,6 +26,7 @@ from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, Coupon, CourseRegistrationCode, RegistrationCodeRedemption
 from student.tests.factories import UserFactory, AdminFactory
 from courseware.tests.factories import InstructorFactory
+from courseware.courses import get_course_by_id
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
@@ -714,6 +716,47 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertFalse(context['any_refunds'])
 
     @patch('shoppingcart.views.render_to_response', render_mock)
+    def test_show_receipt_success_with_order_type_business(self):
+        self.cart.order_type = 'business'
+        self.cart.save()
+        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        self.cart.add_billing_details(company_name='T1Omega', company_contact_name='C1',
+                                      company_contact_email='test@t1.com', recipient_email='test@t2.com')
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        course_key = reg_item.paidcourseregistration.course_id
+        course = get_course_by_id(course_key, depth=0)
+        # mail is sent to these emails recipient_email, company_contact_email, order.user.email
+        self.assertEquals(len(mail.outbox), 3)
+
+        self.login_user()
+        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        self.assertEqual(resp.status_code, 200)
+
+        # when order_type = 'business' the user is not enrolled in the
+        # course but presented with the enrollment links
+        self.assertFalse(CourseEnrollment.is_enrolled(self.cart.user, self.course_key))
+        self.assertIn('FirstNameTesting123', resp.content)
+        self.assertIn('40.00', resp.content)
+        # check for the enrollment codes content
+        self.assertTrue('Next, send each student one of these unique enrollment code for this code.', resp.content)
+
+        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        self.assertEqual(template, 'shoppingcart/receipt.html')
+        self.assertEqual(context['order'], self.cart)
+        self.assertIn(reg_item, context['order_items'])
+        self.assertIn(self.cart.purchase_time.date().isoformat(), resp.content)
+        self.assertIn(course.start_date_text, resp.content)
+        self.assertIn(course.end_date_text, resp.content)
+        self.assertIn(self.cart.company_name, resp.content)
+        self.assertIn(self.cart.company_contact_name, resp.content)
+        self.assertIn(self.cart.company_contact_email, resp.content)
+        self.assertIn(self.cart.recipient_email, resp.content)
+        self.assertIn("Purchase order #{order_id}".format(order_id=self.cart.id), resp.content)
+        self.assertIn('You have successfully purchased <b>{total_registration_codes} student activation'
+                      .format(total_registration_codes=context['total_registration_codes']), resp.content)
+
+    @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_upgrade(self):
 
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -909,6 +952,12 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         #now check that the registration code has already been redeemed
         response = self.client.post(redeem_url, **{'HTTP_HOST': 'localhost'})
         self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
+
+        #now check the response of the dashboard page
+        dashboard_url = reverse('dashboard')
+        response = self.client.get(dashboard_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue(self.course.display_name, response.content)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

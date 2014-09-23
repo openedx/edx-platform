@@ -240,8 +240,12 @@ class Order(models.Model):
             for item in orderitems:
                 item.purchase_item()
 
-
         # send confirmation e-mail
+        recipient_list = [getattr(self.user, 'email')]
+        if self.company_contact_email:
+            recipient_list.append(self.company_contact_email)
+        if self.recipient_email:
+            recipient_list.append(self.recipient_email)
         subject = _("Order Payment Confirmation")
         message = render_to_string(
             'emails/order_confirmation_email.txt',
@@ -256,15 +260,15 @@ class Order(models.Model):
                 'email_from_address',
                 settings.DEFAULT_FROM_EMAIL
             )
-
-            send_mail(subject, message,
-                      from_address, [self.user.email])  # pylint: disable=E1101
+            # send a unique email for each recipient, don't put all email addresses in a single email
+            for recipient in recipient_list:
+                send_mail(subject, message, from_address, [recipient])  # pylint: disable=E1101
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
             log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
 
-    def add_billing_details(self, company_name, company_contact_name, company_contact_email, recipient_name,
-                            recipient_email, company_address_line_1, company_address_line_2, company_city,
-                            company_state, company_zip, company_country, customer_reference_number):
+    def add_billing_details(self, company_name='', company_contact_name='', company_contact_email='', recipient_name='',
+                            recipient_email='', company_address_line_1='', company_address_line_2='', company_city='',
+                            company_state='', company_zip='', company_country='', customer_reference_number=''):
         """
         This function is called after the user selects a purchase type of "Business" and
         is asked to enter the optional billing details. The billing details are updated

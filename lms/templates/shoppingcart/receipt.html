@@ -1,105 +1,251 @@
+<%inherit file="shopping_cart_flow.html" />
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.conf import settings %>
-<%! from microsite_configuration import microsite %>
+<%!
+from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
+%>
 
-<%inherit file="../main.html" />
+<%block name="billing_details_highlight">
+% if order_type == 'business':
+  <li>${_('Billing Details')}</li>
+%endif
+</%block>
 
-<%block name="bodyclass">purchase-receipt</%block>
+<%block name="confirmation_highlight">class="active"</%block>
 
-<%block name="pagetitle">${_("Register for [Course Name] | Receipt (Order")} ${order.id})</%block>
-
-<%block name="content">
-
+<%block name="custom_content">
 <div class="container">
   <section class="notification">
     <h2>${_("Thank you for your Purchase!")}</h2>
-    <p>${_("Please print this receipt page for your records. You should also have received a receipt in your email.")}</p>
-    % for inst in instructions:
-      <p>${inst}</p>
-    % endfor
+    % if order_type == 'personal':
+      % for inst in instructions:
+        <p>${_("{inst}").format(inst=inst)}</p>
+      % endfor
+    % endif
   </section>
-
-  <section class="wrapper cart-list">
-    <div class="wrapper-content-main">
-      <article class="content-main">
-        <h1>${_("{platform_name} ({site_name}) Electronic Receipt").format(platform_name=microsite.get_value('platform_name', settings.PLATFORM_NAME), site_name=microsite.get_value('SITE_NAME', settings.SITE_NAME))}</h1>
-        <hr />
-
-        <table class="order-receipt">
-          <tbody>
-          <tr>
-            <td colspan="2"><h3 class="order-number">${_("Order #")}${order.id}</h3></td>
-            <td></td>
-            <td colspan="2"><h3 class="order-date">${_("Date:")} ${order.purchase_time.date().isoformat()}</h3></td>
-          </tr>
-          <tr>
-            <td colspan="5"><h2 class="items-ordered">${_("Items ordered:")}</h2></td>
-          </tr>
-          <tr>
-            <th class="qty">${_("Qty")}</th>
-            <th class="desc">${_("Description")}</th>
-            <th class="url">${_("URL")}</th>
-            <th class="u-pr">${_("Unit Price")}</th>
-            <th class="pri">${_("Price")}</th>
-            <th class="curr">${_("Currency")}</th>
-          </tr>
-          % for item in order_items:
-
-            <% course_id = reverse('info', args=[item.course_id.to_deprecated_string()]) %>
-
-            <tr class="order-item">
-              % if item.status == "purchased":
-                <td>${item.qty}</td>
-                <td>${item.line_desc}</td>
-                <td><a href="${course_id}" class="enter-course">${_('View Course')}</a></td>
-                <td>${"{0:0.2f}".format(item.unit_cost)}
-                    % if item.list_price != None:
-                        <span class="old-price"> ${"{0:0.2f}".format(item.list_price)}</span>
-                    % endif
-                    </td>
-                <td>${"{0:0.2f}".format(item.line_cost)}</td>
-                <td>${item.currency.upper()}</td></tr>
-              % elif item.status == "refunded":
-                <td><del>${item.qty}</del></td>
-                <td><del>${item.line_desc}</del></td>
-                <td><del>${"{0:0.2f}".format(item.unit_cost)}</del></td>
-                <td><del>${"{0:0.2f}".format(item.line_cost)}</del></td>
-                <td><del>${item.currency.upper()}</del></td></tr>
-              % endif
-          % endfor
-          <tr>
-            <td colspan="3"></td>
-            <th>${_("Total Amount")}</th>
-            <td></td>
-          </tr>
-          <tr>
-            <td colspan="3"></td>
-            <td>${"{0:0.2f}".format(order.total_cost)}</td>
-            <td></td>
-          </tr>
-          </tbody>
-        </table>
-
-        % if any_refunds:
-          <p>
-	    ## Translators: Please keep the "<del>" and "</del>" tags around your translation of the word "this" in your translation.
-            ${_("Note: items with strikethough like <del>this</del> have been refunded.")}
-          </p>
+  </section>
+  <section class="wrapper confirm-enrollment shopping-cart print">
+    <div class="gray-bg">
+      <div class="message-left">
+        <% courses_url = reverse('courses') %>
+        % if order_type == 'personal':
+          <a href="${courses_url}" class="blue pull-right">${_("View Courses")} <i class="icon-caret-right"></i></a>
+          ${_("You have successfully been enrolled for <b>{course_names}</b>. The following receipt has been emailed to"
+          " <strong>{emails}</strong>").format(course_names=course_names, emails=emails)}
+        % elif order_type == 'business':
+          % if total_registration_codes > 1 :
+            <% code_plural_form = 'codes' %>
+          % else:
+            <% code_plural_form = 'code' %>
+          % endif
+          ${_("You have successfully purchased <b>{total_registration_codes} student activation "
+           "{code} </b> for <b>{course_names}.</b>"
+           "The following receipt has been emailed to <strong>{emails}</strong>"
+           ).format(total_registration_codes=total_registration_codes, code=code_plural_form, course_names=course_names, emails=emails)}
         % endif
-        % if order.total_cost > 0:
-            <h2>${_("Billed To:")}</h2>
-            <p>
-              ${order.bill_to_cardtype} ${_("#:")} ${order.bill_to_ccnum}<br />
-              ${order.bill_to_first} ${order.bill_to_last}<br />
-              ${order.bill_to_street1}<br />
-              ${order.bill_to_street2}<br />
-              ${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}<br />
-              ${order.bill_to_country.upper()}<br />
-            </p>
-         % endif
-      </article>
     </div>
-  </section>
+</div>
+% if order_type == 'business':
+  <h3 class="text-center">${_("Next, send each student one of these unique enrollment code for this code")}.</h3>
+  <table class="course-receipt">
+    <thead>
+    <th>${_("Course Name")}</th>
+    <th>${_("Enrollment Code")}</th>
+    <th>${_("Enrollment Link")}</th>
+    </thead>
+    <tbody>
+    % for registration_code in registration_codes:
+      <% course = get_course_by_id(registration_code.course_id, depth=0) %>
+      <tr>
+        <td>${_("{course_name}").format(course_name=course.display_name)}</td>
+        <td>${registration_code.code}</td>
+        <% redemption_url = reverse('register_code_redemption', args = [registration_code.code] ) %>
+        <td><a href="${redemption_url}">${redemption_url}</a></td>
+      </tr>
+    % endfor
+    </tbody>
+  </table>
+%endif
+<div class="bordered-bar">
+  <h2>${_('Purchase order')} #${order.id}<span>${_('Date of purchase')}: ${order.purchase_time.date().isoformat()} </span><span
+      class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon-print"></i> ${_('Print Receipt')}</a></span>
+  </h2>
+</div>
+% if order.total_cost > 0:
+  <div class="pattern">
+    <h2> ${_("Billed To Details")}: </h2>
+
+    <div class="col-two no-border">
+      <div class="row">
+        <div class="row-inside">
+          <p>
+            <b>${_('Card Type')}:</b><label>${order.bill_to_cardtype}</label>
+          </p>
+        </div>
+        <div class="row-inside">
+          <p>
+            <b>${_('Credit Card Number')}:</b><label>${order.bill_to_ccnum}</label>
+          </p>
+        </div>
+        <div class="row-inside">
+          <p>
+            <b>${_('Name')}:</b><label>${order.bill_to_first} ${order.bill_to_last}</label>
+          </p>
+        </div>
+        <div class="row-inside">
+          <p>
+            <b>${_('Address 1')}:</b><label>${order.bill_to_street1}</label>
+          </p>
+        </div>
+        <div class="row-inside">
+          <p>
+            <b>${_('Address 2')}:</b><label>${order.bill_to_street2}</label>
+          </p>
+        </div>
+        <div class="row-inside">
+          <p>
+            <b>${_('City')}:</b><label>${order.bill_to_city}</label>
+          </p>
+        </div>
+        <div class="row-inside">
+          <p>
+            <b>${_('State')}:</b><label>${order.bill_to_state}</label>
+          </p>
+        </div>
+        <div class="row-inside">
+          <p>
+            <b>${_('Country')}:</b><label>${order.bill_to_country.upper()}</label>
+          </p>
+        </div>
+      </div>
+    </div>
+    % if order_type == 'business':
+      <h2> ${_("Company Details")}: </h2>
+      <% billing_details_list = [
+        ('company_address_line_1', 'Address Line 1'),
+        ('company_address_line_2', 'Address Line 2'),
+        ('company_city', 'City'),
+        ('company_state', 'State'),
+        ('company_zip', 'Zip'),
+        ('company_country', 'Country'),
+      ]%>
+      <div class="col-two no-border">
+        <div class="row">
+          <div class="row-inside">
+            <p>
+              <b>${_('Company Name')}:</b>
+              <label>${_("{company_name}").format(company_name=order.company_name)}</label>
+            </p>
+          </div>
+          <div class="row-inside">
+            <p>
+              <b>${_('Company Contact Name')}:</b>
+              <label>${_("{company_contact_name}").format(company_contact_name=order.company_contact_name)}</label>
+            </p>
+          </div>
+          <div class="row-inside">
+            <p>
+              <b>${_('Company Contact Email')}:</b>
+              <label>${ order.company_contact_email }</label>
+            </p>
+          </div>
+          <div class="row-inside">
+            <p>
+              <b>${_('Recipient Name')}:</b>
+              <label>${_("{recipient_name}").format(recipient_name=order.recipient_name)}</label>
+            </p>
+          </div>
+          <div class="row-inside">
+            <p>
+              <b>${_('Recipient Email')}:</b>
+              <label>${order.recipient_email}</label>
+            </p>
+          </div>
+          % for db_column, header in billing_details_list:
+            % if getattr(order, db_column):
+              <% value = getattr(order, db_column) %>
+              <div class="row-inside">
+                <p>
+                  <b>${_("{header}").format(header=header)}:</b><label>${_("{value}").format(value=value)}</label>
+                </p>
+              </div>
+            %endif
+          %endfor
+        </div>
+      </div>
+    %endif
+  </div>
+% endif
+<hr class="border"/>
+% for item, course in shoppingcart_items:
+  <div class="user-data">
+    <div class="clearfix">
+      <div class="image">
+        <img style="width: 100%; height: 100%;" src="${course_image_url(course)}"
+             alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Image"/>
+      </div>
+      <div class="data-input">
+        <h3>${_("Registration for")}: <span class="pull-right">${_("Course Dates")}:</span></h3>
+
+        <h1>${_(" {course_name} ").format(course_name=course.display_name)}<span class="pull-right">${course.start_date_text} -  ${course.end_date_text}</span>
+        </h1>
+        <hr/>
+        <div class="three-col">
+          % if item.status == "purchased":
+            <div class="col-1">
+              % if item.list_price != None:
+                <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span>
+                </div>
+                <div class="price green">${_('Discount Applied:')} <span>  $${"{0:0.2f}".format(item.unit_cost)} </span></div>
+              % else:
+                <div class="price">${_('Price per student:')} <span>  $${"{0:0.2f}".format(item.unit_cost)}</span></div>
+              % endif
+            </div>
+            <div class="col-2">
+              <div class="numbers-row">
+                <label>${_("Students")}:</label>
+                <div class="counter no-border">
+                  ${item.qty}
+                </div>
+              </div>
+            </div>
+          % elif item.status == "refunded":
+            <div class="col-1">
+              % if item.list_price != None:
+                <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span>
+                </div>
+                <div class="price green">${_('Discount Applied:')} <span><del> $${"{0:0.2f}".format(item.unit_cost)}
+                </del></span></div>
+              % else:
+                <div class="price">${_('Price per student:')} <span><del> $${"{0:0.2f}".format(item.unit_cost)}</del></span>
+                </div>
+              % endif
+            </div>
+            <div class="col-2">
+              <div class="numbers-row">
+                <label>${_("Students")}:</label>
+                <div class="counter no-border">
+                  <del>${item.qty}</del>
+                </div>
+              </div>
+            </div>
+          %endif
+        </div>
+      </div>
+    </div>
+  </div>
+% endfor
+<div class="discount">
+  <div class="code-text">
+    % if any_refunds:
+      <span>
+      ## Translators: Please keep the "<del>" and "</del>" tags around your translation of the word "this" in your translation.
+        ${_("Note: items with strikethough like <del>this</del> have been refunded.")}
+      </span>
+    % endif
+    <span class="pull-right">${_("Total")}: <b>$${"{0:0.2f}".format(order.total_cost)} USD</b></span>
+  </div>
+</div>
+</section>
 </div>
 </%block>
