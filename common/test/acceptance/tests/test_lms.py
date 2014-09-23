@@ -77,10 +77,10 @@ class LanguageTest(UniqueCourseTest):
         self.dashboard_page = DashboardPage(self.browser)
 
         self.test_new_lang = 'eo'
-        # This string is unicode for "ÇØÜRSÉS", which should appear in our Dummy Esperanto page
+        # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
         # We store the string this way because Selenium seems to try and read in strings from
         # the HTML in this format. Ideally we could just store the raw ÇÜRRÉNT ÇØÜRSÉS string here
-        self.courses_text = u'\xc7\xd6\xdcRS\xc9S'
+        self.current_courses_text = u'\xc7\xdcRR\xc9NT \xc7\xd6\xdcRS\xc9S'
 
         self.username = "test"
         self.password = "testpass"
@@ -92,10 +92,10 @@ class LanguageTest(UniqueCourseTest):
         # Change language to Dummy Esperanto
         self.dashboard_page.change_language(self.test_new_lang)
 
-        changed_text = self.dashboard_page.courses_text
+        changed_text = self.dashboard_page.current_courses_text
 
         # We should see the dummy-language text on the page
-        self.assertIn(self.courses_text, changed_text)
+        self.assertIn(self.current_courses_text, changed_text)
 
     def test_language_persists(self):
         auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email, course_id=self.course_id)
@@ -113,10 +113,10 @@ class LanguageTest(UniqueCourseTest):
 
         self.dashboard_page.visit()
 
-        changed_text = self.dashboard_page.courses_text
+        changed_text = self.dashboard_page.current_courses_text
 
         # We should see the dummy-language text on the page
-        self.assertIn(self.courses_text, changed_text)
+        self.assertIn(self.current_courses_text, changed_text)
 
 
 class HighLevelTabTest(UniqueCourseTest):

@@ -88,7 +88,6 @@ class TestCourseListing(ModuleStoreTestCase):
             courses_list = list(get_course_enrollment_pairs(self.student, None, []))
             self.assertEqual(courses_list, [])
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_course_listing_errored_deleted_courses(self):
         """
         Create good courses, courses that won't load, and deleted courses which still have
