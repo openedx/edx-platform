@@ -19,8 +19,8 @@ class StudentAccountViewTest(TestCase):
 
     USERNAME = u"heisenberg"
     PASSWORD = u"ḅḷüëṡḳÿ"
-    OLD_EMAIL = u"walt@savewalterwhite.com"
-    NEW_EMAIL = u"heisenberg@felina.com"
+    OLD_EMAIL = u"walter@graymattertech.com"
+    NEW_EMAIL = u"walt@savewalterwhite.com"
 
     def setUp(self):
         # Create/activate a new account
@@ -36,10 +36,6 @@ class StudentAccountViewTest(TestCase):
         self.assertContains(response, "Student Account")
 
     def test_email_change_request_handler(self):
-        # Verify that the email associated with the account is unchanged
-        profile_info = profile_api.profile_info(self.USERNAME)
-        self.assertEquals(profile_info['email'], self.OLD_EMAIL)
-
         response = self.client.put(
             path=reverse('email_change_request'),
             data=urlencode({
@@ -51,8 +47,20 @@ class StudentAccountViewTest(TestCase):
         )
         self.assertEquals(response.status_code, 204)
 
-    def email_change_confirmation_handler(self):
-        pass
+        # Verify that the email associated with the account remains unchanged
+        profile_info = profile_api.profile_info(self.USERNAME)
+        self.assertEquals(profile_info['email'], self.OLD_EMAIL)
+
+    def test_email_change_confirmation_handler(self):
+        # Get an email change activation key
+        activation_key = account_api.request_email_change(self.USERNAME, self.NEW_EMAIL, self.PASSWORD)
+
+        response = self.client.get(reverse('email_change_confirm', kwargs={'key': activation_key}))
+        self.assertContains(response, "Email change successful")
+
+        # Verify that the email associated with the account has changed
+        profile_info = profile_api.profile_info(self.USERNAME)
+        self.assertEquals(profile_info['email'], self.NEW_EMAIL)
 
     @ddt.data(
         ('get', 'account_index'),
@@ -69,7 +77,6 @@ class StudentAccountViewTest(TestCase):
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertIn('accounts/login?next=', response.redirect_chain[0][0])
 
-
     @ddt.data(
         ('get', 'account_index'),
         ('put', 'email_change_request')
@@ -82,4 +89,3 @@ class StudentAccountViewTest(TestCase):
         for method in wrong_methods:
             response = getattr(self.client, method)(url)
             self.assertEqual(response.status_code, 405)
-

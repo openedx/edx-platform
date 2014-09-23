@@ -1,0 +1,31 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+## TODO: Get sign-off from Product on new copy
+## Greeting
+${_("Hi there,")}
+
+## Preamble
+${_("There was recently a request to change the email address associated "
+    "with your {platform_name} account from {old_email} to {new_email}. "
+    "If you requested this change, please confirm your new email address "
+    "by following the link below:").format(
+        platform_name=settings.PLATFORM_NAME,
+        old_email=old_email,
+        new_email=new_email
+    )
+}
+
+## Confirmation link
+% if is_secure:
+https://${site}/account/email_change_confirm/${key}
+% else:
+http://${site}/account/email_change_confirm/${key}
+% endif
+
+## Closing
+${_("If you don't want to change the email address associated with your "
+  "account, ignore this message.")}
+
+## Farewell
+${_("Thanks,")}
+${_("- The edX Team")}
