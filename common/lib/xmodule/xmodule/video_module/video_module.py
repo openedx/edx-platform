@@ -18,6 +18,7 @@ Examples of html5 videos for manual testing:
 import json
 import logging
 from operator import itemgetter
+from base64 import urlsafe_b64encode
 
 from lxml import etree
 from pkg_resources import resource_string
@@ -108,11 +109,20 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         # CountryMiddleware disabled for Studio.
         cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
 
-        if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+        if (getattr(self, 'video_speed_optimizations', True) and cdn_url and
+                not getattr(self, 'video_link_transience', False)):
             for index, source_url in enumerate(sources):
                 new_url = get_video_from_cdn(cdn_url, source_url)
                 if new_url:
                     sources[index] = new_url
+
+        if getattr(self, 'video_link_transience', False) and not getattr(self.system, 'is_author_mode', False):
+            for index, source_url in enumerate(sources):
+                if 'amazonaws.com' in source_url:
+                    query = 'source={}'.format(urlsafe_b64encode(source_url))
+                    new_url = self.runtime.handler_url(self, 'url', 'temporary', query)
+                    if new_url:
+                        sources[index] = new_url
 
         if self.download_video:
             if self.source:
@@ -195,6 +205,7 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
     """
     module_class = VideoModule
     transcript = module_attr('transcript')
+    url = module_attr('url')
 
     tabs = [
         {
@@ -303,6 +314,8 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         editable_fields['transcripts']['type'] = 'VideoTranslations'
         editable_fields['transcripts']['urlRoot'] = self.runtime.handler_url(self, 'studio_transcript', 'translation').rstrip('/?')
         editable_fields['handout']['type'] = 'FileUploader'
+
+        editable_fields.pop('video_link_transience')
 
         return editable_fields
 

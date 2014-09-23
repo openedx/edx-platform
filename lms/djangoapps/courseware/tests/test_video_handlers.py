@@ -6,9 +6,14 @@ import os
 import tempfile
 import textwrap
 import json
+import boto
+import mock
 from datetime import timedelta
 from webob import Request
 from mock import MagicMock, Mock
+from base64 import urlsafe_b64encode
+from urlparse import urlparse, urlunparse, parse_qs
+from urllib import urlencode
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -777,3 +782,74 @@ class TestGetTranscript(TestVideo):
 
         with self.assertRaises(KeyError):
             self.item.get_transcript()
+
+
+class TestVideoLinkTransience(TestVideo):
+    """
+    Test video handler that provide temporary video links.
+    """
+
+    DATA = """
+        <video show_captions="true"
+        display_name="A Name"
+        sub='OEoXaMPEzfM'
+        >
+            <source src="http://s3.amazonaws.com/bucket/video.mp4"/>
+            <source src="example.webm"/>
+        </video>
+    """
+
+    MODEL_DATA = {
+        'data': DATA
+    }
+
+    def setUp(self):
+        super(TestVideoLinkTransience, self).setUp()
+
+        original_generate = boto.s3.connection.S3Connection.generate_url
+
+        def mocked_generate_url(self, *args, **kwargs):
+            """
+            Mocked boto.s3.connection.S3Connection.generate_url.
+            """
+            original_generate_url = original_generate(self, *args, **kwargs)
+            # Replace expire and signature here:
+            original_url = urlparse(original_generate_url)
+            query = parse_qs(original_url.query)
+            query['Expires'] = ['test_expire']
+            query['Signature'] = ['test_signature']
+            return urlunparse(original_url._replace(query=urlencode(query)))  # pylint: disable=W0212, E1101
+
+        patcher = mock.patch.object(boto.s3.connection.S3Connection, "generate_url", mocked_generate_url)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.item_descriptor.render(STUDENT_VIEW)
+        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+
+    def test_temporary_video_url_success(self):
+        """
+        Temporary video url generated successfully.
+        """
+        source = urlsafe_b64encode('http://s3.amazonaws.com/bucket/video.mp4')
+
+        request = Request.blank('/temporary?source={}'.format(source))
+        response = self.item.url(request=request, dispatch='temporary')
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.location, 'http://s3.amazonaws.com/bucket/video.mp4')
+
+    def test_no_source_in_query(self):
+        """
+        No source video in query.
+        """
+        request = Request.blank('/temporary?')
+        response = self.item.url(request=request, dispatch='temporary')
+        self.assertEqual(response.status_code, 400)
+
+    def test_fake_dispatch(self):
+        """
+        Dispatch is not allowed.
+        """
+        request = Request.blank('')
+        response = self.item.url(request=request, dispatch='fake')
+        self.assertEqual(response.status_code, 404)

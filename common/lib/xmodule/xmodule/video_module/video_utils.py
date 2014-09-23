@@ -5,8 +5,11 @@ import json
 import logging
 import urllib
 import requests
+import re
 
+from django.conf import settings
 from requests.exceptions import RequestException
+from boto.s3.connection import S3Connection
 
 log = logging.getLogger(__name__)
 

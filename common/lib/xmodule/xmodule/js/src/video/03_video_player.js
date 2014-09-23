@@ -151,14 +151,14 @@ function (HTML5Video, Resizer) {
 
             player = state.videoEl = state.videoPlayer.player.videoEl;
 
-            player[0].addEventListener('loadedmetadata', function () {
+            player[0].addEventListener('loadedmetadata', _.once(function () {
                 var videoWidth = player[0].videoWidth || player.width(),
                     videoHeight = player[0].videoHeight || player.height();
 
                 _resize(state, videoWidth, videoHeight);
 
                 _updateVcrAndRegion(state);
-            }, false);
+            }), false);
 
         } else {
             youTubeId = state.youtubeId();

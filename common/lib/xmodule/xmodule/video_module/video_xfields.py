@@ -151,3 +151,9 @@ class VideoFields(object):
         display_name=_("Upload Handout"),
         scope=Scope.settings,
     )
+    video_link_transience = Boolean(
+        display_name=_("Enable Video Link Transience"),
+        help=_("Enter true or false. If true, Amazon S3 hosted video URLs will be temporary."),
+        default=False,
+        scope=Scope.settings
+    )

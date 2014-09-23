@@ -7,6 +7,7 @@ StudioViewHandlers are handlers for video descriptor instance.
 import os
 import json
 import logging
+from base64 import urlsafe_b64decode
 from webob import Response
 
 from xblock.core import XBlock
@@ -24,7 +25,6 @@ from .transcripts_utils import (
     save_to_store,
     subs_filename
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -303,6 +303,29 @@ class VideoStudentViewHandlers(object):
             else:
                 response = Response(status=404)
         else:  # unknown dispatch
+            log.debug("Dispatch is not allowed")
+            response = Response(status=404)
+
+        return response
+
+    @XBlock.handler
+    def url(self, request, dispatch):
+        """
+        Handler for creating temporary video URLs in Student View.
+        """
+        if dispatch.startswith('temporary'):
+            source_url = request.GET.get('source')
+
+            if not source_url:
+                log.info("Invalid /temporary request: no original video url in request")
+                return Response(status=400)
+
+            temporary_url = urlsafe_b64decode(source_url.encode('utf-8'))
+
+            response = Response(status=301)
+            response.location = temporary_url
+
+        else:
             log.debug("Dispatch is not allowed")
             response = Response(status=404)
 
