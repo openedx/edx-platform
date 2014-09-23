@@ -97,6 +97,8 @@ textarea {
               logs = cilset[:10]
           else:
               logs = cilset[:2]
+
+          cil = None
           %>
           % for cil in logs:
               <%
@@ -116,7 +118,14 @@ textarea {
           %if course_id is not None:
               <tr>
                 <td colspan="3">
-                  <pre>${cil.import_log | h}</pre>
+                  <pre>
+                    %if cil is not None:
+                        ${cil.import_log | h}
+                    %else:
+                        ## Translators: git is a version-control system; see http://git-scm.com/about
+                        ${_('No git import logs have been recorded for this course.')}
+                    %endif
+                  </pre>
                 </td>
               </tr>
           %endif
