@@ -54,6 +54,21 @@ function () {
             return this.video.currentTime;
         };
 
+        Player.prototype.reloadVideo = function () {
+            var currentTime = this.video.currentTime,
+                playerState = this.getPlayerState();
+
+            this.video.src = this.video.currentSrc;
+            this.video.addEventListener('loadeddata', _.once(function () {
+                var playingStates = [HTML5Video.PlayerState.BUFFERING, HTML5Video.PlayerState.PLAYING];
+                if (_.contains(playingStates, playerState)) {
+                    this.video.play();
+                }
+                this.seekTo(currentTime);
+                this.networkErrorCounter = 0;
+            }).bind(this));
+        };
+
         Player.prototype.playVideo = function () {
             this.video.play();
         };
@@ -153,6 +168,7 @@ function () {
                 sourceList, _this, errorMessage, lastSource;
 
             this.logs = [];
+            this.networkErrorCounter = 0;
             // Initially we assume that el is a DOM element. If jQuery selector
             // fails to select something, we assume that el is an ID of a DOM
             // element. We try to select by ID. If jQuery fails this time, we
@@ -267,7 +283,7 @@ function () {
                     if (_this.debug) {
                         console.log(
                             'event name:', eventName,
-                            'state:', _this.playerState,
+                            'playerState:', _this.playerState,
                             'readyState:', _this.video.readyState,
                             'networkState:', _this.video.networkState
                         );
@@ -277,6 +293,7 @@ function () {
                 });
             });
 
+            _this.config.events.onReady = _.once(_this.config.events.onReady);
             // When the <video> tag has been processed by the browser, and it
             // is ready for playback, notify other parts of the VideoPlayer,
             // and initially pause the video.
@@ -302,6 +319,13 @@ function () {
             this.video.addEventListener('pause', function () {
                 _this.playerState = HTML5Video.PlayerState.PAUSED;
                 _this.callStateChangeCallback();
+            }, false);
+
+            this.video.addEventListener('error',  function (event) {
+                if (event.target.error.code === event.target.error.MEDIA_ERR_NETWORK && !_this.networkErrorCounter) {
+                    _this.reloadVideo();
+                    _this.networkErrorCounter++;
+                }
             }, false);
 
             // Register the 'ended' event.
