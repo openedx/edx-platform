@@ -2,14 +2,14 @@
 Tests for StaticContentServer
 """
 import copy
+import ddt
 import logging
+import unittest
 from uuid import uuid4
 
 from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
-
-from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
@@ -17,12 +17,16 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_from_xml
 
+from contentserver.middleware import parse_range_header
+from student.models import CourseEnrollment
+
 log = logging.getLogger(__name__)
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
+@ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
@@ -137,55 +141,95 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             first=first_byte, last=last_byte, length=self.length_unlocked))
         self.assertEqual(resp['Content-Length'], str(last_byte - first_byte + 1))
 
-    def test_range_request_malformed_missing_equal(self):
+    def test_range_request_multiple_ranges(self):
         """
-        Test that a range request with malformed Range (missing '=') outputs status 400.
+        Test that multiple ranges in request outputs the full content.
         """
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes 0-')
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
-
-    def test_range_request_malformed_not_bytes(self):
-        """
-        Test that a range request with malformed Range (not "bytes") outputs status 400.
-        "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
-        """
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bits=0-')
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
-
-    def test_range_request_malformed_missing_minus(self):
-        """
-        Test that a range request with malformed Range (missing '-') outputs status 400.
-        """
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=0')
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
-
-    def test_range_request_malformed_first_not_integer(self):
-        """
-        Test that a range request with malformed Range (first is not an integer) outputs status 400.
-        """
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=one-')
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
-
-    def test_range_request_malformed_invalid_range(self):
-        """
-        Test that a range request with malformed Range (first_byte > last_byte) outputs status 400.
-        """
-        first_byte = self.length_unlocked / 2
-        last_byte = self.length_unlocked / 4
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
+        first_byte = self.length_unlocked / 4
+        last_byte = self.length_unlocked / 2
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
             first=first_byte, last=last_byte)
         )
 
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
+        self.assertEqual(resp['Content-Length'], str(self.length_unlocked))
+
+    @ddt.data(
+        'bytes 0-',
+        'bits=0-',
+        'bytes=0',
+        'bytes=one-',
+    )
+    def test_syntax_errors_in_range(self, header_value):
+        """
+        Test that syntactically invalid Range values result in a 200 OK full content response.
+        """
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE=header_value)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
+
+    def test_range_request_malformed_invalid_range(self):
+        """
+        Test that a range request with malformed Range (first_byte > last_byte) outputs
+        416 Requested Range Not Satisfiable.
+        """
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
+            first=(self.length_unlocked / 2), last=(self.length_unlocked / 4))
+        )
+        self.assertEqual(resp.status_code, 416)
 
     def test_range_request_malformed_out_of_bounds(self):
         """
-        Test that a range request with malformed Range (last_byte == totalLength, offset by 1 error)
-        outputs status 400.
+        Test that a range request with malformed Range (first_byte, last_byte == totalLength, offset by 1 error)
+        outputs 416 Requested Range Not Satisfiable.
         """
-        last_byte = self.length_unlocked
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=0-{last}'.format(
-            last=last_byte)
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
+            first=(self.length_unlocked), last=(self.length_unlocked))
         )
+        self.assertEqual(resp.status_code, 416)
 
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
+
+@ddt.ddt
+class ParseRangeHeaderTestCase(unittest.TestCase):
+    """
+    Tests for the parse_range_header function.
+    """
+
+    def setUp(self):
+        self.content_length = 10000
+
+    def test_bytes_unit(self):
+        unit, __ = parse_range_header('bytes=100-', self.content_length)
+        self.assertEqual(unit, 'bytes')
+
+    @ddt.data(
+        ('bytes=100-', 1, [(100, 9999)]),
+        ('bytes=1000-', 1, [(1000, 9999)]),
+        ('bytes=100-199, 200-', 2, [(100, 199), (200, 9999)]),
+        ('bytes=100-199, 200-499', 2, [(100, 199), (200, 499)]),
+        ('bytes=-100', 1, [(9900, 9999)]),
+        ('bytes=-100, -200', 2, [(9900, 9999), (9800, 9999)])
+    )
+    @ddt.unpack
+    def test_valid_syntax(self, header_value, excepted_ranges_length, expected_ranges):
+        __, ranges = parse_range_header(header_value, self.content_length)
+        self.assertEqual(len(ranges), excepted_ranges_length)
+        self.assertEqual(ranges, expected_ranges)
+
+    @ddt.data(
+        ('bytes=one-20', ValueError, 'invalid literal for int()'),
+        ('bytes=-one', ValueError, 'invalid literal for int()'),
+        ('bytes=-', ValueError, 'invalid literal for int()'),
+        ('bytes=--', ValueError, 'invalid literal for int()'),
+        ('bytes', ValueError, 'Invalid syntax'),
+        ('bytes=', ValueError, 'Invalid syntax'),
+        ('bytes=0', ValueError, 'Invalid syntax'),
+        ('bytes=0-10,0', ValueError, 'Invalid syntax'),
+        ('bytes=0=', ValueError, 'too many values to unpack'),
+    )
+    @ddt.unpack
+    def test_invalid_syntax(self, header_value, exception_class, exception_message_regex):
+        self.assertRaisesRegexp(
+            exception_class, exception_message_regex, parse_range_header, header_value, self.content_length
+        )
