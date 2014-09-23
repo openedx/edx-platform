@@ -11,6 +11,7 @@ Accounts do NOT include user profile information.
 from django.db import transaction, IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
 from user_api.models import User, UserProfile, Registration, PendingEmailChange
+from user_api.helpers import intercept_errors
 
 
 USERNAME_MIN_LENGTH = 2
@@ -73,6 +74,7 @@ class AccountNotAuthorized(AccountRequestError):
     pass
 
 
+@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
 @transaction.commit_on_success
 def create_account(username, password, email):
     """Create a new user account.
@@ -139,6 +141,7 @@ def create_account(username, password, email):
     return registration.activation_key
 
 
+@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
 def account_info(username):
     """Retrieve information about a user's account.
 
@@ -162,6 +165,7 @@ def account_info(username):
         }
 
 
+@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
 def activate_account(activation_key):
     """Activate a user's account.
 
@@ -184,6 +188,7 @@ def activate_account(activation_key):
         registration.activate()
 
 
+@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
 def request_email_change(username, new_email, password):
     """Request an email change.
 
@@ -233,6 +238,7 @@ def request_email_change(username, new_email, password):
     return pending_change.request_change(new_email)
 
 
+@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
 @transaction.commit_on_success
 def confirm_email_change(activation_key):
     """Confirm an email change.
@@ -410,3 +416,4 @@ def _validate_email(email):
         raise AccountEmailInvalid(
             u"Email '{email}' format is not valid".format(email=email)
         )
+
