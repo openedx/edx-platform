@@ -18,6 +18,7 @@ from student.roles import (
     CourseCcxCoachRole,
     CourseStaffRole,
     CourseObserverRole,
+    CourseAssistantRole,
 )
 
 from instructor.enrollment import (
@@ -33,6 +34,7 @@ ROLES = {
     'observer': CourseObserverRole,
     'staff': CourseStaffRole,
     'ccx_coach': CourseCcxCoachRole,
+    'assistant': CourseAssistantRole,
 }
 
 

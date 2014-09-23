@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.exceptions import PermissionDenied
 
-from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
+from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, CourseAssistantRole
 from student.tests.factories import AdminFactory
 from student.auth import user_has_role, add_users, remove_users
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -143,6 +143,7 @@ class CourseGroupTest(TestCase):
         self.global_admin = AdminFactory()
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
+        self.assistant = User.objects.create_user('testassistant', 'testta+courses@edx.org', 'foo')
         self.course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
 
     def test_add_user_to_course_group(self):
@@ -160,6 +161,11 @@ class CourseGroupTest(TestCase):
         add_users(self.creator, CourseStaffRole(self.course_key), self.staff)
         self.assertTrue(user_has_role(self.staff, CourseStaffRole(self.course_key)))
 
+        # Add another user to the TA role
+        self.assertFalse(has_access(self.assistant, CourseAssistantRole(self.course_key)))
+        add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
+        self.assertTrue(has_access(self.assistant, CourseAssistantRole(self.course_key)))
+
     def test_add_user_to_course_group_permission_denied(self):
         """
         Verifies PermissionDenied if caller of add_user_to_course_group is not instructor role.
@@ -168,6 +174,8 @@ class CourseGroupTest(TestCase):
         add_users(self.global_admin, CourseStaffRole(self.course_key), self.creator)
         with self.assertRaises(PermissionDenied):
             add_users(self.staff, CourseStaffRole(self.course_key), self.staff)
+        with self.assertRaises(PermissionDenied):
+            add_users(self.assistant, CourseAssistantRole(self.course_key), self.assistant)
 
     def test_remove_user_from_course_group(self):
         """
@@ -182,6 +190,12 @@ class CourseGroupTest(TestCase):
         remove_users(self.creator, CourseStaffRole(self.course_key), self.staff)
         self.assertFalse(user_has_role(self.staff, CourseStaffRole(self.course_key)))
 
+        add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
+        self.assertTrue(has_access(self.assistant, CourseAssistantRole(self.course_key)))
+
+        remove_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
+        self.assertFalse(has_access(self.assistant, CourseAssistantRole(self.course_key)))
+
         remove_users(self.creator, CourseInstructorRole(self.course_key), self.creator)
         self.assertFalse(user_has_role(self.creator, CourseInstructorRole(self.course_key)))
 
@@ -194,3 +208,5 @@ class CourseGroupTest(TestCase):
         add_users(self.global_admin, CourseStaffRole(self.course_key), self.creator, self.staff, another_staff)
         with self.assertRaises(PermissionDenied):
             remove_users(self.staff, CourseStaffRole(self.course_key), another_staff)
+        with self.assertRaises(PermissionDenied):
+            remove_users(self.assistant, CourseAssistantRole(self.course_key), another_staff)
