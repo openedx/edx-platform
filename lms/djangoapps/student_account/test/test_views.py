@@ -3,6 +3,7 @@
 
 from urllib import urlencode
 from mock import patch
+import ddt
 from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -12,6 +13,7 @@ from user_api.api import profile as profile_api
 
 
 @patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
+@ddt.ddt
 class StudentAccountViewTest(TestCase):
     """ Tests for the student account views. """
 
@@ -51,3 +53,33 @@ class StudentAccountViewTest(TestCase):
 
     def email_change_confirmation_handler(self):
         pass
+
+    @ddt.data(
+        ('get', 'account_index'),
+        ('put', 'email_change_request')
+    )
+    @ddt.unpack
+    def test_require_login(self, method, url_name):
+        # Access the page while logged out
+        self.client.logout()
+        url = reverse(url_name)
+        response = getattr(self.client, method)(url, follow=True)
+
+        # Should have been redirected to the login page
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertIn('accounts/login?next=', response.redirect_chain[0][0])
+
+
+    @ddt.data(
+        ('get', 'account_index'),
+        ('put', 'email_change_request')
+    )
+    @ddt.unpack
+    def test_require_http_method(self, correct_method, url_name):
+        wrong_methods = {'get', 'put', 'post', 'head', 'options', 'delete'} - {correct_method}
+        url = reverse(url_name)
+
+        for method in wrong_methods:
+            response = getattr(self.client, method)(url)
+            self.assertEqual(response.status_code, 405)
+
