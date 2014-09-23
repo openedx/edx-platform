@@ -604,3 +604,14 @@ describe 'Problem', ->
     xit 'serialize all answers', ->
       @problem.refreshAnswers()
       expect(@problem.answers).toEqual "input_1_1=one&input_1_2=two"
+
+  describe 'multiple JsInput in single problem', ->
+    jsinput_html = readFixtures('jsinput_problem.html')
+
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+      @problem.render(jsinput_html)
+
+    it 'check_save_waitfor should return false', ->
+      $(@problem.inputs[0]).data('waitfor', ->)
+      expect(@problem.check_save_waitfor()).toEqual(false)
