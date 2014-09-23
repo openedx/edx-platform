@@ -13,26 +13,44 @@ class GradesheetTest(unittest.TestCase):
         Score.__sub__ = lambda me, other: (me.earned - other.earned) + (me.possible - other.possible)
 
         all_total, graded_total = aggregate_scores(scores)
-        self.assertEqual(all_total, Score(earned=0, possible=0, graded=False, section="summary", module_id=None))
-        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary", module_id=None))
-
-        scores.append(Score(earned=0, possible=5, graded=False, section="summary", module_id=None))
-        all_total, graded_total = aggregate_scores(scores)
-        self.assertEqual(all_total, Score(earned=0, possible=5, graded=False, section="summary", module_id=None))
-        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary", module_id=None))
-
-        scores.append(Score(earned=3, possible=5, graded=True, section="summary", module_id=None))
-        all_total, graded_total = aggregate_scores(scores)
-        self.assertAlmostEqual(all_total, Score(earned=3, possible=10, graded=False, section="summary", module_id=None))
-        self.assertAlmostEqual(
-            graded_total, Score(earned=3, possible=5, graded=True, section="summary", module_id=None)
+        self.assertEqual(
+            all_total,
+            Score(earned=0, possible=0, graded=False, section="summary", module_id=None, due=None)
+        )
+        self.assertEqual(
+            graded_total, Score(earned=0, possible=0, graded=True, section="summary", module_id=None, due=None)
         )
 
-        scores.append(Score(earned=2, possible=5, graded=True, section="summary", module_id=None))
+        scores.append(Score(earned=0, possible=5, graded=False, section="summary", module_id=None, due=None))
         all_total, graded_total = aggregate_scores(scores)
-        self.assertAlmostEqual(all_total, Score(earned=5, possible=15, graded=False, section="summary", module_id=None))
+        self.assertEqual(
+            all_total,
+            Score(earned=0, possible=5, graded=False, section="summary", module_id=None, due=None)
+        )
+        self.assertEqual(
+            graded_total,
+            Score(earned=0, possible=0, graded=True, section="summary", module_id=None, due=None)
+        )
+
+        scores.append(Score(earned=3, possible=5, graded=True, section="summary", module_id=None, due=None))
+        all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(
-            graded_total, Score(earned=5, possible=10, graded=True, section="summary", module_id=None)
+            all_total,
+            Score(earned=3, possible=10, graded=False, section="summary", module_id=None, due=None)
+        )
+        self.assertAlmostEqual(
+            graded_total,
+            Score(earned=3, possible=5, graded=True, section="summary", module_id=None, due=None)
+        )
+
+        scores.append(Score(earned=2, possible=5, graded=True, section="summary", module_id=None, due=None))
+        all_total, graded_total = aggregate_scores(scores)
+        self.assertAlmostEqual(
+            all_total,
+            Score(earned=5, possible=15, graded=False, section="summary", module_id=None, due=None)
+        )
+        self.assertAlmostEqual(
+            graded_total, Score(earned=5, possible=10, graded=True, section="summary", module_id=None, due=None)
         )
 
 
@@ -49,19 +67,19 @@ class GraderTest(unittest.TestCase):
     }
 
     test_gradesheet = {
-        'Homework': [Score(earned=2, possible=20.0, graded=True, section='hw1', module_id=None),
-                     Score(earned=16, possible=16.0, graded=True, section='hw2', module_id=None)],
+        'Homework': [Score(earned=2, possible=20.0, graded=True, section='hw1', module_id=None, due=None),
+                     Score(earned=16, possible=16.0, graded=True, section='hw2', module_id=None, due=None)],
         # The dropped scores should be from the assignments that don't exist yet
 
-        'Lab': [Score(earned=1, possible=2.0, graded=True, section='lab1', module_id=None),  # Dropped
-                Score(earned=1, possible=1.0, graded=True, section='lab2', module_id=None),
-                Score(earned=1, possible=1.0, graded=True, section='lab3', module_id=None),
-                Score(earned=5, possible=25.0, graded=True, section='lab4', module_id=None),  # Dropped
-                Score(earned=3, possible=4.0, graded=True, section='lab5', module_id=None),  # Dropped
-                Score(earned=6, possible=7.0, graded=True, section='lab6', module_id=None),
-                Score(earned=5, possible=6.0, graded=True, section='lab7', module_id=None)],
+        'Lab': [Score(earned=1, possible=2.0, graded=True, section='lab1', module_id=None, due=None),  # Dropped
+                Score(earned=1, possible=1.0, graded=True, section='lab2', module_id=None, due=None),
+                Score(earned=1, possible=1.0, graded=True, section='lab3', module_id=None, due=None),
+                Score(earned=5, possible=25.0, graded=True, section='lab4', module_id=None, due=None),  # Dropped
+                Score(earned=3, possible=4.0, graded=True, section='lab5', module_id=None, due=None),  # Dropped
+                Score(earned=6, possible=7.0, graded=True, section='lab6', module_id=None, due=None),
+                Score(earned=5, possible=6.0, graded=True, section='lab7', module_id=None, due=None)],
 
-        'Midterm': [Score(earned=50.5, possible=100, graded=True, section="Midterm Exam", module_id=None), ],
+        'Midterm': [Score(earned=50.5, possible=100, graded=True, section="Midterm Exam", module_id=None, due=None), ],
     }
 
     def test_single_section_grader(self):

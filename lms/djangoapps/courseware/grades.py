@@ -253,7 +253,8 @@ def _grade(student, request, course, keep_raw_scores):
                             total,
                             graded,
                             module_descriptor.display_name_with_default,
-                            section_due
+                            module_descriptor.location,
+                            section_due,
                         )
                     )
 
@@ -261,7 +262,7 @@ def _grade(student, request, course, keep_raw_scores):
                 if keep_raw_scores:
                     raw_scores += scores
             else:
-                graded_total = Score(0.0, 1.0, True, section_name, section_due)
+                graded_total = Score(0.0, 1.0, True, section_name, None, section_due)
 
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
@@ -402,7 +403,8 @@ def _progress_summary(student, request, course):
                             total,
                             graded,
                             module_descriptor.display_name_with_default,
-                            due
+                            module_descriptor.location,
+                            due,
                         )
                     )
 
