@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-E2E tests for the LMS.
+End-to-end tests for the LMS.
 """
 import time
 
-from .helpers import UniqueCourseTest
-from ..pages.studio.auto_auth import AutoAuthPage
-from ..pages.lms.courseware import CoursewarePage
-from ..pages.lms.matlab_problem import MatlabProblemPage
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.xqueue import XQueueResponseFixture
+from ..helpers import UniqueCourseTest
+from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.matlab_problem import MatlabProblemPage
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...fixtures.xqueue import XQueueResponseFixture
 from textwrap import dedent
 
 
