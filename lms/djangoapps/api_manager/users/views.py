@@ -26,7 +26,7 @@ from lms.lib.comment_client.utils import CommentClientRequestError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, UserBasedRole
+from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, CourseAssistantRole, UserBasedRole
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
@@ -132,8 +132,8 @@ def _manage_role(course_descriptor, user, role, action):
     """
     Helper method for managing course/forum roles
     """
-    supported_roles = ('instructor', 'staff', 'observer')
-    forum_moderator_roles = ('instructor', 'staff')
+    supported_roles = ('instructor', 'staff', 'observer', 'assistant')
+    forum_moderator_roles = ('instructor', 'staff', 'assistant')
     if role not in supported_roles:
         raise ValueError
     if action is 'allow':
@@ -161,7 +161,8 @@ def _manage_role(course_descriptor, user, role, action):
             # Before we can safely remove the corresponding forum moderator role
             user_instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
             user_staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
-            queryset = user_instructor_courses | user_staff_courses
+            user_assistant_courses = UserBasedRole(user, CourseAssistantRole.ROLE).courses_with_role()
+            queryset = user_instructor_courses | user_staff_courses | user_assistant_courses
             queryset = queryset.filter(course_id=course_descriptor.id)
             if len(queryset) == 0:
                 try:
@@ -1221,7 +1222,8 @@ class UsersRolesList(SecureListAPIView):
         instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
         staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
         observer_courses = UserBasedRole(user, CourseObserverRole.ROLE).courses_with_role()
-        queryset = instructor_courses | staff_courses | observer_courses
+        assistant_courses = UserBasedRole(user, CourseAssistantRole.ROLE).courses_with_role()
+        queryset = instructor_courses | staff_courses | observer_courses | assistant_courses
 
         course_id = self.request.QUERY_PARAMS.get('course_id', None)
         if course_id:
