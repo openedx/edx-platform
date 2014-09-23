@@ -625,7 +625,7 @@ def get_sale_order_records(request, course_id):  # pylint: disable=W0613, W0621
     db_columns = [x[0] for x in query_features]
     csv_columns = [x[1] for x in query_features]
     sale_data = instructor_analytics.basic.sale_order_record_features(course_id, db_columns)
-    header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)
+    header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)  # pylint: disable=W0612
     return instructor_analytics.csvs.create_csv_response("e-commerce_sale_order_records.csv", csv_columns, datarows)
 
 
