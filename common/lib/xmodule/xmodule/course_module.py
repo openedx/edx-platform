@@ -561,6 +561,10 @@ class CourseFields(object):
                               scope=Scope.settings)
     license = String(help="License for this course", scope=Scope.settings)
     license_version = String(help="License version for this course", scope=Scope.settings)
+    licenseable = Boolean(display_name=_("Licenseable"),
+                              help="Wheter this course and it's contents can be licensed using Creative Commons Licensing.",
+                              default=False,
+                              scope=Scope.settings)
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
