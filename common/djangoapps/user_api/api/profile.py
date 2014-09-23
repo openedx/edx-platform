@@ -1,12 +1,13 @@
 """Python API for user profiles.
 
 Profile information includes a student's demographic information and preferences,
-but does NOT include basic account information such as username, password, and 
+but does NOT include basic account information such as username, password, and
 email address.
 
 """
 from user_api.models import UserProfile
 from user_api.helpers import intercept_errors
+
 
 
 class ProfileRequestError(Exception):

@@ -1,7 +1,7 @@
 """Python API for user accounts.
 
 Account information includes a student's username, password, and email
-address, but does NOT include user profile information (i.e., demographic 
+address, but does NOT include user profile information (i.e., demographic
 information and preferences).
 
 """

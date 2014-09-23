@@ -4,12 +4,16 @@ from django.conf import settings
 from django.http import HttpResponse, QueryDict
 from django.core.mail import send_mail
 from django_future.csrf import ensure_csrf_cookie
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response, render_to_string
 from microsite_configuration import microsite
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
 
 
+@login_required
+@require_http_methods(['GET'])
 def index(request):
     """Render the account info page.
 
@@ -31,6 +35,8 @@ def index(request):
     )
 
 
+@login_required
+@require_http_methods(['PUT'])
 @ensure_csrf_cookie
 def email_change_request_handler(request):
     """Handle a request to change the user's email address.
@@ -83,6 +89,8 @@ def email_change_request_handler(request):
     return HttpResponse(status=204)
 
 
+@login_required
+@require_http_methods(['GET'])
 def email_change_confirmation_handler(request, key):
     """Complete a change of the user's email address.
 
