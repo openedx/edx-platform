@@ -96,7 +96,7 @@ masq = (function(){
   % endif
 % endif
 
-% if course.license:
+% if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.license:
   <script type="text/javascript">
         $(document).ready(function() {
           $(".copyright").append($("#license").show());

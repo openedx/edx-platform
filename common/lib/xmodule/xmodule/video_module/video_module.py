@@ -269,7 +269,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                     self.license_version = course.license_version
 
             context['license'] = parse_license(
-                self.license, 
+                self.license,
                 self.license_version
             )
         # else:
@@ -400,6 +400,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
+        if not settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            editable_fields.pop('license')
+            editable_fields.pop('license_version')
+
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
         languages.sort(key=lambda l: l['label'])
         languages.insert(0, {'label': 'Table of Contents', 'code': 'table'})
@@ -456,8 +460,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         xml.set('url_name', self.url_name)
         attrs = {
             'display_name': self.display_name,
-            'license': self.license,
-            'license_version': self.license_version,
             'show_captions': json.dumps(self.show_captions),
             'start_time': self.start_time,
             'end_time': self.end_time,
@@ -465,6 +467,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'download_track': json.dumps(self.download_track),
             'download_video': json.dumps(self.download_video),
         }
+
+        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            attrs['license'] = self.license
+            attrs['license_version'] = self.license_version
+
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
@@ -506,7 +513,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         display_name = metadata_fields['display_name']
         video_url = metadata_fields['html5_sources']
-        license = metadata_fields['license']
 
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
@@ -540,8 +546,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         metadata = {
             'display_name': display_name,
             'video_url': video_url,
-            'license': license
         }
+
+        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            metadata['license'] = metadata_fields['license']
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
         return _context
@@ -592,9 +600,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'to': 'end_time'
         }
 
-        license = xml.get('license')
-        if license is not None:
-            field_data['license_version'] = parse_license(license).version
+        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            license = xml.get('license')
+            if license is not None:
+                field_data['license_version'] = parse_license(license).version
 
         sources = xml.findall('source')
         if sources:

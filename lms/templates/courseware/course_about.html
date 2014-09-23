@@ -223,7 +223,9 @@
 
       <div class="inner-wrapper">
         ${get_course_about_section(course, "overview")}
+        % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
         ${get_course_license_section(course)}
+        % endif
       </div>
     </section>
 

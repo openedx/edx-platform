@@ -6,6 +6,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
+  from django.conf import settings
   from contentstore import utils
   import urllib
 %>
@@ -307,7 +308,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               </ol>
             </section>
           % endif
-          
+          % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
             <hr class="divide" />
             <section class="group-settings license">
               <header>
@@ -322,6 +323,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 </li>
               </ol>
             </section>
+          % endif
 
 
       </form>
