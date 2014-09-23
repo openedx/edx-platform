@@ -206,6 +206,11 @@ class CourseGroupTest(TestCase):
         add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
         self.assertTrue(user_has_role(self.assistant, CourseAssistantRole(self.course_key)))
 
+        # Add another user to the TA role
+        self.assertFalse(has_access(self.assistant, CourseAssistantRole(self.course_key)))
+        add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
+        self.assertTrue(has_access(self.assistant, CourseAssistantRole(self.course_key)))
+
     def test_add_user_to_course_group_permission_denied(self):
         """
         Verifies PermissionDenied if caller of add_user_to_course_group is not instructor role.
@@ -235,6 +240,12 @@ class CourseGroupTest(TestCase):
 
         remove_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
         self.assertFalse(user_has_role(self.assistant, CourseAssistantRole(self.course_key)))
+
+        add_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
+        self.assertTrue(has_access(self.assistant, CourseAssistantRole(self.course_key)))
+
+        remove_users(self.creator, CourseAssistantRole(self.course_key), self.assistant)
+        self.assertFalse(has_access(self.assistant, CourseAssistantRole(self.course_key)))
 
         remove_users(self.creator, CourseInstructorRole(self.course_key), self.creator)
         self.assertFalse(user_has_role(self.creator, CourseInstructorRole(self.course_key)))
