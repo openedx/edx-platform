@@ -399,3 +399,10 @@ def login_analytics(*args, **kwargs):
                 }
             }
         )
+
+@partial.partial
+def change_enrollment(*args, **kwargs):
+    try:
+        CourseEnrollment.enroll(user, 'foo')
+    except:
+        pass

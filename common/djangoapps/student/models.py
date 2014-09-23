@@ -38,13 +38,16 @@ from importlib import import_module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from opaque_keys import InvalidKeyError
 
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
+from courseware.access import has_access
 
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
@@ -818,31 +821,23 @@ class CourseEnrollment(models.Model):
 
         # All the server-side checks for whether a user is allowed to enroll.
         try:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
-        except InvalidKeyError:
-            log.warning(
-                "User {username} tried to {action} with invalid course id: {course_id}".format(
-                    username=user.username,
-                    action=action,
-                    course_id=request.POST.get("course_id")
-                )
-            )
-            raise CourseEnrollmentException
-        try:
-            course = modulestore().get_course(course_id)
+            course = modulestore().get_course(course_key)
         except ItemNotFoundError:
             log.warning(
                 "User {0} failed to enroll in non-existent course {1}".format(
                     user.username,
-                    course_id
+                    course_key.to_deprecated_string()
                 )
             )
             raise NonExistentCourseError
+        if course is None:
+            raise NonExistentCourseError
+
         if not has_access(user, 'enroll', course):
             log.warning(
                 "User {0} failed to enroll in course {1} because enrollment is closed".format(
                     user.username,
-                    course_id
+                    course_key.to_deprecated_string()
                 )
             )
             raise EnrollmentClosedError
@@ -850,15 +845,15 @@ class CourseEnrollment(models.Model):
             log.warning(
                 "User {0} failed to enroll in full course {1}".format(
                     user.username,
-                    course_id
+                    course_key.to_deprecated_string()
                 )
             )
             raise CourseFullError
-        if CourseEnrollment.is_enrolled(user, course_id):
+        if CourseEnrollment.is_enrolled(user, course_key):
             log.warning(
                 "User {0} attempted to enroll in {1}, but they were already enrolled".format(
                     user.username,
-                    course_id
+                    course_key.to_deprecated_string()
                 )
             )
             raise AlreadyEnrolledError

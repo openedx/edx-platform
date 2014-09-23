@@ -669,6 +669,18 @@ def change_enrollment(request, auto_register=False):
     if 'course_id' not in request.POST:
         return HttpResponseBadRequest(_("Course id not specified"))
 
+    try:
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
+    except InvalidKeyError:
+        log.warning(
+            "User {username} tried to {action} with invalid course id: {course_id}".format(
+                username=user.username,
+                action=action,
+                course_id=request.POST.get("course_id")
+            )
+        )
+        return HttpResponseBadRequest(_("Invalid course id"))
+
     # Ensure the user is authenticated
     if not user.is_authenticated():
         return HttpResponseForbidden()
@@ -721,7 +733,7 @@ def change_enrollment(request, auto_register=False):
                 # for no such model to exist, even though we've set the enrollment type
                 # to "honor".
                 try:
-                    CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
+                    CourseEnrollment.enroll(user, course_id, mode=current_mode.slug)
                 except Exception:
                     return HttpResponseBadRequest(_("Could not enroll"))
 
@@ -757,7 +769,7 @@ def change_enrollment(request, auto_register=False):
                 )
 
             try:
-                CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
+                CourseEnrollment.enroll(user, course_id, mode=current_mode.slug)
             except Exception:
                 return HttpResponseBadRequest(_("Could not enroll"))
 

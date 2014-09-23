@@ -14,11 +14,9 @@ from xmodule.x_module import XModule
 
 from xblock.core import XBlock
 
-from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
-from student.models import CourseEnrollment
 from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
@@ -125,6 +123,7 @@ def _has_access_course_desc(user, action, course):
         """
         Can this user access the forums in this course?
         """
+        from student.models import CourseEnrollment
         return (
             can_load() and
             (
@@ -149,6 +148,7 @@ def _has_access_course_desc(user, action, course):
         """
 
         # if using registration method to restrict (say shibboleth)
+        from student.models import CourseEnrollmentAllowed
         if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
             if user is not None and user.is_authenticated() and \
                 ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
