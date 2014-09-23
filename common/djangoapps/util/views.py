@@ -11,6 +11,7 @@ from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
 from dogapi import dog_stats_api
 from edxmako.shortcuts import render_to_response
 import zendesk
+from microsite_configuration import microsite
 
 import calc
 import track.views
@@ -186,6 +187,11 @@ def submit_feedback(request):
     tags = dict(
         [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
     )
+
+    # White Labels (aka Microsites) will add a tag to allow for different ZenDesk routing
+    white_label_site = microsite.get_value('university')
+    if white_label_site:
+        tags['white_label'] = white_label_site
 
     if request.user.is_authenticated():
         realname = request.user.profile.name
