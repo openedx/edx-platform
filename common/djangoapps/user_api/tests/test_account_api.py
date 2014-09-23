@@ -3,12 +3,10 @@
 
 import unittest
 from nose.tools import raises
-import mock
 import ddt
 from dateutil.parser import parse as parse_datetime
 from django.conf import settings
 from django.test import TestCase
-from django.db import DatabaseError
 from user_api.api import account as account_api
 from user_api.models import UserProfile
 
