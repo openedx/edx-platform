@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-17 20:48+0000\n"
-"PO-Revision-Date: 2014-09-17 20:49:46.533441\n"
+"POT-Creation-Date: 2014-09-23 15:37-0400\n"
+"PO-Revision-Date: 2014-09-23 19:38:42.469235\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2373,6 +2373,33 @@ msgstr "Çlösé Çälçülätör Ⱡ'σ#"
 msgid "Post body"
 msgstr "Pöst ßödý #"
 
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "Error fetching distribution."
+msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
+
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
@@ -2401,22 +2428,6 @@ msgid ""
 msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"

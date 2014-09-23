@@ -22,6 +22,7 @@
 # Lulatini <lulatini@gmail.com>, 2014
 # Marcelo Soares Souza <marcelo@juntadados.org>, 2014
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
+# Mariana Baroni <maribaroni@gmail.com>, 2014
 # Matheus Andrade <matheusflkandrade@hotmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
@@ -30,6 +31,7 @@
 # Renata Barboza-Murray, 2013-2014
 # Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
 # RODRIGOR77 <rodrigo_magalhaes_rodrigues_alve@yahoo.com.br>, 2014
+# Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
 # wesleyide <wesley36@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -60,6 +62,7 @@
 # 
 # Translators:
 # lukassem <lucas_sem@hotmail.com>, 2014
+# Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -78,7 +81,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-16 08:57-0400\n"
+"POT-Creation-Date: 2014-09-23 15:15-0400\n"
 "PO-Revision-Date: 2014-09-01 20:40+0000\n"
 "Last-Translator: Marco Túlio Pires <mtrpires@outlook.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -1554,6 +1557,38 @@ msgstr ""
 "SequenceModule atual. Por favor, entre em contato com a equipe do curso."
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Play"
+msgstr "Reproduzir"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Pause"
+msgstr "Pausar"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Mute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Unmute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Exit full browser"
+msgstr "Sair da tela cheia do navegador"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Fill browser"
+msgstr "Ocupar todo o navegador"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
 msgstr "Volume"
 
@@ -1609,22 +1644,6 @@ msgstr "Tente usar um navegador diferente, como o Google Chrome."
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
 msgstr "Barra deslizante do vídeo"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Pause"
-msgstr "Pausar"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Play"
-msgstr "Reproduzir"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Fill browser"
-msgstr "Ocupar todo o navegador"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Exit full browser"
-msgstr "Sair da tela cheia do navegador"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"

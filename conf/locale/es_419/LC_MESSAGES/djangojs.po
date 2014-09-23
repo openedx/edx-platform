@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-16 08:57-0400\n"
+"POT-Creation-Date: 2014-09-23 15:15-0400\n"
 "PO-Revision-Date: 2014-08-28 20:51+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -1578,6 +1578,38 @@ msgstr ""
 "curso."
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Play"
+msgstr "Reproducir"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Pause"
+msgstr "Pausar"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Mute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Unmute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Exit full browser"
+msgstr "Salir del navegador expandido"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Fill browser"
+msgstr "Expandir el navegador"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
 msgstr "Volumen"
 
@@ -1634,22 +1666,6 @@ msgstr "Intente usar otro navegador. Por ejemplo Google Chrome."
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
 msgstr "Barra de desplazamiento del video"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Pause"
-msgstr "Pausar"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Play"
-msgstr "Reproducir"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Fill browser"
-msgstr "Expandir el navegador"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Exit full browser"
-msgstr "Salir del navegador expandido"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
