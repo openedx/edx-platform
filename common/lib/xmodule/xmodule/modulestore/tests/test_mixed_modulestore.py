@@ -245,7 +245,8 @@ class TestMixedModuleStore(CourseComparisonTest):
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
 
-        self.fake_location = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('vertical', 'fake')
+        mongo_course_key = self.course_locations[self.MONGO_COURSEID].course_key
+        self.fake_location = self.store.make_course_key(mongo_course_key.org, mongo_course_key.course, mongo_course_key.run).make_usage_key('vertical', 'fake')
 
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'

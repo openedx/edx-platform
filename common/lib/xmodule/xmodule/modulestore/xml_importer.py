@@ -42,6 +42,7 @@ from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -588,6 +589,7 @@ def _import_course_draft(
 
                             # IMPORTANT: Be sure to update the sequential in the NEW namespace
                             seq_location = seq_location.map_into_course(target_course_id)
+
                             sequential = store.get_item(seq_location, depth=0)
 
                             non_draft_location = module.location.map_into_course(target_course_id)

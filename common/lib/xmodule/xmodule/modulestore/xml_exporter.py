@@ -85,16 +85,16 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
                         course_image_file.write(course_image.data)
 
         # export the static tabs
-        export_extra_content(export_fs, modulestore, xml_centric_course_key, 'static_tab', 'tabs', '.html')
+        export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'static_tab', 'tabs', '.html')
 
         # export the custom tags
-        export_extra_content(export_fs, modulestore, xml_centric_course_key, 'custom_tag_template', 'custom_tags')
+        export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'custom_tag_template', 'custom_tags')
 
         # export the course updates
-        export_extra_content(export_fs, modulestore, xml_centric_course_key, 'course_info', 'info', '.html')
+        export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'course_info', 'info', '.html')
 
         # export the 'about' data (e.g. overview, etc.)
-        export_extra_content(export_fs, modulestore, xml_centric_course_key, 'about', 'about', '.html')
+        export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'about', 'about', '.html')
 
         # export the grading policy
         course_run_policy_dir = policies_dir.makeopendir(course.location.name)
@@ -183,13 +183,13 @@ def _export_field_content(xblock_item, item_dir):
                     field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
 
-def export_extra_content(export_fs, modulestore, course_key, category_type, dirname, file_suffix=''):
-    items = modulestore.get_items(course_key, qualifiers={'category': category_type})
+def export_extra_content(export_fs, modulestore, source_course_key, dest_course_key, category_type, dirname, file_suffix=''):
+    items = modulestore.get_items(source_course_key, qualifiers={'category': category_type})
 
     if len(items) > 0:
         item_dir = export_fs.makeopendir(dirname)
         for item in items:
-            adapt_references(item, course_key, export_fs)
+            adapt_references(item, dest_course_key, export_fs)
             with item_dir.open(item.location.name + file_suffix, 'w') as item_file:
                 item_file.write(item.data.encode('utf8'))
 
