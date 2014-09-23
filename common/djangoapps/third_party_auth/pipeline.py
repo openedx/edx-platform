@@ -69,6 +69,9 @@ from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 
+from student.models import CourseEnrollment
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 from . import provider
 
 
@@ -369,6 +372,7 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
 
 @partial.partial
 def login_analytics(*args, **kwargs):
+    """ Sends login info to Segment.io """
     event_name = None
 
     action_to_event_name = {
@@ -402,7 +406,17 @@ def login_analytics(*args, **kwargs):
 
 @partial.partial
 def change_enrollment(*args, **kwargs):
-    try:
-        CourseEnrollment.enroll(user, 'foo')
-    except:
-        pass
+    """
+    If the user accessed the third party auth flow after trying to register for
+    a course, we automatically log them into that course.
+    """
+    if kwargs['strategy'].session_get('registration_course_id'):
+        try:
+            CourseEnrollment.enroll(
+                kwargs['user'],
+                SlashSeparatedCourseKey.from_deprecated_string(
+                    kwargs['strategy'].session_get('registration_course_id')
+                )
+            )
+        except:
+            pass
