@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-17 20:49+0000\n"
-"PO-Revision-Date: 2014-09-17 20:49:46.218598\n"
+"POT-Creation-Date: 2014-09-23 15:38-0400\n"
+"PO-Revision-Date: 2014-09-23 19:38:42.421614\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2653,6 +2653,12 @@ msgstr ""
 "Týpé ïn nümßér çörréspöndïng tö föllöwïng mödés:  'ïnstrüçtör' ör 'évérýöné'"
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "No email address found."
+msgstr "Nö émäïl äddréss föünd. Ⱡ'σяє#"
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
@@ -2771,45 +2777,6 @@ msgstr ""
 "wïth än éxtérnäl grädïng  sýstém räthér thän läünçh än éxtérnäl tööl.  Thïs "
 "séttïng hïdés thé Läünçh ßüttön änd äný ÌFrämés för thïs çömpönént. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Request user's username"
-msgstr "Réqüést üsér's üsérnämé Ⱡ'σяє#"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Requesting user's username will only work if 'Open in a new page' is set to "
-"True"
-msgstr ""
-"Réqüéstïng üsér's üsérnämé wïll önlý wörk ïf 'Öpén ïn ä néw pägé' ïs sét tö "
-"Trüé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Request user's email"
-msgstr "Réqüést üsér's émäïl Ⱡ'σя#"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Requesting user's email will only work if 'Open in a new page' is set to "
-"True"
-msgstr ""
-"Réqüéstïng üsér's émäïl wïll önlý wörk ïf 'Öpén ïn ä néw pägé' ïs sét tö "
-"Trüé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "LTI Application Information"
-msgstr "LTÌ Àpplïçätïön Ìnförmätïön Ⱡ'σяєм#"
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Provide a description of the third party application. If requesting username"
-" and/or email, use this text box to inform users that their username and/or "
-"email will be forwarded to a third party application."
-msgstr ""
-"Prövïdé ä désçrïptïön öf thé thïrd pärtý äpplïçätïön. Ìf réqüéstïng üsérnämé"
-" änd/ör émäïl, üsé thïs téxt ßöx tö ïnförm üsérs thät théïr üsérnämé änd/ör "
-"émäïl wïll ßé förwärdéd tö ä thïrd pärtý äpplïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ#"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -7716,9 +7683,16 @@ msgstr "Lïnk Ⱡ'σяєм#"
 msgid "Reset Password"
 msgstr "Rését Pässwörd Ⱡ'#"
 
+#: lms/templates/dashboard.html lms/templates/original_navigation.html
+#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/courseware/courses.html
+msgid "Courses"
+msgstr "Çöürsés #"
+
 #: lms/templates/dashboard.html
-msgid "Current Courses"
-msgstr "Çürrént Çöürsés Ⱡ'#"
+msgid "ordered by recent activity"
+msgstr "ördéréd ßý réçént äçtïvïtý Ⱡ'σяєм#"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
@@ -8585,13 +8559,6 @@ msgstr ""
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
 msgstr "Ýöü dö nöt hävé äný nötés. Ⱡ'σяєм#"
-
-#: lms/templates/original_navigation.html
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
-msgid "Courses"
-msgstr "Çöürsés #"
 
 #: lms/templates/original_navigation.html
 msgid "Schools"
@@ -9674,8 +9641,20 @@ msgid "Staff view"
 msgstr "Stäff vïéw Ⱡ#"
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Course is not yet visible to students."
+msgstr "Çöürsé ïs nöt ýét vïsïßlé tö stüdénts. Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student view"
 msgstr "Stüdént vïéw Ⱡ#"
+
+#: lms/templates/courseware/course_navigation.html
+msgid ""
+"You cannot view the course as a student or beta tester before the course "
+"release date."
+msgstr ""
+"Ýöü çännöt vïéw thé çöürsé äs ä stüdént ör ßétä téstér ßéföré thé çöürsé "
+"réléäsé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from leading universities."
@@ -9834,6 +9813,18 @@ msgstr "Séärçh stüdénts Ⱡ'#"
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
 msgstr "{course_number} Çöürsé Ìnfö Ⱡ'#"
+
+#: lms/templates/courseware/info.html
+msgid "You are not enrolled yet"
+msgstr "Ýöü äré nöt énrölléd ýét Ⱡ'σяє#"
+
+#: lms/templates/courseware/info.html
+msgid ""
+"You are not currently enrolled in this course. Sign up for it "
+"{link_start}here{link_end}!"
+msgstr ""
+"Ýöü äré nöt çürréntlý énrölléd ïn thïs çöürsé. Sïgn üp för ït "
+"{link_start}héré{link_end}! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
@@ -10550,6 +10541,12 @@ msgstr "Énrölléd äs:  Ⱡ'#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "Verified"
 msgstr "Vérïfïéd #"
 
@@ -13545,12 +13542,6 @@ msgid "Registered as: "
 msgstr "Régïstéréd äs:  Ⱡ'#"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "ID Verified"
 msgstr "ÌD Vérïfïéd Ⱡ#"
 
@@ -13890,6 +13881,10 @@ msgstr "Ýöü äré ré-vérïfýïng för Ⱡ'σяє#"
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "Ýöü äré régïstérïng för Ⱡ'σяє#"
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
+msgstr "Pröféssïönäl Édüçätïön Ⱡ'σяє#"
 
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
