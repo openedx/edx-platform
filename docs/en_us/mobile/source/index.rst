@@ -4,13 +4,11 @@
    contain the root `toctree` directive.
 
 
-Information for Students
+Mobile FAQ for Students
 ========================================
 
 .. toctree::
    :numbered:
    :maxdepth: 2
 
-   SFD_certificates
-   SFD_mathformatting
-   SFD_ORA
+   SFD_mobileFAQ

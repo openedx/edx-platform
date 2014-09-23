@@ -12,35 +12,37 @@ General Questions
 
 * **How do I get the mobile app?**
 
+  INSTRUCTIONS TO BE ADDED - WAITING FOR REVIEW
+
 * **How much does the app cost?**
 
-  The app is free. You don't have to pay or buy anything to use it.
+  The app is free. You don't have to pay or buy anything to download or use it.
 
 * **What platforms does the app run on?**
 
-  Our current beta app is available for Android smartphones. We're working to make it available on Android tablets, iPhones, and iPads.
+  Our current beta app is available for Android smartphones. We're also working to make it available on Android tablets, iPhones, and iPads.
 
 * **Which courses are available in the mobile app?**
 
   The following courses are currently available for the mobile beta:
 
-	* `edX - DemoX<https://www.edx.org/course/edx/edx-demox-1-demox-4116#.VCGNfytdUZY>`_: A fun and interactive course designed to help you explore the edX learning experience. Perfect to take before you start your course.
-	* ~HarvardX - Poetry in America<https://www.edx.org/course/harvardx/harvardx-ampox-1-poetry-america-poetry-2856#.VA9A57ywLfE>`_: The Poetry of Early New England:  This course, the first installment of the multi-part Poetry in America series, covers American poetry in cultural context through the year 1700. We begin with Puritan poets—some orthodox, some rebel spirits—who wrote and lived in early New England.
-	* `MITx - The Global History of Architecture, Part 1<https://www.edx.org/course/mitx/mitx-4-605x-global-history-architecture-2721#.VA9BebywLfE>`_: This course is a history of architecture from a global perspective.
-	* `MITx - Circuits and Electronics<https://www.edx.org/course/mitx/mitx-6-002x-circuits-electronics-2606#.VA9BKrywLfE>`_: Teaches the fundamentals of circuit and electronic analysis.
-	* `DelftX - Solar Energy<https://www.edx.org/course/delftx/delftx-et-3034tu-solar-energy-1996#.VA9AQrywLfE>`_:  Discover the power of solar energy and design a complete photovoltaic system.
-	* `LouvainX - Computer Programming<https://www.edx.org/course/louvainx/louvainx-louv1-1x-paradigms-computer-2751#.VA9B1LywLfE>`_:  This course covers functional, object-oriented, and declarative dataflow programming in a unified framework, with practical code fragments and simple semantics.
-	* `LouvainX -  Découvrir la science politique<https://www.edx.org/course/louvainx/louvainx-louv3x-decouvrir-la-science-2706#.VA9CILywLfE>`_: Décoder des enjeux politiques actuels à partir d’une boîte à outils de concepts fondamentaux et de postures critiques de la science politique. (Offered in French.)
-	* `UQx - Anthropology of Current World Issues<https://www.edx.org/course/uqx/uqx-world101x-anthropology-current-world-1666#.VA9CYbywLfE>`_: How is anthropology changing the world and what can you learn from this?
+	* `edX - DemoX <https://www.edx.org/course/edx/edx-demox-1-demox-4116#.VCGNfytdUZY>`_: A fun and interactive course designed to help you explore the edX learning experience. Perfect to take before you start your course.
+	* `HarvardX - Poetry in America: The Poetry of Early New England <https://www.edx.org/course/harvardx/harvardx-ampox-1-poetry-america-poetry-2856#.VA9A57ywLfE>`_: This course, the first installment of the multi-part Poetry in America series, covers American poetry in cultural context through the year 1700. We begin with Puritan poets—some orthodox, some rebel spirits—who wrote and lived in early New England.
+	* `MITx - The Global History of Architecture, Part 1 <https://www.edx.org/course/mitx/mitx-4-605x-global-history-architecture-2721#.VA9BebywLfE>`_: This course is a history of architecture from a global perspective.
+	* `MITx - Circuits and Electronics <https://www.edx.org/course/mitx/mitx-6-002x-circuits-electronics-2606#.VA9BKrywLfE>`_: Teaches the fundamentals of circuit and electronic analysis.
+	* `DelftX - Solar Energy <https://www.edx.org/course/delftx/delftx-et-3034tu-solar-energy-1996#.VA9AQrywLfE>`_:  Discover the power of solar energy and design a complete photovoltaic system.
+	* `LouvainX - Computer Programming <https://www.edx.org/course/louvainx/louvainx-louv1-1x-paradigms-computer-2751#.VA9B1LywLfE>`_:  This course covers functional, object-oriented, and declarative dataflow programming in a unified framework, with practical code fragments and simple semantics.
+	* `LouvainX -  Découvrir la science politique <https://www.edx.org/course/louvainx/louvainx-louv3x-decouvrir-la-science-2706#.VA9CILywLfE>`_: Décoder des enjeux politiques actuels à partir d’une boîte à outils de concepts fondamentaux et de postures critiques de la science politique. (Offered in French.)
+	* `UQx - Anthropology of Current World Issues <https://www.edx.org/course/uqx/uqx-world101x-anthropology-current-world-1666#.VA9CYbywLfE>`_: How is anthropology changing the world and what can you learn from this?
 
 
 * **Can I take a course entirely on my mobile device?**
    
-   This beta version of our mobile app is a companion app that you can use to watch course videos and see announcements and handouts. To complete readings and homework problems, you can tap **View on Web** in the bottom right corner of any screen to access the content in your browser, or you can complete assignments on your computer.
+   This beta version of our mobile app is a companion app that you can use to watch course videos and see announcements and handouts. To complete readings, homework problems, and exams, you can tap **View on Web** in the bottom right corner of any screen to access the content in your browser, or you can complete assignments on your computer.
 
 * **How do I post questions on the discussion board?**
 
-  Right now, you can't participate in discussions by using the app. However, when you tap View on Web in the bottom right corner of any screen, the course opens in your browser. You can then tap the Discussion tab in your course to participate in discussions. 
+  Right now, you can't participate in discussions by using the app. However, when you tap **View on Web** in the bottom right corner of any screen, the course opens in your browser. You can then tap the **Discussion** tab in your course to participate in discussions. 
 
 * **How do I change my download settings?**
 
@@ -55,7 +57,7 @@ General Questions
 
 * **How can I send questions or comments to edX?**
 
-  We'd love to receive your feedback on this beta version of our mobile app. In the app home page, tap the menu in the upper left corner, and then tap Submit Feedback. 
+  We'd love to receive your feedback on this beta version of our mobile app. In the app home page, tap the menu in the upper left corner, and then tap **Submit Feedback**. 
 
 
 .. _Video Questions:
@@ -72,7 +74,7 @@ Video Questions
 
 * **How much data will the videos in this app use?**
 
-  Course videos are optimized for mobile playback, but watching or downloading any video can result in heavy data use. We recommend using a Wi-Fi connection if you intend to watch or download a lot of videos. The edX app has a Download only on Wi-Fi setting that's enabled by default to help you avoid using your cellular network accidentally.
+  Course videos are optimized for mobile playback, but watching or downloading any video can result in heavy data use. We recommend using a Wi-Fi connection if you intend to watch or download a lot of videos. The edX app has a **Download only on Wi-Fi** setting that's enabled by default to help you avoid using your cellular network accidentally.
 
 * **What are the numbers to the right of section and subsection names?**
 
@@ -82,7 +84,7 @@ Video Questions
 
 * **What are the circles to the left of the video name?**
 
-  The circle indicates whether you've watched a video. A blue circle means you haven't started watching the video. A half-filled circle means you've watched part of the video.
+  The circle indicates whether you've watched a video. A blue circle means that you haven't started watching the video. A half-filled circle means that you've watched part of the video. A gray circle means that you've watched the entire video.
 
 * **How can I make the video full screen?**
 
@@ -119,14 +121,7 @@ Troubleshooting
 
 * **I get a "This video is not available" screen when I try to watch a video. What can I do?**
 
-  Make sure you have an internet connection. If you do, check back later. You can also tell us about it via Submit Feedback
-
-  If you run into problems, make sure you have an Internet connection. If problems persist, let us know: go to the home page, tap the menu in the upper left corner, and then tap **Submit Feedback**. 
-
-
-
-
-
+  If you run into problems, make sure you have an Internet connection. If problems persist, let us know: go to the app home page, tap the menu in the upper left corner, and then tap **Submit Feedback**. 
 
 
 
