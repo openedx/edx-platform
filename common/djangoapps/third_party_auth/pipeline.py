@@ -69,8 +69,10 @@ from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseEnrollmentException
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from logging import getLogger
 
 from . import provider
 
@@ -86,6 +88,8 @@ _AUTH_ENTRY_CHOICES = frozenset([
 ])
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
 _PASSWORD_CHARSET = string.letters + string.digits
+
+logger = getLogger(__name__)
 
 
 class AuthEntryError(AuthException):
@@ -404,7 +408,7 @@ def login_analytics(*args, **kwargs):
             }
         )
 
-@partial.partial
+#@partial.partial
 def change_enrollment(*args, **kwargs):
     """
     If the user accessed the third party auth flow after trying to register for
@@ -418,5 +422,7 @@ def change_enrollment(*args, **kwargs):
                     kwargs['strategy'].session_get('registration_course_id')
                 )
             )
-        except:
+        except CourseEnrollmentException:
             pass
+        except Exception, e:
+            logger.exception(e)

@@ -13,9 +13,12 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+from social.strategies.django_strategy import DjangoStrategy
+from django.test.client import RequestFactory
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment
-
+from student.views import register_user
+from third_party_auth.pipeline import change_enrollment as change_enrollment_third_party
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
@@ -152,6 +155,25 @@ class EnrollmentTest(ModuleStoreTestCase):
         # Expect that the auto register flag is still set in the user's session
         self.assertIn('auto_register', self.client.session)
         self.assertTrue(self.client.session['auto_register'])
+
+    def test_enroll_from_redirect_autoreg_third_party(self):
+        """
+        Test that, when a user visits the registration page *after* visiting a course,
+        if they go on to register and/or log in via third-party auth, they'll be registered
+        in that course.
+
+        The testing here is a bit hackish, since we just ping the registration page, then
+        directly call the step in the third party pipeline that registers the user if
+        `registration_course_id` is set in the session, but it should catch any major breaks.
+        """
+        self.client.logout()
+        self.client.get(reverse('register_user'), {'course_id': self.course.id})
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.dummy_request = RequestFactory().request()
+        self.dummy_request.session = self.client.session
+        strategy = DjangoStrategy(RequestFactory, request=self.dummy_request)
+        change_enrollment_third_party(is_register=True, strategy=strategy, user=self.user)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
     # TODO (ECOM-16): Remove once the auto-registration A/B test completes
     def test_enroll_auto_registration_excluded_course(self):
