@@ -9,7 +9,6 @@ from user_api.models import UserProfile
 from user_api.helpers import intercept_errors
 
 
-
 class ProfileRequestError(Exception):
     """ The request to the API was not valid. """
     pass

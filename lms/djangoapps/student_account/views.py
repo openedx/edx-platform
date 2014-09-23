@@ -1,7 +1,8 @@
 """ Views for a student's account information. """
 
 from django.conf import settings
-from django.http import HttpResponse, QueryDict
+from django.http import (QueryDict, HttpResponse, HttpResponseBadRequest, 
+                         HttpResponseServerError)
 from django.core.mail import send_mail
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
@@ -22,8 +23,8 @@ def index(request):
 
     Returns:
         HttpResponse: 200 if the index page was sent successfully
-        HttpResponse: 405 if using an unsupported HTTP method
         HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 405 if using an unsupported HTTP method
 
     Example usage:
 
@@ -49,8 +50,12 @@ def email_change_request_handler(request):
     Returns:
         HttpResponse: 204 if the confirmation email was sent successfully
         HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 400 if the format of the new email is incorrect
         HttpResponse: 401 if the provided password (in the form) is incorrect
         HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 409 if the provided email is already in use
+        HttpResponse: 500 if the user to which the email change will be applied 
+                          does not exist
 
     Example usage:
 
@@ -66,14 +71,21 @@ def email_change_request_handler(request):
 
     username = user.username
     old_email = profile_api.profile_info(username)['email']
-    new_email = put.get('new-email')
+    new_email = put.get('new_email')
 
-    key = account_api.request_email_change(username, new_email, password)
+    try:
+        key = account_api.request_email_change(username, new_email, password)
+    except account_api.AccountUserNotFound:
+        return HttpResponseServerError()
+    except account_api.AccountEmailAlreadyExists:
+        return HttpResponse(status=409)
+    except account_api.AccountEmailInvalid:
+        return HttpResponseBadRequest()
 
     context = {
         'key': key,
         'old_email': old_email,
-        'new_email': new_email
+        'new_email': new_email,
     }
 
     subject = render_to_string('student_account/emails/email_change_request/subject_line.txt', context)
@@ -105,7 +117,10 @@ def email_change_confirmation_handler(request, key):
         request (HttpRequest)
 
     Returns:
-        HttpResponse: 200 if the email was changed successfully
+        HttpResponse: 200 if the email change is successful, the activation key
+                          is invalid, the new email is already in use, or the 
+                          user to which the email change will be applied does 
+                          not exist
         HttpResponse: 302 if not logged in (redirect to login page)
         HttpResponse: 405 if using an unsupported HTTP method
 
@@ -114,12 +129,33 @@ def email_change_confirmation_handler(request, key):
         GET /account/email_change_confirm/{key}
 
     """
-    # Need to catch and handle exceptions
-    old_email, new_email = account_api.confirm_email_change(key)
+    try:
+        old_email, new_email = account_api.confirm_email_change(key)
+    except account_api.AccountNotAuthorized:
+        return render_to_response(
+            'student_account/email_change_failed.html', {
+                'disable_courseware_js': True,
+                'error': 'key_invalid',
+            }
+        )
+    except account_api.AccountEmailAlreadyExists:
+        return render_to_response(
+            'student_account/email_change_failed.html', {
+                'disable_courseware_js': True,
+                'error': 'email_used',
+            }
+        )
+    except account_api.AccountInternalError:
+        return render_to_response(
+            'student_account/email_change_failed.html', {
+                'disable_courseware_js': True,
+                'error': 'internal',
+            }
+        )
 
     context = {
         'old_email': old_email,
-        'new_email': new_email
+        'new_email': new_email,
     }
 
     subject = render_to_string('student_account/emails/email_change_confirmation/subject_line.txt', context)
