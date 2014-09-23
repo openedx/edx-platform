@@ -20,7 +20,7 @@ var AssetView = BaseView.extend({
       thumbnail: this.model.get('thumbnail'),
       date_added: this.model.get('date_added'),
       url: this.model.get('url'),
-      licenseable: this.model.get('licenseable'),
+      licenseable: this.licenseable,
       license_img: this.licenseSelector.img(),
       external_url: this.model.get('external_url'),
       portable_url: this.model.get('portable_url'),

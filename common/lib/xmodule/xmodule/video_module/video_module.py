@@ -259,22 +259,18 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         }
 
         # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
-        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
-            if not(self.license):
-                course_id = module_attr('course_id')
-                if course_id is not None and hasattr(self.runtime, 'modulestore'):
-                    course = self.runtime.modulestore.get_course(course_id)
-
+        course_id = module_attr('course_id')
+        if course_id is not None and hasattr(self.runtime, 'modulestore'):
+            course = self.runtime.modulestore.get_course(course_id)
+            if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.licenseable:
+                if not(self.license):
                     self.license = course.license
                     self.license_version = course.license_version
 
-            context['license'] = parse_license(
-                self.license,
-                self.license_version
-            )
-        # else:
-        #     self.license = None
-        #     self.license_version = None
+                context['license'] = parse_license(
+                    self.license,
+                    self.license_version
+                )
 
         return self.system.render_template('video.html', context)
 

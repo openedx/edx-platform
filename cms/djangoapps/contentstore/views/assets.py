@@ -203,7 +203,7 @@ def _upload_asset(request, course_key):
     if thumbnail_content is not None:
         content.thumbnail_location = thumbnail_location
 
-    if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False):
+    if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and course_module.licenseable:
         # Set default license
         content.license = course_module.license
         content.license_version = course_module.license_version
@@ -280,7 +280,16 @@ def _update_asset(request, course_key, asset_key):
 
             contentstore().set_attr(asset_key, 'locked', modified_asset['locked'])
 
-            if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False):
+            # Does the course actually exist?!? Get anything from it to prove its
+            # existence
+            try:
+                course_module = modulestore().get_course(course_key)
+            except ItemNotFoundError:
+                # no return it as a Bad Request response
+                logging.error("Could not find course: %s", course_key)
+                return HttpResponseBadRequest()
+
+            if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and course_module.licenseable:
                 contentstore().set_attr(asset_key, 'license', modified_asset['license'])
                 contentstore().set_attr(asset_key, 'license_version', parse_license(modified_asset['license']).version)
 
@@ -305,7 +314,6 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked, li
         'external_url': external_url,
         'license': license,
         'license_version': license_version,
-        'licenseable': settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False),
         'portable_url': StaticContent.get_static_path_from_location(location),
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,

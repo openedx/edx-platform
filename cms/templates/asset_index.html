@@ -28,7 +28,7 @@
         var assetsView = new AssetsView({
             collection: assets, el: $('.assets-wrapper'),
 
-            % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and context_course.licenseable:
             licenseable: true
             % else:
             licenseable: false
@@ -115,7 +115,7 @@
     </div>
 </div>
 
-% if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False):
+% if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and context_course.licenseable:
 <div class="change-license-modal modal">
     <a href="#" class="close-button"><i class="icon-remove-sign"></i> <span class="sr">${_('close')}</span></a>
     <div class="modal-body">

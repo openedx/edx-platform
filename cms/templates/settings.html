@@ -308,7 +308,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               </ol>
             </section>
           % endif
-          % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+          % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and context_course.licenseable:
             <hr class="divide" />
             <section class="group-settings license">
               <header>

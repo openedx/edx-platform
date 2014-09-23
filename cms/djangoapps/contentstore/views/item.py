@@ -458,7 +458,6 @@ def _create_item(request):
     category = request.json['category']
 
     display_name = request.json.get('display_name')
-    license = request.json.get('license')
 
     if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
@@ -468,28 +467,21 @@ def _create_item(request):
         parent = store.get_item(usage_key)
         dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
 
-        # get the metadata, display_name, and definition from the request
-        metadata = {}
-        data = None
-        template_id = request.json.get('boilerplate')
-        if template_id:
-            clz = parent.runtime.load_block_type(category)
-            if clz is not None:
-                template = clz.get_template(template_id)
-                if template is not None:
-                    metadata = template.get('metadata', {})
-                    data = template.get('data')
+    # get the metadata, display_name, and definition from the request
+    metadata = {}
+    data = None
+    template_id = request.json.get('boilerplate')
+    if template_id:
+        clz = parent.runtime.load_block_type(category)
+        if clz is not None:
+            template = clz.get_template(template_id)
+            if template is not None:
+                metadata = template.get('metadata', {})
+                data = template.get('data')
 
         if display_name is not None:
             metadata['display_name'] = display_name
 
-    if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and license is not None:
-        metadata['license'] = license
-        metadata['license_version'] = parse_license(license).version
-        # TODO need to fix components that are sending definition_data as strings, instead of as dicts
-        # For now, migrate them into dicts here.
-        if isinstance(data, basestring):
-            data = {'data': data}
 
         created_block = store.create_child(
             request.user.id,
@@ -515,7 +507,16 @@ def _create_item(request):
             )
             store.update_item(course, request.user.id)
 
-        return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
+        if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and course.licenseable:
+            license = request.json.get('license')
+            if license is not None:
+                metadata['license'] = license
+                metadata['license_version'] = parse_license(license).version
+            else:
+                metadata['license'] = course.license
+                metadata['license_version'] = course.license_version
+
+    return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
