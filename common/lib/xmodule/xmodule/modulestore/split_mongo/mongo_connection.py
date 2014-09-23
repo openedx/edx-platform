@@ -268,18 +268,17 @@ class MongoConnection(object):
         return self.definitions.find_one({'_id': key})
 
     @autoretry_read()
-    def find_matching_definitions(self, query):
+    def get_definitions(self, definitions):
         """
-        Find the definitions matching the query. Right now the query must be a legal mongo query
-        :param query: a mongo-style query of {key: [value|{$in ..}|..], ..}
+        Retrieve all definitions listed in `definitions`.
         """
-        return self.definitions.find(query)
+        return self.definitions.find({'$in': {'_id': definitions}})
 
-    def insert_definition(self, definition):
+    def upsert_definition(self, definition):
         """
         Create the definition in the db
         """
-        self.definitions.insert(definition)
+        self.definitions.update({'_id': definition['_id']}, definition, upsert=True)
 
     def ensure_indexes(self):
         """
