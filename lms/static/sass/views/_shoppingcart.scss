@@ -267,6 +267,19 @@
 }
 
 .shopping-cart{
+  a.blue{
+      display: inline-block;
+      background: $blue2;
+      color: white;
+      padding: 20px 40px;
+      border-radius: 3px;
+      font-size: 24px;
+      font-weight: 400;
+      margin: 10px 0px 20px;
+      &:hover{
+        text-decoration: none;
+      }
+    }
   input[type="text"], input[type="email"] , select{
         font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
         font-style: normal;
@@ -544,6 +557,26 @@
       overflow: hidden;
       padding-bottom: 20px;
       border-bottom: 2px solid #f2f2f2;
+      .row-inside {
+        float: left;
+        width: 50%;
+        padding: 10px 0;
+        b{
+          font-size: 14px;
+          width: 190px;
+          display: inline-block;
+          margin-right: 20px;
+          font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+        }
+        label{
+          width: 300px;
+          margin: 0px;
+          display: inline-block;
+          font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+          font-style: normal;
+          font-size: 14px;
+        }
+      }
       .col-1{
         width: 50%;
         float: left;
@@ -670,6 +703,104 @@
     display: block;
     padding-bottom: 0;
   }
+  .gray-bg{
+    background: $light-gray1;
+    border-radius: 3px;
+    padding: 20px 20px 20px 30px;
+    margin: 20px 0;
+    overflow: hidden;
+    .message-left{
+      float: left;
+      line-height: 24px;
+      color: $dark-gray1;
+      b{
+        text-transform: capitalize;
+      }
+      a.blue{
+        margin:0 0 0 20px;
+        i{
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+  .bordered-bar{
+    border-bottom: 2px solid $light-gray1;
+    border-top: 2px solid $light-gray1;
+    margin-bottom: 20px;
+    padding: 20px;
+    h2{
+      color: $dark-gray1;
+      font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+      font-weight: bold;
+      margin-bottom: 0;
+      font-size: 17px;
+      span{
+        padding-left: 60px;
+        text-transform: capitalize;
+        .blue-link{
+          color: $blue2;
+          font-size: 14px;
+          &:hover{
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+  .pattern{
+    background: url("../images/pattern.png");
+    margin-top: 10px;
+    margin-bottom: 20px;
+    padding:20px;
+    color: $dark-gray1;
+  }
+  hr.border{
+    border-top: 2px solid $light-gray1;
+  }
+  .no-border{border: none !important; }
+  table.course-receipt{
+    width: 94%;
+    margin: auto;
+    margin-bottom: 27px;
+    thead{
+      th{
+        color: $light-gray2;
+        font-weight: normal;
+        text-align: center;
+        text-transform: uppercase;
+        padding: 8px 0;
+        border-bottom: 1px solid $dark-gray2;
+        &:first-child{
+          text-align: left;
+        }
+        &:last-child{
+          text-align: right;
+        }
+      }
+    }
+    tr{
+      border-bottom: 1px solid $light-gray1;
+      &:last-child{
+        border-bottom: none;
+      }
+      td{
+        padding: 15px 0;
+        text-align: center;
+        color: $dark-gray1;
+        width: 33.33333%;
+
+        &:first-child{
+          text-align: left;
+          font-size: 18px;
+          text-transform: capitalize;
+        }
+        &:last-child{
+          text-align: right;
+        }
+      }
+    }
+  }
 }
 .empty-cart{
   padding: 20px 0px;
@@ -702,3 +833,37 @@
   }
 }
 
+// Print
+
+@media print{
+  ul.steps, a.blue.pull-right, .bordered-bar span.pull-right, .left.nav-global.authenticated {
+    display: none;
+  }
+  .shopping-cart{
+    font-size:  14px;
+    padding-right: 40px;
+    .gray-bg{
+      margin: 0;
+      padding: 10px 0 20px 0;
+      background: none;
+      .message-left{
+        width: 100%;
+      }
+    }
+    .bordered-bar{
+      h2{
+        font-size: 14px;
+      }
+      span{
+        float: right;
+      }
+    }
+    .user-data{
+       .data-input{
+         h1{
+           font-size: 18px;
+         }
+       }
+    }
+  }
+}
