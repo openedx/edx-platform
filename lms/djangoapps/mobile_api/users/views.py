@@ -73,7 +73,7 @@ def mobile_course_enrollments(enrollments, user):
     """
     for enr in enrollments:
         course = enr.course
-        if course.mobile_available:
-            yield enr
-        elif has_access(user, 'staff', course):
+        # The course doesn't always really exist -- we can have bad data in the enrollments
+        # pointing to non-existent (or removed) courses, in which case `course` is None.
+        if course and (course.mobile_available or has_access(user, 'staff', course)):
             yield enr
