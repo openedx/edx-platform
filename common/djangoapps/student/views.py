@@ -7,9 +7,9 @@ import re
 import uuid
 import time
 import json
+import requests
 from collections import defaultdict
 from pytz import UTC
-from requests import request, ConnectionError
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -372,27 +372,31 @@ def register_user(request, extra_context=None):
     """
     This view will display the non-modal registration form
     """
-    if not settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
-        if request.user.is_authenticated():
-            return redirect(reverse('dashboard'))
-        if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
-            # Redirect to branding to process their certificate if SSL is enabled
-            # and registration is disabled.
-            return external_auth.views.redirect_with_get('root', request.GET)
+    if request.user.is_authenticated():
+        return redirect(reverse('dashboard'))
 
-        context = {
-            'course_id': request.GET.get('course_id'),
-            'email': '',
-            'enrollment_action': request.GET.get('enrollment_action'),
-            'name': '',
-            'running_pipeline': None,
-            'platform_name': microsite.get_value(
-                'platform_name',
-                settings.PLATFORM_NAME
-            ),
-            'selected_provider': '',
-            'username': '',
-        }
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        # Redirect to IONISx, we don't want the registration form.
+        return external_auth.views.redirect_with_get('/auth/login/portal-oauth2', request.GET, do_reverse=False)
+
+    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
+        # Redirect to branding to process their certificate if SSL is enabled
+        # and registration is disabled.
+        return external_auth.views.redirect_with_get('root', request.GET)
+
+    context = {
+        'course_id': request.GET.get('course_id'),
+        'email': '',
+        'enrollment_action': request.GET.get('enrollment_action'),
+        'name': '',
+        'running_pipeline': None,
+        'platform_name': microsite.get_value(
+            'platform_name',
+            settings.PLATFORM_NAME
+        ),
+        'selected_provider': '',
+        'username': '',
+    }
 
     # We save this so, later on, we can determine what course motivated a user's signup
     # if they actually complete the registration process
@@ -401,8 +405,8 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-        if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
-            return render_to_response('register-shib.html', context)
+    if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+        return render_to_response('register-shib.html', context)
 
     # If third-party auth is enabled, prepopulate the form with data from the
     # selected provider.
@@ -414,15 +418,7 @@ def register_user(request, extra_context=None):
         overrides['selected_provider'] = current_provider.NAME
         context.update(overrides)
 
-        return render_to_response('register.html', context)
-    else:
-        if request.user.is_authenticated():
-            if 'course_id' in request.GET:
-                return redirect("/courses/{0}/about".format(request.GET.get('course_id')))
-            else:
-                return redirect('/')
-        else:
-            return redirect("/auth/login/portal-oauth2/?auth_entry=login&next={0}".format(urlquote(request.get_full_path())))
+    return render_to_response('register.html', context)
 
 
 def complete_course_mode_info(course_id, enrollment):
@@ -1094,15 +1090,17 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
-def logout_portal(user_mail):
-    try:
-        user = models.DjangoStorage.user.objects.get(uid=user_mail)
-        response = request('POST', settings.IONISX_AUTH['SYNC_LOGOUT_URL'],
-            params={ 'access_token': user.extra_data['access_token'] })
-    except ConnectionError as err:
-        log.warning(err)
-    except Exception as err:
-        log.warning(err)
+def logout_portal(request):
+    if request.user.is_authenticated():
+        user = request.user
+        social_data = models.DjangoStorage.user.get_social_auth_for_user(user)[0]
+        try:
+            requests.post(
+                settings.IONISX_AUTH.get('SYNC_LOGOUT_URL'),
+                headers={'Authorization': 'Bearer {0}'.format(social_data.extra_data['access_token'])}
+            )
+        except requests.ConnectionError as err:
+            log.warning(err)
 
 
 @ensure_csrf_cookie
@@ -1119,9 +1117,8 @@ def logout_user(request):
     else:
         user_mail = request.user.email
 
+    logout_portal(request)
     logout(request)
-    if user_mail:
-        logout_portal(user_mail)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
     else:

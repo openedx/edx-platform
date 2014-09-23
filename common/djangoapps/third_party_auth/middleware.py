@@ -13,8 +13,9 @@ from social.apps.django_app.default import models
 from social.apps.django_app.middleware import SocialAuthExceptionMiddleware
 
 from . import pipeline
+from . import portal
 
-log = logging.getLogger('third_party_auth.middleware')
+log = logging.getLogger(__file__)
 
 class ExceptionMiddleware(SocialAuthExceptionMiddleware):
     """Custom middleware that handles conditional redirection."""
@@ -32,32 +33,36 @@ class PortalSynchronizerMiddleware(object):
     """Custom middleware to synchronize user status of LMS with Portal provider."""
 
     def process_request(self, request):
-        if not isinstance(request.user, AnonymousUser):
-            try:
-                email = request.user.email
-                user = models.DjangoStorage.user.objects.get(uid=email)
-                response = requests.request('POST', settings.IONISX_AUTH['SYNC_USER_URL'],
-                                    params={ 'access_token': user.extra_data['access_token'] })
-                response = response.json()
-                if response is None:
-                    logout(request)
-                    response = redirect(request.get_full_path())
-                    response.delete_cookie(
-                        settings.EDXMKTG_COOKIE_NAME,
-                        path='/', domain=settings.SESSION_COOKIE_DOMAIN,
-                    )
-                    return response
-                if response['updated'] is True:
-                    log.warning('need update !')
-                    user = request.user
-                    user.email = response['emails'][0]['email']
-                    user.username = response['username']
-                    user.save()
+        if request.user.is_authenticated():
+            user = request.user
+            social_auth = models.DjangoStorage.user.get_social_auth_for_user(user)
 
-                    profile = UserProfile.objects.get(user=request.user)
-                    profile.name = response['name']
-                    profile.save()
-            except requests.ConnectionError as err:
-                log.warning(err)
-            except Exception as err:
-                log.warning(err)
+            if len(social_auth) == 1:
+                social_data = social_auth[0]
+
+                try:
+                    r = requests.get(
+                        settings.IONISX_AUTH.get('USER_DATA_URL'),
+                        headers={'Authorization': 'Bearer {0}'.format(social_data.extra_data['access_token'])}
+                    )
+                except requests.ConnectionError as err:
+                    log.warning(err)
+                    return
+
+                user_data = r.json()
+                if user_data:
+                    _id = user_data['_id']
+                    email = portal.get_primary_email(user_data['emails'])
+                    username = user_data['username']
+                    name = user_data['name']
+
+                    if (user.email != email or user.username != user_data['username']):
+                        log.info('User {} needs to be updated'.format(_id))
+                        user.email = email
+                        user.username = username
+                        user.save()
+
+                    if user.profile.name != user_data['name']:
+                        log.info('User profile for {} needs to be updated'.format(_id))
+                        user.profile.name = name
+                        user.profile.save()
