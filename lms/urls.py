@@ -70,7 +70,14 @@ urlpatterns = ('',  # nopep8
 
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
+
 )
+
+if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
+    urlpatterns += (
+        url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
+        url(r'^api/val/v0/', include('edxval.urls')),
+    )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
