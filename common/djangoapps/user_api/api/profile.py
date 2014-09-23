@@ -5,6 +5,7 @@ but does NOT include basic account information such as username/password.
 
 """
 from user_api.models import UserProfile
+from user_api.helpers import intercept_errors
 
 
 class ProfileRequestError(Exception):
@@ -12,7 +13,6 @@ class ProfileRequestError(Exception):
     pass
 
 
-# TODO: error subclasses
 class ProfileInternalError(Exception):
     """ An error occurred in an API call. """
     pass
@@ -21,6 +21,7 @@ class ProfileInternalError(Exception):
 FULL_NAME_MAX_LENGTH = 255
 
 
+@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
 def profile_info(username):
     """Retrieve a user's profile information
 
@@ -50,6 +51,7 @@ def profile_info(username):
     return profile_dict
 
 
+@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
 def update_profile(username, full_name=None):
     """Update a user's profile.
 
@@ -78,6 +80,7 @@ def update_profile(username, full_name=None):
             profile.update_name(full_name)
 
 
+@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
 def preference_info(username, preference_name):
     """Retrieve information about a user's preferences.
 
@@ -92,6 +95,7 @@ def preference_info(username, preference_name):
     pass
 
 
+@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
 def update_preference(username, preference_name, preference_value):
     """Update a user's preference.
 
