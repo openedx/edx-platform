@@ -16,9 +16,9 @@ from user_api.models import UserProfile
 @ddt.ddt
 class AccountApiTest(TestCase):
 
-    USERNAME = u"frank_under-wood"
+    USERNAME = u"frank-underwood"
     PASSWORD = u"ṕáśśẃőŕd"
-    EMAIL = u"frank@example.com"
+    EMAIL = u"frank+underwood@example.com"
 
     INVALID_USERNAMES = [
         None,

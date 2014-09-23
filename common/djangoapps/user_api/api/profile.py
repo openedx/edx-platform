@@ -1,7 +1,8 @@
 """Python API for user profiles.
 
 Profile information includes a student's demographic information and preferences,
-but does NOT include basic account information such as username/password.
+but does NOT include basic account information such as username, password, and 
+email address.
 
 """
 from user_api.models import UserProfile
@@ -43,9 +44,9 @@ def profile_info(username):
         return None
 
     profile_dict = {
-        'username': profile.user.username,
-        'email': profile.user.email,
-        'full_name': profile.name,
+        u'username': profile.user.username,
+        u'email': profile.user.email,
+        u'full_name': profile.name,
     }
 
     return profile_dict
@@ -74,7 +75,8 @@ def update_profile(username, full_name=None):
         raise ProfileRequestError("TODO")
 
     if full_name is not None:
-        if len(full_name) > FULL_NAME_MAX_LENGTH:
+        name_length = len(full_name)
+        if name_length > FULL_NAME_MAX_LENGTH or name_length is 0:
             raise ProfileRequestError("TODO")
         else:
             profile.update_name(full_name)

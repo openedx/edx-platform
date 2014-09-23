@@ -18,10 +18,10 @@ from student_profile import views as profile_views
 class StudentProfileViewTest(TestCase):
     """ Tests for the student profile views. """
 
-    USERNAME = u"frank_under-wood"
-    PASSWORD = u"ṕáśśẃőŕd"
-    EMAIL = u"fŕáńḱ@éxáḿṕĺé.ćőḿ"
-    FULL_NAME = u"FɍȺnꝁ ᵾnđɇɍwøøđ"
+    USERNAME = u"heisenberg"
+    PASSWORD = u"ḅḷüëṡḳÿ"
+    EMAIL = u"walt@savewalterwhite.com"
+    FULL_NAME = u"𝖂𝖆𝖑𝖙𝖊𝖗 𝖂𝖍𝖎𝖙𝖊"
 
     def test_index(self):
         response = self.client.get(reverse('profile_index'))
@@ -44,7 +44,7 @@ class StudentProfileViewTest(TestCase):
             path= reverse('name_change'), 
             data= urlencode({
                 # We can't pass a Unicode object to urlencode, so we encode the Unicode object
-                'proposed_name': self.FULL_NAME.encode('utf8')
+                'new_name': self.FULL_NAME.encode('utf8')
             }),
             content_type= 'application/x-www-form-urlencoded'
         )
