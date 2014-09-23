@@ -117,6 +117,8 @@ class SplitBulkWriteRecord(BulkOpsRecord):
         self.index = None
         self.structures = {}
         self.structures_in_db = set()
+        self.definitions = {}
+        self.definitions_in_db = set()
 
     # TODO: This needs to track which branches have actually been modified/versioned,
     # so that copying one branch to another doesn't update the original branch.
@@ -226,6 +228,9 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         for _id in bulk_write_record.structures.viewkeys() - bulk_write_record.structures_in_db:
             self.db_connection.upsert_structure(bulk_write_record.structures[_id])
 
+        for _id in bulk_write_record.definitions.viewkeys() - bulk_write_record.definitions_in_db:
+            self.db_connection.upsert_definition(bulk_write_record.definitions[_id])
+
         if bulk_write_record.index is not None and bulk_write_record.index != bulk_write_record.initial_index:
             if bulk_write_record.initial_index is None:
                 self.db_connection.insert_course_index(bulk_write_record.index)
@@ -291,6 +296,67 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             bulk_write_record.structures[structure['_id']] = structure
         else:
             self.db_connection.upsert_structure(structure)
+
+    def get_definition(self, course_key, definition_guid):
+        """
+        Retrieve a single definition by id, respecting the active bulk operation
+        on course_key.
+
+        Args:
+            course_key (:class:`.CourseKey`): The course being operated on
+            definition_guid (str or ObjectID): The id of the definition to load
+        """
+        bulk_write_record = self._get_bulk_ops_record(course_key)
+        if bulk_write_record.active:
+            definition = bulk_write_record.definitions.get(definition_guid)
+
+            # The definition hasn't been loaded from the db yet, so load it
+            if definition is None:
+                definition = self.db_connection.get_definition(definition_guid)
+                bulk_write_record.definitions[definition_guid] = definition
+                if definition is not None:
+                    bulk_write_record.definitions_in_db.add(definition_guid)
+
+            return definition
+        else:
+            # cast string to ObjectId if necessary
+            definition_guid = course_key.as_object_id(definition_guid)
+            return self.db_connection.get_definition(definition_guid)
+
+    def get_definitions(self, ids):
+        """
+        Return all definitions that specified in ``ids``.
+
+        If a definition with the same id is in both the cache and the database,
+        the cached version will be preferred.
+
+        Arguments:
+            ids (list): A list of definition ids
+        """
+        definitions = []
+        ids = set(ids)
+
+        for _, record in self._active_records:
+            for definition in record.definitions.values():
+                definition_id = definition.get('_id')
+                if definition_id in ids:
+                    ids.remove(definition_id)
+                    definitions.append(definition)
+
+        definitions.extend(self.db_connection.get_definitions(list(ids)))
+        return definitions
+
+
+    def update_definition(self, course_key, definition):
+        """
+        Update a definition, respecting the current bulk operation status
+        (no data will be written to the database if a bulk operation is active.)
+        """
+        bulk_write_record = self._get_bulk_ops_record(course_key)
+        if bulk_write_record.active:
+            bulk_write_record.definitions[definition['_id']] = definition
+        else:
+            self.db_connection.upsert_definition(definition)
 
     def version_structure(self, course_key, structure, user_id):
         """
@@ -530,9 +596,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             if not lazy:
                 # Load all descendants by id
-                descendent_definitions = self.db_connection.find_matching_definitions({
-                    '_id': {'$in': [block['definition']
-                                    for block in new_module_data.itervalues()]}})
+                descendent_definitions = self.get_definitions([
+                    block['definition']
+                    for block in new_module_data.itervalues()
+                ])
                 # turn into a map
                 definitions = {definition['_id']: definition
                                for definition in descendent_definitions}
@@ -803,7 +870,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 self._block_matches(block_json.get('fields', {}), settings)
             ):
                 if content:
-                    definition_block = self.db_connection.get_definition(block_json['definition'])
+                    definition_block = self.get_definition(course_locator, block_json['definition'])
                     return self._block_matches(definition_block.get('fields', {}), content)
                 else:
                     return True
@@ -1016,7 +1083,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # TODO implement
         raise NotImplementedError()
 
-    def create_definition_from_data(self, new_def_data, category, user_id):
+    def create_definition_from_data(self, course_key, new_def_data, category, user_id):
         """
         Pull the definition fields out of descriptor and save to the db as a new definition
         w/o a predecessor and return the new id.
@@ -1037,11 +1104,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             },
             'schema_version': self.SCHEMA_VERSION,
         }
-        self.db_connection.insert_definition(document)
+        self.update_definition(course_key, document)
         definition_locator = DefinitionLocator(category, new_id)
         return definition_locator
 
-    def update_definition_from_data(self, definition_locator, new_def_data, user_id):
+    def update_definition_from_data(self, course_key, definition_locator, new_def_data, user_id):
         """
         See if new_def_data differs from the persisted version. If so, update
         the persisted version and return the new id.
@@ -1058,7 +1125,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         # if this looks in cache rather than fresh fetches, then it will probably not detect
         # actual change b/c the descriptor and cache probably point to the same objects
-        old_definition = self.db_connection.get_definition(definition_locator.definition_id)
+        old_definition = self.get_definition(course_key, definition_locator.definition_id)
         if old_definition is None:
             raise ItemNotFoundError(definition_locator)
 
@@ -1072,7 +1139,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # previous version id
             old_definition['edit_info']['previous_version'] = definition_locator.definition_id
             old_definition['schema_version'] = self.SCHEMA_VERSION
-            self.db_connection.insert_definition(old_definition)
+            self.update_definition(course_key, old_definition)
             return DefinitionLocator(old_definition['block_type'], old_definition['_id']), True
         else:
             return definition_locator, False
@@ -1160,9 +1227,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_def_data = partitioned_fields.get(Scope.content, {})
             # persist the definition if persisted != passed
             if (definition_locator is None or isinstance(definition_locator.definition_id, LocalId)):
-                definition_locator = self.create_definition_from_data(new_def_data, block_type, user_id)
+                definition_locator = self.create_definition_from_data(course_key, new_def_data, block_type, user_id)
             elif new_def_data is not None:
-                definition_locator, _ = self.update_definition_from_data(definition_locator, new_def_data, user_id)
+                definition_locator, _ = self.update_definition_from_data(course_key, definition_locator, new_def_data, user_id)
 
             # copy the structure and modify the new one
             new_structure = self.version_structure(course_key, structure, user_id)
@@ -1355,7 +1422,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 },
                 'schema_version': self.SCHEMA_VERSION,
             }
-            self.db_connection.insert_definition(definition_entry)
+            self.update_definition(locator, definition_entry)
 
             draft_structure = self._new_structure(
                 user_id,
@@ -1383,14 +1450,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if block_fields is not None:
                 root_block['fields'].update(self._serialize_fields(root_category, block_fields))
             if definition_fields is not None:
-                definition = self.db_connection.get_definition(root_block['definition'])
+                definition = self.get_definition(locator, root_block['definition'])
                 definition['fields'].update(definition_fields)
                 definition['edit_info']['previous_version'] = definition['_id']
                 definition['edit_info']['edited_by'] = user_id
                 definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
                 definition['_id'] = ObjectId()
                 definition['schema_version'] = self.SCHEMA_VERSION
-                self.db_connection.insert_definition(definition)
+                self.update_definition(locator, definition)
                 root_block['definition'] = definition['_id']
                 root_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
                 root_block['edit_info']['edited_by'] = user_id
@@ -1483,7 +1550,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 definition_locator = DefinitionLocator(original_entry['block_type'], original_entry['definition'])
             if definition_fields:
                 definition_locator, is_updated = self.update_definition_from_data(
-                    definition_locator, definition_fields, user_id
+                    course_key, definition_locator, definition_fields, user_id
                 )
 
             # check metadata
@@ -1607,7 +1674,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             structure = self._lookup_course(course_key).structure
             new_structure = self.version_structure(course_key, structure, user_id)
             new_id = new_structure['_id']
-            is_updated = self._persist_subdag(xblock, user_id, new_structure['blocks'], new_id)
+            is_updated = self._persist_subdag(course_key, xblock, user_id, new_structure['blocks'], new_id)
 
             if is_updated:
                 self.update_structure(course_key, new_structure)
@@ -1621,18 +1688,20 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             else:
                 return xblock
 
-    def _persist_subdag(self, xblock, user_id, structure_blocks, new_id):
+    def _persist_subdag(self, course_key, xblock, user_id, structure_blocks, new_id):
         # persist the definition if persisted != passed
         partitioned_fields = self.partition_xblock_fields_by_scope(xblock)
         new_def_data = self._serialize_fields(xblock.category, partitioned_fields[Scope.content])
         is_updated = False
         if xblock.definition_locator is None or isinstance(xblock.definition_locator.definition_id, LocalId):
             xblock.definition_locator = self.create_definition_from_data(
-                new_def_data, xblock.category, user_id)
+                course_key, new_def_data, xblock.category, user_id
+            )
             is_updated = True
         elif new_def_data:
             xblock.definition_locator, is_updated = self.update_definition_from_data(
-                xblock.definition_locator, new_def_data, user_id)
+                course_key, xblock.definition_locator, new_def_data, user_id
+            )
 
         if isinstance(xblock.scope_ids.usage_id.block_id, LocalId):
             # generate an id
@@ -1654,7 +1723,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             for child in xblock.children:
                 if isinstance(child.block_id, LocalId):
                     child_block = xblock.system.get_block(child)
-                    is_updated = self._persist_subdag(child_block, user_id, structure_blocks, new_id) or is_updated
+                    is_updated = self._persist_subdag(course_key, child_block, user_id, structure_blocks, new_id) or is_updated
                     children.append(BlockKey.from_usage_key(child_block.location))
                 else:
                     children.append(BlockKey.from_usage_key(child))

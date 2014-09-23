@@ -153,7 +153,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
         if definition_id is not None and not json_data.get('definition_loaded', False):
             definition_loader = DefinitionLazyLoader(
-                self.modulestore, block_key.type, definition_id,
+                self.modulestore,
+                course_key,
+                block_key.type,
+                definition_id,
                 lambda fields: self.modulestore.convert_references_to_keys(
                     course_key, self.load_block_type(block_key.type),
                     fields, self.course_entry.structure['blocks'],
