@@ -111,7 +111,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-16 08:59-0400\n"
+"POT-Creation-Date: 2014-09-23 15:16-0400\n"
 "PO-Revision-Date: 2014-09-02 00:40+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -2569,6 +2569,12 @@ msgid ""
 "Type in number corresponding to following modes:  'instructor' or 'everyone'"
 msgstr "كتابة الرقم المرتبط بالوضعيات التالية: \"موجّه المساق\" أو \"الجميع\""
 
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "No email address found."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
@@ -2683,37 +2689,6 @@ msgstr ""
 "الرجاء اختيار \"صواب\" إذا أردت استخدام هذا المكوِّن بمثابة حجز خانات لغرض "
 "المزامنة مع نظام تقييم خارجي بدلاً من تشغيل أداة خارجية. يؤدي هذا الإعداد "
 "إلى إخفاء زر التشغيل وأي IFrames لهذا المكوِّن."
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Request user's username"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Requesting user's username will only work if 'Open in a new page' is set to "
-"True"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Request user's email"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Requesting user's email will only work if 'Open in a new page' is set to "
-"True"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "LTI Application Information"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Provide a description of the third party application. If requesting username"
-" and/or email, use this text box to inform users that their username and/or "
-"email will be forwarded to a third party application."
-msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -4297,10 +4272,6 @@ msgid "coupon with the coupon id ({coupon_id}) updated successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon with the coupon code ({code}) already exist"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
 msgid ""
 "The code ({code}) that you have tried to define is already in use as a "
 "registration code"
@@ -4316,6 +4287,10 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) added successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) already exists for this course"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -5304,7 +5279,7 @@ msgid "Code '{0}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{0}' already used."
+msgid "Only one coupon redemption is allowed against an order"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -7281,16 +7256,14 @@ msgid "An error occurred. Please try again later."
 msgstr "حدث خطأ. الرجاء إعادة المحاولة في وقتٍ لاحق. "
 
 #: lms/templates/dashboard.html
-msgid "Please verify your new email"
-msgstr "الرجاء تأكيد عنوان بريدك الإلكتروني الجديد"
+msgid "Please verify your new email address"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid ""
-"You'll receive a confirmation in your inbox. Please click the link in the "
-"email to confirm the email change."
+"You'll receive a confirmation in your inbox. Please follow the link in the "
+"email to confirm your email address change."
 msgstr ""
-"ستصلك رسالة تأكيد على البريد الوارد الخاص بك. الرجاء الضغط على الرابط في "
-"الرسالة لتأكيد تغيير البريد الالكتروني."
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -7344,9 +7317,16 @@ msgstr ""
 msgid "Reset Password"
 msgstr "إعادة ضبط كلمة السر"
 
+#: lms/templates/dashboard.html lms/templates/original_navigation.html
+#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/courseware/courses.html
+msgid "Courses"
+msgstr "المساقات"
+
 #: lms/templates/dashboard.html
-msgid "Current Courses"
-msgstr "المساقات الحالية"
+msgid "ordered by recent activity"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
@@ -7402,11 +7382,9 @@ msgstr "الرجاء تأكيد كلمة السر الخاصة بك:"
 
 #: lms/templates/dashboard.html
 msgid ""
-"We will send a confirmation to both {email} and your new email as part of "
-"the process."
+"We will send a confirmation to both {email} and your new email address as "
+"part of the process."
 msgstr ""
-"سنقوم بإرسال رسالة تأكيد إلى كلٍ من {email} وعنوان بريدك الإلكتروني الجديد "
-"أيضاً."
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
@@ -7418,10 +7396,8 @@ msgstr "تغيير اسمك"
 #: lms/templates/dashboard.html
 msgid ""
 "To uphold the credibility of your {platform} {cert_name_short}, all name "
-"changes will be logged and recorded."
+"changes will be recorded."
 msgstr ""
-"سيتم تسجيل وحفظ كافة التغييرات على الاسم بغرض حفظ مصداقية شهادتك {platform} "
-"{cert_name_short}."
 
 #. Translators: note that {platform} {cert_name_short} will look something
 #. like: "edX certificate". Please do not change the order of these
@@ -7445,11 +7421,9 @@ msgstr "تغيير اسمي"
 
 #: lms/templates/dashboard.html
 msgid ""
-"<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
-"info\"></span>"
+"<span id='track-info'></span> {course_number}?  <span id='refund-"
+"info'></span>"
 msgstr ""
-"<span id=\"track-info\"></span> {course_number}؟ <span id=\"refund-"
-"info\"></span>"
 
 #: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -8177,13 +8151,6 @@ msgstr ""
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
 msgstr "لا يوجد لديك أية ملاحظات."
-
-#: lms/templates/original_navigation.html
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
-msgid "Courses"
-msgstr "المساقات"
 
 #: lms/templates/original_navigation.html
 msgid "Schools"
@@ -9244,8 +9211,18 @@ msgid "Staff view"
 msgstr "استعراض طاقم المساق"
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Course is not yet visible to students."
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student view"
 msgstr "منظور الطالب "
+
+#: lms/templates/courseware/course_navigation.html
+msgid ""
+"You cannot view the course as a student or beta tester before the course "
+"release date."
+msgstr ""
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from leading universities."
@@ -9400,6 +9377,16 @@ msgstr "ابحث ضمن الطلاب"
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
 msgstr "{course_number} معلومات المساق "
+
+#: lms/templates/courseware/info.html
+msgid "You are not enrolled yet"
+msgstr ""
+
+#: lms/templates/courseware/info.html
+msgid ""
+"You are not currently enrolled in this course. Sign up for it "
+"{link_start}here{link_end}!"
+msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
@@ -10093,6 +10080,12 @@ msgstr "مسجل كـ: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "Verified"
 msgstr "تم التحقق"
 
@@ -12855,6 +12848,64 @@ msgstr "ملاحظة: تمّ رد قيمة العناصر المشطوبة عل�
 msgid "Billed To:"
 msgstr "تم تسجيل الفاتورة لـ: "
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "Confirm Enrollment"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{site_name} -  Confirm Enrollment"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "Confirm your enrollment for:"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "course dates"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{course_name}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{start_date}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{end_date}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You've clicked a link for an enrollment code that has already been used. "
+"Check your <a href={dashboard_url}>course dashboard</a> to see if you're "
+"enrolled in the course, or contact your company's administrator."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You have successfully enrolled in {course_name}. This course has now been "
+"added to your dashboard."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You're already registered for this course. Visit your <a "
+"href={dashboard_url}>dashboard</a> to see the course."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You're about to activate an enrollment code for {course_name} by "
+"{site_name}. This code can only be used one time, so you should only "
+"activate this code if you're its intended recipient."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course &nbsp; &nbsp; &#x25b8;"
+msgstr ""
+
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
 msgstr "الإيصال (الطلب"
@@ -12868,12 +12919,6 @@ msgid "Registered as: "
 msgstr "مسجل كـ: "
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "ID Verified"
 msgstr "تم التحقق من الهوية "
 
@@ -13155,14 +13200,10 @@ msgstr "هل تواجه مشكلة تقنية؟ "
 #: lms/templates/verify_student/_reverification_support.html
 msgid ""
 "Please make sure your browser is updated to the <strong>{a_start}most recent"
-" version possible{a_end}</strong>. Also, please make sure your <strong>web "
-"cam is plugged in, turned on, and allowed to function in your web browser "
-"(commonly adjustable in your browser settings)</strong>"
+" version possible{a_end}</strong>. Also, please make sure your "
+"<strong>webcam is plugged in, turned on, and allowed to function in your web"
+" browser (commonly adjustable in your browser settings)</strong>"
 msgstr ""
-"الرجاء التأكد من تحديث المتصفّح الخاص بك إلى <strong>{a_start}النسخة الأحدث "
-"المتاحة{a_end}</strong>. كما يجب التأكد من كون <strong>كاميرا الويب لديك "
-"موصولة، ومفعّلة، ومسموح لها العمل على متصفّح الإنترنت الخاص بك (يمكن عادةً "
-"تعديله في إعدادات المتصفّح)</strong> "
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
@@ -13194,6 +13235,10 @@ msgstr "أنت تقوم بعملية إعادة التحقّق بالنسبة ل
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "تقوم بالتسجيل لـ "
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -13241,14 +13286,10 @@ msgstr "المتطلّبات التقنيّة"
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
-" possible{a_end}. Also, please make sure your <strong>web cam is plugged in,"
-" turned on, and allowed to function in your web browser (commonly adjustable"
-" in your browser settings).</strong>"
+" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
+"turned on, and allowed to function in your web browser (commonly adjustable "
+"in your browser settings).</strong>"
 msgstr ""
-"الرجاء التأكد من تحديث المتصفّح الخاص بك إلى {a_start} أحدث نسخة "
-"متاحة{a_end}. كما يجب التأكد من كون <strong>كاميرا الويب لديك موصولة، "
-"ومفعّلة، ومسموح لها العمل على متصفّح الإنترنت الخاص بك (يمكن عادةً تعديل ذلك"
-" في إعدادات المتصفّح)</strong>."
 
 #: lms/templates/verify_student/face_upload.html
 msgid "Edit Your Full Name"
@@ -14017,11 +14058,9 @@ msgstr "تحقق من بريدك الإلكتروني "
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"you need an active edX account before registering - check your email for "
-"instructions"
+"You need to activate your {platform_name} account before you can register "
+"for courses. Check your inbox for an activation email."
 msgstr ""
-"قبل القيام بالتسجيل تحتاج إلى حساب edX مفعّل - تحقق من بريدك الإلكتروني لتجد"
-" المزيد من التعليمات "
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Identification"
@@ -14034,7 +14073,7 @@ msgstr "وثيقة إثبات شخصية باستخدام الصورة "
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
 "A driver's license, passport, or other government or school-issued ID with "
-"your name and picture on it"
+"your name and picture on it."
 msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
@@ -14045,10 +14084,17 @@ msgstr "كاميرا الويب "
 msgid "A webcam and a modern browser"
 msgstr "كاميرا ويب ومتصفح حديث "
 
+#. Translators: This phrase will look like this: "Internet Explorer 9 or
+#. later"
+#: lms/templates/verify_student/show_requirements.html
+msgid "{internet_explorer_version} or later"
+msgstr ""
+
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"Please make sure your browser is updated to the most recent version possible"
-msgstr "الرجاء التأكد من أن المتصفح الخاص بك محدّث وفق آخر إصدار ممكن "
+"Please make sure your browser is updated to the most recent version "
+"possible."
+msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Credit or Debit Card"
@@ -14060,11 +14106,9 @@ msgstr "بطاقة ائتمان أو خصم مباشر رئيسية "
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"Visa, Master Card, American Express, Discover, Diners Club, JCB with "
-"Discover logo"
+"Visa, MasterCard, American Express, Discover, Diners Club, or JCB with the "
+"Discover logo."
 msgstr ""
-"فيزا، ماستر كارد، أمريكان إكسبرس، ديسكفر، داينرز كلاب، جي سي بي مع شعار "
-"ديسكافر"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
