@@ -22,6 +22,8 @@ def index(request):
 
     Returns:
         HttpResponse: 200
+        HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 302 if not logged in (redirect to login page)
 
     Example usage:
 
@@ -46,7 +48,9 @@ def email_change_request_handler(request):
 
     Returns:
         HttpResponse: 204, if the confirmation email was sent successfully
-        HttpResponse: 401, if authorization is refused for the provided credentials
+        HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 401, if the provided password (in the form) is incorrect
+        HttpResponse: 405 if using an unsupported HTTP method
 
     Example usage:
 
@@ -99,6 +103,8 @@ def email_change_confirmation_handler(request, key):
 
     Returns:
         HttpResponse: 200
+        HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 405 if using an unsupported HTTP method
 
     Example usage:
 

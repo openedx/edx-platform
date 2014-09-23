@@ -17,7 +17,9 @@ def index(request):
         request (HttpRequest)
 
     Returns:
-        HttpResponse: 200
+        HttpResponse: 200 if successful
+        HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 302 if not logged in (redirect to login page)
 
     Example usage:
 
@@ -41,7 +43,9 @@ def name_change_handler(request):
         request (HttpRequest)
 
     Returns:
-        HttpResponse: 204
+        HttpResponse: 204 if successful
+        HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 302 if not logged in (redirect to login page)
 
     Example usage:
 
