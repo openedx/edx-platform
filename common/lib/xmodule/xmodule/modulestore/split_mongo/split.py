@@ -722,7 +722,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         course_entry = self._lookup_course(course_id)
         root = course_entry['structure']['root']
-        result = self._load_items(course_entry, [root], 0, lazy=True, **kwargs)
+        result = self._load_items(course_entry, [root], depth, lazy=True, **kwargs)
         return result[0]
 
     def has_course(self, course_id, ignore_case=False, **kwargs):
