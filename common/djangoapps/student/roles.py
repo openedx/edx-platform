@@ -7,7 +7,6 @@ from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User
 from django.conf import settings
-from student.models import CourseAccessRole
 from xmodule_django.models import CourseKeyField
 
 
@@ -16,6 +15,7 @@ class RoleCache(object):
     A cache of the CourseAccessRoles held by a particular user
     """
     def __init__(self, user):
+        from student.models import CourseAccessRole
         self._roles = set(
             CourseAccessRole.objects.filter(user=user).all()
         )
@@ -128,6 +128,7 @@ class RoleBase(AccessRole):
         """
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
+        from student.models import CourseAccessRole
         for user in users:
             if user.is_authenticated and user.is_active and not self.has_user(user):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
@@ -139,6 +140,7 @@ class RoleBase(AccessRole):
         """
         Remove the supplied django users from this role.
         """
+        from student.models import CourseAccessRole
         entries = CourseAccessRole.objects.filter(
             user__in=users, role=self._role_name, org=self.org, course_id=self.course_key
         )
@@ -175,6 +177,7 @@ class CourseRole(RoleBase):
 
     @classmethod
     def course_group_already_exists(self, course_key):
+        from student.models import CourseAccessRole
         return CourseAccessRole.objects.filter(org=course_key.org, course_id=course_key).exists()
 
 
@@ -283,6 +286,7 @@ class UserBasedRole(object):
         """
         Grant this object's user the object's role for the supplied courses
         """
+        from student.models import CourseAccessRole
         if self.user.is_authenticated and self.user.is_active:
             for course_key in course_keys:
                 entry = CourseAccessRole(user=self.user, role=self.role, course_id=course_key, org=course_key.org)
@@ -296,6 +300,7 @@ class UserBasedRole(object):
         """
         Remove the supplied courses from this user's configured role.
         """
+        from student.models import CourseAccessRole
         entries = CourseAccessRole.objects.filter(user=self.user, role=self.role, course_id__in=course_keys)
         entries.delete()
         if hasattr(self.user, '_roles'):
@@ -310,6 +315,7 @@ class UserBasedRole(object):
         * course_id
         * role (will be self.role--thus uninteresting)
         """
+        from student.models import CourseAccessRole
         return CourseAccessRole.objects.filter(role=self.role, user=self.user)
 
 
