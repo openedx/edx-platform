@@ -2,6 +2,7 @@
 Tests for StaticContentServer
 """
 import copy
+import ddt
 import logging
 import unittest
 from uuid import uuid4
@@ -25,6 +26,7 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
+@ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
@@ -153,36 +155,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertNotIn('Content-Range', resp)
         self.assertEqual(resp['Content-Length'], str(self.length_unlocked))
 
-    def test_range_request_malformed_missing_equal(self):
+    @ddt.data(
+        'bytes 0-',
+        'bits=0-',
+        'bytes=0',
+        'bytes=one-',
+    )
+    def test_syntax_errors_in_range(self, header_value):
         """
-        Test that a range request with malformed Range (missing '=') outputs a 200 OK full content response.
+        Test that syntactically invalid Range values result in a 200 OK full content response.
         """
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes 0-')
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn('Content-Range', resp)
-
-    def test_range_request_malformed_not_bytes(self):
-        """
-        Test that a range request with malformed Range (not "bytes") outputs a 200 OK full content response.
-        "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
-        """
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bits=0-')
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn('Content-Range', resp)
-
-    def test_range_request_malformed_missing_minus(self):
-        """
-        Test that a range request with malformed Range (missing '-') outputs a 200 OK full content response.
-        """
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=0')
-        self.assertEqual(resp.status_code, 200)
-        self.assertNotIn('Content-Range', resp)
-
-    def test_range_request_malformed_first_not_integer(self):
-        """
-        Test that a range request with malformed Range (first is not an integer) outputs a 200 OK full content response.
-        """
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=one-')
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE=header_value)
         self.assertEqual(resp.status_code, 200)
         self.assertNotIn('Content-Range', resp)
 
@@ -191,12 +174,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Test that a range request with malformed Range (first_byte > last_byte) outputs
         416 Requested Range Not Satisfiable.
         """
-        first_byte = self.length_unlocked / 2
-        last_byte = self.length_unlocked / 4
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
-            first=first_byte, last=last_byte)
+            first=(self.length_unlocked / 2), last=(self.length_unlocked / 4))
         )
-
         self.assertEqual(resp.status_code, 416)
 
     def test_range_request_malformed_out_of_bounds(self):
@@ -204,14 +184,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Test that a range request with malformed Range (first_byte, last_byte == totalLength, offset by 1 error)
         outputs 416 Requested Range Not Satisfiable.
         """
-        last_byte = self.length_unlocked
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
-            first=last_byte, last=last_byte)
+            first=(self.length_unlocked), last=(self.length_unlocked))
         )
-
         self.assertEqual(resp.status_code, 416)
 
 
+@ddt.ddt
 class ParseRangeHeaderTestCase(unittest.TestCase):
     """
     Tests for the parse_range_header function.
@@ -224,45 +203,33 @@ class ParseRangeHeaderTestCase(unittest.TestCase):
         unit, __ = parse_range_header('bytes=100-', self.content_length)
         self.assertEqual(unit, 'bytes')
 
-    def test_invalid_syntax(self):
-        self.assertRaisesRegexp(ValueError, 'Invalid syntax', parse_range_header, 'bytes', self.content_length)
-        self.assertRaisesRegexp(ValueError, 'Invalid syntax', parse_range_header, 'bytes=', self.content_length)
+    @ddt.data(
+        ('bytes=100-', 1, [(100, 9999)]),
+        ('bytes=1000-', 1, [(1000, 9999)]),
+        ('bytes=100-199, 200-', 2, [(100, 199), (200, 9999)]),
+        ('bytes=100-199, 200-499', 2, [(100, 199), (200, 499)]),
+        ('bytes=-100', 1, [(9900, 9999)]),
+        ('bytes=-100, -200', 2, [(9900, 9999), (9800, 9999)])
+    )
+    @ddt.unpack
+    def test_valid_syntax(self, header_value, excepted_ranges_length, expected_ranges):
+        __, ranges = parse_range_header(header_value, self.content_length)
+        self.assertEqual(len(ranges), excepted_ranges_length)
+        self.assertEqual(ranges, expected_ranges)
+
+    @ddt.data(
+        ('bytes=one-20', ValueError, 'invalid literal for int()'),
+        ('bytes=-one', ValueError, 'invalid literal for int()'),
+        ('bytes=-', ValueError, 'invalid literal for int()'),
+        ('bytes=--', ValueError, 'invalid literal for int()'),
+        ('bytes', ValueError, 'Invalid syntax'),
+        ('bytes=', ValueError, 'Invalid syntax'),
+        ('bytes=0', ValueError, 'Invalid syntax'),
+        ('bytes=0-10,0', ValueError, 'Invalid syntax'),
+        ('bytes=0=', ValueError, 'too many values to unpack'),
+    )
+    @ddt.unpack
+    def test_invalid_syntax(self, header_value, exception_class, exception_message_regex):
         self.assertRaisesRegexp(
-            ValueError, 'too many values to unpack', parse_range_header, 'bytes=0=', self.content_length
-        )
-        self.assertRaisesRegexp(ValueError, 'Invalid syntax', parse_range_header, 'bytes=0', self.content_length)
-        self.assertRaisesRegexp(ValueError, 'Invalid syntax', parse_range_header, 'bytes=0-10,0', self.content_length)
-
-    def test_byte_range_spec(self):
-        __, ranges = parse_range_header('bytes=100-', self.content_length)
-        self.assertEqual(len(ranges), 1)
-        self.assertEqual(ranges[0], (100, 9999))
-
-        __, ranges = parse_range_header('bytes=1000-', self.content_length)
-        self.assertEqual(len(ranges), 1)
-        self.assertEqual(ranges[0], (1000, 9999))
-
-        __, ranges = parse_range_header('bytes=100-199, 200-', self.content_length)
-        self.assertEqual(len(ranges), 2)
-        self.assertEqual(ranges, [(100, 199), (200, 9999)])
-
-        __, ranges = parse_range_header('bytes=100-199, 200-499', self.content_length)
-        self.assertEqual(len(ranges), 2)
-        self.assertEqual(ranges, [(100, 199), (200, 499)])
-
-        self.assertRaisesRegexp(
-            ValueError, 'invalid literal for int()', parse_range_header, 'bytes=one-20', self.content_length
-        )
-
-    def test_suffix_byte_range_spec(self):
-        __, ranges = parse_range_header('bytes=-100', self.content_length)
-        self.assertEqual(len(ranges), 1)
-        self.assertEqual(ranges[0], (9900, 9999))
-
-        __, ranges = parse_range_header('bytes=-100, -200', self.content_length)
-        self.assertEqual(len(ranges), 2)
-        self.assertEqual(ranges, [(9900, 9999), (9800, 9999)])
-
-        self.assertRaisesRegexp(
-            ValueError, 'invalid literal for int()', parse_range_header, 'bytes=-one', self.content_length
+            exception_class, exception_message_regex, parse_range_header, header_value, self.content_length
         )
