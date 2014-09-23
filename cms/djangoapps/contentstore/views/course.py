@@ -536,7 +536,7 @@ def _create_or_rerun_course(request):
         fields = {'display_name': display_name, 'license': license} if display_name is not None else {'license': license}
 
         license = request.json.get('license')
-        if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False)                                                                                                          and license is not None:
+        if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and license is not None:
             fields['license'] = license
 
         if 'source_course_key' in request.json:

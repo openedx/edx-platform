@@ -43,7 +43,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     ViewUtils.hideLoadingIndicator();
 
                     // Create the table
-                    this.$el.html(this.template());
+                    this.$el.html(this.template({
+                        licenseable: this.licenseable,
+                    }));
                     tableBody = this.$('#asset-table-body');
                     this.tableBody = tableBody;
                     this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});

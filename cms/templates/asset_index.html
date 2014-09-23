@@ -25,7 +25,15 @@
 
         var assets = new AssetCollection();
         assets.url = "${asset_callback_url}";
-        var assetsView = new AssetsView({collection: assets, el: $('.assets-wrapper')});
+        var assetsView = new AssetsView({
+            collection: assets, el: $('.assets-wrapper'),
+
+            % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            licenseable: true
+            % else:
+            licenseable: false
+            % endif
+        });
         assetsView.render();
 
     }); // end of require()

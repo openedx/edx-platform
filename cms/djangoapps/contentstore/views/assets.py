@@ -305,7 +305,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked, li
         'external_url': external_url,
         'license': license,
         'license_version': license_version,
-        'license_editable': settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False),
+        'licenseable': settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False),
         'portable_url': StaticContent.get_static_path_from_location(location),
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
