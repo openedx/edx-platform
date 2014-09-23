@@ -61,6 +61,8 @@ urlpatterns = ('',  # nopep8
     url(r'^heartbeat$', include('heartbeat.urls')),
 
 
+    url(r'^notifier_api/', include('notifier_api.urls')),
+
     url(r'^lang_pref/', include('lang_pref.urls')),
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
