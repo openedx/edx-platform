@@ -1598,11 +1598,17 @@ class CustomResponse(LoncapaResponse):
         correct = self.context['correct']
         messages = self.context['messages']
         overall_message = self.clean_message_html(self.context['overall_message'])
+        grade_decimals = self.context.get('grade_decimals')
+
         correct_map = CorrectMap()
         correct_map.set_overall_message(overall_message)
 
         for k in range(len(idset)):
-            npoints = self.maxpoints[idset[k]] if correct[k] == 'correct' else 0
+            max_points = self.maxpoints[idset[k]]
+            if grade_decimals:
+                npoints = max_points * grade_decimals[k]
+            else:
+                npoints = max_points if correct[k] == 'correct' else 0
             correct_map.set(idset[k], correct[k], msg=messages[k],
                             npoints=npoints)
         return correct_map
@@ -1643,7 +1649,9 @@ class CustomResponse(LoncapaResponse):
             )
             if isinstance(ret, dict):
                 # One kind of dictionary the check function can return has the
-                # form {'ok': BOOLEAN, 'msg': STRING}
+                # form {'ok': BOOLEAN, 'msg': STRING, 'grade_decimal' (optional): FLOAT (between 0.0 and 1.0)}
+                # 'ok' will control the checkmark, while grade_decimal, if present, will scale
+                # the score the student receives on the response.
                 # If there are multiple inputs, they all get marked
                 # to the same correct/incorrect value
                 if 'ok' in ret:
@@ -1658,28 +1666,49 @@ class CustomResponse(LoncapaResponse):
                     else:
                         self.context['messages'][0] = msg
 
+                    if 'grade_decimal' in ret:
+                        decimal = ret['grade_decimal']
+                    else:
+                        decimal = 1.0 if ret['ok'] else 0.0
+                    grade_decimals = [decimal] * len(idset)
+                    self.context['grade_decimals'] = grade_decimals
+
                 # Another kind of dictionary the check function can return has
                 # the form:
-                # {'overall_message': STRING,
-                #  'input_list': [{ 'ok': BOOLEAN, 'msg': STRING }, ...] }
+                # { 'overall_message': STRING,
+                #   'input_list': [
+                #     { 'ok': BOOLEAN, 'msg': STRING, 'grade_decimal' (optional): FLOAT (between 0.0 and 1.0)},
+                #   ...
+                #   ]
+                # }
+                # 'ok' will control the checkmark, while grade_decimal, if present, will scale
+                # the score the student receives on the response.
                 #
                 # This allows the function to return an 'overall message'
                 # that applies to the entire problem, as well as correct/incorrect
-                # status and messages for individual inputs
+                # status, scaled grades, and messages for individual inputs
                 elif 'input_list' in ret:
                     overall_message = ret.get('overall_message', '')
                     input_list = ret['input_list']
 
                     correct = []
                     messages = []
+                    grade_decimals = []
                     for input_dict in input_list:
                         correct.append('correct'
                                        if input_dict['ok'] else 'incorrect')
                         msg = (self.clean_message_html(input_dict['msg'])
                                if 'msg' in input_dict else None)
                         messages.append(msg)
+                        if 'grade_decimal' in input_dict:
+                            decimal = input_dict['grade_decimal']
+                        else:
+                            decimal = 1.0 if input_dict['ok'] else 0.0
+                        grade_decimals.append(decimal)
+
                     self.context['messages'] = messages
                     self.context['overall_message'] = overall_message
+                    self.context['grade_decimals'] = grade_decimals
 
                 # Otherwise, we do not recognize the dictionary
                 # Raise an exception
