@@ -813,6 +813,11 @@ class CourseEnrollment(models.Model):
                may include "audit", "verified_id", etc. Please don't use it
                until we have these mapped out.
 
+        Exceptions that can be raised: NonExistentCourseError,
+        EnrollmentClosedError, CourseFullError, AlreadyEnrolledError.  All these
+        are subclasses of CourseEnrollmentException if you want to catch all of
+        them in the same way.
+
         It is expected that this method is called from a method which has already
         verified the user authentication.
 
