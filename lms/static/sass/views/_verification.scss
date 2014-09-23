@@ -368,15 +368,24 @@
 
         .sts-track-value {
           @extend %copy-badge;
-          color: $white;
+          display: inline-block;
           background: $verified-color-lvl3;
+          color: $white;
+          font-weight: 600;
 
           .context {
-            margin-right: ($baseline/4);
             opacity: 0.80;
             color: $white;
             letter-spacing: 0.1rem;
           }
+        }
+
+        &.professional-ed {
+
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
+          }
+
         }
       }
 

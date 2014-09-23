@@ -22,17 +22,25 @@
         <span class="sts-course-name">${course_name}</span>
       </span>
 
+      %if modes_dict and "professional" in modes_dict:
+      <span class="sts-track professional-ed">
+        <span class="sts-track-value">
+            ${_("Professional Education")}
+        </span>
+      </span>
+      %else:
       <span class="sts-track">
         <span class="sts-track-value">
           %if upgrade:
-            <span class="context">${_("Upgrading to:")}</span> ${_("ID Verified")}
+            <span class="context">${_("Upgrading to:")}</span> ${_("Verified")}
           %elif reverify:
-            <span class="context">${_("Re-verifying for:")}</span> ${_("ID Verified")}
+            <span class="context">${_("Re-verifying for:")}</span> ${_("Verified")}
           %else:
-            <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+            <span class="context">${_("Registering as: ")}</span> ${_("Verified")}
           %endif
         </span>
       </span>
+      %endif
     </span>
   </h2>
 </header>
@@ -58,11 +66,11 @@
     <span class="sts-track">
       <span class="sts-track-value">
         %if upgrade:
-          <span class="context">${_("Upgrading to:")}</span> ${_("ID Verified")}
+          <span class="context">${_("Upgrading to:")}</span> ${_("Verified")}
         %elif reverify:
-          <span class="context">${_("Re-verifying for:")}</span> ${_("ID Verified")}
+          <span class="context">${_("Re-verifying for:")}</span> ${_("Verified")}
         %else:
-          <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+          <span class="context">${_("Registering as: ")}</span> ${_("Verified")}
         %endif
     </span>
   </h2>
