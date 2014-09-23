@@ -25,7 +25,7 @@ from django_comment_common.models import FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, UserBasedRole
+from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole
 
 from xmodule.modulestore.django import modulestore
 
@@ -289,8 +289,8 @@ def _manage_role(course_descriptor, user, role, action):
     """
     Helper method for managing course/forum roles
     """
-    supported_roles = ('instructor', 'staff', 'observer')
-    forum_moderator_roles = ('instructor', 'staff')
+    supported_roles = ('instructor', 'staff', 'observer', 'assistant')
+    forum_moderator_roles = ('instructor', 'staff', 'assistant')
     if role not in supported_roles:
         raise ValueError
     if action is 'allow':
@@ -309,7 +309,8 @@ def _manage_role(course_descriptor, user, role, action):
             # Before we can safely remove the corresponding forum moderator role
             user_instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
             user_staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
-            queryset = user_instructor_courses | user_staff_courses
+            user_assistant_courses = UserBasedRole(user, CourseAssistantRole.ROLE).courses_with_role()
+            queryset = user_instructor_courses | user_staff_courses | user_assistant_courses
             queryset = queryset.filter(course_id=course_descriptor.id)
             if len(queryset) == 0:
                 update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
@@ -1767,6 +1768,10 @@ class CoursesRolesList(SecureAPIView):
         observers = CourseObserverRole(course_key).users_with_role()
         for observer in observers:
             response_data.append({'id': observer.id, 'role': 'observer'})
+
+        assistants = CourseAssistantRole(course_key).users_with_role()
+        for assistant in assistants:
+            response_data.append({'id': assistant.id, 'role': 'assistant'})
 
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
         if user_id:
