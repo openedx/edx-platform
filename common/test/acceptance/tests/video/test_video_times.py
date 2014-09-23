@@ -80,6 +80,7 @@ class VideoTimesTest(VideoBaseTest):
 
         self.assertEqual(self.video.position, '1:00')
 
+    @skip("Intermittently fails 23 Sept 2014")
     def test_video_start_time_and_end_time(self):
         """
         Scenario: Start time and end time work together for Youtube video.
