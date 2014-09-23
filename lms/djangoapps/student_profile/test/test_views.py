@@ -69,7 +69,6 @@ class StudentProfileViewTest(TestCase):
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertIn('accounts/login?next=', response.redirect_chain[0][0])
 
-
     @ddt.data(
         ('get', 'profile_index'),
         ('put', 'name_change')
