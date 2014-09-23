@@ -626,7 +626,7 @@ def try_change_enrollment(request):
 
 
 @require_POST
-def change_enrollment(request, auto_register=False):
+def change_enrollment(request, auto_register=False, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
 
@@ -661,8 +661,24 @@ def change_enrollment(request, auto_register=False):
         Response
 
     """
+    # Sets the auto_register flag, if that's desired
+    # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
+    # If a user is in the experimental condition (auto-registration enabled),
+    # immediately set a session flag so they stay in the experimental condition.
+    # We keep them in the experimental condition even if later on the user
+    # tries to register using the control URL (e.g. because of a redirect from the login page,
+    # which is hard-coded to use the control URL).
+    if auto_register:
+        request.session['auto_register'] = True
+    if request.session.get('auto_register') and not auto_register:
+        auto_register = True
+
     # Get the user
     user = request.user
+
+    # Ensure the user is authenticated
+    if not user.is_authenticated():
+        return HttpResponseForbidden()
 
     # Ensure we received a course_id
     action = request.POST.get("enrollment_action")
@@ -680,22 +696,6 @@ def change_enrollment(request, auto_register=False):
             )
         )
         return HttpResponseBadRequest(_("Invalid course id"))
-
-    # Ensure the user is authenticated
-    if not user.is_authenticated():
-        return HttpResponseForbidden()
-
-    # Sets the auto_register flag, if that's desired
-    # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
-    # If a user is in the experimental condition (auto-registration enabled),
-    # immediately set a session flag so they stay in the experimental condition.
-    # We keep them in the experimental condition even if later on the user
-    # tries to register using the control URL (e.g. because of a redirect from the login page,
-    # which is hard-coded to use the control URL).
-    if auto_register:
-        request.session['auto_register'] = True
-    if request.session.get('auto_register') and not auto_register:
-        auto_register = True
 
     # Don't execute auto-register for the set of courses excluded from auto-registration
     # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
@@ -733,7 +733,7 @@ def change_enrollment(request, auto_register=False):
                 # for no such model to exist, even though we've set the enrollment type
                 # to "honor".
                 try:
-                    CourseEnrollment.enroll(user, course_id, mode=current_mode.slug)
+                    CourseEnrollment.enroll(user, course_id, check_access=check_access)
                 except Exception:
                     return HttpResponseBadRequest(_("Could not enroll"))
 
@@ -769,7 +769,7 @@ def change_enrollment(request, auto_register=False):
                 )
 
             try:
-                CourseEnrollment.enroll(user, course_id, mode=current_mode.slug)
+                CourseEnrollment.enroll(user, course_id, mode=current_mode.slug, check_access=check_access)
             except Exception:
                 return HttpResponseBadRequest(_("Could not enroll"))
 
