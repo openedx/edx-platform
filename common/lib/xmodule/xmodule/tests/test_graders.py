@@ -13,23 +13,23 @@ class GradesheetTest(unittest.TestCase):
         Score.__sub__ = lambda me, other: (me.earned - other.earned) + (me.possible - other.possible)
 
         all_total, graded_total = aggregate_scores(scores)
-        self.assertEqual(all_total, Score(earned=0, possible=0, graded=False, section="summary"))
-        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary"))
+        self.assertEqual(all_total, Score(earned=0, possible=0, graded=False, section="summary", due=None))
+        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary", due=None))
 
-        scores.append(Score(earned=0, possible=5, graded=False, section="summary"))
+        scores.append(Score(earned=0, possible=5, graded=False, section="summary", due=None))
         all_total, graded_total = aggregate_scores(scores)
-        self.assertEqual(all_total, Score(earned=0, possible=5, graded=False, section="summary"))
-        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary"))
+        self.assertEqual(all_total, Score(earned=0, possible=5, graded=False, section="summary", due=None))
+        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary", due=None))
 
-        scores.append(Score(earned=3, possible=5, graded=True, section="summary"))
+        scores.append(Score(earned=3, possible=5, graded=True, section="summary", due=None))
         all_total, graded_total = aggregate_scores(scores)
-        self.assertAlmostEqual(all_total, Score(earned=3, possible=10, graded=False, section="summary"))
-        self.assertAlmostEqual(graded_total, Score(earned=3, possible=5, graded=True, section="summary"))
+        self.assertAlmostEqual(all_total, Score(earned=3, possible=10, graded=False, section="summary", due=None))
+        self.assertAlmostEqual(graded_total, Score(earned=3, possible=5, graded=True, section="summary", due=None))
 
-        scores.append(Score(earned=2, possible=5, graded=True, section="summary"))
+        scores.append(Score(earned=2, possible=5, graded=True, section="summary", due=None))
         all_total, graded_total = aggregate_scores(scores)
-        self.assertAlmostEqual(all_total, Score(earned=5, possible=15, graded=False, section="summary"))
-        self.assertAlmostEqual(graded_total, Score(earned=5, possible=10, graded=True, section="summary"))
+        self.assertAlmostEqual(all_total, Score(earned=5, possible=15, graded=False, section="summary", due=None))
+        self.assertAlmostEqual(graded_total, Score(earned=5, possible=10, graded=True, section="summary", due=None))
 
 
 class GraderTest(unittest.TestCase):
@@ -45,19 +45,19 @@ class GraderTest(unittest.TestCase):
     }
 
     test_gradesheet = {
-        'Homework': [Score(earned=2, possible=20.0, graded=True, section='hw1'),
-                     Score(earned=16, possible=16.0, graded=True, section='hw2')],
+        'Homework': [Score(earned=2, possible=20.0, graded=True, section='hw1', due=None),
+                     Score(earned=16, possible=16.0, graded=True, section='hw2', due=None)],
         # The dropped scores should be from the assignments that don't exist yet
 
-        'Lab': [Score(earned=1, possible=2.0, graded=True, section='lab1'),  # Dropped
-                Score(earned=1, possible=1.0, graded=True, section='lab2'),
-                Score(earned=1, possible=1.0, graded=True, section='lab3'),
-                Score(earned=5, possible=25.0, graded=True, section='lab4'),  # Dropped
-                Score(earned=3, possible=4.0, graded=True, section='lab5'),  # Dropped
-                Score(earned=6, possible=7.0, graded=True, section='lab6'),
-                Score(earned=5, possible=6.0, graded=True, section='lab7')],
+        'Lab': [Score(earned=1, possible=2.0, graded=True, section='lab1', due=None),  # Dropped
+                Score(earned=1, possible=1.0, graded=True, section='lab2', due=None),
+                Score(earned=1, possible=1.0, graded=True, section='lab3', due=None),
+                Score(earned=5, possible=25.0, graded=True, section='lab4', due=None),  # Dropped
+                Score(earned=3, possible=4.0, graded=True, section='lab5', due=None),  # Dropped
+                Score(earned=6, possible=7.0, graded=True, section='lab6', due=None),
+                Score(earned=5, possible=6.0, graded=True, section='lab7', due=None)],
 
-        'Midterm': [Score(earned=50.5, possible=100, graded=True, section="Midterm Exam"), ],
+        'Midterm': [Score(earned=50.5, possible=100, graded=True, section="Midterm Exam", due=None), ],
     }
 
     def test_single_section_grader(self):
