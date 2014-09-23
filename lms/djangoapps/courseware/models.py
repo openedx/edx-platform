@@ -93,6 +93,12 @@ class StudentModule(models.Model):
         return unicode(repr(self))
 
 
+def course_modified_times(user, ids):
+    ''' Returns the times when a given studentmodule was last modified.
+    '''
+    results = StudentModule.objects.filter(student=user, module_state_key__in=ids).values_list('module_state_key', 'modified')
+    return dict(results)
+
 class StudentModuleHistory(models.Model):
     """Keeps a complete history of state changes for a given XModule for a given
     Student. Right now, we restrict this to problems so that the table doesn't
