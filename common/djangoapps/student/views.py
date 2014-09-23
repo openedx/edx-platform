@@ -1,13 +1,13 @@
 """
 Student Views
 """
+import datetime
 import logging
 import re
 import uuid
 import time
 import json
 from collections import defaultdict
-from datetime import datetime
 from pytz import UTC
 
 from django.conf import settings
@@ -42,7 +42,6 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from mako.exceptions import TopLevelLookupException
 
 from course_modes.models import CourseMode
-
 from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
@@ -65,7 +64,6 @@ from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
-from courseware.models import course_modified_times
 
 from django_comment_common.models import Role
 
@@ -228,7 +226,7 @@ def single_course_reverification_info(user, course, enrollment):  # pylint: disa
         ReverifyInfo: (course_id, course_name, course_number, date, status)
         OR, None: None if there is no re-verification info for this enrollment
     """
-    window = MidcourseReverificationWindow.get_window(course.id, datetime.now(UTC))
+    window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
 
     # If there's no window OR the user is not verified, we don't get reverification info
     if (not window) or (enrollment.mode != "verified"):
@@ -246,8 +244,6 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     Get the relevant set of (Course, CourseEnrollment) pairs to be displayed on
     a student's dashboard.
     """
-    pairs = []
-
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         course = modulestore().get_course(enrollment.course_id)
         if course and not isinstance(course, ErrorDescriptor):
@@ -261,18 +257,12 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
             elif course.location.org in org_filter_out_set:
                 continue
 
-            pairs.append((course, enrollment))
+            yield (course, enrollment)
         else:
             log.error("User {0} enrolled in {2} course {1}".format(
                 user.username, enrollment.course_id, "broken" if course else "non-existent"
             ))
 
-    ## Sort pairs in order of courseware access. If I am actively using a course, it should bubble up to the top.
-    modified_times_map = course_modified_times(user, [p[0].scope_ids.usage_id for p in pairs])
-    def key_function(x):
-        return modified_times_map.get(unicode(x[0].scope_ids.usage_id), datetime.min)
-    pairs.sort(key=key_function, reverse=True)
-    return pairs
 
 def _cert_info(user, course, cert_status):
     """
@@ -439,7 +429,7 @@ def complete_course_mode_info(course_id, enrollment):
         mode_info['show_upsell'] = True
         # if there is an expiration date, find out how long from now it is
         if modes['verified'].expiration_datetime:
-            today = datetime.now(UTC).date()
+            today = datetime.datetime.now(UTC).date()
             mode_info['days_for_upsell'] = (modes['verified'].expiration_datetime.date() - today).days
 
     return mode_info
@@ -1177,7 +1167,7 @@ def disable_account_ajax(request):
             context['message'] = _("Unexpected account status")
             return JsonResponse(context, status=400)
         user_account.changed_by = request.user
-        user_account.standing_last_changed_at = datetime.now(UTC)
+        user_account.standing_last_changed_at = datetime.datetime.now(UTC)
         user_account.save()
 
     return JsonResponse(context)
@@ -1562,7 +1552,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
     if do_external_auth:
         eamap.user = new_user
-        eamap.dtsignup = datetime.now(UTC)
+        eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
         AUDIT_LOG.info("User registered with external_auth %s", post_vars['username'])
         AUDIT_LOG.info('Updated ExternalAuthMap for %s to be %s', post_vars['username'], eamap)
@@ -1990,7 +1980,7 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
         meta = u_prof.get_meta()
         if 'old_emails' not in meta:
             meta['old_emails'] = []
-        meta['old_emails'].append([user.email, datetime.now(UTC).isoformat()])
+        meta['old_emails'].append([user.email, datetime.datetime.now(UTC).isoformat()])
         u_prof.set_meta(meta)
         u_prof.save()
         # Send it to the old email...
@@ -2110,7 +2100,7 @@ def accept_name_change_by_id(uid):
     meta = u_prof.get_meta()
     if 'old_names' not in meta:
         meta['old_names'] = []
-    meta['old_names'].append([u_prof.name, pnc.rationale, datetime.now(UTC).isoformat()])
+    meta['old_names'].append([u_prof.name, pnc.rationale, datetime.datetime.now(UTC).isoformat()])
     u_prof.set_meta(meta)
 
     u_prof.name = pnc.new_name
