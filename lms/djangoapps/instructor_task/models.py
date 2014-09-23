@@ -20,6 +20,8 @@ import json
 import hashlib
 import os.path
 import urllib
+import sys
+import logging
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
@@ -208,7 +210,19 @@ class ReportStore(object):
             return S3ReportStore.from_config()
         elif storage_type.lower() == "localfs":
             return LocalFSReportStore.from_config()
-
+        else:
+            reportstore_class_data=storage_type.split(".")
+            module_reportstore_path = ".".join(reportstore_class_data[:-1])
+            reportstore_class_name = reportstore_class_data[-1]
+            try:
+                module_reportstore = __import__(module_reportstore_path,fromlist=[reportstore_class_name])
+                reportstore_class = getattr(module_reportstore,reportstore_class_name)
+                return reportstore_class.from_config()
+            except AttributeError:
+                logging.error('Class does not exist')
+            except ImportError:
+                logging.error('Module does not exist')
+                 
 
 class S3ReportStore(ReportStore):
     """
