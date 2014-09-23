@@ -1244,7 +1244,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
             field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
-            user_location=None, **kwargs):
+            user_location=None, get_python_lib_zip=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1293,6 +1293,10 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         can_execute_unsafe_code - A function returning a boolean, whether or
             not to allow the execution of unsafe, unsandboxed code.
 
+        get_python_lib_zip - A function returning a bytestring or None.  The
+            bytestring is the contents of a zip file that should be importable
+            by other Python code running in the module.
+
         error_descriptor_class - The class to use to render XModules with errors
 
         get_real_user - function that takes `anonymous_student_id` and returns real user_id,
@@ -1334,6 +1338,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
 
         self.cache = cache or DoNothingCache()
         self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
+        self.get_python_lib_zip = get_python_lib_zip or (lambda: None)
         self.replace_course_urls = replace_course_urls
         self.replace_jump_to_id_urls = replace_jump_to_id_urls
         self.error_descriptor_class = error_descriptor_class
