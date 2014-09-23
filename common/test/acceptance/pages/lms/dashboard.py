@@ -20,8 +20,8 @@ class DashboardPage(PageObject):
         return self.q(css='section.my-courses').present
 
     @property
-    def current_courses_text(self):
-        text_items = self.q(css='section#my-courses').text
+    def courses_text(self):
+        text_items = self.q(css='section#my-courses span.my-courses-title-label').text
         if len(text_items) > 0:
             return text_items[0]
         else:
