@@ -12,7 +12,7 @@ TO DO sync instructor and staff flags
 import logging
 from django_comment_common.models import Role
 
-from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole
+from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ ROLES = {
     'instructor': CourseInstructorRole,
     'observer': CourseObserverRole,
     'staff': CourseStaffRole,
+    'assistant': CourseAssistantRole,
 }
 
 
