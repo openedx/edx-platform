@@ -976,6 +976,7 @@ courseware_js = (
 # RequireJS and an optimizer.
 base_vendor_js = [
     'js/vendor/jquery.min.js',
+    'js/vendor/jquery.cookie.js',
 ]
 
 main_vendor_js = base_vendor_js + [

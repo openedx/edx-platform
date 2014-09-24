@@ -66,7 +66,7 @@ def email_change_request_handler(request):
 
     username = user.username
     old_email = profile_api.profile_info(username)['email']
-    new_email = put.get('new-email')
+    new_email = put.get('new_email')
 
     key = account_api.request_email_change(username, new_email, password)
 
