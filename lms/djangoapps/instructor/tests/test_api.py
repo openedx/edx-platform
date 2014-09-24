@@ -1299,35 +1299,22 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         # Seed forum roles for course.
         seed_permissions_roles(self.course.id)
 
-        # Test add discussion admin with email.
-        self.assert_update_forum_role_membership(self.other_user.email, "Administrator", "allow")
+        for user in [self.instructor, self.other_user]:
+            for identifier_attr in [user.email, user.username]:
+                for rolename in ["Administrator", "Moderator", "Community TA"]:
+                    for action in ["allow", "revoke"]:
+                        self.assert_update_forum_role_membership(user, identifier_attr, rolename, action)
 
-        # Test revoke discussion admin with email.
-        self.assert_update_forum_role_membership(self.other_user.email, "Administrator", "revoke")
-
-        # Test add discussion moderator with username.
-        self.assert_update_forum_role_membership(self.other_user.username, "Moderator", "allow")
-
-        # Test revoke discussion moderator with username.
-        self.assert_update_forum_role_membership(self.other_user.username, "Moderator", "revoke")
-
-        # Test add discussion community TA with email.
-        self.assert_update_forum_role_membership(self.other_user.email, "Community TA", "allow")
-
-        # Test revoke discussion community TA with username.
-        self.assert_update_forum_role_membership(self.other_user.username, "Community TA", "revoke")
-
-    def assert_update_forum_role_membership(self, unique_student_identifier, rolename, action):
+    def assert_update_forum_role_membership(self, current_user, identifier, rolename, action):
         """
         Test update forum role membership.
         Get unique_student_identifier, rolename and action and update forum role.
         """
-
         url = reverse('update_forum_role_membership', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(
             url,
             {
-                'unique_student_identifier': unique_student_identifier,
+                'unique_student_identifier': identifier,
                 'rolename': rolename,
                 'action': action,
             }
@@ -1336,7 +1323,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         # Status code should be 200.
         self.assertEqual(response.status_code, 200)
 
-        user_roles = self.other_user.roles.filter(course_id=self.course.id).values_list("name", flat=True)
+        user_roles = current_user.roles.filter(course_id=self.course.id).values_list("name", flat=True)
         if action == 'allow':
             self.assertIn(rolename, user_roles)
         elif action == 'revoke':
