@@ -32,7 +32,8 @@ from .exceptions import (
     MultipleCouponsNotAllowedException, InvalidCartItem
 )
 from .models import (
-    Order, PaidCourseRegistration, OrderItem, Coupon,
+    Order, OrderTypes,
+    PaidCourseRegistration, OrderItem, Coupon,
     CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption,
     Donation, DonationConfiguration
 )
@@ -40,6 +41,7 @@ from .processors import (
     process_postpay_callback, render_purchase_form_html,
     get_signed_purchase_params, get_purchase_endpoint
 )
+
 import json
 from xmodule_django.models import CourseKeyField
 
@@ -92,7 +94,48 @@ def add_course_to_cart(request, course_id):
 
 
 @login_required
+def update_user_cart(request):
+    """
+    when user change the number-of-students from the UI then
+    this method Update the corresponding qty field in OrderItem model and update the order_type in order model.
+    """
+    purchase_type = request.POST.get('purchase_type', OrderTypes.PERSONAL)
+    if purchase_type == OrderTypes.BUSINESS:
+        try:
+            qty = int(request.POST.get('qty', 1))
+        except ValueError:
+            log.exception('Quantity must be an integer.')
+            return HttpResponseBadRequest('Quantity must be an integer.')
+
+        if qty < 1 or qty > 1000:
+            log.warning('Quantity must be between 1 and 1000.')
+            return HttpResponseBadRequest('Quantity must be between 1 and 1000.')
+    else:
+        qty = 1  # Quantity is 1 if purchase type is personal..
+
+    item_id = request.POST.get('ItemId', None)
+    if item_id:
+        try:
+            item = OrderItem.objects.get(id=item_id, status='cart')
+        except OrderItem.DoesNotExist:
+            log.exception('Cart OrderItem id={0} DoesNotExist'.format(item_id))
+            return HttpResponseNotFound('Order item does not exist.')
+
+        item.qty = qty
+        item.order.order_type = purchase_type
+        item.order.save()
+        item.save()
+        total_cost = item.order.total_cost
+        return JsonResponse({"total_cost": total_cost}, 200)
+
+    return HttpResponseBadRequest('Order item not found in request.')
+
+
+@login_required
 def show_cart(request):
+    """
+    This view shows cart items.
+    """
     cart = Order.get_cart_for_user(request.user)
     total_cost = cart.total_cost
     cart_items = cart.orderitem_set.all()
@@ -106,13 +149,14 @@ def show_cart(request):
         course = get_course_by_id(course_key, depth=None)
         shoppingcart_items.append((cart_item, course))
 
-    site_name = microsite.get_value('SITE_NAME', 'localhost')
+    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
 
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
     )
     form_html = render_purchase_form_html(cart, callback_url=callback_url)
     context = {
+        'order': cart,
         'shoppingcart_items': shoppingcart_items,
         'amount': total_cost,
         'site_name': site_name,
@@ -140,6 +184,9 @@ def clear_cart(request):
 
 @login_required
 def remove_item(request):
+    """
+    This will remove an item from the user cart and also delete the corresponding codes redemption.
+    """
     item_id = request.REQUEST.get('id', '-1')
     try:
         item = OrderItem.objects.get(id=item_id, status='cart')
@@ -527,6 +574,7 @@ def billing_details(request):
         return JsonResponse({
             'response': _('success')
         })  # status code 200: OK by default
+
 
 @login_required
 def show_receipt(request, ordernum):

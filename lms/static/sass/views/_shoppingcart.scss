@@ -280,6 +280,9 @@
         text-decoration: none;
       }
     }
+  .relative{
+    position: relative;
+  }
   input[type="text"], input[type="email"] , select{
         font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
         font-style: normal;
@@ -392,7 +395,6 @@
           color: $light-gray2;
           .numbers-row{
             position: relative;
-            pointer-events:none;
             label{
               font-size: 16px;
               text-transform: uppercase;
@@ -423,6 +425,7 @@
                   outline: none;
                 }
               }
+
             }
             .button{
               position: absolute;
@@ -439,8 +442,40 @@
                 span{display: none;}
               }
               &.inc{top: 9px;}
-              &.dec{bottom: 16px;height: 22px;}
+              &.dec{top: 30px;height: 22px;}
             }
+            &.disabled{
+              .counter{
+                border: 2px solid #CCCCCC;
+                &:hover{
+                  cursor: not-allowed;
+                }
+                input{
+                  color: #CCC;
+                }
+              }
+              .button{
+                i{
+                  color: #ccc;
+                }
+              }
+              }
+            #update_btn{
+                display: inline-block;
+                float: right;
+                font-size: 15px;
+                padding: 25px 35px 25px 0;
+                &:focus{
+                  outline: none;
+                }
+            }
+            span.error-text{
+              display: block;
+              text-transform: lowercase;
+            }
+          }
+          .disable-numeric-counter{
+            pointer-events: none;
           }
         }
         .col-3{
@@ -578,7 +613,7 @@
         }
       }
       .col-1{
-        width: 50%;
+        width: 35%;
         float: left;
         span.radio-group{
           display: inline-block;
@@ -611,7 +646,7 @@
           }
         }
       .col-2{
-        width: 50%;
+        width: 65%;
         float: right;
         input[type="submit"]{
           width: auto;
@@ -620,20 +655,27 @@
           font-size: 24px;
           letter-spacing: 0;
           font-weight: 600;
+          margin-left: 15px;
           &#register{
             padding: 18px 30px;
           }
          }
+        p{
+          font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+          padding: 13px 0;
+          text-align: right;
+        }
         form{
           position: relative;
-          i{
+        }
+          i.icon-caret-right{
             position: absolute;
             right: 30px;
-            top: 21px;
+            top: 25px;
             color: white;
             font-size: 24px;
           }
-        }
+
         label.pull-right{
           font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
           font-style: normal;
