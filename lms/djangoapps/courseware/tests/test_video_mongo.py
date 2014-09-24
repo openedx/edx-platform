@@ -155,7 +155,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             <video show_captions="true"
             display_name="A Name"
                 sub="{sub}" download_track="{download_track}"
-            start_time="01:00:03" end_time="01:00:10"
+            start_time="01:00:03" end_time="01:00:10" download_video="true"
             >
                 <source src="example.mp4"/>
                 <source src="example.webm"/>

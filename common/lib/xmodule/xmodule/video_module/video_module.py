@@ -297,6 +297,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
 
         self.source_visible = False
+        # Set download_video field to default value if its not explicitly set for backward compatibility.
+        download_video = editable_fields['download_video']
+        if not download_video['explicitly_set']:
+            self.download_video = self.download_video
+
         if self.source:
             # If `source` field value exist in the `html5_sources` field values,
             # then delete `source` field value and use value from `html5_sources` field.
@@ -305,7 +310,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 self.download_video = True
             else:  # Otherwise, `source` field value will be used.
                 self.source_visible = True
-                download_video = editable_fields['download_video']
                 if not download_video['explicitly_set']:
                     self.download_video = True
 
