@@ -31,11 +31,13 @@
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
   <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to this view's content" %}</a>
-  {% if ENABLE_NEW_EDX_HEADER %}
-    {% include "navigation.html" %}
-  {% else %}
-    {% include "original_navigation.html" %}
-  {% endif %}
+  {% with course=request.course %}
+    {% if ENABLE_NEW_EDX_HEADER %}
+      {% include "navigation.html" %}
+    {% else %}
+      {% include "original_navigation.html" %}
+    {% endif %}
+  {% endwith %}
   <div class="content-wrapper" id="content">
     {% block body %}{% endblock %}
     {% block bodyextra %}{% endblock %}
