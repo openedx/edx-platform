@@ -7,7 +7,6 @@ import re
 import uuid
 import time
 import json
-import requests
 from collections import defaultdict
 from pytz import UTC
 
@@ -1090,19 +1089,6 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
-def logout_portal(request):
-    if request.user.is_authenticated():
-        user = request.user
-        social_data = models.DjangoStorage.user.get_social_auth_for_user(user)[0]
-        try:
-            requests.post(
-                settings.IONISX_AUTH.get('SYNC_LOGOUT_URL'),
-                headers={'Authorization': 'Bearer {0}'.format(social_data.extra_data['access_token'])}
-            )
-        except requests.ConnectionError as err:
-            log.warning(err)
-
-
 @ensure_csrf_cookie
 def logout_user(request):
     """
@@ -1112,18 +1098,8 @@ def logout_user(request):
     """
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
-    if isinstance(request.user, AnonymousUser):
-        user_mail = None
-    else:
-        user_mail = request.user.email
-
-    logout_portal(request)
     logout(request)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        target = reverse('cas-logout')
-    else:
-        target = settings.IONISX_AUTH.get('ROOT_URL')
-    response = redirect(target)
+    response = redirect(settings.IONISX_AUTH.get('LOGOUT_URL'))
     response.delete_cookie(
         settings.EDXMKTG_COOKIE_NAME,
         path='/', domain=settings.SESSION_COOKIE_DOMAIN,
