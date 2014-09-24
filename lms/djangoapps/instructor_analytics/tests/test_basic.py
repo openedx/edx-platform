@@ -13,15 +13,18 @@ from instructor_analytics.basic import (
     sale_record_features, enrolled_students_features, course_registration_features, coupon_codes_features,
     AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 )
+from course_groups.models import CourseUserGroup
 from courseware.tests.factories import InstructorFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class TestAnalyticsBasic(TestCase):
+class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
 
     def setUp(self):
+        super(TestAnalyticsBasic, self).setUp()
         self.course_key = SlashSeparatedCourseKey('robot', 'course', 'id')
         self.users = tuple(UserFactory() for _ in xrange(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
@@ -40,13 +43,49 @@ class TestAnalyticsBasic(TestCase):
         query_features = ('username', 'name', 'email')
         for feature in query_features:
             self.assertIn(feature, AVAILABLE_FEATURES)
-        userreports = enrolled_students_features(self.course_key, query_features)
+        with self.assertNumQueries(1):
+            userreports = enrolled_students_features(self.course_key, query_features)
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(set(userreport.keys()), set(query_features))
             self.assertIn(userreport['username'], [user.username for user in self.users])
             self.assertIn(userreport['email'], [user.email for user in self.users])
             self.assertIn(userreport['name'], [user.profile.name for user in self.users])
+
+    def test_enrolled_students_features_keys_cohorted(self):
+        course = CourseFactory.create(course_key=self.course_key)
+        course.cohort_config = {'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
+        self.store.update_item(course, self.instructor.id)
+        cohort = CourseUserGroup.objects.create(
+            name='cohort',
+            course_id=course.id,
+            group_type=CourseUserGroup.COHORT
+        )
+        cohorted_students = [UserFactory.create() for _ in xrange(10)]
+        cohorted_usernames = [student.username for student in cohorted_students]
+        non_cohorted_student = UserFactory.create()
+        for student in cohorted_students:
+            cohort.users.add(student)
+            CourseEnrollment.enroll(student, course.id)
+        CourseEnrollment.enroll(non_cohorted_student, course.id)
+        instructor = InstructorFactory(course_key=course.id)
+        self.client.login(username=instructor.username, password='test')
+
+        query_features = ('username', 'cohort')
+        # There should be a constant of 2 SQL queries when calling
+        # enrolled_students_features.  The first query comes from the call to
+        # User.objects.filter(...), and the second comes from
+        # prefetch_related('course_groups').
+        with self.assertNumQueries(2):
+            userreports = enrolled_students_features(course.id, query_features)
+        self.assertEqual(len([r for r in userreports if r['username'] in cohorted_usernames]), len(cohorted_students))
+        self.assertEqual(len([r for r in userreports if r['username'] == non_cohorted_student.username]), 1)
+        for report in userreports:
+            self.assertEqual(set(report.keys()), set(query_features))
+            if report['username'] in cohorted_usernames:
+                self.assertEqual(report['cohort'], cohort.name)
+            else:
+                self.assertEqual(report['cohort'], '[unassigned]')
 
     def test_available_features(self):
         self.assertEqual(len(AVAILABLE_FEATURES), len(STUDENT_FEATURES + PROFILE_FEATURES))
@@ -59,6 +98,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestCourseSaleRecordsAnalyticsBasic, self).setUp()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -107,6 +147,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestCourseRegistrationCodeAnalyticsBasic, self).setUp()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
