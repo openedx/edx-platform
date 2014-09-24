@@ -18,6 +18,13 @@ for all of their organizations' edx.org and edge.edx.org courses.
 
 * :ref:`Data Package Contents`
 
+Course-specific data is also available to the members of individual course
+teams. Users who are assigned the Instructor or Course Staff role can view and
+download data from the Instructor Dashboard in their live courses and from edX
+Insights. The data available to course teams from these applications is a
+subset of the data available in the data packages. For more information, see
+`Building and Running an edX Course`_ and `Using edX Insights`_.
+
 .. _Data Package Files:
 
 **********************
@@ -289,3 +296,8 @@ following set of sql and mongo database files.
 
   Changes and deletions affecting course wiki articles. See
   :ref:`wiki_articlerevision`.
+
+
+
+.. _Using edX Insights: http://edx-insights.readthedocs.org/en/latest/
+.. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
