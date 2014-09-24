@@ -57,7 +57,7 @@ var edx = edx || {};
                     var $email = $('#new-email'),
                         $password = $('#password'),
                         data = {
-                            email: $email.val(),
+                            new_email: $email.val(),
                             password: $password.val()
                         };
 
