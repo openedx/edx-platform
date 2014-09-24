@@ -7,6 +7,7 @@
 # Adam Łukasiak <adamus160@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
+# Mateusz <blue90pl@gmail.com>, 2014
 # Cairath, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Dyfeomorfizm <ximixd@gmail.com>, 2014
@@ -19,6 +20,7 @@
 # kuba11p <jakubsw.p@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
+# Mateusz <blue90pl@gmail.com>, 2014
 # Cairath, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
@@ -39,8 +41,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-23 15:15-0400\n"
-"PO-Revision-Date: 2014-09-21 16:30+0000\n"
+"POT-Creation-Date: 2014-09-24 13:34-0400\n"
+"PO-Revision-Date: 2014-09-24 18:00+0000\n"
 "Last-Translator: Mateusz <blue90pl@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/)\n"
 "MIME-Version: 1.0\n"
