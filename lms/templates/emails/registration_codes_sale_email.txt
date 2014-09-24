@@ -1,0 +1,31 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("Thank you for your purchase of {course_name}!").format(course_name=course.display_name)}
+
+${_("An invoice for ${total_price} is attached. Payment is due immediately.  Information on payment methods can be found on the invoice.").format(total_price=sale_price)}
+
+${_("A CSV file of your registration codes is attached. Please distribute registration codes to each student planning to enroll using the email template below.")}
+
+${_("Thanks,")}
+${_("Your {platform_name} Team").format(platform_name=platform_name)}
+
+
+———————————————————————————————————————————
+
+
+${_("Dear [[Name]]:")}
+
+${_("We have provided an enrollment for you in the course {course_name} from {platform_name}. Please follow the instructions below to claim your access.").format(course_name=course.display_name, platform_name=platform_name)}
+
+${_("Your redeem code is: [[Enter Redeem Code here from the attached CSV]]")}
+
+${_("(1) Register for an account at https://{site_name}.").format(site_name=site_name)}
+${_("(2) Once registered, navigate to https://{course_url}").format(course_url=course_url)}
+${_("(3) Click 'Add {course_number} to Cart'").format(course_number=course.display_coursenumber)}
+${_("(4) On the shopping cart page, enter your redeem code and click apply code. This will make payment equal to $0.")}
+${_("(5) Click 'Register'")}
+${_("(6) You should be able to see your course on your student dashboard at https://{dashboard_url}").format(dashboard_url=dashboard_url)}
+${_("(7) Course materials will not be available until the course start date.")}
+
+${_("Sincerely,")}
+${_("[[Your Signature]]")}

@@ -294,7 +294,7 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,    
 
-    # Expose Mobile REST API. Note that if you use this, you must also set 
+    # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
 
@@ -1870,6 +1870,10 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
     "HarvardX/SW12.9x/3T2014",
     "HarvardX/SW12.8x/3T2014",
 ])
+
+# REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
+INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
+INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
 
 ################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
 
