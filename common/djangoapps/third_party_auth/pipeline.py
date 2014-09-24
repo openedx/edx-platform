@@ -75,10 +75,12 @@ from . import provider
 AUTH_ENTRY_KEY = 'auth_entry'
 AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
+AUTH_ENTRY_PROFILE = 'profile'
 AUTH_ENTRY_REGISTER = 'register'
 _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_DASHBOARD,
     AUTH_ENTRY_LOGIN,
+    AUTH_ENTRY_PROFILE,
     AUTH_ENTRY_REGISTER
 ])
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
@@ -335,15 +337,17 @@ def parse_query_params(strategy, response, *args, **kwargs):
         'is_login': auth_entry == AUTH_ENTRY_LOGIN,
         # Whether the auth pipeline entered from /register.
         'is_register': auth_entry == AUTH_ENTRY_REGISTER,
+        # Whether the auth pipeline entered from /profile.
+        'is_profile': auth_entry == AUTH_ENTRY_PROFILE,
     }
 
 
 @partial.partial
-def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboard=None, is_login=None, is_register=None, user=None, *args, **kwargs):
+def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboard=None, is_login=None, is_profile=None, is_register=None, user=None, *args, **kwargs):
     """Dispatches user to views outside the pipeline if necessary."""
 
     # We're deliberately verbose here to make it clear what the intended
-    # dispatch behavior is for the three pipeline entry points, given the
+    # dispatch behavior is for the four pipeline entry points, given the
     # current state of the pipeline. Keep in mind the pipeline is re-entrant
     # and values will change on repeated invocations (for example, the first
     # time through the login flow the user will be None so we dispatch to the
@@ -358,7 +362,7 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
     user_unset = user is None
     dispatch_to_login = is_login and (user_unset or user_inactive)
 
-    if is_dashboard:
+    if is_dashboard or is_profile:
         return
 
     if dispatch_to_login:
@@ -373,7 +377,8 @@ def login_analytics(*args, **kwargs):
 
     action_to_event_name = {
         'is_login': 'edx.bi.user.account.authenticated',
-        'is_dashboard': 'edx.bi.user.account.linked'
+        'is_dashboard': 'edx.bi.user.account.linked',
+        'is_profile': 'edx.bi.user.account.linked',
     }
 
     # Note: we assume only one of the `action` kwargs (is_dashboard, is_login) to be

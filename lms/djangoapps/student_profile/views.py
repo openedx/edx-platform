@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response
 from user_api.api import profile as profile_api
+from third_party_auth import pipeline
 
 
 @login_required
@@ -26,9 +27,12 @@ def index(request):
         GET /profile
 
     """
+    user = request.user
+
     return render_to_response(
         'student_profile/index.html', {
             'disable_courseware_js': True,
+            'provider_user_states': pipeline.get_provider_user_states(user),
         }
     )
 
