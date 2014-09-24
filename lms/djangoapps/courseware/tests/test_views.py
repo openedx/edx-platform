@@ -35,6 +35,7 @@ from course_modes.models import CourseMode
 import shoppingcart
 
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
+from util.views import ensure_valid_course_key
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -568,9 +569,9 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
 
-class TestVerifyCourseIdDecorator(TestCase):
+class VerifyCourseKeyDecoratorTests(TestCase):
     """
-    Tests for the verify_course_id decorator.
+    Tests for the ensure_valid_course_key decorator.
     """
 
     def setUp(self):
@@ -580,12 +581,12 @@ class TestVerifyCourseIdDecorator(TestCase):
 
     def test_decorator_with_valid_course_id(self):
         mocked_view = create_autospec(views.course_about)
-        view_function = views.verify_course_id(mocked_view)
+        view_function = ensure_valid_course_key(mocked_view)
         view_function(self.request, course_id=self.valid_course_id)
         self.assertTrue(mocked_view.called)
 
     def test_decorator_with_invalid_course_id(self):
         mocked_view = create_autospec(views.course_about)
-        view_function = views.verify_course_id(mocked_view)
+        view_function = ensure_valid_course_key(mocked_view)
         self.assertRaises(Http404, view_function, self.request, course_id=self.invalid_course_id)
         self.assertFalse(mocked_view.called)
