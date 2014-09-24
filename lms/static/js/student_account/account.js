@@ -46,28 +46,7 @@ var edx = edx || {};
 
             cookie: {
                 get: function( name ) {
-                    var cookieValue = null,
-                        cookies,
-                        cookie = '',
-                        i,
-                        len;
-
-                    if ( document.cookie && document.cookie !== '' ) {
-                        cookies = document.cookie.split(';');
-                        len = cookies.length;
-
-                        for ( i = 0; i < len; i++ ) {
-                            cookie = $.trim( cookies[i] );
-
-                            // Does this cookie string begin with the name we want?
-                            if ( cookie.substring( 0, name.length + 1 ) === ( name + '=' ) ) {
-                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                i = len;
-                            }
-                        }
-                    }
-
-                    return cookieValue;
+                    return $.cookie(name);
                 }
             },
 

@@ -1,37 +1,76 @@
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = $.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
+var edx = edx || {};
 
-var csrftoken = getCookie('csrftoken');
+(function($) {
+    'use strict';
 
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (settings.type == "PUT") {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
+    edx.student = edx.student || {};
 
-$("#name-change-form").submit(function(event) {
-    // perform validation?
-    $.ajax({
-        url: "name_change",
-        type: "PUT",
-        data: {
-            new_name: $("#new-name").val()
-        }
-    });
-    event.preventDefault();
-});
+    edx.student.profile = (function() {
+
+        var _fn = {
+            init: function() {
+                _fn.ajax.init();
+                _fn.eventHandlers.init();
+            },
+
+            eventHandlers: {
+                init: function() {
+                    _fn.eventHandlers.submit();
+                },
+
+                submit: function() {
+                    $("#name-change-form").submit( _fn.form.submit );
+                }
+            },
+
+            form: {
+                submit: function( event ) {
+                    var $newName = $('new-name');
+                    var data = {
+                        new_name: $newName.val()
+                    };
+
+                    event.preventDefault();
+                    _fn.ajax.put( 'name_change', data );
+                }
+            },
+
+            ajax: {
+                init: function() {
+                    var csrftoken = _fn.cookie.get( 'csrftoken' );
+
+                    $.ajaxSetup({
+                        beforeSend: function(xhr, settings) {
+                            if ( settings.type === 'PUT' ) {
+                                xhr.setRequestHeader( 'X-CSRFToken', csrftoken );
+                            }
+                        }
+                    });
+                },
+
+                put: function( url, data ) {
+                    $.ajax({
+                        url: url,
+                        type: 'PUT',
+                        data: data
+                    });
+                }
+            },
+
+            cookie: {
+                get: function( name ) {
+                    return $.cookie(name);
+                }
+            },
+
+        };
+
+        return {
+            init: _fn.init
+        };
+
+    })();
+
+    edx.student.profile.init();
+
+})(jQuery);
