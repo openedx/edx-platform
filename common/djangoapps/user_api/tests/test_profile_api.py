@@ -3,6 +3,7 @@
 
 from django.test import TestCase
 import ddt
+from nose.tools import raises
 from dateutil.parser import parse as parse_datetime
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
@@ -28,24 +29,21 @@ class ProfileApiTest(TestCase):
             'full_name': u'',
         })
 
-    @ddt.data(
-        (None, ''),
-        ('', ''),
-        (u'ȻħȺɍłɇs', u'ȻħȺɍłɇs'),
-    )
-    @ddt.unpack
-    def test_update_full_name(self, new_full_name, expected_name):
+    def test_update_full_name(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        profile_api.update_profile(self.USERNAME, full_name=new_full_name)
-
+        profile_api.update_profile(self.USERNAME, full_name=u"ȻħȺɍłɇs")
         profile = profile_api.profile_info(username=self.USERNAME)
-        self.assertEqual(profile['full_name'], expected_name)
+        self.assertEqual(profile['full_name'], u"ȻħȺɍłɇs")
 
-    def test_update_full_name_too_long(self):
+    @raises(profile_api.ProfileInvalidField)
+    @ddt.data('', 'a' * profile_api.FULL_NAME_MAX_LENGTH + 'a')
+    def test_update_full_name_invalid(self, invalid_name):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        profile_api.update_profile(self.USERNAME, full_name=invalid_name)
 
-        with self.assertRaises(profile_api.ProfileRequestError):
-            profile_api.update_profile(self.USERNAME, full_name=u'𝓐' * 256)
+    @raises(profile_api.ProfileUserNotFound)
+    def test_update_profile_no_user(self):
+        profile_api.update_profile(self.USERNAME, full_name="test")
 
     def test_retrieve_profile_no_user(self):
         profile = profile_api.profile_info("does not exist")

@@ -14,6 +14,25 @@ class ProfileRequestError(Exception):
     pass
 
 
+class ProfileUserNotFound(ProfileRequestError):
+    """ The requested user does not exist. """
+    pass
+
+
+class ProfileInvalidField(ProfileRequestError):
+    """ The proposed value for a field is not in a valid format. """
+
+    def __init__(self, field, value):
+        self.field = field
+        self.value = value
+
+    def __str__(self):
+        return u"Invalid value '{value}' for profile field '{field}'".format(
+            value=self.value,
+            field=self.field
+        )
+
+
 class ProfileInternalError(Exception):
     """ An error occurred in an API call. """
     pass
@@ -72,12 +91,12 @@ def update_profile(username, full_name=None):
     try:
         profile = UserProfile.objects.get(user__username=username)
     except UserProfile.DoesNotExist:
-        raise ProfileRequestError("TODO")
+        raise ProfileUserNotFound
 
     if full_name is not None:
         name_length = len(full_name)
-        if name_length > FULL_NAME_MAX_LENGTH or name_length is 0:
-            raise ProfileRequestError("TODO")
+        if name_length > FULL_NAME_MAX_LENGTH or name_length == 0:
+            raise ProfileInvalidField("full_name", full_name)
         else:
             profile.update_name(full_name)
 

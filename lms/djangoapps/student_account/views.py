@@ -1,8 +1,10 @@
 """ Views for a student's account information. """
 
 from django.conf import settings
-from django.http import (QueryDict, HttpResponse, HttpResponseBadRequest, 
-                         HttpResponseServerError)
+from django.http import (
+    QueryDict, HttpResponse,
+    HttpResponseBadRequest, HttpResponseServerError
+)
 from django.core.mail import send_mail
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
@@ -54,7 +56,7 @@ def email_change_request_handler(request):
         HttpResponse: 401 if the provided password (in the form) is incorrect
         HttpResponse: 405 if using an unsupported HTTP method
         HttpResponse: 409 if the provided email is already in use
-        HttpResponse: 500 if the user to which the email change will be applied 
+        HttpResponse: 500 if the user to which the email change will be applied
                           does not exist
 
     Example usage:
@@ -118,8 +120,8 @@ def email_change_confirmation_handler(request, key):
 
     Returns:
         HttpResponse: 200 if the email change is successful, the activation key
-                          is invalid, the new email is already in use, or the 
-                          user to which the email change will be applied does 
+                          is invalid, the new email is already in use, or the
+                          user to which the email change will be applied does
                           not exist
         HttpResponse: 302 if not logged in (redirect to login page)
         HttpResponse: 405 if using an unsupported HTTP method

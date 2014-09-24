@@ -1,6 +1,6 @@
 """ Views for a student's profile information. """
 
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, HttpResponseBadRequest, QueryDict
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -49,7 +49,9 @@ def name_change_handler(request):
     Returns:
         HttpResponse: 204 if successful
         HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 400 if the provided name is invalid
         HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 500 if an unexpected error occurs.
 
     Example usage:
 
@@ -61,7 +63,10 @@ def name_change_handler(request):
     username = request.user.username
     new_name = put.get('new_name')
 
-    profile_api.update_profile(username, full_name=new_name)
+    try:
+        profile_api.update_profile(username, full_name=new_name)
+    except profile_api.ProfileInvalidField:
+        return HttpResponseBadRequest()
 
     # A 204 is intended to allow input for actions to take place
     # without causing a change to the user agent's active document view.
