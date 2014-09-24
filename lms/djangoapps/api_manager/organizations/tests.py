@@ -50,6 +50,7 @@ class OrganizationsApiTests(TestCase):
         self.test_organization_contact_name = 'John Org'
         self.test_organization_contact_email = 'john@test.org'
         self.test_organization_contact_phone = '+1 332 232 24234'
+        self.test_organization_logo_url = 'org_logo.jpg'
 
         self.test_user_email = str(uuid.uuid4())
         self.test_user_username = str(uuid.uuid4())
@@ -119,6 +120,7 @@ class OrganizationsApiTests(TestCase):
             'contact_name': self.test_organization_contact_name,
             'contact_email': self.test_organization_contact_email,
             'contact_phone': self.test_organization_contact_phone,
+            'logo_url': self.test_organization_logo_url,
             'users': users
         }
         response = self.do_post(self.base_organizations_uri, data)
@@ -136,6 +138,7 @@ class OrganizationsApiTests(TestCase):
         self.assertEqual(response.data['contact_name'], self.test_organization_contact_name)
         self.assertEqual(response.data['contact_email'], self.test_organization_contact_email)
         self.assertEqual(response.data['contact_phone'], self.test_organization_contact_phone)
+        self.assertEqual(response.data['logo_url'], self.test_organization_logo_url)
         self.assertIsNotNone(response.data['workgroups'])
         self.assertEqual(len(response.data['users']), len(users))
         self.assertIsNotNone(response.data['created'])
