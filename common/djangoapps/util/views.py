@@ -11,7 +11,6 @@ from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
 from dogapi import dog_stats_api
 from edxmako.shortcuts import render_to_response
 import zendesk
-from microsite_configuration import microsite
 
 import calc
 import track.views
@@ -101,13 +100,6 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
 
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
     zendesk_tags = list(tags.values()) + ["LMS"]
-
-    # Per edX support, we would like to be able to route white label feedback items
-    # via tagging
-    white_label_org = microsite.get_value('course_org_filter')
-    if white_label_org:
-        zendesk_tags = zendesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
-
     new_ticket = {
         "ticket": {
             "requester": {"name": realname, "email": email},

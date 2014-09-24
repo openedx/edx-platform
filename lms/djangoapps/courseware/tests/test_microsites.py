@@ -3,13 +3,14 @@ Tests related to the Microsites feature
 """
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from django.conf import settings
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+
+MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -50,14 +51,14 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.create_account(username, email, password)
             self.activate_user(email)
 
-    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    @override_settings(SITE_NAME=MICROSITE_TEST_HOSTNAME)
     def test_microsite_anonymous_homepage_content(self):
         """
         Verify that the homepage, when accessed via a Microsite domain, returns
         HTML that reflects the Microsite branding elements
         """
 
-        resp = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        resp = self.client.get('/', HTTP_HOST=MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 200)
 
         # assert various branding definitions on this Microsite
@@ -115,7 +116,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)
-        resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        resp = self.client.get(reverse('root'), HTTP_HOST=MICROSITE_TEST_HOSTNAME)
         self.assertEquals(resp.status_code, 200)
 
     def test_redirect_on_homepage_when_has_enrollments(self):
@@ -129,7 +130,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(email, password)
         self.enroll(self.course, True)
 
-        resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        resp = self.client.get(reverse('root'), HTTP_HOST=MICROSITE_TEST_HOSTNAME)
         self.assertEquals(resp.status_code, 302)
 
     def test_microsite_course_enrollment(self):
@@ -145,7 +146,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.course_outside_microsite, True)
 
         # Access the microsite dashboard and make sure the right courses appear
-        resp = self.client.get(reverse('dashboard'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        resp = self.client.get(reverse('dashboard'), HTTP_HOST=MICROSITE_TEST_HOSTNAME)
         self.assertContains(resp, 'Robot_Super_Course')
         self.assertNotContains(resp, 'Robot_Course_Outside_Microsite')
 
