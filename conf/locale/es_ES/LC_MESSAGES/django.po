@@ -114,7 +114,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-23 15:16-0400\n"
+"POT-Creation-Date: 2014-09-24 13:35-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: spentamanyu <i.delamo@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"
@@ -1013,6 +1013,10 @@ msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "Error running code."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid "Cannot connect to the queue"
 msgstr ""
 
@@ -1797,6 +1801,16 @@ msgstr ""
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses "
 "on edx.org, and a New! badge temporarily appears next to the course image."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Mobile Course Available"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, the course will be available to mobile "
+"devices."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3369,6 +3383,19 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Upload Handout"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Optional. Use this for videos where download and streaming URLs for the "
+"videos are completely managed by edX. This will override the settings for "
+"\"Default Video URL\", \"Video File URLs\", and all YouTube IDs. If you do "
+"not know what this setting is, you can leave it blank and continue to use "
+"these other settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "EdX Video ID"
 msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
@@ -6729,15 +6756,8 @@ msgstr ""
 msgid "Reset Password"
 msgstr "Restablecer Contraseña"
 
-#: lms/templates/dashboard.html lms/templates/original_navigation.html
-#: lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
-msgid "Courses"
-msgstr "Cursos"
-
 #: lms/templates/dashboard.html
-msgid "ordered by recent activity"
+msgid "Current Courses"
 msgstr ""
 
 #: lms/templates/dashboard.html
@@ -7549,6 +7569,13 @@ msgstr ""
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
 msgstr "Usted no tiene ninguna anotación."
+
+#: lms/templates/original_navigation.html
+#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/courseware/courses.html
+msgid "Courses"
+msgstr "Cursos"
 
 #: lms/templates/original_navigation.html
 msgid "Schools"
@@ -10329,113 +10356,145 @@ msgstr ""
 msgid "#:"
 msgstr "#:"
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Professional Education Invoicing Center"
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Thank you for your purchase of {course_name}!"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Portland Street, "
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "9th floor Cambridge, MA,"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "02139 finance@edx.org"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "---------------------------------"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Bill To:"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "{company_name}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "{purchaser_name}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Customer Reference Number: {customer_reference_number}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Registration codes:"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"Please distribute one of the following registration codes to each student "
-"who is going to enroll in the class."
+"An invoice for ${total_price} is attached. Payment is due immediately.  "
+"Information on payment methods can be found on the invoice."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"A student can redeem one of these codes by registering an account on "
-"({site_name}.edx.org), starting the purchase"
+"A CSV file of your registration codes is attached. Please distribute "
+"registration codes to each student planning to enroll using the email "
+"template below."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Thanks,"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Your {platform_name} Team"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Dear [[Name]]:"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"process on this course by adding it to their shopping cart from this page "
-"({course_url}), and"
+"We have provided an enrollment for you in the course {course_name} from "
+"{platform_name}. Please follow the instructions below to claim your access."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "entering their registration code while in the shopping cart."
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Your redeem code is: [[Enter Redeem Code here from the attached CSV]]"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(1) Register for an account at https://{site_name}."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(2) Once registered, navigate to https://{course_url}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(3) Click 'Add {course_number} to Cart'"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"Thank you for your purchase! Failure to pay this invoice will result the "
-"invalidation of student enrollments"
+"(4) On the shopping cart page, enter your redeem code and click apply code. "
+"This will make payment equal to $0."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(5) Click 'Register'"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"that use these codes. All purchases are final. Please refer to the "
-"cancellation policy"
+"(6) You should be able to see your course on your student dashboard at "
+"https://{dashboard_url}"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "on {site_name} for more information."
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid ""
+"(7) Course materials will not be available until the course start date."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Course: {course_name} {start_date} - {end_date}"
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Sincerely,"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Price:     ${price}"
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "[[Your Signature]]"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Quantity:  ${quantity}"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "INVOICE"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Sub-Total: ${sub_total}"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Discount:  ${discount}"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Invoice No: {invoice_number}"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "---------  ------"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Terms: Due Immediately"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Total Due: ${total_price}"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Due Date: {date}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Bill to:"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Customer Reference Number: {reference_number}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Balance Due: ${sale_price}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Course: {course_name}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid ""
+"Price:         ${course_price}  Quantity:      {quantity}  Sub-Total:    "
+"${sub_total}  Discount:  ${discount}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Total:      ${sale_price}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Payment instructions"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid ""
+"Failure to pay this invoice will result the invalidation of student "
+"enrollment that use these codes. All purchases are final. Please refer to "
+"the cancellation policy on {site_name} for more information."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "If you have payment questions, please contact {contact_email}"
 msgstr ""
 
 #: lms/templates/emails/reject_name_change.txt
@@ -10884,10 +10943,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please enter the coupon code"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Please enter the coupon discount value greater than 0"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
