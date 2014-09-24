@@ -8,13 +8,13 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from util.testing import UrlResetMixin
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
 
 
-@patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
 @ddt.ddt
-class StudentProfileViewTest(TestCase):
+class StudentProfileViewTest(UrlResetMixin, TestCase):
     """ Tests for the student profile views. """
 
     USERNAME = u"heisenberg"
@@ -22,7 +22,10 @@ class StudentProfileViewTest(TestCase):
     EMAIL = u"walt@savewalterwhite.com"
     FULL_NAME = u"𝖂𝖆𝖑𝖙𝖊𝖗 𝖂𝖍𝖎𝖙𝖊"
 
+    @patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
     def setUp(self):
+        super(StudentProfileViewTest, self).setUp()
+
         # Create/activate a new account
         activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         account_api.activate_account(activation_key)

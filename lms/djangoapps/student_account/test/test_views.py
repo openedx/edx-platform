@@ -8,13 +8,13 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
+from util.testing import UrlResetMixin
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
 
 
-@patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
 @ddt.ddt
-class StudentAccountViewTest(TestCase):
+class StudentAccountViewTest(UrlResetMixin, TestCase):
     """ Tests for the student account views. """
 
     USERNAME = u"heisenberg"
@@ -22,7 +22,7 @@ class StudentAccountViewTest(TestCase):
     PASSWORD = u"ḅḷüëṡḳÿ"
     OLD_EMAIL = u"walter@graymattertech.com"
     NEW_EMAIL = u"walt@savewalterwhite.com"
-    
+
     INVALID_EMAILS = [
         None,
         u"",
@@ -42,7 +42,10 @@ class StudentAccountViewTest(TestCase):
 
     INVALID_KEY = u"123abc"
 
+    @patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
     def setUp(self):
+        super(StudentAccountViewTest, self).setUp()
+
         # Create/activate a new account
         activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.OLD_EMAIL)
         account_api.activate_account(activation_key)
@@ -145,7 +148,7 @@ class StudentAccountViewTest(TestCase):
         with patch('student_account.views.account_api.confirm_email_change') as mock_call:
             mock_call.side_effect = account_api.AccountInternalError
             response = self.client.get(reverse('email_change_confirm', kwargs={'key': activation_key}))
-        
+
         self.assertContains(response, "Something went wrong")
 
     @ddt.data(
