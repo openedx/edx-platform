@@ -1495,10 +1495,6 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
-    target_is_instructor = has_access(user, 'instructor', course)
-    # cannot revoke instructor
-    if target_is_instructor and action == 'revoke' and rolename == FORUM_ROLE_ADMINISTRATOR:
-        return HttpResponseBadRequest("Cannot revoke instructor forum admin privileges.")
 
     try:
         update_forum_role(course_id, user, rolename, action)
