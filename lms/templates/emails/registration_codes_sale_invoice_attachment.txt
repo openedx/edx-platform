@@ -1,0 +1,41 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("INVOICE")}
+
+———————————————————————————————————————————
+
+${corp_address}
+
+${_("Date: {date}").format(date=date)}
+${_("Invoice No: {invoice_number}").format(invoice_number=invoice.id)}
+${_("Terms: Due Immediately")}
+${_("Due Date: {date}").format(date=date)}
+
+${_("Bill to:")}
+${invoice.company_name}
+${invoice.address_line_1}
+${invoice.address_line_2}
+% if invoice.address_line_3:
+${invoice.address_line_3}
+% endif
+${invoice.city}, ${invoice.state}, ${invoice.zip}
+${invoice.country}
+${_("Customer Reference Number: {reference_number}").format(reference_number=invoice.customer_reference_number if invoice.customer_reference_number else "")}
+
+                                        ${_("Balance Due: ${sale_price}").format(sale_price=sale_price)}
+
+———————————————————————————————————————————
+
+${_("Course: {course_name}").format(course_name=course.display_name)}
+ ${_("Price:         ${course_price}  Quantity:      {quantity}  Sub-Total:    ${sub_total}  Discount:  ${discount}").format(course_price=course_price, quantity=quantity, sub_total=sub_total, discount=discount)}
+${_("Total:      ${sale_price}").format(sale_price=sale_price)}
+
+———————————————————————————————————————————
+
+${_("Payment instructions")}
+
+${payment_instructions}
+
+${_("Failure to pay this invoice will result the invalidation of student enrollment that use these codes. All purchases are final. Please refer to the cancellation policy on {site_name} for more information.").format(site_name=site_name)}
+
+${_("If you have payment questions, please contact {contact_email}").format(contact_email=contact_email)}

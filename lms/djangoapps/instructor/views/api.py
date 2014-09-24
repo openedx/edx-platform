@@ -9,6 +9,7 @@ import StringIO
 import json
 import logging
 import re
+import time
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
@@ -879,26 +880,40 @@ def generate_registration_codes(request, course_id):
     course_honor_mode = CourseMode.mode_for_course(course_id, 'honor')
     course_price = course_honor_mode.min_price
     quantity = course_code_number
-    discount_price = (float(quantity * course_price) - float(sale_price))
+    discount = (float(quantity * course_price) - float(sale_price))
     course_url = '{base_url}{course_about}'.format(
-        base_url=request.META['HTTP_HOST'],
+        base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
         course_about=reverse('about_course', kwargs={'course_id': course_id.to_deprecated_string()})
     )
+    dashboard_url = '{base_url}{dashboard}'.format(
+        base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        dashboard=reverse('dashboard')
+    )
+
+    from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     context = {
         'invoice': sale_invoice,
         'site_name': site_name,
         'course': course,
         'course_price': course_price,
-        'discount_price': discount_price,
+        'sub_total': course_price * quantity,
+        'discount': discount,
         'sale_price': sale_price,
         'quantity': quantity,
         'registration_codes': course_registration_codes,
         'course_url': course_url,
+        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+        'dashboard_url': dashboard_url,
+        'contact_email': from_address,
+        'corp_address': microsite.get_value('invoice_corp_address', settings.INVOICE_CORP_ADDRESS),
+        'payment_instructions': microsite.get_value('invoice_payment_instructions', settings. INVOICE_PAYMENT_INSTRUCTIONS),
+        'date': time.strftime("%m/%d/%Y")
     }
     # composes registration codes invoice email
-    subject = u'Invoice for {course_name}'.format(course_name=course.display_name)
-    message = render_to_string('emails/registration_codes_sale_invoice.txt', context)
-    from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    subject = u'Confirmation and Invoice for {course_name}'.format(course_name=course.display_name)
+    message = render_to_string('emails/registration_codes_sale_email.txt', context)
+
+    invoice_attachment = render_to_string('emails/registration_codes_sale_invoice_attachment.txt', context)
 
     #send_mail(subject, message, from_address, recipient_list, fail_silently=False)
     csv_file = StringIO.StringIO()
@@ -914,6 +929,7 @@ def generate_registration_codes(request, course_id):
         email.from_email = from_address
         email.to = [recipient]
         email.attach(u'RegistrationCodes.csv', csv_file.getvalue(), 'text/csv')
+        email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
         email.send()
 
     return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
