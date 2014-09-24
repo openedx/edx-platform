@@ -21,6 +21,11 @@ class DashboardPage(PageObject):
 
     @property
     def courses_text(self):
+        """
+        This is the title label for the section of the student dashboard that
+        shows all the courses that the student is enrolled in.
+        The string displayed is defined in lms/templates/dashboard.html.
+        """
         text_items = self.q(css='section#my-courses span.my-courses-title-label').text
         if len(text_items) > 0:
             return text_items[0]

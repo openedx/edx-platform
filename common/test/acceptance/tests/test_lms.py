@@ -6,6 +6,7 @@ E2E tests for the LMS.
 from textwrap import dedent
 from unittest import skip
 
+from bok_choy.web_app_test import WebAppTest
 from .helpers import UniqueCourseTest, load_data_str
 from ..pages.lms.auto_auth import AutoAuthPage
 from ..pages.lms.find_courses import FindCoursesPage
@@ -37,7 +38,7 @@ class RegistrationTest(UniqueCourseTest):
         self.course_about_page = CourseAboutPage(self.browser, self.course_id)
 
         # Create a course to register for
-        course_fix = CourseFixture(
+        CourseFixture(
             self.course_info['org'], self.course_info['number'],
             self.course_info['run'], self.course_info['display_name']
         ).install()
@@ -64,7 +65,7 @@ class RegistrationTest(UniqueCourseTest):
         self.assertIn(self.course_info['display_name'], course_names)
 
 
-class LanguageTest(UniqueCourseTest):
+class LanguageTest(WebAppTest):
     """
     Tests that the change language functionality on the dashboard works
     """
@@ -87,7 +88,7 @@ class LanguageTest(UniqueCourseTest):
         self.email = "test@example.com"
 
     def test_change_lang(self):
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        AutoAuthPage(self.browser).visit()
         self.dashboard_page.visit()
         # Change language to Dummy Esperanto
         self.dashboard_page.change_language(self.test_new_lang)
@@ -98,7 +99,7 @@ class LanguageTest(UniqueCourseTest):
         self.assertIn(self.courses_text, changed_text)
 
     def test_language_persists(self):
-        auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email, course_id=self.course_id)
+        auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email)
         auto_auth_page.visit()
 
         self.dashboard_page.visit()
