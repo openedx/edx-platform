@@ -55,6 +55,7 @@ from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
 
+from util.views import ensure_valid_course_key
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
@@ -83,25 +84,6 @@ def user_groups(user):
         cache.set(key, group_names, cache_expiration)
 
     return group_names
-
-
-def verify_course_id(view_func):
-    """
-    This decorator should only be used with views whose kwargs must contain course_id.
-    If course_id is not valid raise 404.
-    """
-
-    @wraps(view_func)
-    def _decorated(request, *args, **kwargs):
-        course_id = kwargs.get("course_id")
-        try:
-            SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        except InvalidKeyError:
-            raise Http404
-        response = view_func(request, *args, **kwargs)
-        return response
-
-    return _decorated
 
 
 @ensure_csrf_cookie
@@ -265,7 +247,7 @@ def chat_settings(course, user):
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@verify_course_id
+@ensure_valid_course_key
 def index(request, course_id, chapter=None, section=None,
           position=None):
     """
@@ -503,7 +485,7 @@ def index(request, course_id, chapter=None, section=None,
 
 
 @ensure_csrf_cookie
-@verify_course_id
+@ensure_valid_course_key
 def jump_to_id(request, course_id, module_id):
     """
     This entry point allows for a shorter version of a jump to where just the id of the element is
@@ -562,7 +544,7 @@ def jump_to(request, course_id, location):
 
 
 @ensure_csrf_cookie
-@verify_course_id
+@ensure_valid_course_key
 def course_info(request, course_id):
     """
     Display the course's info.html, or 404 if there is no such course.
@@ -610,7 +592,7 @@ def course_info(request, course_id):
 
 
 @ensure_csrf_cookie
-@verify_course_id
+@ensure_valid_course_key
 def static_tab(request, course_id, tab_slug):
     """
     Display the courses tab with the given name.
@@ -644,7 +626,7 @@ def static_tab(request, course_id, tab_slug):
 
 
 @ensure_csrf_cookie
-@verify_course_id
+@ensure_valid_course_key
 def syllabus(request, course_id):
     """
     Display the course's syllabus.html, or 404 if there is no such course.
@@ -756,7 +738,7 @@ def course_about(request, course_id):
 
 @ensure_csrf_cookie
 @cache_if_anonymous
-@verify_course_id
+@ensure_valid_course_key
 def mktg_course_about(request, course_id):
     """
     This is the button that gets put into an iframe on the Drupal site
@@ -814,7 +796,7 @@ def mktg_course_about(request, course_id):
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @transaction.commit_manually
-@verify_course_id
+@ensure_valid_course_key
 def progress(request, course_id, student_id=None):
     """
     Wraps "_progress" with the manual_transaction context manager just in case
@@ -895,7 +877,7 @@ def fetch_reverify_banner_info(request, course_key):
 
 
 @login_required
-@verify_course_id
+@ensure_valid_course_key
 def submission_history(request, course_id, student_username, location):
     """Render an HTML fragment (meant for inclusion elsewhere) that renders a
     history of all state changes made by this user for this problem location.
@@ -1003,7 +985,7 @@ def get_static_tab_contents(request, course, tab):
 
 
 @require_GET
-@verify_course_id
+@ensure_valid_course_key
 def get_course_lti_endpoints(request, course_id):
     """
     View that, given a course_id, returns the a JSON object that enumerates all of the LTI endpoints for that course.
