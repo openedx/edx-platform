@@ -78,6 +78,7 @@ import track.views
 
 from dogapi import dog_stats_api
 
+from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
@@ -615,6 +616,7 @@ def try_change_enrollment(request):
 
 
 @require_POST
+@commit_on_success_with_read_committed
 def change_enrollment(request, auto_register=False, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
