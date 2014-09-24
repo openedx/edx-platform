@@ -5,7 +5,8 @@ Enrollment
 ##########################
 
 Course authors and instructors can enroll students in a course, see how many
-people are enrolled, and, when necessary, unenroll students.
+people are enrolled, and, when necessary, unenroll students on the Instructor
+Dashboard.
 
 Students can enroll themselves in a course during its defined enrollment
 period. For a ``www.edx.org`` course, enrollment is publicly available to
@@ -20,6 +21,11 @@ and students you explicitly enroll.
 * :ref:`view_enrollment_count`
 
 * :ref:`unenroll_student`
+
+Data about course enrollment is also available from edX Insights. You access
+Insights from the Instructor Dashboard for your live course: after you click
+**Instructor**, click the link in the banner at the top of each page. For more
+information, see `Using edX Insights`_.
 
 .. _registration_enrollment:
 
@@ -174,3 +180,5 @@ To unenroll students, you supply the email addresses of enrolled students.
    **Current Courses** dashboards, and the students can no longer contribute to
    discussions or the wiki or access the courseware.
 
+
+.. _Using edX Insights: http://edx-insights.readthedocs.org/en/latest/

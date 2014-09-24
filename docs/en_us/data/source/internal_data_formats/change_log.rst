@@ -1,9 +1,17 @@
 .. _Change Log:
 
-**********
+###########
 Change Log
-**********
+###########
 
+.. **********************
+.. October-December 2014
+.. **********************
+
+
+**********************
+July-September 2014
+**********************
 
 .. list-table::
    :widths: 10 70
@@ -11,6 +19,9 @@ Change Log
 
    * - Date
      - Change
+   * - 09/30/14
+     - Added information about the data that is available to course teams to
+       the :ref:`Package` chapter.
    * - 09/18/14
      - Added descriptions of two columns added to the :ref:`auth_userprofile
        table<auth_userprofile>`.
@@ -38,6 +49,18 @@ Change Log
    * - 07/10/14
      - Added the :ref:`Getting_Credentials_Data_Czar` chapter with information
        to help new data czars set up credentials for secure data transfers.
+
+
+**********************
+April-June 2014
+**********************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
    * - 06/27/14
      - Made a correction to the ``edx.forum.searched`` event name in the
        :ref:`Tracking Logs` chapter.
@@ -85,6 +108,18 @@ Change Log
        data packages.
    * - 04/25/14
      - Added new event types to the :ref:`Tracking Logs` chapter for interactions with PDF files.
+       
+
+**********************
+January-March 2014
+**********************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
    * - 03/31/14
      - Added new fields for the server ``problem_check`` event type to the :ref:`Tracking Logs` chapter.
    * -
