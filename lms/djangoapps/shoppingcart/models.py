@@ -53,13 +53,22 @@ ORDER_STATUSES = (
     # The user's order has been refunded.
     ('refunded', 'refunded'),
 )
-ORDER_TYPES = (
-    ('personal', 'personal'),
-    ('business', 'business'),
-)
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
 OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=C0103
+
+
+class OrderTypes:
+    """
+    This class specify purchase OrderTypes.
+    """
+    PERSONAL = 'personal'
+    BUSINESS = 'business'
+
+    ORDER_TYPES = (
+        (PERSONAL, 'personal'),
+        (BUSINESS, 'business'),
+    )
 
 
 class Order(models.Model):
@@ -101,7 +110,7 @@ class Order(models.Model):
     company_zip = models.CharField(max_length=15, null=True, blank=True)
     company_country = models.CharField(max_length=64, null=True, blank=True)
     customer_reference_number = models.CharField(max_length=63, null=True, blank=True)
-    order_type = models.CharField(max_length=32, default='personal', choices=ORDER_TYPES)
+    order_type = models.CharField(max_length=32, default='personal', choices=OrderTypes.ORDER_TYPES)
 
     @classmethod
     def get_cart_for_user(cls, user):
@@ -145,7 +154,7 @@ class Order(models.Model):
         if not item_type:
             return self.orderitem_set.exists()  # pylint: disable=E1101
         else:
-            items = self.orderitem_set.all().select_subclasses()
+            items = self.orderitem_set.all().select_subclasses()  # pylint: disable=E1101
             for item in items:
                 if isinstance(item, item_type):
                     return True
