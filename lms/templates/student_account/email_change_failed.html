@@ -1,0 +1,31 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+
+<section class="container activation">
+
+  <section class="message">
+    <h1 class="invalid">${_("Email change failed.")}</h1>
+    <hr class="horizontal-divider">
+
+    <p>
+        % if error is 'key_invalid' or error is 'internal':
+            ${_("Something went wrong. Please contact {support} for help.").format(
+                support="<a href='mailto:{support_email}'>{support_email}</a>".format(
+                    support_email=settings.TECH_SUPPORT_EMAIL
+                )
+            )}
+        % elif error is 'email_used':
+            ${_("The email address you wanted to use is already used by another "
+            "{platform_name} account.").format(platform_name=settings.PLATFORM_NAME)}
+        % endif
+    </p>
+
+    <p>
+        ${_("You can try again from the {link_start}account settings{link_end} page.").format(
+            link_start="<a href='{url}'>".format(url=reverse('account_index')),
+            link_end="</a>"
+        )}
+    </p>
+  </section>
+</section>
