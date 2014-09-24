@@ -36,6 +36,7 @@ from mock import patch, Mock
 from shoppingcart.views import initialize_report
 from decimal import Decimal
 from student.tests.factories import AdminFactory
+import json
 
 def mock_render_purchase_form_html(*args, **kwargs):
     return render_purchase_form_html(*args, **kwargs)
@@ -160,6 +161,71 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': non_existing_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Discount does not exist against code '{0}'.".format(non_existing_code), resp.content)
+
+    def test_valid_qty_case_when_purchase_type_is_business(self):
+        qty = 2
+        item = self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        self.assertEqual(resp.status_code, 200)
+        data = json.loads(resp.content)
+        self.assertEqual(data['total_cost'], item.unit_cost * qty)
+
+    def test_in_valid_qty_case_when_purchase_type_is_business(self):
+        # invalid quantity, Quantity must be between 1 and 1000.
+        qty = 0
+        item = self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Quantity must be between 1 and 1000.", resp.content)
+
+        # invalid quantity, Quantity must be an integer.
+        qty = 'abcde'
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Quantity must be an integer.", resp.content)
+
+    def test_valid_qty_but_item_not_found_when_purchase_type_is_business(self):
+        qty = 2
+        item_id = '-1'
+        self.login_user()
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item_id, 'qty': qty, 'purchase_type': 'business'})
+        self.assertEqual(resp.status_code, 404)
+        self.assertEqual('Order item does not exist.', resp.content)
+
+        # now testing the case if item id not found in request,
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'qty': qty, 'purchase_type': 'business'})
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual('Order item not found in request.', resp.content)
+
+    def test_qty_should_be_one_when_purchase_type_is_personal(self):
+        qty = 5
+        item = self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'personal'})
+        self.assertEqual(resp.status_code, 200)
+        data = json.loads(resp.content)
+        self.assertEqual(data['total_cost'], item.unit_cost * 1)
+
+    def test_billing_details_btn_in_cart_when_purchase_type_is_business(self):
+        qty = 5
+        item = self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        self.assertEqual(resp.status_code, 200)
+        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        self.assertIn("Billing Details", resp.content)
+
+    def test_use_valid_coupon_code_when_purchase_type_is_business(self):
+        qty = 5
+        item = self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        self.assertEqual(resp.status_code, 200)
+        data = json.loads(resp.content)
+        self.assertEqual(data['total_cost'], item.unit_cost * qty)
+
+        # use coupon code
+        self.add_coupon(self.course_key, True, self.coupon_code)
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        item = self.cart.orderitem_set.all().select_subclasses()[0]
+        self.assertEquals(item.unit_cost * qty, 180)
 
     def test_course_discount_invalid_reg_code(self):
         self.add_reg_code(self.course_key)
