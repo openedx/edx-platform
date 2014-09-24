@@ -13,8 +13,8 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         """ Serializer/field specification """
         model = Organization
-        fields = ('url', 'id', 'name', 'display_name', 'contact_name', 'contact_email', 'contact_phone', 'workgroups',
-                  'users', 'groups', 'created', 'modified')
+        fields = ('url', 'id', 'name', 'display_name', 'contact_name', 'contact_email', 'contact_phone'
+                  , 'logo_url', 'workgroups', 'users', 'groups', 'created', 'modified')
         read_only = ('url', 'id', 'created')
 
 
@@ -25,5 +25,5 @@ class BasicOrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         """ Serializer/field specification """
         model = Organization
-        fields = ('url', 'id', 'name', 'created', 'display_name')
+        fields = ('url', 'id', 'name', 'created', 'display_name', 'logo_url')
         read_only = ('url', 'id', 'created',)
