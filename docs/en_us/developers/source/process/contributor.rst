@@ -15,17 +15,34 @@ track -- before you spend a lot of time and effort making a pull request.
 .. _chat on the IRC channel: http://webchat.freenode.net?channels=edx-code
 .. _open an issue in our JIRA issue tracker: https://openedx.atlassian.net
 
+If you've got an idea for a new feature or new functionality for an existing feature,
+and wish to contribute your code upstream, please `start a discussion on JIRA`_.
+Do this by visiting the JIRA website and clicking the "Create" button at the top.
+Choose the project "Open Source Pull Requests" and the issue type "Feature Proposal";
+in the description give us as much detail as you can for the feature or functionality
+you are thinking about implementing. We encourage you to do this before
+you begin implementing your feature, in order to get valuable feedback from the edX
+product team early on in your journey and increase the likelihood of a successful
+pull request.
+
+.. _start a discussion on JIRA: https://openedx.atlassian.net/secure/Dashboard.jspa
+
 It’s also sometimes useful to submit a pull request even before the code is
 working properly, to make it easier to collect early feedback. To indicate to
 others that your pull request is not yet in a functional state, just prefix the
-pull request title with "(WIP)" (which stands for Work In Progress).
+pull request title with "(WIP)" (which stands for Work In Progress). Please do
+include a link to a WIP pull request in your JIRA ticket, if you have one.
 
 Once you’re ready to submit your changes in a pull request, check the following
 list of requirements to be sure that your pull request is ready to be reviewed:
 
+#. Prepare a :doc:`pull request cover letter <cover-letter>`. When you open
+   up your pull request, put your cover letter into the "Description" field on Github.
+
 #. The code should be clear and understandable.
    Comments in code, detailed docstrings, and good variable naming conventions
-   are expected.
+   are expected. The `edx-platform Github wiki`_ contains many great links to
+   style guides for Python, Javascript, and internationaliation conventions.
 
 #. The pull request should be as small as possible.
    Each pull request should encompass only one idea: one bugfix, one feature,
@@ -49,13 +66,16 @@ list of requirements to be sure that your pull request is ready to be reviewed:
    (edX’s continuous integration server will verify this for your pull request,
    and point out any failing tests.)
 
-#. The author of the pull request should provide a test plan for verifying
+#. The author of the pull request should provide a test plan for manually verifying
    the change in this pull request. The test plan should include details
    of what should be checked, how to check it, and what the correct behavior
-   should be.
+   should be. When it makes sense to do so, a good test plan includes a tarball
+   of a small edX test course that has a unit which triggers the bug or illustrates
+   the new feature.
 
 #. For pull requests that make changes to the user interface,
-   it’s very helpful if you can include screenshots of what you changed.
+   please include screenshots of what you changed. Github will allow
+   you to upload images directly from your computer.
    In the future, the core committers will produce a style guide that
    contains more requirements around how pages should appear and how
    front-end code should be structured.
@@ -107,5 +127,6 @@ links:
 * `Python Guidelines <https://github.com/edx/edx-platform/wiki/Python-Guidelines>`_
 * `Javascript Guidelines <https://github.com/edx/edx-platform/wiki/Javascript-Guidelines>`_
 
+.. _edx-platform Github wiki: https://github.com/edx/edx-platform/wiki#development
 .. _contributor's agreement with edX: http://code.edx.org/individual-contributor-agreement.pdf
 .. _compatible licenses: https://github.com/edx/edx-platform/wiki/Licensing
