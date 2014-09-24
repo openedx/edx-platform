@@ -577,13 +577,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             var isRP = (typeof rp!='undefined');
             var isSource = false;
             
-            // Double checks that the image being displayed matches the annotations 
-            var source = this.viewer.source;
-            var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
-            var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
-            var compareUrl = tilesUrl!=''?tilesUrl:('' + functionUrl).replace(/\s+/g, ' ');
-            if(isContainer) isSource = (an.target.src == compareUrl);
-            
+            // Though it would be better to store server ids of images in the annotation that
+            // would require changing annotations that were already made, instead we check if
+            // the id is a substring of the thumbnail, which according to OpenSeaDragon API should be the case.
+            var sourceId = this.viewer.source['@id'];
+            var targetThumb = an.target.thumb;
+            if (isContainer) {
+                isSource = (targetThumb.indexOf(sourceId) !== -1);
+            }            
             return (isOpenSeaDragon && isContainer && isImage && isRP && isSource);
         },
         
