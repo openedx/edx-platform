@@ -10,8 +10,6 @@ from django.contrib.auth.models import User
 
 FAKE_MICROSITE = {
     "SITE_NAME": "openedx.localhost",
-    "university": "fakeuniversity",
-    "course_org_filter": "fakeorg",
     "REGISTRATION_EXTRA_FIELDS": {
         "address1": "required",
         "city": "required",

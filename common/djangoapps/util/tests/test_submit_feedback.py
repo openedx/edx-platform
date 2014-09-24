@@ -11,8 +11,6 @@ from zendesk import ZendeskError
 import json
 import mock
 
-from student.tests.test_microsite import fake_microsite_get_value
-
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
 @override_settings(ZENDESK_URL="dummy", ZENDESK_USER="dummy", ZENDESK_API_KEY="dummy")
@@ -53,7 +51,7 @@ class SubmitFeedbackTest(TestCase):
             HTTP_REFERER="test_referer",
             HTTP_USER_AGENT="test_user_agent",
             REMOTE_ADDR="1.2.3.4",
-            SERVER_NAME="test_server",
+            SERVER_NAME="test_server"
         )
         req.user = user
         return views.submit_feedback(req)
@@ -168,49 +166,6 @@ class SubmitFeedbackTest(TestCase):
                         "subject": "a subject",
                         "comment": {"body": "some details"},
                         "tags": ["test_course", "test_issue", "LMS"]
-                    }
-                }
-            ),
-            mock.call.update_ticket(
-                42,
-                {
-                    "ticket": {
-                        "comment": {
-                            "public": False,
-                            "body":
-                            "Additional information:\n\n"
-                            "Client IP: 1.2.3.4\n"
-                            "Host: test_server\n"
-                            "Page: test_referer\n"
-                            "Browser: test_user_agent"
-                        }
-                    }
-                }
-            )
-        ]
-        self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
-        self._assert_datadog_called(datadog_mock, with_tags=True)
-
-    @mock.patch("microsite_configuration.microsite.get_value", fake_microsite_get_value)
-    def test_valid_request_anon_user_microsite(self, zendesk_mock_class, datadog_mock):
-        """
-        Test a valid request from an anonymous user to a mocked out microsite
-
-        The response should have a 200 (success) status code, and a ticket with
-        the given information should have been submitted via the Zendesk API with the additional
-        tag that will come from microsite configuration
-        """
-        zendesk_mock_instance = zendesk_mock_class.return_value
-        zendesk_mock_instance.create_ticket.return_value = 42
-        self._test_success(self._anon_user, self._anon_fields)
-        expected_zendesk_calls = [
-            mock.call.create_ticket(
-                {
-                    "ticket": {
-                        "requester": {"name": "Test User", "email": "test@edx.org"},
-                        "subject": "a subject",
-                        "comment": {"body": "some details"},
-                        "tags": ["test_course", "test_issue", "LMS", "whitelabel_fakeorg"]
                     }
                 }
             ),
