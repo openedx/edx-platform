@@ -38,11 +38,13 @@ from importlib import import_module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from opaque_keys import InvalidKeyError
 
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
 
@@ -659,6 +661,22 @@ class LoginFailures(models.Model):
             return
 
 
+class CourseEnrollmentException(Exception):
+    pass
+
+class NonExistentCourseError(CourseEnrollmentException):
+    pass
+
+class EnrollmentClosedError(CourseEnrollmentException):
+    pass
+
+class CourseFullError(CourseEnrollmentException):
+    pass
+
+class AlreadyEnrolledError(CourseEnrollmentException):
+    pass
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -847,7 +865,7 @@ class CourseEnrollment(models.Model):
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
 
     @classmethod
-    def enroll(cls, user, course_key, mode="honor"):
+    def enroll(cls, user, course_key, mode="honor", check_access=False):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -857,18 +875,74 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_key` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
 
         `mode` is a string specifying what kind of enrollment this is. The
                default is "honor", meaning honor certificate. Future options
                may include "audit", "verified_id", etc. Please don't use it
                until we have these mapped out.
 
+        `check_access`: if True, we check that an accessible course actually
+                exists for the given course_key before we enroll the student.
+                The default is set to False to avoid breaking legacy code or
+                code with non-standard flows (ex. beta tester invitations), but
+                for any standard enrollment flow you probably want this to be True.
+
+        Exceptions that can be raised: NonExistentCourseError,
+        EnrollmentClosedError, CourseFullError, AlreadyEnrolledError.  All these
+        are subclasses of CourseEnrollmentException if you want to catch all of
+        them in the same way.
+
         It is expected that this method is called from a method which has already
-        verified the user authentication and access.
+        verified the user authentication.
 
         Also emits relevant events for analytics purposes.
         """
+        from courseware.access import has_access
+
+        # All the server-side checks for whether a user is allowed to enroll.
+        try:
+            course = modulestore().get_course(course_key)
+        except ItemNotFoundError:
+            log.warning(
+                "User {0} failed to enroll in non-existent course {1}".format(
+                    user.username,
+                    course_key.to_deprecated_string()
+                )
+            )
+            raise NonExistentCourseError
+
+        if check_access:
+            if course is None:
+                raise NonExistentCourseError
+            if not has_access(user, 'enroll', course):
+                log.warning(
+                    "User {0} failed to enroll in course {1} because enrollment is closed".format(
+                        user.username,
+                        course_key.to_deprecated_string()
+                    )
+                )
+                raise EnrollmentClosedError
+
+            if CourseEnrollment.is_course_full(course):
+                log.warning(
+                    "User {0} failed to enroll in full course {1}".format(
+                        user.username,
+                        course_key.to_deprecated_string()
+                    )
+                )
+                raise CourseFullError
+        if CourseEnrollment.is_enrolled(user, course_key):
+            log.warning(
+                "User {0} attempted to enroll in {1}, but they were already enrolled".format(
+                    user.username,
+                    course_key.to_deprecated_string()
+                )
+            )
+            if check_access:
+                raise AlreadyEnrolledError
+
+        # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
         return enrollment

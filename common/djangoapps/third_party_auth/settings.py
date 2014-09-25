@@ -117,6 +117,7 @@ def _set_global_settings(django_settings):
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',
         'third_party_auth.pipeline.login_analytics',
+        'third_party_auth.pipeline.change_enrollment',
     )
 
     # We let the user specify their email address during signup.

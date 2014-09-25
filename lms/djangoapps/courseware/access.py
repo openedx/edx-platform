@@ -14,15 +14,14 @@ from xmodule.x_module import XModule
 
 from xblock.core import XBlock
 
-from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
-from student.models import CourseEnrollment
 from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from opaque_keys.edx.keys import CourseKey, UsageKey
 DEBUG_ACCESS = False
 
