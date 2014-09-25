@@ -461,54 +461,55 @@ def _create_item(request):
         raise PermissionDenied()
 
     store = modulestore()
-    parent = store.get_item(usage_key)
-    dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
+    with store.bulk_operations(usage_key.course_key):
+        parent = store.get_item(usage_key)
+        dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
 
-    # get the metadata, display_name, and definition from the request
-    metadata = {}
-    data = None
-    template_id = request.json.get('boilerplate')
-    if template_id:
-        clz = parent.runtime.load_block_type(category)
-        if clz is not None:
-            template = clz.get_template(template_id)
-            if template is not None:
-                metadata = template.get('metadata', {})
-                data = template.get('data')
+        # get the metadata, display_name, and definition from the request
+        metadata = {}
+        data = None
+        template_id = request.json.get('boilerplate')
+        if template_id:
+            clz = parent.runtime.load_block_type(category)
+            if clz is not None:
+                template = clz.get_template(template_id)
+                if template is not None:
+                    metadata = template.get('metadata', {})
+                    data = template.get('data')
 
-    if display_name is not None:
-        metadata['display_name'] = display_name
+        if display_name is not None:
+            metadata['display_name'] = display_name
 
-    # TODO need to fix components that are sending definition_data as strings, instead of as dicts
-    # For now, migrate them into dicts here.
-    if isinstance(data, basestring):
-        data = {'data': data}
+        # TODO need to fix components that are sending definition_data as strings, instead of as dicts
+        # For now, migrate them into dicts here.
+        if isinstance(data, basestring):
+            data = {'data': data}
 
-    created_block = store.create_child(
-        request.user.id,
-        usage_key,
-        dest_usage_key.block_type,
-        block_id=dest_usage_key.block_id,
-        definition_data=data,
-        metadata=metadata,
-        runtime=parent.runtime,
-    )
-
-    # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-    # if we add one then we need to also add it to the policy information (i.e. metadata)
-    # we should remove this once we can break this reference from the course to static tabs
-    if category == 'static_tab':
-        display_name = display_name or _("Empty")  # Prevent name being None
-        course = store.get_course(dest_usage_key.course_key)
-        course.tabs.append(
-            StaticTab(
-                name=display_name,
-                url_slug=dest_usage_key.name,
-            )
+        created_block = store.create_child(
+            request.user.id,
+            usage_key,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
+            definition_data=data,
+            metadata=metadata,
+            runtime=parent.runtime,
         )
-        store.update_item(course, request.user.id)
 
-    return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        if category == 'static_tab':
+            display_name = display_name or _("Empty")  # Prevent name being None
+            course = store.get_course(dest_usage_key.course_key)
+            course.tabs.append(
+                StaticTab(
+                    name=display_name,
+                    url_slug=dest_usage_key.name,
+                )
+            )
+            store.update_item(course, request.user.id)
+
+        return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
@@ -516,52 +517,53 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
     store = modulestore()
-    source_item = store.get_item(duplicate_source_usage_key)
-    # Change the blockID to be unique.
-    dest_usage_key = source_item.location.replace(name=uuid4().hex)
-    category = dest_usage_key.block_type
+    with store.bulk_operations(duplicate_source_usage_key.course_key):
+        source_item = store.get_item(duplicate_source_usage_key)
+        # Change the blockID to be unique.
+        dest_usage_key = source_item.location.replace(name=uuid4().hex)
+        category = dest_usage_key.block_type
 
-    # Update the display name to indicate this is a duplicate (unless display name provided).
-    duplicate_metadata = own_metadata(source_item)
-    if display_name is not None:
-        duplicate_metadata['display_name'] = display_name
-    else:
-        if source_item.display_name is None:
-            duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+        # Update the display name to indicate this is a duplicate (unless display name provided).
+        duplicate_metadata = own_metadata(source_item)
+        if display_name is not None:
+            duplicate_metadata['display_name'] = display_name
         else:
-            duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+            if source_item.display_name is None:
+                duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+            else:
+                duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
-    dest_module = store.create_item(
-        user.id,
-        dest_usage_key.course_key,
-        dest_usage_key.block_type,
-        block_id=dest_usage_key.block_id,
-        definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
-        metadata=duplicate_metadata,
-        runtime=source_item.runtime,
-    )
+        dest_module = store.create_item(
+            user.id,
+            dest_usage_key.course_key,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
+            definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
+            metadata=duplicate_metadata,
+            runtime=source_item.runtime,
+        )
 
-    # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
-    # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-    if source_item.has_children:
-        dest_module.children = []
-        for child in source_item.children:
-            dupe = _duplicate_item(dest_module.location, child, user=user)
-            dest_module.children.append(dupe)
-        store.update_item(dest_module, user.id)
+        # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
+        # Because DAGs are not fully supported, we need to actually duplicate each child as well.
+        if source_item.has_children:
+            dest_module.children = []
+            for child in source_item.children:
+                dupe = _duplicate_item(dest_module.location, child, user=user)
+                dest_module.children.append(dupe)
+            store.update_item(dest_module, user.id)
 
-    if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
-        parent = store.get_item(parent_usage_key)
-        # If source was already a child of the parent, add duplicate immediately afterward.
-        # Otherwise, add child to end.
-        if source_item.location in parent.children:
-            source_index = parent.children.index(source_item.location)
-            parent.children.insert(source_index + 1, dest_module.location)
-        else:
-            parent.children.append(dest_module.location)
-        store.update_item(parent, user.id)
+        if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
+            parent = store.get_item(parent_usage_key)
+            # If source was already a child of the parent, add duplicate immediately afterward.
+            # Otherwise, add child to end.
+            if source_item.location in parent.children:
+                source_index = parent.children.index(source_item.location)
+                parent.children.insert(source_index + 1, dest_module.location)
+            else:
+                parent.children.append(dest_module.location)
+            store.update_item(parent, user.id)
 
-    return dest_module.location
+        return dest_module.location
 
 
 def _delete_item(usage_key, user):
@@ -571,16 +573,17 @@ def _delete_item(usage_key, user):
     """
     store = modulestore()
 
-    # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-    # if we add one then we need to also add it to the policy information (i.e. metadata)
-    # we should remove this once we can break this reference from the course to static tabs
-    if usage_key.category == 'static_tab':
-        course = store.get_course(usage_key.course_key)
-        existing_tabs = course.tabs or []
-        course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]
-        store.update_item(course, user.id)
+    with store.bulk_operations(usage_key.course_key):
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        if usage_key.category == 'static_tab':
+            course = store.get_course(usage_key.course_key)
+            existing_tabs = course.tabs or []
+            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]
+            store.update_item(course, user.id)
 
-    store.delete_item(usage_key, user.id)
+        store.delete_item(usage_key, user.id)
 
 
 # pylint: disable=W0613
@@ -618,17 +621,18 @@ def _get_xblock(usage_key, user):
     in the CREATE_IF_NOT_FOUND list, an xblock will be created and saved automatically.
     """
     store = modulestore()
-    try:
-        return store.get_item(usage_key, depth=None)
-    except ItemNotFoundError:
-        if usage_key.category in CREATE_IF_NOT_FOUND:
-            # Create a new one for certain categories only. Used for course info handouts.
-            return store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
-        else:
-            raise
-    except InvalidLocationError:
-        log.error("Can't find item by location.")
-        return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
+    with store.bulk_operations(usage_key.course_key):
+        try:
+            return store.get_item(usage_key, depth=None)
+        except ItemNotFoundError:
+            if usage_key.category in CREATE_IF_NOT_FOUND:
+                # Create a new one for certain categories only. Used for course info handouts.
+                return store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
+            else:
+                raise
+        except InvalidLocationError:
+            log.error("Can't find item by location.")
+            return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
 
 def _get_module_info(xblock, rewrite_static_links=True):
@@ -636,19 +640,20 @@ def _get_module_info(xblock, rewrite_static_links=True):
     metadata, data, id representation of a leaf module fetcher.
     :param usage_key: A UsageKey
     """
-    data = getattr(xblock, 'data', '')
-    if rewrite_static_links:
-        data = replace_static_urls(
-            data,
-            None,
-            course_id=xblock.location.course_key
-        )
+    with modulestore().bulk_operations(xblock.location.course_key):
+        data = getattr(xblock, 'data', '')
+        if rewrite_static_links:
+            data = replace_static_urls(
+                data,
+                None,
+                course_id=xblock.location.course_key
+            )
 
-    # Pre-cache has changes for the entire course because we'll need it for the ancestor info
-    modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
+        # Pre-cache has changes for the entire course because we'll need it for the ancestor info
+        modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
 
-    # Note that children aren't being returned until we have a use case.
-    return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
+        # Note that children aren't being returned until we have a use case.
+        return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
