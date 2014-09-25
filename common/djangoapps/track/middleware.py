@@ -6,6 +6,8 @@ import logging
 
 from django.conf import settings
 
+from social.apps.django_app.default import models as social_models
+
 from track import views
 from track import contexts
 from eventtracking import tracker
@@ -27,6 +29,7 @@ class TrackMiddleware(object):
     Tracks all requests made, as well as setting up context for other server
     emitted events.
     """
+    ionisx_session_re = re.compile('s%3A(\w*?)\..*')
 
     def process_request(self, request):
         try:
@@ -102,6 +105,8 @@ class TrackMiddleware(object):
         context = {
             'session': self.get_session_key(request),
             'user_id': self.get_user_primary_key(request),
+            'ionisx_id': self.get_ionisx_user_id(request),
+            'ionisx_session': self.get_ionisx_session(request),
             'username': self.get_username(request),
         }
         for header_name, context_key in META_KEY_TO_CONTEXT_KEY.iteritems():
@@ -147,6 +152,28 @@ class TrackMiddleware(object):
         """Gets the primary key of the logged in Django user"""
         try:
             return request.user.pk
+        except AttributeError:
+            return ''
+
+    def get_ionisx_session(self, request):
+        """Gets the session id stored in the IONISx session cookie"""
+        cookie = request.COOKIES.get('ionisx-sid')
+        if cookie:
+            try:
+                m = self.ionisx_session_re.findall(cookie)
+                if len(m) == 1:
+                    return m[0]
+            except Exception:  # pylint: disable=broad-except
+                pass
+        return ''
+
+    def get_ionisx_user_id(self, request):
+        """Gets the user id stored in the IONISx social auth"""
+        try:
+            social_auth = social_models.DjangoStorage.user.get_social_auth_for_user(request.user)
+            if len(social_auth) == 1:
+                return social_auth[0].uid
+            return ''
         except AttributeError:
             return ''
 
