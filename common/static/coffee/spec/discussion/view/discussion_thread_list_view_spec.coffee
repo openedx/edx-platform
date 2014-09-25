@@ -549,6 +549,7 @@ describe "DiscussionThreadListView", ->
             ,
             "Following"
           )
+          expect($.ajax.mostRecentCall.args[0].data.group_id).toBeUndefined();
 
         it "should get threads for the selected leaf", ->
           testSelectionRequest(
