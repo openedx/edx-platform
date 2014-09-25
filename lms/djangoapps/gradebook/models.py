@@ -30,7 +30,7 @@ class StudentGradebook(TimeStampedModel):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
-    def generate_leaderboard(cls, course_key, user_id=None, count=3, exclude_users=None):
+    def generate_leaderboard(cls, course_key, user_id=None, count=3, exclude_users=[]):
         """
         Assembles a data set representing the Top N users, by grade, for a given course.
         Optionally provide a user_id to include user-specific info.  For example, you
@@ -62,59 +62,53 @@ class StudentGradebook(TimeStampedModel):
         data['course_count'] = 0
         data['queryset'] = []
 
-        total_user_count = CourseEnrollment.users_enrolled_in(course_key).count()
-        if total_user_count:
+        enrolled_users_not_excluded = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+        total_user_count = enrolled_users_not_excluded.count()
 
+        if total_user_count:
             # Generate the base data set we're going to work with
             queryset = StudentGradebook.objects.select_related('user')\
-                .filter(course_id__exact=course_key, user__is_active=True)
+                .filter(course_id__exact=course_key, user__is_active=True, user__in=enrolled_users_not_excluded)
             gradebook_user_count = len(queryset)
+
             if gradebook_user_count:
+                # Calculate the class average
+                course_avg = queryset.aggregate(Avg('grade'))['grade__avg']
+                if course_avg is not None:
+                    # Take into account any ungraded students (assumes zeros for grades...)
+                    course_avg = course_avg / total_user_count * gradebook_user_count
 
-                # Remove any users who should not be considered for the statistics
-                if exclude_users:
-                    total_user_count = total_user_count - len(exclude_users)
-                    queryset = queryset.exclude(user__in=exclude_users)
-                    gradebook_user_count = len(queryset)
+                    # Fill up the response container
+                    data['course_avg'] = float("{0:.3f}".format(course_avg))
+                    data['course_max'] = queryset.aggregate(Max('grade'))['grade__max']
+                    data['course_min'] = queryset.aggregate(Min('grade'))['grade__min']
+                    data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
 
-                if gradebook_user_count:
-                    # Calculate the class average
-                    course_avg = queryset.aggregate(Avg('grade'))['grade__avg']
-                    if course_avg is not None and gradebook_user_count < total_user_count:
-                        # Take into account any ungraded students (assumes zeros for grades...)
-                        course_avg = course_avg / total_user_count * gradebook_user_count
-
-                        # Fill up the response container
-                        data['course_avg'] = float("{0:.3f}".format(course_avg))
-                        data['course_max'] = queryset.aggregate(Max('grade'))['grade__max']
-                        data['course_min'] = queryset.aggregate(Min('grade'))['grade__min']
-                        data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
-
-                    # Construct the leaderboard as a queryset
-                    data['queryset'] = queryset.values(
-                        'user__id',
-                        'user__username',
-                        'user__profile__title',
-                        'user__profile__avatar_url',
-                        'grade',
-                        'modified')\
-                        .order_by('-grade', 'modified')[:count]
-                    # If a user_id value was provided, we need to provide some additional user-specific data to the caller
-                    if user_id:
-                        user_grade = 0
-                        user_time_scored = timezone.now()
-                        try:
-                            user_queryset = StudentGradebook.objects.get(course_id__exact=course_key, user__id=user_id)
-                        except StudentGradebook.DoesNotExist:
-                            user_queryset = None
-                        if user_queryset:
-                            user_grade = user_queryset.grade
-                            user_time_scored = user_queryset.created
-                        users_above = queryset.filter(grade__gte=user_grade)\
-                            .exclude(user__id=user_id)\
-                            .exclude(grade=user_grade, modified__gt=user_time_scored)
-                        data['user_position'] = len(users_above) + 1
-                        data['user_grade'] = user_grade
+                # Construct the leaderboard as a queryset
+                data['queryset'] = queryset.values(
+                    'user__id',
+                    'user__username',
+                    'user__profile__title',
+                    'user__profile__avatar_url',
+                    'grade',
+                    'modified')\
+                    .order_by('-grade', 'modified')[:count]
+                # If a user_id value was provided, we need to provide some additional user-specific data to the caller
+                if user_id:
+                    user_grade = 0
+                    user_time_scored = timezone.now()
+                    try:
+                        user_queryset = StudentGradebook.objects.get(course_id__exact=course_key, user__id=user_id)
+                    except StudentGradebook.DoesNotExist:
+                        user_queryset = None
+                    if user_queryset:
+                        user_grade = user_queryset.grade
+                        user_time_scored = user_queryset.created
+                    users_above = queryset.filter(grade__gte=user_grade)\
+                        .exclude(user__id=user_id)\
+                        .exclude(grade=user_grade, modified__gt=user_time_scored)
+                    data['user_position'] = len(users_above) + 1
+                    data['user_grade'] = user_grade
 
         return data
 
