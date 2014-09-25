@@ -13,9 +13,9 @@ label = xblock.display_name or xblock.scope_ids.block_type
 
 % if not is_root:
     % if is_reorderable:
-    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
+    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
     % else:
-    <div class="studio-xblock-wrapper" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
+    <div class="studio-xblock-wrapper" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
     % endif
 
     <section class="wrapper-xblock ${section_class} ${collapsible_class}">

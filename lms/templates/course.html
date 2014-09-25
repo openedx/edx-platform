@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 %>
 <%page args="course" />
-<article id="${course.id.to_deprecated_string()}" class="course">
+<article id="${course.id | h}" class="course">
   %if course.is_newish:
     <span class="status">${_("New")}</span>
   %endif

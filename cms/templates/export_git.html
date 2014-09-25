@@ -60,7 +60,7 @@
     <aside class="content-supplementary" role="complimentary">
       <dl class="export-git-info-block">
         <dt>${_("Your course:")}</dt>
-        <dd class="course_text">${context_course.id}</dd>
+        <dd class="course_text">${context_course.id | h}</dd>
         <dt>${_("Course git url:")}</dt>
         <dd class="giturl_text">${context_course.giturl}</dd>
       </dl>

@@ -52,7 +52,7 @@
               % if item.status == "purchased":
                 <td>${item.qty}</td>
                 <td>${item.line_desc}</td>
-                <td><a href="${course_id}" class="enter-course">${_('View Course')}</a></td>
+                <td><a href="${course_id | h}" class="enter-course">${_('View Course')}</a></td>
                 <td>${"{0:0.2f}".format(item.unit_cost)}
                     % if item.list_price != None:
                         <span class="old-price"> ${"{0:0.2f}".format(item.list_price)}</span>

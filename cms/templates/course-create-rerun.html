@@ -2,6 +2,7 @@
 <%def name="online_help_token()"><% return "course_rerun" %></%def>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.template.defaultfilters import escapejs %>
 
 <%block name="title">${_("Create a Course Rerun of:")}</%block>
 <%block name="bodyclass">is-signedin view-course-create view-course-create-rerun</%block>
@@ -13,7 +14,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
 });
 </script>
 <script type="text/javascript">
-    var source_course_key = "${source_course_key}"
+    var source_course_key = "${source_course_key | escapejs}"
 </script>
 
 </%block>
@@ -37,7 +38,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
 
       <h2 class="page-header-super course-original">
         <span class="sr">${_("You are creating a re-run from:")}</span>
-        <span class="course-original-title-id">${source_course_key.org} ${source_course_key.course} ${source_course_key.run}</span>
+        <span class="course-original-title-id">${source_course_key.org | h} ${source_course_key.course | h} ${source_course_key.run | h}</span>
         <span class="course-original-title">${display_name}</span>
       </h2>
     </header>
@@ -79,7 +80,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
                     </li>
                     <li class="field text required" id="field-organization">
                       <label for="rerun-course-org">${_("Organization")}</label>
-                      <input class="rerun-course-org" id="rerun-course-org" type="text" name="rerun-course-org" aria-required="true" value="${source_course_key.org}" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
+                      <input class="rerun-course-org" id="rerun-course-org" type="text" name="rerun-course-org" aria-required="true" value="${source_course_key.org | h}" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
                       <span class="tip">
                         ${_("The name of the organization sponsoring the new course. (This name is often the same as the original organization name.)")}
                         <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
@@ -90,7 +91,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
                     <li class="row">
                       <div class="column field text required" id="field-course-number">
                         <label for="rerun-course-number">${_("Course Number")}</label>
-                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" value="${source_course_key.course}" placeholder="${_('e.g. CS101')}" />
+                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" value="${source_course_key.course | h}" placeholder="${_('e.g. CS101')}" />
                         <span class="tip">
                           ${_("The unique number that identifies the new course within the organization.  (This number is often the same as the original course number.)")}
                           <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
