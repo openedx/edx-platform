@@ -270,7 +270,7 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     ## Sort pairs in order of courseware access. If I am actively using a course, it should bubble up to the top.
     modified_times_map = course_modified_times(user, [p[0].scope_ids.usage_id for p in pairs])
     def key_function(x):
-        return modified_times_map.get(unicode(x[0].scope_ids.usage_id), datetime.min)
+        return modified_times_map.get(unicode(x[0].scope_ids.usage_id), datetime.min.replace(tzinfo=UTC))
     pairs.sort(key=key_function, reverse=True)
     return pairs
 
