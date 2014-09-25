@@ -353,7 +353,7 @@
 
             <!-- create/edit cohort group messages -->
             <div class="message message-confirmation is-shown">
-                <h3 class="message-title">New Cohort Name has been created. You may add students below.</h3>
+                <h3 class="message-title">New Cohort Name has been created. You can manually add students to this group below.</h3>
             </div>
 
             <div class="message message-error is-shown">
@@ -373,7 +373,19 @@
                     <div class="cohort-management-group-setup">
                         <h4 class="sr">This cohort group's current management set up:</h4>
                         <div class="setup-value">
-                            Students are added to this group automatically
+                            Students are added to this group automatically.
+                            <a href="" class="incontext-help action-secondary action-help">What does this mean?</a>
+                        </div>
+
+                        <div class="setup-actions">
+                            <a href="" class="action-secondary action-edit">Edit settings in Studio</a>
+                        </div>
+                    </div>
+
+                    <div class="cohort-management-group-setup">
+                        <h4 class="sr">This cohort group's current management set up:</h4>
+                        <div class="setup-value">
+                            Students are added to this group only when you provide their email addresses or usernames on this page.
                             <a href="" class="incontext-help action-secondary action-help">What does this mean?</a>
                         </div>
 
@@ -390,7 +402,7 @@
                         <h4 class="form-title">Add students to this cohort group</h4>
 
                         <div class="form-introduction">
-                            <p>Please Note: Adding a student to this group will remove them from any groups they are currently  a part of.</p>
+                            <p>Note: Students can only be in one cohort group. Adding students to this group overrides any previous group assignment.</p>
                         </div>
 
                         <!-- individual group - form message - confirmation -->
@@ -428,11 +440,13 @@
                         <div class="form-fields">
                             <div class="field field-textarea is-required">
                                 <label for="cohort-management-group-add-students" class="label">
-                                    Student ID or Email Address of Students to be added (one per line or comma-separated) *
+                                    Enter email addresses and/or usernames separated by new lines or commas for students to add. *
                                     <span class="sr">(Required Field)</span>
                                 </label>
 
                                 <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students" class="input cohort-management-group-add-students" placeholder="e.g. johndoe@example.com, JaneDoe, joeydoe@example.com" required="required"></textarea>
+
+                                <span class="tip">You will not get notification for emails that bounce, so please double-check spelling.</span>
                             </div>
                         </div>
 
