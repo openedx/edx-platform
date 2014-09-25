@@ -581,8 +581,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             // would require changing annotations that were already made, instead we check if
             // the id is a substring of the thumbnail, which according to OpenSeaDragon API should be the case.
             var sourceId = this.viewer.source['@id'];
-            var targetThumb = an.target.thumb;
-            if (isContainer) isSource = (targetThumb.indexOf(sourceId) !== -1);            
+
+            // code runs on annotation creation before thumbnail is created
+            var targetThumb = an.target ? an.target.thumb : false;
+            if (isContainer) {
+                // reason why this is okay is that we are trying to ascertain that the annotation
+                // is related to the image drawn. If thumbnail attribute is empty it means the annotation
+                // was just created and should still be considered an annotation of this image.
+                isSource = targetThumb ? (targetThumb.indexOf(sourceId) !== -1) : true;
+            }            
             return (isOpenSeaDragon && isContainer && isImage && isRP && isSource);
         },
         
@@ -840,13 +847,13 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         // Makes sure OSD exists and that annotation is an image annotation
         // with a position in the OSD instance
         var isOpenSeaDragon = (typeof annotator.osda != 'undefined');
-        var isContainer = (typeof an.target!='undefined' && an.target.container==this.viewer.id );
+        var isContainer = (typeof an.target!='undefined' && an.target.container==osda.viewer.id );
         var isImage = (typeof an.media!='undefined' && an.media=='image');
         var isRP = (typeof rp!='undefined');
         var isSource = false;
         
         // Double checks that the image being displayed matches the annotations 
-        var source = this.viewer.source;
+        var source = osda.viewer.source;
         var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
         var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
         var compareUrl = tilesUrl!=''?tilesUrl:('' + functionUrl).replace(/\s+/g, ' ');
