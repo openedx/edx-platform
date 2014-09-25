@@ -14,7 +14,7 @@ General Questions
 How do I get the mobile app?
 ================================
 
-This beta version of the mobile app is only available for a few select courses. If you're registered for a course that's available on the mobile app, the instructor for the course will send or post a link that you can use to join the edX Android Beta Testers Google group. You can then install the edX mobile app.
+This beta version of the mobile app is only available for a few select courses. If you're registered for a course that's available on the mobile app, the instructor for the course will send or post a link that you can use to join the **edX Android Beta Testers** Google group. You can then install the edX mobile app by using either your mobile device or your computer.
 
 Install the edX Mobile App Using Your Mobile Device
 ************************************************************
@@ -22,11 +22,11 @@ Install the edX Mobile App Using Your Mobile Device
 #. Click the link that you've received from your instructor to access the **edX Android Beta Testers** Google group.
 #. On the **EdX Android Beta Testers** Google group page, tap **Join Group**.
 #. In the dialog box that opens, select the options that you want, and then tap **Join this group**.
-#. On the group's home page, tap the **Testing2** post.
-#. On the **Testing2** page, tap the link to the app in the Google Play Store.
-#. On the app's page in the Google Play Store, tap **Become a Tester**.
-#. Tap the link under **Get the test version** to download the app from the Google Play Store.
-#. On the app's page in the Google Play Store, tap **Install**, and then tap **Accept** to allow the app to access your device.
+#. On the group's home page, tap the **Get the App** post.
+#. On the **Get the App** page, tap the link to the app in the Google Play store.
+#. On the app's page in the Google Play store, tap **Become a Tester**.
+#. Tap the link under **Get the test version** to download the app from the Google Play store.
+#. On the app's page in the Google Play store, tap **Install**, and then tap **Accept** to allow the app to access your device.
 #. When the app finishes installing, click **Open**. 
 
 
@@ -36,9 +36,9 @@ Install the edX Mobile App Using Your Computer
 #. Click the link that you've received from your instructor to access the **edX Android Beta Testers** Google group.
 #. On the **EdX Android Beta Testers** Google group page, click **Join Group**.
 #. In the dialog box that opens, select the options that you want, and then click **Join this group**.
-#. On the group's home page, click the link to the app in the Google Play Store.
-#. On the app's page in the Google Play Store, click **Become a Tester**.
-#. Click the link under **Get the test version** to download the app from the Google Play Store.
+#. On the group's home page, click the link to the app in the Google Play store.
+#. On the app's page in the Google Play store, click **Become a Tester**.
+#. Click the link under **Get the test version** to download the app from the Google Play store.
 #. Click **Install**. In the dialog box that opens, select the devices that you want to install the app on, and then click **OK**. 
 #. When you a see a message saying that the app has been installed, go to your device. Check the app list on your device for the edX app.
 
@@ -86,11 +86,11 @@ Right now, you can't participate in discussions by using the app. However, when 
 How do I change my download settings?
 ========================================
 
-#. In the upper left corner of your home page, tap the menu icon.
+#. In the upper left corner of your **My Courses** page, tap the menu icon.
 
    .. image:: /Images/Mob_Menu.png
       :width: 300
-      :alt: Mobile home page with menu in upper left corner circled
+      :alt: Mobile "My Courses" page with an arrow pointing to the menu in the upper left corner
 
 #. In the list that appears, locate **SETTINGS: Download only on Wi-Fi**, and then tap the option's current setting to change it.
 
@@ -200,7 +200,7 @@ Troubleshooting
 I get a "This video is not available" screen when I try to watch a video. What can I do?
 ======================================================================================================
 
-If you run into problems, make sure you have an Internet connection. If problems persist, let us know: go to the app home page, tap the menu in the upper left corner, and then tap **Submit Feedback**. 
+If you run into problems, make sure you have an Internet connection. If problems persist, let us know: go to your **My Courses** page on the app, tap the menu icon in the upper left corner, and then tap **Submit Feedback**. 
 
 
 
