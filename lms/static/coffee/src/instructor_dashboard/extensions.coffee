@@ -23,6 +23,7 @@ class Extensions
     @$reset_due_date = @$section.find("input[name='reset-due-date']")
     @$show_unit_extensions = @$section.find("input[name='show-unit-extensions']")
     @$show_student_extensions = @$section.find("input[name='show-student-extensions']")
+    @$fix_extensions = @$section.find("input[name='fix-extensions']")
 
     # Gather notification areas
     @$section.find(".request-response").hide()
@@ -65,6 +66,16 @@ class Extensions
         data: send_data
         success: (data) => @display_response "reset-extension", data
         error: (xhr) => @fail_with_error "reset-extension", "Error reseting due date", xhr
+
+    @$fix_extensions.click =>
+      @clear_display()
+      send_data = {}
+      $.ajax
+        dataType: 'json'
+        url: @$fix_extensions.data 'endpoint'
+        data: send_data
+        success: (data) => @display_response "fix-extensions", data
+        error: (xhr) => @fail_with_error "fix-extensions", "Error fixing extensions", xhr
 
     @$show_unit_extensions.click =>
       @clear_display()

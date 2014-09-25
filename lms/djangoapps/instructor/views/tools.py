@@ -1,8 +1,9 @@
 """
 Tools for the instructor dashboard
 """
-import dateutil
 import json
+import dateutil
+import itertools
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -251,3 +252,30 @@ def dump_student_extensions(course, student):
         "title": _("Due date extensions for {0} {1} ({2})").format(
             student.first_name, student.last_name, student.username),
         "data": data}
+
+
+def fix_missing_extensions(course):
+    units = get_units_with_due_date(course)
+    units = dict([(u.location.url(), u) for u in units])
+    msks = units.keys()
+    query = StudentModule.objects.filter(
+        course_id=course.id,
+        module_state_key__in=msks,
+        state__contains='extended_due'
+    )
+    eunit_map = itertools.groupby(query, lambda el: el.student)
+    reapplied = {}
+    for student, extended_modules in eunit_map:
+        for module in extended_modules:
+            state = json.loads(module.state)
+            edue = DATE_FIELD.from_json(state.get('extended_due'))
+            if not edue:
+                continue
+            unit = units.get(module.module_state_key)
+            print('reapplying extension %s to %s for user %s' %
+                  (edue, unit.location.url(), student.username))
+            set_due_date_extension(course, unit, student, edue)
+            r = reapplied.get(student.username, [])
+            r.append(unit.location.url())
+            reapplied[student.username] = r
+    return reapplied

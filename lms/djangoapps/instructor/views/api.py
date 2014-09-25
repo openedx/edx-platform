@@ -67,6 +67,7 @@ from .tools import (
     set_due_date_extension,
     strip_if_string,
     bulk_email_is_enabled_for_course,
+    fix_missing_extensions,
 )
 from xmodule.modulestore import Location
 
@@ -1227,6 +1228,19 @@ def reset_due_date(request, course_id):
         'Successfully reset due date for student {0} for {1} '
         'to {2}').format(student.profile.name, _display_unit(unit),
                          unit.due.strftime('%Y-%m-%d %H:%M')))
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def fix_extensions(request, course_id):
+    """
+    Fix any <problems> missing their parent's 'extended_due'
+    """
+    course = get_course_by_id(course_id)
+    fix_missing_extensions(course)
+    return JsonResponse(_('Successfully repaired extensions'))
 
 
 @handle_dashboard_error
