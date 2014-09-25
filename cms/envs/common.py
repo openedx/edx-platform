@@ -703,3 +703,6 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
+### Platform-wide configuration used to initialize the XBlock runtime
+EXTRA_XBLOCK_SETTINGS = {}

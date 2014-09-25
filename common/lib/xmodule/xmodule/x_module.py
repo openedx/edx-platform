@@ -1,11 +1,13 @@
 import logging
+from collections import namedtuple
 import os
+from functools import partial
 import sys
 import yaml
 
-from functools import partial
+from django.conf import settings as django_settings
+from dogapi import dog_stats_api
 from lxml import etree
-from collections import namedtuple
 from pkg_resources import (
     resource_exists,
     resource_listdir,
@@ -25,7 +27,6 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import UsageKey
 from xmodule.exceptions import UndefinedContext
-from dogapi import dog_stats_api
 
 
 log = logging.getLogger(__name__)
@@ -1112,6 +1113,11 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         local_resource_url: an implementation of :meth:`xblock.runtime.Runtime.local_resource_url`
 
         """
+        # Initialize the XBlock Runtime with extra site-wide configuration.
+        #    Sent to every kind of XBlock.
+        if not kwargs.has_key('platform_settings'):
+            kwargs['platform_settings'] = getattr(django_settings, 'EXTRA_XBLOCK_SETTINGS', {})
+
         super(DescriptorSystem, self).__init__(id_reader=OpaqueKeyReader(), **kwargs)
 
         # This is used by XModules to write out separate files during xml export
@@ -1310,6 +1316,11 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         rebind_noauth_module_to_user - rebinds module bound to AnonymousUser to a real user...used in LTI
            modules, which have an anonymous handler, to set legitimate users' data
         """
+
+        # Initialize the XBlock Runtime with extra site-wide configuration.
+        #    Sent to every kind of XBlock.
+        if not kwargs.has_key('platform_settings'):
+            kwargs['platform_settings'] = getattr(django_settings, 'EXTRA_XBLOCK_SETTINGS', {})
 
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.

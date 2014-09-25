@@ -1801,3 +1801,6 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
     "HarvardX/SW12.9x/3T2014",
     "HarvardX/SW12.8x/3T2014",
 ])
+
+### Platform-wide configuration used to initialize the XBlock runtime
+EXTRA_XBLOCK_SETTINGS = {}
