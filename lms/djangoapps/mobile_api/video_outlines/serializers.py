@@ -20,7 +20,7 @@ class BlockOutline(object):
             self.local_cache['course_videos'] = get_video_info_for_course_and_profile(
                 unicode(course_id), "mobile_low"
             )
-        except ValInternalError:
+        except ValInternalError: # pragma: nocover
             self.local_cache['course_videos'] = {}
 
     def __iter__(self):
@@ -114,6 +114,7 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
 
     # Transcripts...
     transcript_langs = video_descriptor.available_translations(verify_assets=False)
+
     transcripts = {
         lang: reverse(
             'video-transcripts-detail',

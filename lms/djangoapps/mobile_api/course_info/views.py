@@ -1,3 +1,7 @@
+"""
+Views for course info API
+"""
+from django.http import Http404
 from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.response import Response
@@ -25,9 +29,8 @@ class CourseUpdatesList(generics.ListAPIView):
         course_id = CourseKey.from_string(kwargs['course_id'])
         course = modulestore().get_course(course_id)
         course_updates_module = get_course_info_section_module(request, course, 'updates')
-
         updates_to_show = [
-            update for update in reversed(course_updates_module.items)
+            update for update in reversed(getattr(course_updates_module, 'items', []))
             if update.get("status") != "deleted"
         ]
         return Response(updates_to_show)
@@ -43,7 +46,12 @@ class CourseHandoutsList(generics.ListAPIView):
         course_id = CourseKey.from_string(kwargs['course_id'])
         course = modulestore().get_course(course_id)
         course_handouts_module = get_course_info_section_module(request, course, 'handouts')
-        return Response({'handouts_html': course_handouts_module.data})
+        if course_handouts_module:
+            return Response({'handouts_html': course_handouts_module.data})
+        else:
+            # course_handouts_module could be None if there are no handouts
+            # (such as while running tests)
+            raise Http404(u"No handouts for {}".format(unicode(course_id)))
 
 
 class CourseAboutDetail(generics.RetrieveAPIView):
