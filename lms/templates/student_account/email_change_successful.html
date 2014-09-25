@@ -1,0 +1,18 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+
+<section class="container activation">
+    <section class="message">
+        <h1 class="valid">${_("Email change successful!")}</h1>
+        <hr class="horizontal-divider">
+
+        <p>
+            ${_("You should see your new email address listed on the "
+                "{link_start}account settings{link_end} page.").format(
+                link_start="<a href='{url}'>".format(url=reverse('account_index')),
+                link_end="</a>",
+            )}
+        </p>
+    </section>
+</section>

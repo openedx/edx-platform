@@ -26,7 +26,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
@@ -278,6 +278,59 @@ class UserProfile(models.Model):
         self.set_meta(meta)
         self.save()
 
+    @transaction.commit_on_success
+    def update_name(self, new_name):
+        """Update the user's name, storing the old name in the history.
+
+        Implicitly saves the model.
+        If the new name is not the same as the old name, do nothing.
+
+        Arguments:
+            new_name (unicode): The new full name for the user.
+
+        Returns:
+            None
+
+        """
+        if self.name == new_name:
+            return
+
+        if self.name:
+            meta = self.get_meta()
+            if 'old_names' not in meta:
+                meta['old_names'] = []
+            meta['old_names'].append([self.name, u"", datetime.now(UTC).isoformat()])
+            self.set_meta(meta)
+
+        self.name = new_name
+        self.save()
+
+    @transaction.commit_on_success
+    def update_email(self, new_email):
+        """Update the user's email and save the change in the history.
+
+        Implicitly saves the model.
+        If the new email is the same as the old email, do not update the history.
+
+        Arguments:
+            new_email (unicode): The new email for the user.
+
+        Returns:
+            None
+        """
+        if self.user.email == new_email:
+            return
+
+        meta = self.get_meta()
+        if 'old_emails' not in meta:
+            meta['old_emails'] = []
+        meta['old_emails'].append([self.user.email, datetime.now(UTC).isoformat()])
+        self.set_meta(meta)
+        self.save()
+
+        self.user.email = new_email
+        self.user.save()
+
 
 class UserSignupSource(models.Model):
     """
@@ -341,6 +394,23 @@ class PendingEmailChange(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+
+    def request_change(self, email):
+        """Request a change to a user's email.
+
+        Implicitly saves the pending email change record.
+
+        Arguments:
+            email (unicode): The proposed new email for the user.
+
+        Returns:
+            unicode: The activation code to confirm the change.
+
+        """
+        self.new_email = email
+        self.activation_key = uuid.uuid4().hex
+        self.save()
+        return self.activation_key
 
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'

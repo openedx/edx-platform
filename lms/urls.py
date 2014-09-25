@@ -537,6 +537,13 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         url(r'', include('third_party_auth.urls')),
     )
 
+# If enabled, expose the URLs for the new dashboard, account, and profile pages
+if settings.FEATURES.get('ENABLE_NEW_DASHBOARD'):
+    urlpatterns += (
+        url(r'^profile/', include('student_profile.urls')),
+        url(r'^account/', include('student_account.urls')),
+    )
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:

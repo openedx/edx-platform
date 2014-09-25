@@ -59,7 +59,11 @@
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
 
-  <%static:js group='main_vendor'/>
+  % if disable_courseware_js:
+    <%static:js group='base_vendor'/>
+  % else:
+    <%static:js group='main_vendor'/>
+  % endif
 
   <%block name="headextra"/>
 
@@ -131,8 +135,10 @@
   <%include file="${footer_file}" />
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
-  <%static:js group='application'/>
-  <%static:js group='module-js'/>
+  % if not disable_courseware_js:
+    <%static:js group='application'/>
+    <%static:js group='module-js'/>
+  % endif
 
   <%block name="js_extra"/>
 
