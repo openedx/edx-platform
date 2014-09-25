@@ -64,7 +64,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         # call through to the db_connection. It should also clear the
         # system cache
         self.bulk.update_structure(self.course_key, self.structure)
-        self.assertConnCalls(call.upsert_structure(self.structure))
+        self.assertConnCalls(call.insert_structure(self.structure))
         self.clear_cache.assert_called_once_with(self.structure['_id'])
 
     @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
@@ -79,7 +79,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         # Writing a definition when no bulk operation is active should just
         # call through to the db_connection.
         self.bulk.update_definition(self.course_key, self.definition)
-        self.assertConnCalls(call.upsert_definition(self.definition))
+        self.assertConnCalls(call.insert_definition(self.definition))
 
     @ddt.data(True, False)
     def test_no_bulk_read_index(self, ignore_case):
@@ -128,7 +128,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key, self.structure)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
-        self.assertConnCalls(call.upsert_structure(self.structure))
+        self.assertConnCalls(call.insert_structure(self.structure))
 
     def test_write_multiple_structures_on_close(self):
         self.conn.get_course_index.return_value = None
@@ -140,7 +140,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
         self.assertItemsEqual(
-            [call.upsert_structure(self.structure), call.upsert_structure(other_structure)],
+            [call.insert_structure(self.structure), call.insert_structure(other_structure)],
             self.conn.mock_calls
         )
 
@@ -154,7 +154,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
         self.assertConnCalls(
-            call.upsert_definition(self.definition),
+            call.insert_definition(self.definition),
             call.update_course_index(
                 {'versions': {self.course_key.branch: self.definition['_id']}},
                 from_index=original_index
@@ -173,8 +173,8 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk._end_bulk_operation(self.course_key)
         self.assertItemsEqual(
             [
-                call.upsert_definition(self.definition),
-                call.upsert_definition(other_definition),
+                call.insert_definition(self.definition),
+                call.insert_definition(other_definition),
                 call.update_course_index(
                     {'versions': {'a': self.definition['_id'], 'b': other_definition['_id']}},
                     from_index=original_index
@@ -190,7 +190,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_definition(self.course_key, self.definition)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
-        self.assertConnCalls(call.upsert_definition(self.definition))
+        self.assertConnCalls(call.insert_definition(self.definition))
 
     def test_write_multiple_definitions_on_close(self):
         self.conn.get_course_index.return_value = None
@@ -202,7 +202,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
         self.assertItemsEqual(
-            [call.upsert_definition(self.definition), call.upsert_definition(other_definition)],
+            [call.insert_definition(self.definition), call.insert_definition(other_definition)],
             self.conn.mock_calls
         )
 
@@ -216,7 +216,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
         self.assertConnCalls(
-            call.upsert_structure(self.structure),
+            call.insert_structure(self.structure),
             call.update_course_index(
                 {'versions': {self.course_key.branch: self.structure['_id']}},
                 from_index=original_index
@@ -235,8 +235,8 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk._end_bulk_operation(self.course_key)
         self.assertItemsEqual(
             [
-                call.upsert_structure(self.structure),
-                call.upsert_structure(other_structure),
+                call.insert_structure(self.structure),
+                call.insert_structure(other_structure),
                 call.update_course_index(
                     {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}},
                     from_index=original_index
@@ -397,13 +397,12 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         active_definition = lambda _id: {'active': 'definition', '_id': _id}
 
         db_definitions = [db_definition(_id) for _id in db_ids if _id not in active_ids]
+        self.bulk._begin_bulk_operation(self.course_key)
         for n, _id in enumerate(active_ids):
-            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
-            self.bulk._begin_bulk_operation(course_key)
-            self.bulk.update_definition(course_key, active_definition(_id))
+            self.bulk.update_definition(self.course_key, active_definition(_id))
 
         self.conn.get_definitions.return_value = db_definitions
-        results = self.bulk.get_definitions(search_ids)
+        results = self.bulk.get_definitions(self.course_key, search_ids)
         self.conn.get_definitions.assert_called_once_with(list(set(search_ids) - set(active_ids)))
         for _id in active_ids:
             if _id in search_ids:
@@ -669,7 +668,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         index_copy['versions']['draft'] = index['versions']['published']
         self.bulk.update_course_index(self.course_key, index_copy)
         self.bulk._end_bulk_operation(self.course_key)
-        self.conn.upsert_structure.assert_called_once_with(published_structure)
+        self.conn.insert_structure.assert_called_once_with(published_structure)
         self.conn.update_course_index.assert_called_once_with(index_copy, from_index=self.conn.get_course_index.return_value)
         self.conn.get_course_index.assert_called_once_with(self.course_key)
 

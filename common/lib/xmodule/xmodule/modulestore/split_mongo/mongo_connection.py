@@ -4,6 +4,10 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 import re
 import pymongo
 import time
+
+# Import this just to export it
+from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+
 from contracts import check
 from functools import wraps
 from pymongo.errors import AutoReconnect
@@ -182,11 +186,11 @@ class MongoConnection(object):
             }
         })]
 
-    def upsert_structure(self, structure):
+    def insert_structure(self, structure):
         """
-        Update the db record for structure, creating that record if it doesn't already exist
+        Insert a new structure into the database.
         """
-        self.structures.update({'_id': structure['_id']}, structure_to_mongo(structure), upsert=True)
+        self.structures.insert(structure_to_mongo(structure))
 
     @autoretry_read()
     def get_course_index(self, key, ignore_case=False):
@@ -274,11 +278,11 @@ class MongoConnection(object):
         """
         return self.definitions.find({'$in': {'_id': definitions}})
 
-    def upsert_definition(self, definition):
+    def insert_definition(self, definition):
         """
         Create the definition in the db
         """
-        self.definitions.update({'_id': definition['_id']}, definition, upsert=True)
+        self.definitions.insert(definition)
 
     def ensure_indexes(self):
         """
