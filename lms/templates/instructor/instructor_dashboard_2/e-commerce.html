@@ -436,12 +436,6 @@
          $('#add_coupon_form #coupon_form_error').text("${_('Please enter the coupon code')}");
          return false;
        }
-       if (coupon_discount == '0') {
-         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please enter the coupon discount value greater than 0')}");
-         $("#add_coupon_button").removeAttr('disabled');
-         return false;
-       }
        if (parseInt(coupon_discount) > 100) {
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
          $('#add_coupon_form #coupon_form_error').text("${_('Please enter the coupon discount value less than or equal to 100')}");

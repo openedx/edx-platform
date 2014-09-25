@@ -25,7 +25,12 @@ class CourseUpdatesList(generics.ListAPIView):
         course_id = CourseKey.from_string(kwargs['course_id'])
         course = modulestore().get_course(course_id)
         course_updates_module = get_course_info_section_module(request, course, 'updates')
-        return Response(reversed(course_updates_module.items))
+
+        updates_to_show = [
+            update for update in reversed(course_updates_module.items)
+            if update.get("status") != "deleted"
+        ]
+        return Response(updates_to_show)
 
 
 class CourseHandoutsList(generics.ListAPIView):
