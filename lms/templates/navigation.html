@@ -36,7 +36,7 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-<header class="${"global slim" if course else "global-new"}" aria-label="Main" role="banner">
+<header class="${"global slim" if course and not disable_courseware_header else "global-new"}" aria-label="Main" role="banner">
   <nav aria-label="Main">
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
       <a href="${marketing_link('ROOT')}" title="Home page" itemprop="url">
@@ -46,7 +46,7 @@ site_status_msg = get_site_status_msg(course_id)
       </a>
     </h1>
 
-    % if course:
+    % if course and not disable_courseware_header:
     <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
     % endif
 
