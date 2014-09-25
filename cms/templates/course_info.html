@@ -1,5 +1,6 @@
-<%! 
+<%!
     from django.utils.translation import ugettext as _
+    from django.template.defaultfilters import escapejs
 %>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "updates" %></%def>
@@ -20,7 +21,7 @@
 
 <%block name="jsextra">
   <script type="text/javascript" charset="utf-8">
-  
+
 require(["domReady!", "jquery", "js/collections/course_update", "js/models/module_info", "js/models/course_info", "js/views/course_info_edit"],
   function(doc, $, CourseUpdateCollection, ModuleInfoModel, CourseInfoModel, CourseInfoEditView) {
     var course_updates = new CourseUpdateCollection();
@@ -28,7 +29,7 @@ require(["domReady!", "jquery", "js/collections/course_update", "js/models/modul
     course_updates.fetch({reset: true});
 
     var course_handouts = new ModuleInfoModel({
-        id: '${handouts_locator}'
+        id: '${handouts_locator | escapejs}'
       });
 
     var editor = new CourseInfoEditView({

@@ -5,6 +5,7 @@
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
   from xmodule.tabs import StaticTab
+  from django.template.defaultfilters import escapejs
 %>
 <%block name="title">${_("Pages")}</%block>
 <%block name="bodyclass">is-signedin course view-static-pages</%block>
@@ -24,7 +25,7 @@
             function (TabsModel, TabsEditView, xmoduleLoader) {
                 xmoduleLoader.done(function () {
                     var model = new TabsModel({
-                        id: "${context_course.location}",
+                        id: "${context_course.location | escapejs}",
                         explicit_url: "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}"
                     });
 
@@ -86,7 +87,7 @@
                 %>
 
                 % if isinstance(tab, StaticTab):
-                    <li class="component ${css_class}" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
+                    <li class="component ${css_class}" data-locator="${tab.locator | h}" data-tab-id="${tab.tab_id | h}"></li>
 
                 % else:
                     <li class="course-nav-item ${css_class}" data-tab-id="${tab.tab_id}">
