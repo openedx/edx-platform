@@ -107,7 +107,8 @@ li[class*=forum-nav-thread-label-] {
 // new post form
 // -------------
 
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   // Override global label rules
   .post-type {
     text-shadow: none;
@@ -127,7 +128,7 @@ li[class*=forum-nav-thread-label-] {
     margin-bottom: 0;
   }
 
-  // Override global span rules 
+  // Override global span rules
   .post-topic-button .drop-arrow {
     line-height: 36px;
   }

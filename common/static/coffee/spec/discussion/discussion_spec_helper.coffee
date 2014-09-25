@@ -71,9 +71,9 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
-  <div class="discussion-post edit-post-form">
     <h1>Editing post</h1>
     <ul class="edit-post-form-errors"></ul>
+    <div class="forum-edit-post-form-wrapper"></div>
     <div class="form-row">
       <label class="sr" for="edit-post-title">Edit post title</label>
       <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="<%-title %>" placeholder="Title">
@@ -83,7 +83,6 @@ browser and pasting the output.  When that file changes, this one should be rege
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="Update post">
     <a href="#" class="post-cancel">Cancel</a>
-  </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
@@ -113,7 +112,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <%= author_display %>
         <p class="posted-details">
             <span class="timeago" title="<%= created_at %>"><%= created_at %></span>
-            
+
               <% if (obj.endorsement) { %> - <%=
                 interpolate(
                     thread.get("thread_type") == "question" ?
@@ -174,7 +173,7 @@ browser and pasting the output.  When that file changes, this one should be rege
             }
         )
     %>
-    
+
     <p class="posted-details">
     <%=
       interpolate(
@@ -222,7 +221,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <i class="icon <%= icon_class %>"></i>
       </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title"><%- title %></span>
-        
+
         <%
         var labels = "";
         if (pinned) {
@@ -242,7 +241,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         }
         %>
       </div><div class="forum-nav-thread-wrapper-2">
-        
+
         <span class="forum-nav-thread-votes-count">+<%=
             interpolate(
                 '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
@@ -250,7 +249,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 true
                 )
         %></span>
-        
+
         <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
             <%
         var fmt;
@@ -319,30 +318,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 Questions raise issues that need answers. Discussions share ideas and start conversations.
             </span>
         </div>
-        <% if (mode=="tab") { %>
-        <div class="post-field">
-            <div class="field-label">
-                <span class="field-label-text">
-                    Topic Area:
-                </span><div class="field-input post-topic">
-                    <a href="#" class="post-topic-button">
-                        <span class="sr">Discussion topics; current selection is: </span>
-                        <span class="js-selected-topic"></span>
-                        <span class="drop-arrow" aria-hidden="true">▾</span>
-                    </a>
-                    <div class="topic-menu-wrapper">
-                        <label class="topic-filter-label">
-                            <span class="sr">Filter topics</span>
-                            <input type="text" class="topic-filter-input" placeholder="Filter topics">
-                        </label>
-                        <ul class="topic-menu" role="menu"><%= topics_html %></ul>
-                   </div>
-               </div>
-            </div><span class="field-help">
-                Add your post to a relevant topic to help others find it.
-            </span>
-        </div>
-        <% } %>
+        <div class="forum-new-post-form-wrapper"></div>
         <% if (cohort_options) { %>
         <div class="post-field">
             <label class="field-label">
@@ -404,6 +380,27 @@ browser and pasting the output.  When that file changes, this one should be rege
         <span class="topic-title"><%- text %></span>
         <ul role="menu" class="topic-submenu"><%= entries %></ul>
     </li>
+</script>
+
+<script aria-hidden="true" type="text/template" id="topic-template">
+    <div class="field-label">
+        <span class="field-label-text">Topic Area:</span><div class="field-input post-topic">
+            <a href="#" class="post-topic-button">
+                <span class="sr">Discussion topics; current selection is: </span>
+                <span class="js-selected-topic"></span>
+                <span class="drop-arrow" aria-hidden="true">▾</span>
+            </a>
+            <div class="topic-menu-wrapper">
+                <label class="topic-filter-label">
+                    <span class="sr">Filter topics</span>
+                    <input type="text" class="topic-filter-input" placeholder="Filter topics">
+                </label>
+                <ul class="topic-menu" role="menu"><%= topics_html %></ul>
+           </div>
+       </div>
+    </div><span class="field-help">
+        Add your post to a relevant topic to help others find it.
+    </span>
 </script>
 
 

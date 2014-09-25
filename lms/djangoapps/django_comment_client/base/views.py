@@ -18,8 +18,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.models import CourseUserGroup
-from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,
@@ -28,7 +26,8 @@ from django_comment_client.utils import (
     JsonError,
     JsonResponse,
     prepare_content,
-    get_group_id_for_comments_service
+    get_group_id_for_comments_service,
+    get_discussion_id_map,
 )
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
@@ -139,12 +138,21 @@ def update_thread(request, course_id, thread_id):
         return JsonError(_("Title can't be empty"))
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
+
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
     thread.body = request.POST["body"]
     thread.title = request.POST["title"]
-    thread.save()
 
+    if "commentable_id" in request.POST:
+        course = get_course_with_access(request.user, 'load', course_key)
+        id_map = get_discussion_id_map(course)
+        if request.POST.get("commentable_id") in id_map:
+            thread.commentable_id = request.POST["commentable_id"]
+        else:
+            return JsonError(_("Topic doesn't exist"))
+
+    thread.save()
     if request.is_ajax():
         return ajax_content_response(request, course_key, thread.to_dict())
     else:
@@ -614,6 +622,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         }
     })
 
+
 @require_GET
 @login_required
 def users(request, course_id):
@@ -640,7 +649,7 @@ def users(request, course_id):
     try:
         matched_user = User.objects.get(username=username)
         cc_user = cc.User.from_django_user(matched_user)
-        cc_user.course_id=course_key
+        cc_user.course_id = course_key
         cc_user.retrieve(complete=False)
         if (cc_user['threads_count'] + cc_user['comments_count']) > 0:
             user_objs.append({

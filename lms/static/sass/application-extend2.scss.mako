@@ -56,7 +56,7 @@
 @import "discussion/elements/labels";
 @import "discussion/elements/navigation";
 @import "discussion/views/thread";
-@import "discussion/views/new-post";
+@import "discussion/views/create-edit-post";
 @import "discussion/views/response";
 @import 'discussion/utilities/developer';
 @import 'discussion/utilities/shame';
