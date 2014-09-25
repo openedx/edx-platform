@@ -7,6 +7,7 @@ from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test.utils import check_firefox_version
 from optparse import make_option
+import os
 
 try:
     from pygments.console import colorize
@@ -40,9 +41,14 @@ def test_bokchoy(options):
     - path/to/test.py:TestFoo.test_bar
     It can also be left blank to run all tests in the suite.
     """
-    if getattr(options, 'validate_firefox_version', True):
+    # Note: Bok Choy uses firefox if SELENIUM_BROWSER is not set. So we are using
+    # firefox as the default here.
+    using_firefox = (os.environ.get('SELENIUM_BROWSER', 'firefox') == 'firefox')
+    validate_firefox = getattr(options, 'validate_firefox_version', using_firefox)
+
+    if validate_firefox:
         check_firefox_version()
-        
+
     opts = {
         'test_spec': getattr(options, 'test_spec', None),
         'fasttest': getattr(options, 'fasttest', False),
