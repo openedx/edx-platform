@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 """ Tests for student account views. """
 
+import re
 from urllib import urlencode
 from mock import patch
 import ddt
 from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core import mail
 
 from util.testing import UrlResetMixin
 from user_api.api import account as account_api
@@ -76,13 +78,45 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         response = self.client.get(reverse('account_index'))
         self.assertContains(response, "Student Account")
 
-    def test_email_change_request_handler(self):
+    def test_change_email(self):
         response = self._change_email(self.NEW_EMAIL, self.PASSWORD)
         self.assertEquals(response.status_code, 204)
 
         # Verify that the email associated with the account remains unchanged
         profile_info = profile_api.profile_info(self.USERNAME)
         self.assertEquals(profile_info['email'], self.OLD_EMAIL)
+
+        # Check that an email was sent with the activation key
+        self.assertEqual(len(mail.outbox), 1)
+        self._assert_email(
+            mail.outbox[0],
+            [self.NEW_EMAIL],
+            u'Email Change Request',
+            u'There was recently a request to change the email address'
+        )
+
+        # Retrieve the activation key from the email
+        email_body = mail.outbox[0].body
+        result = re.search('/email_change_confirm/([^ \n]+)', email_body)
+        self.assertIsNot(result, None)
+        activation_key = result.group(1)
+
+        # Attempt to activate the email
+        response = self.client.get(reverse('email_change_confirm', kwargs={'key': activation_key}))
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that the email was changed
+        profile_info = profile_api.profile_info(self.USERNAME)
+        self.assertEquals(profile_info['email'], self.NEW_EMAIL)
+
+        # Verify that notification emails were sent
+        self.assertEqual(len(mail.outbox), 2)
+        self._assert_email(
+            mail.outbox[1],
+            [self.OLD_EMAIL, self.NEW_EMAIL],
+            u'Email Change Successful',
+            u'You successfully changed the email address'
+        )
 
     def test_email_change_wrong_password(self):
         response = self._change_email(self.NEW_EMAIL, "wrong password")
@@ -202,3 +236,9 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         for method in wrong_methods:
             response = getattr(self.client, method)(url)
             self.assertEqual(response.status_code, 405)
+
+    def _assert_email(self, email, expected_to, expected_subject, expected_body):
+        """Check whether an email has the correct properties. """
+        self.assertEqual(email.to, expected_to)
+        self.assertIn(expected_subject, email.subject)
+        self.assertIn(expected_body, email.body)
