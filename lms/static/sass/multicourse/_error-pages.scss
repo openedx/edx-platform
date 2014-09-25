@@ -1,6 +1,6 @@
 section.outside-app {
   @extend .container;
-  text-align: left;
+  text-align: flip(left, right);
   padding: 80px 0;
 
   h1 {
