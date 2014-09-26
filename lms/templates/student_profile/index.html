@@ -16,13 +16,45 @@
 <form id="name-change-form">
     <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
 
-    <label for="new-name">${_('Full Name')}</label>
+    <label for="new-name">${_("Full Name")}</label>
     <input id="new-name" type="text" name="new-name" value="" placeholder="Xsy" />
 
     <div class="submit-button">
-        <input type="submit" id="name-change-submit" value="${_('Change My Name')}">
+        <input type="submit" id="name-change-submit" value="${_("Change My Name")}">
     </div>
 </form>
+
+<div id="language-change-body">
+    <form id="language-change-form">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+
+        <label for="new-language">${_("Please choose your preferred language")}</label>
+        <select id="new-language" name="language">
+            % for language in released_languages:
+                % if language.name is preferred_language:
+                    <option value="${language.code}" selected="selected">${language.name}</option>
+                % else:
+                    <option value="${language.code}">${language.name}</option>
+                % endif
+            % endfor
+        </select>
+
+        <div class="submit-button">
+            <input type="submit" id="language-change-submit" value="${_("Change Preferred Language")}" />
+        </div>
+    </form>
+
+    <ul class="list list-actions actions-supplemental">
+        <li class="list-actions-item">
+            ${_("Don't see your preferred language? {link_start}Volunteer to become a translator!{link_end}").format(
+                link_start='<a class=" action action-volunteer" rel="external" target="_blank" href={translators_guide}>'.format(
+                    translators_guide=settings.TRANSLATORS_GUIDE
+                ),
+                link_end="</a>"
+            )}
+        </li>
+    </ul>
+</div>
 
 % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     <%include file="third_party_auth.html" />
