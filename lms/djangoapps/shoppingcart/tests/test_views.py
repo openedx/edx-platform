@@ -805,20 +805,20 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('40.00', resp.content)
         # check for the enrollment codes content
-        self.assertTrue('Next, send each student one of these unique enrollment code for this code.', resp.content)
+        self.assertIn('Next, send each student one of these unique enrollment codes for this course.', resp.content)
 
         ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['order_items'])
-        self.assertIn(self.cart.purchase_time.date().isoformat(), resp.content)
+        self.assertIn(self.cart.purchase_time.strftime("%B %d, %Y"), resp.content)
         self.assertIn(course.start_date_text, resp.content)
         self.assertIn(course.end_date_text, resp.content)
         self.assertIn(self.cart.company_name, resp.content)
         self.assertIn(self.cart.company_contact_name, resp.content)
         self.assertIn(self.cart.company_contact_email, resp.content)
         self.assertIn(self.cart.recipient_email, resp.content)
-        self.assertIn("Purchase order #{order_id}".format(order_id=self.cart.id), resp.content)
+        self.assertIn("Invoice #{order_id}".format(order_id=self.cart.id), resp.content)
         self.assertIn('You have successfully purchased <b>{total_registration_codes} student activation'
                       .format(total_registration_codes=context['total_registration_codes']), resp.content)
 

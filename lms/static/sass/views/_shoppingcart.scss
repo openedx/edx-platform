@@ -341,6 +341,7 @@
       }
     }
   }
+  hr{border-top: 1px solid $dark-gray2;}
   .user-data{
     margin: 20px 0px;
     .image{
@@ -602,6 +603,7 @@
           display: inline-block;
           margin-right: 20px;
           font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+          vertical-align: top;
         }
         label{
           width: 300px;
@@ -610,6 +612,7 @@
           font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
           font-style: normal;
           font-size: 14px;
+          word-wrap: break-word;
         }
       }
       .col-1{
@@ -791,7 +794,6 @@
     }
   }
   .pattern{
-    background: url("../images/pattern.png");
     margin-top: 10px;
     margin-bottom: 20px;
     padding:20px;
@@ -878,6 +880,9 @@
 // Print
 
 @media print{
+  a[href]:after {
+    content: none !important;
+  }
   ul.steps, a.blue.pull-right, .bordered-bar span.pull-right, .left.nav-global.authenticated {
     display: none;
   }
