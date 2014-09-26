@@ -1,0 +1,7 @@
+{
+    "unit.lms": "lms/*.py",
+    "unit.studio": "cms/*.py",
+    "unit.javascript": "*.js",
+    "unit.common_lib": "common/lib/*.py",
+    "unit.common_app": "common/djangoapps/*.py"
+}
