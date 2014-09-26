@@ -55,6 +55,22 @@ from ..views.tools import get_extended_due
 EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","customer_reference_number","internal_reference"'
 EXPECTED_COUPON_CSV_HEADER = '"course_id","percentage_discount","code_redeemed_count","description"'
 
+# ddt data for test cases involving reports
+REPORTS_DATA = (
+    {
+        'report_type': 'grade',
+        'instructor_api_endpoint': 'calculate_grades_csv',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_grades_csv',
+        'extra_instructor_api_kwargs': {}
+    },
+    {
+        'report_type': 'enrolled student profile',
+        'instructor_api_endpoint': 'get_students_features',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_students_features_csv',
+        'extra_instructor_api_kwargs': {'csv': '/csv'}
+    }
+)
+
 
 @common_exceptions_400
 def view_success(request):  # pylint: disable=W0613
@@ -156,6 +172,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('list_background_email_tasks', {}),
             ('list_report_downloads', {}),
             ('calculate_grades_csv', {}),
+            ('get_students_features', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -1343,6 +1360,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
             self.assertNotIn(rolename, user_roles)
 
 
+@ddt.ddt
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -1350,6 +1368,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     """
 
     def setUp(self):
+        super(TestInstructorAPILevelsDataDump, self).setUp()
         self.course = CourseFactory.create()
         self.course_mode = CourseMode(course_id=self.course.id,
                                       mode_slug="honor",
@@ -1613,6 +1632,21 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
 
+    @ddt.data(True, False)
+    def test_get_students_features_cohorted(self, is_cohorted):
+        """
+        Test that get_students_features includes cohort info when the course is
+        cohorted, and does not when the course is not cohorted.
+        """
+        url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
+        self.course.cohort_config = {'cohorted': is_cohorted}
+        self.store.update_item(self.course, self.instructor.id)
+
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+
+        self.assertEqual('cohort' in res_json['feature_names'], is_cohorted)
+
     @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
     @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
     def test_get_anon_ids(self):
@@ -1625,9 +1659,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(
             '"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
-            '\n"2","41","42"\n'
+            '\n"3","41","42"\n'
         ))
-        self.assertTrue(body.endswith('"7","41","42"\n'))
+        self.assertTrue(body.endswith('"8","41","42"\n'))
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -1655,32 +1689,30 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected_response)
 
-    def test_calculate_grades_csv_success(self):
-        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id.to_deprecated_string()})
+    @ddt.data(*REPORTS_DATA)
+    @ddt.unpack
+    def test_calculate_report_csv_success(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
+        kwargs = {'course_id': unicode(self.course.id)}
+        kwargs.update(extra_instructor_api_kwargs)
+        url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
-        with patch('instructor_task.api.submit_calculate_grades_csv') as mock_cal_grades:
-            mock_cal_grades.return_value = True
+        with patch(task_api_endpoint):
             response = self.client.get(url, {})
-        success_status = "Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section."
+        success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
-    def test_calculate_grades_csv_already_running(self):
-        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id.to_deprecated_string()})
+    @ddt.data(*REPORTS_DATA)
+    @ddt.unpack
+    def test_calculate_report_csv_already_running(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
+        kwargs = {'course_id': unicode(self.course.id)}
+        kwargs.update(extra_instructor_api_kwargs)
+        url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
-        with patch('instructor_task.api.submit_calculate_grades_csv') as mock_cal_grades:
-            mock_cal_grades.side_effect = AlreadyRunningError()
+        with patch(task_api_endpoint) as mock:
+            mock.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
-        already_running_status = "A grade report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below."
+        already_running_status = "{report_type} report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.".format(report_type=report_type)
         self.assertIn(already_running_status, response.content)
-
-    def test_get_students_features_csv(self):
-        """
-        Test that some minimum of information is formatted
-        correctly in the response to get_students_features.
-        """
-        url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url + '/csv', {})
-        self.assertEqual(response['Content-Type'], 'text/csv')
 
     def test_get_distribution_no_feature(self):
         """

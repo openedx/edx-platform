@@ -92,9 +92,9 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
 
         # Expect to see a message that grade report is being generated
         expected_msg = "Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section."
-        world.wait_for_visible('#grade-request-response')
+        world.wait_for_visible('#report-request-response')
         assert_in(
-            expected_msg, world.css_text('#grade-request-response'),
+            expected_msg, world.css_text('#report-request-response'),
             msg="Could not find grade report generation success message."
         )
 
@@ -113,7 +113,8 @@ def click_a_button(step, button):  # pylint: disable=unused-argument
     elif button == "Download profile information as a CSV":
         # Go to the data download section of the instructor dash
         go_to_section("data_download")
-        # Don't do anything else, next step will handle clicking & downloading
+
+        world.css_click('input[name="list-profiles-csv"]')
 
     else:
         raise ValueError("Unrecognized button option " + button)
