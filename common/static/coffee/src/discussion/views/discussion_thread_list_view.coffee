@@ -188,7 +188,6 @@ if Backbone?
             options.group_id = @group_id
         when 'followed'
           options.user_id = window.user.id
-          options.group_id = "all"
         when 'commentables'
           options.commentable_ids = @discussionIds
           if @group_id
