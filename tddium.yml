@@ -36,7 +36,7 @@ tddium:
       - "reports/diff_quality/diff_quality_pylint.html"
     - :type: junit
       :mode: basic
-      :command: bash ./scripts/run_ut.sh && python ./scripts/cov_merge.py unit
+      :command: bash ./scripts/run_ut.sh && python ./scripts/cov_merge.py unit && python ./scripts/metrics/publish.py
       :invocation: single
       :output: exit-status
       :report_files:
