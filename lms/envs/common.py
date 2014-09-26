@@ -1399,7 +1399,7 @@ INSTALLED_APPS = (
     'edx_jsme',    # Molecular Structure
 
     # Country list
-    'django_countries'
+    'django_countries',
     
     # EDX API application
     'api_manager',
