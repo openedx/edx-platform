@@ -69,13 +69,15 @@ class Command(BaseCommand):
                 request.user = user
                 grade_data = grades.grade(user, request, course)
                 grade = grade_data['percent']
+                proforma_grade = grades.calculate_proforma_grade(grade_data, course.grading_policy)
                 try:
                     gradebook_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
                     if gradebook_entry.grade != grade:
                         gradebook_entry.grade = grade
+                        proforma_grade = proforma_grade
                         gradebook_entry.save()
                 except StudentGradebook.DoesNotExist:
-                    StudentGradebook.objects.create(user=user, course_id=course.id, grade=grade)
+                    StudentGradebook.objects.create(user=user, course_id=course.id, grade=grade, proforma_grade=proforma_grade)
                 log_msg = 'Gradebook entry created -- Course: {}, User: {}  (grade: {})'.format(course.id, user.id, grade)
                 print log_msg
                 log.info(log_msg)
