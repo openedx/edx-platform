@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response, render_to_string
 from microsite_configuration import microsite
+
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
 
