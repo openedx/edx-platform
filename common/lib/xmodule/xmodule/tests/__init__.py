@@ -193,7 +193,7 @@ class BulkAssertionManager(object):
             self._equal_actual.append((description, actual))
 
     def run_assertions(self):
-        self._test_case.assertEqual(self._equal_expected, self._equal_actual)
+        super(BulkAssertionTest, self._test_case).assertEqual(self._equal_expected, self._equal_actual)
 
 
 class BulkAssertionTest(unittest.TestCase):
@@ -224,6 +224,7 @@ class BulkAssertionTest(unittest.TestCase):
             self._manager.assertEqual(expected, actual, message)
         else:
             super(BulkAssertionTest, self).assertEqual(expected, actual, message)
+    assertEquals = assertEqual
 
 
 class CourseComparisonTest(BulkAssertionTest):
