@@ -748,6 +748,9 @@ def course_about(request, course_id):
         'invitation_only': invitation_only,
         'active_reg_button': active_reg_button,
         'is_shib_course': is_shib_course,
+         # We do not want to display the internal courseware header, which is used when the course is found in the
+         # context. This value is therefor explicitly set to render the appropriate header.
+        'disable_courseware_header': True,
     })
 
 
