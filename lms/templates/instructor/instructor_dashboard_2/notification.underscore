@@ -1,4 +1,4 @@
-<div class="message message-<%= type %> is-shown">
+<div class="message message-<%= type %>">
     <h3 class="message-title">
         <%- title %>
     </h3>
