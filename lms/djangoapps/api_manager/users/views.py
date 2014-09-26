@@ -945,7 +945,7 @@ class UsersCoursesGradesDetail(SecureAPIView):
         )
         if len(queryset):
             current_grade = queryset[0].grade
-            proforma_grade = calculate_proforma_grade(grade_summary, grading_policy)
+            proforma_grade = grades.calculate_proforma_grade(grade_summary, grading_policy)
 
         response_data = {
             'courseware_summary': progress_summary,
