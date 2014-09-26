@@ -97,12 +97,12 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
     # export the grading policy
     course_run_policy_dir = policies_dir.makeopendir(course.location.name)
     with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
-        grading_policy.write(dumps(course.grading_policy, cls=EdxJSONEncoder))
+        grading_policy.write(dumps(course.grading_policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
     # export all of the course metadata in policy.json
     with course_run_policy_dir.open('policy.json', 'w') as course_policy:
         policy = {'course/' + course.location.name: own_metadata(course)}
-        course_policy.write(dumps(policy, cls=EdxJSONEncoder))
+        course_policy.write(dumps(policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
     #### DRAFTS ####
     # xml backed courses don't support drafts!
@@ -178,7 +178,7 @@ def _export_field_content(xblock_item, item_dir):
                 # filename format: {dirname}.{field_name}.json
                 with item_dir.open('{0}.{1}.{2}'.format(xblock_item.location.name, field_name, 'json'),
                                    'w') as field_content_file:
-                    field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder))
+                    field_content_file.write(dumps(module_data.get(field_name, {}), cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
 
 def export_extra_content(export_fs, modulestore, course_key, category_type, dirname, file_suffix=''):
