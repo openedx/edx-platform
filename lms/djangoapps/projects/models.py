@@ -93,8 +93,8 @@ class WorkgroupReview(TimeStampedModel):
     """
     workgroup = models.ForeignKey(Workgroup, related_name="workgroup_reviews")
     reviewer = models.CharField(max_length=255)  # AnonymousUserId
-    question = models.CharField(max_length=255)
-    answer = models.CharField(max_length=255)
+    question = models.CharField(max_length=1024)
+    answer = models.TextField()
     content_id = models.CharField(max_length=255, null=True, blank=True)
 
 
@@ -121,8 +121,8 @@ class WorkgroupSubmissionReview(TimeStampedModel):
     """
     submission = models.ForeignKey(WorkgroupSubmission, related_name="reviews")
     reviewer = models.CharField(max_length=255)  # AnonymousUserId
-    question = models.CharField(max_length=255)
-    answer = models.CharField(max_length=255)
+    question = models.CharField(max_length=1024)
+    answer = models.TextField()
     content_id = models.CharField(max_length=255, null=True, blank=True)
 
 
@@ -135,6 +135,6 @@ class WorkgroupPeerReview(TimeStampedModel):
     workgroup = models.ForeignKey(Workgroup, related_name="peer_reviews")
     user = models.ForeignKey(User, related_name="workgroup_peer_reviewees")
     reviewer = models.CharField(max_length=255)  # AnonymousUserId
-    question = models.CharField(max_length=255)
-    answer = models.CharField(max_length=255)
+    question = models.CharField(max_length=1024)
+    answer = models.TextField()
     content_id = models.CharField(max_length=255, null=True, blank=True)
