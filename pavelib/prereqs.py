@@ -162,6 +162,7 @@ def python_prereqs_installation():
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
+    sh("rm -rf /edx/app/edxapp/venvs/edxapp/build/*")
     sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
