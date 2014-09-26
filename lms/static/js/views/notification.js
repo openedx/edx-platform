@@ -9,17 +9,14 @@
         },
 
         render: function() {
-            var actionText = null;
-            // If no actionText is passed to the template, the action button
-            // will not be shown.
-            if (this.model.get("actionText") && this.model.get("actionCallback")) {
-                actionText = this.model.get("actionText");
-            }
             this.$el.html(this.template({
                 type: this.model.get("type"),
                 title: this.model.get("title"),
+                message: this.model.get("message"),
                 details: this.model.get("details"),
-                actionText: actionText
+                actionText: this.model.get("actionText"),
+                actionClass: this.model.get("actionClass"),
+                actionIconClass: this.model.get("actionIconClass")
             }));
             return this;
         },

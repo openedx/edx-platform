@@ -454,8 +454,11 @@ section.instructor-dashboard-content-2 {
 
     .form-submit {
       @include idashbutton($blue);
+      @include font-size(14);
+      @include line-height(14);
       margin-right: ($baseline/2);
       margin-bottom: 0;
+      text-shadow: none;
     }
 
     .form-cancel {
@@ -481,6 +484,21 @@ section.instructor-dashboard-content-2 {
       @include idashbutton($blue);
       float: right;
       text-align: right;
+      text-shadow: none;
+      font-weight: 600;
+    }
+
+    // STATE: is disabled
+    &.is-disabled {
+
+
+      .cohort-select {
+        opacity: 0.25;
+      }
+
+      .action-create {
+        opacity: 0.50;
+      }
     }
   }
 
