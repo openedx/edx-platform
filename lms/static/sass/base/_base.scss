@@ -59,6 +59,11 @@ span {
   text-align: center;
 }
 
+.text-dark-grey {
+  color: $dark-gray1;
+  font-size: 24px;
+}
+
 p + p, ul + p, ol + p {
   margin-top: 20px;
 }
