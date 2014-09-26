@@ -18,7 +18,7 @@ tddium:
       - requirements/edx/post.txt
       - package.json
   :mongodb:
-    :version: "2.4.7"
+    :version: "2.6.4"
   :mysql:
     :version: "5.5"
   :python:
