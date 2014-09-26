@@ -51,10 +51,6 @@
     .copy {
       font-weight: 600;
     }
-
-    &.is-shown {
-      display: block;
-    }
   }
 
   // TYPE: warning
@@ -63,10 +59,6 @@
     background: tint($warning-color,95%);
     display: none;
     color: $warning-color;
-
-    &.is-shown {
-      display: block;
-    }
   }
 
   // TYPE: confirm
@@ -75,10 +67,6 @@
     background: tint($confirm-color,95%);
     display: none;
     color: $confirm-color;
-
-    &.is-shown {
-      display: block;
-    }
   }
 
   // TYPE: confirm
@@ -88,10 +76,6 @@
 
     .copy {
       color: $error-color;
-    }
-
-    &.is-shown {
-      display: block;
     }
   }
 
@@ -224,12 +208,13 @@ section.instructor-dashboard-content-2 {
   // messages
   .message {
     margin-bottom: $baseline;
-    display: none;
+    display: block;
     border-radius: 1px;
     padding: ($baseline*0.75) $baseline;
 
-    &.is-shown {
-      display: block;
+    // CASE: is hidden
+    &.is-hidden {
+      display: none;
     }
   }
 
