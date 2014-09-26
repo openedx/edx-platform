@@ -704,8 +704,6 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
             'goals'
         ]
 
-    student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
-
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
     # used as the header row in the CSV, but could be in the future.
@@ -724,6 +722,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     }
 
     if not csv:
+        student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
         response_payload = {
             'course_id': course_id.to_deprecated_string(),
             'students': student_data,
@@ -734,8 +733,15 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         }
         return JsonResponse(response_payload)
     else:
-        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+        try:
+            instructor_task.api.submit_calculate_students_features_csv(request, course_id, query_features)
+            success_status = _("Your enrolled student profile report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+            return JsonResponse({"status": success_status})
+        except AlreadyRunningError:
+            already_running_status = _("An enrolled student profile report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
+            return JsonResponse({
+                "status": already_running_status
+            })
 
 
 @ensure_csrf_cookie

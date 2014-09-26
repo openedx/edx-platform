@@ -1679,8 +1679,10 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         correctly in the response to get_students_features.
         """
         url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url + '/csv', {})
-        self.assertEqual(response['Content-Type'], 'text/csv')
+        with patch('instructor_task.api.submit_calculate_students_features_csv') as mock_cal_students:
+            mock_cal_students.return_value = True
+            response = self.client.get(url + '/csv', {})
+        self.assertIn('Your enrolled student profile report is being generated!', response.content)
 
     def test_get_distribution_no_feature(self):
         """
