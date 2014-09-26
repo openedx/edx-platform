@@ -45,11 +45,22 @@ class DataDownload
     # this handler binds to both the download
     # and the csv button
     @$list_studs_csv_btn.click (e) =>
+      @clear_display()
+
       url = @$list_studs_csv_btn.data 'endpoint'
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
-      location.href = url
+
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: std_ajax_err =>
+          @$grades_request_response_error.text gettext("Error generating student profile information. Please try again.")
+          $(".msg-error").css({"display":"block"})
+        success: (data) =>
+          @$grades_request_response.text data['status']
+          $(".msg-confirm").css({"display":"block"})
 
     @$list_studs_btn.click (e) =>
       url = @$list_studs_btn.data 'endpoint'

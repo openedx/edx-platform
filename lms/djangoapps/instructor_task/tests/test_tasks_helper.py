@@ -17,7 +17,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
-from instructor_task.tasks_helper import push_grades_to_s3
+from instructor_task.models import ReportStore
+from instructor_task.tasks_helper import push_grades_to_s3, push_students_csv_to_s3, UPDATE_STATUS_SUCCEEDED
 
 
 TEST_COURSE_ORG = 'edx'
@@ -25,10 +26,9 @@ TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
 
 
-@ddt.ddt
-class TestInstructorGradeReport(TestCase):
+class TestReport(TestCase):
     """
-    Tests that CSV grade report generation works.
+    Base class for testing that
     """
     def setUp(self):
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,
@@ -39,6 +39,12 @@ class TestInstructorGradeReport(TestCase):
         if os.path.exists(settings.GRADES_DOWNLOAD['ROOT_PATH']):
             shutil.rmtree(settings.GRADES_DOWNLOAD['ROOT_PATH'])
 
+
+@ddt.ddt
+class TestInstructorGradeReport(TestReport):
+    """
+    Tests that CSV grade report generation works.
+    """
     def create_student(self, username, email):
         student = UserFactory.create(username=username, email=email)
         CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
@@ -58,3 +64,18 @@ class TestInstructorGradeReport(TestCase):
             result = push_grades_to_s3(None, None, self.course.id, None, 'graded')
         #This assertion simply confirms that the generation completed with no errors
         self.assertEquals(result['succeeded'], result['attempted'])
+
+
+class TestStudentReport(TestReport):
+    """
+    Tests that CSV student profile report generation works.
+    """
+    def test_success(self):
+        task_input = {'features': []}
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = push_students_csv_to_s3(None, None, self.course.id, task_input, 'calculated')
+        report_store = ReportStore.from_config()
+        links = report_store.links_for(self.course.id)
+
+        self.assertEquals(len(links), 1)
+        self.assertEquals(result, UPDATE_STATUS_SUCCEEDED)
