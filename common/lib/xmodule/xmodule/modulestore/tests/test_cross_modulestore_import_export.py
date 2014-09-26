@@ -269,8 +269,8 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                 with dest_content_builder.build() as dest_content:
                     # Construct the modulestore for storing the second import (using the second contentstore)
                     with dest_builder.build(dest_content) as dest_store:
-                        source_course_key = source_store.make_course_key('source', 'course', 'key')
-                        dest_course_key = dest_store.make_course_key('dest', 'course', 'key')
+                        source_course_key = source_store.make_course_key('a', 'course', 'course')
+                        dest_course_key = dest_store.make_course_key('a', 'course', 'course')
 
                         import_from_xml(
                             source_store,
@@ -287,16 +287,25 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                             source_content,
                             source_course_key,
                             self.export_dir,
-                            'exported_course',
+                            'exported_source_course',
                         )
 
                         import_from_xml(
                             dest_store,
                             'test_user',
                             self.export_dir,
+                            course_dirs=['exported_source_course'],
                             static_content_store=dest_content,
                             target_course_id=dest_course_key,
                             create_new_course_if_not_present=True,
+                        )
+
+                        export_to_xml(
+                            dest_store,
+                            dest_content,
+                            dest_course_key,
+                            self.export_dir,
+                            'exported_dest_course',
                         )
 
                         self.exclude_field(None, 'wiki_slug')
