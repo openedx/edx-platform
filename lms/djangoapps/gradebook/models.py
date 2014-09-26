@@ -22,6 +22,7 @@ class StudentGradebook(TimeStampedModel):
     user = models.ForeignKey(User, db_index=True)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
     grade = models.FloatField()
+    proforma_grade = models.FloatField()
 
     class Meta:
         """
@@ -121,6 +122,7 @@ class StudentGradebookHistory(TimeStampedModel):
     user = models.ForeignKey(User, db_index=True)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
     grade = models.FloatField()
+    proforma_grade = models.FloatField()
 
     @receiver(post_save, sender=StudentGradebook)
     def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argument, unused-argument
@@ -130,6 +132,7 @@ class StudentGradebookHistory(TimeStampedModel):
         history_entry = StudentGradebookHistory(
             user=instance.user,
             course_id=instance.course_id,
-            grade=instance.grade
+            grade=instance.grade,
+            proforma_grade=instance.proforma_grade
         )
         history_entry.save()
