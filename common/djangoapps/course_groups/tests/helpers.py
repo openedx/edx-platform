@@ -9,6 +9,9 @@ from xmodule.modulestore import ModuleStoreEnum
 
 
 class CohortFactory(DjangoModelFactory):
+    """
+    Factory for constructing mock cohorts.
+    """
     FACTORY_FOR = CourseUserGroup
 
     name = Sequence("cohort{}".format)
@@ -17,6 +20,9 @@ class CohortFactory(DjangoModelFactory):
 
     @post_generation
     def users(self, create, extracted, **kwargs):  # pylint: disable=W0613
+        """
+        Returns the users associated with the cohort.
+        """
         if extracted:
             self.users.add(*extracted)
 

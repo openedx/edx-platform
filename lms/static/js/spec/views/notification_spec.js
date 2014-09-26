@@ -1,7 +1,7 @@
 define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification', 'js/common_helpers/template_helpers'],
     function (Backbone, $, NotificationModel, NotificationView, TemplateHelpers) {
         describe("NotificationView", function () {
-            var createNotification, verifyTitle, verifyDetails, verifyAction, notificationView;
+            var createNotification, verifyTitle, verifyMessage, verifyDetails, verifyAction, notificationView;
 
             createNotification = function (modelVals) {
                 var notificationModel = new NotificationModel(modelVals);
@@ -14,6 +14,10 @@ define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification',
 
             verifyTitle = function (expectedTitle) {
                 expect(notificationView.$('.message-title').text().trim()).toBe(expectedTitle);
+            };
+
+            verifyMessage = function (expectedMessage) {
+                expect(notificationView.$('.message-copy').text().trim()).toBe(expectedMessage);
             };
 
             verifyDetails = function (expectedDetails) {
@@ -41,7 +45,7 @@ define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification',
 
             it('has default values', function () {
                 createNotification({});
-                expect(notificationView.$('div.message').hasClass('message-confirmation')).toBe(true);
+                expect(notificationView.$('div.message')).toHaveClass('message-confirmation');
                 verifyTitle('');
                 verifyDetails([]);
                 verifyAction(null);
@@ -49,13 +53,18 @@ define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification',
 
             it('can use an error type', function () {
                 createNotification({type: 'error'});
-                expect(notificationView.$('div.message').hasClass('message-error')).toBe(true);
-                expect(notificationView.$('div.message').hasClass('message-confirmation')).toBe(false);
+                expect(notificationView.$('div.message')).toHaveClass('message-error');
+                expect(notificationView.$('div.message')).not.toHaveClass('message-confirmation');
             });
 
             it('can specify a title', function () {
                 createNotification({title: 'notification title'});
                 verifyTitle('notification title');
+            });
+
+            it('can specify a message', function () {
+                createNotification({message: 'This is a dummy message'});
+                verifyMessage('This is a dummy message');
             });
 
             it('can specify details', function () {
@@ -69,9 +78,9 @@ define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification',
                 verifyAction('action text');
             });
 
-            it ('does not show an action button if callback is not provided', function () {
+            it ('shows an action button if only text is provided', function () {
                 createNotification({actionText: 'action text'});
-                verifyAction(null);
+                verifyAction('action text');
             });
 
             it ('does not show an action button if text is not provided', function () {
@@ -82,7 +91,7 @@ define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification',
             it ('triggers the callback when the action button is clicked', function () {
                 var actionCallback = jasmine.createSpy('Spy on callback');
                 var view = createNotification({actionText: 'action text', actionCallback: actionCallback});
-                notificationView.$('a.action-primary').click();
+                notificationView.$('button.action-primary').click();
                 expect(actionCallback).toHaveBeenCalledWith(view);
             });
         });

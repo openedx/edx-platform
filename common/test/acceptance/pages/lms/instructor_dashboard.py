@@ -37,7 +37,7 @@ class MembershipPage(PageObject):
 
     def _get_cohort_options(self):
         """
-        Returns the available options in the cohort dropdown, including the initial "Select a cohort".
+        Returns the available options in the cohort dropdown, including the initial "Select a cohort group".
         """
         return self.q(css=".cohort-management #cohort-select option")
 
@@ -55,7 +55,7 @@ class MembershipPage(PageObject):
 
     def get_cohorts(self):
         """
-        Returns, as a list, the names of the available cohorts in the drop-down, filtering out "Select a cohort".
+        Returns, as a list, the names of the available cohorts in the drop-down, filtering out "Select a cohort group".
         """
         return [
             self._cohort_name(opt.text)
@@ -85,6 +85,15 @@ class MembershipPage(PageObject):
         self.q(css=".cohort-management #cohort-select option").filter(
             lambda el: self._cohort_name(el.text) == cohort_name
         ).first.click()
+
+    def add_cohort(self, cohort_name):
+        """
+        Adds a new manual cohort with the specified name.
+        """
+        self.q(css="div.cohort-management-nav .action-create").first.click()
+        textinput = self.q(css="#cohort-create-name").results[0]
+        textinput.send_keys(cohort_name)
+        self.q(css="div.form-actions .action-save").first.click()
 
     def get_cohort_group_setup(self):
         """

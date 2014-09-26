@@ -277,7 +277,7 @@ class AddCohortTestCase(CohortViewsTestCase):
         self.verify_contains_added_cohort(
             self.request_add_cohort(cohort_name, self.course),
             cohort_name,
-            expected_error_msg="Can't create two cohorts with the same name"
+            expected_error_msg="You cannot create two cohorts with the same name"
         )
 
 

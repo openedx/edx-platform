@@ -11,6 +11,8 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 
+import uuid
+
 
 class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
     """
@@ -149,6 +151,30 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self.assertEqual("There was an error when trying to add students:", error_messages[0])
         self.assertEqual("Unknown user: unknown_user", error_messages[1])
         self.assertEqual(
-            self.student_name+",unknown_user,",
+            self.student_name + ",unknown_user,",
             self.membership_page.get_cohort_student_input_field_value()
         )
+
+    def test_add_new_cohort(self):
+        """
+        Scenario: A new manual cohort can be created, and a student assigned to it.
+
+        Given I have a course with a user in the course
+        When I add a new manual cohort to the course via the LMS instructor dashboard
+        Then the new cohort is displayed and has no users in it
+        And when I add the user to the new cohort
+        Then the cohort has 1 user
+        """
+        new_cohort = str(uuid.uuid4().get_hex()[0:20])
+        self.assertFalse(new_cohort in self.membership_page.get_cohorts())
+        self.membership_page.add_cohort(new_cohort)
+        # After adding the cohort, it should automatically be selected
+        EmptyPromise(
+            lambda: new_cohort == self.membership_page.get_selected_cohort(), "Waiting for new cohort to appear"
+        ).fulfill()
+        self.assertEqual(0, self.membership_page.get_selected_cohort_count())
+        self.membership_page.add_students_to_selected_cohort([self.instructor_name])
+        # Wait for the number of users in the cohort to change, indicating that the add operation is complete.
+        EmptyPromise(
+            lambda: 1 == self.membership_page.get_selected_cohort_count(), 'Waiting for student to be added'
+        ).fulfill()

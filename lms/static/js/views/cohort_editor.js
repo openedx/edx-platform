@@ -101,7 +101,8 @@
 
         addNotifications: function(modifiedUsers) {
             var oldCohort, title, details, numPresent, numUsersAdded, numErrors,
-                createErrorDetails, errorActionCallback, errorModel;
+                createErrorDetails, errorActionCallback, errorModel,
+                errorLimit = 5;
 
             // Show confirmation messages.
             this.undelegateViewEvents(this.confirmationNotifications);
@@ -165,7 +166,7 @@
             numErrors = modifiedUsers.unknown.length;
             if (numErrors > 0) {
                 createErrorDetails = function (unknownUsers, showAllErrors) {
-                    var numErrors = unknownUsers.length, details = [], errorLimit = 5;
+                    var numErrors = unknownUsers.length, details = [];
 
                     for (var i = 0; i < (showAllErrors ? numErrors : Math.min(errorLimit, numErrors)); i++) {
                         details.push(interpolate_text(gettext("Unknown user: {user}"), {user: unknownUsers[i]}));
@@ -181,15 +182,16 @@
                 details = createErrorDetails(modifiedUsers.unknown, false);
 
                 errorActionCallback = function (view) {
-                    view.model.set("actionCallback", null);
+                    view.model.set("actionText", null);
                     view.model.set("details", createErrorDetails(modifiedUsers.unknown, true));
                     view.render();
                 };
 
                 errorModel = new NotificationModel({
                     details: details,
-                    actionText: gettext("View all errors"),
-                    actionCallback: numErrors > 5 ? errorActionCallback : null
+                    actionText: numErrors > errorLimit ? gettext("View all errors") : null,
+                    actionCallback: errorActionCallback,
+                    actionClass: 'action-expand'
                 });
 
                 this.showErrorMessage(title, false, errorModel);

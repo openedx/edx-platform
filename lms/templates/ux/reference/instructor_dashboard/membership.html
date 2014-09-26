@@ -19,7 +19,6 @@
         window.Range.prototype = { };
     }
 </script>
-<script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
@@ -244,9 +243,10 @@
 
                     <div class="form-fields">
                         <div class="cohort-management-nav-form-select field field-select">
-                            <label for="cohort-select" class="label sr">Select a cohort to manage</label>
+                            <label for="cohort-select" class="label sr">Select a cohort group to manage</label>
 
                             <select class="input cohort-select" name="cohort-select" id="cohort-select">
+                                <option>Select a cohort group</option>
                                 <option value="cohort-name-1">Cohort Name is Placed Here and Should Accommodate Almost Everything (12,546)</option>
                                 <option value="cohort-name-2" selected>Cras mattis consectetur purus sit amet fermentum (8,546)</option>
                                 <option value="cohort-name-3">Donec id elit non mi porta gravida at eget metus. (4)
@@ -310,7 +310,6 @@
                                 <span class="sr">(Required Field)</span>
                             </label>
                             <input type="text" name="cohort-create-name" value="" class=" input cohort-create-name" id="cohort-create-name" placeholder="Enter Your New Cohort Group's Name" required="required" />
-                            <span class="tip">No special characters or symbols are allowed in group names</span>
                         </div>
                     </div>
 
@@ -337,7 +336,6 @@
                                 <span class="sr">(Required Field)</span>
                             </label>
                             <input type="text" name="cohort-edit-name" value="" class=" input cohort-edit-name" id="cohort-edit-name" placeholder="Enter Your Cohort Group's Name" required="required" />
-                            <span class="tip">No special characters or symbols are allowed in group names</span>
                         </div>
                     </div>
 
@@ -354,10 +352,6 @@
             <!-- create/edit cohort group messages -->
             <div class="message message-confirmation">
                 <h3 class="message-title">New Cohort Name has been created. You can manually add students to this group below.</h3>
-            </div>
-
-            <div class="message message-error">
-                <h3 class="message-title">Special characters are not allowed in cohort group names</h3>
             </div>
 
             <!-- individual group -->

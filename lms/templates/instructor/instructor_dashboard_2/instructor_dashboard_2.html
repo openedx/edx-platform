@@ -32,7 +32,6 @@
         window.Range.prototype = { };
     }
   </script>
-  <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
@@ -63,7 +62,7 @@
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["cohorts", "cohort-editor", "cohort-selector", "notification"]:
+% for template_name in ["cohorts", "cohort-editor", "cohort-selector", "add-cohort-form", "notification"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>
