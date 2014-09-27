@@ -10,7 +10,7 @@ the recorded metrics.
 from django.db.models.signals import post_save, post_delete, m2m_changed, post_init
 from django.dispatch import receiver
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 
 def _database_tags(action, sender, kwargs):

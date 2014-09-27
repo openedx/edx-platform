@@ -11,7 +11,7 @@ from django.db import transaction
 from django.test.client import RequestFactory
 from django.utils import timezone
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 from courseware import courses
 from courseware.model_data import FieldDataCache
@@ -526,7 +526,7 @@ def iterate_grades_for(course_id, students):
     request = RequestFactory().get('/')
 
     for student in students:
-        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=['action:{}'.format(course_id)]):
+        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course_id)]):
             try:
                 request.user = student
                 # Grading calls problem rendering, which calls masquerading,

@@ -13,7 +13,7 @@ from django.utils.timezone import UTC
 from collections import OrderedDict
 from functools import partial
 from requests.auth import HTTPBasicAuth
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from opaque_keys import InvalidKeyError
 
 from django.conf import settings

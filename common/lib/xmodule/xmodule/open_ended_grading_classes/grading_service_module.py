@@ -2,7 +2,7 @@
 import json
 import logging
 import requests
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from requests.exceptions import RequestException, ConnectionError, HTTPError
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, RubricParsingError
