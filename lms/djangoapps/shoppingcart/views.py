@@ -494,6 +494,7 @@ def show_receipt(request, ordernum):
         'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
         'order_type': order_type,
         'course_names': course_names,
+        'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
     }
 
     if order_items.count() == 1:
