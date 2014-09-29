@@ -192,6 +192,10 @@
     </section>
   %endif
 
+  %if enrollment_message:
+      ${enrollment_message}
+  %endif
+
   % if duplicate_provider:
     <section class="dashboard-banner third-party-auth">
       ## Translators: this message is displayed when a user tries to link their account with a third-party authentication provider (for example, Google or LinkedIn) with a given edX account, but their third-party account is already associated with another edX account. provider_name is the name of the third-party authentication provider, and platform_name is the name of the edX deployment.
