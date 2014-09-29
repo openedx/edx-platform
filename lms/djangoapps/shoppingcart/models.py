@@ -103,12 +103,6 @@ class Order(models.Model):
     company_contact_email = models.CharField(max_length=255, null=True, blank=True)
     recipient_name = models.CharField(max_length=255, null=True, blank=True)
     recipient_email = models.CharField(max_length=255, null=True, blank=True)
-    company_address_line_1 = models.CharField(max_length=255, null=True, blank=True)
-    company_address_line_2 = models.CharField(max_length=255, null=True, blank=True)
-    company_city = models.CharField(max_length=255, null=True, blank=True)
-    company_state = models.CharField(max_length=255, null=True, blank=True)
-    company_zip = models.CharField(max_length=15, null=True, blank=True)
-    company_country = models.CharField(max_length=64, null=True, blank=True)
     customer_reference_number = models.CharField(max_length=63, null=True, blank=True)
     order_type = models.CharField(max_length=32, default='personal', choices=OrderTypes.ORDER_TYPES)
 
@@ -173,7 +167,7 @@ class Order(models.Model):
         """
         Clear out all the items in the cart
         """
-        self.orderitem_set.all().delete()
+        self.orderitem_set.all().delete()  # pylint: disable=E1101
 
     @transaction.commit_on_success
     def start_purchase(self):
@@ -233,7 +227,7 @@ class Order(models.Model):
         # this should return all of the objects with the correct types of the
         # subclasses
         orderitems = OrderItem.objects.filter(order=self).select_subclasses()
-        if getattr(self, 'order_type') == 'business':
+        if getattr(self, 'order_type') == OrderTypes.BUSINESS:
             for item in orderitems:
                 from instructor.views.api import save_registration_codes
                 if hasattr(item, 'paidcourseregistration'):
@@ -276,8 +270,7 @@ class Order(models.Model):
             log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
 
     def add_billing_details(self, company_name='', company_contact_name='', company_contact_email='', recipient_name='',
-                            recipient_email='', company_address_line_1='', company_address_line_2='', company_city='',
-                            company_state='', company_zip='', company_country='', customer_reference_number=''):
+                            recipient_email='', customer_reference_number=''):
         """
         This function is called after the user selects a purchase type of "Business" and
         is asked to enter the optional billing details. The billing details are updated
@@ -288,12 +281,6 @@ class Order(models.Model):
         company_contact_email - Email of the key contact at the company the sale was made to
         recipient_name - Name of the company should the invoice be sent to
         recipient_email - Email of the company should the invoice be sent to
-        company_address_line_1 - Organization Billing Address field
-        company_address_line_2 - Organization Billing Address field
-        company_city - Organization Billing Address field
-        company_state - Organization Billing Address field
-        company_zip - Organization Billing Address field
-        company_country - Organization Billing Address field
         customer_reference_number - purchase order number of the organization associated with this Order
         """
 
@@ -302,12 +289,6 @@ class Order(models.Model):
         self.company_contact_email = company_contact_email
         self.recipient_name = recipient_name
         self.recipient_email = recipient_email
-        self.company_address_line_1 = company_address_line_1
-        self.company_address_line_2 = company_address_line_2
-        self.company_city = company_city
-        self.company_state = company_state
-        self.company_zip = company_zip
-        self.company_country = company_country
         self.customer_reference_number = customer_reference_number
 
         self.save()
