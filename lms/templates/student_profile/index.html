@@ -6,23 +6,24 @@
 <%block name="pagetitle">${_("Student Profile")}</%block>
 
 <%block name="js_extra">
+    <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
     <%static:js group='student_profile'/>
+</%block>
+
+<%block name="header_extras">
+% for template_name in ["profile"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="student_profile/${template_name}.underscore" />
+</script>
+% endfor
 </%block>
 
 <h1>Student Profile</h1>
 
 <p>This is a placeholder for the student's profile page.</p>
 
-<form id="name-change-form">
-    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-
-    <label for="new-name">${_('Full Name')}</label>
-    <input id="new-name" type="text" name="new-name" value="" placeholder="Xsy" />
-
-    <div class="submit-button">
-        <input type="submit" id="name-change-submit" value="${_('Change My Name')}">
-    </div>
-</form>
+<div id="profile-container" />
 
 % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     <%include file="third_party_auth.html" />
