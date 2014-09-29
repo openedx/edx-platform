@@ -4,6 +4,7 @@ from django.http import (
     QueryDict, HttpResponse,
     HttpResponseBadRequest, HttpResponseServerError
 )
+from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -32,12 +33,14 @@ def index(request):
     """
     user = request.user
 
-    return render_to_response(
-        'student_profile/index.html', {
-            'disable_courseware_js': True,
-            'provider_user_states': pipeline.get_provider_user_states(user),
-        }
-    )
+    context = {
+        'disable_courseware_js': True
+    }
+
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        context['provider_user_states'] = pipeline.get_provider_user_states(user)
+
+    return render_to_response('student_profile/index.html', context)
 
 
 @login_required
