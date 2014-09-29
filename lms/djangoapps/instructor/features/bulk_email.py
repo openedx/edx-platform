@@ -7,7 +7,7 @@ Define steps for bulk email acceptance test.
 
 from lettuce import world, step
 from lettuce.django import mail
-from nose.tools import assert_in, assert_true, assert_equal  # pylint: disable=E0611
+from nose.tools import assert_in, assert_equal  # pylint: disable=E0611
 from django.core.management import call_command
 from django.conf import settings
 
@@ -115,8 +115,9 @@ def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
     call_command('loaddata', 'course_email_template.json')
 
     # Go to the email section of the instructor dash
-    world.visit('/courses/edx/888/Bulk_Email_Test_Course')
-    world.css_click('a[href="/courses/edx/888/Bulk_Email_Test_Course/instructor"]')
+    url = '/courses/{}'.format(world.bulk_email_course_key)
+    world.visit(url)
+    world.css_click('a[href="{}/instructor"]'.format(url))
     world.css_click('a[data-section="send_email"]')
 
     # Select the recipient
