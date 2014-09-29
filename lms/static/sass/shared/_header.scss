@@ -556,7 +556,7 @@ header.global-new {
   }
 
   .nav-global {
-    margin-top: ($baseline/2);
+    margin-top: ($baseline/4);
     list-style: none;
     float: left;
 
@@ -576,7 +576,7 @@ header.global-new {
         display:block;
         padding: ($baseline/4);
         font-size: 18px;
-        padding-bottom: 20px;
+        padding-bottom: ($baseline*1.25);
         font-weight: 600;
         font-family: $header-sans-serif;
         color: $courseware-navigation-color;
