@@ -23,10 +23,33 @@ class IsUser(permissions.BasePermission):
 
 
 class UserDetail(generics.RetrieveAPIView):
-    """Read-only information about our User.
+    """
+    **Use Case**
 
-    This will be where users are redirected to after API login and will serve
-    as a place to list all useful resources this user can access.
+        Get information about the specified user and
+        access other resources the user has permissions for.
+
+        Users are redirected to this endpoint after logging in.
+
+        You can use the **course_enrollments** value in
+        the response to get a list of courses the user is enrolled in.
+
+    **Example request**:
+
+        GET /api/mobile/v0.5/users/{username}
+
+    **Response Values**
+
+        * id: The ID of the user.
+
+        * username: The username of the currently logged in user.
+
+        * email: The email address of the currently logged in user.
+
+        * name: The full name of the currently logged in user.
+
+        * course_enrollments: The URI to list the courses the currently logged
+          in user is enrolled in.
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsUser)
@@ -39,7 +62,38 @@ class UserDetail(generics.RetrieveAPIView):
 
 
 class UserCourseEnrollmentsList(generics.ListAPIView):
-    """Read-only list of courses that this user is enrolled in."""
+    """
+    **Use Case**
+
+        Get information about the courses the currently logged in user is
+        enrolled in.
+
+    **Example request**:
+
+        GET /api/mobile/v0.5/users/{username}/course_enrollments/
+
+    **Response Values**
+
+        * created: The date the course was created.
+        * mode: The type of certificate registration for this course:  honor or
+          certified.
+        * is_active: Whether the course is currently active; true or false.
+        * course: A collection of data about the course:
+        
+          * course_about: The URI to get the data for the course About page.
+          * course_updates: The URI to get data for course updates.
+          * number: The course number.
+          * org: The organization that created the course.
+          * video_outline: The URI to get the list of all vides the user can
+            access in the course.
+          * id: The unique ID of the course.
+          * latest_updates:  Reserved for future use.
+          * end: The end date of the course.
+          * name: The name of the course.
+          * course_handouts: The URI to get data for course handouts.
+          * start: The data and time the course starts.
+          * course_image: The path to the course image.
+    """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsUser)
     queryset = CourseEnrollment.objects.all()
