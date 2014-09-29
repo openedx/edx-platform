@@ -15,6 +15,7 @@ from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.exceptions import PermissionDenied
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
@@ -66,7 +67,7 @@ class VideoTranscripts(generics.RetrieveAPIView):
             video_descriptor = modulestore().get_item(usage_key)
             content, filename, mimetype = video_descriptor.get_transcript(lang=lang)
         except (NotFoundError, ValueError, KeyError):
-            raise Http404("Transcript not found for {}, lang: {}".format(block_id, lang))
+            raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
 
         response = HttpResponse(content, content_type=mimetype)
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)

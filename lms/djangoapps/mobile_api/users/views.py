@@ -51,19 +51,11 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         ).order_by('created')
         return mobile_course_enrollments(qset, self.request.user)
 
-    def get(self, request, *args, **kwargs):
-        if request.user.username != kwargs['username']:
-            raise PermissionDenied
-
-        return super(UserCourseEnrollmentsList, self).get(self, request, *args, **kwargs)
-
 
 @api_view(["GET"])
 @authentication_classes((OAuth2Authentication, SessionAuthentication))
 @permission_classes((IsAuthenticated,))
 def my_user_info(request):
-    if not request.user:
-        raise PermissionDenied
     return redirect("user-detail", username=request.user.username)
 
 def mobile_course_enrollments(enrollments, user):
