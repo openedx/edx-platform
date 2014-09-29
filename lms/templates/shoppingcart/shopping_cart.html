@@ -18,10 +18,13 @@ from django.utils.translation import ugettext as _
             <li>${_('Billing Details')}</li>
          % endif
         </%block>
-
+ <% discount_applied = False %>
   <section class="wrapper confirm-enrollment shopping-cart">
     % for item, course in shoppingcart_items:
-    <div class="user-data">
+       % if loop.index > 0 :
+        <hr>
+      %endif
+     <div class="user-data">
       <div class="clearfix">
       <div class="image">
 
@@ -36,6 +39,7 @@ from django.utils.translation import ugettext as _
         <div class="three-col">
             <div class="col-1">
                 % if item.list_price != None:
+                <% discount_applied = True %>
                 <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span></div>
                 <div class="price green">${_('Discount Applied:')} <span>  $${"{0:0.2f}".format(item.unit_cost)} </span></div>
                 % else:
@@ -43,20 +47,14 @@ from django.utils.translation import ugettext as _
                 % endif
             </div>
             <div class="col-2">
-              <div
-                    %if order.order_type == 'personal':
-                        class = 'numbers-row disable-numeric-counter disabled'
-                    %else:
-                        class =  'numbers-row'
-                    %endif
-              >
+              <div class="numbers-row">
                 <label for="students">${_('Students:')}</label>
                 <div class="counter">
-                    <input maxlength="3" max="999" type="text" name="students" value="${item.qty}" id="students" data-item-id="${item.id}" >
+                    <input maxlength="3" max="999" type="text" name="students" value="${item.qty}" id="${item.id}" >
                 </div>
                 <div class="inc button"><i class="icon-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon-caret-down"></i></div>
-                <a id="update_btn" class="hidden" href="#">update</a>
-                <span class="error-text students hidden"></span>
+                    <a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>
+                <span class="error-text hidden" id="students-${item.id}"></span>
             </div>
               </div>
 
@@ -72,12 +70,11 @@ from django.utils.translation import ugettext as _
       <div class="discount">
 
           <div class="code-text">
-            % if item.list_price == None:
-           <a id="enter_code">${_('enter code')}</a>
-           <div class="code-input hidden">
+           % if not discount_applied:
+           <div class="code-input">
               <input type="text" placeholder="discount or activation code" id="input_code">
               <input type="submit" value="Apply" class="blue" id="submit-code">
-              <span class="error-text code hidden" ></span>
+              <span class="error-text hidden" id="code" ></span>
            </div>
            % else:
            <div class="code-applied">
@@ -89,35 +86,6 @@ from django.utils.translation import ugettext as _
           </div>
       </div>
       <div class="col-two">
-          <div class="col-1">
-              ${_('Purchase type:')}
-                <span id="radio-group-personal"
-                    % if order.order_type == 'personal':
-                        class = "radio-group blue"
-                    % else:
-                        class = "radio-group"
-                    % endif
-                    ><input type="radio" name="purchase" id="personal"
-                    % if order.order_type == 'personal':
-                        checked="true"
-                    % endif
-                ><label for="personal">${_('Personal')}</label>
-                </span>
-
-                <span id="radio-group-business"
-                    % if order.order_type == 'business':
-                        class="radio-group blue"
-                    % else:
-                        class="radio-group"
-                    %endif
-                ><input type="radio" name="purchase" id="business"
-                    % if order.order_type == 'business':
-                        checked="true"
-                    %endif
-                 > <label for="business">${_('Business')}</label>
-                  </span>
-
-          </div>
           <div class="col-2 relative">
              % if amount == 0:
                 <input type="submit" value = "Register" id="register" >
@@ -148,7 +116,7 @@ from django.utils.translation import ugettext as _
 <script>
     $(function() {
 
-   $('a.btn-remove').click(function(event) {
+        $('a.btn-remove').click(function(event) {
       event.preventDefault();
       var post_url = "${reverse('shoppingcart.views.remove_item')}";
       $.post(post_url, {id:$(this).data('item-id')})
@@ -161,7 +129,7 @@ from django.utils.translation import ugettext as _
       event.preventDefault();
       var post_url = "${reverse('shoppingcart.views.use_code')}";
       if($('#input_code').val() == "") {
-        showErrorMsgs('Must enter a valid code');
+        showErrorMsgs('Must enter a valid code','code');
         return;
       }
       $.post(post_url,{
@@ -175,7 +143,7 @@ from django.utils.translation import ugettext as _
                   if(status=="parsererror"){
                        location.reload(true);
                   }else{
-                        showErrorMsgs(data.responseText)
+                        showErrorMsgs(data.responseText, 'code')
                       }
               })
    });
@@ -191,7 +159,7 @@ from django.utils.translation import ugettext as _
                    if(status=="parsererror"){
                        location.reload(true);
                   }else{
-                        showErrorMsgs(data.responseText)
+                        showErrorMsgs(data.responseText,'code')
                       }
                })
    });
@@ -217,72 +185,51 @@ from django.utils.translation import ugettext as _
        location.href = "${reverse('shoppingcart.views.billing_details')}";
    });
 
-  $(".button").on("click", function() {
-      $('#update_btn').addClass('hidden');
-      hideErrorMsg('students');
-      var $button = $(this);
-      var oldValue = $button.parent().find("input").val();
-      var newVal = 1; // initialize with 1.
-      if ($.isNumeric(oldValue)){
-          if ($button.text() == "+") {
-              if(oldValue > 0){
-                newVal = parseFloat(oldValue) + 1;
-                if(newVal > 1000){
-                    newVal = 1000;
-                }
-              }
-          } else {
-          // Don't allow decrementing below one
-            if (oldValue > 1) {
-                newVal = parseFloat(oldValue) - 1;
-            }
-          }
-      }
-      $button.parent().find("input").val(newVal);
-      update_user_cart('business', false);
 
-  });
+ $(".button").on("click", function() {
+     var studentField =  $(this).parent().find('input');
+     var ItemId = studentField.attr('id');
+     var $button = $(this);
+     var oldValue = $button.parent().find("input").val();
+     var newVal = 1; // initialize with 1.
+     hideErrorMsg('students-'+ItemId);
+     if ($.isNumeric(oldValue)){
+         if ($button.text() == "+") {
+             if(oldValue > 0){
+                 newVal = parseFloat(oldValue) + 1;
+                 if(newVal > 1000){
+                     newVal = 1000;
+                 }
+             }
+         } else {
+     // Don't allow decrementing below one
+     if (oldValue > 1) {
+         newVal = parseFloat(oldValue) - 1;
+     }
+         }
+     }
+     $button.parent().find("input").val(newVal);
+     $('#updateBtn-'+ItemId).removeClass('hidden');
 
-  $("#enter_code").click(function(){
-      $(this).addClass('hidden');
-      $( "div.code-input" ).removeClass("hidden");
-  });
+ });
 
-  $('#update_btn').click(function(event) {
-      if($('#students').val() <=0 ){
-          showErrorMsgs('value must be greater then 0', 'students');
-      }else{
-        hideErrorMsg('students');
-        update_user_cart('business', false);
-      }
-  });
+$('a[name="updateBtn"]').click(function(event) {
+    var studentField =  $(this).parent().find('input');
+    var number_of_students = studentField.val();
+    var ItemId = studentField.attr('id');
 
-  $('input:radio[name="purchase"]').change(
-          function(){
-              if ($(this).is(':checked') && $(this).attr('id') == 'personal') {
-                  purchaseTypePersonalSelected();
-              }else{
-                  purchaseTypeBusinessSelected();
-              }
-          });
-
-  function purchaseTypePersonalSelected(){
-      $( "#radio-group-business" ).removeClass("blue");
-      $( "#radio-group-personal" ).addClass("blue");
-      update_user_cart('personal', true);
-  }
-
-  function purchaseTypeBusinessSelected(){
-      $( "#radio-group-personal" ).removeClass("blue");
-      $( ".numbers-row" ).removeClass("disable-numeric-counter");
-      $( "#radio-group-business" ).addClass("blue");
-      update_user_cart('business', true);
-  }
+    if($.isNumeric(number_of_students) && number_of_students > 0 ){
+        hideErrorMsg('students-'+ItemId);
+        update_user_cart(ItemId, number_of_students);
+    }else{
+        showErrorMsgs('quantity must be greater then 0.', 'students-'+ItemId);
+    }
+});
 
   function showErrorMsgs(msg, msg_area){
-      msg_area = typeof msg_area !== 'undefined' ? msg_area : 'code';
-      $( "span.error-text."+ msg_area +"" ).removeClass("hidden");
-      $( "span.error-text."+ msg_area +"" ).html(msg).show();
+
+      $( "span.error-text#"+ msg_area +"" ).removeClass("hidden");
+      $( "span.error-text#"+ msg_area +"" ).html(msg).show();
 
       if(msg_area=='code'){
         $("#input_code").addClass('error');
@@ -290,44 +237,39 @@ from django.utils.translation import ugettext as _
   }
 
   function hideErrorMsg(msg_area){
-      $( "span.error-text."+ msg_area +"" ).addClass("hidden");
+      $( "span.error-text#"+ msg_area +"" ).addClass("hidden");
   }
 
-  function update_user_cart(purchase_type, isPageRefreshRequired){
+  function update_user_cart(ItemId, number_of_students){
       var post_url = "${reverse('shoppingcart.views.update_user_cart')}";
       $.post(post_url, {
-          ItemId:$("#students").data('item-id'),
-          qty:$("#students").val(),
-          purchase_type: purchase_type
+          ItemId:ItemId,
+          qty:number_of_students,
+          purchase_type: number_of_students > 1 ? 'business' : 'personal'
           }
       )
       .success(function(data) {
-                  if(isPageRefreshRequired){
-                      location.reload(true);
-                  }else{
-                   $('#total-amount').html('$' + data.total_cost.toFixed(2) + ' USD');
-                   $('#update_btn').addClass('hidden');
-                  }
-              })
+                    location.reload(true);
+            })
       .error(function(data,status) {
                   location.reload(true);
               })
   }
 
+$('input[name="students"]').on("click", function() {
+    $('#updateBtn-'+this.id).removeClass('hidden');
+});
+
 // allowing user to enter numeric qty only.
-  $("#students").keydown(function(event) {
+  $("input[name=students]").keydown(function(event) {
       var eventDelete       = 46;
       var eventBackSpace    = 8;
       var eventLeftKey      = 37;
       var eventRightKey     = 39;
-      var allowedEventCodes = [eventDelete, eventBackSpace, eventLeftKey, eventRightKey ]
-
+      var allowedEventCodes = [eventDelete, eventBackSpace, eventLeftKey, eventRightKey ];
       // Allow only backspace and delete
 	  if (allowedEventCodes.indexOf(event.keyCode) > -1) {
           // let it happen, don't do anything
-          if(event.keyCode == eventBackSpace || event.keyCode == eventDelete){
-              $('#update_btn').removeClass('hidden');
-          }
 		}
       else {
 	     /*
@@ -336,7 +278,7 @@ from django.utils.translation import ugettext as _
           KeyCode range 96 - 105 represents [numpad 0 - numpad 9]
          */
 		if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) ) {
-            $('#update_btn').removeClass('hidden');
+            $('#updateBtn-'+this.id).removeClass('hidden');
         }else{
             event.preventDefault();
         }
