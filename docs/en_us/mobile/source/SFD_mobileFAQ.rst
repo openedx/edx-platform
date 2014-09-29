@@ -22,8 +22,8 @@ Install the edX Mobile App Using Your Mobile Device
 #. Click the link that you've received from your instructor to access the **edX Android Beta Testers** Google group.
 #. On the **EdX Android Beta Testers** Google group page, tap **Join Group**.
 #. In the dialog box that opens, select the options that you want, and then tap **Join this group**.
-#. On the group's home page, tap the **Get the App** post.
-#. On the **Get the App** page, tap the link to the app in the Google Play store.
+#. On the group's home page, tap the **Announcing edX beta app for Android smartphone** post.
+#. On the **Announcing edX beta app for Android smartphone** page, tap the link to the app in the Google Play store.
 #. On the app's page in the Google Play store, tap **Become a Tester**.
 #. Tap the link under **Get the test version** to download the app from the Google Play store.
 #. On the app's page in the Google Play store, tap **Install**, and then tap **Accept** to allow the app to access your device.
@@ -62,13 +62,6 @@ Which courses are available in the mobile app?
 The following courses are currently available for the mobile beta:
 
 * `edX - DemoX <https://www.edx.org/course/edx/edx-demox-1-demox-4116#.VCGNfytdUZY>`_: A fun and interactive course designed to help you explore the edX learning experience. Perfect to take before you start your course.
-* `HarvardX - Poetry in America: The Poetry of Early New England <https://www.edx.org/course/harvardx/harvardx-ampox-1-poetry-america-poetry-2856#.VA9A57ywLfE>`_: This course, the first installment of the multi-part Poetry in America series, covers American poetry in cultural context through the year 1700. We begin with Puritan poets—some orthodox, some rebel spirits—who wrote and lived in early New England.
-* `MITx - The Global History of Architecture, Part 1 <https://www.edx.org/course/mitx/mitx-4-605x-global-history-architecture-2721#.VA9BebywLfE>`_: This course is a history of architecture from a global perspective.
-* `MITx - Circuits and Electronics <https://www.edx.org/course/mitx/mitx-6-002x-circuits-electronics-2606#.VA9BKrywLfE>`_: Teaches the fundamentals of circuit and electronic analysis.
-* `DelftX - Solar Energy <https://www.edx.org/course/delftx/delftx-et-3034tu-solar-energy-1996#.VA9AQrywLfE>`_:  Discover the power of solar energy and design a complete photovoltaic system.
-* `LouvainX - Computer Programming <https://www.edx.org/course/louvainx/louvainx-louv1-1x-paradigms-computer-2751#.VA9B1LywLfE>`_:  This course covers functional, object-oriented, and declarative dataflow programming in a unified framework, with practical code fragments and simple semantics.
-* `LouvainX -  Découvrir la science politique <https://www.edx.org/course/louvainx/louvainx-louv3x-decouvrir-la-science-2706#.VA9CILywLfE>`_: Décoder des enjeux politiques actuels à partir d’une boîte à outils de concepts fondamentaux et de postures critiques de la science politique. (Offered in French.)
-* `UQx - Anthropology of Current World Issues <https://www.edx.org/course/uqx/uqx-world101x-anthropology-current-world-1666#.VA9CYbywLfE>`_: How is anthropology changing the world and what can you learn from this?
 
 ========================================================
 Can I take a course entirely on my mobile device?
