@@ -17,7 +17,7 @@ from django.conf import settings
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
-from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
 from django.core import mail
 from django.utils.timezone import utc
@@ -39,7 +39,6 @@ from courseware.models import StudentModule
 
 # modules which are mocked in test cases.
 import instructor_task.api
-from instructor.access import allow_access
 import instructor.views.api
 from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
@@ -55,6 +54,7 @@ from ..views.tools import get_extended_due
 
 EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","customer_reference_number","internal_reference"'
 EXPECTED_COUPON_CSV_HEADER = '"course_id","percentage_discount","code_redeemed_count","description"'
+
 
 @common_exceptions_400
 def view_success(request):  # pylint: disable=W0613
@@ -305,8 +305,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.about_path = '/courses/MITx/999/Robot_Super_Course/about'
-        self.course_path = '/courses/MITx/999/Robot_Super_Course/'
+        self.about_path = '/courses/{}/about'.format(self.course.id)
+        self.course_path = '/courses/{}/'.format(self.course.id)
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -486,16 +486,17 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been enrolled in Robot Super Course'
+            u'You have been enrolled in {}'.format(self.course.display_name)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear NotEnrolled Student\n\nYou have been enrolled in Robot Super Course "
+            "Dear NotEnrolled Student\n\nYou have been enrolled in {} "
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
             "{proto}://{site}{course_path}\n\n----\n"
             "This email was automatically sent from edx.org to NotEnrolled Student".format(
+                self.course.display_name,
                 proto=protocol, site=self.site_name, course_path=self.course_path
             )
         )
@@ -512,17 +513,17 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for Robot Super Course'
+            u'You have been invited to register for {}'.format(self.course.display_name)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {} at edx.org by a member of the course staff.\n\n"
             "To finish your registration, please visit {proto}://{site}/register and fill out the "
             "registration form making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, "
             "visit {proto}://{site}{about_path} to join the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name, about_path=self.about_path
+                self.course.display_name, proto=protocol, site=self.site_name, about_path=self.about_path
             )
         )
 
@@ -537,12 +538,12 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
             "To finish your registration, please visit {proto}://{site}/register and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
-            "You can then enroll in Robot Super Course.\n\n----\n"
+            "You can then enroll in {display_name}.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name
+                display_name=self.course.display_name, proto=protocol, site=self.site_name
             )
         )
 
@@ -560,16 +561,16 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for Robot Super Course'
+            u'You have been invited to register for {}'.format(self.course.display_name)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
             "To finish your registration, please visit {proto}://{site}/register and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
-            "Once you have registered and activated your account, you will see Robot Super Course listed on your dashboard.\n\n----\n"
+            "Once you have registered and activated your account, you will see {display_name} listed on your dashboard.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name
+                proto=protocol, site=self.site_name, display_name=self.course.display_name
             )
         )
 
@@ -652,15 +653,17 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been un-enrolled from Robot Super Course'
+            'You have been un-enrolled from {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear Enrolled Student\n\nYou have been un-enrolled in Robot Super Course "
+            "Dear Enrolled Student\n\nYou have been un-enrolled in {display_name} "
             "at edx.org by a member of the course staff. "
             "The course will no longer appear on your edx.org dashboard.\n\n"
             "Your other courses have not been affected.\n\n----\n"
-            "This email was automatically sent from edx.org to Enrolled Student"
+            "This email was automatically sent from edx.org to Enrolled Student".format(
+                display_name=self.course.display_name,
+            )
         )
 
     def test_unenroll_with_email_allowed_student(self):
@@ -699,13 +702,15 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been un-enrolled from Robot Super Course'
+            'You have been un-enrolled from {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear Student,\n\nYou have been un-enrolled from course Robot Super Course by a member of the course staff. "
+            "Dear Student,\n\nYou have been un-enrolled from course {display_name} by a member of the course staff. "
             "Please disregard the invitation previously sent.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-allowed@robot.org"
+            "This email was automatically sent from edx.org to robot-allowed@robot.org".format(
+                display_name=self.course.display_name,
+            )
         )
 
     @ddt.data('http', 'https')
@@ -723,15 +728,16 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for Robot Super Course'
+            'You have been invited to register for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
             "To access the course visit {proto}://{site}{about_path} and register for the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name, about_path=self.about_path
+                proto=protocol, site=self.site_name, about_path=self.about_path,
+                display_name=self.course.display_name,
             )
         )
 
@@ -749,8 +755,10 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+            "Dear student,\n\nYou have been invited to join {} at edx.org by a member of the course staff.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
+                self.course.display_name,
+            )
         )
 
     @ddt.data('http', 'https')
@@ -770,14 +778,15 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for Robot Super Course'
+            'You have been invited to register for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
             "To access the course visit {proto}://{site}{course_path} and login.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
+                display_name=self.course.display_name,
                 proto=protocol, site=self.site_name, course_path=self.course_path
             )
         )
@@ -814,8 +823,8 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.about_path = '/courses/MITx/999/Robot_Super_Course/about'
-        self.course_path = '/courses/MITx/999/Robot_Super_Course/'
+        self.about_path = '/courses/{}/about'.format(self.course.id)
+        self.course_path = '/courses/{}/'.format(self.course.id)
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -917,16 +926,17 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to a beta test for Robot Super Course'
+            'You have been invited to a beta test for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
             mail.outbox[0].body,
             u"Dear {student_name}\n\nYou have been invited to be a beta tester "
-            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "for {display_name} at edx.org by a member of the course staff.\n\n"
             "Visit {proto}://{site}{about_path} to join "
             "the course and begin the beta test.\n\n----\n"
             "This email was automatically sent from edx.org to {student_email}".format(
+                display_name=self.course.display_name,
                 student_name=self.notenrolled_student.profile.name,
                 student_email=self.notenrolled_student.email,
                 proto=protocol,
@@ -963,16 +973,17 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to a beta test for Robot Super Course'
+            'You have been invited to a beta test for {display_name}'.format(display_name=self.course.display_name)
         )
 
         self.assertEqual(
             mail.outbox[0].body,
             u"Dear {student_name}\n\nYou have been invited to be a beta tester "
-            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "for {display_name} at edx.org by a member of the course staff.\n\n"
             "To start accessing course materials, please visit "
             "{proto}://{site}{course_path}\n\n----\n"
             "This email was automatically sent from edx.org to {student_email}".format(
+                display_name=self.course.display_name,
                 student_name=self.notenrolled_student.profile.name,
                 student_email=self.notenrolled_student.email,
                 proto=protocol,
@@ -990,11 +1001,12 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             mail.outbox[0].body,
-            u"Dear {0}\n\nYou have been invited to be a beta tester "
-            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            u"Dear {}\n\nYou have been invited to be a beta tester "
+            "for {} at edx.org by a member of the course staff.\n\n"
             "Visit edx.org to enroll in the course and begin the beta test.\n\n----\n"
-            "This email was automatically sent from edx.org to {1}".format(
+            "This email was automatically sent from edx.org to {}".format(
                 self.notenrolled_student.profile.name,
+                self.course.display_name,
                 self.notenrolled_student.email,
             )
         )
@@ -1077,16 +1089,17 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been removed from a beta test for Robot Super Course'
+            u'You have been removed from a beta test for {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
             "Dear {full_name}\n\nYou have been removed as a beta tester for "
-            "Robot Super Course at edx.org by a member of the course staff. "
+            "{display_name} at edx.org by a member of the course staff. "
             "The course will remain on your dashboard, but you will no longer "
             "be part of the beta testing group.\n\n"
             "Your other courses have not been affected.\n\n----\n"
             "This email was automatically sent from edx.org to {email_address}".format(
+                display_name=self.course.display_name,
                 full_name=self.beta_tester.profile.name,
                 email_address=self.beta_tester.email
             )

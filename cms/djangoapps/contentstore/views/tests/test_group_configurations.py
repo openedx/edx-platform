@@ -10,6 +10,8 @@ from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.split_test_module import ValidationMessage, ValidationMessageType
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 
 GROUP_CONFIGURATION_JSON = {
     u'name': u'Test name',
@@ -266,12 +268,6 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
 
     ID = 0
 
-    def setUp(self):
-        """
-        Set up GroupConfigurationsDetailHandlerTestCase.
-        """
-        super(GroupConfigurationsDetailHandlerTestCase, self).setUp()
-
     def _url(self, cid=-1):
         """
         Return url for the handler.
@@ -450,7 +446,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         Test if group configurations json updated successfully with usage information.
         """
         self._add_user_partitions(count=2)
-        self._create_content_experiment(cid=0, name_suffix='0')
+        vertical, __ = self._create_content_experiment(cid=0, name_suffix='0')
         self._create_content_experiment(name_suffix='1')
 
         actual = GroupConfiguration.add_usage_info(self.course, self.store)
@@ -466,7 +462,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [{
-                'url': '/container/i4x://MITx/999/vertical/Test_Unit_0',
+                'url': '/container/{}'.format(vertical.location),
                 'label': 'Test Unit 0 / Test Content Experiment 0',
                 'validation': None,
             }],
@@ -491,8 +487,8 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         group configuration.
         """
         self._add_user_partitions()
-        self._create_content_experiment(cid=0, name_suffix='0')
-        self._create_content_experiment(cid=0, name_suffix='1')
+        vertical, __ = self._create_content_experiment(cid=0, name_suffix='0')
+        vertical1, __ = self._create_content_experiment(cid=0, name_suffix='1')
 
         actual = GroupConfiguration.add_usage_info(self.course, self.store)
 
@@ -507,11 +503,11 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [{
-                'url': '/container/i4x://MITx/999/vertical/Test_Unit_0',
+                'url': '/container/{}'.format(vertical.location),
                 'label': 'Test Unit 0 / Test Content Experiment 0',
                 'validation': None,
             }, {
-                'url': '/container/i4x://MITx/999/vertical/Test_Unit_1',
+                'url': '/container/{}'.format(vertical1.location),
                 'label': 'Test Unit 1 / Test Content Experiment 1',
                 'validation': None,
             }],
@@ -524,11 +520,15 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         """
         self._add_user_partitions()
         # Create split test without parent.
-        ItemFactory.create(
-            category='split_test',
-            user_partition_id=0,
-            display_name='Test Content Experiment'
-        )
+        with modulestore().branch_setting(ModuleStoreEnum.Branch.published_only):
+            orphan = modulestore().create_item(
+                ModuleStoreEnum.UserID.test,
+                self.course.id, 'split_test',
+            )
+            orphan.user_partition_id = 0
+            orphan.display_name = 'Test Content Experiment'
+            modulestore().update_item(orphan, ModuleStoreEnum.UserID.test)
+
         self.save_course()
         actual = GroupConfiguration.get_usage_info(self.course, self.store)
         self.assertEqual(actual, {0: []})

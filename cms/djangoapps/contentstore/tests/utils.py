@@ -77,11 +77,7 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=user_password)
 
-        self.course = CourseFactory.create(
-            org='MITx',
-            number='999',
-            display_name='Robot Super Course',
-        )
+        self.course = CourseFactory.create()
 
     def create_non_staff_authed_user_client(self, authenticate=True):
         """

@@ -30,6 +30,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
+from student.models import anonymous_id_for_user
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -101,7 +102,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         problem_location = self.problem_location(problem_url_name)
         modx_url = self.modx_url(problem_location, 'problem_check')
 
-        answer_key_prefix = 'input_i4x-' + self.course.org + '-{}-problem-{}_'.format(self.COURSE_SLUG, problem_url_name)
+        answer_key_prefix = 'input_{}_'.format(problem_location.html_id())
 
         # format the response dictionary to be sent in the post request by adding the above prefix to each key
         response_dict = {(answer_key_prefix + k): v for k, v in responses.items()}
@@ -317,8 +318,8 @@ class TestCourseGrader(TestSubmittingProblems):
                 "weight": 1.0
             }],
             "GRADE_CUTOFFS": {
-            'A': .9,
-            'B': .33
+                'A': .9,
+                'B': .33
             }
         }
         self.add_grading_policy(grading_policy)
@@ -513,7 +514,8 @@ class TestCourseGrader(TestSubmittingProblems):
 
             # Verify that the submissions API was sent an anonymized student ID
             mock_get_scores.assert_called_with(
-                self.course.id.to_deprecated_string(), '99ac6730dc5f900d69fd735975243b31'
+                self.course.id.to_deprecated_string(),
+                anonymous_id_for_user(self.student_user, self.course.id)
             )
 
     def test_weighted_homework(self):
@@ -903,9 +905,9 @@ class TestAnswerDistributions(TestSubmittingProblems):
         super(TestAnswerDistributions, self).setUp()
 
         self.homework = self.add_graded_section_to_course('homework')
-        self.add_dropdown_to_section(self.homework.location, 'p1', 1)
-        self.add_dropdown_to_section(self.homework.location, 'p2', 1)
-        self.add_dropdown_to_section(self.homework.location, 'p3', 1)
+        self.p1_html_id = self.add_dropdown_to_section(self.homework.location, 'p1', 1).location.html_id()
+        self.p2_html_id = self.add_dropdown_to_section(self.homework.location, 'p2', 1).location.html_id()
+        self.p3_html_id = self.add_dropdown_to_section(self.homework.location, 'p3', 1).location.html_id()
         self.refresh_course()
 
     def test_empty(self):
@@ -924,10 +926,10 @@ class TestAnswerDistributions(TestSubmittingProblems):
         self.assertEqual(
             distributions,
             {
-                ('p1', 'p1', 'i4x-MITx-100-problem-p1_2_1'): {
+                ('p1', 'p1', '{}_2_1'.format(self.p1_html_id)): {
                     u'ⓤⓝⓘⓒⓞⓓⓔ': 1
                 },
-                ('p2', 'p2', 'i4x-MITx-100-problem-p2_2_1'): {
+                ('p2', 'p2', '{}_2_1'.format(self.p2_html_id)): {
                     'Correct': 1
                 }
             }
@@ -959,14 +961,14 @@ class TestAnswerDistributions(TestSubmittingProblems):
         self.assertEqual(
             grades.answer_distributions(self.course.id),
             {
-                ('p1', 'p1', 'i4x-MITx-100-problem-p1_2_1'): {
+                ('p1', 'p1', '{}_2_1'.format(self.p1_html_id)): {
                     'Correct': 2
                 },
-                ('p2', 'p2', 'i4x-MITx-100-problem-p2_2_1'): {
+                ('p2', 'p2', '{}_2_1'.format(self.p2_html_id)): {
                     'Correct': 1,
                     'Incorrect': 1
                 },
-                ('p3', 'p3', 'i4x-MITx-100-problem-p3_2_1'): {
+                ('p3', 'p3', '{}_2_1'.format(self.p3_html_id)): {
                     'Correct': 1
                 }
             }
@@ -985,14 +987,14 @@ class TestAnswerDistributions(TestSubmittingProblems):
         )
         for val in ('Correct', True, False, 0, 0.0, 1, 1.0, None):
             state = json.loads(student_module.state)
-            state["student_answers"]['i4x-MITx-100-problem-p1_2_1'] = val
+            state["student_answers"]['{}_2_1'.format(self.p1_html_id)] = val
             student_module.state = json.dumps(state)
             student_module.save()
 
             self.assertEqual(
                 grades.answer_distributions(self.course.id),
                 {
-                    ('p1', 'p1', 'i4x-MITx-100-problem-p1_2_1'): {
+                    ('p1', 'p1', '{}_2_1'.format(self.p1_html_id)): {
                         str(val): 1
                     },
                 }
@@ -1043,7 +1045,7 @@ class TestAnswerDistributions(TestSubmittingProblems):
             self.assertEqual(
                 grades.answer_distributions(self.course.id),
                 {
-                    ('p2', 'p2', 'i4x-MITx-100-problem-p2_2_1'): {
+                    ('p2', 'p2', '{}_2_1'.format(self.p2_html_id)): {
                         'Incorrect': 1
                     },
                 }

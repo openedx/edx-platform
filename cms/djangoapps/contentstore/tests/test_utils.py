@@ -12,7 +12,7 @@ from contentstore import utils
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locator import CourseLocator
@@ -168,27 +168,26 @@ class CourseImageTestCase(TestCase):
 
     def test_get_image_url(self):
         """Test image URL formatting."""
-        course = CourseFactory.create(org='edX', course='999')
+        course = CourseFactory.create()
         url = utils.course_image_url(course)
-        self.assertEquals(url, '/c4x/edX/999/asset/{0}'.format(course.course_image))
+        self.assertEquals(url, unicode(course.id.make_asset_key('asset', course.course_image)))
 
     def test_non_ascii_image_name(self):
-        # Verify that non-ascii image names are cleaned
-        course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')
+        """ Verify that non-ascii image names are cleaned """
+        course_image = u'before_\N{SNOWMAN}_after.jpg'
+        course = CourseFactory.create(course_image=course_image)
         self.assertEquals(
             utils.course_image_url(course),
-            '/c4x/{org}/{course}/asset/before___after.jpg'.format(org=course.location.org, course=course.location.course)
+            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_')))
         )
 
     def test_spaces_in_image_name(self):
-        # Verify that image names with spaces in them are cleaned
+        """ Verify that image names with spaces in them are cleaned """
+        course_image = u'before after.jpg'
         course = CourseFactory.create(course_image=u'before after.jpg')
         self.assertEquals(
             utils.course_image_url(course),
-            '/c4x/{org}/{course}/asset/before_after.jpg'.format(
-                org=course.location.org,
-                course=course.location.course
-            )
+            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_")))
         )
 
 

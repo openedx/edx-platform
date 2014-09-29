@@ -177,8 +177,9 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            (r'"/container/i4x://MITx/999/wrapper/\w+" class="action-button">\s*'
-             '<span class="action-button-text">View</span>')
+            r'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
+                wrapper_usage_key
+            )
         )
 
     def test_split_test(self):
@@ -1269,8 +1270,8 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test course.
         """
         self.assertEqual(xblock_info['category'], 'course')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/course/Robot_Super_Course')
-        self.assertEqual(xblock_info['display_name'], 'Robot Super Course')
+        self.assertEqual(xblock_info['id'], unicode(self.course.location))
+        self.assertEqual(xblock_info['display_name'], self.course.display_name)
         self.assertTrue(xblock_info['published'])
 
         # Finally, validate the entire response for consistency
@@ -1281,7 +1282,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test chapter.
         """
         self.assertEqual(xblock_info['category'], 'chapter')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(xblock_info['id'], unicode(self.chapter.location))
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -1299,7 +1300,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test sequential.
         """
         self.assertEqual(xblock_info['category'], 'sequential')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/sequential/Lesson_1')
+        self.assertEqual(xblock_info['id'], unicode(self.sequential.location))
         self.assertEqual(xblock_info['display_name'], 'Lesson 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -1312,7 +1313,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test vertical.
         """
         self.assertEqual(xblock_info['category'], 'vertical')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/vertical/Unit_1')
+        self.assertEqual(xblock_info['id'], unicode(self.vertical.location))
         self.assertEqual(xblock_info['display_name'], 'Unit 1')
         self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
@@ -1334,7 +1335,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test component.
         """
         self.assertEqual(xblock_info['category'], 'video')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/video/My_Video')
+        self.assertEqual(xblock_info['id'], unicode(self.video.location))
         self.assertEqual(xblock_info['display_name'], 'My Video')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
