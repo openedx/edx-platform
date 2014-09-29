@@ -17,8 +17,12 @@ import copy
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestVideoOutline(ModuleStoreTestCase, APITestCase):
+    """
+    Tests for /api/mobile/v0.5/video_outlines/
+    """
     def setUp(self):
         super(TestVideoOutline, self).setUp()
         self.user = UserFactory.create()
@@ -57,15 +61,16 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
             'extension': 'mp4',
             'width': 1280,
             'height': 720
-            })
+        })
         api.create_profile({
             'profile_name': 'mobile_low',
             'extension': 'mp4',
             'width': 640,
             'height': 480
-            })
+        })
 
-        val_video = api.create_video({
+        # create the video in VAL
+        api.create_video({
             'edx_video_id': self.edx_video_id,
             'client_video_id': u"test video omega \u03a9",
             'duration': 12,
@@ -94,7 +99,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
             sub=subid
         )
 
-        result_location = transcripts_utils.save_subs_to_store({
+        transcripts_utils.save_subs_to_store({
             'start': [100, 200, 240, 390, 1000],
             'end': [200, 240, 380, 1000, 1500],
             'text': [
@@ -116,20 +121,20 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_course_list(self):
-        second_video = ItemFactory.create(
+        ItemFactory.create(
             parent_location=self.other_unit.location,
             category="video",
             display_name=u"test video omega 2 \u03a9",
             html5_sources=[self.html5_video_url]
         )
-        third_video = ItemFactory.create(
+        ItemFactory.create(
             parent_location=self.other_unit.location,
             category="video",
             display_name=u"test video omega 3 \u03a9",
             source=self.html5_video_url
         )
 
-        draft_video = ItemFactory.create(
+        ItemFactory.create(
             parent_location=self.unit.location,
             category="video",
             edx_video_id=self.edx_video_id,
@@ -141,7 +146,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
-        course_outline = response.data
+        course_outline = response.data  # pylint: disable=E1103
         self.assertEqual(len(course_outline), 3)
         vid = course_outline[0]
         self.assertTrue('test_subsection_omega_%CE%A9' in vid['section_url'])
@@ -161,7 +166,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
             'course_id': unicode(self.course.id),
             'block_id': unicode(self.video.scope_ids.usage_id.block_id),
             'lang': 'pl'
-            }
+        }
         url = reverse('video-transcripts-detail', kwargs=kwargs)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)

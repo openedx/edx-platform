@@ -1,11 +1,13 @@
-from django.conf.urls import patterns, url, include
+"""
+URLs for video outline API
+"""
+from django.conf.urls import patterns, url
 from django.conf import settings
-from rest_framework import routers
-from rest_framework.urlpatterns import format_suffix_patterns
 
 from .views import VideoSummaryList, VideoTranscripts
 
-urlpatterns = patterns('mobile_api.video_outlines.views',
+urlpatterns = patterns(
+    'mobile_api.video_outlines.views',
     url(
         r'^courses/{}$'.format(settings.COURSE_ID_PATTERN),
         VideoSummaryList.as_view(),
@@ -17,4 +19,3 @@ urlpatterns = patterns('mobile_api.video_outlines.views',
         name='video-transcripts-detail'
     ),
 )
-

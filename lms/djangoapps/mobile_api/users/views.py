@@ -1,22 +1,23 @@
-from django.core.exceptions import PermissionDenied
+"""
+Views for user API
+"""
 from django.shortcuts import redirect
 
 from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 from courseware.access import has_access
-from student.forms import PasswordResetFormNoActive
 from student.models import CourseEnrollment, User
-from xmodule.modulestore.django import modulestore
 
 from .serializers import CourseEnrollmentSerializer, UserSerializer
 
 
 class IsUser(permissions.BasePermission):
+    """
+    Permission that checks to see if the request user matches the User models
+    """
     def has_object_permission(self, request, view, obj):
         return request.user == obj
 
@@ -56,7 +57,11 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
 @authentication_classes((OAuth2Authentication, SessionAuthentication))
 @permission_classes((IsAuthenticated,))
 def my_user_info(request):
+    """
+    Redirect to the currently-logged-in user's info page
+    """
     return redirect("user-detail", username=request.user.username)
+
 
 def mobile_course_enrollments(enrollments, user):
     """

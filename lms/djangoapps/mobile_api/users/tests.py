@@ -4,7 +4,7 @@ Tests for users API
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.factories import StaffFactory, UserFactory
+from courseware.tests.factories import UserFactory
 from django.core.urlresolvers import reverse
 from mobile_api.users.serializers import CourseEnrollmentSerializer
 from student.models import CourseEnrollment
@@ -25,7 +25,10 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         super(TestUserApi, self).tearDown()
         self.client.logout()
 
-    def enroll(self):
+    def _enroll(self):
+        """
+        enroll test user in test course
+        """
         resp = self.client.post(reverse('change_enrollment'), {
             'enrollment_action': 'enroll',
             'course_id': self.course.id.to_deprecated_string(),
@@ -39,13 +42,13 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         self.client.login(username=self.username, password=self.password)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, [])
+        self.assertEqual(response.data, [])  # pylint: disable=E1103
 
-        self.enroll()
+        self._enroll()
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        courses = response.data
+        courses = response.data  # pylint: disable=E1103
 
         self.assertTrue(len(courses), 1)
         course = courses[0]['course']
@@ -59,7 +62,7 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         url = reverse('user-detail', kwargs={'username': self.user.username})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        data = response.data
+        data = response.data  # pylint: disable=E1103
         self.assertEqual(data['username'], self.user.username)
         self.assertEqual(data['email'], self.user.email)
 
@@ -86,7 +89,7 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
 
     def test_course_serializer(self):
         self.client.login(username=self.username, password=self.password)
-        self.enroll()
-        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data
+        self._enroll()
+        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=E1101
         self.assertEqual(serialized['course']['video_outline'], None)
         self.assertEqual(serialized['course']['name'], self.course.display_name)
