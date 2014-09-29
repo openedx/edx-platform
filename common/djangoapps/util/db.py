@@ -13,6 +13,8 @@ def commit_on_success_with_read_committed(func):  # pylint: disable=invalid-name
     If the function returns a response the transaction is committed and if the function raises an exception the
     transaction is rolled back.
 
+    Raises TransactionManagementError if there are already more than 1 level of transactions open.
+
     Note: This only works on MySQL.
     """
     @wraps(func)
@@ -21,7 +23,12 @@ def commit_on_success_with_read_committed(func):  # pylint: disable=invalid-name
         if connection.vendor == 'mysql':
             # The isolation level cannot be changed while a transaction is in progress. So we close any existing one.
             if connection.transaction_state:
-                connection.commit()
+                if len(connection.transaction_state) == 1:
+                    connection.commit()
+                # We can commit all open transactions. But it does not seem like a good idea.
+                elif len(connection.transaction_state) > 1:
+                    raise transaction.TransactionManagementError('Cannot change isolation level. '
+                                                                 'More than 1 level of nested transactions.')
 
             # This will set the transaction isolation level to READ COMMITTED for the next transaction.
             cursor = connection.cursor()
