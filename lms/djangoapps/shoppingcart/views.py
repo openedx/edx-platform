@@ -170,6 +170,11 @@ def remove_item(request):
     item_id = request.REQUEST.get('id', '-1')
     try:
         item = OrderItem.objects.get(id=item_id, status='cart')
+
+    except OrderItem.DoesNotExist:
+        log.exception('Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(item_id))
+
+    else:
         if item.user == request.user:
             order_item_course_id = None
             if hasattr(item, 'paidcourseregistration'):
@@ -178,8 +183,18 @@ def remove_item(request):
             log.info('order item {0} removed for user {1}'.format(item_id, request.user))
             remove_code_redemption(order_item_course_id, item_id, item, request.user)
 
-    except OrderItem.DoesNotExist:
-        log.exception('Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(item_id))
+            # Updating Order Type
+            cart = Order.get_cart_for_user(request.user)
+            cart_items = cart.orderitem_set.all()
+            order_type = OrderTypes.PERSONAL
+
+            for cart_item in cart_items:
+                if cart_item.qty > 1:
+                    order_type = OrderTypes.BUSINESS
+
+            cart.order_type = order_type
+            cart.save()
+
     return HttpResponse('OK')
 
 

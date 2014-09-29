@@ -165,9 +165,10 @@ class Order(models.Model):
         Reset the items price state in the user cart
         """
         for item in self.orderitem_set.all():  # pylint: disable=E1101
-            item.unit_cost = item.list_price
-            item.list_price = None
-            item.save()
+            if item.list_price:
+                item.unit_cost = item.list_price
+                item.list_price = None
+                item.save()
 
     def clear(self):
         """
