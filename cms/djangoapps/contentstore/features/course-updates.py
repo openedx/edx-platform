@@ -4,6 +4,7 @@
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, get_codemirror_value
+from opaque_keys.edx.locations import CourseLocator
 from nose.tools import assert_in  # pylint: disable=E0611
 
 
@@ -27,6 +28,14 @@ def check_update(_step, text):
     update_css = 'div.update-contents'
     update_html = world.css_find(update_css).html
     assert_in(text, update_html)
+
+
+@step(u'I should see the asset update to "([^"]*)"$')
+def check_asset_update(_step, asset_file):
+    update_css = 'div.update-contents'
+    update_html = world.css_find(update_css).html
+    asset_key = world.scenario_dict['COURSE'].id.make_asset_key(asset_type='asset', path=asset_file)
+    assert_in(unicode(asset_key), update_html)
 
 
 @step(u'I should not see the update "([^"]*)"$')
@@ -88,6 +97,14 @@ def edit_handouts(_step, text):
 def check_handout(_step, handout):
     handout_css = 'div.handouts-content'
     assert_in(handout, world.css_html(handout_css))
+
+
+@step(u'I see the handout image link "([^"]*)"$')
+def check_handout_image_link(_step, image_file):
+    handout_css = 'div.handouts-content'
+    handout_html = world.css_html(handout_css)
+    asset_key = world.scenario_dict['COURSE'].id.make_asset_key(asset_type='asset', path=image_file)
+    assert_in(unicode(asset_key), handout_html)
 
 
 @step(u'I see the handout error text')
