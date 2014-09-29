@@ -13,7 +13,7 @@ from courseware.tests.factories import InstructorFactory, BetaTesterFactory
 from courseware.access import has_access
 from student.tests.factories import UserFactory
 
-from common import course_id, visit_scenario_item
+from common import visit_scenario_item
 
 
 @step('I view the LTI and error is shown$')
@@ -29,7 +29,7 @@ def lti_is_not_rendered(_step):
 
 
 def check_lti_iframe_content(text):
-    #inside iframe test content is presented
+    # inside iframe test content is presented
     location = world.scenario_dict['LTI'].location.html_id()
     iframe_name = 'ltiFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
@@ -95,7 +95,7 @@ def incorrect_lti_is_rendered(_step):
     assert not world.is_css_present('.link_lti_new_window', wait_time=0)
     assert not world.is_css_present('.error_message', wait_time=0)
 
-    #inside iframe test content is presented
+    # inside iframe test content is presented
     check_lti_iframe_content("Wrong LTI signature")
 
 
@@ -119,7 +119,7 @@ def set_incorrect_lti_passport(_step):
     i_am_registered_for_the_course(coursenum, metadata)
 
 
-@step('the course has an LTI component with (.*) fields(?:\:)?$') #, new_page is(.*), is_graded is(.*)
+@step('the course has an LTI component with (.*) fields(?:\:)?$')  # , new_page is(.*), graded is(.*)
 def add_correct_lti_to_course(_step, fields):
     category = 'lti'
     metadata = {
@@ -176,7 +176,6 @@ def create_course_for_lti(course, metadata):
             },
         ]
     }
-    metadata.update(grading_policy)
 
     # Create the course
     # We always use the same org and display name,
@@ -186,17 +185,7 @@ def create_course_for_lti(course, metadata):
         number=course,
         display_name='Test Course',
         metadata=metadata,
-        grading_policy={
-            "GRADER": [
-                {
-                    "type": "Homework",
-                    "min_count": 1,
-                    "drop_count": 0,
-                    "short_label": "HW",
-                    "weight": weight
-                },
-            ]
-        },
+        grading_policy=grading_policy,
     )
 
     # Add a section to the course to contain problems
@@ -248,7 +237,7 @@ def check_lti_popup(parent_window):
     assert len(world.browser.windows) != 1
 
     for window in world.browser.windows:
-        world.browser.switch_to_window(window) # Switch to a different window (the pop-up)
+        world.browser.switch_to_window(window)  # Switch to a different window (the pop-up)
         # Check if this is the one we want by comparing the url
         url = world.browser.url
         basename = os.path.basename(url)
@@ -260,8 +249,8 @@ def check_lti_popup(parent_window):
 
     assert result == u'This is LTI tool. Success.'
 
-    world.browser.driver.close() # Close the pop-up window
-    world.browser.switch_to_window(parent_window) # Switch to the main window again
+    world.browser.driver.close()  # Close the pop-up window
+    world.browser.switch_to_window(parent_window)  # Switch to the main window again
 
 
 def click_and_check_lti_popup():
@@ -314,7 +303,7 @@ def see_value_in_the_gradebook(_step, label, text):
     for i, element in enumerate(table_headers):
         if element.text.strip() == label:
             index = i
-            break;
+            break
 
     assert_true(world.css_has_text('{0} tbody td'.format(table_selector), text, index=index))
 

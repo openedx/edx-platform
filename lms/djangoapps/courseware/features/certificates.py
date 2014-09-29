@@ -3,22 +3,20 @@
 
 from lettuce import world, step
 from lettuce.django import django_url
-from course_modes.models import CourseMode
 from nose.tools import assert_equal
 
-
-UPSELL_LINK_CSS = '.message-upsell a.action-upgrade[href*="edx/999/Certificates"]'
 
 def create_cert_course():
     world.clear_courses()
     org = 'edx'
     number = '999'
     name = 'Certificates'
-    course_id = '{org}/{number}/{name}'.format(
-        org=org, number=number, name=name)
-    world.scenario_dict['course_id'] = course_id
     world.scenario_dict['COURSE'] = world.CourseFactory.create(
         org=org, number=number, display_name=name)
+    world.scenario_dict['course_id'] = world.scenario_dict['COURSE'].id
+    world.UPSELL_LINK_CSS = u'.message-upsell a.action-upgrade[href*="{}"]'.format(
+        world.scenario_dict['course_id']
+    )
 
     honor_mode = world.CourseModeFactory.create(
         course_id=world.scenario_dict['course_id'],
@@ -28,7 +26,7 @@ def create_cert_course():
     )
 
     verfied_mode = world.CourseModeFactory.create(
-        course_id=course_id,
+        course_id=world.scenario_dict['course_id'],
         mode_slug='verified',
         mode_display_name='verified cert course',
         min_price=16,
@@ -38,8 +36,7 @@ def create_cert_course():
 
 
 def register():
-    url = 'courses/{org}/{number}/{name}/about'.format(
-        org='edx', number='999', name='Certificates')
+    url = u'courses/{}/about'.format(world.scenario_dict['course_id'])
     world.browser.visit(django_url(url))
 
     world.css_click('section.intro a.register')
@@ -147,7 +144,7 @@ def approve_my_photo(step, name):
     # HACK: for now don't bother clicking the approve button for
     # id_photo, because it is sending you back to Step 1.
     # Come back and figure it out later. JZ Aug 29 2013
-    if name=='face':
+    if name == 'face':
         world.css_click(button_css[name])
 
     # Make sure you didn't advance the carousel
@@ -234,27 +231,27 @@ def navigate_to_my_dashboard(step):
 
 @step(u'I see the course on my dashboard')
 def see_the_course_on_my_dashboard(step):
-    course_link_css = 'section.my-courses a[href*="edx/999/Certificates"]'
+    course_link_css = u'section.my-courses a[href*="{}"]'.format(world.scenario_dict['course_id'])
     assert world.is_css_present(course_link_css)
 
 
 @step(u'I see the upsell link on my dashboard')
 def see_upsell_link_on_my_dashboard(step):
-    course_link_css = UPSELL_LINK_CSS
+    course_link_css = world.UPSELL_LINK_CSS
     assert world.is_css_present(course_link_css)
 
 
 @step(u'I do not see the upsell link on my dashboard')
-def see_upsell_link_on_my_dashboard(step):
-    course_link_css = UPSELL_LINK_CSS
+def see_no_upsell_link(step):
+    course_link_css = world.UPSELL_LINK_CSS
     assert world.is_css_not_present(course_link_css)
 
 
 @step(u'I select the upsell link on my dashboard')
-def see_upsell_link_on_my_dashboard(step):
+def select_upsell_link_on_my_dashboard(step):
     # expand the upsell section
     world.css_click('.message-upsell')
-    course_link_css = UPSELL_LINK_CSS
+    course_link_css = world.UPSELL_LINK_CSS
     # click the actual link
     world.css_click(course_link_css)
 
@@ -267,7 +264,7 @@ def see_that_i_am_on_the_verified_track(step):
 
 @step(u'I leave the flow and return$')
 def leave_the_flow_and_return(step):
-    world.visit('verify_student/verified/edx/999/Certificates/')
+    world.visit(u'verify_student/verified/{}/'.format(world.scenario_dict['course_id']))
 
 
 @step(u'I am at the verified page$')

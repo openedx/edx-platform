@@ -44,7 +44,7 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works
   Given the course has correct LTI credentials with registered Instructor
   And the course has an LTI component with correct fields:
-  | open_in_a_new_page | weight | is_graded | has_score |
+  | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 1 question
   And I click on the "Progress" tab
@@ -71,7 +71,7 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works with beta testers
   Given the course has correct LTI credentials with registered BetaTester
   And the course has an LTI component with correct fields:
-  | open_in_a_new_page | weight | is_graded | has_score |
+  | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 1 question
   And I click on the "Progress" tab
@@ -82,7 +82,7 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works with LTI2v0 PUT callback
   Given the course has correct LTI credentials with registered Instructor
   And the course has an LTI component with correct fields:
-  | open_in_a_new_page | weight | is_graded | has_score |
+  | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 2 question
   And I click on the "Progress" tab
@@ -101,7 +101,7 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works with LTI2v0 PUT delete callback
   Given the course has correct LTI credentials with registered Instructor
   And the course has an LTI component with correct fields:
-  | open_in_a_new_page | weight | is_graded | has_score |
+  | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 2 question
   And I visit the LTI component

@@ -9,7 +9,7 @@ acceptance tests.
 from lettuce import world, step
 from nose.tools import assert_in, assert_regexp_matches  # pylint: disable=E0611
 from terrain.steps import reload_the_page
-from splinter.request_handler.request_handler import RequestHandler
+from django.utils import http
 
 
 @step(u'I see a table of student profiles')
@@ -60,11 +60,11 @@ Graded sections:
   subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Midterm Exam, category=Midterm Exam, weight=0.3
   subgrader=<class 'xmodule.graders.AssignmentFormatGrader'>, type=Final Exam, category=Final Exam, weight=0.4
 -----------------------------------------------------------------------------
-Listing grading context for course edx/999/Test_Course
+Listing grading context for course {}
 graded sections:
 []
 all descriptors:
-length=0"""
+length=0""".format(world.course_key)
     assert_in(expected_config, world.css_text('#data-grade-config-text'))
 
 
@@ -74,7 +74,8 @@ def find_grade_report_csv_link(step):  # pylint: disable=unused-argument
     reload_the_page(step)
     world.wait_for_visible('#report-downloads-table')
     # Find table and assert a .csv file is present
-    expected_file_regexp = 'edx_999_Test_Course_grade_report_\d{4}-\d{2}-\d{2}-\d{4}\.csv'
+    quoted_id = http.urlquote(world.course_key).replace('/', '_')
+    expected_file_regexp = quoted_id + '_grade_report_\d{4}-\d{2}-\d{2}-\d{4}\.csv'
     assert_regexp_matches(
         world.css_html('#report-downloads-table'), expected_file_regexp,
         msg="Expected grade report filename was not found."

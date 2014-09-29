@@ -6,10 +6,8 @@ Steps for problem.feature lettuce tests
 # pylint: disable=W0621
 
 from lettuce import world, step
-from lettuce.django import django_url
 from common import i_am_registered_for_the_course, visit_scenario_item
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
-from nose.tools import assert_equal
 
 
 def _view_problem(step, problem_type, problem_settings=None):
