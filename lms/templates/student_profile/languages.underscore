@@ -1,0 +1,7 @@
+<% _.each( languageInfo.languages, function( language ){ %>
+    <% if ( language.name === languageInfo.preferredLanguage.name ){ %>
+        <option value=<%= language.code %> selected="selected"><%= language.name %></option>
+    <% } else { %>
+        <option value=<%= language.code %>><%= language.name %></option>
+    <% } %>
+<% }); %>
