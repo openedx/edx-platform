@@ -1,0 +1,6 @@
+<%! from django.utils.translation import ugettext as _ %>
+% for course, enrollment in recent_course_enrollment_pairs:
+    <section class="dashboard-banner">
+        <p class='activation-message'>${_("You have successfully enrolled in {enrolled_course}.").format(enrolled_course=course.display_name)}</p>
+    </section>
+% endfor
