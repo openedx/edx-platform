@@ -93,7 +93,9 @@ class UsersApiTests(TestCase):
         self.course = CourseFactory.create(
             display_name="TEST COURSE",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30)
+            end=datetime(2015, 1, 16, 14, 30),
+            org='USERTEST',
+            run='USERTEST1'
         )
         self.course_content = ItemFactory.create(
             category="videosequence",
@@ -102,7 +104,7 @@ class UsersApiTests(TestCase):
             due=datetime(2016, 5, 16, 14, 30),
             display_name="View_Sequence"
         )
-        self.course2 = CourseFactory.create(display_name="TEST COURSE2", org='TESTORG2')
+        self.course2 = CourseFactory.create(display_name="TEST COURSE2", org='TESTORG2', run='USERTEST2')
         self.course2_content = ItemFactory.create(
             category="videosequence",
             parent_location=self.course2.location,
@@ -737,7 +739,7 @@ class UsersApiTests(TestCase):
         self.assertTrue(response.data['is_active'])
 
     def test_user_courses_list_post_undefined_user(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCLPUU', run='TUCLPUU1')
         test_uri = self.users_base_uri
         user_id = '234234'
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
@@ -774,7 +776,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         confirm_uri = self.test_server_prefix + test_uri + '/' + unicode(self.course.id)
 
-        course_with_out_date_values = CourseFactory.create()
+        course_with_out_date_values = CourseFactory.create(org='TUCLG', run='TUCLG1')
         data = {'course_id': unicode(course_with_out_date_values.id)}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -797,7 +799,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_post_position_course_as_descriptor(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCDPPCAD', run='TUCDPPCAD1')
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
             category="chapter",
@@ -892,7 +894,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_post_position_invalid_user(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCDPPIU', run='TUCDPPIU1')
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
             category="chapter",
@@ -916,7 +918,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_post_position_course_as_content(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCDPPCAS', run='TUCDPPCAS1')
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
             category="chapter",
@@ -965,7 +967,13 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_user_courses_detail_get(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(
+            display_name="UserCoursesDetailTestCourse",
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16, 14, 30),
+            org='TUCDG',
+            run='TUCDG1'
+        )
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
             category="chapter",
@@ -990,6 +998,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertEqual(response.data['course_id'], unicode(course.id))
         self.assertEqual(response.data['user_id'], user_id)
+
+        # Now add the user's position in the course
         position_data = {
             'positions': [
                 {
@@ -1016,7 +1026,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_get_undefined_enrollment(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCDGUE', run='TUCDGUE1')
         test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
@@ -1028,7 +1038,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_delete(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCDD', run='TUCDD1')
         test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
@@ -1057,7 +1067,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_delete_undefined_user(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCDDUU', run='TUCDDUU1')
         user_id = '2134234'
         test_uri = '{}/{}/courses/{}'.format(self.users_base_uri, user_id, course.id)
         response = self.do_delete(test_uri)
@@ -1074,7 +1084,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_course_grades_user_not_found(self):
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCGUNF', run='TUCGUNF1')
         test_uri = '{}/99999999/courses/{}/grades'.format(self.users_base_uri, course.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
@@ -1091,8 +1101,9 @@ class UsersApiTests(TestCase):
         test_uri = '{}/{}/preferences'.format(self.users_base_uri, user_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data['pref-lang'], 'en')
+        self.assertIsNotNone(response.data['notification_pref'])
 
     def test_user_preferences_list_post_user_not_found(self):
         test_uri = '{}/{}/preferences'.format(self.users_base_uri, '999999')
@@ -1121,7 +1132,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 3)
+        self.assertIsNotNone(response.data['notification_pref'])
         self.assertEqual(response.data['pref-lang'], 'en')
         self.assertEqual(response.data['foo'], 'bar')
 
@@ -1134,7 +1146,8 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 3)
+        self.assertIsNotNone(response.data['notification_pref'])
         self.assertEqual(response.data['pref-lang'], 'en')
         self.assertEqual(response.data['foo'], 'updated')
 
@@ -1174,7 +1187,7 @@ class UsersApiTests(TestCase):
     def test_user_courses_grades_list_get(self):
         user_id = self.user.id
 
-        course = CourseFactory.create()
+        course = CourseFactory.create(org='TUCGLG', run='TUCGLG1')
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
             category="chapter",
@@ -1340,8 +1353,6 @@ class UsersApiTests(TestCase):
             due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
         )
 
-
-
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
 
         response = self.do_get(test_uri)
@@ -1358,7 +1369,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(sections[0]['graded'], False)
 
         sections = courseware_summary[1]['sections']
-        self.assertEqual(len(sections), 8)
+        self.assertEqual(len(sections), 12)
         self.assertEqual(sections[0]['display_name'], 'Sequence 2')
         self.assertEqual(sections[0]['graded'], False)
 
@@ -1368,7 +1379,7 @@ class UsersApiTests(TestCase):
         self.assertGreater(len(grading_policy['GRADER']), 0)
         self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
 
-        self.assertEqual(response.data['current_grade'], 0.7)
+        self.assertEqual(response.data['current_grade'], 0.73)
         self.assertEqual(response.data['proforma_grade'], 0.9375)
 
     def is_user_profile_created_updated(self, response, data):
@@ -1581,13 +1592,17 @@ class UsersApiTests(TestCase):
         course2 = CourseFactory.create(
             display_name="TEST COURSE2",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30)
+            end=datetime(2015, 1, 16, 14, 30),
+            org='TURLG',
+            run='TURLG1'
         )
         allow_access(course2, self.user, 'instructor')
         course3 = CourseFactory.create(
             display_name="TEST COURSE3",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30)
+            end=datetime(2015, 1, 16, 14, 30),
+            org='TURLG2',
+            run='TURLG2'
         )
         allow_access(course3, self.user, 'staff')
         test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
@@ -1666,7 +1681,9 @@ class UsersApiTests(TestCase):
         course2 = CourseFactory.create(
             display_name="TEST COURSE2",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30)
+            end=datetime(2015, 1, 16, 14, 30),
+            org='TURLP2',
+            run='TURLP2'
         )
         Role.objects.get_or_create(
             name=FORUM_ROLE_MODERATOR,
@@ -1675,7 +1692,9 @@ class UsersApiTests(TestCase):
         course3 = CourseFactory.create(
             display_name="TEST COURSE3",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30)
+            end=datetime(2015, 1, 16, 14, 30),
+            org='TURLP3',
+            run='TURLP3'
         )
         Role.objects.get_or_create(
             name=FORUM_ROLE_MODERATOR,
@@ -1684,7 +1703,9 @@ class UsersApiTests(TestCase):
         course4 = CourseFactory.create(
             display_name="COURSE4 NO MODERATOR",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30)
+            end=datetime(2015, 1, 16, 14, 30),
+            org='TURLP4',
+            run='TURLP4'
         )
 
         test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)

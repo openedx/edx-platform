@@ -144,7 +144,7 @@ class LocationKeyField(models.CharField):
 
         if isinstance(value, basestring):
             try:
-                UsageKey.from_string(value)
+                return UsageKey.from_string(value)
             except InvalidKeyError:
                 return Location.from_deprecated_string(value)
         else:
