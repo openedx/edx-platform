@@ -1,6 +1,7 @@
 import json
 import logging
 import sys
+from functools import wraps
 
 from django.conf import settings
 from django.core.validators import ValidationError, validate_email
@@ -16,8 +17,30 @@ from microsite_configuration import microsite
 import calc
 import track.views
 
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
+
+
+def ensure_valid_course_key(view_func):
+    """
+    This decorator should only be used with views which have argument course_key_string (studio) or course_id (lms).
+    If course_key_string (studio) or course_id (lms) is not valid raise 404.
+    """
+    @wraps(view_func)
+    def inner(request, *args, **kwargs):
+        course_key = kwargs.get('course_key_string') or kwargs.get('course_id')
+        if course_key is not None:
+            try:
+                CourseKey.from_string(course_key)
+            except InvalidKeyError:
+                raise Http404
+
+        response = view_func(request, *args, **kwargs)
+        return response
+
+    return inner
 
 
 @requires_csrf_token
