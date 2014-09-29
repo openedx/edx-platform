@@ -3,7 +3,10 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-from shoppingcart.models import PaidCourseRegistration, CouponRedemption, Invoice, RegistrationCodeRedemption, CourseRegistrationCode
+from shoppingcart.models import (
+    PaidCourseRegistration, CouponRedemption, Invoice,
+    OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode
+)
 from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
@@ -19,9 +22,9 @@ SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_name', 'compan
                  'recipient_email', 'customer_reference_number', 'internal_reference')
 
 SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_contact_email', 'purchase_time',
-                       'customer_reference_number', 'recipient_name', 'recipient_email', 'company_address_line_1',
-                       'company_address_line_2', 'company_city', 'company_state', 'company_zip',
-                       'company_country', 'order_type',)
+                       'customer_reference_number', 'recipient_name', 'recipient_email', 'bill_to_street1',
+                       'bill_to_street2', 'bill_to_city', 'bill_to_state', 'bill_to_postalcode',
+                       'bill_to_country', 'order_type',)
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at')
@@ -63,7 +66,7 @@ def sale_order_record_features(course_id, features):
         sale_order_dict.update({"total_codes": 'N/A'})
         sale_order_dict.update({'total_used_codes': 'N/A'})
 
-        if getattr(purchased_course.order, 'order_type') == 'business':
+        if getattr(purchased_course.order, 'order_type') == OrderTypes.BUSINESS:
             registration_codes = CourseRegistrationCode.objects.filter(order=purchased_course.order)
             sale_order_dict.update({"total_codes": registration_codes.count()})
             sale_order_dict.update({'total_used_codes': purchased_course.order.registrationcoderedemption_set.all().count()})

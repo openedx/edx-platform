@@ -426,7 +426,7 @@ def billing_details(request):
     #cart.order_type = 'business'
     #cart.save()
 
-    if getattr(cart, 'order_type') != 'business':
+    if getattr(cart, 'order_type') != OrderTypes.BUSINESS:
         raise Http404('Page not found!')
 
     if request.method == "GET":
@@ -449,17 +449,10 @@ def billing_details(request):
         company_contact_email = request.POST.get("company_contact_email", "")
         recipient_name = request.POST.get("recipient_name", "")
         recipient_email = request.POST.get("recipient_email", "")
-        company_address_line_1 = request.POST.get("company_address_line_1", "")
-        company_address_line_2 = request.POST.get("company_address_line_2", "")
-        company_city = request.POST.get("company_city", "")
-        company_state = request.POST.get("company_state", "")
-        company_zip = request.POST.get("company_zip", "")
-        company_country = request.POST.get("company_country", "")
         customer_reference_number = request.POST.get("customer_reference_number", "")
 
         cart.add_billing_details(company_name, company_contact_name, company_contact_email, recipient_name,
-                                 recipient_email, company_address_line_1, company_address_line_2, company_city,
-                                 company_state, company_zip, company_country, customer_reference_number)
+                                 recipient_email, customer_reference_number)
         return JsonResponse({
             'response': _('success')
         })  # status code 200: OK by default
@@ -525,7 +518,7 @@ def show_receipt(request, ordernum):
 
     recipient_list = list()
     recipient_list.append(getattr(order.user, 'email'))
-    if order_type == 'business':
+    if order_type == OrderTypes.BUSINESS:
         registration_codes = CourseRegistrationCode.objects.filter(order=order)
         total_registration_codes = registration_codes.count()
         context.update({'registration_codes': registration_codes})

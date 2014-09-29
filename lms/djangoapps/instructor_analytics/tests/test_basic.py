@@ -112,20 +112,20 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             ('total_amount', 'Total Amount'),
             ('total_codes', 'Total Codes'),
             ('total_used_codes', 'Total Used Codes'),
-            ('logged_in_username', 'Account Username'),
-            ('logged_in_email', 'Account Email'),
+            ('logged_in_username', 'Login Username'),
+            ('logged_in_email', 'Login User Email'),
             ('purchase_time', 'Date of Sale'),
             ('customer_reference_number', 'Customer Reference Number'),
             ('recipient_name', 'Recipient Name'),
             ('recipient_email', 'Recipient Email'),
-            ('company_address_line_1', 'Address Line 1'),
-            ('company_address_line_2', 'Address Line 2'),
-            ('company_city', 'City'),
-            ('company_state', 'State'),
-            ('company_zip', 'Zip'),
-            ('company_country', 'Country'),
+            ('bill_to_street1', 'Street 1'),
+            ('bill_to_street2', 'Street 2'),
+            ('bill_to_city', 'City'),
+            ('bill_to_state', 'State'),
+            ('bill_to_postalcode', 'Postal Code'),
+            ('bill_to_country', 'Country'),
             ('order_type', 'Order Type'),
-            ('codes', 'Codes'),
+            ('codes', 'Registration Codes'),
             ('course_id', 'Course Id')
         ]
 
@@ -134,9 +134,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         order.save()
         order.add_billing_details(company_name='Test Company', company_contact_name='Test',
                                   company_contact_email='test@123', recipient_name='R1',
-                                  recipient_email='', company_address_line_1='', company_address_line_2='S1',
-                                  company_city='NY', company_state='NY', company_zip='4234', company_country='US',
-                                  customer_reference_number='PO#23')
+                                  recipient_email='', customer_reference_number='PO#23')
         PaidCourseRegistration.add_to_order(order, self.course.id)
         order.purchase()
 
