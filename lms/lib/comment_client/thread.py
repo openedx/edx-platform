@@ -62,6 +62,7 @@ class Thread(models.Model):
         if query_params.get('text'):
             search_query = query_params['text']
             course_id = query_params['course_id']
+            group_id = query_params['group_id'] if 'group_id' in query_params else None
             requested_page = params['page']
             total_results = response.get('total_results')
             corrected_text = response.get('corrected_text')
@@ -72,15 +73,17 @@ class Thread(models.Model):
                 {
                     'query': search_query,
                     'corrected_text': corrected_text,
+                    'group_id': group_id,
                     'page': requested_page,
                     'total_results': total_results,
                 }
             )
             log.info(
-                u'forum_text_search query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} page={requested_page} total_results={total_results}'.format(
+                u'forum_text_search query="{search_query}" corrected_text="{corrected_text}" course_id={course_id} group_id={group_id} page={requested_page} total_results={total_results}'.format(
                     search_query=search_query,
                     corrected_text=corrected_text,
                     course_id=course_id,
+                    group_id=group_id,
                     requested_page=requested_page,
                     total_results=total_results
                 )
