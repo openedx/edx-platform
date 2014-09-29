@@ -898,6 +898,29 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def _test_unicode_data(self, text, mock_request):
+        mock_request.side_effect = make_mock_request_impl(text)
+        data = {
+            "ajax": 1,
+            "text": text,
+        }
+        request = RequestFactory().get("dummy_url", data)
+        request.user = self.student
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+
+        response = views.forum_form_discussion(request, self.course.id.to_deprecated_string())
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data["discussion_data"][0]["title"], text)
+        self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
