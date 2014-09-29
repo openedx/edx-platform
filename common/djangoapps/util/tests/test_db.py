@@ -7,7 +7,7 @@ import unittest
 
 from django.contrib.auth.models import User
 from django.db import connection, IntegrityError
-from django.db.transaction import commit_on_success
+from django.db.transaction import commit_on_success, TransactionManagementError
 from django.test import TransactionTestCase
 
 from util.db import commit_on_success_with_read_committed
@@ -79,3 +79,23 @@ class TransactionIsolationLevelsTestCase(TransactionTestCase):
 
         self.assertIsNone(thread2.status.get('exception'))
         self.assertEqual(thread2.status.get('created'), created_in_2)
+
+    def test_transaction_nesting(self):
+        """Test that the decorator raises an error if there are already more than 1 levels of nested transactions."""
+
+        if connection.vendor != 'mysql':
+            raise unittest.SkipTest('Only works on MySQL.')
+
+        def do_nothing():
+            """Just return."""
+            return
+
+        commit_on_success_with_read_committed(do_nothing)()
+
+        with commit_on_success():
+            commit_on_success_with_read_committed(do_nothing)()
+
+        with self.assertRaises(TransactionManagementError):
+            with commit_on_success():
+                with commit_on_success():
+                    commit_on_success_with_read_committed(do_nothing)()
