@@ -7,7 +7,6 @@ Define common steps for instructor dashboard acceptance tests.
 
 from __future__ import absolute_import
 
-from django.conf import settings
 from lettuce import world, step
 from mock import patch
 from nose.tools import assert_in  # pylint: disable=E0611
@@ -75,8 +74,8 @@ def i_am_staff_or_instructor(step, role):  # pylint: disable=unused-argument
 def go_to_section(section_name):
     # section name should be one of
     # course_info, membership, student_admin, data_download, analytics, send_email
-    world.visit('/courses/edx/999/Test_Course')
-    world.css_click('a[href="/courses/edx/999/Test_Course/instructor"]')
+    world.visit(u'/courses/{}'.format(world.course_key))
+    world.css_click(u'a[href="/courses/{}/instructor"]'.format(world.course_key))
     world.css_click('a[data-section="{0}"]'.format(section_name))
 
 
