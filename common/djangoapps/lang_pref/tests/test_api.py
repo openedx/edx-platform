@@ -18,13 +18,13 @@ class LanguageApiTest(TestCase):
 
     def test_preferred_language(self):
         preferred_language = language_api.preferred_language('fr')
-        self.assertEqual(preferred_language, u'Français')
+        self.assertEqual(preferred_language, language_api.Language('fr', u'Français'))
 
     @ddt.data(*INVALID_LANGUAGE_CODES)
     def test_invalid_preferred_language(self, language_code):
         preferred_language = language_api.preferred_language(language_code)
-        self.assertEqual(preferred_language, u'English')
+        self.assertEqual(preferred_language, language_api.Language('en', u'English'))
 
     def test_no_preferred_language(self):
         preferred_language = language_api.preferred_language(None)
-        self.assertEqual(preferred_language, u'English')
+        self.assertEqual(preferred_language, language_api.Language('en', u'English'))

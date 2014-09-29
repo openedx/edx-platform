@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-24 14:16-0400\n"
-"PO-Revision-Date: 2014-09-24 18:16:48.297294\n"
+"POT-Creation-Date: 2014-10-01 13:57+0000\n"
+"PO-Revision-Date: 2014-10-01 13:57:56.152525\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +111,7 @@ msgstr "Réqüéstéd pägé müst ßé gréätér thän zérö Ⱡ'σяєм ι�
 msgid "Honor Code Certificate"
 msgstr "Hönör Çödé Çértïfïçäté Ⱡ'σяє#"
 
-#: common/djangoapps/course_modes/views.py common/djangoapps/student/views.py
+#: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
 msgstr "Énröllmént ïs çlöséd Ⱡ'σя#"
 
@@ -216,14 +216,9 @@ msgstr "Ìnvälïd çöürsé ïd Ⱡ'σ#"
 msgid "Course id is invalid"
 msgstr "Çöürsé ïd ïs ïnvälïd Ⱡ'σя#"
 
-#: common/djangoapps/student/views.py
-#: lms/templates/courseware/course_about.html
-msgid "Course is full"
-msgstr "Çöürsé ïs füll Ⱡ'#"
-
-#: common/djangoapps/student/views.py
-msgid "Student is already enrolled"
-msgstr "Stüdént ïs älréädý énrölléd Ⱡ'σяєм#"
+#: common/djangoapps/student/views.py common/djangoapps/student/views.py
+msgid "Could not enroll"
+msgstr "Çöüld nöt énröll Ⱡ'σ#"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
@@ -2795,6 +2790,58 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
 
 #: common/lib/xmodule/xmodule/lti_module.py
+msgid "Request user's username"
+msgstr "Réqüést üsér's üsérnämé Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Select True to request the user's username. You must also set Open in New "
+"Page to True to get the user's information."
+msgstr ""
+"Séléçt Trüé tö réqüést thé üsér's üsérnämé. Ýöü müst älsö sét Öpén ïn Néw "
+"Pägé tö Trüé tö gét thé üsér's ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Request user's email"
+msgstr "Réqüést üsér's émäïl Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Select True to request the user's email address. You must also set Open in "
+"New Page to True to get the user's information."
+msgstr ""
+"Séléçt Trüé tö réqüést thé üsér's émäïl äddréss. Ýöü müst älsö sét Öpén ïn "
+"Néw Pägé tö Trüé tö gét thé üsér's ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєт#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "LTI Application Information"
+msgstr "LTÌ Àpplïçätïön Ìnförmätïön Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Enter a description of the third party application. If requesting username "
+"and/or email, use this text box to inform users why their username and/or "
+"email will be forwarded to a third party application."
+msgstr ""
+"Éntér ä désçrïptïön öf thé thïrd pärtý äpplïçätïön. Ìf réqüéstïng üsérnämé "
+"änd/ör émäïl, üsé thïs téxt ßöx tö ïnförm üsérs whý théïr üsérnämé änd/ör "
+"émäïl wïll ßé förwärdéd tö ä thïrd pärtý äpplïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Button Text"
+msgstr "Büttön Téxt Ⱡ#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Enter the text on the button used to launch the third party application."
+msgstr ""
+"Éntér thé téxt ön thé ßüttön üséd tö läünçh thé thïrd pärtý äpplïçätïön. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
 "string."
@@ -4317,6 +4364,10 @@ msgstr "Tïtlé çän't ßé émptý Ⱡ'σя#"
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
 msgstr "Bödý çän't ßé émptý Ⱡ'σя#"
+
+#: lms/djangoapps/django_comment_client/base/views.py
+msgid "Topic doesn't exist"
+msgstr "Töpïç döésn't éxïst Ⱡ'σя#"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
@@ -7689,14 +7740,17 @@ msgstr "édït Ⱡ'σяєм#"
 #. (for example, Google and LinkedIn) the user can link with or unlink from
 #. their edX account.
 #: lms/templates/dashboard.html
+#: lms/templates/student_profile/third_party_auth.html
 msgid "Connected Accounts"
 msgstr "Çönnéçtéd Àççöünts Ⱡ'σ#"
 
 #: lms/templates/dashboard.html
+#: lms/templates/student_profile/third_party_auth.html
 msgid "Linked"
 msgstr "Lïnkéd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/dashboard.html
+#: lms/templates/student_profile/third_party_auth.html
 msgid "Not Linked"
 msgstr "Nöt Lïnkéd Ⱡ#"
 
@@ -7704,6 +7758,7 @@ msgstr "Nöt Lïnkéd Ⱡ#"
 #. and their account with an external authentication provider (like Google or
 #. LinkedIn).
 #: lms/templates/dashboard.html
+#: lms/templates/student_profile/third_party_auth.html
 msgid "Unlink"
 msgstr "Ûnlïnk Ⱡ'σяєм ιρѕ#"
 
@@ -7711,6 +7766,7 @@ msgstr "Ûnlïnk Ⱡ'σяєм ιρѕ#"
 #. and their account with an external authentication provider (like Google or
 #. LinkedIn).
 #: lms/templates/dashboard.html
+#: lms/templates/student_profile/third_party_auth.html
 msgid "Link"
 msgstr "Lïnk Ⱡ'σяєм#"
 
@@ -8531,10 +8587,6 @@ msgstr "Çönfïrm #"
 msgid "Reject"
 msgstr "Réjéçt Ⱡ'σяєм ιρѕ#"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
-msgid "Global Navigation"
-msgstr "Glößäl Nävïgätïön Ⱡ'σ#"
-
 #: lms/templates/navigation.html lms/templates/navigation.html
 #: lms/templates/original_navigation.html
 msgid "Find Courses"
@@ -8587,6 +8639,10 @@ msgstr ""
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
 msgstr "Ýöü dö nöt hävé äný nötés. Ⱡ'σяєм#"
+
+#: lms/templates/original_navigation.html
+msgid "Global Navigation"
+msgstr "Glößäl Nävïgätïön Ⱡ'σ#"
 
 #: lms/templates/original_navigation.html
 #: lms/templates/sysadmin_dashboard.html
@@ -9603,6 +9659,10 @@ msgstr ""
 "Ⱡ'σяє#"
 
 #: lms/templates/courseware/course_about.html
+msgid "Course is full"
+msgstr "Çöürsé ïs füll Ⱡ'#"
+
+#: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "Énröllmént ïn thïs çöürsé ïs ßý ïnvïtätïön önlý Ⱡ'σяєм ιρѕυм #"
 
@@ -9826,15 +9886,6 @@ msgstr ""
 " fïx ït äs söön äs pössïßlé. Pléäsé émäïl üs ät {link_to_support_email} tö "
 "répört äný prößléms ör döwntïmé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιη#"
-
-#: lms/templates/courseware/grade_summary.html
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Grade summary"
-msgstr "Grädé sümmärý Ⱡ'#"
-
-#: lms/templates/courseware/grade_summary.html
-msgid "Not implemented yet"
-msgstr "Nöt ïmpléméntéd ýét Ⱡ'σя#"
 
 #: lms/templates/courseware/gradebook.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -11140,20 +11191,6 @@ msgstr ""
 "Qüéstïöns räïsé ïssüés thät nééd änswérs. Dïsçüssïöns shäré ïdéäs änd stärt "
 "çönvérsätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Topic Area:"
-msgstr "Töpïç Àréä: Ⱡ#"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Filter topics"
-msgstr "Fïltér töpïçs Ⱡ'#"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Add your post to a relevant topic to help others find it."
-msgstr ""
-"Àdd ýöür pöst tö ä rélévänt töpïç tö hélp öthérs fïnd ït. Ⱡ'σяєм ιρѕυм ∂σł#"
-
 #. Translators: This labels the selector for which group of students can view
 #. a
 #. post
@@ -11202,6 +11239,20 @@ msgstr "pöst änönýmöüslý tö çlässmätés Ⱡ'σяєм #"
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add Post"
 msgstr "Àdd Pöst #"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Topic Area:"
+msgstr "Töpïç Àréä: Ⱡ#"
+
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Filter topics"
+msgstr "Fïltér töpïçs Ⱡ'#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Add your post to a relevant topic to help others find it."
+msgstr ""
+"Àdd ýöür pöst tö ä rélévänt töpïç tö hélp öthérs fïnd ït. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Endorse"
@@ -13089,10 +13140,12 @@ msgid "None Available"
 msgstr "Nöné Àväïläßlé Ⱡ'#"
 
 #: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/student_profile/language.html
 msgid "Change Preferred Language"
 msgstr "Çhängé Préférréd Längüägé Ⱡ'σяєм#"
 
 #: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/student_profile/language.html
 msgid "Please choose your preferred language"
 msgstr "Pléäsé çhöösé ýöür préférréd längüägé Ⱡ'σяєм ιρѕ#"
 
@@ -13101,6 +13154,7 @@ msgid "Save Language Settings"
 msgstr "Sävé Längüägé Séttïngs Ⱡ'σяє#"
 
 #: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/student_profile/language.html
 msgid ""
 "Don't see your preferred language? {link_start}Volunteer to become a "
 "translator!{link_end}"
@@ -13871,6 +13925,50 @@ msgstr ""
 msgid "Currently the {platform_name} servers are overloaded"
 msgstr "Çürréntlý thé {platform_name} sérvérs äré övérlöädéd Ⱡ'σяєм ιρѕυ#"
 
+#: lms/templates/student_account/email_change_failed.html
+msgid "Email change failed."
+msgstr "Émäïl çhängé fäïléd. Ⱡ'σя#"
+
+#: lms/templates/student_account/email_change_failed.html
+msgid "Something went wrong. Please contact {support} for help."
+msgstr ""
+"Söméthïng wént wröng. Pléäsé çöntäçt {support} för hélp. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/student_account/email_change_failed.html
+msgid ""
+"The email address you wanted to use is already used by another "
+"{platform_name} account."
+msgstr ""
+"Thé émäïl äddréss ýöü wäntéd tö üsé ïs älréädý üséd ßý änöthér "
+"{platform_name} äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/student_account/email_change_failed.html
+msgid ""
+"You can try again from the {link_start}account settings{link_end} page."
+msgstr ""
+"Ýöü çän trý ägäïn fröm thé {link_start}äççöünt séttïngs{link_end} pägé. "
+"Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/student_account/email_change_successful.html
+msgid "Email change successful!"
+msgstr "Émäïl çhängé süççéssfül! Ⱡ'σяє#"
+
+#: lms/templates/student_account/email_change_successful.html
+msgid ""
+"You should see your new email address listed on the {link_start}account "
+"settings{link_end} page."
+msgstr ""
+"Ýöü shöüld séé ýöür néw émäïl äddréss lïstéd ön thé {link_start}äççöünt "
+"séttïngs{link_end} pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/student_account/index.html
+msgid "Student Account"
+msgstr "Stüdént Àççöünt Ⱡ'#"
+
+#: lms/templates/student_profile/index.html
+msgid "Student Profile"
+msgstr "Stüdént Pröfïlé Ⱡ'#"
+
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Edit Your Name"
 msgstr "Édït Ýöür Nämé Ⱡ'#"
@@ -13953,9 +14051,11 @@ msgstr "Ýöü äré ré-vérïfýïng för Ⱡ'σяє#"
 
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "Ýöü äré régïstérïng för Ⱡ'σяє#"
 
+#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "Professional Education"
 msgstr "Pröféssïönäl Édüçätïön Ⱡ'σяє#"
@@ -15235,23 +15335,67 @@ msgstr "Vïéw Lïvé Vérsïön Ⱡ'σ#"
 msgid "Preview Changes"
 msgstr "Prévïéw Çhängés Ⱡ'#"
 
-#: cms/templates/container.html cms/templates/group_configurations.html
-#: cms/templates/settings_graders.html
-msgid "What can I do on this page?"
-msgstr "Whät çän Ì dö ön thïs pägé? Ⱡ'σяєм#"
+#: cms/templates/container.html
+msgid "Adding components"
+msgstr "Àddïng çömpönénts Ⱡ'σ#"
 
 #: cms/templates/container.html
 msgid ""
-"You can view and edit course components that contain other components on "
-"this page. In the case of experiment blocks, this allows you to confirm that"
-" you have properly configured your experiment groups and make changes to "
-"existing content."
+"Select a component type under {em_start}Add New Component{em_end}. Then "
+"select a template."
 msgstr ""
-"Ýöü çän vïéw änd édït çöürsé çömpönénts thät çöntäïn öthér çömpönénts ön "
-"thïs pägé. Ìn thé çäsé öf éxpérïmént ßlöçks, thïs ällöws ýöü tö çönfïrm thät"
-" ýöü hävé pröpérlý çönfïgüréd ýöür éxpérïmént gröüps änd mäké çhängés tö "
-"éxïstïng çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,"
-" ѕє∂ ∂σ єιυѕмσ∂ тє#"
+"Séléçt ä çömpönént týpé ündér {em_start}Àdd Néw Çömpönént{em_end}. Thén "
+"séléçt ä témpläté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: cms/templates/container.html
+msgid ""
+"The new component is added at the bottom of the page or group. You can then "
+"edit and move the component."
+msgstr ""
+"Thé néw çömpönént ïs äddéd ät thé ßöttöm öf thé pägé ör gröüp. Ýöü çän thén "
+"édït änd mövé thé çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: cms/templates/container.html
+msgid "Editing components"
+msgstr "Édïtïng çömpönénts Ⱡ'σ#"
+
+#: cms/templates/container.html
+msgid ""
+"Click the {em_start}Edit{em_end} icon in a component to edit its content."
+msgstr ""
+"Çlïçk thé {em_start}Édït{em_end} ïçön ïn ä çömpönént tö édït ïts çöntént. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя#"
+
+#: cms/templates/container.html
+msgid "Reorganizing components"
+msgstr "Réörgänïzïng çömpönénts Ⱡ'σяє#"
+
+#: cms/templates/container.html
+msgid "Drag components to new locations within this component."
+msgstr ""
+"Dräg çömpönénts tö néw löçätïöns wïthïn thïs çömpönént. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/container.html
+msgid "For content experiments, you can drag components to other groups."
+msgstr ""
+"För çöntént éxpérïménts, ýöü çän dräg çömpönénts tö öthér gröüps. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: cms/templates/container.html
+msgid "Working with content experiments"
+msgstr "Wörkïng wïth çöntént éxpérïménts Ⱡ'σяєм ι#"
+
+#: cms/templates/container.html
+msgid ""
+"Confirm that you have properly configured content in each of your experiment"
+" groups."
+msgstr ""
+"Çönfïrm thät ýöü hävé pröpérlý çönfïgüréd çöntént ïn éäçh öf ýöür éxpérïmént"
+" gröüps. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/templates/container.html
+msgid "Learn more about component containers"
+msgstr "Léärn möré äßöüt çömpönént çöntäïnérs Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/container.html
 msgid "Unit Location"
@@ -15919,6 +16063,10 @@ msgstr "Néw Gröüp Çönfïgürätïön Ⱡ'σяє#"
 #: cms/templates/group_configurations.html
 msgid "This module is disabled at the moment."
 msgstr "Thïs mödülé ïs dïsäßléd ät thé mömént. Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/group_configurations.html cms/templates/settings_graders.html
+msgid "What can I do on this page?"
+msgstr "Whät çän Ì dö ön thïs pägé? Ⱡ'σяєм#"
 
 #: cms/templates/group_configurations.html
 msgid "You can create, edit, and delete group configurations."

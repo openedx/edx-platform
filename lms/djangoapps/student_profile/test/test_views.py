@@ -2,7 +2,7 @@
 """ Tests for student profile views. """
 
 from urllib import urlencode
-from collections import namedtuple
+import json
 
 from mock import patch
 import ddt
@@ -13,7 +13,7 @@ from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
-from lang_pref import LANGUAGE_KEY
+from lang_pref import LANGUAGE_KEY, api as language_api
 
 
 @ddt.ddt
@@ -25,8 +25,7 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
     EMAIL = u'walt@savewalterwhite.com'
     FULL_NAME = u'𝖂𝖆𝖑𝖙𝖊𝖗 𝖂𝖍𝖎𝖙𝖊'
 
-    Language = namedtuple('Language', 'code name')
-    NEW_LANGUAGE = Language('fr', u'Français')
+    TEST_LANGUAGE = language_api.Language('eo', u'Dummy language')
 
     INVALID_LANGUAGE_CODES = [
         '',
@@ -49,8 +48,6 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
     def test_index(self):
         response = self.client.get(reverse('profile_index'))
         self.assertContains(response, "Student Profile")
-        self.assertContains(response, "Change My Name")
-        self.assertContains(response, "Change Preferred Language")
         self.assertContains(response, "Connected Accounts")
 
     def test_name_change(self):
@@ -81,45 +78,61 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
         response = self._change_name(self.FULL_NAME)
         self.assertEqual(response.status_code, 500)
 
+    @patch('student_profile.views.language_api.preferred_language')
+    @patch('student_profile.views.language_api.released_languages')
+    def test_get_released_languages(self, mock_released_languages, mock_preferred_language):
+        mock_released_languages.return_value = [self.TEST_LANGUAGE]
+        mock_preferred_language.return_value = self.TEST_LANGUAGE
+
+        response = self.client.get(reverse('language_info'))
+        self.assertEqual(
+            json.loads(response.content),
+            {
+                'preferredLanguage': {'code': self.TEST_LANGUAGE.code, 'name': self.TEST_LANGUAGE.name},
+                'languages': [{'code': self.TEST_LANGUAGE.code, 'name': self.TEST_LANGUAGE.name}]
+            }
+        )
+
     @patch('student_profile.views.language_api.released_languages')
     def test_language_change(self, mock_released_languages):
-        mock_released_languages.return_value = [self.NEW_LANGUAGE]
+        mock_released_languages.return_value = [self.TEST_LANGUAGE]
 
-        # Set French as the user's preferred language
-        response = self._change_language(self.NEW_LANGUAGE.code)
+        # Set the dummy language as the user's preferred language
+        response = self._change_preferences(language=self.TEST_LANGUAGE.code)
         self.assertEqual(response.status_code, 204)
 
-        # Verify that French is now the user's preferred language
+        # Verify that the dummy language is now the user's preferred language
         preferences = profile_api.preference_info(self.USERNAME)
-        self.assertEqual(preferences[LANGUAGE_KEY], self.NEW_LANGUAGE.code)
+        self.assertEqual(preferences[LANGUAGE_KEY], self.TEST_LANGUAGE.code)
 
-        # Verify that the page reloads in French
+        # Verify that the page reloads in the dummy language
         response = self.client.get(reverse('profile_index'))
-        self.assertContains(response, "Merci de choisir la langue")
+        self.assertContains(response, u"Stüdént Pröfïlé")
 
     @ddt.data(*INVALID_LANGUAGE_CODES)
     def test_change_to_invalid_or_unreleased_language(self, language_code):
-        response = self._change_language(language_code)
+        response = self._change_preferences(language=language_code)
         self.assertEqual(response.status_code, 400)
 
     def test_change_to_missing_language(self):
-        response = self._change_language(None)
+        response = self._change_preferences(language=None)
         self.assertEqual(response.status_code, 400)
 
     @patch('student_profile.views.profile_api.update_preferences')
     @patch('student_profile.views.language_api.released_languages')
     def test_language_change_missing_profile(self, mock_released_languages, mock_update_preferences):
         # This can't happen if the user is logged in, but test it anyway
-        mock_released_languages.return_value = [self.NEW_LANGUAGE]
+        mock_released_languages.return_value = [self.TEST_LANGUAGE]
         mock_update_preferences.side_effect = profile_api.ProfileUserNotFound
 
-        response = self._change_language(self.NEW_LANGUAGE.code)
+        response = self._change_preferences(language=self.TEST_LANGUAGE.code)
         self.assertEqual(response.status_code, 500)
 
     @ddt.data(
         ('get', 'profile_index'),
-        ('put', 'name_change'),
-        ('put', 'language_change')
+        ('put', 'profile_index'),
+        ('put', 'preference_handler'),
+        ('get', 'language_info'),
     )
     @ddt.unpack
     def test_require_login(self, method, url_name):
@@ -133,13 +146,13 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
         self.assertIn('accounts/login?next=', response.redirect_chain[0][0])
 
     @ddt.data(
-        ('get', 'profile_index'),
-        ('put', 'name_change'),
-        ('put', 'language_change')
+        (['get', 'put'], 'profile_index'),
+        (['put'], 'preference_handler'),
+        (['get'], 'language_info'),
     )
     @ddt.unpack
-    def test_require_http_method(self, correct_method, url_name):
-        wrong_methods = {'get', 'put', 'post', 'head', 'options', 'delete'} - {correct_method}
+    def test_require_http_method(self, correct_methods, url_name):
+        wrong_methods = {'get', 'put', 'post', 'head', 'options', 'delete'} - set(correct_methods)
         url = reverse(url_name)
 
         for method in wrong_methods:
@@ -156,27 +169,28 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
         data = {}
         if new_name is not None:
             # We can't pass a Unicode object to urlencode, so we encode the Unicode object
-            data['new_name'] = new_name.encode('utf-8')
+            data['fullName'] = new_name.encode('utf-8')
 
         return self.client.put(
-            path=reverse('name_change'),
+            path=reverse('profile_index'),
             data=urlencode(data),
             content_type='application/x-www-form-urlencoded'
         )
 
-    def _change_language(self, new_language):
-        """Request a language change.
+    def _change_preferences(self, **preferences):
+        """Request a change to the user's preferences.
 
         Returns:
             HttpResponse
 
         """
         data = {}
-        if new_language is not None:
-            data['new_language'] = new_language
+        for key, value in preferences.iteritems():
+            if value is not None:
+                data[key] = value
 
         return self.client.put(
-            path=reverse('language_change'),
+            path=reverse('preference_handler'),
             data=urlencode(data),
             content_type='application/x-www-form-urlencoded'
         )

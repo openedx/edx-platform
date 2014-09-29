@@ -1,141 +1,155 @@
 var edx = edx || {};
 
-(function($) {
+(function($, _, Backbone, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
+    edx.student.account = {};
 
-    edx.student.account = (function() {
-        var _fn = {
-            init: function() {
-                _fn.ajax.init();
-                _fn.eventHandlers.init();
-            },
+    edx.student.account.AccountModel = Backbone.Model.extend({
+        // These should be the same length limits enforced by the server
+        EMAIL_MIN_LENGTH: 3,
+        EMAIL_MAX_LENGTH: 254,
+        PASSWORD_MIN_LENGTH: 2,
+        PASSWORD_MAX_LENGTH: 75,
 
-            eventHandlers: {
-                init: function() {
-                    _fn.eventHandlers.submit();
-                },
+        // This is the same regex used to validate email addresses in Django 1.4
+        EMAIL_REGEX: new RegExp(
+            "(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*" +
+            '|^"([\\001-\\010\\013\\014\\016-\\037!#-\\[\\]-\\177]|\\\\[\\001-\\011\\013\\014\\016-\\177])*"' +
+            ')@((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\\.)+[A-Z]{2,6}\\.?$)' +
+            '|\\[(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}\\]$',
+            'i'
+        ),
 
-                submit: function() {
-                    $('#email-change-form').submit( _fn.form.submit );
-                }
-            },
+        defaults: {
+            email: '',
+            password: ''
+        },
 
-            ajax: {
-                init: function() {
-                    var csrftoken = _fn.cookie.get( 'csrftoken' );
+        urlRoot: 'email',
 
-                    $.ajaxSetup({
-                        beforeSend: function(xhr, settings) {
-                            if ( settings.type === 'PUT' ) {
-                                xhr.setRequestHeader( 'X-CSRFToken', csrftoken );
-                            }
-                        }
-                    });
-                },
+        sync: function(method, model) {
+            var headers = {
+                'X-CSRFToken': $.cookie('csrftoken')
+            };
 
-                put: function( url, data ) {
-                    $.ajax({
-                        url: url,
-                        type: 'PUT',
-                        data: data
-                    });
-                }
-            },
+            $.ajax({
+                url: model.urlRoot,
+                type: 'POST',
+                data: model.attributes,
+                headers: headers
+            })
+            .done(function() {
+                model.trigger('sync');
+            })
+            .fail(function() {
+                var error = gettext("The data could not be saved.");
+                model.trigger('error', error);
+            });
+        },
 
-            cookie: {
-                get: function( name ) {
-                    return $.cookie(name);
-                }
-            },
+        validate: function(attrs) {
+            var errors = {};
 
-            form: {
-                isValid: true,
+            if (attrs.email.length < this.EMAIL_MIN_LENGTH ||
+                attrs.email.length > this.EMAIL_MAX_LENGTH ||
+                !this.EMAIL_REGEX.test(attrs.email)
+            ) { errors.email = gettext("Please enter a valid email address"); }
 
-                submit: function( event ) {
-                    var $email = $('#new-email'),
-                        $password = $('#password'),
-                        data = {
-                            new_email: $email.val(),
-                            password: $password.val()
-                        };
-
-                    event.preventDefault();
-
-                    _fn.form.validate( $('#email-change-form') );
-
-                    if ( _fn.form.isValid ) {
-                        _fn.ajax.put( 'email_change_request', data );
-                    }
-                },
-
-                validate: function( $form ) {
-                    _fn.form.isValid = true;
-                    $form.find('input').each( _fn.valid.input );
-                }
-            },
-
-            regex: {
-                email: function() {
-                    // taken from http://parsleyjs.org/
-                    return /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
-                }
-            },
-
-            valid: {
-                email: function( str ) {
-                    var valid = false,
-                        len = str ? str.length : 0,
-                        regex = _fn.regex.email();
-
-                    if ( 0 < len && len < 254 ) {
-                        valid = regex.test( str );
-                    }
-
-                    return valid;
-                },
-
-                input: function() {
-                    var $el = $(this),
-                        validation = $el.data('validate'),
-                        value = $el.val(),
-                        valid = true;
-
-
-                    if ( validation && validation.length > 0 ) {
-                        $el.removeClass('error')
-                            .css('border-color', '#c8c8c8'); // temp. for development
-
-                        // Required field
-                        if ( validation.indexOf('required') > -1 ) {
-                            valid = _fn.valid.required( value );
-                        }
-
-                        // Email address
-                        if ( valid && validation.indexOf('email') > -1 ) {
-                            valid = _fn.valid.email( value );
-                        }
-
-                        if ( !valid ) {
-                            $el.addClass('error')
-                                .css('border-color', '#f00'); // temp. for development
-                            _fn.form.isValid = false;
-                        }
-                    }
-                },
-
-                required: function( str ) {
-                    return ( str && str.length > 0 ) ? true : false;
-                }
+            if (attrs.password.length < this.PASSWORD_MIN_LENGTH || attrs.password.length > this.PASSWORD_MAX_LENGTH) {
+                errors.password = gettext("Please enter a valid password");
             }
-        };
 
-        return {
-            init: _fn.init
-        };
-    })();
+            if (!$.isEmptyObject(errors)) {
+                return errors;
+            }
+        }
+    });
 
-    edx.student.account.init();
+    edx.student.account.AccountView = Backbone.View.extend({
 
-})(jQuery);
+        events: {
+            'submit': 'submit',
+            'change': 'change'
+        },
+
+        initialize: function() {
+            _.bindAll(this, 'render', 'submit', 'change', 'clearStatus', 'invalid', 'error', 'sync');
+            this.model = new edx.student.account.AccountModel();
+            this.model.on('invalid', this.invalid);
+            this.model.on('error', this.error);
+            this.model.on('sync', this.sync);
+        },
+
+        render: function() {
+            this.$el.html(_.template($('#account-tpl').html(), {}));
+            this.$email = $('#new-email', this.$el);
+            this.$password = $('#password', this.$el);
+            this.$emailStatus = $('#new-email-status', this.$el);
+            this.$passwordStatus = $('#password-status', this.$el);
+            this.$requestStatus = $('#request-email-status', this.$el);
+            return this;
+        },
+
+        submit: function(event) {
+            event.preventDefault();
+            this.clearStatus();
+            this.model.save();
+        },
+
+        change: function() {
+            this.model.set({
+                email: this.$email.val(),
+                password: this.$password.val()
+            });
+        },
+
+        invalid: function(model) {
+            var errors = model.validationError;
+
+            if (errors.hasOwnProperty('email')) {
+                this.$emailStatus
+                    .addClass('validation-error')
+                    .text(errors.email);
+            }
+
+            if (errors.hasOwnProperty('password')) {
+                this.$passwordStatus
+                    .addClass('validation-error')
+                    .text(errors.password);
+            }
+        },
+
+        error: function(error) {
+            this.$requestStatus
+                .addClass('error')
+                .text(error);
+        },
+
+        sync: function() {
+            this.$requestStatus
+                .addClass('success')
+                .text(gettext("Please check your email to confirm the change"));
+        },
+
+        clearStatus: function() {
+            this.$emailStatus
+                .removeClass('validation-error')
+                .text("");
+
+            this.$passwordStatus
+                .removeClass('validation-error')
+                .text("");
+
+            this.$requestStatus
+                .removeClass('error')
+                .text("");
+        },
+    });
+
+    return new edx.student.account.AccountView({
+        el: $('#account-container')
+    }).render();
+
+})(jQuery, _, Backbone, gettext);
