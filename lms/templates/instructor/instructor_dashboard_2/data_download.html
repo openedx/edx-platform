@@ -6,16 +6,12 @@
   <h2>${_("Data Download")}</h2>
   <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
 
-  <p>${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}</p>
-
-  <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
-
   % if not disable_buttons:
     <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
     <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
   %endif
   <div class="data-display-table" id="data-student-profiles-table"></div>
-  
+
 
   <br>
   <p>${_("Click to display the grading configuration for the course. The grading configuration is the breakdown of graded subsections of the course (such as exams and problem sets), and can be changed on the 'Grading' page (under 'Settings') in Studio.")}</p>
@@ -40,12 +36,16 @@
 
     <p>${_("The report is generated in the background, meaning it is OK to navigate away from this page while your report is generating.")}</p>
 
+    <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
+  %endif
+
+    <p>${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}</p>
+
+    <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
+
     <div class="request-response msg msg-confirm copy" id="grade-request-response"></div>
     <div class="request-response-error msg msg-warning copy" id="grade-request-response-error"></div>
     <br>
-
-    <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
-  %endif
 
     <p><b>${_("Reports Available for Download")}</b></p>
     <p>
