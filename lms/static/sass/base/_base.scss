@@ -295,6 +295,11 @@ mark {
   @extend %ui-disabled;
 }
 
+// UI - is hidden
+.is-hidden {
+  display: none;
+}
+
 // UI - semantically hide text
 .sr {
   @extend %text-sr;

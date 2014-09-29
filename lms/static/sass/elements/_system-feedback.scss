@@ -11,10 +11,6 @@
   background: $notify-banner-bg-1;
   padding: $baseline ($baseline*1.5);
 
-  &.is-hidden {
-    display: none;
-  }
-
   // basic object
   .msg {
     @include clearfix();
