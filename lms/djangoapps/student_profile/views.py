@@ -1,14 +1,13 @@
 """ Views for a student's profile information. """
 
-from django.conf import settings
 from django.http import (
     QueryDict, HttpResponse,
     HttpResponseBadRequest, HttpResponseServerError
 )
+from django.conf import settings
+from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-
 from edxmako.shortcuts import render_to_response
 from user_api.api import profile as profile_api
 from lang_pref import LANGUAGE_KEY, api as language_api
@@ -16,34 +15,47 @@ from third_party_auth import pipeline
 
 
 @login_required
-@require_http_methods(['GET'])
 def index(request):
-    """Render the profile info page.
+    """View or modify the student's profile.
+
+    GET: Retrieve the user's profile information.
+    PUT: Update the user's profile information.  Currently the only accept param is "fullName".
 
     Args:
         request (HttpRequest)
 
     Returns:
-        HttpResponse: 200 if successful
+        HttpResponse: 200 if successful on GET
+        HttpResponse: 204 if successful on PUT
         HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 400 if the updated information is invalid
         HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 500 if an unexpected error occurs.
 
-    Example:
+    """
+    if request.method == "GET":
+        return _get_profile(request)
+    elif request.method == "PUT":
+        return _update_profile(request)
+    else:
+        return HttpResponse(status=405)
 
-        GET /profile
+
+def _get_profile(request):
+    """Retrieve the user's profile information, including an HTML form
+    that students can use to update the information.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse
 
     """
     user = request.user
 
-    released_languages = language_api.released_languages()
-
-    preferred_language_code = profile_api.preference_info(user.username).get(LANGUAGE_KEY)
-    preferred_language = language_api.preferred_language(preferred_language_code)
-
     context = {
-        'disable_courseware_js': True,
-        'released_languages': released_languages,
-        'preferred_language': preferred_language,
+        'disable_courseware_js': True
     }
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
@@ -52,34 +64,24 @@ def index(request):
     return render_to_response('student_profile/index.html', context)
 
 
-@login_required
-@require_http_methods(['PUT'])
 @ensure_csrf_cookie
-def name_change_handler(request):
-    """Change the user's name.
+def _update_profile(request):
+    """Update a user's profile information.
 
     Args:
         request (HttpRequest)
 
     Returns:
-        HttpResponse: 204 if successful
-        HttpResponse: 302 if not logged in (redirect to login page)
-        HttpResponse: 400 if the provided name is invalid
-        HttpResponse: 405 if using an unsupported HTTP method
-        HttpResponse: 500 if an unexpected error occurs.
-
-    Example:
-
-        PUT /profile/name_change
+        HttpResponse
 
     """
     put = QueryDict(request.body)
 
     username = request.user.username
-    new_name = put.get('new_name')
+    new_name = put.get('fullName')
 
     if new_name is None:
-        return HttpResponseBadRequest("Missing param 'new_name'")
+        return HttpResponseBadRequest("Missing param 'fullName'")
 
     try:
         profile_api.update_profile(username, full_name=new_name)

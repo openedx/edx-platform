@@ -1,97 +1,119 @@
 var edx = edx || {};
 
-(function($) {
+(function($, _, Backbone, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
+    edx.student.profile = {};
 
-    edx.student.profile = (function() {
+    edx.student.profile.ProfileModel = Backbone.Model.extend({
+        defaults: {
+            fullName: ''
+        },
 
-        var _fn = {
-            init: function() {
-                _fn.ajax.init();
-                _fn.eventHandlers.init();
-            },
+        urlRoot: '/',
 
-            eventHandlers: {
-                init: function() {
-                    _fn.eventHandlers.submit();
-                    _fn.eventHandlers.click();
-                },
+        sync: function(method, model) {
+            var headers = {
+                'X-CSRFToken': $.cookie('csrftoken')
+            };
 
-                submit: function() {
-                    $('#name-change-form').on( 'submit', _fn.update.name );
-                },
+            $.ajax({
+                url: model.urlRoot,
+                type: 'PUT',
+                data: model.attributes,
+                headers: headers
+            })
+            .done(function() {
+                model.trigger('sync');
+            })
+            .fail(function() {
+                var error = gettext("The data could not be saved.");
+                model.trigger('error', error);
+            });
+        },
 
-                click: function() {
-                    $('#language-change-form .submit-button').on( 'click', _fn.update.language );
-                }
-            },
+        validate: function(attrs) {
+            var errors = {};
+            if (attrs.fullName.length < 1) {
+                errors.fullName = gettext("Full name cannot be blank");
+            }
 
-            update: {
-                name: function( event ) {
-                    _fn.form.submit( event, '#new-name', 'new_name', 'name_change' );
-                },
+            if (!$.isEmptyObject(errors)) {
+                return errors;
+            }
+        }
+    });
 
-                language: function( event ) {
-                    /** 
-                     * The onSuccess argument here means: take `window.location.reload`
-                     * and return a function that will use `window.location` as the 
-                     * `this` reference inside `reload()`.
-                     */
-                    _fn.form.submit( event, '#new-language', 'new_language', 'language_change', window.location.reload.bind(window.location) );
-                }
-            },
+    edx.student.profile.ProfileView = Backbone.View.extend({
 
-            form: {
-                submit: function( event, idSelector, key, url, onSuccess ) {
-                    var $selection = $(idSelector),
-                        data = {};
+        events: {
+            'submit': 'submit',
+            'change': 'change'
+        },
 
-                    data[key] = $selection.val();
+        initialize: function() {
+            _.bindAll(this, 'render', 'change', 'submit', 'invalid', 'error', 'sync', 'clearStatus');
+            this.model = new edx.student.profile.ProfileModel();
+            this.model.on('invalid', this.invalid);
+            this.model.on('error', this.error);
+            this.model.on('sync', this.sync);
+        },
 
-                    event.preventDefault();
-                    _fn.ajax.put( url, data, onSuccess );
-                }
-            },
+        render: function() {
+            this.$el.html(_.template($("#profile-tpl").html(), {}));
+            this.$nameStatus = $("#profile-name-status", this.$el);
+            this.$nameField = $("#profile-name", this.$el);
+            this.$submitStatus = $("#submit-status", this.$el);
+            return this;
+        },
 
-            ajax: {
-                init: function() {
-                    var csrftoken = _fn.cookie.get( 'csrftoken' );
+        change: function() {
+            this.model.set({
+                fullName: this.$nameField.val()
+            });
+        },
 
-                    $.ajaxSetup({
-                        beforeSend: function( xhr, settings ) {
-                            if ( settings.type === 'PUT' ) {
-                                xhr.setRequestHeader( 'X-CSRFToken', csrftoken );
-                            }
-                        }
-                    });
-                },
+        submit: function(event) {
+            event.preventDefault();
+            this.clearStatus();
+            this.model.save();
+        },
 
-                put: function( url, data, onSuccess ) {
-                    $.ajax({
-                        url: url,
-                        type: 'PUT',
-                        data: data,
-                        success: onSuccess ? onSuccess : ''
-                    });
-                }
-            },
+        invalid: function(model) {
+            var errors = model.validationError;
+            if (errors.hasOwnProperty('fullName')) {
+                this.$nameStatus
+                    .addClass('validation-error')
+                    .text(errors.fullName);
+            }
+        },
 
-            cookie: {
-                get: function( name ) {
-                    return $.cookie(name);
-                }
-            },
+        error: function(error) {
+            this.$submitStatus
+                .addClass('error')
+                .text(error);
+        },
 
-        };
+        sync: function() {
+            this.$submitStatus
+                .addClass('success')
+                .text(gettext('Saved'));
+        },
 
-        return {
-            init: _fn.init
-        };
+        clearStatus: function() {
+            this.$nameStatus
+                .removeClass('validation-error')
+                .text('');
 
-    })();
+            this.$submitStatus
+                .removeClass('error')
+                .text('');
+        }
+    });
 
-    edx.student.profile.init();
+    return new edx.student.profile.ProfileView({
+        el: $("#profile-container")
+    }).render();
 
-})(jQuery);
+})(jQuery, _, Backbone, gettext);

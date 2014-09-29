@@ -46,6 +46,8 @@ lib_paths:
     - xmodule_js/src/capa/
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
+    - xmodule_js/common_static/js/vendor/underscore-min.js
+    - xmodule_js/common_static/js/vendor/backbone-min.js
 
 # Paths to source JavaScript files
 src_paths:
