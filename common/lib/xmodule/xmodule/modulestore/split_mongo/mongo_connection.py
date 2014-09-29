@@ -159,13 +159,17 @@ class MongoConnection(object):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
-        case_regex = ur"(?i)^{}$" if ignore_case else ur"{}"
-        return self.course_index.find_one(
-            {
-                key_attr: re.compile(case_regex.format(getattr(key, key_attr)))
+        if ignore_case:
+            query = {
+                key_attr: re.compile(u'^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
                 for key_attr in ('org', 'course', 'run')
             }
-        )
+        else:
+            query = {
+                key_attr: getattr(key, key_attr)
+                for key_attr in ('org', 'course', 'run')
+            }
+        return self.course_index.find_one(query)
 
     def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
