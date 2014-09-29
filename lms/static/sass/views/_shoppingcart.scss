@@ -706,17 +706,28 @@
   }
   .billing-data{
     display: table;
-    padding: 0px 20px;
+    width: 100%;
     h3{
       padding: 12px 0px;
-      color: $dark-gray2;
+      color: $dark-gray1;
+      font-size: 17px;
+      margin-bottom: 5px;
     }
     .row{
       display: table-row;
-      .data-group{
-      width: 262px;
+    }
+    .col-half{
+      width: 45%;
       float: left;
-      margin-right: 30px;
+      background: $light-gray1;
+      padding: 20px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      min-height: 240px;
+      &:nth-child(even){
+        margin-left: 30px;
+      }
+      .data-group{
       margin-bottom: 15px;
         label{
         display: block;
@@ -727,15 +738,6 @@
         color: $dark-gray2;
       }
       input{width: 100%;margin-bottom: 5px;}
-      select{
-        width: 100%;
-        background: white;
-        border-radius: 3px;
-        appearance:none;
-        background: url('../images/drop-arrow.png') no-repeat 238px 14px;
-        -moz-appearance:none; /* Firefox */
-        -webkit-appearance:none; /* Safari and Chrome */
-      }
       &:nth-child(4n){
         margin-right: 0px;
       }

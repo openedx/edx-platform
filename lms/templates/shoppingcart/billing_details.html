@@ -10,50 +10,34 @@
   % if shoppingcart_items:
   <section class="confirm-enrollment shopping-cart">
   <h3>${_('You can proceed to payment at any point in time. Any additional space you provide will be included in your receipt.')}</h3>
-  <div class="billing-data">
-   <div class="row">
-      <div class="data-group"><label for="id_company_name">${_('Purchasing organization')}</label><input type="text" placeholder="${_('Organization Name')}" id="id_company_name" name="company_name"></div>
-      <div class="data-group"><label for="id_customer_reference_number">${_('Purchase order number')}</label><input type="text" id="id_customer_reference_number" name="customer_reference_number"></div>
-      <div class="data-group"><label for="id_company_contact_name">${_('Organization contact name')}</label><input type="text" placeholder="${_('Name')}" id="id_company_contact_name" name="company_contact_name"></div>
-      <div class="data-group"><label for="id_company_contact_email">${_('Organization contact email')}</label><input type="email" placeholder="${_('email@example.com;')}" id="id_company_contact_email" name="company_contact_email"><span id="company_contact_email_error" class="error-text"></span></div>
-   </div>
-   <div class="row">
-      <div class="data-group"><label for="id_company_address_line_1">${_('Address1')}</label><input type="text" id="id_company_address_line_1" name="company_address_line_1"></div>
-      <div class="data-group"><label for="id_company_city">${_('City')}</label><input type="text" id="id_company_city" name="company_city"></div>
-      <div class="data-group"><label for="id_company_state">${_('State/Province')}</label><input type="text" id="id_company_state" name="company_state"></div>
-      <div class="data-group"><label for="id_company_zip">${_('Zip/Postal Code')}</label><input type="text" id="id_company_zip" name="company_zip"></div>
-   </div>
-    <div class="row">
-      <div class="data-group"><label for="id_company_address_line_2">${_('Address2')}</label><input type="text" id="id_company_address_line_2" name="company_address_line_2"></div>
-      <div class="data-group"><label>${_('Country')}</label>
-        <select name="company_country">
-          <img style="width: 100%; height: 100%;" src="../../static/images/drop-arrow.png"
-                alt="" />
-          <option selected value="">${_('Not Specified')}</option>
-          <option value="${_('US')}">${_('United States')}</option>
-        </select>
+    <div class="billing-data">
+      <div class="col-half">
+        <h3>${_('Purchasing Organizational Details')}</h3>
+        <div class="data-group"><label for="id_company_name">${_('Purchasing organization')}</label><input type="text" id="id_company_name" name="company_name"></div>
+      <div class="data-group"><label for="id_customer_reference_number">${_('Purchase order number (if any)')}</label><input type="text" id="id_customer_reference_number" maxlength="63" name="customer_reference_number"></div>
       </div>
-    </div>
-  </div>
-    <hr>
-   <div class="billing-data">
-     <h3>${_('Additional receipt recipient in addition to organization contact listed above')}</h3>
-     <div class="row">
-       <div class="data-group">
-       <input type="text" placeholder="${_('Name')}" name="recipient_name">
+      <div class="col-half">
+        <h3>${_('Organization Contact')}</h3>
+         <div class="data-group"><label for="id_company_contact_name">${_('Name')}</label><input type="text"id="id_company_contact_name" name="company_contact_name"></div>
+      <div class="data-group"><label for="id_company_contact_email">${_('Email Address')}</label><input type="email" placeholder="${_('email@example.com')}" id="id_company_contact_email" name="company_contact_email"><span id="company_contact_email_error" class="error-text"></span></div>
+      </div>
+      <div class="col-half">
+        <h3>${_('Additional Receipt Recipient')}</h3>
+        <div class="data-group">
+          <label for="id_recipient_name">${_('Name')}</label>
+       <input type="text" id="id_recipient_name" name="recipient_name">
        </div>
        <div class="data-group">
-       <input type="email" placeholder="${_('Email')}" name="recipient_email">
+         <label for="id_recipient_email">${_('Email Address')}</label>
+       <input type="email" id="id_recipient_email" placeholder="${_('email@example.com')}" name="recipient_email">
          <span id="recipient_email_error" class="error-text"></span>
        </div>
-     </div>
-   </div>
-
+      </div>
+    </div>
     <div class="discount">
-
-          <div class="code-text">
-              <span class="pull-right">${_('Total')}: <b>$${"{0:0.2f}".format(amount)} USD</b></span>
-          </div>
+      <div class="code-text">
+          <span class="pull-right">${_('Total')}: <b>$${"{0:0.2f}".format(amount)} USD</b></span>
+      </div>
       </div>
       <div class="col-two">
 
@@ -113,12 +97,6 @@
                "company_contact_email" : company_contact_email,
                "recipient_name" : $('input[name="recipient_name"]').val(),
                "recipient_email" : recipient_email,
-               "company_address_line_1" : $('input[name="company_address_line_1"]').val(),
-               "company_address_line_2" : $('input[name="company_address_line_2"]').val(),
-               "company_city" : $('input[name="company_city"]').val(),
-               "company_state" : $('input[name="company_state"]').val(),
-               "company_zip" : $('input[name="company_zip"]').val(),
-               "company_country" : $('select[name="company_country"]').val(),
                "customer_reference_number" : $('input[name="customer_reference_number"]').val()
                };
       $.post(post_url, data)
