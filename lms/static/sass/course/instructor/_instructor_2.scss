@@ -211,11 +211,6 @@ section.instructor-dashboard-content-2 {
     display: block;
     border-radius: 1px;
     padding: ($baseline*0.75) $baseline;
-
-    // CASE: is hidden
-    &.is-hidden {
-      display: none;
-    }
   }
 
   .message-title {
