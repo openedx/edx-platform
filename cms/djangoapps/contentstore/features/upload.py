@@ -185,7 +185,13 @@ def open_course_with_locked(step, lock_state):
 
 @step(u'Then the asset is (viewable|protected)$')
 def view_asset(_step, status):
-    url = django_url('/c4x/MITx/999/asset/asset.html')
+    asset_loc = world.scenario_dict['COURSE'].id.make_asset_key(asset_type='asset', path='asset.html')
+    svr_loc = django_url()
+    asset_url = unicode(asset_loc)
+    divider = '/'
+    if asset_url[0] == '/':
+        divider = ''
+    url = '{}{}{}'.format(svr_loc, divider, asset_url)
     if status == 'viewable':
         expected_text = 'test file'
     else:
