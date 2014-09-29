@@ -205,6 +205,16 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         data = json.loads(resp.content)
         self.assertEqual(data['total_cost'], item.unit_cost * 1)
 
+    def test_purchase_type_personal_case_when_remove_item(self):
+        qty = 5
+        item = self.add_course_to_user_cart(self.course_key)
+        item2 = self.add_course_to_user_cart(self.testing_course.id)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': qty, 'purchase_type': 'business'})
+        self.assertEqual(resp.status_code, 200)
+        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+                                {'id': item.id})
+        self.assertEqual(resp.status_code, 200)
+
     def test_billing_details_btn_in_cart_when_purchase_type_is_business(self):
         qty = 5
         item = self.add_course_to_user_cart(self.course_key)
@@ -774,7 +784,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args
+        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['order_items'])
