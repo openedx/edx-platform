@@ -20,6 +20,7 @@ from html_to_text import html_to_text
 from mail_utils import wrap_message
 
 from xmodule_django.models import CourseKeyField
+from util.keyword_substitution import substitute_keywords_with_data
 
 log = logging.getLogger(__name__)
 
@@ -185,21 +186,21 @@ class CourseEmailTemplate(models.Model):
         using the provided template.  The template is a format string,
         which is rendered using format() with the provided `context` dict.
 
-        This doesn't insert user's text into template, until such time we can
-        support proper error handling due to errors in the message body
-        (e.g. due to the use of curly braces).
-
-        Instead, for now, we insert the message body *after* the substitutions
-        have been performed, so that anything in the message body that might
-        interfere will be innocently returned as-is.
+        Any keywords encoded in the form %%KEYWORD%% found in the message
+        body are subtituted with user data before the body is inserted into
+        the template.
 
         Output is returned as a unicode string.  It is not encoded as utf-8.
         Such encoding is left to the email code, which will use the value
         of settings.DEFAULT_CHARSET to encode the message.
         """
-        # If we wanted to support substitution, we'd call:
-        # format_string = format_string.replace(COURSE_EMAIL_MESSAGE_BODY_TAG, message_body)
+
+        # Substitute all %%-encoded keywords in the message body
+        if 'user_id' in context and 'course_id' in context:
+            message_body = substitute_keywords_with_data(message_body, context['user_id'], context['course_id'])
+
         result = format_string.format(**context)
+
         # Note that the body tag in the template will now have been
         # "formatted", so we need to do the same to the tag being
         # searched for.

@@ -13,6 +13,7 @@ PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTas
 create_task_list_table = -> window.InstructorDashboard.util.create_task_list_table.apply this, arguments
 create_email_content_table = -> window.InstructorDashboard.util.create_email_content_table.apply this, arguments
 create_email_message_views = -> window.InstructorDashboard.util.create_email_message_views.apply this, arguments
+KeywordValidator = -> window.InstructorDashboard.util.KeywordValidator
 
 class SendEmail
   constructor: (@$container) ->
@@ -42,6 +43,14 @@ class SendEmail
         alert gettext("Your message cannot be blank.")
 
       else
+        # Validation for keyword substitution
+        validation = KeywordValidator().validate_string @$emailEditor.save()['data']
+        if not validation.is_valid
+          message = gettext("There are invalid keywords in your email. Please check the following keywords and try again:")
+          message += "\n" + validation.invalid_keywords.join('\n')
+          alert message
+          return
+
         success_message = gettext("Your email was successfully queued for sending.")
         send_to = @$send_to.val().toLowerCase()
         if send_to == "myself"
