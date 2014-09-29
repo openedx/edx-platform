@@ -262,7 +262,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         course_id = module_attr('course_id')
         if course_id is not None and hasattr(self.runtime, 'modulestore'):
             course = self.runtime.modulestore.get_course(course_id)
-            if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.licenseable:
+            if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.licenseable:
                 if not(self.license):
                     self.license = course.license
                     self.license_version = course.license_version
@@ -333,14 +333,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     self.download_video = True
 
         # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
-        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and not(self.license):
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and not(self.license):
             course = modulestore().get_course(course_id)
 
             self.license = course.license
             self.license_version = course.license_version
-        else:
-            self.license = None
-            self.license_version = None
 
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,
@@ -396,9 +393,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
-        if not settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
-            editable_fields.pop('license')
-            editable_fields.pop('license_version')
+        if not(hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False)):
+            editable_fields.pop('license', None)
+            editable_fields.pop('license_version', None)
 
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
         languages.sort(key=lambda l: l['label'])
@@ -464,7 +461,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'download_video': json.dumps(self.download_video),
         }
 
-        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
             attrs['license'] = self.license
             attrs['license_version'] = self.license_version
 
@@ -544,7 +541,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'video_url': video_url,
         }
 
-        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
             metadata['license'] = metadata_fields['license']
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
@@ -596,7 +593,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'to': 'end_time'
         }
 
-        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
             license = xml.get('license')
             if license is not None:
                 field_data['license_version'] = parse_license(license).version

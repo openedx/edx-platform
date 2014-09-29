@@ -1,6 +1,6 @@
-define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads",
+define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
     "js/views/uploads", "js/utils/change_on_enter", "js/views/license-selector", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
+    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter, LicenseSelector) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails

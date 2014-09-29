@@ -17,6 +17,7 @@ import json
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
 from django.utils.timezone import UTC
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -576,7 +577,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         super(CourseDescriptor, self).__init__(*args, **kwargs)
         _ = self.runtime.service(self, "i18n").ugettext
 
-        if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and self.licenseable:
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and self.licenseable:
             if self.license and not(self.license_version):
                 self.license_version = parse_license(self.license).version
 
@@ -702,7 +703,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
 
-        if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False):
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False):
             license = xml_object.find("license")
             if license is not None:
                 definition["license_version"] = None
