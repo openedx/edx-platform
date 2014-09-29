@@ -1,7 +1,8 @@
+"""
+Serializer for user API
+"""
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-
-from xmodule.modulestore.search import path_to_location
 
 from courseware.courses import course_image_url
 from student.models import CourseEnrollment, User
@@ -59,22 +60,28 @@ class CourseField(serializers.RelatedField):
 
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    """
+    Serializes CourseEnrollment models
+    """
     course = CourseField()
 
-    class Meta:
+    class Meta:  # pylint: disable=C0111
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course')
         lookup_field = 'username'
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Serializes User models
+    """
     name = serializers.Field(source='profile.name')
     course_enrollments = serializers.HyperlinkedIdentityField(
         view_name='courseenrollment-detail',
         lookup_field='username'
     )
 
-    class Meta:
+    class Meta:  # pylint: disable=C0111
         model = User
         fields = ('id', 'username', 'email', 'name', 'course_enrollments')
         lookup_field = 'username'

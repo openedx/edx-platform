@@ -8,19 +8,16 @@ general XBlock representation in this rather specialized formatting.
 """
 from functools import partial
 
-from django.core.cache import cache
 from django.http import Http404, HttpResponse
 
 from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.exceptions import PermissionDenied
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
 from courseware.access import has_access
-from student.models import CourseEnrollment, User
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 
@@ -38,8 +35,8 @@ class VideoSummaryList(generics.ListAPIView):
 
         video_outline = list(
             BlockOutline(
-                course_id, 
-                course, 
+                course_id,
+                course,
                 {"video": partial(video_summary, course)},
                 request,
             )
