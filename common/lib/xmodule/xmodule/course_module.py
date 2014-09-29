@@ -246,7 +246,7 @@ class CourseFields(object):
     )
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
-        help=_("Enter pairs of dates between which students cannot post to discussion forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to include the \"T\" between the date and time)."),
+        help=_("Enter pairs of dates between which students cannot post to discussion forums. Each pair should be formatted as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (be sure to include the \"T\" between the date and time). An entry defining more than one blackout period might look like this: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", \"2014-10-08\"]]"),
         scope=Scope.settings
     )
     discussion_topics = Dict(
