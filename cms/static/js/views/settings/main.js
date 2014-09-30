@@ -1,6 +1,6 @@
-define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads",
+define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
     "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, tzAbbr, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
+    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -12,7 +12,7 @@ var DetailsView = ValidatingView.extend({
         "change textarea" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
-        'mouseover #timezone' : "updateTime",
+        'mouseover .timezone' : "updateTime",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus",
@@ -34,8 +34,6 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('img.course-image').load(function() {
             $(this).show();
         });
-
-        this.$el.find('#timezone').html("(" + tzAbbr() + ")");
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
@@ -81,11 +79,15 @@ var DetailsView = ValidatingView.extend({
     },
 
     updateTime : function(e) {
-        var now = new Date();
-        var hours = now.getHours();
-        var minutes = now.getMinutes();
-        $(e.currentTarget).attr('title', (hours % 12 === 0 ? 12 : hours % 12) + ":" + (minutes < 10 ? "0" : "")  +
-                now.getMinutes() + (hours < 12 ? "am" : "pm") + " (current local time)");
+        var now = new Date(),
+            hours = now.getUTCHours(),
+            minutes = now.getUTCMinutes(),
+            currentTimeText = gettext('%(hours)s:%(minutes)s (current UTC time)');
+
+        $(e.currentTarget).attr('title', interpolate(currentTimeText, {
+            'hours': hours,
+            'minutes': minutes
+        }, true));
     },
 
     setupDatePicker: function (fieldName) {
@@ -95,13 +97,8 @@ var DetailsView = ValidatingView.extend({
         var timefield = $(div).find("input:.time");
         var cachethis = this;
         var setfield = function () {
-            var date = datefield.datepicker('getDate');
-            if (date) {
-                var time = timefield.timepicker("getSecondsFromMidnight");
-                if (!time) {
-                    time = 0;
-                }
-                var newVal = new Date(date.getTime() + time * 1000);
+            var newVal = DateUtils.getDate(datefield, timefield);
+            if (newVal) {
                 if (!cacheModel.has(fieldName) || cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
                     cachethis.clearValidationErrors();
                     cachethis.setAndValidate(fieldName, newVal);
@@ -126,13 +123,14 @@ var DetailsView = ValidatingView.extend({
         timefield.on('changeTime', setfield);
         timefield.on('input', setfield);
 
-        datefield.datepicker('setDate', this.model.get(fieldName));
+        date = this.model.get(fieldName)
         // timepicker doesn't let us set null, so check that we have a time
-        if (this.model.has(fieldName)) {
-            timefield.timepicker('setTime', this.model.get(fieldName));
-        } // but reset the field either way
+        if (date) {
+            DateUtils.setDate(datefield, timefield, date);
+        } // but reset fields either way
         else {
             timefield.val('');
+            datefield.val('');
         }
     },
 
