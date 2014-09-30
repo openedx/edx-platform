@@ -4,7 +4,6 @@
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, get_codemirror_value
-from opaque_keys.edx.locations import CourseLocator
 from nose.tools import assert_in  # pylint: disable=E0611
 
 
