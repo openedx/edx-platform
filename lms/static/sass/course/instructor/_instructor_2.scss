@@ -517,7 +517,7 @@ section.instructor-dashboard-content-2 {
         input[type="button"].add {
           @include idashbutton($blue);
           position: absolute;
-          right: $baseline;
+          #{$right}: $baseline;
         }
       }
 
