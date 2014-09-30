@@ -100,6 +100,11 @@
   padding: 10px 20px;
   width: 100%;
   color: #333;
+
+  ol, ul { // Fix up the RTL-only _reset.scss, but only in specific places
+    #{$padding-left}: 40px;
+    #{$padding-right}: 0;
+  }
 }
 
 @-webkit-keyframes fadeIn {

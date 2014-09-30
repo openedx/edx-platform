@@ -532,6 +532,13 @@ body.discussion {
       border-radius: 3px 3px 0 0;
       padding: $baseline;
       background-color: $white;
+
+      .response-body {
+        ol, ul { // Fix up the RTL-only _reset.scss, but only in specific places
+          #{$padding-left}: 40px;
+          #{$padding-right}: 0;
+        }
+      }
     }
     .posted-by {
       font-weight: 700;
