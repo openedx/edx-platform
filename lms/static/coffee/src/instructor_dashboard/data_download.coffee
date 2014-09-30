@@ -26,9 +26,9 @@ class DataDownload
     # response areas
     @$download                        = @$section.find '.data-download-container'
     @$download_display_text           = @$download.find '.data-display-text'
-    @$download_display_table          = @$download.find '.data-display-table'
     @$download_request_response_error = @$download.find '.request-response-error'
     @$reports                        = @$section.find '.reports-download-container'
+    @$download_display_table          = @$reports.find '.data-display-table'
     @$reports_request_response       = @$reports.find '.request-response'
     @$reports_request_response_error = @$reports.find '.request-response-error'
 
