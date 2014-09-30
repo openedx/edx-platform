@@ -335,9 +335,9 @@ class TestMixedModuleStore(CourseComparisonTest):
     #   problem: find draft item, find all items pertinent to inheritance computation
     #   non-existent problem: find draft, find published
     # split:
-    #   problem: active_versions, structure, then active_versions again?
+    #   problem: active_versions, structure
     #   non-existent problem: ditto
-    @ddt.data(('draft', [2, 2], 0), ('split', [3, 3], 0))
+    @ddt.data(('draft', [2, 2], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_get_item(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -831,8 +831,8 @@ class TestMixedModuleStore(CourseComparisonTest):
             xml_store.create_course("org", "course", "run", self.user_id)
 
     # draft is 2: find out which ms owns course, get item
-    # split: find out which ms owns course, active_versions, structure, definition (definition s/b unnecessary unless lazy is false)
-    @ddt.data(('draft', 2, 0), ('split', 4, 0))
+    # split: active_versions, structure, definition (to load course wiki string)
+    @ddt.data(('draft', 2, 0), ('split', 3, 0))
     @ddt.unpack
     def test_get_course(self, default_ms, max_find, max_send):
         """
