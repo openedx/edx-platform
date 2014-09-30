@@ -383,11 +383,12 @@ def extend_content(content):
     return merge_dict(content, content_info)
 
 
-def add_courseware_context(content_list, course, user):
+def add_courseware_context(content_list, course, user, id_map=None):
     """
     Decorates `content_list` with courseware metadata.
     """
-    id_map = get_discussion_id_map(course, user)
+    if id_map is None:
+        id_map = get_discussion_id_map(course, user)
 
     for content in content_list:
         commentable_id = content['commentable_id']

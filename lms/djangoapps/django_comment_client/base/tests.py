@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from lms.lib.comment_client import Thread
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from django_comment_client.base import views
@@ -17,7 +18,7 @@ from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -852,7 +853,10 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request')
-    def _test_unicode_data(self, text, mock_request):
+    def _test_unicode_data(self, text, mock_request,):
+        """
+        Test to make sure unicode data in a thread doesn't break it.
+        """
         self._set_mock_request_data(mock_request, {})
         request = RequestFactory().post("dummy_url", {"thread_type": "discussion", "body": text, "title": text})
         request.user = self.student
@@ -908,14 +912,22 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         self._set_mock_request_data(mock_request, {
             "closed": False,
         })
-        request = RequestFactory().post("dummy_url", {"body": text})
-        request.user = self.student
-        request.view_name = "create_comment"
-        response = views.create_comment(request, course_id=self.course.id.to_deprecated_string(), thread_id="dummy_thread_id")
+        # We have to get clever here due to Thread's setters and getters.
+        # Patch won't work with it.
+        try:
+            Thread.commentable_id = Mock()
+            request = RequestFactory().post("dummy_url", {"body": text})
+            request.user = self.student
+            request.view_name = "create_comment"
+            response = views.create_comment(
+                request, course_id=unicode(self.course.id), thread_id="dummy_thread_id"
+            )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(mock_request.called)
-        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(mock_request.called)
+            self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+        finally:
+            del Thread.commentable_id
 
 
 class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
@@ -944,6 +956,9 @@ class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
 
 
 class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+    """
+    Make sure comments under a response can handle unicode.
+    """
     def setUp(self):
         super(CreateSubCommentUnicodeTestCase, self).setUp()
 
@@ -954,20 +969,130 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
+        """
+        Create a comment with unicode in it.
+        """
         self._set_mock_request_data(mock_request, {
             "closed": False,
             "depth": 1,
+            "thread_id": "test_thread"
         })
         request = RequestFactory().post("dummy_url", {"body": text})
         request.user = self.student
         request.view_name = "create_sub_comment"
-        response = views.create_sub_comment(request, course_id=self.course.id.to_deprecated_string(), comment_id="dummy_comment_id")
+        Thread.commentable_id = Mock()
+        try:
+            response = views.create_sub_comment(
+                request, course_id=self.course.id.to_deprecated_string(), comment_id="dummy_comment_id"
+            )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(mock_request.called)
-        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(mock_request.called)
+            self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+        finally:
+            del Thread.commentable_id
 
 
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
+    """
+    Forum actions are expected to launch analytics events. Test these here.
+    """
+    def setUp(self):
+        super(ForumEventTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+        self.student.roles.add(Role.objects.get(name="Student", course_id=self.course.id))
+        CourseAccessRoleFactory(course_id=self.course.id, user=self.student, role='Wizard')
+
+    @patch('eventtracking.tracker.emit')
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_thread_event(self, __, mock_emit):
+        request = RequestFactory().post(
+            "dummy_url", {
+                "thread_type": "discussion",
+                "body": "Test text",
+                "title": "Test",
+                "auto_subscribe": True
+            }
+        )
+        request.user = self.student
+        request.view_name = "create_thread"
+
+        views.create_thread(request, course_id=self.course.id.to_deprecated_string(), commentable_id="test_commentable")
+
+        event_name, event = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.forum.thread.created')
+        self.assertEqual(event['body'], 'Test text')
+        self.assertEqual(event['title'], 'Test')
+        self.assertEqual(event['commentable_id'], 'test_commentable')
+        self.assertEqual(event['user_forums_roles'], ['Student'])
+        self.assertEqual(event['options']['followed'], True)
+        self.assertEqual(event['user_course_roles'], ['Wizard'])
+        self.assertEqual(event['anonymous'], False)
+        self.assertEqual(event['group_id'], None)
+        self.assertEqual(event['thread_type'], 'discussion')
+        self.assertEquals(event['anonymous_to_peers'], False)
+
+    @patch('eventtracking.tracker.emit')
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_response_event(self, mock_request, mock_emit):
+        """
+        Check to make sure an event is fired when a user responds to a thread.
+        """
+        mock_request.return_value.status_code = 200
+        self._set_mock_request_data(mock_request, {
+            "closed": False,
+            "commentable_id": 'test_commentable_id',
+            'thread_id': 'test_thread_id',
+        })
+        request = RequestFactory().post("dummy_url", {"body": "Test comment", 'auto_subscribe': True})
+        request.user = self.student
+        request.view_name = "create_comment"
+        views.create_comment(request, course_id=self.course.id.to_deprecated_string(), thread_id='test_thread_id')
+
+        event_name, event = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.forum.response.created')
+        self.assertEqual(event['body'], "Test comment")
+        self.assertEqual(event['commentable_id'], 'test_commentable_id')
+        self.assertEqual(event['user_forums_roles'], ['Student'])
+        self.assertEqual(event['user_course_roles'], ['Wizard'])
+        self.assertEqual(event['discussion']['id'], 'test_thread_id')
+        self.assertEqual(event['options']['followed'], True)
+
+    @patch('eventtracking.tracker.emit')
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_comment_event(self, mock_request, mock_emit):
+        """
+        Ensure an event is fired when someone comments on a response.
+        """
+        self._set_mock_request_data(mock_request, {
+            "closed": False,
+            "depth": 1,
+            "thread_id": "test_thread_id",
+            "commentable_id": "test_commentable_id",
+            "parent_id": "test_response_id"
+        })
+        request = RequestFactory().post("dummy_url", {"body": "Another comment"})
+        request.user = self.student
+        request.view_name = "create_sub_comment"
+        views.create_sub_comment(
+            request, course_id=self.course.id.to_deprecated_string(), comment_id="dummy_comment_id"
+        )
+
+        event_name, event = mock_emit.call_args[0]
+        self.assertEqual(event_name, "edx.forum.comment.created")
+        self.assertEqual(event['body'], 'Another comment')
+        self.assertEqual(event['discussion']['id'], 'test_thread_id')
+        self.assertEqual(event['response']['id'], 'test_response_id')
+        self.assertEqual(event['user_forums_roles'], ['Student'])
+        self.assertEqual(event['user_course_roles'], ['Wizard'])
+        self.assertEqual(event['options']['followed'], False)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
