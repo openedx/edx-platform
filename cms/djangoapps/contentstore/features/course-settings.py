@@ -150,7 +150,7 @@ def i_see_new_course_image(_step):
     images = world.css_find(img_css)
     assert len(images) == 1
     img = images[0]
-    expected_src = '/c4x/MITx/999/asset/image.jpg'
+    expected_src = 'image.jpg'
 
     # Don't worry about the domain in the URL
     success_func = lambda _: img['src'].endswith(expected_src)
@@ -160,8 +160,8 @@ def i_see_new_course_image(_step):
 @step('the image URL should be present in the field')
 def image_url_present(_step):
     field_css = '#course-image-url'
-    expected_value = '/c4x/MITx/999/asset/image.jpg'
-    assert world.css_value(field_css) == expected_value
+    expected_value = 'image.jpg'
+    assert world.css_value(field_css).endswith(expected_value)
 
 
 ############### HELPER METHODS ####################
