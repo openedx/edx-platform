@@ -59,7 +59,7 @@ Our current beta app is available for Android smartphones. We're also working to
 Which courses are available in the mobile app?
 ================================================
 
-The following courses are currently available for the mobile beta:
+The following courses are currently available for the mobile beta. We'll be adding more courses over the next few weeks, so check the **EdX Android Beta Testers** Google group page for updates.
 
 * `edX - DemoX <https://www.edx.org/course/edx/edx-demox-1-demox-4116#.VCGNfytdUZY>`_: A fun and interactive course designed to help you explore the edX learning experience. Perfect to take before you start your course.
 
