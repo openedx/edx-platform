@@ -42,7 +42,7 @@ def index(request):
 
 
 @login_required
-@require_http_methods(['PUT'])
+@require_http_methods(['POST'])
 @ensure_csrf_cookie
 def email_change_request_handler(request):
     """Handle a request to change the user's email address.
@@ -51,7 +51,7 @@ def email_change_request_handler(request):
         request (HttpRequest)
 
     Returns:
-        HttpResponse: 204 if the confirmation email was sent successfully
+        HttpResponse: 200 if the confirmation email was sent successfully
         HttpResponse: 302 if not logged in (redirect to login page)
         HttpResponse: 400 if the format of the new email is incorrect
         HttpResponse: 401 if the provided password (in the form) is incorrect
@@ -62,21 +62,19 @@ def email_change_request_handler(request):
 
     Example usage:
 
-        PUT /account/email_change_request
+        PUT /account/email
 
     """
-    put = QueryDict(request.body)
-    user = request.user
-    password = put.get('password')
-
-    username = user.username
-    old_email = profile_api.profile_info(username)['email']
-    new_email = put.get('new_email')
+    username = request.user.username
+    password = request.POST.get('password')
+    new_email = request.POST.get('email')
 
     if new_email is None:
-        return HttpResponseBadRequest("Missing param 'new_email'")
+        return HttpResponseBadRequest("Missing param 'email'")
     if password is None:
         return HttpResponseBadRequest("Missing param 'password'")
+
+    old_email = profile_api.profile_info(username)['email']
 
     try:
         key = account_api.request_email_change(username, new_email, password)
@@ -104,12 +102,11 @@ def email_change_request_handler(request):
         settings.DEFAULT_FROM_EMAIL
     )
 
-    # Email new address
+    # Send a confirmation email to the new address containing the activation key
     send_mail(subject, message, from_address, [new_email])
 
-    # A 204 is intended to allow input for actions to take place
-    # without causing a change to the user agent's active document view.
-    return HttpResponse(status=204)
+    # Send a 200 response code to the client to indicate that the email was sent successfully.
+    return HttpResponse(status=200)
 
 
 @login_required

@@ -1,5 +1,4 @@
-describe("edx.student.ProfileModel", function() {
-
+describe("edx.student.profile.ProfileModel", function() {
     var profile = null;
 
     beforeEach(function() {
@@ -8,21 +7,21 @@ describe("edx.student.ProfileModel", function() {
 
     it("validates the full name field", function() {
         // Full name cannot be blank
-        profile.set('fullName', '');
+        profile.set("fullName", "");
         var errors = profile.validate(profile.attributes);
         expect(errors).toEqual({
             fullName: "Full name cannot be blank"
         });
 
         // Fill in the name and expect that the model is valid
-        profile.set('fullName', 'Bob');
+        profile.set("fullName", "Bob");
         errors = profile.validate(profile.attributes);
         expect(errors).toBe(undefined);
     });
 
 });
 
-describe("edx.student.ProfileView", function() {
+describe("edx.student.profile.ProfileView", function() {
     var view = null;
     var ajaxSuccess = true;
 
@@ -38,38 +37,38 @@ describe("edx.student.ProfileView", function() {
         expect(ajaxArgs.url).toEqual(url);
         expect(ajaxArgs.type).toEqual(method);
         expect(ajaxArgs.data).toEqual(data)
-        expect(ajaxArgs.headers.hasOwnProperty('X-CSRFToken')).toBe(true);
+        expect(ajaxArgs.headers.hasOwnProperty("X-CSRFToken")).toBe(true);
     };
 
     var assertSubmitStatus = function(success, expectedStatus) {
         if (!success) {
-            expect(view.$submitStatus).toHaveClass('error');
+            expect(view.$submitStatus).toHaveClass("error");
         }
         else {
-            expect(view.$submitStatus).not.toHaveClass('error');
+            expect(view.$submitStatus).not.toHaveClass("error");
         }
         expect(view.$submitStatus.text()).toEqual(expectedStatus);
     };
 
     var assertValidationError = function(expectedError) {
         if (expectedError === null) {
-            expect(view.$nameStatus).not.toHaveClass('validation-error');
-            expect(view.$nameStatus.text()).toEqual('');
+            expect(view.$nameStatus).not.toHaveClass("validation-error");
+            expect(view.$nameStatus.text()).toEqual("");
         }
         else {
-            expect(view.$nameStatus).toHaveClass('validation-error');
+            expect(view.$nameStatus).toHaveClass("validation-error");
             expect(view.$nameStatus.text()).toEqual(expectedError);
         }
     };
 
     beforeEach(function() {
-        var fixture = readFixtures('js/fixtures/student_profile/profile.underscore');
-        setFixtures('<div id="profile-tpl">' + fixture + '</div>');
+        var fixture = readFixtures("js/fixtures/student_profile/profile.underscore");
+        setFixtures("<div id=\"profile-tpl\">" + fixture + "</div>");
 
         view = new edx.student.profile.ProfileView().render();
 
         // Stub AJAX calls to return success / failure
-        spyOn($, 'ajax').andCallFake(function() {
+        spyOn($, "ajax").andCallFake(function() {
             return $.Deferred(function(defer) {
                 if (ajaxSuccess) { defer.resolve(); }
                 else { defer.reject(); }
@@ -78,30 +77,30 @@ describe("edx.student.ProfileView", function() {
     });
 
     it("updates the student profile", function() {
-        updateProfile({ fullName: 'John Smith' });
-        assertAjax('/', 'PUT', { fullName: 'John Smith' });
+        updateProfile({ fullName: "John Smith" });
+        assertAjax("/", "PUT", { fullName: "John Smith" });
         assertSubmitStatus(true, "Saved");
     });
 
     it("displays validation errors", function() {
         // Blank name should display a validation error
-        updateProfile({ fullName: '' });
+        updateProfile({ fullName: "" });
         assertValidationError("Full name cannot be blank");
 
         // If we fix the problem and resubmit, the error should go away
-        updateProfile({ fullName: 'John Smith' });
+        updateProfile({ fullName: "John Smith" });
         assertValidationError(null);
     });
 
     it("displays an error if the sync fails", function() {
         // If we get an error status on the AJAX request, display an error
         ajaxSuccess = false;
-        updateProfile({ fullName: 'John Smith' });
-        assertSubmitStatus(false, 'The data could not be saved.');
+        updateProfile({ fullName: "John Smith" });
+        assertSubmitStatus(false, "The data could not be saved.");
 
         // If we try again and succeed, the error should go away
         ajaxSuccess = true;
-        updateProfile({ fullName: 'John Smith' });
-        assertSubmitStatus(true, 'Saved');
+        updateProfile({ fullName: "John Smith" });
+        assertSubmitStatus(true, "Saved");
     });
 });

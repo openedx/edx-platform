@@ -2,7 +2,6 @@
 """ Tests for student profile views. """
 
 from urllib import urlencode
-from collections import namedtuple
 
 from mock import patch
 import ddt
@@ -13,7 +12,7 @@ from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
-from lang_pref import LANGUAGE_KEY
+from lang_pref import LANGUAGE_KEY, api as language_api
 
 
 @ddt.ddt
@@ -25,8 +24,7 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
     EMAIL = u'walt@savewalterwhite.com'
     FULL_NAME = u'𝖂𝖆𝖑𝖙𝖊𝖗 𝖂𝖍𝖎𝖙𝖊'
 
-    Language = namedtuple('Language', 'code name')
-    NEW_LANGUAGE = Language('fr', u'Français')
+    NEW_LANGUAGE = language_api.Language('eo', u'Dummy language')
 
     INVALID_LANGUAGE_CODES = [
         '',
@@ -49,8 +47,6 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
     def test_index(self):
         response = self.client.get(reverse('profile_index'))
         self.assertContains(response, "Student Profile")
-        self.assertContains(response, "Change My Name")
-        self.assertContains(response, "Change Preferred Language")
         self.assertContains(response, "Connected Accounts")
 
     def test_name_change(self):
@@ -85,17 +81,17 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
     def test_language_change(self, mock_released_languages):
         mock_released_languages.return_value = [self.NEW_LANGUAGE]
 
-        # Set French as the user's preferred language
+        # Set the dummy language as the user's preferred language
         response = self._change_language(self.NEW_LANGUAGE.code)
         self.assertEqual(response.status_code, 204)
 
-        # Verify that French is now the user's preferred language
+        # Verify that the dummy language is now the user's preferred language
         preferences = profile_api.preference_info(self.USERNAME)
         self.assertEqual(preferences[LANGUAGE_KEY], self.NEW_LANGUAGE.code)
 
-        # Verify that the page reloads in French
+        # Verify that the page reloads in the dummy language
         response = self.client.get(reverse('profile_index'))
-        self.assertContains(response, "Merci de choisir la langue")
+        self.assertContains(response, u"Stüdént Pröfïlé")
 
     @ddt.data(*INVALID_LANGUAGE_CODES)
     def test_change_to_invalid_or_unreleased_language(self, language_code):
@@ -134,7 +130,7 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
 
     @ddt.data(
         (['get', 'put'], 'profile_index'),
-        ('put', 'language_change')
+        (['put'], 'language_change')
     )
     @ddt.unpack
     def test_require_http_method(self, correct_methods, url_name):
