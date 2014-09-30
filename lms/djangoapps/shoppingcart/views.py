@@ -79,19 +79,15 @@ def update_user_cart(request):
     when user change the number-of-students from the UI then
     this method Update the corresponding qty field in OrderItem model and update the order_type in order model.
     """
-    purchase_type = request.POST.get('purchase_type', OrderTypes.PERSONAL)
-    if purchase_type == OrderTypes.BUSINESS:
-        try:
-            qty = int(request.POST.get('qty', 1))
-        except ValueError:
-            log.exception('Quantity must be an integer.')
-            return HttpResponseBadRequest('Quantity must be an integer.')
+    try:
+        qty = int(request.POST.get('qty', -1))
+    except ValueError:
+        log.exception('Quantity must be an integer.')
+        return HttpResponseBadRequest('Quantity must be an integer.')
 
-        if qty < 1 or qty > 1000:
-            log.warning('Quantity must be between 1 and 1000.')
-            return HttpResponseBadRequest('Quantity must be between 1 and 1000.')
-    else:
-        qty = 1  # Quantity is 1 if purchase type is personal..
+    if qty < 1 or qty > 1000:
+        log.warning('Quantity must be between 1 and 1000.')
+        return HttpResponseBadRequest('Quantity must be between 1 and 1000.')
 
     item_id = request.POST.get('ItemId', None)
     if item_id:
@@ -102,9 +98,8 @@ def update_user_cart(request):
             return HttpResponseNotFound('Order item does not exist.')
 
         item.qty = qty
-        item.order.order_type = purchase_type
-        item.order.save()
         item.save()
+        update_order_type(request.user)
         total_cost = item.order.total_cost
         return JsonResponse({"total_cost": total_cost}, 200)
 
@@ -182,21 +177,24 @@ def remove_item(request):
             item.delete()
             log.info('order item {0} removed for user {1}'.format(item_id, request.user))
             remove_code_redemption(order_item_course_id, item_id, item, request.user)
-
-            # Updating Order Type
-            cart = Order.get_cart_for_user(request.user)
-            cart_items = cart.orderitem_set.all()
-            order_type = OrderTypes.PERSONAL
-
-            for cart_item in cart_items:
-                if cart_item.qty > 1:
-                    order_type = OrderTypes.BUSINESS
-
-            cart.order_type = order_type
-            cart.save()
+            update_order_type(request.user)
 
     return HttpResponse('OK')
 
+
+def update_order_type(user):
+    """
+    updating order type
+    """
+    cart = Order.get_cart_for_user(user)
+    cart_items = cart.orderitem_set.all()
+    order_type = OrderTypes.PERSONAL
+    for cart_item in cart_items:
+        if cart_item.qty > 1:
+            order_type = OrderTypes.BUSINESS
+
+    cart.order_type = order_type
+    cart.save()
 
 def remove_code_redemption(order_item_course_id, item_id, item, user):
     """
