@@ -265,13 +265,6 @@ def add_cohort(course_key, name):
     )
 
 
-class CohortConflict(Exception):
-    """
-    Raised when user to be added is already in another cohort in same course.
-    """
-    pass
-
-
 def add_user_to_cohort(cohort, username_or_email):
     """
     Look up the given user, and if successful, add them to the specified cohort.
@@ -307,17 +300,3 @@ def add_user_to_cohort(cohort, username_or_email):
 
     cohort.users.add(user)
     return (user, previous_cohort)
-
-
-def delete_empty_cohort(course_key, name):
-    """
-    Remove an empty cohort.  Raise ValueError if cohort is not empty.
-    """
-    cohort = get_cohort_by_name(course_key, name)
-    if cohort.users.exists():
-        raise ValueError(_("You cannot delete non-empty cohort {cohort_name} in course {course_key}").format(
-            cohort_name=name,
-            course_key=course_key
-        ))
-
-    cohort.delete()
