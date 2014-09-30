@@ -1682,7 +1682,6 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         with patch('instructor_task.api.submit_calculate_students_features_csv') as mock_cal_students:
             mock_cal_students.return_value = True
             response = self.client.get(url + '/csv', {})
-        from nose.tools import set_trace; set_trace()
         self.assertIn('Your CSV is being generated!', response.content)
 
     def test_get_distribution_no_feature(self):

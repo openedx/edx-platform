@@ -13,6 +13,7 @@ from mock import Mock, patch
 from django.conf import settings
 from django.test.testcases import TestCase
 
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -26,9 +27,9 @@ TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
 
 
-class TestReport(TestCase):
+class TestReport(ModuleStoreTestCase):
     """
-    Base class for testing that
+    Base class for testing CSV download tasks.
     """
     def setUp(self):
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,
