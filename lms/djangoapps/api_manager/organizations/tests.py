@@ -7,12 +7,14 @@ Run these tests @ Devstack:
 import json
 import uuid
 import mock
+from urllib import urlencode
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import Client
 from django.test.utils import override_settings
 
+from gradebook.models import StudentGradebook
 from student.models import UserProfile
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -295,3 +297,105 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], self.test_user.id)
         self.assertEqual(response.data[0]['course_count'], 2)
+
+
+    def test_organizations_metrics_get(self):
+        users = []
+        for i in xrange(1, 6):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i),
+                'city': 'Boston',
+            }
+            response = self.do_post(self.base_users_uri, data)
+            self.assertEqual(response.status_code, 201)
+            user_id = response.data['id']
+            user = User.objects.get(pk=user_id)
+            users.append(user_id)
+            if i < 2:
+                StudentGradebook.objects.create(user=user, grade=0.75, proforma_grade=0.85)
+            elif i < 4:
+                StudentGradebook.objects.create(user=user, grade=0.82, proforma_grade=0.82)
+            else:
+                StudentGradebook.objects.create(user=user, grade=0.90, proforma_grade=0.91)
+
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'contact_name': self.test_organization_contact_name,
+            'contact_email': self.test_organization_contact_email,
+            'contact_phone': self.test_organization_contact_phone,
+            'logo_url': self.test_organization_logo_url,
+            'users': users
+        }
+        response = self.do_post(self.base_organizations_uri, data)
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        metrics_uri = '{}metrics/'.format(test_uri)
+        response = self.do_get(metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_grade_complete_count'], 4)
+
+
+    def test_organizations_metrics_get_courses_filter(self):
+        users = []
+        for i in xrange(1, 10):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i),
+                'city': 'Boston',
+            }
+            response = self.do_post(self.base_users_uri, data)
+            self.assertEqual(response.status_code, 201)
+            user_id = response.data['id']
+            user = User.objects.get(pk=user_id)
+            users.append(user_id)
+            course1 = CourseFactory.create(display_name="COURSE1", org="CRS1", run="RUN1")
+            course2 = CourseFactory.create(display_name="COURSE2", org="CRS2", run="RUN2")
+            course3 = CourseFactory.create(display_name="COURSE3", org="CRS3", run="RUN3")
+            if i < 3:
+                StudentGradebook.objects.create(user=user, grade=0.75, proforma_grade=0.85, course_id=course1.id)
+            elif i < 5:
+                StudentGradebook.objects.create(user=user, grade=0.82, proforma_grade=0.82, course_id=course2.id)
+            elif i < 7:
+                StudentGradebook.objects.create(user=user, grade=0.72, proforma_grade=0.78, course_id=course3.id)
+            elif i < 9:
+                StudentGradebook.objects.create(user=user, grade=0.94, proforma_grade=0.67, course_id=course1.id)
+            else:
+                StudentGradebook.objects.create(user=user, grade=0.90, proforma_grade=0.91, course_id=course2.id)
+
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'contact_name': self.test_organization_contact_name,
+            'contact_email': self.test_organization_contact_email,
+            'contact_phone': self.test_organization_contact_phone,
+            'logo_url': self.test_organization_logo_url,
+            'users': users
+        }
+
+        response = self.do_post(self.base_organizations_uri, data)
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        metrics_uri = '{}metrics/'.format(test_uri)
+        response = self.do_get(metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_grade_complete_count'], 5)
+
+        courses = {'courses': unicode(course1.id)}
+        filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
+        response = self.do_get(filtered_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_grade_complete_count'], 2)
+
+        courses = {'courses': '{},{}'.format(course1.id, course2.id)}
+        filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
+        response = self.do_get(filtered_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_grade_complete_count'], 5)
