@@ -90,9 +90,9 @@ class Thread(models.Model):
     @classmethod
     def url_for_threads(cls, params={}):
         if params.get('commentable_id'):
-            return "{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
+            return u"{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
         else:
-            return "{prefix}/threads".format(prefix=settings.PREFIX)
+            return u"{prefix}/threads".format(prefix=settings.PREFIX)
 
     @classmethod
     def url_for_search_threads(cls, params={}):
