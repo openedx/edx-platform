@@ -136,6 +136,10 @@
   &:last-child {
     margin-right: 0;
   }
+
+  &.is-hidden {
+    display: none;
+  }
 }
 
 @mixin forum-user-label($color) {
