@@ -30,7 +30,7 @@ from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR
 
@@ -271,6 +271,20 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(self.store.get_modulestore_type(
             SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), mongo_ms_type
         )
+
+    @ddt.data('draft', 'split')
+    def test_get_modulestore_cache(self, default_ms):
+        """
+        Make sure we cache discovered course mappings
+        """
+        self.initdb(default_ms)
+        # unset mappings
+        self.store.mappings = {}
+        course_key = self.course_locations[self.MONGO_COURSEID].course_key
+        with check_exact_number_of_calls(self.store.default_modulestore, 'has_course', 1):
+            self.assertEqual(self.store.default_modulestore, self.store._get_modulestore_for_courseid(course_key))
+            self.assertIn(course_key, self.store.mappings)
+            self.assertEqual(self.store.default_modulestore, self.store._get_modulestore_for_courseid(course_key))
 
     @ddt.data(*itertools.product(
         (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
