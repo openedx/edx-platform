@@ -13,6 +13,11 @@ Instructor Dashboard. You can find:
 
 * The defined grade cutoff for passing or failing.
 
+Additional data about the course and its students is available from other pages
+in the Instructor Dashboard, and from edX Insights. You also access Insights
+from the Instructor Dashboard: click the link in the banner at the top of each
+page. For more information, see `Using edX Insights`_.
+
 *************************************************
 Review Course Data
 *************************************************
@@ -75,3 +80,6 @@ Studio, or derived from data that you define in Studio.
   Grading can be changed in Studio (not recommended if your course is live):
   select **Settings** > **Grading**.
 
+
+
+.. _Using edX Insights: http://edx-insights.readthedocs.org/en/latest/
