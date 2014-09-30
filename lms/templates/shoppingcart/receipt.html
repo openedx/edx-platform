@@ -65,7 +65,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
 
             <% redemption_url = reverse('register_code_redemption', args = [registration_code.code] ) %>
             <% enrollment_url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url) %>
-            <td><a href="${enrollment_url}">${enrollment_url}</a></td>
+            <td><a href="${redemption_url}">${enrollment_url}</a></td>
           </tr>
         % endfor
         </tbody>
