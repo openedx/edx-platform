@@ -14,7 +14,7 @@ September, 2014
      - Change
    * - 09/30/14
      - Added information about accessing edX Insights to the :ref:`Course Data`
-       and :ref`Enrollment` chapters.
+       and :ref:`Enrollment` chapters.
    * - 09/04/14
      - Updated the :ref:`Discussions` and :ref:`Discussions for Students and
        Staff` chapters to include information about choosing the type of post
