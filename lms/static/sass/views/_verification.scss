@@ -108,6 +108,11 @@
     color: $m-gray-d4;
   }
 
+  // reset: navigation (needed due to edX's new global-header styling)
+  .global-new .nav-global a {
+    padding-bottom: ($baseline +1);
+  }
+
   // HACK: nasty override due to our bad input/button styling
   button, input[type="submit"], input[type="button"], button[type="submit"] {
     @include font-size(16);
