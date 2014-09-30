@@ -1,76 +1,120 @@
 var edx = edx || {};
 
-(function($) {
+(function($, _, Backbone, gettext) {
     'use strict';
 
+
+    Backbone.sync = function(method, model, options) {
+        var headers = {
+            'X-CSRFToken': $.cookie('csrftoken')
+        };
+
+        $.ajax({
+            url: model.urlRoot,
+            type: 'PUT',
+            data: model.attributes,
+            headers: headers
+        })
+        .done(function(data) {
+            model.trigger('sync', model, data, options);
+        })
+        .fail(function() {
+            var error = gettext("The data could not be saved.");
+            model.trigger('error', model, error, options);
+        });
+    };
+
     edx.student = edx.student || {};
+    edx.student.profile = {};
 
-    edx.student.profile = (function() {
+    edx.student.profile.ProfileModel = Backbone.Model.extend({
+        defaults: {
+            fullName: ''
+        },
 
-        var _fn = {
-            init: function() {
-                _fn.ajax.init();
-                _fn.eventHandlers.init();
-            },
+        urlRoot: '/',
 
-            eventHandlers: {
-                init: function() {
-                    _fn.eventHandlers.submit();
-                },
+        validate: function(attrs) {
+            var errors = {};
+            if (attrs.fullName.length < 1) {
+                errors.fullName = gettext("Full name cannot be blank");
+            }
 
-                submit: function() {
-                    $("#name-change-form").submit( _fn.form.submit );
-                }
-            },
+            if (!$.isEmptyObject(errors)) {
+                return errors;
+            }
+        }
+    });
 
-            form: {
-                submit: function( event ) {
-                    var $newName = $('#new-name');
-                    var data = {
-                        new_name: $newName.val()
-                    };
+    edx.student.profile.ProfileView = Backbone.View.extend({
 
-                    event.preventDefault();
-                    _fn.ajax.put( 'name_change', data );
-                }
-            },
+        events: {
+            'submit': 'submit',
+            'change': 'change'
+        },
 
-            ajax: {
-                init: function() {
-                    var csrftoken = _fn.cookie.get( 'csrftoken' );
+        initialize: function() {
+            _.bindAll(this, 'render', 'change', 'submit', 'invalid', 'error', 'sync', 'clearStatus');
+            this.model = new edx.student.profile.ProfileModel();
+            this.model.on('invalid', this.invalid);
+            this.model.on('error', this.error);
+            this.model.on('sync', this.sync);
+        },
 
-                    $.ajaxSetup({
-                        beforeSend: function(xhr, settings) {
-                            if ( settings.type === 'PUT' ) {
-                                xhr.setRequestHeader( 'X-CSRFToken', csrftoken );
-                            }
-                        }
-                    });
-                },
+        render: function() {
+            this.$el.html(_.template($("#profile-tpl").html(), {}));
+            this.$nameStatus = $("#profile-name-status", this.$el);
+            this.$nameField = $("#profile-name", this.$el);
+            this.$submitStatus = $("#submit-status", this.$el);
+            return this;
+        },
 
-                put: function( url, data ) {
-                    $.ajax({
-                        url: url,
-                        type: 'PUT',
-                        data: data
-                    });
-                }
-            },
+        change: function() {
+            this.model.set({
+                fullName: this.$nameField.val()
+            });
+        },
 
-            cookie: {
-                get: function( name ) {
-                    return $.cookie(name);
-                }
-            },
+        submit: function(event) {
+            event.preventDefault();
+            this.clearStatus();
+            this.model.save();
+        },
 
-        };
+        invalid: function(model) {
+            var errors = model.validationError;
+            if (errors.hasOwnProperty('fullName')) {
+                this.$nameStatus
+                    .addClass('validation-error')
+                    .text(errors.fullName);
+            }
+        },
 
-        return {
-            init: _fn.init
-        };
+        error: function(model, error, options) {
+            this.$submitStatus
+                .addClass('error')
+                .text(error);
+        },
 
-    })();
+        sync: function(model, resp, options) {
+            this.$submitStatus
+                .addClass('success')
+                .text(gettext('Saved'));
+        },
 
-    edx.student.profile.init();
+        clearStatus: function() {
+            this.$nameStatus
+                .removeClass('validation-error')
+                .text('');
 
-})(jQuery);
+            this.$submitStatus
+                .removeClass('error')
+                .text('');
+        }
+    });
+
+    return new edx.student.profile.ProfileView({
+        el: $("#profile-container")
+    }).render();
+
+})(jQuery, _, Backbone, gettext);

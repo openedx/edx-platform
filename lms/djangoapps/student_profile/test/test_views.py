@@ -68,7 +68,7 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
 
     @ddt.data(
         ('get', 'profile_index'),
-        ('put', 'name_change')
+        ('put', 'profile_index')
     )
     @ddt.unpack
     def test_require_login(self, method, url_name):
@@ -82,12 +82,11 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
         self.assertIn('accounts/login?next=', response.redirect_chain[0][0])
 
     @ddt.data(
-        ('get', 'profile_index'),
-        ('put', 'name_change')
+        (['get', 'put'], 'profile_index'),
     )
     @ddt.unpack
-    def test_require_http_method(self, correct_method, url_name):
-        wrong_methods = {'get', 'put', 'post', 'head', 'options', 'delete'} - {correct_method}
+    def test_require_http_method(self, correct_methods, url_name):
+        wrong_methods = {'get', 'put', 'post', 'head', 'options', 'delete'} - set(correct_methods)
         url = reverse(url_name)
 
         for method in wrong_methods:
@@ -104,10 +103,10 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
         data = {}
         if new_name is not None:
             # We can't pass a Unicode object to urlencode, so we encode the Unicode object
-            data['new_name'] = new_name.encode('utf-8')
+            data['fullName'] = new_name.encode('utf-8')
 
         return self.client.put(
-            path=reverse('name_change'),
+            path=reverse('profile_index'),
             data=urlencode(data),
             content_type= 'application/x-www-form-urlencoded'
         )
