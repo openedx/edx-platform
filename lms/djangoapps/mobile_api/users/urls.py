@@ -1,11 +1,12 @@
-from django.conf.urls import patterns, url, include
-
-from rest_framework import routers
-from rest_framework.urlpatterns import format_suffix_patterns
+"""
+URLs for user API
+"""
+from django.conf.urls import patterns, url
 
 from .views import UserDetail, UserCourseEnrollmentsList
 
-urlpatterns = patterns('mobile_api.users.views',
+urlpatterns = patterns(
+    'mobile_api.users.views',
     url(r'^(?P<username>[\w.+-]+)$', UserDetail.as_view(), name='user-detail'),
     url(
         r'^(?P<username>[\w.+-]+)/course_enrollments/$',
@@ -13,4 +14,3 @@ urlpatterns = patterns('mobile_api.users.views',
         name='courseenrollment-detail'
     ),
 )
-

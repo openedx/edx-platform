@@ -1,0 +1,3 @@
+"""
+Course info API
+"""

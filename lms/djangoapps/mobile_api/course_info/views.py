@@ -5,15 +5,11 @@ from django.http import Http404
 from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
 from courseware.courses import get_course_about_section, get_course_info_section_module
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import modulestore
-from student.models import CourseEnrollment, User
 
 
 class CourseUpdatesList(generics.ListAPIView):
@@ -55,6 +51,9 @@ class CourseHandoutsList(generics.ListAPIView):
 
 
 class CourseAboutDetail(generics.RetrieveAPIView):
+    """
+    Renders course 'about' page
+    """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)
 
