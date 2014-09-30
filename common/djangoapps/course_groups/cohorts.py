@@ -277,13 +277,6 @@ def add_cohort(course_key, name):
     )
 
 
-class CohortConflict(Exception):
-    """
-    Raised when user to be added is already in another cohort in same course.
-    """
-    pass
-
-
 def add_user_to_cohort(cohort, username_or_email):
     """
     Look up the given user, and if successful, add them to the specified cohort.
