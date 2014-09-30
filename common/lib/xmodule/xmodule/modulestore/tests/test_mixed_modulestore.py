@@ -18,6 +18,7 @@ from uuid import uuid4
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
 from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
 
 if not settings.configured:
     settings.configure()
@@ -26,17 +27,17 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, ModuleStoreDraftAndPublished
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.tests import DATA_DIR
+from xmodule.tests import DATA_DIR, CourseComparisonTest
 
 
 @ddt.ddt
-class TestMixedModuleStore(unittest.TestCase):
+class TestMixedModuleStore(CourseComparisonTest):
     """
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
@@ -58,7 +59,7 @@ class TestMixedModuleStore(unittest.TestCase):
         'default_class': DEFAULT_CLASS,
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin,)
+        'xblock_mixins': (EditInfoMixin, InheritanceMixin),
     }
     DOC_STORE_CONFIG = {
         'host': HOST,
@@ -244,7 +245,8 @@ class TestMixedModuleStore(unittest.TestCase):
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
 
-        self.fake_location = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('vertical', 'fake')
+        mongo_course_key = self.course_locations[self.MONGO_COURSEID].course_key
+        self.fake_location = self.store.make_course_key(mongo_course_key.org, mongo_course_key.course, mongo_course_key.run).make_usage_key('vertical', 'fake')
 
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
@@ -1046,7 +1048,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.revert_to_published(self.vertical_x1a, self.user_id)
         reverted_parent = self.store.get_item(self.vertical_x1a)
         self.assertEqual(vertical_children_num, len(published_parent.children))
-        self.assertEqual(reverted_parent, published_parent)
+        self.assertBlocksEqualByFields(reverted_parent, published_parent)
         self.assertFalse(self._has_changes(self.vertical_x1a))
 
     @ddt.data('draft', 'split')
@@ -1081,7 +1083,8 @@ class TestMixedModuleStore(unittest.TestCase):
         orig_vertical = self.store.get_item(self.vertical_x1a)
         self.store.revert_to_published(self.vertical_x1a, self.user_id)
         reverted_vertical = self.store.get_item(self.vertical_x1a)
-        self.assertEqual(orig_vertical, reverted_vertical)
+
+        self.assertBlocksEqualByFields(orig_vertical, reverted_vertical)
 
     @ddt.data('draft', 'split')
     def test_revert_to_published_no_published(self, default_ms):
@@ -1787,9 +1790,11 @@ def create_modulestore_instance(engine, contentstore, doc_store_config, options,
     """
     class_ = load_function(engine)
 
+    if issubclass(class_, ModuleStoreDraftAndPublished):
+        options['branch_setting_func'] = lambda: ModuleStoreEnum.Branch.draft_preferred
+
     return class_(
         doc_store_config=doc_store_config,
         contentstore=contentstore,
-        branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
         **options
     )

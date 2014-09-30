@@ -2,7 +2,7 @@ import time
 import logging
 import re
 
-from xblock.fields import Field
+from xblock.fields import JSONField
 import datetime
 import dateutil.parser
 
@@ -11,7 +11,7 @@ from pytz import UTC
 log = logging.getLogger(__name__)
 
 
-class Date(Field):
+class Date(JSONField):
     '''
     Date fields know how to parse and produce json (iso) compatible formats. Converts to tz aware datetimes.
     '''
@@ -85,7 +85,7 @@ class Date(Field):
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
 
-class Timedelta(Field):
+class Timedelta(JSONField):
     # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
     MUTABLE = False
 
@@ -101,6 +101,10 @@ class Timedelta(Field):
         """
         if time_str is None:
             return None
+
+        if isinstance(time_str, datetime.timedelta):
+            return time_str
+
         parts = TIMEDELTA_REGEX.match(time_str)
         if not parts:
             return
@@ -112,6 +116,9 @@ class Timedelta(Field):
         return datetime.timedelta(**time_params)
 
     def to_json(self, value):
+        if value is None:
+            return None
+
         values = []
         for attr in ('days', 'hours', 'minutes', 'seconds'):
             cur_value = getattr(value, attr, 0)
@@ -129,7 +136,7 @@ class Timedelta(Field):
         return self.from_json(value)
 
 
-class RelativeTime(Field):
+class RelativeTime(JSONField):
     """
     Field for start_time and end_time video module properties.
 
@@ -181,6 +188,9 @@ class RelativeTime(Field):
         """
         if not value:
             return datetime.timedelta(seconds=0)
+
+        if isinstance(value, datetime.timedelta):
+            return value
 
         # We've seen serialized versions of float in this field
         if isinstance(value, float):

@@ -56,7 +56,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             target_course_id=target_course_id,
             create_new_course_if_not_present=create_new_course_if_not_present,
         )
-        course_id = SlashSeparatedCourseKey('edX', 'test_import_course', '2012_Fall')
+        course_id = module_store.make_course_key('edX', 'test_import_course', '2012_Fall')
         course = module_store.get_course(course_id)
         self.assertIsNotNone(course)
 

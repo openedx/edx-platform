@@ -115,35 +115,36 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     field_data_cache must include data from the course module and 2 levels of its descendents
     '''
 
-    course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
-    if course_module is None:
-        return None
+    with modulestore().bulk_operations(course.id):
+        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
+        if course_module is None:
+            return None
 
-    chapters = list()
-    for chapter in course_module.get_display_items():
-        if chapter.hide_from_toc:
-            continue
+        chapters = list()
+        for chapter in course_module.get_display_items():
+            if chapter.hide_from_toc:
+                continue
 
-        sections = list()
-        for section in chapter.get_display_items():
+            sections = list()
+            for section in chapter.get_display_items():
 
-            active = (chapter.url_name == active_chapter and
-                      section.url_name == active_section)
+                active = (chapter.url_name == active_chapter and
+                          section.url_name == active_section)
 
-            if not section.hide_from_toc:
-                sections.append({'display_name': section.display_name_with_default,
-                                 'url_name': section.url_name,
-                                 'format': section.format if section.format is not None else '',
-                                 'due': get_extended_due_date(section),
-                                 'active': active,
-                                 'graded': section.graded,
-                                 })
+                if not section.hide_from_toc:
+                    sections.append({'display_name': section.display_name_with_default,
+                                     'url_name': section.url_name,
+                                     'format': section.format if section.format is not None else '',
+                                     'due': get_extended_due_date(section),
+                                     'active': active,
+                                     'graded': section.graded,
+                                     })
 
-        chapters.append({'display_name': chapter.display_name_with_default,
-                         'url_name': chapter.url_name,
-                         'sections': sections,
-                         'active': chapter.url_name == active_chapter})
-    return chapters
+            chapters.append({'display_name': chapter.display_name_with_default,
+                             'url_name': chapter.url_name,
+                             'sections': sections,
+                             'active': chapter.url_name == active_chapter})
+        return chapters
 
 
 def get_module(user, request, usage_key, field_data_cache,

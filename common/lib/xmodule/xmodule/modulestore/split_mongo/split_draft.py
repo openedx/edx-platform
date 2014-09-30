@@ -242,7 +242,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         :return: True if the draft and published versions differ
         """
         def get_course(branch_name):
-            return self._lookup_course(xblock.location.course_key.for_branch(branch_name))['structure']
+            return self._lookup_course(xblock.location.course_key.for_branch(branch_name)).structure
 
         def get_block(course_structure, block_key):
             return self._get_block_from_structure(course_structure, block_key)
@@ -318,7 +318,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             # get head version of Published branch
             published_course_structure = self._lookup_course(
                 location.course_key.for_branch(ModuleStoreEnum.BranchName.published)
-            )['structure']
+            ).structure
             published_block = self._get_block_from_structure(
                 published_course_structure,
                 BlockKey.from_usage_key(location)
@@ -327,7 +327,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 raise InvalidVersionError(location)
 
             # create a new versioned draft structure
-            draft_course_structure = self._lookup_course(draft_course_key)['structure']
+            draft_course_structure = self._lookup_course(draft_course_key).structure
             new_structure = self.version_structure(draft_course_key, draft_course_structure, user_id)
 
             # remove the block and its descendants from the new structure
@@ -394,7 +394,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         pass
 
     def _get_head(self, xblock, branch):
-        course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
+        course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch)).structure
         return self._get_block_from_structure(course_structure, BlockKey.from_usage_key(xblock.location))
 
     def _get_version(self, block):

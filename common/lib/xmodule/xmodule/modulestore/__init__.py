@@ -634,7 +634,7 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         '''
         Set up the error-tracking logic.
         '''
-        super(ModuleStoreReadBase, self).__init__()
+        super(ModuleStoreReadBase, self).__init__(**kwargs)
         self._course_errors = defaultdict(make_error_tracker)  # location -> ErrorLog
         # TODO move the inheritance_cache_subsystem to classes which use it
         self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem

@@ -25,11 +25,11 @@ class BranchSettingMixin(object):
         :param branch_setting_func: a function that returns the default branch setting for this object.
             If not specified, ModuleStoreEnum.Branch.published_only is used as the default setting.
         """
-        super(BranchSettingMixin, self).__init__(*args, **kwargs)
         self.default_branch_setting_func = kwargs.pop(
             'branch_setting_func',
             lambda: ModuleStoreEnum.Branch.published_only
         )
+        super(BranchSettingMixin, self).__init__(*args, **kwargs)
 
         # cache the branch setting on a local thread to support a multi-threaded environment
         self.thread_cache = threading.local()
@@ -68,9 +68,6 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
     options to prefer Draft and fallback to Published.
     """
     __metaclass__ = ABCMeta
-
-    def __init__(self, *args, **kwargs):
-        super(ModuleStoreDraftAndPublished, self).__init__(*args, **kwargs)
 
     @abstractmethod
     def delete_item(self, location, user_id, revision=None, **kwargs):
@@ -116,7 +113,7 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
         raise NotImplementedError
 
 
-class   UnsupportedRevisionError(ValueError):
+class UnsupportedRevisionError(ValueError):
     """
     This error is raised if a method is called with an unsupported revision parameter.
     """
