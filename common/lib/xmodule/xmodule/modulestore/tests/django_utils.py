@@ -46,8 +46,10 @@ def mixed_store_config(data_dir, mappings, include_xml=True):
         split_mongo_store_config(data_dir)['default']
     ]
 
+    # Only load the courses that you care about into the XML store
+    course_ids = [course_id for course_id,store in mappings.items() if store == 'xml']
     if include_xml:
-        stores.append(xml_store_config(data_dir)['default'])
+        stores.append(xml_store_config(data_dir, course_ids=course_ids)['default'])
 
     store = {
         'default': {
@@ -116,9 +118,10 @@ def split_mongo_store_config(data_dir):
     return store
 
 
-def xml_store_config(data_dir):
+def xml_store_config(data_dir, course_ids='edX/toy/2012_Fall'):
     """
     Defines default module store using XMLModuleStore.
+    Note: for performance reasons, only load the toy course unless otherwise specified.
     """
     store = {
         'default': {
@@ -127,6 +130,7 @@ def xml_store_config(data_dir):
             'OPTIONS': {
                 'data_dir': data_dir,
                 'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                'course_ids': course_ids,
             }
         }
     }
