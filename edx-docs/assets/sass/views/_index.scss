@@ -1,15 +1,12 @@
 // docs.edx.org - Index View
 // ====================
 
-// @extend .trans-size;
-
 .view--index {
   border-top: ($baseline/4) solid $blue-t1;
   background: $white url('../images/bg-subtlepatterns-carbonfiber.png') 0 0 repeat;
 
   // grid
   .wrapper--view {
-    @include outer-container;
     @include pad(($baseline*2) ($baseline*3));
 
     // BP: mobile
@@ -47,18 +44,8 @@
 
     // audience
     .item-audience {
-
-      // STATE: hover
-      &:hover {
-
-        .icon-stack-base {
-          color: $gray-l2;
-        }
-
-        .item-audience__title {
-          border-top-color: $gray-l2;
-        }
-      }
+      margin-bottom: ($baseline/2);
+      border-bottom: ($baseline/4) solid $gray-l5;
     }
 
     .icon-stack {
@@ -80,17 +67,14 @@
     }
 
     .item-audience__title {
-      @extend %t-title-6;
+      @extend %t-title-4;
       @extend %t-weight3;
-      @include transition(border-color $tmg-f1 ease-in-out);
       margin-bottom: ($baseline/2);
-      border-top: ($baseline/4) solid $gray-l5;
-      padding-top: ($baseline*1.5);
     }
 
     .item-audience__copy {
       @extend %t-copy-base;
-      margin-bottom: ($baseline*0.75);
+      margin-bottom: $baseline;
 
       // BP: small desktop
       @include media($bp-ds) {
@@ -111,21 +95,22 @@
     // audience: link lists
     .list--links {
 
-      .item-link {
-        @extend %ui-wipe-last-child;
-        @include pad(0 0 ($baseline/2) 0);
-        margin-bottom: ($baseline/2);
-        border-bottom: 1px solid $gray-l5;
-      }
-
       .item-link__title {
-        @extend %t-title-7;
+        @extend %t-title-6;
         color: $blue-u1;
+        margin-bottom: ($baseline/4);
       }
 
       .item-link__copy {
         @include transition(color $tmg-f1 ease-in-out);
         @extend %t-copy-sub1;
+        color: $gray-l3;
+      }
+
+      .item-link__updated-date {
+        @extend %t-copy-sub1;
+        @extend %t-weight3;
+        margin-bottom: ($baseline/2);
         color: $gray-l3;
       }
     }
@@ -147,21 +132,6 @@
       &:visited {
         opacity: 0.9;
       }
-    }
-
-    // audience: specific - devs
-    .item-audience--developers {
-
-    }
-
-    // audience: specific - researchers
-    .item-audience--researchers {
-
-    }
-
-    // audience: specific - authors
-    .item-audience--authors {
-
     }
   }
 
@@ -203,35 +173,29 @@
 
   // masthead: brand
   .wrapper--logo {
-    @extend .trans-size;
-    @include span-columns(2 of 12);
-    @include shift(5);
     @include pad(($baseline*0.75) $baseline);
     position: relative;
     top: -($baseline/2);
+    display: block;
+    width: 15%;
+    margin: 0 auto;
     box-shadow: 0 2px 2px 0 $shadow-l1;
     border-top: ($baseline/4) solid $blue-s1;
     background: $white-t;
 
     // BP: medium desktop
     @include media($bp-dm) {
-      @include span-columns(2 of 12);
-      @include shift(5);
-      @include pad(($baseline/2) ($baseline*0.75));
+      width: 20%;
     }
 
     // BP: small desktop
     @include media($bp-ds) {
-      @include span-columns(2 of 6);
-      @include shift(2);
-      @include pad(($baseline/2) ($baseline*0.75));
+      width: 30%;
     }
 
     // BP: mobile
     @include media($bp-m) {
-      @include span-columns(2 of 6);
-      @include shift(2);
-      @include pad(($baseline/2) ($baseline/2));
+      width: 40%;
     }
 
     *[class^="depth"] {
@@ -331,45 +295,20 @@
 
   // ====================
 
+  // content
+  .wrapper--content {
+    @include outer-container;
+  }
+
   // main content
   .content--view {
-    @include span-columns(12);
+    @include pad(($baseline*2));
     box-shadow: 0 2px 2px 0 $shadow-l1;
     background: $white-t;
-    @include pad(($baseline*3));
-
-    // BP: small desktop
-    @include media($bp-ds) {
-      @include pad(($baseline*2));
-    }
-
-    // BP: mobile
-    @include media($bp-m) {
-      @include pad(($baseline*2));
-    }
   }
 
   .content__main {
-    @extend .trans-size;
-    @include span-columns(8 of 12);
-
-    // BP: medium desktop
-    @include media($bp-dm) {
-      @include fill-parent;
-      margin-bottom: ($baseline*3);
-    }
-
-    // BP: small desktop
-    @include media($bp-ds) {
-      @include fill-parent;
-      margin-bottom: ($baseline*2);
-    }
-
-    // BP: mobile
-    @include media($bp-m) {
-      @include fill-parent;
-      margin-bottom: ($baseline*2);
-    }
+    margin-bottom: ($baseline*2);
 
     .introduction__copy {
       @extend %t-copy-lead1;
@@ -391,138 +330,92 @@
 
     // elem: audience lists
     .item-audience {
-      @extend .trans-size;
-      @extend %ui-wipe-last-child;
-      @include span-columns(4 of 8);
-      position: relative;
-
-      // BP: medium desktop
-      @include media($bp-dm) {
-        @include fill-parent;
-        margin-bottom: ($baseline*3);
-      }
+      margin-bottom: ($baseline*2);
 
       // BP: small desktop
       @include media($bp-ds) {
-        @include fill-parent;
         margin-bottom: ($baseline*2);
       }
 
-      // BP: mobile
-      @include media($bp-m) {
-        @include fill-parent;
-        margin-bottom: ($baseline*3);
-      }
+      // NOTE: semi-nasty hack for visual display harmony
+      .list--links {
+        @include row();
+        margin-top: ($baseline*0.75);
 
-      &.item-audience--developers {
-        @include span-columns(8 of 8);
-        margin-bottom: ($baseline*2);
-
-        // NOTE: semi-nasty hack for visual display harmony
-        .list--links {
-          @extend %ui-wipe-last-child;
-          @include span-columns(8 of 8);
-          @include pad(0 0 ($baseline/2) 0);
-          border-bottom: 1px solid $gray-l5;
-          margin-top: ($baseline*0.75);
-
-          &:first-child {
-            margin-top: 0;
-          }
-
-          // BP: medium desktop
-          @include media($bp-dm) {
-            @include pad(0);
-            margin-top: 0;
-            border-bottom: none;
-          }
-
-          // BP: small desktop
-          @include media($bp-ds) {
-            @include pad(0);
-            margin-top: 0;
-            border-bottom: none;
-          }
-
-          // BP: mobile
-          @include media($bp-m) {
-            @include pad(0);
-            margin-top: 0;
-            border-bottom: none;
-          }
+        &:first-child {
+          margin-top: 0;
         }
 
-        .item-link {
-          @include span-columns(4 of 8);
-          @include pad(0);
-          border: none;
+        // BP: medium desktop
+        @include media($bp-dm) {
+          margin-top: 0;
+        }
 
-          // BP: medium desktop
-          @include media($bp-dm) {
-            @include fill-parent;
-            @include pad(0 0 ($baseline/2) 0);
-            margin-bottom: ($baseline/2);
-            border-bottom: 1px solid $gray-l5;
-          }
+        // BP: small desktop
+        @include media($bp-ds) {
+          margin-top: 0;
+        }
 
-          // BP: small desktop
-          @include media($bp-ds) {
-            @include fill-parent;
-            @include pad(0 0 ($baseline/2) 0);
-            margin-bottom: ($baseline/2);
-            border-bottom: 1px solid $gray-l5;
-          }
+        // BP: mobile
+        @include media($bp-m) {
+          margin-top: 0;
+        }
+      }
 
-          // BP: mobile
-          @include media($bp-m) {
-            @include fill-parent;
-            @include pad(0 0 ($baseline/2) 0);
-            margin-bottom: ($baseline/2);
-            border-bottom: 1px solid $gray-l5;
-          }
+      .item-link {
+        margin-bottom: $baseline;
+
+        // BP: large desktop
+        @include media($bp-dl) {
+          @include span-columns(4 of 12);
+          @include omega(3n);
+          min-height: ($baseline*6);
+        }
+
+        // BP: medium desktop
+        @include media($bp-dm) {
+          @include span-columns(6 of 12);
+          @include omega(2n);
+          min-height: ($baseline*6);
+        }
+
+        // BP: small desktop
+        @include media($bp-ds) {
+          @include fill-parent();
+        }
+
+        // BP: mobile
+        @include media($bp-m) {
+          @include fill-parent();
         }
       }
     }
   }
 
   .content__supplementary {
-    @extend .trans-size;
-    @include span-columns(4 of 12);
-
-    // BP: medium desktop
-    @include media($bp-dm) {
-      @include fill-parent;
-    }
-
-    // BP: small desktop
-    @include media($bp-ds) {
-      @include fill-parent;
-    }
-
-    // BP: mobile
-    @include media($bp-m) {
-      @include fill-parent;
-    }
-
-    .info {
-      @include transition(border-color $tmg-f1 ease-in-out);
-      border-top: ($baseline/4) solid $gray-l5;
-      padding-top: ($baseline/2);
-
-      // STATE: hover
-      &:hover {
-        border-top-color: $gray-l2;
-      }
-    }
 
     .info__title {
-      @extend %t-title-8;
+      @extend %t-title-4;
       @extend %t-weight3;
       margin-bottom: ($baseline/2);
     }
 
     .info__copy {
-      @extend %t-copy-sub1;
+      @extend %t-copy-base;
+
+      // BP: small desktop
+      @include media($bp-ds) {
+       // NOTE: drat! typography extends don't work
+        @include font-size(14);
+        @include lh(14);
+      }
+
+      // BP: mobile
+      @include media($bp-m) {
+        // NOTE: drat! typography extends don't work
+        @include font-size(14);
+        @include lh(14);
+      }
     }
   }
 }
