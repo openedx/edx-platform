@@ -244,8 +244,7 @@ $('a[name="updateBtn"]').click(function(event) {
       var post_url = "${reverse('shoppingcart.views.update_user_cart')}";
       $.post(post_url, {
           ItemId:ItemId,
-          qty:number_of_students,
-          purchase_type: number_of_students > 1 ? 'business' : 'personal'
+          qty:number_of_students
           }
       )
       .success(function(data) {
