@@ -89,7 +89,7 @@
 
 @mixin discussion-wmd-preview-label {
   padding-top: 3px;
-  padding-left: 5px;
+  #{$padding-left}: 5px;
   width: 100%;
   color: #bbb;
   text-transform: uppercase;
@@ -130,11 +130,11 @@
   color: $color;
 
   .icon {
-    margin-right: ($baseline/5);
+    #{$margin-right}: ($baseline/5);
   }
 
   &:last-child {
-    margin-right: 0;
+    #{$margin-right}: 0;
   }
 
   &.is-hidden {
