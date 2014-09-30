@@ -28,9 +28,9 @@ class DataDownload
     @$download_display_text           = @$download.find '.data-display-text'
     @$download_display_table          = @$download.find '.data-display-table'
     @$download_request_response_error = @$download.find '.request-response-error'
-    @$grades                        = @$section.find '.grades-download-container'
-    @$grades_request_response       = @$grades.find '.request-response'
-    @$grades_request_response_error = @$grades.find '.request-response-error'
+    @$reports                        = @$section.find '.reports-download-container'
+    @$reports_request_response       = @$reports.find '.request-response'
+    @$reports_request_response_error = @$reports.find '.request-response-error'
 
     @report_downloads = new ReportDownloads(@$section)
     @instructor_tasks = new (PendingInstructorTasks()) @$section
@@ -56,10 +56,10 @@ class DataDownload
         dataType: 'json'
         url: url
         error: std_ajax_err =>
-          @$grades_request_response_error.text gettext("Error generating student profile information. Please try again.")
+          @$reports_request_response_error.text gettext("Error generating student profile information. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
-          @$grades_request_response.text data['status']
+          @$reports_request_response.text data['status']
           $(".msg-confirm").css({"display":"block"})
 
     @$list_studs_btn.click (e) =>
@@ -117,10 +117,10 @@ class DataDownload
         dataType: 'json'
         url: url
         error: std_ajax_err =>
-          @$grades_request_response_error.text gettext("Error generating grades. Please try again.")
+          @$reports_request_response_error.text gettext("Error generating grades. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
-          @$grades_request_response.text data['status']
+          @$reports_request_response.text data['status']
           $(".msg-confirm").css({"display":"block"})
 
   # handler for when the section title is clicked.
@@ -140,8 +140,8 @@ class DataDownload
     @$download_display_text.empty()
     @$download_display_table.empty()
     @$download_request_response_error.empty()
-    @$grades_request_response.empty()
-    @$grades_request_response_error.empty()
+    @$reports_request_response.empty()
+    @$reports_request_response_error.empty()
     # Clear any CSS styling from the request-response areas
     $(".msg-confirm").css({"display":"none"})
     $(".msg-error").css({"display":"none"})

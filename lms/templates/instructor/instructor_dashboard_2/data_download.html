@@ -25,7 +25,7 @@
 </div>
 
 %if settings.FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
-  <div class="grades-download-container action-type-container">
+  <div class="reports-download-container action-type-container">
     <hr>
     <h2> ${_("Reports")}</h2>
 
@@ -43,8 +43,8 @@
 
     <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
 
-    <div class="request-response msg msg-confirm copy" id="grade-request-response"></div>
-    <div class="request-response-error msg msg-warning copy" id="grade-request-response-error"></div>
+    <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
+    <div class="request-response-error msg msg-warning copy" id="report-request-response-error"></div>
     <br>
 
     <p><b>${_("Reports Available for Download")}</b></p>
