@@ -41,32 +41,36 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 this.messageView.render();
                 this.isUnitPage = this.options.isUnitPage;
                 if (this.isUnitPage) {
-                    this.xblockPublisher = new ContainerSubviews.Publisher({
-                        el: this.$('#publish-unit'),
-                        model: this.model,
-                        // When "Discard Changes" is clicked, the whole page must be re-rendered.
-                        renderPage: this.render
-                    });
-                    this.xblockPublisher.render();
-
-                    this.publishHistory = new ContainerSubviews.PublishHistory({
-                        el: this.$('#publish-history'),
-                        model: this.model
-                    });
-                    this.publishHistory.render();
-
-                    this.previewActions = new ContainerSubviews.PreviewActionController({
-                        el: this.$('.nav-actions'),
-                        model: this.model
-                    });
-                    this.previewActions.render();
-
-                    this.unitOutlineView = new UnitOutlineView({
-                        el: this.$('.wrapper-unit-overview'),
-                        model: this.model
-                    });
-                    this.unitOutlineView.render();
+                    this.setUnitPage();
                 }
+            },
+
+            setUnitPage: function() {
+                this.xblockPublisher = new ContainerSubviews.Publisher({
+                    el: this.$('#publish-unit'),
+                    model: this.model,
+                    // When "Discard Changes" is clicked, the whole page must be re-rendered.
+                    renderPage: this.render
+                });
+                this.xblockPublisher.render();
+
+                this.publishHistory = new ContainerSubviews.PublishHistory({
+                    el: this.$('#publish-history'),
+                    model: this.model
+                });
+                this.publishHistory.render();
+
+                this.previewActions = new ContainerSubviews.PreviewActionController({
+                    el: this.$('.nav-actions'),
+                    model: this.model
+                });
+                this.previewActions.render();
+
+                this.unitOutlineView = new UnitOutlineView({
+                    el: this.$('.wrapper-unit-overview'),
+                    model: this.model
+                });
+                this.unitOutlineView.render();
             },
 
             render: function(options) {
@@ -142,6 +146,14 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 element.find('.edit-button').click(function(event) {
                     event.preventDefault();
                     self.editComponent(self.findXBlockElement(event.target));
+                    // update sidebar for draft changes for unit page
+                    if (self.isUnitPage) {
+                        // since using self.model.fetch() will trigger get request and also model may not be updated
+                        // in response so manually set 'visibility_state' and 'has_changes' fields
+                        self.model.set('visibility_state', 'needs_attention');
+                        self.model.set('has_changes', true);
+                        self.setUnitPage();
+                    }
                 });
                 element.find('.duplicate-button').click(function(event) {
                     event.preventDefault();
