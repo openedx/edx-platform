@@ -550,11 +550,15 @@ body.discussion {
       padding: 0 18px;
       width: 100%;
       box-shadow: 0 1px 1px $shadow-l1;
-      text-align: left;
+      text-align: $left;
       font-size: 13px;
 
+      .icon-reply:before {
+        content: flip("\f112", "\f064"); // RTL: Make it like fa-mail-forward
+      }
+
       span.add-response-btn-text {
-        padding-left: ($baseline/5);
+        #{$padding-left}: ($baseline/5);
       }
     }
   }
@@ -639,7 +643,7 @@ body.discussion {
 
   .discussion-submit-post {
     @include blue-button;
-    float: left;
+    float: $left;
   }
 
   .wmd-button {
@@ -675,7 +679,11 @@ body.discussion {
       padding-left: ($baseline*1.5);
       width: 100%;
       box-shadow: 0 1px 1px $shadow-l1;
-      text-align: left;
+      text-align: $left;
+
+      .icon-reply:before {
+        content: flip("\f112", "\f064"); // RTL: Make it like fa-mail-forward
+      }
 
       &:hover, &:focus {
         @include linear-gradient(top, $white 35%, #ddd);
