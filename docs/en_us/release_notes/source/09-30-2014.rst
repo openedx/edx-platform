@@ -1,0 +1,102 @@
+###################################
+September 30, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of
+September 30, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we update the edX Course Staff Release Notes.
+
+*******************************
+edX Insights
+*******************************
+
+The initial version of edX Insights, our new course analytics product, is now
+available. In this release, edX Insights provides data for student enrollment
+activity, geographic location, and engagement with course content.
+
+Team members who have the Instructor or Course Staff role can open edX Insights
+from the Instructor Dashboard. A banner announcing this new product displays at
+the top of every page: click the **visit edX Insights** link to view data about
+your course.
+
+EdX Insights uses visualizations, key metrics, and tables to present data about
+who your students are and what they do while interacting with your course. 
+
+For example, the Weekly Student Engagement chart displays the number of
+students who engaged in different activities over time.
+
+.. image:: images/Engagement_Chart.png
+   :alt: A line graph with three lines showing ongoing, differing levels of
+         student activity of any kind, students who watched a video, and
+         students who tried a problem.
+
+To report where your students are, edX Insights shows a color-coded map.
+
+.. image:: images/Geography.png
+   :alt: A world map; countries with darker shading have a higher number of 
+         students than those with lighter shading.
+
+You can use the data that is available from edX Insights to monitor activity,
+validate choices, reveal unexpected patterns, form hypotheses, and inform plans
+for your course. For information about edX Insights, see `Using edX Insights`_.
+
+**************************
+Coming Soon
+**************************
+
+We're pleased to announce the following upcoming changes:
+
+* EdX will soon release a fully supported cohorts feature that allows course
+  teams and TAs to assign students to different cohorts in class discussions.
+  Students in different cohorts will be able to see the discussions for their
+  individual cohorts, but cannot see discussions for other cohorts. Course
+  teams can also open some course discussions to all students.
+
+**************************
+edX Documentation
+**************************
+
+All guides now include a section that lists browsers supported for use with the
+edX platform.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+* `Using edX Insights`_
+
+* `Creating Peer Assessments`_
+
+* `edX Research Guide`_
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst
