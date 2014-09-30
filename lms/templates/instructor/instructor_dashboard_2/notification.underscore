@@ -3,22 +3,29 @@
         <%- title %>
     </h3>
 
-    <% if (details.length > 0) { %>
+    <% if (details.length > 0 || message) { %>
         <div class="message-copy">
-            <ul class="list-summary summary-items">
-                <% for (var i = 0; i < details.length; i++) { %>
-                    <li class="summary-item">
-                        <%- details[i] %>
-                    </li>
-                <% } %>
-            </ul>
+            <% if (message) { %>
+                <p><%- message %></p>
+            <% } %>
+            <% if (details.length > 0) { %>
+                <ul class="list-summary summary-items">
+                    <% for (var i = 0; i < details.length; i++) { %>
+                        <li class="summary-item"><%- details[i] %></li>
+                    <% } %>
+                </ul>
+            <% } %>
         </div>
     <% } %>
 
     <% if (actionText) { %>
         <div class="message-actions">
-            <a href="" class="action-primary"><%- actionText %></a>
+            <button class="action-primary <%- actionClass %>">
+                <% if (actionIconClass) { %>
+                    <i class="icon <%- actionIconClass %>"></i>
+                <% } %>
+                <%- actionText %>
+            </button>
         </div>
     <% } %>
-
 </div>

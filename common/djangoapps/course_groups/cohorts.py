@@ -3,10 +3,11 @@ This file contains the logic for cohort groups, as exposed internally to the
 forums, and to the cohort admin views.
 """
 
-from django.http import Http404
-
 import logging
 import random
+
+from django.http import Http404
+from django.utils.translation import ugettext as _
 
 from courseware import courses
 from student.models import get_user_by_username_or_email
@@ -140,7 +141,7 @@ def get_cohorted_commentables(course_key):
 
 def get_cohort(user, course_key):
     """
-    Given a django User and a CourseKey, return the user's cohort in that
+    Given a Django user and a CourseKey, return the user's cohort in that
     cohort.
 
     Arguments:
@@ -180,7 +181,7 @@ def get_cohort(user, course_key):
         # Use the "default cohort".
         group_name = DEFAULT_COHORT_NAME
 
-    group, _ = CourseUserGroup.objects.get_or_create(
+    group, __ = CourseUserGroup.objects.get_or_create(
         course_id=course_key,
         group_type=CourseUserGroup.COHORT,
         name=group_name
@@ -250,7 +251,7 @@ def add_cohort(course_key, name):
     if CourseUserGroup.objects.filter(course_id=course_key,
                                       group_type=CourseUserGroup.COHORT,
                                       name=name).exists():
-        raise ValueError("Can't create two cohorts with the same name")
+        raise ValueError(_("You cannot create two cohorts with the same name"))
 
     try:
         course = courses.get_course_by_id(course_key)
@@ -296,9 +297,10 @@ def add_user_to_cohort(cohort, username_or_email):
     )
     if course_cohorts.exists():
         if course_cohorts[0] == cohort:
-            raise ValueError("User {0} already present in cohort {1}".format(
-                user.username,
-                cohort.name))
+            raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                user_name=user.username,
+                cohort_name=cohort.name
+            ))
         else:
             previous_cohort = course_cohorts[0].name
             course_cohorts[0].users.remove(user)
@@ -313,8 +315,9 @@ def delete_empty_cohort(course_key, name):
     """
     cohort = get_cohort_by_name(course_key, name)
     if cohort.users.exists():
-        raise ValueError(
-            "Can't delete non-empty cohort {0} in course {1}".format(
-                name, course_key))
+        raise ValueError(_("You cannot delete non-empty cohort {cohort_name} in course {course_key}").format(
+            cohort_name=name,
+            course_key=course_key
+        ))
 
     cohort.delete()
