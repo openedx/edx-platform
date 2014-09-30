@@ -12,7 +12,12 @@
 
     .actions-item {
       @include box-sizing(border-box);
+      display: block;
       margin: ($baseline/4) 0;
+
+      &.is-hidden {
+        display: none;
+      }
     }
 
     .more-wrapper {
@@ -77,7 +82,12 @@
     }
 
     .actions-item {
+      display: block;
       margin: 0;
+
+      &.is-hidden {
+        display: none;
+      }
     }
   }
 
