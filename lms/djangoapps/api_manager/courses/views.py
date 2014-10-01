@@ -358,7 +358,7 @@ def _get_course_data(request, course_key, course_descriptor, depth=0):
             course_descriptor
         )
     base_uri_without_qs = generate_base_uri(request, True)
-    data['course_image_url'] = request.build_absolute_uri(course_image_url(course_descriptor))
+    data['course_image_url'] = course_image_url(course_descriptor)
     data['resources'] = []
     resource_uri = '{}/content/'.format(base_uri_without_qs)
     data['resources'].append({'uri': resource_uri})
@@ -1526,16 +1526,16 @@ class CoursesMetrics(SecureAPIView):
             'users_started': users_started_qs.values('user').distinct().count(),
             'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
-        # TODO: (mattdrayer) Uncomment after comment service has been updated
-        # thread_stats = {}
-        # try:
-        #     thread_stats = get_course_thread_stats(slash_course_id)
-        # except CommentClientRequestError, e:
-        #     data = {
-        #         "err_msg": str(e)
-        #     }
-        #     return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # data.update(thread_stats)
+
+        thread_stats = {}
+        try:
+            thread_stats = get_course_thread_stats(slash_course_id)
+        except CommentClientRequestError, e:
+            data = {
+                "err_msg": str(e)
+            }
+            return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        data.update(thread_stats)
         return Response(data, status=status.HTTP_200_OK)
 
 
