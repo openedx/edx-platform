@@ -43,9 +43,11 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/URI.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/coffee/src/xblock
+    - xmodule_js/common_static/js/vendor/sinon-1.7.1.js
     - xmodule_js/src/capa/
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
+    - xmodule_js/common_static/js/src/
     - xmodule_js/common_static/js/vendor/underscore-min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
 
@@ -53,8 +55,6 @@ lib_paths:
 src_paths:
     - js
     - js/common_helpers
-    - xmodule_js
-    - xmodule_js/common_static
 
 # Paths to spec (test) JavaScript files
 spec_paths:
