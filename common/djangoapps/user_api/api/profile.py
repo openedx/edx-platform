@@ -5,7 +5,8 @@ but does NOT include basic account information such as username, password, and
 email address.
 
 """
-from user_api.models import UserProfile
+
+from user_api.models import User, UserProfile, UserPreference
 from user_api.helpers import intercept_errors
 
 
@@ -43,13 +44,13 @@ FULL_NAME_MAX_LENGTH = 255
 
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
 def profile_info(username):
-    """Retrieve a user's profile information
+    """Retrieve a user's profile information.
 
     Searches either by username or email.
 
     At least one of the keyword args must be provided.
 
-    Arguments:
+    Args:
         username (unicode): The username of the account to retrieve.
 
     Returns:
@@ -78,7 +79,7 @@ def update_profile(username, full_name=None):
     Args:
         username (unicode): The username associated with the account.
 
-    Keyword Arguments:
+    Keyword Args:
         full_name (unicode): If provided, set the user's full name to this value.
 
     Returns:
@@ -102,31 +103,48 @@ def update_profile(username, full_name=None):
 
 
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
-def preference_info(username, preference_name):
+def preference_info(username):
     """Retrieve information about a user's preferences.
 
-    Arguments:
+    Args:
         username (unicode): The username of the account to retrieve.
-        preference_name (unicode): The name of the preference to retrieve.
 
     Returns:
-        The JSON-deserialized value.
+        dict: Empty if there is no user
 
     """
-    pass
+    preferences = UserPreference.objects.filter(user__username=username)
+
+    preferences_dict = {}
+    for preference in preferences:
+        preferences_dict[preference.key] = preference.value
+
+    return preferences_dict
 
 
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
-def update_preference(username, preference_name, preference_value):
-    """Update a user's preference.
+def update_preferences(username, **kwargs):
+    """Update a user's preferences.
 
-    Arguments:
+    Sets the provided preferences for the given user.
+
+    Args:
         username (unicode): The username of the account to retrieve.
-        preference_name (unicode): The name of the preference to set.
-        preference_value (JSON-serializable): The new value for the preference.
+
+    Keyword Args:
+        **kwargs (unicode): Arbitrary key-value preference pairs
 
     Returns:
         None
 
+    Raises:
+        ProfileUserNotFound
+
     """
-    pass
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise ProfileUserNotFound
+    else:
+        for key, value in kwargs.iteritems():
+            UserPreference.set_preference(user, key, value)

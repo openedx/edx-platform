@@ -56,24 +56,6 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result)
 
-    def _change_email(self, new_email, password):
-        """Request to change the user's email. """
-        data = {}
-
-        if new_email is not None:
-            data['new_email'] = new_email
-        if password is not None:
-            # We can't pass a Unicode object to urlencode, so we encode the Unicode object
-            data['password'] = password.encode('utf-8')
-
-        response = self.client.put(
-            path=reverse('email_change_request'),
-            data=urlencode(data),
-            content_type='application/x-www-form-urlencoded'
-        )
-
-        return response
-
     def test_index(self):
         response = self.client.get(reverse('account_index'))
         self.assertContains(response, "Student Account")
@@ -153,7 +135,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         response = self._change_email(invalid_email, self.PASSWORD)
         self.assertEquals(response.status_code, 400)
 
-    def test_email_change_confirmation_handler(self):
+    def test_email_change_confirmation(self):
         # Get an email change activation key
         activation_key = account_api.request_email_change(self.USERNAME, self.NEW_EMAIL, self.PASSWORD)
 
@@ -242,3 +224,21 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         self.assertEqual(email.to, expected_to)
         self.assertIn(expected_subject, email.subject)
         self.assertIn(expected_body, email.body)
+
+    def _change_email(self, new_email, password):
+        """Request to change the user's email. """
+        data = {}
+
+        if new_email is not None:
+            data['new_email'] = new_email
+        if password is not None:
+            # We can't pass a Unicode object to urlencode, so we encode the Unicode object
+            data['password'] = password.encode('utf-8')
+
+        response = self.client.put(
+            path=reverse('email_change_request'),
+            data=urlencode(data),
+            content_type='application/x-www-form-urlencoded'
+        )
+
+        return response

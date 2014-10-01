@@ -414,4 +414,3 @@ def _validate_email(email):
         raise AccountEmailInvalid(
             u"Email '{email}' format is not valid".format(email=email)
         )
-

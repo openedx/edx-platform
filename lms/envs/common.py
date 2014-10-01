@@ -687,7 +687,7 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
     ('en', u'English'),
-    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
+    ('eo', u'Dummy Language (Esperanto)'),  # Dummy language used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('am', u'አማርኛ'),  # Amharic
@@ -777,6 +777,9 @@ USE_L10N = True
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+# Guidelines for translators
+TRANSLATORS_GUIDE = 'https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/i18n_translators_guide.rst'
 
 #################################### GITHUB #######################################
 # gitreload is used in LMS-workflow to pull content from github
