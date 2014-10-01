@@ -849,13 +849,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
             raise ItemNotFoundError(usage_key)
 
-        course = self._lookup_course(usage_key.course_key)
-        items = self._load_items(course, [BlockKey.from_usage_key(usage_key)], depth, lazy=True, **kwargs)
-        if len(items) == 0:
-            raise ItemNotFoundError(usage_key)
-        elif len(items) > 1:
-            log.debug("Found more than one item for '{}'".format(usage_key))
-        return items[0]
+        with self.bulk_operations(usage_key.course_key):
+            course = self._lookup_course(usage_key.course_key)
+            items = self._load_items(course, [BlockKey.from_usage_key(usage_key)], depth, lazy=True, **kwargs)
+            if len(items) == 0:
+                raise ItemNotFoundError(usage_key)
+            elif len(items) > 1:
+                log.debug("Found more than one item for '{}'".format(usage_key))
+            return items[0]
 
     def get_items(self, course_locator, settings=None, content=None, qualifiers=None, **kwargs):
         """
