@@ -11,7 +11,7 @@
 <%! from microsite_configuration import page_title_breadcrumbs %>
 
 <%namespace name='static' file='static_content.html'/>
-<%! from django.utils import html %>
+<%! from django.utils.http import urlquote_plus %>
 
 ## Define a couple of helper functions to make life easier when
 ## embedding theme conditionals into templates. All inheriting
@@ -148,7 +148,7 @@
 
 <%def name="login_query()">${
   u"?course_id={0}&enrollment_action={1}".format(
-    html.escape(course_id),
-    html.escape(enrollment_action)
+    urlquote_plus(course_id),
+    urlquote_plus(enrollment_action)
   ) if course_id and enrollment_action else ""
 }</%def>

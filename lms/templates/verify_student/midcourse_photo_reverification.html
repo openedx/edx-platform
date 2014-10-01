@@ -174,7 +174,7 @@
                   <li class="wizard-step step-proceed">
                     <form id="reverify_form" method="post">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-                      <input type="hidden" name="course_id" value="${course_id}">
+                      <input type="hidden" name="course_id" value="${course_id | h}">
                       <input class="action-primary disabled" type="button" id="midcourse_reverify_button" value="${_('Submit photos &amp; re-verify')}" name="payment">
                     </form>
                   </li>

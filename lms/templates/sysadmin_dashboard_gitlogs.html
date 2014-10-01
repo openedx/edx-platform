@@ -75,7 +75,7 @@ textarea {
 
       %if course_id is not None:
           ## Translators: Git is a version-control system; see http://git-scm.com/about
-          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id)}</h2>
+          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id) | h}</h2>
           %if error_msg:
               <h3>${_('Error')}:</h3>
               <p>${error_msg}</p>
@@ -100,15 +100,13 @@ textarea {
           %>
           % for cil in logs:
               <%
-                  course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None
-
                   # Appropriate datetime string for current locale and timezone
                   date = get_time_display(cil.created.replace(tzinfo=UTC),
                                           DEFAULT_DATE_TIME_FORMAT, coerce_tz=settings.TIME_ZONE)
               %>
               <tr>
                 <td>${date}</td>
-                <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
+                <td><a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">${cil.course_id | h}</a></td>
                 <td>${cil.git_log}</td>
               </tr>
           %endfor
