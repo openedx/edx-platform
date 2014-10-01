@@ -50,7 +50,7 @@ See the detailed Style Guidelines at the end for details.
 Editing source files
 ********************
 
-While editing source files (including Python, Javascript, or HTML template
+While editing source files (including Python, JavaScript, or HTML template
 files), use the appropriate conventions.  There are a few things to know how to
 do:
 
@@ -70,13 +70,14 @@ The code samples below show how to do each of these things for:
 * `Python source code`_
 * `Django template files`_
 * `Mako template files`_
-* `Javascript files`_
+* `JavaScript files`_
 * `Coffeescript files`_
+* `Underscore template files`_
 * `Other kinds of code`_
 
 Note that you have to take into account not just the programming language involved,
-but the type of file: Javascript embedded in an HTML Mako template is treated differently
-than Javascript in a pure .js file.
+but the type of file: JavaScript embedded in an HTML Mako template is treated differently
+than JavaScript in a pure .js file.
 
 Python source code
 ==================
@@ -139,36 +140,36 @@ functions first. Here's a Mako template example::
     ## Translators: message to the translator
     ${_("Welcome!")}
 
-Javascript files
+JavaScript files
 ================
 
 .. highlight:: javascript
 
-In order to internationalize Javascript, first the html template (base.html)
-must load a special Javascript library (and Django must be configured to serve
+In order to internationalize JavaScript, first the HTML template (base.html)
+must load a special JavaScript library (and Django must be configured to serve
 it)::
 
     <script type="text/javascript" src="jsi18n/"></script>
 
-Then, in Javascript files (`*.js`)::
+Then, in JavaScript files (`*.js`)::
 
     // Translators: this will help the translator.
     var message = gettext('Welcome!');
 
-Note that Javascript embedded in HTML in a Mako template file is handled
-differently.  There, you use the Mako syntax even within the Javascript.
+Note that JavaScript embedded in HTML in a Mako template file is handled
+differently.  There, you use the Mako syntax even within the JavaScript.
 
 Coffeescript files
 ==================
 
 .. highlight:: coffeescript
 
-Coffeescript files are compiled to Javascript files, so it works mostly like
-Javascript::
+Coffeescript files are compiled to JavaScript files, so it works mostly like
+JavaScript::
 
     `// Translators: this will help the translator.`
     message = gettext('Hey there!')
-    # Interpolation has to be done in Javascript, not Coffeescript:
+    # Interpolation has to be done in JavaScript, not Coffeescript:
     message = gettext("Error getting student progress url for '<%= student_id %>'.")
     full_message = _.template(message, {student_id: unique_student_identifier})
 
@@ -179,7 +180,7 @@ native Coffeescript features that break the extraction from the .js files:
    concatenation in the .js file, so string extraction won't work.
 
 2. You cannot use Coffeescript comments for translator comments, since they are
-   not passed through to the Javascript file.
+   not passed through to the JavaScript file.
 
 ::
 
@@ -198,6 +199,36 @@ native Coffeescript features that break the extraction from the .js files:
  
 .. highlight:: python
 
+Underscore template files
+=========================
+
+.. highlight:: underscore
+
+Underscore template files are used in conjunction with JavaScript, and so the
+same techniques are used for localization. Ensure that the i18n JavaScript
+library has already been loaded, and then use the regular i18n functions
+such as ``gettext`` and ``interpolate`` from your template.
+
+For example::
+
+    <div class="group-visibility-label">
+        <% if (group.group_name) { %>
+            <%-
+            interpolate(
+                gettext('This post is visible only to %(group_name)s.'),
+                {group_name: group.group_name},
+                true
+            )
+            %>
+        <% } else { %>
+            <%- gettext('This post is visible to everyone.') %>
+        <% } %>
+    </div>
+
+Note: it is recommended that you use ``<%-`` for all translated strings
+as this will HTML escape the string before including it in the page. This
+ensures that translations are free to use non-HTML characters.
+
 Other kinds of code
 ===================
 
@@ -206,8 +237,6 @@ We have not yet established guidelines for internationalizing the following.
 * Course content (such as subtitles for videos)
 
 * Documentation (written for Sphinx as .rst files)
-  
-* Client-side templates written using Underscore.
 
 
 Building and testing your code
@@ -278,7 +307,7 @@ This dummy text is distinguished by extra accent characters. If you see plain
 English instead (without these accents), it most likely means the string has
 not been externalized yet. To fix this: 
 
-* Find the string in the source tree (either in Python, Javascript, or HTML
+* Find the string in the source tree (either in Python, JavaScript, or HTML
   template code). 
 
 * Refer to the above coding guidelines to make sure it has been externalized
@@ -413,7 +442,7 @@ Be aware of nested syntax
 =========================
 
 When translating strings in templated files, you have to be careful of nested
-syntax.  For example, consider this Javascript fragment in a Mako template::
+syntax.  For example, consider this JavaScript fragment in a Mako template::
 
     <script>
     var feeling = '${_("I love you.")';
@@ -425,9 +454,9 @@ When rendered for a French speaker, it will produce this::
     var feeling = 'Je t'aime.';
     </script>
 
-which is now invalid Javascript.  This can be avoided by using double-quotes
-for the Javascript string.  The better solution is to use a filtering function
-that properly escapes the string for Javascript use::
+which is now invalid JavaScript.  This can be avoided by using double-quotes
+for the JavaScript string.  The better solution is to use a filtering function
+that properly escapes the string for JavaScript use::
 
     <%!
         from django.utils.translation import ugettext as _
