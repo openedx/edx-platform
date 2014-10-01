@@ -162,71 +162,104 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Discount does not exist against code '{0}'.".format(non_existing_code), resp.content)
 
-    def test_valid_qty_case_when_purchase_type_is_business(self):
+    def test_valid_qty_greater_then_one_and_purchase_type_should_business(self):
         qty = 2
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
         self.assertEqual(data['total_cost'], item.unit_cost * qty)
+        cart = Order.get_cart_for_user(self.user)
+        self.assertEqual(cart.order_type, 'business')
 
-    def test_in_valid_qty_case_when_purchase_type_is_business(self):
+    def test_in_valid_qty_case(self):
         # invalid quantity, Quantity must be between 1 and 1000.
         qty = 0
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Quantity must be between 1 and 1000.", resp.content)
 
         # invalid quantity, Quantity must be an integer.
         qty = 'abcde'
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Quantity must be an integer.", resp.content)
 
-    def test_valid_qty_but_item_not_found_when_purchase_type_is_business(self):
+        # invalid quantity, Quantity is not present in request
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Quantity must be between 1 and 1000.", resp.content)
+
+    def test_valid_qty_but_item_not_found(self):
         qty = 2
         item_id = '-1'
         self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item_id, 'qty': qty, 'purchase_type': 'business'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item_id, 'qty': qty})
         self.assertEqual(resp.status_code, 404)
         self.assertEqual('Order item does not exist.', resp.content)
 
         # now testing the case if item id not found in request,
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'qty': qty, 'purchase_type': 'business'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'qty': qty})
         self.assertEqual(resp.status_code, 400)
         self.assertEqual('Order item not found in request.', resp.content)
 
-    def test_qty_should_be_one_when_purchase_type_is_personal(self):
-        qty = 5
+    def test_purchase_type_should_be_personal_when_qty_is_one(self):
+        qty = 1
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'personal'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
         self.assertEqual(data['total_cost'], item.unit_cost * 1)
+        cart = Order.get_cart_for_user(self.user)
+        self.assertEqual(cart.order_type, 'personal')
 
-    def test_purchase_type_personal_case_when_remove_item(self):
+    def test_purchase_type_on_removing_item_and_cart_has_item_with_qty_one(self):
         qty = 5
-        item = self.add_course_to_user_cart(self.course_key)
+        self.add_course_to_user_cart(self.course_key)
         item2 = self.add_course_to_user_cart(self.testing_course.id)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': qty, 'purchase_type': 'business'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                {'id': item.id})
+                                {'id': item2.id})
         self.assertEqual(resp.status_code, 200)
+        cart = Order.get_cart_for_user(self.user)
+        self.assertEqual(cart.order_type, 'personal')
 
-    def test_billing_details_btn_in_cart_when_purchase_type_is_business(self):
+    def test_billing_details_btn_in_cart_when_qty_is_greater_than_one(self):
         qty = 5
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertIn("Billing Details", resp.content)
 
-    def test_use_valid_coupon_code_when_purchase_type_is_business(self):
+    def test_purchase_type_should_be_personal_when_remove_all_items_from_cart(self):
+        qty = 2
+        item1 = self.add_course_to_user_cart(self.course_key)
+        item2 = self.add_course_to_user_cart(self.testing_course.id)
+
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item1.id, 'qty': qty})
+        self.assertEqual(resp.status_code, 200)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': qty})
+        self.assertEqual(resp.status_code, 200)
+
+        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+                                {'id': item1.id})
+        self.assertEqual(resp.status_code, 200)
+        cart = Order.get_cart_for_user(self.user)
+        self.assertEqual(cart.order_type, 'business')
+
+        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
+                                {'id': item2.id})
+
+        cart = Order.get_cart_for_user(self.user)
+        self.assertEqual(cart.order_type, 'personal')
+
+    def test_use_valid_coupon_code_and_qty_is_greater_than_one(self):
         qty = 5
         item = self.add_course_to_user_cart(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty, 'purchase_type': 'business'})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
         self.assertEqual(data['total_cost'], item.unit_cost * qty)
