@@ -229,14 +229,14 @@ FEATURES = {
     # when enrollment exceeds this number
     'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
 
-    # Grade calculation started from the new instructor dashboard will write
-    # grades CSV files to S3 and give links for downloads.
+    # Grade calculation and submission report requests started from the new instructor dashboard will write
+    # CSV files to S3 and give links for downloads.
     'ENABLE_S3_GRADE_DOWNLOADS': False,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,
 
-    # Give course staff unrestricted access to grade downloads (if set to False,
+    # Give course staff unrestricted access to grade and student submissions downloads (if set to False,
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 
@@ -1494,6 +1494,15 @@ GRADES_DOWNLOAD = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': 'edx-grades',
     'ROOT_PATH': '/tmp/edx-s3/grades',
+}
+
+#################### Student Submissions Reports Downloads #################
+STUDENT_SUBMISSIONS_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+
+STUDENT_SUBMISSIONS_DOWNLOAD = {
+    'STORAGE_TYPE': 'localfs',
+    'BUCKET': 'edx-student-submissions',
+    'ROOT_PATH': '/tmp/edx-s3/student-submissions',
 }
 
 ######################## PROGRESS SUCCESS BUTTON ##############################

@@ -19,10 +19,12 @@ from pytz import UTC
 from xmodule.modulestore.django import modulestore
 from track.views import task_track
 
+from courseware.courses import get_course
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
+from instructor_analytics.basic import student_submissions
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from student.models import CourseEnrollment
 
@@ -579,3 +581,38 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
     # One last update before we close out...
     return update_task_progress()
+
+
+def push_student_submissions_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    For a given `course_id`, generate a submissions CSV file for students that
+    have submitted problem responses, and store using a `ReportStore`. Once
+    created, the files can be accessed by instantiating another `ReportStore` (via
+    `ReportStore.from_config()`) and calling `link_for()` on it. Writes are
+    buffered, so we'll never write part of a CSV file to S3 -- i.e. any files
+    that are visible in ReportStore will be complete ones.
+    """
+    start_time = datetime.now(UTC)
+
+    try:
+        course = get_course(course_id)
+    except ValueError as e:
+        TASK_LOG.error(e.message)
+        return "failed"
+
+    header, datarows = student_submissions(course)
+    rows = [header] + datarows
+
+    # Generate parts of the file name
+    timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
+    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
+
+    # Perform the actual upload
+    report_store = ReportStore.from_config()
+    report_store.store_rows(
+        course_id,
+        u"{}_submissions_report_{}.csv".format(course_id_prefix, timestamp_str),
+        rows
+    )
+
+    return "succeeded" 
