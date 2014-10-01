@@ -272,7 +272,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.check_confirm_email_change('email_exists.html', {})
         self.assertFailedBeforeEmailing(email_user)
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
+    @unittest.skipUnless(settings.FEATURES.get('TEST_EMAIL_RESET', True),
                          dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     def test_old_email_fails(self, email_user):
@@ -283,7 +283,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.assertRolledBack()
         self.assertChangeEmailSent(email_user)
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
+    @unittest.skipUnless(settings.FEATURES.get('TEST_EMAIL_RESET', True),
                          dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     def test_new_email_fails(self, email_user):
@@ -294,7 +294,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.assertRolledBack()
         self.assertChangeEmailSent(email_user)
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
+    @unittest.skipUnless(settings.FEATURES.get('TEST_EMAIL_RESET', True),
                          dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     def test_successful_email_change(self, email_user):

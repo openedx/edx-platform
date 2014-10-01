@@ -90,8 +90,8 @@ class ResetPasswordTests(TestCase):
 
         cache.clear()
 
-    @unittest.skipIf(
-        settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
+    @unittest.skipUnless(
+        settings.FEATURES.get('TEST_EMAIL_RESET', True),
         dedent("""
             Skipping Test because CMS has not provided necessary templates for password reset.
             If LMS tests print this message, that needs to be fixed.
@@ -123,8 +123,8 @@ class ResetPasswordTests(TestCase):
         self.assertFalse(self.user.is_active)
         re.search(r'password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/', msg).groupdict()
 
-    @unittest.skipIf(
-        settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
+    @unittest.skipUnless(
+        settings.FEATURES.get('TEST_EMAIL_RESET', True),
         dedent("""
             Skipping Test because CMS has not provided necessary templates for password reset.
             If LMS tests print this message, that needs to be fixed.
