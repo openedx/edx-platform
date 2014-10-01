@@ -106,7 +106,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
         viewer_params += current_chapter['url']
         current_url = current_chapter['url']
 
-    viewer_params += '#zoom=page-fit'
+    viewer_params += '#zoom=page-fit&disableRange=true'
     if page is not None:
         viewer_params += '&amp;page={}'.format(page)
 

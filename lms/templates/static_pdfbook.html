@@ -18,7 +18,7 @@ $(function(){
     e.preventDefault();
     var url = $(this).attr('rel');
     $('#viewer-frame').attr({
-        'src': '${request.path}?viewer=true&file=' + url + '#zoom=page-fit',
+        'src': 'https://courses.edx.org${request.path}?viewer=true&file=' + url + '#zoom=page-fit&disableRange=true',
         'title': $(this).text()
         });
     $('#viewer-frame').focus();
@@ -44,7 +44,7 @@ $(function(){
 <iframe
   title="${current_chapter['title']|h}"
   id="viewer-frame"
-  src="${request.path}?viewer=true${viewer_params}"
+  src="https://courses.edx.org${request.path}?viewer=true${viewer_params}"
   width="856"
   height="1108"
   frameborder="0"
