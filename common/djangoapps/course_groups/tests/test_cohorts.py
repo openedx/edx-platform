@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http import Http404
 
 from django.test.utils import override_settings
+from mock import call, patch
 
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -23,6 +24,103 @@ from xmodule.modulestore.tests.django_utils import mixed_store_config
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
+
+
+@patch("course_groups.cohorts.tracker")
+class TestCohortSignals(django.test.TestCase):
+    def setUp(self):
+        self.course_key = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
+
+    def test_cohort_added(self, mock_tracker):
+        # Add cohort
+        cohort = CourseUserGroup.objects.create(
+            name="TestCohort",
+            course_id=self.course_key,
+            group_type=CourseUserGroup.COHORT
+        )
+        mock_tracker.emit.assert_called_with(
+            "edx.cohort.created",
+            {"cohort_id": cohort.id, "cohort_name": cohort.name}
+        )
+        mock_tracker.reset_mock()
+
+        # Modify existing cohort
+        cohort.name = "NewName"
+        cohort.save()
+        self.assertFalse(mock_tracker.called)
+
+        # Add non-cohort group
+        CourseUserGroup.objects.create(
+            name="TestOtherGroupType",
+            course_id=self.course_key,
+            group_type="dummy"
+        )
+        self.assertFalse(mock_tracker.called)
+
+    def test_cohort_membership_changed(self, mock_tracker):
+        cohort_list = [CohortFactory() for _ in range(2)]
+        non_cohort = CourseUserGroup.objects.create(
+            name="dummy",
+            course_id=self.course_key,
+            group_type="dummy"
+        )
+        user_list = [UserFactory() for _ in range(2)]
+        mock_tracker.reset_mock()
+
+        def assert_events(event_name_suffix, user_list, cohort_list):
+            mock_tracker.emit.assert_has_calls([
+                call(
+                    "edx.cohort.user_" + event_name_suffix,
+                    {
+                        "user_id": user.id,
+                        "cohort_id": cohort.id,
+                        "cohort_name": cohort.name,
+                    }
+                )
+                for user in user_list for cohort in cohort_list
+            ])
+
+        # Add users to cohort
+        cohort_list[0].users.add(*user_list)
+        assert_events("added", user_list, cohort_list[:1])
+        mock_tracker.reset_mock()
+
+        # Remove users from cohort
+        cohort_list[0].users.remove(*user_list)
+        assert_events("removed", user_list, cohort_list[:1])
+        mock_tracker.reset_mock()
+
+        # Clear users from cohort
+        cohort_list[0].users.add(*user_list)
+        cohort_list[0].users.clear()
+        assert_events("removed", user_list, cohort_list[:1])
+        mock_tracker.reset_mock()
+
+        # Clear users from non-cohort group
+        non_cohort.users.add(*user_list)
+        non_cohort.users.clear()
+        self.assertFalse(mock_tracker.emit.called)
+
+        # Add cohorts to user
+        user_list[0].course_groups.add(*cohort_list)
+        assert_events("added", user_list[:1], cohort_list)
+        mock_tracker.reset_mock()
+
+        # Remove cohorts from user
+        user_list[0].course_groups.remove(*cohort_list)
+        assert_events("removed", user_list[:1], cohort_list)
+        mock_tracker.reset_mock()
+
+        # Clear cohorts from user
+        user_list[0].course_groups.add(*cohort_list)
+        user_list[0].course_groups.clear()
+        assert_events("removed", user_list[:1], cohort_list)
+        mock_tracker.reset_mock()
+
+        # Clear non-cohort groups from user
+        user_list[0].course_groups.add(non_cohort)
+        user_list[0].course_groups.clear()
+        self.assertFalse(mock_tracker.emit.called)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -354,13 +452,18 @@ class TestCohorts(django.test.TestCase):
             lambda: cohorts.get_cohort_by_id(course.id, cohort.id)
         )
 
-    def test_add_cohort(self):
+    @patch("course_groups.cohorts.tracker")
+    def test_add_cohort(self, mock_tracker):
         """
         Make sure cohorts.add_cohort() properly adds a cohort to a course and handles
         errors.
         """
         course = modulestore().get_course(self.toy_course_key)
         added_cohort = cohorts.add_cohort(course.id, "My Cohort")
+        mock_tracker.emit.assert_any_call(
+            "edx.cohort.creation_requested",
+            {"cohort_name": added_cohort.name, "cohort_id": added_cohort.id}
+        )
 
         self.assertEqual(added_cohort.name, "My Cohort")
         self.assertRaises(
@@ -372,7 +475,8 @@ class TestCohorts(django.test.TestCase):
             lambda: cohorts.add_cohort(SlashSeparatedCourseKey("course", "does_not", "exist"), "My Cohort")
         )
 
-    def test_add_user_to_cohort(self):
+    @patch("course_groups.cohorts.tracker")
+    def test_add_user_to_cohort(self, mock_tracker):
         """
         Make sure cohorts.add_user_to_cohort() properly adds a user to a cohort and
         handles errors.
@@ -390,13 +494,32 @@ class TestCohorts(django.test.TestCase):
             cohorts.add_user_to_cohort(first_cohort, "Username"),
             (course_user, None)
         )
+        mock_tracker.emit.assert_any_call(
+            "edx.cohort.user_add_requested",
+            {
+                "user_id": course_user.id,
+                "cohort_id": first_cohort.id,
+                "cohort_name": first_cohort.name,
+                "previous_cohort_id": None,
+                "previous_cohort_name": None,
+            }
+        )
         # Should get (user, previous_cohort_name) when moved from one cohort to
         # another
         self.assertEqual(
             cohorts.add_user_to_cohort(second_cohort, "Username"),
             (course_user, "FirstCohort")
         )
-
+        mock_tracker.emit.assert_any_call(
+            "edx.cohort.user_add_requested",
+            {
+                "user_id": course_user.id,
+                "cohort_id": second_cohort.id,
+                "cohort_name": second_cohort.name,
+                "previous_cohort_id": first_cohort.id,
+                "previous_cohort_name": first_cohort.name,
+            }
+        )
         # Error cases
         # Should get ValueError if user already in cohort
         self.assertRaises(

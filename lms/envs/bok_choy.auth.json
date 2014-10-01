@@ -46,6 +46,15 @@
         "port": 27017,
         "user": "edxapp"
     },
+    "EVENT_TRACKING_BACKENDS": {
+        "mongo": {
+            "ENGINE": "eventtracking.backends.mongodb.MongoBackend",
+            "OPTIONS": {
+                "database": "test",
+                "collection": "events"
+            }
+        }
+    },
     "MODULESTORE": {
         "default": {
             "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
