@@ -283,7 +283,7 @@ header.global {
     margin-top: ($baseline/4);
     list-style: none;
 
-    div {
+    li, div {
       display: inline-block;
 
       .cta {
