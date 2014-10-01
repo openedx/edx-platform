@@ -19,30 +19,10 @@
 % endfor
 </%block>
 
-<%block name="jsextra">
-  <script type="text/javascript" charset="utf-8">
-
-require(["domReady!", "jquery", "js/collections/course_update", "js/models/module_info", "js/models/course_info", "js/views/course_info_edit"],
-  function(doc, $, CourseUpdateCollection, ModuleInfoModel, CourseInfoModel, CourseInfoEditView) {
-    var course_updates = new CourseUpdateCollection();
-    course_updates.url = '${updates_url}';
-    course_updates.fetch({reset: true});
-
-    var course_handouts = new ModuleInfoModel({
-        id: '${handouts_locator | escapejs}'
-      });
-
-    var editor = new CourseInfoEditView({
-      el: $('.main-wrapper'),
-      model : new CourseInfoModel({
-        updates : course_updates,
-        base_asset_url : '${base_asset_url}',
-        handouts : course_handouts
-        })
-    });
-    editor.render();
-});
-  </script>
+<%block name="requirejs">
+  require(["js/factories/course_info"], function(CourseInfoFactory) {
+      CourseInfoFactory("${updates_url}", "${handouts_locator | escapejs}", "${base_asset_url}");
+  });
 </%block>
 
 <%block name="content">

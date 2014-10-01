@@ -22,25 +22,12 @@ CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
 CMS.URL.TEXTBOOKS = "${textbook_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
-require(["js/models/section", "js/collections/textbook", "js/views/list_textbooks"],
-        function(Section, TextbookCollection, ListTextbooksView) {
-  var textbooks = new TextbookCollection(${json.dumps(textbooks)}, {parse: true});
-  var tbView = new ListTextbooksView({collection: textbooks});
-
-  $(function() {
-      $(".content-primary").append(tbView.render().el);
-      $(".nav-actions .new-button").click(function(e) {
-          tbView.addOne(e);
-      })
-      $(window).on("beforeunload", function() {
-          var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
-          if(dirty) {
-              return "${_('You have unsaved changes. Do you really want to leave this page?')}";
-          }
-      })
-  })
-});
 </script>
+</%block>
+<%block name="requirejs">
+    require(["js/factories/textbooks"], function(TextbooksFactory) {
+        TextbooksFactory(${json.dumps(textbooks)});
+    });
 </%block>
 
 <%block name="content">

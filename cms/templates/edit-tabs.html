@@ -18,25 +18,10 @@
 % endfor
 </%block>
 
-<%block name="jsextra">
-<script type='text/javascript'>
-    require(["js/models/explicit_url", "coffee/src/views/tabs",
-        "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-            function (TabsModel, TabsEditView, xmoduleLoader) {
-                xmoduleLoader.done(function () {
-                    var model = new TabsModel({
-                        id: "${context_course.location | escapejs}",
-                        explicit_url: "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}"
-                    });
-
-                    new TabsEditView({
-                        el: $('.tab-list'),
-                        model: model,
-                        mast: $('.wrapper-mast')
-                    });
-                });
-            });
-  </script>
+<%block name="requirejs">
+    require(["js/factories/edit_tabs"], function (EditTabsFactory) {
+        EditTabsFactory("${context_course.location | escapejs}", "${reverse('contentstore.views.tabs_handler', kwargs={'course_key_string': context_course.id})}");
+    });
 </%block>
 
 <%block name="content">

@@ -99,35 +99,8 @@
 </div>
 </%block>
 
-<%block name="jsextra">
-  <script type="text/javascript">
-require(["jquery", "jquery.cookie"], function($) {
-  $("form :input").focus(function() {
-    $("label[for='" + this.id + "']").addClass("is-focused");
-  }).blur(function() {
-    $("label").removeClass("is-focused");
-  });
-
-  $('form#register_form').submit(function(e) {
-    e.preventDefault();
-    var submit_data = $('#register_form').serialize();
-
-    $.ajax({
-      url: '/create_account',
-      type: 'POST',
-      dataType: 'json',
-      data: submit_data,
-      headers: {'X-CSRFToken': $.cookie('csrftoken')},
-      success: function(json) {
-        location.href = "/course/";
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        json = $.parseJSON(jqXHR.responseText);
-        $('#register_error').html(json.value).stop().addClass('is-shown');
-      },
-      notifyOnError: false
+<%block name="requirejs">
+    require(["js/factories/register"], function (RegisterFactory) {
+        RegisterFactory();
     });
-  });
-});
-  </script>
 </%block>
