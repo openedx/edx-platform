@@ -18,7 +18,7 @@ $(function(){
     e.preventDefault();
     var url = $(this).attr('rel');
     $('#viewer-frame').attr({
-        'src': '${request.path}?viewer=true&file=' + url + '#zoom=page-fit',
+        'src': '${request.path}?viewer=true&file=' + url + '#zoom=page-fit&disableRange=true',
         'title': $(this).text()
         });
     $('#viewer-frame').focus();
