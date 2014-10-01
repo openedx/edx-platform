@@ -6,14 +6,67 @@ forums, and to the cohort admin views.
 import logging
 import random
 
+from django.db.models.signals import post_save, m2m_changed
+from django.dispatch import receiver
 from django.http import Http404
 from django.utils.translation import ugettext as _
 
 from courseware import courses
+from eventtracking import tracker
 from student.models import get_user_by_username_or_email
 from .models import CourseUserGroup
 
 log = logging.getLogger(__name__)
+
+
+@receiver(post_save, sender=CourseUserGroup)
+def _cohort_added(sender, **kwargs):
+    """Emits a tracking log event each time a cohort is created"""
+    instance = kwargs["instance"]
+    if kwargs["created"] and instance.group_type == CourseUserGroup.COHORT:
+        tracker.emit(
+            "edx.cohort.created",
+            {"cohort_id": instance.id, "cohort_name": instance.name}
+        )
+
+
+@receiver(m2m_changed, sender=CourseUserGroup.users.through)
+def _cohort_membership_changed(sender, **kwargs):
+    """Emits a tracking log event each time cohort membership is modified"""
+    def get_event_iter(user_id_iter, cohort_iter):
+        return (
+            {"cohort_id": cohort.id, "cohort_name": cohort.name, "user_id": user_id}
+            for user_id in user_id_iter
+            for cohort in cohort_iter
+        )
+
+    action = kwargs["action"]
+    instance = kwargs["instance"]
+    pk_set = kwargs["pk_set"]
+    reverse = kwargs["reverse"]
+
+    if action == "post_add":
+        event_name = "edx.cohort.user_added"
+    elif action in ["post_remove", "pre_clear"]:
+        event_name = "edx.cohort.user_removed"
+    else:
+        return
+
+    if reverse:
+        user_id_iter = [instance.id]
+        if action == "pre_clear":
+            cohort_iter = instance.course_groups.filter(group_type=CourseUserGroup.COHORT)
+        else:
+            cohort_iter = CourseUserGroup.objects.filter(pk__in=pk_set, group_type=CourseUserGroup.COHORT)
+    else:
+        cohort_iter = [instance] if instance.group_type == CourseUserGroup.COHORT else []
+        if action == "pre_clear":
+            user_id_iter = (user.id for user in instance.users.all())
+        else:
+            user_id_iter = pk_set
+
+    for event in get_event_iter(user_id_iter, cohort_iter):
+        tracker.emit(event_name, event)
 
 
 # A 'default cohort' is an auto-cohort that is automatically created for a course if no auto_cohort_groups have been
@@ -270,12 +323,16 @@ def add_cohort(course_key, name):
     except Http404:
         raise ValueError("Invalid course_key")
 
-    return CourseUserGroup.objects.create(
+    cohort = CourseUserGroup.objects.create(
         course_id=course.id,
         group_type=CourseUserGroup.COHORT,
         name=name
     )
-
+    tracker.emit(
+        "edx.cohort.creation_requested",
+        {"cohort_name": cohort.name, "cohort_id": cohort.id}
+    )
+    return cohort
 
 def add_user_to_cohort(cohort, username_or_email):
     """
@@ -293,8 +350,9 @@ def add_user_to_cohort(cohort, username_or_email):
         ValueError if user already present in this cohort.
     """
     user = get_user_by_username_or_email(username_or_email)
-    previous_cohort = None
-    
+    previous_cohort_name = None
+    previous_cohort_id = None
+
     course_cohorts = CourseUserGroup.objects.filter(
         course_id=cohort.course_id,
         users__id=user.id,
@@ -307,69 +365,20 @@ def add_user_to_cohort(cohort, username_or_email):
                 cohort_name=cohort.name
             ))
         else:
-            previous_cohort = course_cohorts[0].name
-            course_cohorts[0].users.remove(user)
+            previous_cohort = course_cohorts[0]
+            previous_cohort.users.remove(user)
+            previous_cohort_name = previous_cohort.name
+            previous_cohort_id = previous_cohort.id
 
-    cohort.users.add(user)
-    return (user, previous_cohort)
-
-
-def is_user_in_cohort(cohort, user_id, group_type=CourseUserGroup.COHORT):
-    """
-    Returns True or False if a user is in a cohort
-    """
-    return CourseUserGroup.objects.filter(
-        course_id=cohort.course_id,
-        users__id=user_id,
-        group_type=group_type).exists()
-
-
-def remove_user_from_cohort(cohort, username_or_email):
-    """
-    Look up the given user, and if successful, remove them to the specified cohort.
-
-    Arguments:
-        cohort: CourseUserGroup
-        username_or_email: string.  Treated as email if has '@'
-
-    Returns:
-        User object that has been removed from the cohort
-
-    Raises:
-        User.DoesNotExist if can't find user.
-
-        ValueError if user is not in this cohort.
-    """
-
-    user = get_user_by_username_or_email(username_or_email)
-
-    course_cohorts = CourseUserGroup.objects.filter(
-        course_id=cohort.course_id,
-        users__id=user.id,
-        group_type=CourseUserGroup.COHORT,
+    tracker.emit(
+        "edx.cohort.user_add_requested",
+        {
+            "user_id": user.id,
+            "cohort_id": cohort.id,
+            "cohort_name": cohort.name,
+            "previous_cohort_id": previous_cohort_id,
+            "previous_cohort_name": previous_cohort_name,
+        }
     )
-    if course_cohorts.exists():
-        cohort.users.remove(user)
-
-    return user
-
-
-def get_course_cohort_names(course_key):
-    """
-    Return a list of the cohort names in a course.
-    """
-    return [c.name for c in get_course_cohorts(course_key)]
-
-
-def delete_empty_cohort(course_key, name):
-    """
-    Remove an empty cohort.  Raise ValueError if cohort is not empty.
-    """
-    cohort = get_cohort_by_name(course_key, name)
-    if cohort.users.exists():
-        raise ValueError(_("You cannot delete non-empty cohort {cohort_name} in course {course_key}").format(
-            cohort_name=name,
-            course_key=course_key
-        ))
-
-    cohort.delete()
+    cohort.users.add(user)
+    return (user, previous_cohort_name)

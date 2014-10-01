@@ -4,6 +4,7 @@ Helper methods for testing cohorts.
 from factory import post_generation, Sequence
 from factory.django import DjangoModelFactory
 from course_groups.models import CourseUserGroup
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
@@ -15,7 +16,7 @@ class CohortFactory(DjangoModelFactory):
     FACTORY_FOR = CourseUserGroup
 
     name = Sequence("cohort{}".format)
-    course_id = "dummy_id"
+    course_id = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
     group_type = CourseUserGroup.COHORT
 
     @post_generation

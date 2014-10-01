@@ -3,6 +3,10 @@
 End-to-end tests related to the cohort management on the LMS Instructor Dashboard
 """
 
+from datetime import datetime
+
+from pymongo import MongoClient
+
 from bok_choy.promise import EmptyPromise
 from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest
@@ -24,6 +28,8 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Set up a cohorted course
         """
         super(CohortConfigurationTest, self).setUp()
+
+        self.event_collection = MongoClient()["test"]["events"]
 
         # create course with cohorts
         self.manual_cohort_name = "ManualCohort1"
@@ -106,7 +112,9 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         And I get a notification that 2 users have been added to the cohort
         And I get a notification that 1 user was moved from the other cohort
         And the user input field is empty
+        And appropriate events have been emitted
         """
+        start_time = datetime.now()
         self.membership_page.select_cohort(self.auto_cohort_name)
         self.assertEqual(0, self.membership_page.get_selected_cohort_count())
         self.membership_page.add_students_to_selected_cohort([self.student_name, self.instructor_name])
@@ -119,6 +127,44 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self.assertEqual("2 students have been added to this cohort group", confirmation_messages[0])
         self.assertEqual("1 student was removed from " + self.manual_cohort_name, confirmation_messages[1])
         self.assertEqual("", self.membership_page.get_cohort_student_input_field_value())
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_added",
+                "time": {"$gt": start_time},
+                "event.user_id": {"$in": [int(self.instructor_id), int(self.student_id)]},
+                "event.cohort_name": self.auto_cohort_name,
+            }).count(),
+            2
+        )
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_removed",
+                "time": {"$gt": start_time},
+                "event.user_id": int(self.student_id),
+                "event.cohort_name": self.manual_cohort_name,
+            }).count(),
+            1
+        )
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_add_requested",
+                "time": {"$gt": start_time},
+                "event.user_id": int(self.instructor_id),
+                "event.cohort_name": self.auto_cohort_name,
+                "event.previous_cohort_name": None,
+            }).count(),
+            1
+        )
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_add_requested",
+                "time": {"$gt": start_time},
+                "event.user_id": int(self.student_id),
+                "event.cohort_name": self.auto_cohort_name,
+                "event.previous_cohort_name": self.manual_cohort_name,
+            }).count(),
+            1
+        )
 
     def test_add_students_to_cohort_failure(self):
         """
@@ -164,7 +210,9 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then the new cohort is displayed and has no users in it
         And when I add the user to the new cohort
         Then the cohort has 1 user
+        And appropriate events have been emitted
         """
+        start_time = datetime.now()
         new_cohort = str(uuid.uuid4().get_hex()[0:20])
         self.assertFalse(new_cohort in self.membership_page.get_cohorts())
         self.membership_page.add_cohort(new_cohort)
@@ -178,3 +226,19 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         EmptyPromise(
             lambda: 1 == self.membership_page.get_selected_cohort_count(), 'Waiting for student to be added'
         ).fulfill()
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.created",
+                "time": {"$gt": start_time},
+                "event.cohort_name": new_cohort,
+            }).count(),
+            1
+        )
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.creation_requested",
+                "time": {"$gt": start_time},
+                "event.cohort_name": new_cohort,
+            }).count(),
+            1
+        )
