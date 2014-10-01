@@ -1737,7 +1737,7 @@ class TestMixedModuleStore(CourseComparisonTest):
 
         # verify store used for creating a course
         try:
-            course = self.store.create_course("org", "course{}".format(uuid4().hex[:3]), "run", self.user_id)
+            course = self.store.create_course("org", "course{}".format(uuid4().hex[:5]), "run", self.user_id)
             self.assertEquals(course.system.modulestore.get_modulestore_type(), store_type)
         except NotImplementedError:
             self.assertEquals(store_type, ModuleStoreEnum.Type.xml)
