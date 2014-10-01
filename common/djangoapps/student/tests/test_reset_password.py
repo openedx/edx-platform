@@ -15,7 +15,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
 
 from mock import Mock, patch
-from textwrap import dedent
 import ddt
 
 from student.views import password_reset, password_reset_confirm_wrapper
@@ -90,13 +89,7 @@ class ResetPasswordTests(TestCase):
 
         cache.clear()
 
-    @unittest.skipIf(
-        settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-        dedent("""
-            Skipping Test because CMS has not provided necessary templates for password reset.
-            If LMS tests print this message, that needs to be fixed.
-        """)
-    )
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch('django.core.mail.send_mail')
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_reset_password_email(self, send_email):
@@ -123,13 +116,7 @@ class ResetPasswordTests(TestCase):
         self.assertFalse(self.user.is_active)
         re.search(r'password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/', msg).groupdict()
 
-    @unittest.skipIf(
-        settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-        dedent("""
-            Skipping Test because CMS has not provided necessary templates for password reset.
-            If LMS tests print this message, that needs to be fixed.
-        """)
-    )
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch('django.core.mail.send_mail')
     @ddt.data((False, 'http://'), (True, 'https://'))
     @ddt.unpack
