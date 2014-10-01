@@ -137,6 +137,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
     """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('graded')
     task_fn = partial(push_grades_to_s3, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
@@ -148,6 +149,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     Compute student profile informataion for a course and upload the
     CSV to an S3 bucket for download.
     """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('calculated')
     task_fn = partial(push_students_csv_to_s3, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

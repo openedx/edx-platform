@@ -723,15 +723,14 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     }
 
     if course.is_cohorted:
+        # Translators: 'Cohort' refers to a group of students within a course.
         query_features.append('cohort')
         query_features_names['cohort'] = _('Cohort')
-
-    student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
 
     if not csv:
         student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
         response_payload = {
-            'course_id': course_id,
+            'course_id': unicode(course_key),
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
@@ -746,9 +745,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
             return JsonResponse({"status": success_status})
         except AlreadyRunningError:
             already_running_status = _("An enrolled student profile report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
-            return JsonResponse({
-                "status": already_running_status
-            })
+            return JsonResponse({"status": already_running_status})
 
 
 @ensure_csrf_cookie
