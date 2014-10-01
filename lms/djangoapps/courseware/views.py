@@ -296,9 +296,13 @@ def index(request, course_id, chapter=None, section=None,
     # Redirecting to dashboard if the course is blocked due to un payment.
     redeemed_registration_codes = CourseRegistrationCode.objects.filter(course_id=course_key, registrationcoderedemption__redeemed_by=request.user)
     for redeemed_registration in redeemed_registration_codes:
-        if not getattr(redeemed_registration.invoice, 'is_valid'):
-            log.warning(u'User %s cannot access the course %s because payment has not yet been received', user, course_key.to_deprecated_string())
-            return redirect(reverse('dashboard'))
+        # registration codes may be generated via Bulk Purchase Scenario
+        # we have to check only for the invoice generated registration codes
+        # that their invoice is valid or not
+        if redeemed_registration.invoice:
+            if not getattr(redeemed_registration.invoice, 'is_valid'):
+                log.warning(u'User %s cannot access the course %s because payment has not yet been received', user, course_key.to_deprecated_string())
+                return redirect(reverse('dashboard'))
 
     request.user = user  # keep just one instance of User
     course = get_course_with_access(user, 'load', course_key, depth=2)
