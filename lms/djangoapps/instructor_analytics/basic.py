@@ -3,7 +3,9 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
+from itertools import chain
 import json
+import logging
 from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, CourseRegCodeItem,
     RegistrationCodeRedemption, CourseRegistrationCodeInvoiceItem
@@ -17,6 +19,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from microsite_configuration import microsite
 from student.models import CourseEnrollmentAllowed
 
+from courseware.models import StudentModule
+
+log = logging.getLogger(__name__)
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
@@ -399,3 +404,71 @@ def dump_grading_context(course):
     msg += "length=%d\n" % len(gcontext['all_descriptors'])
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
     return msg
+
+
+def iterate_problem_components(course):
+    """
+    Python generator for iterating through all problems of a course.
+    """
+    for section in course.get_children():
+        section_name = section.display_name_with_default
+        for subsection in section.get_children():
+            subsection_name = subsection.display_name_with_default
+            for unit in subsection.get_children():
+                unit_name = unit.display_name_with_default
+
+                parent_metadata = [section_name, subsection_name, unit_name]
+                for component in unit.get_children():
+                    if component.category == 'problem':
+                        yield component, parent_metadata
+
+
+def student_responses(course):
+    """
+    Yields student responses for all problems in course for writing out to a CSV file.
+    """
+    # `order` is for the corresponding "order" column in the CSV for problem
+    # order in the course, so instructors could sort by it.
+    order = 1
+    for problem_component, parent_metadata in iterate_problem_components(course):
+        problem_component_info = (parent_metadata +
+                                  [problem_component.display_name_with_default, order, problem_component.location])
+        modules = StudentModule.objects.filter(
+            course_id=course.id,
+            grade__isnull=False,
+            module_state_key=problem_component.location,
+        ).order_by('student__username')
+        # Check if this particular problem_component has any student responses (i.e. modules with non-null grade)
+        if modules:
+            # Default: we have not retrieved an answer for the current problem
+            has_answer = False
+            for module in modules:
+                try:
+                    state_dict = json.loads(module.state) if module.state else {}
+                    raw_answers = state_dict.get("student_answers", {})
+                except ValueError:
+                    log.error(
+                        "Student responses: Could not parse module state for StudentModule id=%s, course=%s",
+                        module.id,
+                        course.id
+                    )
+                    continue
+
+                pretty_answers = u', '.join(
+                    u"{problem}={answer}".format(problem=problem, answer=answer)
+                    for (problem, answer) in raw_answers.items()
+                )
+                yield problem_component_info + [module.student.username, pretty_answers]
+                if not has_answer:
+                    has_answer = True
+            # Barring no errors up to this point, this problem has yielded at least one response,
+            # so we need to increment the order variable for the next problem.
+            if has_answer:
+                order += 1
+
+
+def student_response_rows(course):
+    """ Wrapper to return all (header and data) rows for student responses reports for a course """
+    header = ["Section", "Subsection", "Unit", "Problem", "Order In Course", "Location", "Student", "Response"]
+    rows = chain([header], student_responses(course))
+    return rows

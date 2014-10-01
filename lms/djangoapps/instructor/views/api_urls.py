@@ -92,6 +92,10 @@ urlpatterns = patterns(
     url(r'^list_financial_report_downloads$',
         'instructor.views.api.list_financial_report_downloads', name="list_financial_report_downloads"),
 
+    # Student responses for questions
+    url(r'^calculate_student_responses_csv$',
+        'instructor.views.api.calculate_student_responses_csv', name="calculate_student_responses_csv"),
+
     # Registration Codes..
     url(r'get_registration_codes$',
         'instructor.views.api.get_registration_codes', name="get_registration_codes"),

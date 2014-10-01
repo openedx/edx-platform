@@ -101,7 +101,13 @@ REPORTS_DATA = (
         'instructor_api_endpoint': 'get_students_who_may_enroll',
         'task_api_endpoint': 'instructor_task.api.submit_calculate_may_enroll_csv',
         'extra_instructor_api_kwargs': {},
-    }
+    },
+    {
+        'report_type': 'student responses',
+        'instructor_api_endpoint': 'calculate_student_responses_csv',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_student_responses_csv',
+        'extra_instructor_api_kwargs': {}
+    },
 )
 
 # ddt data for test cases involving executive summary report
@@ -202,6 +208,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
         # Endpoints that only Staff or Instructors can access
+        # Entries should be a tuple of (api_method_name, {request_args_sent_to_endpoint})
         self.staff_level_endpoints = [
             ('students_update_enrollment',
              {'identifiers': 'foo@example.org', 'action': 'enroll'}),
@@ -220,6 +227,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('list_financial_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_students_features', {}),
+            ('calculate_student_responses_csv', {}),
             ('get_enrollment_report', {}),
             ('get_students_who_may_enroll', {}),
             ('get_exec_summary_report', {}),

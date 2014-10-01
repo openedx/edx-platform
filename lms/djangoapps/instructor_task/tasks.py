@@ -42,6 +42,7 @@ from instructor_task.tasks_helper import (
     upload_may_enroll_csv,
     upload_exec_summary_report,
     generate_students_certificates,
+    push_student_responses_to_s3,
 )
 
 
@@ -242,7 +243,7 @@ def generate_certificates(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask)  # pylint: disable=E1102
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def cohort_students(entry_id, xmodule_instance_args):
     """
     Cohort students in bulk, and upload the results.
@@ -251,4 +252,14 @@ def cohort_students(entry_id, xmodule_instance_args):
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def calculate_student_responses_csv(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV file of student responses to all course problems and store in S3.
+    """
+    action_name = ugettext_noop('generated')
+    task_fn = partial(push_student_responses_to_s3, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
