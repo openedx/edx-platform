@@ -645,6 +645,26 @@ class UnitPublishingTest(ContainerBase):
         unit.wait_for_ajax()
         self._verify_publish_title(unit, self.PUBLISHED_STATUS)
 
+    def test_edit_xblock_on_container_page_makes_it_draft(self):
+        """
+        Scenario: The publish title displays correctly for units on which user edits any component
+            Given I have a live published unit
+            When I go to the unit page in Studio
+            Then the title in the Publish information box is "Published and Live"
+            And when I click on edit button of a component to the unit
+            Then the title in the Publish information box is "Published and Live"
+            And when I revisit unit page in studio
+            Then the title in the Publish information box is "Published and Live"
+        """
+        unit = self.go_to_unit_page()
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        component = unit.xblocks[1]
+        component.edit()
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+
+        unit = self.go_to_unit_page()
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+
     def _view_published_version(self, unit):
         """
         Goes to the published version, then waits for the browser to load the page.
