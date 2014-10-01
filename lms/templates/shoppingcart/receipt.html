@@ -17,6 +17,11 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
 <div class="container">
   <section class="notification">
     <h2>${_("Thank you for your Purchase!")}</h2>
+    % if len(order_items) == 1 and order_type != 'business':
+      % for inst in instructions:
+        <p>${inst}</p>
+      % endfor
+    % endif
   </section>
   <section class="wrapper confirm-enrollment shopping-cart print">
     <div class="gray-bg">
@@ -28,7 +33,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
           % if len(order_items) > 1 :
             <% dashboard_url = reverse('dashboard') %>
             <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
-          % else:
+          % elif order_items[0].course_id:
             <% course = get_course_by_id(order_items[0].course_id, depth=0) %>
             <% course_info_url = reverse('info', kwargs={'course_id': course.id.to_deprecated_string()}) %>
             <a href="${course_info_url}" class="blue pull-right">${_("View Course")} <i class="icon-caret-right"></i></a>

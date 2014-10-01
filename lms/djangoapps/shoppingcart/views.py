@@ -136,13 +136,15 @@ def show_cart(request):
     cart_items = cart.orderitem_set.all()
     shoppingcart_items = []
     for cart_item in cart_items:
+        course_key = None
         if hasattr(cart_item, 'paidcourseregistration'):
             course_key = cart_item.paidcourseregistration.course_id
-        else:
+        elif hasattr(cart_item, 'certificateitem'):
             course_key = cart_item.certificateitem.course_id
 
-        course = get_course_by_id(course_key, depth=None)
-        shoppingcart_items.append((cart_item, course))
+        if course_key:
+            course = get_course_by_id(course_key, depth=0)
+            shoppingcart_items.append((cart_item, course))
 
     site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
 
@@ -242,7 +244,6 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
                 reg_code_redemption.delete()
                 log.info('Registration code "{0}" redemption entry removed for user "{1}" for order item "{2}"'
                          .format(reg_code_redemption.registration_code.code, user, item_id))
-
 
 
 @login_required
@@ -601,14 +602,18 @@ def show_receipt(request, ordernum):
     shoppingcart_items = []
     course_names_list = []
     for order_item in order_items:
+        course_key = None
         if hasattr(order_item, 'paidcourseregistration'):
             course_key = order_item.paidcourseregistration.course_id
-        else:
+        elif hasattr(order_item, 'certificateitem'):
             course_key = order_item.certificateitem.course_id
-
-        course = get_course_by_id(course_key, depth=0)
-        shoppingcart_items.append((order_item, course))
-        course_names_list.append(course.display_name)
+        elif hasattr(order_item, 'donation'):
+            if hasattr(order_item, 'course_id'):
+                course_key = order_item.donation.course_id
+        if course_key:
+            course = get_course_by_id(course_key, depth=0)
+            shoppingcart_items.append((order_item, course))
+            course_names_list.append(course.display_name)
 
     course_names = ", ".join(course_names_list)
     any_refunds = any(i.status == "refunded" for i in order_items)
