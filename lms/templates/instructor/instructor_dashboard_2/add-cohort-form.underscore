@@ -1,0 +1,26 @@
+<div class="cohort-management-create">
+    <form action="" method="post" name="" id="cohort-management-create-form" class="cohort-management-create-form">
+
+        <h3 class="form-title"><%- gettext('Add a New Cohort Group') %></h3>
+
+        <div class="form-fields">
+            <div class="cohort-management-create-form-name field field-text">
+                <label for="cohort-create-name" class="label">
+                    <%- gettext('New Cohort Name') %> *
+                    <span class="sr"><%- gettext('(Required Field)')%></span>
+                </label>
+                <input type="text" name="cohort-create-name" value="" class="input cohort-create-name"
+                       id="cohort-create-name"
+                       placeholder="<%- gettext("Enter Your New Cohort Group's Name") %>" required="required" />
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button class="form-submit button action-primary action-save">
+                <i class="icon icon-plus"></i>
+                <%- gettext('Save') %>
+            </button>
+            <a href="" class="form-cancel action-secondary action-cancel"><%- gettext('Cancel') %></a>
+        </div>
+    </form>
+</div>

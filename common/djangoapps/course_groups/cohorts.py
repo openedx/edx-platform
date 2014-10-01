@@ -3,10 +3,11 @@ This file contains the logic for cohort groups, as exposed internally to the
 forums, and to the cohort admin views.
 """
 
-from django.http import Http404
-
 import logging
 import random
+
+from django.http import Http404
+from django.utils.translation import ugettext as _
 
 from courseware import courses
 from student.models import get_user_by_username_or_email
@@ -15,10 +16,47 @@ from .models import CourseUserGroup
 log = logging.getLogger(__name__)
 
 
+# A 'default cohort' is an auto-cohort that is automatically created for a course if no auto_cohort_groups have been
+# specified. It is intended to be used in a cohorted-course for users who have yet to be assigned to a cohort.
+# Note 1: If an administrator chooses to configure a cohort with the same name, the said cohort will be used as
+#         the "default cohort".
+# Note 2: If auto_cohort_groups are configured after the 'default cohort' has been created and populated, the
+#         stagnant 'default cohort' will still remain (now as a manual cohort) with its previously assigned students.
+# Translation Note: We are NOT translating this string since it is the constant identifier for the "default group"
+#                   and needed across product boundaries.
+DEFAULT_COHORT_NAME = "Default Group"
+
+
+class CohortAssignmentType(object):
+    """
+    The various types of rule-based cohorts
+    """
+    # No automatic rules are applied to this cohort; users must be manually added.
+    NONE = "none"
+
+    # One of (possibly) multiple cohort groups to which users are randomly assigned.
+    # Note: The 'default cohort' group is included in this category iff it exists and
+    # there are no other random groups. (Also see Note 2 above.)
+    RANDOM = "random"
+
+    @staticmethod
+    def get(cohort, course):
+        """
+        Returns the assignment type of the given cohort for the given course
+        """
+        if cohort.name in course.auto_cohort_groups:
+            return CohortAssignmentType.RANDOM
+        elif len(course.auto_cohort_groups) == 0 and cohort.name == DEFAULT_COHORT_NAME:
+            return CohortAssignmentType.RANDOM
+        else:
+            return CohortAssignmentType.NONE
+
+
 # tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
 # if and when that's fixed, it's a good idea to have a local generator to avoid any other
 # code that messes with the global random module.
 _local_random = None
+
 
 def local_random():
     """
@@ -103,7 +141,7 @@ def get_cohorted_commentables(course_key):
 
 def get_cohort(user, course_key):
     """
-    Given a django User and a CourseKey, return the user's cohort in that
+    Given a Django user and a CourseKey, return the user's cohort in that
     cohort.
 
     Arguments:
@@ -135,27 +173,19 @@ def get_cohort(user, course_key):
         # Didn't find the group.  We'll go on to create one if needed.
         pass
 
-    if not course.auto_cohort:
-        return None
-
     choices = course.auto_cohort_groups
-    n = len(choices)
-    if n == 0:
-        # Nowhere to put user
-        log.warning("Course %s is auto-cohorted, but there are no"
-                    " auto_cohort_groups specified",
-                    course_key)
-        return None
+    if len(choices) > 0:
+        # Randomly choose one of the auto_cohort_groups, creating it if needed.
+        group_name = local_random().choice(choices)
+    else:
+        # Use the "default cohort".
+        group_name = DEFAULT_COHORT_NAME
 
-    # Put user in a random group, creating it if needed
-    group_name = local_random().choice(choices)
-
-    group, created = CourseUserGroup.objects.get_or_create(
+    group, __ = CourseUserGroup.objects.get_or_create(
         course_id=course_key,
         group_type=CourseUserGroup.COHORT,
         name=group_name
     )
-
     user.course_groups.add(group)
     return group
 
@@ -172,15 +202,13 @@ def get_course_cohorts(course):
         A list of CourseUserGroup objects.  Empty if there are no cohorts. Does
         not check whether the course is cohorted.
     """
-    # TODO: remove auto_cohort check with TNL-160
-    if course.auto_cohort:
-        # Ensure all auto cohorts are created.
-        for group_name in course.auto_cohort_groups:
-            CourseUserGroup.objects.get_or_create(
-                course_id=course.location.course_key,
-                group_type=CourseUserGroup.COHORT,
-                name=group_name
-            )
+    # Ensure all auto cohorts are created.
+    for group_name in course.auto_cohort_groups:
+        CourseUserGroup.objects.get_or_create(
+            course_id=course.location.course_key,
+            group_type=CourseUserGroup.COHORT,
+            name=group_name
+        )
 
     return list(CourseUserGroup.objects.filter(
         course_id=course.location.course_key,
@@ -223,7 +251,7 @@ def add_cohort(course_key, name):
     if CourseUserGroup.objects.filter(course_id=course_key,
                                       group_type=CourseUserGroup.COHORT,
                                       name=name).exists():
-        raise ValueError("Can't create two cohorts with the same name")
+        raise ValueError(_("You cannot create two cohorts with the same name"))
 
     try:
         course = courses.get_course_by_id(course_key)
@@ -269,9 +297,10 @@ def add_user_to_cohort(cohort, username_or_email):
     )
     if course_cohorts.exists():
         if course_cohorts[0] == cohort:
-            raise ValueError("User {0} already present in cohort {1}".format(
-                user.username,
-                cohort.name))
+            raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
+                user_name=user.username,
+                cohort_name=cohort.name
+            ))
         else:
             previous_cohort = course_cohorts[0].name
             course_cohorts[0].users.remove(user)
@@ -286,8 +315,9 @@ def delete_empty_cohort(course_key, name):
     """
     cohort = get_cohort_by_name(course_key, name)
     if cohort.users.exists():
-        raise ValueError(
-            "Can't delete non-empty cohort {0} in course {1}".format(
-                name, course_key))
+        raise ValueError(_("You cannot delete non-empty cohort {cohort_name} in course {course_key}").format(
+            cohort_name=name,
+            course_key=course_key
+        ))
 
     cohort.delete()

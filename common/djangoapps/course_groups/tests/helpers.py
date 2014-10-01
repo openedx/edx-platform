@@ -1,8 +1,30 @@
 """
 Helper methods for testing cohorts.
 """
+from factory import post_generation, Sequence
+from factory.django import DjangoModelFactory
+from course_groups.models import CourseUserGroup
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
+
+
+class CohortFactory(DjangoModelFactory):
+    """
+    Factory for constructing mock cohorts.
+    """
+    FACTORY_FOR = CourseUserGroup
+
+    name = Sequence("cohort{}".format)
+    course_id = "dummy_id"
+    group_type = CourseUserGroup.COHORT
+
+    @post_generation
+    def users(self, create, extracted, **kwargs):  # pylint: disable=W0613
+        """
+        Returns the users associated with the cohort.
+        """
+        if extracted:
+            self.users.add(*extracted)
 
 
 def topic_name_to_id(course, name):
@@ -17,11 +39,13 @@ def topic_name_to_id(course, name):
     )
 
 
-def config_course_cohorts(course, discussions,
-                          cohorted,
-                          cohorted_discussions=None,
-                          auto_cohort=None,
-                          auto_cohort_groups=None):
+def config_course_cohorts(
+        course,
+        discussions,
+        cohorted,
+        cohorted_discussions=None,
+        auto_cohort_groups=None
+):
     """
     Given a course with no discussion set up, add the discussions and set
     the cohort config appropriately.
@@ -33,7 +57,6 @@ def config_course_cohorts(course, discussions,
         cohorted: bool.
         cohorted_discussions: optional list of topic names.  If specified,
             converts them to use the same ids as topic names.
-        auto_cohort: optional bool.
         auto_cohort_groups: optional list of strings
                   (names of groups to put students into).
 
@@ -54,8 +77,6 @@ def config_course_cohorts(course, discussions,
         d["cohorted_discussions"] = [to_id(name)
                                      for name in cohorted_discussions]
 
-    if auto_cohort is not None:
-        d["auto_cohort"] = auto_cohort
     if auto_cohort_groups is not None:
         d["auto_cohort_groups"] = auto_cohort_groups
 

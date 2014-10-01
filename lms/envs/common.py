@@ -992,6 +992,7 @@ courseware_js = (
 base_vendor_js = [
     'js/vendor/jquery.min.js',
     'js/vendor/jquery.cookie.js',
+    'js/vendor/underscore-min.js'
 ]
 
 main_vendor_js = base_vendor_js + [
@@ -999,7 +1000,6 @@ main_vendor_js = base_vendor_js + [
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/json2.js',
     'js/vendor/jquery-ui.min.js',
-    'js/vendor/jquery.cookie.js',
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
@@ -1129,6 +1129,7 @@ PIPELINE_JS = {
             'js/src/utility.js',
             'js/src/accessibility_tools.js',
             'js/src/ie_shim.js',
+            'js/src/string_utils.js',
         ],
         'output_filename': 'js/lms-application.js',
     },

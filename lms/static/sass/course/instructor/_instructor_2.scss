@@ -6,6 +6,10 @@
   padding: 8px 17px 8px 17px;
   font-size: em(13);
   line-height: 1.3em;
+
+  .icon {
+    margin-right: ($baseline/5);
+  }
 }
 
 .instructor-dashboard-wrapper-2 {
@@ -34,7 +38,6 @@
   }
 
   // system feedback - messages
-
   .wrapper-msg {
     margin-bottom: ($baseline*1.5);
   }
@@ -48,10 +51,6 @@
     .copy {
       font-weight: 600;
     }
-
-    &.is-shown {
-      display: block;
-    }
   }
 
   // TYPE: warning
@@ -60,10 +59,6 @@
     background: tint($warning-color,95%);
     display: none;
     color: $warning-color;
-
-    &.is-shown {
-      display: block;
-    }
   }
 
   // TYPE: confirm
@@ -72,10 +67,6 @@
     background: tint($confirm-color,95%);
     display: none;
     color: $confirm-color;
-
-    &.is-shown {
-      display: block;
-    }
   }
 
   // TYPE: confirm
@@ -85,10 +76,6 @@
 
     .copy {
       color: $error-color;
-    }
-
-    &.is-shown {
-      display: block;
     }
   }
 
@@ -121,6 +108,8 @@
   }
 }
 
+// instructor dashboard 2
+// ====================
 section.instructor-dashboard-content-2 {
   @extend .content;
   // position: relative;
@@ -210,35 +199,119 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
+}
 
-  section.idash-section {
+// elements - general
+// --------------------
+.idash-section {
+
+  // messages
+  .message {
+    margin-bottom: $baseline;
+    display: block;
+    border-radius: 1px;
+    padding: ($baseline*0.75) $baseline;
+  }
+
+  .message-title {
+    @extend %t-title6;
+    @extend %t-weight4;
+    margin-bottom: ($baseline/4);
+  }
+
+  .message-copy {
+    @extend %t-copy-sub1;
+  }
+
+  .message-actions {
+    margin-top: ($baseline/2);
+
+    .action-primary {
+      @include idashbutton($gray-l4);
+    }
+  }
+
+  // type - error
+  .message-error {
+    border-top: 2px solid $error-color;
+    background: tint($error-color,95%);
+
+    .message-title {
+      color: $error-color;
+    }
+
+    .message-copy {
+      color: $base-font-color;
+    }
+  }
+
+  // type - confirmation
+  .message-confirmation {
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+
+    .message-title {
+      color: $confirm-color;
+    }
+
+    .message-copy {
+      color: $base-font-color;
+    }
+  }
+
+  // type - error
+  .message-warning {
+    border-top: 2px solid $warning-color;
+    background: tint($warning-color,95%);
+  }
+
+  // grandfathered
+  display: none;
+  margin-top: ($baseline*1.5);
+
+  &.active-section {
+    display: block;
+  }
+
+  .basic-data {
+    padding: 6px;
+  }
+
+  .running-tasks-section {
     display: none;
-    margin-top: ($baseline*1.5);
-    // background-color: #0f0;
+  }
 
-    &.active-section {
-      display: block;
-      // background-color: #ff0;
+  .no-pending-tasks-message {
+    display: none;
+
+    p {
+      color: #a2a2a2;
+      font-style: italic;
+    }
+  }
+
+  .section-title {
+    @include clearfix();
+    margin-bottom: ($baseline/2);
+
+    .value {
+      float: left;
     }
 
-    .basic-data {
-      padding: 6px;
-    }
-
-    .running-tasks-section {
-      display: none;
-    }
-
-    .no-pending-tasks-message {
-      display: none;
-      p {
-        color: #a2a2a2;
-        font-style: italic;
-      }
+    .description {
+      @extend %t-title7;
+      float: right;
+      text-transform: none;
+      letter-spacing: 0;
+      text-align: right;
+      color: $gray;
     }
   }
 }
 
+
+// view - course info
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#course_info {
   .course-errors-wrapper {
     margin-top: 2em;
@@ -301,6 +374,8 @@ section.instructor-dashboard-content-2 {
   }
 }
 
+// view - bulk email
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#send_email {
   // form fields
   .list-fields {
@@ -325,21 +400,260 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-
+// view - membership
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
-  $half_width: $baseline * 20;
 
-  .vert-left,
-  .vert-right {
-    display: inline-block;
-    vertical-align: top;
-    width: 48%;
-    margin-right: 2%;
+  .membership-section {
+    margin-bottom: ($baseline*1.5);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
-  .vert-right {
-    margin-right: 0;
+  // cohort management
+  %cohort-management-form {
+
+    .form-fields {
+
+      .label, .input, .tip {
+        display: block;
+      }
+
+      .label {
+        @extend %t-title7;
+        @extend %t-weight4;
+        margin-bottom: ($baseline/2);
+      }
+
+      .tip {
+        @extend %t-copy-sub1;
+        margin-top: ($baseline/4);
+        color: $gray-l3;
+      }
+
+      .field-text {
+
+        // needed to reset poor input styling
+        input[type="text"] {
+          height: auto;
+        }
+
+        .input {
+          width: 100%;
+          padding: ($baseline/2) ($baseline*0.75);
+        }
+      }
+    }
+
+    .form-submit, .form-cancel {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .form-submit {
+      @include idashbutton($blue);
+      @include font-size(14);
+      @include line-height(14);
+      margin-right: ($baseline/2);
+      margin-bottom: 0;
+      text-shadow: none;
+    }
+
+    .form-cancel {
+      @extend %t-copy-sub1;
+    }
   }
+
+  .cohort-management-nav {
+    @include clearfix();
+    margin-bottom: $baseline;
+
+    .cohort-management-nav-form {
+      width: 60%;
+      float: left;
+    }
+
+    .cohort-select {
+      width: 100%;
+      margin-top: ($baseline/4);
+    }
+
+    .action-create {
+      @include idashbutton($blue);
+      float: right;
+      text-align: right;
+      text-shadow: none;
+      font-weight: 600;
+    }
+
+    // STATE: is disabled
+    &.is-disabled {
+
+
+      .cohort-select {
+        opacity: 0.25;
+      }
+
+      .action-create {
+        opacity: 0.50;
+      }
+    }
+  }
+
+  .cohort-management {
+
+    // specific message actions
+    .message .action-create {
+      @include idashbutton($blue);
+    }
+  }
+
+  // create or edit cohort group
+  .cohort-management-create, .cohort-management-edit {
+    @extend %cohort-management-form;
+    border: 1px solid $gray-l5;
+    margin-bottom: $baseline;
+
+    .form-title {
+      @extend %t-title5;
+      @extend %t-weight4;
+      border-bottom: ($baseline/10) solid $gray-l4;
+      background: $gray-l5;
+      padding: $baseline;
+    }
+
+    .form-fields {
+      padding: $baseline;
+    }
+
+    .form-actions {
+      padding: 0 $baseline $baseline $baseline;
+    }
+  }
+
+  // cohort group
+  .cohort-management-group {
+    border: 1px solid $gray-l5;
+  }
+
+  .cohort-management-group-header {
+    border-bottom: ($baseline/10) solid $gray-l4;
+    background: $gray-l5;
+    padding: $baseline;
+
+    .group-header-title {
+      margin-bottom: ($baseline/2);
+      border-bottom: 1px solid $gray-l4;
+      padding-bottom: ($baseline/2);
+
+      &:hover, &:active, &:focus {
+
+        .action-edit-name {
+          opacity: 1.0;
+          pointer-events: auto;
+        }
+      }
+    }
+
+    .title-value, .group-count, .action-edit {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .title-value {
+      @extend %t-title5;
+      @extend %t-weight4;
+      margin-right: ($baseline/4);
+    }
+
+    .group-count {
+      @extend %t-title7;
+      @extend %t-weight4;
+    }
+
+    .action-edit-name {
+      @include idashbutton($gray-l3);
+      @include transition(opacity 0.25s ease-in-out);
+      @include font-size(14);
+      @include line-height(14);
+      margin-left: ($baseline/2);
+      margin-bottom: 0;
+      opacity: 0.0;
+      pointer-events: none;
+      padding: ($baseline/4) ($baseline/2);
+    }
+  }
+
+  .cohort-management-group-setup {
+    @include clearfix();
+    @extend %t-copy-sub1;
+    color: $gray-l2;
+
+    .setup-value {
+      float: left;
+      width: 70%;
+      margin-right: 5%;
+    }
+
+    .setup-actions {
+      float: right;
+      width: 20%;
+      text-align: right;
+    }
+  }
+
+  .cohort-management-group-add {
+    @extend %cohort-management-form;
+    padding: $baseline $baseline 0 $baseline;
+
+    .message-title {
+      @extend %t-title7;
+    }
+
+    .form-title {
+      @extend %t-title6;
+      @extend %t-weight4;
+      margin-bottom: ($baseline/4);
+    }
+
+    .form-introduction {
+      @extend %t-copy-sub1;
+      margin-bottom: $baseline;
+
+      p {
+        color: $gray-l1;
+      }
+    }
+
+    .form-fields {
+      padding: $baseline 0;
+    }
+
+    .form-actions {
+      padding: 0 0 $baseline 0;
+    }
+
+    .cohort-management-group-add-students {
+      min-height: ($baseline*10);
+      width: 100%;
+      padding: ($baseline/2) ($baseline*0.75);
+    }
+  }
+
+
+  .cohort-management-supplemental {
+    @extend %t-copy-sub1;
+    margin-top: ($baseline/2);
+
+    .icon {
+      margin-right: ($baseline/4);
+      color: $gray-l1;
+    }
+  }
+
+
 
   .batch-enrollment, .batch-beta-testers {
     textarea {
@@ -535,7 +849,8 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-
+// view - student admin
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
   .action-type-container{
     margin-bottom: $baseline * 2;
@@ -570,7 +885,8 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-
+// view - data download
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#data_download {
   input {
     // display: block;
@@ -600,7 +916,8 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-
+// view - metrics
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#metrics {
 
   .metrics-container, .metrics-header-container {
