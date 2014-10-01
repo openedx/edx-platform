@@ -22,19 +22,12 @@ from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import push_grades_to_s3, push_students_csv_to_s3, UPDATE_STATUS_SUCCEEDED
 
 
-TEST_COURSE_ORG = 'edx'
-TEST_COURSE_NAME = 'test_course'
-TEST_COURSE_NUMBER = '1.23x'
-
-
 class TestReport(ModuleStoreTestCase):
     """
     Base class for testing CSV download tasks.
     """
     def setUp(self):
-        self.course = CourseFactory.create(org=TEST_COURSE_ORG,
-                                           number=TEST_COURSE_NUMBER,
-                                           display_name=TEST_COURSE_NAME)
+        self.course = CourseFactory.create()
 
     def tearDown(self):
         if os.path.exists(settings.GRADES_DOWNLOAD['ROOT_PATH']):

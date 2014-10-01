@@ -197,6 +197,6 @@ class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
         api_call = lambda: submit_calculate_students_features_csv(
             self.create_task_request(self.instructor),
             self.course.id,
-            []
+            features=[]
         )
         self._test_resubmission(api_call)

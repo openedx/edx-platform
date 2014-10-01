@@ -479,7 +479,7 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     return UPDATE_STATUS_SUCCEEDED
 
 
-def upload_csv_to_report_store(rows, csv_name, course_id):
+def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
     """
     Upload data as a CSV using ReportStore.
 
@@ -496,7 +496,11 @@ def upload_csv_to_report_store(rows, csv_name, course_id):
     report_store = ReportStore.from_config()
     report_store.store_rows(
         course_id,
-        u"{name}.csv".format(name=csv_name),
+        u"{course_prefix}_{csv_name}_{timestamp_str}".format(
+            course_prefix=urllib.quote(course_id.to_deprecated_string().replace("/", "_")),
+            csv_name=csv_name,
+            timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
+        ),
         rows
     )
 
@@ -581,18 +585,12 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
     curr_step = "Uploading CSVs"
     update_task_progress()
 
-    # Generate parts of the file name
-    timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
-    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
-
     # Perform the actual upload
-    csv_name = u"{}_grade_report_{}".format(course_id_prefix, timestamp_str)
-    upload_csv_to_report_store(rows, csv_name, course_id)
+    upload_csv_to_report_store(rows, 'grade_report', course_id, start_time)
 
     # If there are any error rows (don't count the header), write them out as well
     if len(err_rows) > 1:
-        err_csv_name = u"{}_grade_report_{}_err".format(course_id_prefix, timestamp_str)
-        upload_csv_to_report_store(err_rows, err_csv_name, course_id)
+        upload_csv_to_report_store(err_rows, 'grade_report_err', course_id, start_time)
 
     # One last update before we close out...
     return update_task_progress()
@@ -610,12 +608,7 @@ def push_students_csv_to_s3(_xmodule_instance_args, _entry_id, course_id, task_i
     header, rows = format_dictlist(student_data, query_features)
     rows.insert(0, header)
 
-    # Generate the file name
-    timestamp_str = datetime.now(UTC).strftime("%Y-%m-%d-%H%M")
-    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
-    csv_name = u"{}_student_profile_info_{}".format(course_id_prefix, timestamp_str)
-
-    # Perform the actual upload
-    upload_csv_to_report_store(rows, csv_name, course_id)
+    # Perform the upload
+    upload_csv_to_report_store(rows, 'student_profile_info', course_id, datetime.now(UTC))
 
     return UPDATE_STATUS_SUCCEEDED
