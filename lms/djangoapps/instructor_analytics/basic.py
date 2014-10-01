@@ -67,9 +67,9 @@ def sale_order_record_features(course_id, features):
         sale_order_dict.update({'total_used_codes': 'N/A'})
 
         if getattr(purchased_course.order, 'order_type') == OrderTypes.BUSINESS:
-            registration_codes = CourseRegistrationCode.objects.filter(order=purchased_course.order)
+            registration_codes = CourseRegistrationCode.objects.filter(order=purchased_course.order, course_id=course_id)
             sale_order_dict.update({"total_codes": registration_codes.count()})
-            sale_order_dict.update({'total_used_codes': purchased_course.order.registrationcoderedemption_set.all().count()})
+            sale_order_dict.update({'total_used_codes': RegistrationCodeRedemption.objects.filter(registration_code__in=registration_codes).count()})
 
             codes = list()
             for reg_code in registration_codes:
