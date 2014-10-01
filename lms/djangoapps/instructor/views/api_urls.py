@@ -66,6 +66,10 @@ urlpatterns = patterns('',  # nopep8
     url(r'calculate_grades_csv$',
         'instructor.views.api.calculate_grades_csv', name="calculate_grades_csv"),
 
+    # Student responses for questions
+    url(r'^get_student_responses$',
+        'instructor.views.api.get_student_responses', name="get_student_responses"),
+
     # Registration Codes..
     url(r'get_registration_codes$',
         'instructor.views.api.get_registration_codes', name="get_registration_codes"),

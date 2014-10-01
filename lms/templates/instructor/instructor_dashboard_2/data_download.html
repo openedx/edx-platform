@@ -38,9 +38,12 @@
   <div class="data-display-table" id="data-student-profiles-table"></div>
 
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
-    <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
+    <p>${_("Click to generate a CSV grade report for all currently enrolled students, or a CSV submissions report for all problems.")}</p>
 
-    <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
+    <p>
+      <input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
+      <input type="button" name="get-student-responses" value="${_("Get Student Responses Report")}" data-endpoint="${ section_data['get_student_responses_url'] }"/>
+    </p>
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>

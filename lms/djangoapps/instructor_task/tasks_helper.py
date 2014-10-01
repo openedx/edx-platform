@@ -21,12 +21,12 @@ from track.views import task_track
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
 from xmodule.modulestore.django import modulestore
 
-from courseware.courses import get_course_by_id
+from courseware.courses import get_course, get_course_by_id
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-from instructor_analytics.basic import enrolled_students_features
+from instructor_analytics.basic import enrolled_students_features, student_response_rows
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
@@ -738,3 +738,28 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)
 
     return task_progress.update_task_state(extra_meta=current_step)
+
+
+def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    For a given `course_id`, generate a responses CSV file for students that
+    have submitted problem responses, and store using a `ReportStore`. Once
+    created, the files can be accessed by instantiating another `ReportStore` (via
+    `ReportStore.from_config()`) and calling `link_for()` on it. Writes are
+    buffered, so we'll never write part of a CSV file to S3 -- i.e. any files
+    that are visible in ReportStore will be complete ones.
+    """
+    start_time = datetime.now(UTC)
+
+    try:
+        course = get_course(course_id)
+    except ValueError as exc:
+        TASK_LOG.error(exc.message)
+        return "failed"
+
+    rows = student_response_rows(course)
+
+    # Perform the actual upload
+    upload_csv_to_report_store(rows, 'responses_report', course_id, start_time)
+
+    return "succeeded"

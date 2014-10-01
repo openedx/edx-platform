@@ -21,7 +21,7 @@ class DataDownload
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
-    @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
+    @$grades_btn = @$section.find ".reports-download-container input[type='button']"
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
@@ -107,17 +107,17 @@ class DataDownload
           @clear_display()
           @$download_display_text.html data['grading_config_summary']
 
-    @$calculate_grades_csv_btn.click (e) =>
-      # Clear any CSS styling from the request-response areas
-      #$(".msg-confirm").css({"display":"none"})
-      #$(".msg-error").css({"display":"none"})
+    @$grades_btn.click (e) =>
       @clear_display()
-      url = @$calculate_grades_csv_btn.data 'endpoint'
+      url = $(e.target).data 'endpoint'
       $.ajax
         dataType: 'json'
         url: url
         error: (std_ajax_err) =>
-          @$reports_request_response_error.text gettext("Error generating grades. Please try again.")
+          if e.target.name == 'calculate-grades-csv'
+            @$reports_request_response_error.text gettext("Error generating grades. Please try again.")
+          else
+            @$reports_request_response_error.text gettext("Error getting student responses. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
           @$reports_request_response.text data['status']

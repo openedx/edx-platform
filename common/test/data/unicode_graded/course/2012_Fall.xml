@@ -1,0 +1,15 @@
+<course>
+  <chapter url_name="UnicodeGradedChapter" display_name="Üñîçø∂éßradedChapter">
+    <videosequence url_name="Homework1" display_name="πoméwork 1">
+      <vertical url_name="Homework1Unit" display_name="中oméwork1Uni大">
+        
+        <problem url_name="H1P1">
+          <optionresponse>
+            <optioninput options="('Correct', 'Incorrect')" correct="Correct"></optioninput>
+            <optioninput options="('Correct', 'Incorrect')" correct="Correct"></optioninput>
+          </optionresponse>
+        </problem>
+      </vertical>
+    </videosequence>
+  </chapter>
+</course>
