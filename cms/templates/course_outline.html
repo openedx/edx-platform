@@ -12,19 +12,10 @@ from contentstore.utils import reverse_usage_url
 
 <%namespace name='static' file='static_content.html'/>
 
-<%block name="jsextra">
-<script type="text/javascript">
-    require(["domReady!", "jquery", "js/views/pages/course_outline", "js/models/xblock_outline_info"],
-            function(doc, $, CourseOutlinePage, XBlockOutlineInfo) {
-                var courseXBlock = new XBlockOutlineInfo(${json.dumps(course_structure) | n}, { parse: true });
-                var view = new CourseOutlinePage({
-                    el: $('#content'),
-                    model: courseXBlock,
-                    initialState: ${json.dumps(initial_state) | n}
-                });
-                view.render();
-            });
-</script>
+<%block name="requirejs">
+    require(["js/factories/outline"], function (OutlineFactory) {
+        OutlineFactory(${json.dumps(course_structure) | n}, ${json.dumps(initial_state) | n});
+    });
 </%block>
 
 <%block name="header_extras">
