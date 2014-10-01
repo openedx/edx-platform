@@ -202,7 +202,7 @@
     @include font-size(14);
 
     &:before {
-      transform: scale(flip(1, -1), 1); // RTL for font awesome question mark
+      @include transform(scale(flip(1, -1), 1)); // RTL for font awesome question mark
     }
   }
 

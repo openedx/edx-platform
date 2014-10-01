@@ -81,6 +81,10 @@ $right:           right;
 
 // ====================
 
+// Cross-browsers transform
+@mixin transform($transform-functions) {
+  @include prefixer(transform, $transform-functions, webkit moz ms o spec);
+}
 
 // extends - UI - used for page/view-level wrappers (for centering/grids)
 %ui-wrapper {
