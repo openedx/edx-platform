@@ -42,6 +42,16 @@ Alphabetical Event List
      - :ref:`Instructor_Event_Types`
    * - ``dump-grades-raw``
      - :ref:`Instructor_Event_Types`
+   * - ``edx.cohort.created``
+     - :ref:`student_cohort_events`
+   * - ``edx.cohort.creation_requested``
+     - :ref:`instructor_cohort_events`
+   * - ``edx.cohort.user_add_requested``
+     - :ref:`instructor_cohort_events`
+   * - ``edx.cohort.user_added``
+     - :ref:`student_cohort_events`
+   * - ``edx.cohort.user_removed``
+     - :ref:`student_cohort_events`
    * - ``edx.course.enrollment.activated``
      - :ref:`enrollment` and :ref:`instructor_enrollment`
    * - ``edx.course.enrollment.deactivated`` 
