@@ -13,6 +13,7 @@ from instructor_analytics.basic import (
     sale_record_features, enrolled_students_features, course_registration_features, coupon_codes_features,
     AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 )
+from course_groups.tests.helpers import CohortFactory
 from course_groups.models import CourseUserGroup
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -56,11 +57,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         course = CourseFactory.create(course_key=self.course_key)
         course.cohort_config = {'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
         self.store.update_item(course, self.instructor.id)
-        cohort = CourseUserGroup.objects.create(
-            name='cohort',
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
+        cohort = CohortFactory.create(name='cohort', course_id=course.id)
         cohorted_students = [UserFactory.create() for _ in xrange(10)]
         cohorted_usernames = [student.username for student in cohorted_students]
         non_cohorted_student = UserFactory.create()

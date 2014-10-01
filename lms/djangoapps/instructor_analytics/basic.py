@@ -160,9 +160,10 @@ def enrolled_students_features(course_key, features):
             # Note that we use student.course_groups.all() here instead of
             # student.course_groups.filter(). The latter creates a fresh query,
             # therefore negating the performance gain from prefetch_related().
-            student_dict['cohort'] = {
-                cohort.course_id: cohort.name for cohort in student.course_groups.all()
-            }.get(course_key, "[unassigned]")
+            student_dict['cohort'] = next(
+                (cohort.name for cohort in student.course_groups.all() if cohort.course_id == course_key),
+                "[unassigned]"
+            )
         return student_dict
 
     return [extract_student(student, features) for student in students]
