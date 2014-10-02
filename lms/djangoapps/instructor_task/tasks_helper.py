@@ -496,7 +496,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
     report_store = ReportStore.from_config()
     report_store.store_rows(
         course_id,
-        u"{course_prefix}_{csv_name}_{timestamp_str}".format(
+        u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
             course_prefix=urllib.quote(unicode(course_id).replace("/", "_")),
             csv_name=csv_name,
             timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
