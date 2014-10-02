@@ -57,6 +57,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
@@ -1674,7 +1675,7 @@ def auto_auth(request):
     course_id = request.GET.get('course_id', None)
     course_key = None
     if course_id:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
