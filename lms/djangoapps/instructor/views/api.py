@@ -80,6 +80,7 @@ from .tools import (
     bulk_email_is_enabled_for_course,
     add_block_ids,
 )
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 
@@ -690,7 +691,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     TO DO accept requests for different attribute sets.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_by_id(course_key)
 
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES

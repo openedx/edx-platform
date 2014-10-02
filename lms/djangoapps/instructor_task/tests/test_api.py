@@ -175,7 +175,9 @@ class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
         """
         Tests the resubmission of an instructor task through the API.
         The call to the API is a lambda expression passed via
-        `api_call`.
+        `api_call`.  Expects that the API call returns the resulting
+        InstructorTask object, and that its resubmission raises
+        `AlreadyRunningError`.
         """
         instructor_task = api_call()
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)  # pylint: disable=E1101
@@ -186,12 +188,12 @@ class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
 
     def test_submit_bulk_email_all(self):
         email_id = self._define_course_email()
-        instructor_task = lambda: submit_bulk_course_email(
+        api_call = lambda: submit_bulk_course_email(
             self.create_task_request(self.instructor),
             self.course.id,
             email_id
         )
-        self._test_resubmission(instructor_task)
+        self._test_resubmission(api_call)
 
     def test_submit_calculate_students_features(self):
         api_call = lambda: submit_calculate_students_features_csv(

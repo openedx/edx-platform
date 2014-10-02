@@ -146,7 +146,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
 @task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
 def calculate_students_features_csv(entry_id, xmodule_instance_args):
     """
-    Compute student profile informataion for a course and upload the
+    Compute student profile information for a course and upload the
     CSV to an S3 bucket for download.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.

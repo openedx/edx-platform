@@ -55,6 +55,22 @@ from ..views.tools import get_extended_due
 EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","customer_reference_number","internal_reference"'
 EXPECTED_COUPON_CSV_HEADER = '"course_id","percentage_discount","code_redeemed_count","description"'
 
+# ddt data for test cases involving reports
+REPORTS_DATA = (
+    {
+        'report_type': 'grade',
+        'instructor_api_endpoint': 'calculate_grades_csv',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_grades_csv',
+        'extra_instructor_api_kwargs': {}
+    },
+    {
+        'report_type': 'enrolled student profile',
+        'instructor_api_endpoint': 'get_students_features',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_students_features_csv',
+        'extra_instructor_api_kwargs': {'csv': '/csv'}
+    }
+)
+
 
 @common_exceptions_400
 def view_success(request):  # pylint: disable=W0613
@@ -1672,13 +1688,11 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected_response)
 
-    @ddt.data(('grade', 'calculate_grades_csv', 'instructor_task.api.submit_calculate_grades_csv'),
-              ('enrolled student profile', 'get_students_features', 'instructor_task.api.submit_calculate_students_features_csv'))
+    @ddt.data(*REPORTS_DATA)
     @ddt.unpack
-    def test_calculate_report_csv_success(self, report_type, instructor_api_endpoint, task_api_endpoint):
+    def test_calculate_report_csv_success(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
         kwargs = {'course_id': unicode(self.course.id)}
-        if instructor_api_endpoint == 'get_students_features':
-            kwargs['csv'] = '/csv'
+        kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
         with patch(task_api_endpoint):
@@ -1686,13 +1700,11 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
-    @ddt.data(('grade', 'calculate_grades_csv', 'instructor_task.api.submit_calculate_grades_csv'),
-              ('enrolled student profile', 'get_students_features', 'instructor_task.api.submit_calculate_students_features_csv'))
+    @ddt.data(*REPORTS_DATA)
     @ddt.unpack
-    def test_calculate_report_csv_already_running(self, report_type, instructor_api_endpoint, task_api_endpoint):
+    def test_calculate_report_csv_already_running(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
         kwargs = {'course_id': unicode(self.course.id)}
-        if instructor_api_endpoint == 'get_students_features':
-            kwargs['csv'] = '/csv'
+        kwargs.update(extra_instructor_api_kwargs)
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
         with patch(task_api_endpoint) as mock:
