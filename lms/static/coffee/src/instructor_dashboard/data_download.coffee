@@ -27,10 +27,10 @@ class DataDownload
     @$download                        = @$section.find '.data-download-container'
     @$download_display_text           = @$download.find '.data-display-text'
     @$download_request_response_error = @$download.find '.request-response-error'
-    @$reports                        = @$section.find '.reports-download-container'
+    @$reports                         = @$section.find '.reports-download-container'
     @$download_display_table          = @$reports.find '.data-display-table'
-    @$reports_request_response       = @$reports.find '.request-response'
-    @$reports_request_response_error = @$reports.find '.request-response-error'
+    @$reports_request_response        = @$reports.find '.request-response'
+    @$reports_request_response_error  = @$reports.find '.request-response-error'
 
     @report_downloads = new ReportDownloads(@$section)
     @instructor_tasks = new (PendingInstructorTasks()) @$section
@@ -55,7 +55,7 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: std_ajax_err =>
+        error: (std_ajax_err) =>
           @$reports_request_response_error.text gettext("Error generating student profile information. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
@@ -73,7 +73,7 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: std_ajax_err =>
+        error: (std_ajax_err) =>
           @clear_display()
           @$download_request_response_error.text gettext("Error getting student list.")
         success: (data) =>
@@ -100,7 +100,7 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: std_ajax_err =>
+        error: (std_ajax_err) =>
           @clear_display()
           @$download_request_response_error.text gettext("Error retrieving grading configuration.")
         success: (data) =>
@@ -116,7 +116,7 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: std_ajax_err =>
+        error: (std_ajax_err) =>
           @$reports_request_response_error.text gettext("Error generating grades. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
@@ -168,7 +168,7 @@ class ReportDownloads
           @create_report_downloads_table data.downloads
         else
           console.log "No reports ready for download"
-      error: std_ajax_err => console.error "Error finding report downloads"
+      error: (std_ajax_err) => console.error "Error finding report downloads"
 
   create_report_downloads_table: (report_downloads_data) ->
     @$report_downloads_table.empty()

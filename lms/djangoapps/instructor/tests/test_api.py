@@ -1621,7 +1621,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         Test that get_students_features includes cohort info when the course is
         cohorted, and does not when the course is not cohorted.
         """
-        url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
         self.course.cohort_config = {'cohorted': is_cohorted}
         self.store.update_item(self.course, self.instructor.id)
 
@@ -1676,7 +1676,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
               ('enrolled student profile', 'get_students_features', 'instructor_task.api.submit_calculate_students_features_csv'))
     @ddt.unpack
     def test_calculate_report_csv_success(self, report_type, instructor_api_endpoint, task_api_endpoint):
-        kwargs = {'course_id': self.course.id.to_deprecated_string()}
+        kwargs = {'course_id': unicode(self.course.id)}
         if instructor_api_endpoint == 'get_students_features':
             kwargs['csv'] = '/csv'
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
@@ -1690,7 +1690,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
               ('enrolled student profile', 'get_students_features', 'instructor_task.api.submit_calculate_students_features_csv'))
     @ddt.unpack
     def test_calculate_report_csv_already_running(self, report_type, instructor_api_endpoint, task_api_endpoint):
-        kwargs = {'course_id': self.course.id.to_deprecated_string()}
+        kwargs = {'course_id': unicode(self.course.id)}
         if instructor_api_endpoint == 'get_students_features':
             kwargs['csv'] = '/csv'
         url = reverse(instructor_api_endpoint, kwargs=kwargs)
