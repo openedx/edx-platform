@@ -24,7 +24,10 @@ from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
 from lms.lib.comment_client.user import User as CommentUser
 from lms.lib.comment_client.utils import CommentClientRequestError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from notification_prefs.views import enable_notifications
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, CourseAssistantRole, UserBasedRole
 from user_api.models import UserPreference
@@ -33,9 +36,11 @@ from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
     validate_password_dictionary
 )
+from xmodule.modulestore import InvalidLocationError
+from xmodule.modulestore.django import modulestore
 
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
-from api_manager.courseware_access import get_course, get_course_child, get_course_key, course_exists, calculate_proforma_grade
+from api_manager.courseware_access import get_course, get_course_child, get_course_child_content, get_course_key, course_exists, calculate_proforma_grade
 from api_manager.permissions import SecureAPIView, SecureListAPIView, IdsInFilterBackend, HasOrgsFilterBackend
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
@@ -43,12 +48,7 @@ from api_manager.utils import generate_base_uri, dict_has_items, extract_data_pa
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer, UserRolesSerializer
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey, CourseKey
-from opaque_keys.edx.locations import Location
-from xmodule.modulestore import InvalidLocationError
 
-from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -122,7 +122,7 @@ def _save_child_position(parent_descriptor, target_child_location):
     we just compare id's from the array of children
     """
     for position, child_location in enumerate(parent_descriptor.children, start=1):
-        if child_location == target_child_location:
+        if unicode(child_location) == unicode(target_child_location):
             # Only save if position changed
             if position != parent_descriptor.position:
                 parent_descriptor.position = position
@@ -333,6 +333,8 @@ class UsersList(SecureListAPIView):
         profile.save()
 
         UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
+        if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
+            enable_notifications(user)
 
         # add this account creation to password history
         # NOTE, this will be a NOP unless the feature has been turned on in configuration
@@ -756,13 +758,17 @@ def _get_current_position_loc(parent_module):
     An optimized lookup for the current position. The LMS version can cause unnecessary round trips to
     the Mongo database
     """
+
+
     if not hasattr(parent_module, 'position'):
         return None
+
 
     if not parent_module.children:
         return None
 
     index = 0
+
     if parent_module.position:
         index = parent_module.position - 1   # position is 1 indexed
 
@@ -859,15 +865,11 @@ class UsersCoursesDetail(SecureAPIView):
         response_data['position_tree'] = {}
         parent_module = course_module
         while parent_module is not None:
-
             current_child_loc = _get_current_position_loc(parent_module)
-
             if  current_child_loc:
                 response_data['position_tree'][current_child_loc.category] = {}
                 response_data['position_tree'][current_child_loc.category]['id'] = unicode(current_child_loc)
-
                 _,_,parent_module = get_course_child(request, user, course_key, unicode(current_child_loc), load_content=True)
-
             else:
                 parent_module = None
         return Response(response_data, status=status.HTTP_200_OK)

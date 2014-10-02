@@ -580,8 +580,8 @@ def get_module_system_for_user(user, field_data_cache,
         except (ValueError, TypeError):
             log.exception('Non-integer %r passed as position.', position)
             position = None
-
     system.set('position', position)
+
     if settings.FEATURES.get('ENABLE_PSYCHOMETRICS') and user.is_authenticated():
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
