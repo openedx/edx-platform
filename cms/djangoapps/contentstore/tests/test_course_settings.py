@@ -20,10 +20,13 @@ from xmodule.fields import Date
 from .utils import CourseTestCase
 from xmodule.modulestore.django import modulestore
 from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
+import ddt
+from xmodule.modulestore import ModuleStoreEnum
 
 
 def get_url(course_id, handler_name='settings_handler'):
     return reverse_course_url(handler_name, course_id)
+
 
 class CourseDetailsTestCase(CourseTestCase):
     """
@@ -139,7 +142,6 @@ class CourseDetailsTestCase(CourseTestCase):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Short Description")
 
-
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
@@ -240,6 +242,7 @@ class CourseDetailsViewTest(CourseTestCase):
             self.fail(field + " included in encoding but missing from details at " + context)
 
 
+@ddt.ddt
 class CourseGradingTest(CourseTestCase):
     """
     Tests for the course settings grading page.
@@ -258,7 +261,10 @@ class CourseGradingTest(CourseTestCase):
             subgrader = CourseGradingModel.fetch_grader(self.course.id, i)
             self.assertDictEqual(grader, subgrader, str(i) + "th graders not equal")
 
-    def test_update_from_json(self):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_update_from_json(self, store):
+        self.course = CourseFactory.create(default_store=store)
+
         test_grader = CourseGradingModel.fetch(self.course.id)
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Noop update")
@@ -266,6 +272,18 @@ class CourseGradingTest(CourseTestCase):
         test_grader.graders[0]['weight'] = test_grader.graders[0].get('weight') * 2
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Weight[0] * 2")
+
+        # test for bug LMS-11485
+        with modulestore().bulk_operations(self.course.id):
+            new_grader = test_grader.graders[0].copy()
+            new_grader['type'] += '_foo'
+            new_grader['short_label'] += '_foo'
+            new_grader['id'] = len(test_grader.graders)
+            test_grader.graders.append(new_grader)
+            # don't use altered cached def, get a fresh one
+            CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
+            altered_grader = CourseGradingModel.fetch(self.course.id)
+            self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__)
 
         test_grader.grade_cutoffs['D'] = 0.3
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)

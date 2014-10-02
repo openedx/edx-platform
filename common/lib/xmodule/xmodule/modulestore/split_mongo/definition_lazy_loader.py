@@ -1,4 +1,5 @@
 from opaque_keys.edx.locator import DefinitionLocator
+import copy
 
 
 class DefinitionLazyLoader(object):
@@ -24,4 +25,8 @@ class DefinitionLazyLoader(object):
         Fetch the definition. Note, the caller should replace this lazy
         loader pointer with the result so as not to fetch more than once
         """
-        return self.modulestore.get_definition(self.course_key, self.definition_locator.definition_id)
+        # get_definition may return a cached value perhaps from another course or code path
+        # so, we copy the result here so that updates don't cross-pollinate nor change the cached
+        # value in such a way that we can't tell that the definition's been updated.
+        definition = self.modulestore.get_definition(self.course_key, self.definition_locator.definition_id)
+        return copy.deepcopy(definition)

@@ -361,7 +361,6 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         definitions.extend(self.db_connection.get_definitions(list(ids)))
         return definitions
 
-
     def update_definition(self, course_key, definition):
         """
         Update a definition, respecting the current bulk operation status
@@ -1892,7 +1891,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     # find the parents and put root in the right sequence
                     parent = self._get_parent_from_structure(BlockKey.from_usage_key(subtree_root), source_structure)
                     if parent is not None:  # may be a detached category xblock
-                        if not parent in destination_blocks:
+                        if parent not in destination_blocks:
                             raise ItemNotFoundError(parent)
                         orphans.update(
                             self._sync_children(
