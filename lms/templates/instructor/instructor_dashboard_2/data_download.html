@@ -6,16 +6,6 @@
   <h2>${_("Data Download")}</h2>
   <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
 
-  <p>${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}</p>
-
-  <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
-
-  % if not disable_buttons:
-    <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
-    <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
-  %endif
-  <div class="data-display-table" id="data-student-profiles-table"></div>
-  
 
   <br>
   <p>${_("Click to display the grading configuration for the course. The grading configuration is the breakdown of graded subsections of the course (such as exams and problem sets), and can be changed on the 'Grading' page (under 'Settings') in Studio.")}</p>
@@ -29,27 +19,37 @@
 </div>
 
 %if settings.FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
-  <div class="grades-download-container action-type-container">
+  <div class="reports-download-container action-type-container">
     <hr>
     <h2> ${_("Reports")}</h2>
 
+    <p>${_("For large courses, generating some reports can take several hours. When report generation is complete, a link that includes the date and time of generation appears in the table below. These reports are generated in the background, meaning it is OK to navigate away from this page while your report is generating.")}</p>
+
+    <p>${_("Please be patient and do not click these buttons multiple times. Clicking these buttons multiple times will significantly slow the generation process.")}</p>
+
+    <p>${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}</p>
+
+    <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
+
+  % if not disable_buttons:
+    <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
+    <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
+  %endif
+  <div class="data-display-table" id="data-student-profiles-table"></div>
+
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
-    <p>${_("Click to generate a CSV grade report for all currently enrolled students.  Links to generated reports appear in a table below when report generation is complete.")}</p>
-
-    <p>${_("For large courses, generating this report may take several hours. Please be patient and do not click the button multiple times. Clicking the button multiple times will significantly slow the grade generation process.")}</p>
-
-    <p>${_("The report is generated in the background, meaning it is OK to navigate away from this page while your report is generating.")}</p>
-
-    <div class="request-response msg msg-confirm copy" id="grade-request-response"></div>
-    <div class="request-response-error msg msg-warning copy" id="grade-request-response-error"></div>
-    <br>
+    <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
 
     <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
   %endif
 
+    <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
+    <div class="request-response-error msg msg-warning copy" id="report-request-response-error"></div>
+    <br>
+
     <p><b>${_("Reports Available for Download")}</b></p>
     <p>
-      ${_("The grade reports listed below are generated each time the <b>Generate Grade Report</b> button is clicked. A link to each grade report remains available on this page, identified by the UTC date and time of generation. Grade reports are not deleted, so you will always be able to access previously generated reports from this page.")}
+      ${_("The reports listed below are available for download. A link to every report remains available on this page, identified by the UTC date and time of generation. Reports are not deleted, so you will always be able to access previously generated reports from this page.")}
     </p>
 
   %if settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
