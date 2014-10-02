@@ -331,7 +331,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <% }); %>
                  </select>
             </label><div class="field-help">
-                Discussion admins and moderators can make their posts visible to all students or specify a single cohort group.
+                Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort group.
             </div>
         </div>
         <% } %>
