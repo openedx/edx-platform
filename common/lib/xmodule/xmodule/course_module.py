@@ -266,7 +266,7 @@ class CourseFields(object):
     )
     cohort_config = Dict(
         display_name=_("Cohort Configuration"),
-        help=_("Cohorts are not currently supported by edX."),
+        help=_("Enter policy keys and values to enable the cohort feature, define automated student assignment to groups, or identify any course-wide discussion topics as private to cohort members."),
         scope=Scope.settings
     )
     is_new = Boolean(
