@@ -8,6 +8,7 @@ from django.test.client import RequestFactory
 
 from microsite_configuration import microsite
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
@@ -37,31 +38,33 @@ def course_id_from_url(url):
     if not url:
         return None
 
-    COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[a-zA-Z0-9_+\/:]+)')
+    deprecated = False
+    if '/' in url:
+        deprecated = True
+
+    if deprecated:
+        COURSE_REGEX = re.compile(r'^.*/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)')
+        key_generator = SlashSeparatedCourseKey.from_deprecated_string
+    else:
+        COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[a-zA-Z0-9_+\/:]+)')
+        key_generator = CourseKey.from_string
+
     match = COURSE_REGEX.match(url)
     if match is None:
         return None
+
     course_id = match.group('course_id')
     if course_id is None:
         return None
 
     try:
-        return SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = key_generator(course_id)
     except InvalidKeyError:
-        COURSE_REGEX = re.compile(r'(?P<course_id>[^/]+/[^/]+/[^/]+)')
-        match = COURSE_REGEX.match(course_id)
-        if match is None:
-            return None
-        course_id = match.group('course_id')
-        if course_id is None:
-            return None
-        try:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        except InvalidKeyError:
-            log.warning(
-                'unable to parse course_id "{}"'.format(course_id),
-                exc_info=True
-            )
+        log.warning(
+            'unable to parse course_id "{}"'.format(course_id),
+            exc_info=True
+        )
+        return None
 
     return course_key
 
