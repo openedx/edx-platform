@@ -297,6 +297,9 @@ FEATURES = {
 
     # Enable the new dashboard, account, and profile pages
     'ENABLE_NEW_DASHBOARD': False,
+
+    # Enable RTL compilation and layout switching based on the user's preferred language
+    'ENABLE_RTL': False,
 }
 
 # Ignore static asset files on import which match this pattern

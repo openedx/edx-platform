@@ -2,7 +2,11 @@
 
 // setting the layout to handle right to left languages
 // false= lang direction left to right (eg. english); true = rtl (eg. arabic)
-$rtl: false;
+% if env.get("RTL", False):
+  $rtl: true;
+%else:
+  $rtl: false;
+%endif
 
 
 // base

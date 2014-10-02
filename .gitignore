@@ -73,10 +73,14 @@ lms/static/sass/*.css.map
 lms/static/sass/application.scss
 lms/static/sass/application-extend1.scss
 lms/static/sass/application-extend2.scss
+lms/static/sass/base/_variables.scss
 lms/static/sass/course.scss
 cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
+
+###Generated RTL assets
+sass-rtl
 
 ### Logging artifacts
 log/
