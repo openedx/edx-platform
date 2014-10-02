@@ -331,7 +331,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <% }); %>
                  </select>
             </label><div class="field-help">
-                Instructors can set whether a post in a cohorted topic is visible to all cohorts or only to a specific cohort.
+                Discussion admins and moderators can make their posts visible to all students or specify a single cohort group.
             </div>
         </div>
         <% } %>
