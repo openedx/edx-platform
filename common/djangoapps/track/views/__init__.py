@@ -30,6 +30,14 @@ def _get_request_header(request, header_name, default=''):
         return default
 
 
+def _get_request_value(request, value_name, default=''):
+    """Helper method to get header values from a request's REQUEST dict, if present."""
+    if request is not None and hasattr(request, 'REQUEST') and value_name in request.REQUEST:
+        return request.REQUEST[value_name]
+    else:
+        return default
+
+
 def user_track(request):
     """
     Log when POST call to "event" URL is made by a user. Uses request.REQUEST
@@ -42,7 +50,7 @@ def user_track(request):
     except:
         username = "anonymous"
 
-    page = request.REQUEST['page']
+    page = _get_request_value(request, 'page')
 
     with eventtracker.get_tracker().context('edx.course.browser', contexts.course_context_from_url(page)):
         context = eventtracker.get_tracker().resolve_context()
@@ -51,8 +59,8 @@ def user_track(request):
             "session": context.get('session', ''),
             "ip": _get_request_header(request, 'REMOTE_ADDR'),
             "event_source": "browser",
-            "event_type": request.REQUEST['event_type'],
-            "event": request.REQUEST['event'],
+            "event_type": _get_request_value(request, 'event_type'),
+            "event": _get_request_value(request, 'event'),
             "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
             "page": page,
             "time": datetime.datetime.utcnow(),
