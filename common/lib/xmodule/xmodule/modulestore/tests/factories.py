@@ -63,10 +63,17 @@ class CourseFactory(XModuleFactory):
         run = kwargs.get('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
+        # Pass the metadata just as field=value pairs
+        kwargs.update(kwargs.pop('metadata', {}))
+        default_store_override = kwargs.pop('default_store', None)
+
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            # Write the data to the mongo datastore
-            kwargs.update(kwargs.get('metadata', {}))
-            new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+            if default_store_override is not None:
+                with store.default_store(default_store_override):
+                    new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+            else:
+                new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+
             last_course.loc = new_course.location
             return new_course
 

@@ -24,6 +24,7 @@ _ = lambda text: text
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
+
 class StringOrDate(Date):
     def from_json(self, value):
         """
