@@ -1,7 +1,7 @@
 var edx = edx || {};
 
 (function($, _, Backbone, gettext) {
-    "use strict";
+    'use strict';
 
     edx.student = edx.student || {};
     edx.student.account = {};
@@ -23,29 +23,29 @@ var edx = edx || {};
         ),
 
         defaults: {
-            email: "",
-            password: ""
+            email: '',
+            password: ''
         },
 
-        urlRoot: "/email",
+        urlRoot: 'email',
 
         sync: function(method, model) {
             var headers = {
-                "X-CSRFToken": $.cookie("csrftoken")
+                'X-CSRFToken': $.cookie('csrftoken')
             };
 
             $.ajax({
                 url: model.urlRoot,
-                type: "POST",
+                type: 'POST',
                 data: model.attributes,
                 headers: headers
             })
             .done(function() {
-                model.trigger("sync");
+                model.trigger('sync');
             })
             .fail(function() {
                 var error = gettext("The data could not be saved.");
-                model.trigger("error", error);
+                model.trigger('error', error);
             });
         },
 
@@ -70,25 +70,25 @@ var edx = edx || {};
     edx.student.account.AccountView = Backbone.View.extend({
 
         events: {
-            "submit": "submit",
-            "change": "change"
+            'submit': 'submit',
+            'change': 'change'
         },
 
         initialize: function() {
-            _.bindAll(this, "render", "submit", "change", "clearStatus", "invalid", "error", "sync");
+            _.bindAll(this, 'render', 'submit', 'change', 'clearStatus', 'invalid', 'error', 'sync');
             this.model = new edx.student.account.AccountModel();
-            this.model.on("invalid", this.invalid);
-            this.model.on("error", this.error);
-            this.model.on("sync", this.sync);
+            this.model.on('invalid', this.invalid);
+            this.model.on('error', this.error);
+            this.model.on('sync', this.sync);
         },
 
         render: function() {
-            this.$el.html(_.template($("#account-tpl").html(), {}));
-            this.$email = $("#new-email", this.$el);
-            this.$password = $("#password", this.$el);
-            this.$emailStatus = $("#new-email-status", this.$el);
-            this.$passwordStatus = $("#password-status", this.$el);
-            this.$requestStatus = $("#request-email-status", this.$el);
+            this.$el.html(_.template($('#account-tpl').html(), {}));
+            this.$email = $('#new-email', this.$el);
+            this.$password = $('#password', this.$el);
+            this.$emailStatus = $('#new-email-status', this.$el);
+            this.$passwordStatus = $('#password-status', this.$el);
+            this.$requestStatus = $('#request-email-status', this.$el);
             return this;
         },
 
@@ -108,48 +108,48 @@ var edx = edx || {};
         invalid: function(model) {
             var errors = model.validationError;
 
-            if (errors.hasOwnProperty("email")) {
+            if (errors.hasOwnProperty('email')) {
                 this.$emailStatus
-                    .addClass("validation-error")
+                    .addClass('validation-error')
                     .text(errors.email);
             }
 
-            if (errors.hasOwnProperty("password")) {
+            if (errors.hasOwnProperty('password')) {
                 this.$passwordStatus
-                    .addClass("validation-error")
+                    .addClass('validation-error')
                     .text(errors.password);
             }
         },
 
         error: function(error) {
             this.$requestStatus
-                .addClass("error")
+                .addClass('error')
                 .text(error);
         },
 
         sync: function() {
             this.$requestStatus
-                .addClass("success")
+                .addClass('success')
                 .text(gettext("Please check your email to confirm the change"));
         },
 
         clearStatus: function() {
             this.$emailStatus
-                .removeClass("validation-error")
+                .removeClass('validation-error')
                 .text("");
 
             this.$passwordStatus
-                .removeClass("validation-error")
+                .removeClass('validation-error')
                 .text("");
 
             this.$requestStatus
-                .removeClass("error")
+                .removeClass('error')
                 .text("");
         },
     });
 
     return new edx.student.account.AccountView({
-        el: $("#account-container")
+        el: $('#account-container')
     }).render();
 
 })(jQuery, _, Backbone, gettext);

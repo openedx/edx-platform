@@ -11,7 +11,7 @@ var edx = edx || {};
             fullName: ''
         },
 
-        urlRoot: '/',
+        urlRoot: '',
 
         sync: function(method, model) {
             var headers = {
@@ -61,10 +61,10 @@ var edx = edx || {};
         },
 
         render: function() {
-            this.$el.html(_.template($("#profile-tpl").html(), {}));
-            this.$nameStatus = $("#profile-name-status", this.$el);
-            this.$nameField = $("#profile-name", this.$el);
-            this.$submitStatus = $("#submit-status", this.$el);
+            this.$el.html(_.template($('#profile-tpl').html(), {}));
+            this.$nameStatus = $('#profile-name-status', this.$el);
+            this.$nameField = $('#profile-name', this.$el);
+            this.$submitStatus = $('#submit-status', this.$el);
             return this;
         },
 
@@ -98,22 +98,22 @@ var edx = edx || {};
         sync: function() {
             this.$submitStatus
                 .addClass('success')
-                .text(gettext('Saved'));
+                .text(gettext("Saved"));
         },
 
         clearStatus: function() {
             this.$nameStatus
                 .removeClass('validation-error')
-                .text('');
+                .text("");
 
             this.$submitStatus
                 .removeClass('error')
-                .text('');
+                .text("");
         }
     });
 
     return new edx.student.profile.ProfileView({
-        el: $("#profile-container")
+        el: $('#profile-container')
     }).render();
 
 })(jQuery, _, Backbone, gettext);

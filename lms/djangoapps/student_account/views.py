@@ -62,7 +62,7 @@ def email_change_request_handler(request):
 
     Example usage:
 
-        PUT /account/email
+        POST /account/email
 
     """
     username = request.user.username
