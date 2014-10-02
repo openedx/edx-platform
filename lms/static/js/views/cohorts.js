@@ -177,6 +177,7 @@
             event.preventDefault();
             var section = $(event.currentTarget).data("section");
             $(".instructor-nav .nav-item a[data-section='" + section + "']").click();
+            $(window).scrollTop(0);
         }
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView);
