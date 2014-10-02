@@ -157,7 +157,7 @@ class ChooseModeView(View):
         #  it doesn't matter, but it will avoid hitting the database.
         if requested_mode == 'honor':
             CourseEnrollment.enroll(user, course_key, requested_mode)
-            return redirect('dashboard')
+            return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]
 

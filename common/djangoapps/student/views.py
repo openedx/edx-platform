@@ -46,8 +46,8 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory, UserSignupSource
-)
+    create_comments_service_user, PasswordHistory, UserSignupSource,
+    DashboardConfiguration)
 from student.forms import PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
@@ -471,6 +471,10 @@ def dashboard(request):
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = list(get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set))
 
+    # Check to see if the student has recently enrolled in a course. If so, display a notification message confirming
+    # the enrollment.
+    enrollment_message = _create_recent_enrollment_message(course_enrollment_pairs)
+
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
@@ -551,6 +555,7 @@ def dashboard(request):
         current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
 
     context = {
+        'enrollment_message': enrollment_message,
         'course_enrollment_pairs': course_enrollment_pairs,
         'course_optouts': course_optouts,
         'message': message,
@@ -584,6 +589,49 @@ def dashboard(request):
         context['provider_user_states'] = pipeline.get_provider_user_states(user)
 
     return render_to_response('dashboard.html', context)
+
+
+def _create_recent_enrollment_message(course_enrollment_pairs):
+    """Builds a recent course enrollment message
+
+    Constructs a new message template based on any recent course enrollments for the student.
+
+    Args:
+        course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
+
+    Returns:
+        A string representing the HTML message output from the message template.
+
+    """
+    recent_course_enrollment_pairs = _get_recently_enrolled_courses(course_enrollment_pairs)
+    if recent_course_enrollment_pairs:
+        return render_to_string(
+            'enrollment/course_enrollment_message.html',
+            {'recent_course_enrollment_pairs': recent_course_enrollment_pairs,}
+        )
+
+
+def _get_recently_enrolled_courses(course_enrollment_pairs):
+    """Checks to see if the student has recently enrolled in courses.
+
+    Checks to see if any of the enrollments in the course_enrollment_pairs have been recently created and activated.
+
+    Args:
+        course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
+
+    Returns:
+        A list of tuples for the course and enrollment.
+
+    """
+    seconds = DashboardConfiguration.current().recent_enrollment_time_delta
+    sorted_list = sorted(course_enrollment_pairs, key=lambda created: created[1].created, reverse=True)
+    time_delta = (datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds))
+    return [
+        (course, enrollment) for course, enrollment in sorted_list
+        # If the enrollment has no created date, we are explicitly excluding the course
+        # from the list of recent enrollments.
+        if enrollment.is_active and enrollment.created > time_delta
+    ]
 
 
 def try_change_enrollment(request):
