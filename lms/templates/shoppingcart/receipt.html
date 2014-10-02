@@ -46,13 +46,17 @@
           </tr>
           % for item in order_items:
 
-            <% course_id = reverse('info', args=[item.course_id.to_deprecated_string()]) %>
 
             <tr class="order-item">
               % if item.status == "purchased":
                 <td>${item.qty}</td>
                 <td>${item.line_desc}</td>
-                <td><a href="${course_id | h}" class="enter-course">${_('View Course')}</a></td>
+                <td>
+                % if item.course_id:
+                  <% course_id = reverse('info', args=[item.course_id.to_deprecated_string()]) %>
+                  <a href="${course_id | h}" class="enter-course">${_('View Course')}</a></td>
+                % endif
+                </td>
                 <td>${"{0:0.2f}".format(item.unit_cost)}
                     % if item.list_price != None:
                         <span class="old-price"> ${"{0:0.2f}".format(item.list_price)}</span>

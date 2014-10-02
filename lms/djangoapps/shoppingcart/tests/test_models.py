@@ -1,31 +1,41 @@
 """
 Tests for the Shopping Cart Models
 """
+from decimal import Decimal
+import datetime
+
 import smtplib
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
 from mock import patch, MagicMock
+import pytz
 from django.core import mail
 from django.conf import settings
 from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, mixed_store_config
+)
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from shoppingcart.models import (Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration,
-                                 OrderItemSubclassPK)
+from shoppingcart.models import (
+    Order, OrderItem, CertificateItem,
+    InvalidCartItem, PaidCourseRegistration,
+    Donation, OrderItemSubclassPK
+)
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import PurchasedCallbackException
-import pytz
-import datetime
+
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+# Since we don't need any XML course fixtures, use a modulestore configuration
+# that disables the XML modulestore.
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class OrderTest(ModuleStoreTestCase):
     def setUp(self):
         self.user = UserFactory.create()
@@ -286,7 +296,7 @@ class OrderItemTest(TestCase):
         self.assertEquals(set([]), inst_set)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     def setUp(self):
         self.user = UserFactory.create()
@@ -383,7 +393,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertTrue(PaidCourseRegistration.contained_in_order(cart, self.course_key))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class CertificateItemTest(ModuleStoreTestCase):
     """
     Tests for verifying specific CertificateItem functionality
@@ -547,3 +557,80 @@ class CertificateItemTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.user, self.course_key, 'verified')
         ret_val = CourseEnrollment.unenroll(self.user, self.course_key)
         self.assertFalse(ret_val)
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class DonationTest(ModuleStoreTestCase):
+    """Tests for the donation order item type. """
+
+    COST = Decimal('23.45')
+
+    def setUp(self):
+        """Create a test user and order. """
+        super(DonationTest, self).setUp()
+        self.user = UserFactory.create()
+        self.cart = Order.get_cart_for_user(self.user)
+
+    def test_donate_to_org(self):
+        # No course ID provided, so this is a donation to the entire organization
+        donation = Donation.add_to_order(self.cart, self.COST)
+        self._assert_donation(
+            donation,
+            donation_type="general",
+            unit_cost=self.COST,
+            line_desc="Donation"
+        )
+
+    def test_donate_to_course(self):
+        # Create a test course
+        course = CourseFactory.create(display_name="Test Course")
+
+        # Donate to the course
+        donation = Donation.add_to_order(self.cart, self.COST, course_id=course.id)
+        self._assert_donation(
+            donation,
+            donation_type="course",
+            course_id=course.id,
+            unit_cost=self.COST,
+            line_desc=u"Donation for Test Course"
+        )
+
+    def test_donate_no_such_course(self):
+        fake_course_id = SlashSeparatedCourseKey("edx", "fake", "course")
+        with self.assertRaises(InvalidCartItem):
+            Donation.add_to_order(self.cart, self.COST, course_id=fake_course_id)
+
+    def test_confirmation_email(self):
+        # Pay for a donation
+        Donation.add_to_order(self.cart, self.COST)
+        self.cart.start_purchase()
+        self.cart.purchase()
+
+        # Check that the tax-deduction information appears in the confirmation email
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEquals('Order Payment Confirmation', email.subject)
+        self.assertIn("tax deductible", email.body)
+
+    def _assert_donation(self, donation, donation_type=None, course_id=None, unit_cost=None, line_desc=None):
+        """Verify the donation fields and that the donation can be purchased. """
+        self.assertEqual(donation.order, self.cart)
+        self.assertEqual(donation.user, self.user)
+        self.assertEqual(donation.donation_type, donation_type)
+        self.assertEqual(donation.course_id, course_id)
+        self.assertEqual(donation.qty, 1)
+        self.assertEqual(donation.unit_cost, unit_cost)
+        self.assertEqual(donation.currency, "usd")
+        self.assertEqual(donation.line_desc, line_desc)
+
+        # Verify that the donation is in the cart
+        self.assertTrue(self.cart.has_items(item_type=Donation))
+        self.assertEqual(self.cart.total_cost, unit_cost)
+
+        # Purchase the item
+        self.cart.start_purchase()
+        self.cart.purchase()
+
+        # Verify that the donation is marked as purchased
+        donation = Donation.objects.get(pk=donation.id)
+        self.assertEqual(donation.status, "purchased")

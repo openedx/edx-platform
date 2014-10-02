@@ -30,9 +30,12 @@ from xmodule_django.models import CourseKeyField
 
 from verify_student.models import SoftwareSecurePhotoVerification
 
-from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-                         AlreadyEnrolledInCourseException, CourseDoesNotExistException,
-                         MultipleCouponsNotAllowedException, RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException)
+from .exceptions import (
+    InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
+    AlreadyEnrolledInCourseException, CourseDoesNotExistException,
+    MultipleCouponsNotAllowedException, RegCodeAlreadyExistException,
+    ItemDoesNotExistAgainstRegCodeException
+)
 
 from microsite_configuration import microsite
 
@@ -865,3 +868,140 @@ class CertificateItem(OrderItem):
                 mode='verified',
                 status='purchased',
                 unit_cost__gt=(CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd')))).count()
+
+
+class Donation(OrderItem):
+    """A donation made by a user.
+
+    Donations can be made for a specific course or to the organization as a whole.
+    Users can choose the donation amount.
+    """
+
+    # Types of donations
+    DONATION_TYPES = (
+        ("general", "A general donation"),
+        ("course", "A donation to a particular course")
+    )
+
+    # The type of donation
+    donation_type = models.CharField(max_length=32, default="general", choices=DONATION_TYPES)
+
+    # If a donation is made for a specific course, then store the course ID here.
+    # If the donation is made to the organization as a whole,
+    # set this field to CourseKeyField.Empty
+    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    @classmethod
+    @transaction.commit_on_success
+    def add_to_order(cls, order, donation_amount, course_id=None, currency='usd'):
+        """Add a donation to an order.
+
+        Args:
+            order (Order): The order to add this donation to.
+            donation_amount (Decimal): The amount the user is donating.
+
+
+        Keyword Args:
+            course_id (CourseKey): If provided, associate this donation with a particular course.
+            currency (str): The currency used for the the donation.
+
+        Raises:
+            InvalidCartItem: The provided course ID is not valid.
+
+        Returns:
+            Donation
+
+        """
+        # This will validate the currency but won't actually add the item to the order.
+        super(Donation, cls).add_to_order(order, currency=currency)
+
+        # Create a line item description, including the name of the course
+        # if this is a per-course donation.
+        # This will raise an exception if the course can't be found.
+        description = cls._line_item_description(course_id=course_id)
+
+        params = {
+            "order": order,
+            "user": order.user,
+            "status": order.status,
+            "qty": 1,
+            "unit_cost": donation_amount,
+            "currency": currency,
+            "line_desc": description
+        }
+
+        if course_id is not None:
+            params["course_id"] = course_id
+            params["donation_type"] = "course"
+        else:
+            params["donation_type"] = "general"
+
+        return cls.objects.create(**params)
+
+    def purchased_callback(self):
+        """Donations do not need to be fulfilled, so this method does nothing."""
+        pass
+
+    def generate_receipt_instructions(self):
+        """Provide information about tax-deductible donations in the receipt.
+
+        Returns:
+            tuple of (Donation, unicode)
+
+        """
+        return self.pk_with_subclass, set([self._tax_deduction_msg()])
+
+    @property
+    def additional_instruction_text(self):
+        """Provide information about tax-deductible donations in the confirmation email.
+
+        Returns:
+            unicode
+
+        """
+        return self._tax_deduction_msg()
+
+    def _tax_deduction_msg(self):
+        """Return the translated version of the tax deduction message.
+
+        Returns:
+            unicode
+
+        """
+        return _(
+            u"This receipt was prepared to support charitable contributions for tax purposes.  "
+            u"Gifts are tax deductible as permitted by law.  "
+            u"We confirm that neither goods nor services were provided in exchange for this gift."
+        )
+
+    @classmethod
+    def _line_item_description(self, course_id=None):
+        """Create a line-item description for the donation.
+
+        Includes the course display name if provided.
+
+        Keyword Arguments:
+            course_id (CourseKey)
+
+        Raises:
+            InvalidCartItem: The course ID is not valid.
+
+        Returns:
+            unicode
+
+        """
+        # If a course ID is provided, include the display name of the course
+        # in the line item description.
+        if course_id is not None:
+            course = modulestore().get_course(course_id)
+            if course is None:
+                err = _(
+                    u"Could not find a course with the ID '{course_id}'"
+                ).format(course_id=course_id)
+                raise InvalidCartItem(err)
+
+            return _(u"Donation for {course}").format(course=course.display_name)
+
+        # The donation is for the organization as a whole, not a specific course
+        else:
+            return _(u"Donation")
