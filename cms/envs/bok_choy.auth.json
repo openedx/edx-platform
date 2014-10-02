@@ -11,9 +11,7 @@
             "host": [
                 "localhost"
             ],
-            "password": "password",
-            "port": 27017,
-            "user": "edxapp"
+            "port": 27017
         },
         "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",
         "OPTIONS": {
@@ -21,9 +19,7 @@
             "host": [
                 "localhost"
             ],
-            "password": "password",
-            "port": 27017,
-            "user": "edxapp"
+            "port": 27017
         }
     },
     "DATABASES": {
@@ -42,9 +38,7 @@
         "host": [
             "localhost"
         ],
-        "password": "password",
-        "port": 27017,
-        "user": "edxapp"
+        "port": 27017
     },
     "MODULESTORE": {
         "default": {
@@ -60,9 +54,7 @@
                             "host": [
                                 "localhost"
                             ],
-                            "password": "password",
-                            "port": 27017,
-                            "user": "edxapp"
+                            "port": 27017
                         },
                         "ENGINE": "xmodule.modulestore.mongo.DraftMongoModuleStore",
                         "OPTIONS": {
@@ -73,10 +65,8 @@
                             "host": [
                                 "localhost"
                             ],
-                            "password": "password",
                             "port": 27017,
-                            "render_template": "edxmako.shortcuts.render_to_string",
-                            "user": "edxapp"
+                            "render_template": "edxmako.shortcuts.render_to_string"
                         }
                     },
                     {
