@@ -45,8 +45,7 @@ REQUIREJS_WAIT = {
     # Content - Outline
     # Note that calling your org, course number, or display name, 'course' will mess this up
     re.compile('^Course Outline \|'): [
-        "js/base", "js/models/course", "js/models/location", "js/models/section",
-        "js/views/section_edit"],
+        "js/base", "js/models/course", "js/models/location", "js/models/section"],
 
     # Dashboard
     re.compile('^My Courses \|'): [
