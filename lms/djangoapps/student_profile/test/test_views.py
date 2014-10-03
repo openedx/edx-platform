@@ -2,6 +2,7 @@
 """ Tests for student profile views. """
 
 from urllib import urlencode
+import json
 
 from mock import patch
 import ddt
@@ -76,6 +77,16 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
         mock_update_profile.side_effect = profile_api.ProfileUserNotFound
         response = self._change_name(self.FULL_NAME)
         self.assertEqual(response.status_code, 500)
+
+    @patch('student_profile.views.language_api.released_languages')
+    def test_get_released_languages(self, mock_released_languages):
+        mock_released_languages.return_value = [self.NEW_LANGUAGE]
+
+        response = self.client.get(reverse('released_languages'))
+        self.assertEqual(
+            json.loads(response.content),
+            [{'code': self.NEW_LANGUAGE.code, 'name': self.NEW_LANGUAGE.name}]
+        )
 
     @patch('student_profile.views.language_api.released_languages')
     def test_language_change(self, mock_released_languages):

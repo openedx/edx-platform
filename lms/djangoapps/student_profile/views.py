@@ -1,5 +1,7 @@
 """ Views for a student's profile information. """
 
+import json
+
 from django.http import (
     QueryDict, HttpResponse,
     HttpResponseBadRequest, HttpResponseServerError
@@ -93,6 +95,31 @@ def _update_profile(request):
     # A 204 is intended to allow input for actions to take place
     # without causing a change to the user agent's active document view.
     return HttpResponse(status=204)
+
+
+@login_required
+@require_http_methods(['GET'])
+def get_released_languages(request):
+    """Convert the list of released languages to JSON.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if successful on GET
+        HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 500 if an unexpected error occurs
+
+    Example:
+
+        GET /profile/language/released
+
+    """
+    languages = language_api.released_languages()
+    response_data = [{'code': language.code, 'name': language.name} for language in languages]
+
+    return HttpResponse(json.dumps(response_data), content_type='application/json')
 
 
 @login_required
