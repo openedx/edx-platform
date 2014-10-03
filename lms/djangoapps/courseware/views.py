@@ -805,8 +805,9 @@ def progress(request, course_id, student_id=None):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    with grades.manual_transaction():
-        return _progress(request, course_key, student_id)
+    with modulestore().bulk_operations(course_key):
+        with grades.manual_transaction():
+            return _progress(request, course_key, student_id)
 
 
 def _progress(request, course_key, student_id):
