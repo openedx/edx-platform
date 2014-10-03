@@ -65,12 +65,12 @@ enrolls them in each selected course.
 You can access this self-reported information for all of the students who are
 enrolled in your course:
 
-* email
 * username
 * name
-* level_of_education
-* gender
+* email
 * year_of_birth
+* gender
+* level_of_education
 * mailing_address
 * goals
 
@@ -82,7 +82,8 @@ names at any time. As a result, you may want to download student data
 periodically to gain insights into how the student population changes over
 time.
 
-.. note:: In the future, edX may also request that students select a language and location. This data is not collected at this time.
+.. note:: In the future, edX may also request that students select a language 
+ and location. This data is not collected at this time.
 
 .. _View and download student data:
 
@@ -90,40 +91,71 @@ time.
 Download or View Student Data
 ==========================================
 
-You can download student data to learn about population demographics at a
-specific point in time, compare demographics at different points in time, and
-plot trends in the population over time.
+You can download a report of the self-reported student data to learn about
+population demographics at a specific point in time, compare demographics at
+different points in time, and plot trends in the population over time. For
+courses that include student cohorts, this report also includes the cohort
+group that is assigned to each student.
 
-In addition to the data for enrolled students, data for the course staff is
-included in the file or display.
+When you choose to download student data, a process starts on the edX servers.
+The number of students enrolled in your course, and whether your course has the
+cohort feature enabled, affect how long this process takes. You can download a
+report of student profile information in a CSV (comma-separated values) file
+after the process is complete.
 
-.. important:: Do not navigate away from this page while you wait for the data to be prepared. The larger the enrollment for your course, the longer it takes to create and output the data. 
+For courses with fewer than 200 students enrolled, you also have the option to
+view student data on the Instructor Dashboard.
 
-For smaller courses, you also have the option to view student data on the
-Instructor Dashboard.
+.. note:: In addition to the data for enrolled students, data for the course 
+ staff is included in the file or display.
 
-To download or view student data:
+To download student data:
 
 #. View the live version of your course.
 
 #. Click **Instructor**, then click **Data Download**.
 
-#. To download data about enrolled students in a CSV file, click **Download profile information as a CSV**.
+#. To download data about enrolled students in a CSV file, click **Download
+   profile information as a CSV**.
 
-   You are prompted to open or save the enrolled_profiles.csv file. All
-   student-supplied data is included without truncation.
+  A status message indicates that report generation is in progress. This
+  process can take some time to complete, but you can navigate away from this
+  page and do other work while it runs.
+
+  To track the progress of the report process, reload the page in your browser
+  and scroll down to the **Pending Instructor Tasks** section.
+
+4. To open or save a student data report, click the
+   ``{course_id}_enrolled_profiles_{date}.csv`` file name at the bottom of the
+   page.
+
+  All student-supplied data is included in this file without truncation.
+
+To view student data:
+
+.. note:: This option is available only for courses with an enrollment of less 
+ than 200.
+
+#. View the live version of your course.
+
+#. Click **Instructor**, then click **Data Download**.
 
 #. To display data about enrolled students, click **List enrolled students'
-   profile information**. (This option is available only for courses with an
-   enrollment of less than 200.)
+   profile information**. 
 
    A table of the student data displays, with one row for each enrolled
    student. Longer values, such as student goals, are truncated.
 
  .. image:: ../Images/StudentData_Table.png
-  :alt: Table with columns for the collected data points and rows for each student on the Instructor Dashboard
+  :alt: Table with columns for the collected data points and rows for each 
+        student on the Instructor Dashboard
 
-.. note:: The columns for language and location are included in this report for backward compatibility only. This data is no longer collected during student registration.
+For courses that have the cohorts feature enabled, this report also includes a
+Cohort column with each student's assigned cohort group.
+
+.. note:: The columns for language and location are included in this report 
+ for backward compatibility only. This data is no longer collected during
+ student registration.
 
 ==========================================
 View Demographic Distributions

@@ -19,12 +19,17 @@ sections:
 
 * :ref:`Organizing_discussions`
 
+* :ref:`Assigning_discussion_roles`
+
 * :ref:`Running_discussions`
 
 * :ref:`Moderating_discussions`
 
 * :ref:`Close_discussions`
   
+For information about how enabling the cohort feature for a course affects the 
+course discussions, see :ref:`Moderating Discussions for Cohorts`.
+
 .. _Overview_discussions:
 
 ********************************
@@ -80,11 +85,19 @@ Add Units With a Discussion Component
 
 Typically, all units are added during the design and creation of your course in
 Studio. To add a discussion topic to a unit, you add a discussion component.
-Follow the instructions in :ref:`Working with Discussion Components`.
+Follow the instructions in :ref:`Working with Discussion Components`. The
+result is a content-specific discussion topic.
 
 This type of discussion topic is subject to the release date of the section
 that contains it. Students cannot contribute to these discussion topics until
 that date.
+
+.. note:: In courses that include the cohort feature, all of the 
+ content-specific discussion topics are private. Student posts to these topics
+ can only be read, and responded to, by members of the same cohort group. See
+ :ref:`Cohorts Overview`.
+
+.. _Create CourseWide Discussion Topics:
 
 =====================================
 Create Course-Wide Discussion Topics
@@ -107,37 +120,49 @@ To create a course-wide discussion topic:
    value is:
 
  .. image:: ../Images/Discussion_Add_initial.png
-  :alt: Policy value of {"General": {"id": "i4x-edX-Open_DemoX-course-edx_demo_course"}}
+  :alt: Policy value of {"General": {"id": "i4x-edX-Open-edx_demo_course"}}
 
 4. Copy the three lines provided for the General topic and paste
-   them above the closing brace:
+   them above the closing brace character (``}``):
 
  .. image:: ../Images/Discussion_Add_paste.png
-  :alt: Policy value of {"General": {"id": "i4x-test_doc-SB101-course-2014_Jan"} "General": {"id": "i4x-test_doc-SB101-course-2014_Jan"}}
+  :alt: Policy value of {"General": {"id": "i4x-edX-Open-edx_demo_course"} 
+        "General": {"id": "i4x-edX-Open-edx_demo_course"}}
 
 5. Replace the second "General" with the quoted name of your new topic.
 
-#. Change the second id value to a unique identifier. For example, append a
-   reference to the name of the topic.
+#. Change the value for the second "id" to a unique identifier. For example,
+   append a reference to the name of the topic.
 
-#. Add a comma after the first closing brace.
+#. Add a comma after the first closing brace (``},``).
 
  .. image:: ../Images/Discussion_Add_name.png
-  :alt: Policy value of {"General": {"id": "i4x-test_doc-SB101-course-2014_Jan"}, "Course Q&A": {"id": "i4x-test_doc-SB101-course-2014_Jan_faq"}}
+  :alt: Policy value of {"General": {"id": "i4x-edX-Open-edx_demo_course"}, 
+        "Course Q&A": {"id": "i4x-edX-Open-edx_demo_course_faq"}}
 
-8. Click **Save Changes**.
+8. Click **Save Changes**. Studio resequences and reformats your entry. Scroll
+   back to the **Discussion Topic Mapping** field to verify that your entry was
+   saved as you expect. Entries that do not contain all of the required
+   punctuation characters revert to the previous value when you save, and no
+   warning is presented.
 
 When students click the **Discussion** page for your course, the drop-down
-Discussion list now includes this topic.
+Discussion list now includes the topic you added.
 
  .. image:: ../Images/NewCategory_Discussion.png
   :alt: Image of a new topic named Course Q&A in the list of discussions
 
+.. note:: In courses that include the cohort feature, the course-wide 
+ discussion topics that you add are public. All of the posts can be read, and
+ responded to, by every student, regardless of their assignement to a cohort
+ group. You can configure course-wide discussion topics to be private. See
+ :ref:`Identifying Private CourseWide Discussion Topics`.
+
 .. _Assigning_discussion_roles:
 
-==========================================
+*************************************************
 Assign Discussion Administration Roles 
-==========================================
+*************************************************
 
 You can designate a team of people to help you run course discussions.
 
@@ -169,7 +194,7 @@ these roles:
   by community TAs have a colored "Community TA" identifier. This role is often
   given to students.
 
-.. put this comment in to make the formatting of this bulleted list consistent when output using the spinx template
+.. I put this comment in to make the formatting of this bulleted list consistent when output using the sphinx template
 
 * *Discussion admins* have the same options for working with discussions as
   moderators, and their posts, responses, and comments have the same "Staff"
@@ -188,8 +213,13 @@ addresses or usernames.
 * To get this information for an enrolled student, on the Instructor Dashboard
   click **Data Download**, then **Download profile information as a CSV**.
 
-To assign a role, you must be the course author or an Instructor (that is, you
-are identified in Studio as a team member with Admin access).
+====================================
+Assign Roles
+====================================
+
+To assign a discussion administration role, you must be the course author or an
+Instructor (that is, you are identified in Studio as a team member with Admin
+access).
 
 #. View the live version of the course.
 
