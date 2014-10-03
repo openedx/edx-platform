@@ -154,6 +154,14 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings
     )
 
+    show_reset_button = Boolean(
+        display_name=_("Show Reset Button for Problems"),
+        help=_("Enter true or false. If true, problems default to displaying a 'Reset' button. This value may be "
+               "overriden in each problem's settings. Existing problems are unaffected."),
+        scope=Scope.settings,
+        default=True
+    )
+
 
 def compute_inherited_metadata(descriptor):
     """Given a descriptor, traverse all of its descendants and do metadata
