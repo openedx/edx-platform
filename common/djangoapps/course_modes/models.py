@@ -59,6 +59,9 @@ class CourseMode(models.Model):
     DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None, None)
     DEFAULT_MODE_SLUG = 'honor'
 
+    # Modes that allow a student to pursue a verified certificate
+    VERIFIED_MODES = ["verified", "professional"]
+
     class Meta:
         """ meta attributes of this model """
         unique_together = ('course_id', 'mode_slug', 'currency')
@@ -126,6 +129,22 @@ class CourseMode(models.Model):
         professional_mode = modes_dict.get('professional', None)
         # we prefer professional over verify
         return professional_mode if professional_mode else verified_mode
+
+    @classmethod
+    def has_verified_mode(cls, course_mode_dict):
+        """Check whether the modes for a course allow a student to pursue a verfied certificate.
+
+        Args:
+            course_mode_dict (dictionary mapping course mode slugs to Modes)
+
+        Returns:
+            bool: True iff the course modes contain a verified track.
+
+        """
+        for mode in cls.VERIFIED_MODES:
+            if mode in course_mode_dict:
+                return True
+        return False
 
     @classmethod
     def min_course_price_for_verified_for_currency(cls, course_id, currency):

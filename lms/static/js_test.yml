@@ -71,6 +71,7 @@ spec_paths:
 #
 fixture_paths:
     - templates/instructor/instructor_dashboard_2
+    - templates/dashboard
 
 requirejs:
   paths:

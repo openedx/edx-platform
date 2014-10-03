@@ -27,9 +27,9 @@ from shoppingcart.models import (
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from shoppingcart.exceptions import PurchasedCallbackException
+from shoppingcart.exceptions import PurchasedCallbackException, CourseDoesNotExistException
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
@@ -321,7 +321,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(reg1.status, "cart")
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
         self.assertFalse(PaidCourseRegistration.contained_in_order(
-            self.cart, SlashSeparatedCourseKey("MITx", "999", "Robot_Super_Course_abcd"))
+            self.cart, CourseLocator(org="MITx", course="999", run="Robot_Super_Course_abcd"))
         )
 
         self.assertEqual(self.cart.total_cost, self.cost)
@@ -370,13 +370,13 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
     def test_purchased_callback_exception(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        reg1.course_id = SlashSeparatedCourseKey("changed", "forsome", "reason")
+        reg1.course_id = CourseLocator(org="changed", course="forsome", run="reason")
         reg1.save()
         with self.assertRaises(PurchasedCallbackException):
             reg1.purchased_callback()
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
 
-        reg1.course_id = SlashSeparatedCourseKey("abc", "efg", "hij")
+        reg1.course_id = CourseLocator(org="abc", course="efg", run="hij")
         reg1.save()
         with self.assertRaises(PurchasedCallbackException):
             reg1.purchased_callback()
@@ -595,11 +595,6 @@ class DonationTest(ModuleStoreTestCase):
             line_desc=u"Donation for Test Course"
         )
 
-    def test_donate_no_such_course(self):
-        fake_course_id = SlashSeparatedCourseKey("edx", "fake", "course")
-        with self.assertRaises(InvalidCartItem):
-            Donation.add_to_order(self.cart, self.COST, course_id=fake_course_id)
-
     def test_confirmation_email(self):
         # Pay for a donation
         Donation.add_to_order(self.cart, self.COST)
@@ -611,6 +606,11 @@ class DonationTest(ModuleStoreTestCase):
         email = mail.outbox[0]
         self.assertEquals('Order Payment Confirmation', email.subject)
         self.assertIn("tax deductible", email.body)
+
+    def test_donate_no_such_course(self):
+        fake_course_id = CourseLocator(org="edx", course="fake", run="course")
+        with self.assertRaises(CourseDoesNotExistException):
+            Donation.add_to_order(self.cart, self.COST, course_id=fake_course_id)
 
     def _assert_donation(self, donation, donation_type=None, course_id=None, unit_cost=None, line_desc=None):
         """Verify the donation fields and that the donation can be purchased. """
