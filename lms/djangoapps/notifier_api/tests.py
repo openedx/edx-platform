@@ -120,6 +120,11 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         result = self._get_detail()
         self.assertEqual(result["course_info"], {})
 
+    def test_course_info_non_existent_course_enrollment(self):
+        CourseEnrollmentFactory(user=self.user)
+        result = self._get_detail()
+        self.assertEqual(result["course_info"], {})
+
     def test_preferences(self):
         lang_pref = UserPreferenceFactory(
             user=self.user,

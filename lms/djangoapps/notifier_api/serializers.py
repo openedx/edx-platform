@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import Http404
 from rest_framework import serializers
 
 from course_groups.cohorts import is_course_cohorted
@@ -47,16 +48,20 @@ class NotifierUserSerializer(serializers.ModelSerializer):
             for role in user.roles.all()
             for perm in role.permissions.all() if perm.name == "see_all_cohorts"
         }
-        return {
-            unicode(enrollment.course_id): {
-                "cohort_id": cohort_id_map.get(enrollment.course_id),
-                "see_all_cohorts": (
-                    enrollment.course_id in see_all_cohorts_set or
-                    not is_course_cohorted(enrollment.course_id)
-                ),
-            }
-            for enrollment in user.courseenrollment_set.all() if enrollment.is_active
-        }
+        ret = {}
+        for enrollment in user.courseenrollment_set.all():
+            if enrollment.is_active:
+                try:
+                    ret[unicode(enrollment.course_id)] = {
+                        "cohort_id": cohort_id_map.get(enrollment.course_id),
+                        "see_all_cohorts": (
+                            enrollment.course_id in see_all_cohorts_set or
+                            not is_course_cohorted(enrollment.course_id)
+                        ),
+                    }
+                except Http404:  # is_course_cohorted raises this if course does not exist
+                    pass
+        return ret
 
     class Meta:
         model = User
