@@ -22,7 +22,7 @@ class Thread(models.Model):
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned'
+        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type'
     ]
 
     metric_tag_fields = [
