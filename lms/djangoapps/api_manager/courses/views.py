@@ -1631,13 +1631,13 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
                 data['position'] = completions_above_user + 1
             completion_percentage = 0
             if total_possible_completions > 0:
-                completion_percentage = int(round(100 * user_completions/total_possible_completions))
+                completion_percentage = 100 * user_completions/total_possible_completions
             data['completions'] = completion_percentage
 
         total_users = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
         if total_users and total_actual_completions:
-            course_avg = round(total_actual_completions / float(total_users), 1)
-            course_avg = int(round(100 * course_avg / total_possible_completions))  # avg in percentage
+            course_avg = total_actual_completions / float(total_users)
+            course_avg = 100 * course_avg / total_possible_completions  # avg in percentage
         data['course_avg'] = course_avg
         if not skipleaders:
             queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username',
