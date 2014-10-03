@@ -285,6 +285,11 @@ def index(request, course_id, chapter=None, section=None,
             return redirect(reverse('dashboard'))
 
     request.user = user  # keep just one instance of User
+    with modulestore().bulk_operations(course_key):
+        return _index_bulk_op(request, user, course_key, chapter, section, position)
+
+
+def _index_bulk_op(request, user, course_key, chapter, section, position):
     course = get_course_with_access(user, 'load', course_key, depth=2)
     staff_access = has_access(user, 'staff', course)
     registered = registered_for_course(course, user)
