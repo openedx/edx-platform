@@ -44,7 +44,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                 courses.append(get_course_key(course_string))
             org_user_grades = org_user_grades.filter(course_id__in=courses)
         users_grade_complete_count = org_user_grades\
-            .filter(proforma_grade__lte=F('grade') + grade_complete_match_range).count()
+            .filter(proforma_grade__lte=F('grade') + grade_complete_match_range, proforma_grade__gt=0).count()
         response_data['users_grade_complete_count'] = users_grade_complete_count
         return Response(response_data, status=status.HTTP_200_OK)
 
