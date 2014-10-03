@@ -8,24 +8,32 @@ from django.test import Client
 from opaque_keys.edx import locator
 from pytz import UTC
 import unittest
+import ddt
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment, DashboardConfiguration
 from student.views import get_course_enrollment_pairs, _get_recently_enrolled_courses
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@ddt.ddt
 class TestRecentEnrollments(ModuleStoreTestCase):
     """
     Unit tests for getting the list of courses for a logged in user
     """
+    PASSWORD = 'test'
+
     def setUp(self):
         """
         Add a student
         """
         super(TestRecentEnrollments, self).setUp()
         self.student = UserFactory()
+        self.student.set_password(self.PASSWORD)
+        self.student.save()
 
         # Old Course
         old_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')
@@ -35,7 +43,7 @@ class TestRecentEnrollments(ModuleStoreTestCase):
 
         # New Course
         course_location = locator.CourseLocator('Org1', 'Course1', 'Run1')
-        self._create_course_and_enrollment(course_location)
+        self.course, _ = self._create_course_and_enrollment(course_location)
 
     def _create_course_and_enrollment(self, course_location):
         """ Creates a course and associated enrollment. """
@@ -47,12 +55,17 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         enrollment = CourseEnrollment.enroll(self.student, course.id)
         return course, enrollment
 
+    def _configure_message_timeout(self, timeout):
+        """Configure the amount of time the enrollment message will be displayed. """
+        config = DashboardConfiguration(recent_enrollment_time_delta=timeout)
+        config.save()
+
     def test_recently_enrolled_courses(self):
         """
         Test if the function for filtering recent enrollments works appropriately.
         """
-        config = DashboardConfiguration(recent_enrollment_time_delta=60)
-        config.save()
+        self._configure_message_timeout(60)
+
         # get courses through iterating all courses
         courses_list = list(get_course_enrollment_pairs(self.student, None, []))
         self.assertEqual(len(courses_list), 2)
@@ -64,8 +77,7 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         """
         Tests that the recent enrollment list is empty if configured to zero seconds.
         """
-        config = DashboardConfiguration(recent_enrollment_time_delta=0)
-        config.save()
+        self._configure_message_timeout(0)
         courses_list = list(get_course_enrollment_pairs(self.student, None, []))
         self.assertEqual(len(courses_list), 2)
 
@@ -78,30 +90,21 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         recent enrollments first.
 
         """
-        config = DashboardConfiguration(recent_enrollment_time_delta=600)
-        config.save()
+        self._configure_message_timeout(600)
 
         # Create a number of new enrollments and courses, and force their creation behind
         # the first enrollment
-        course_location = locator.CourseLocator('Org2', 'Course2', 'Run2')
-        _, enrollment2 = self._create_course_and_enrollment(course_location)
-        enrollment2.created = datetime.datetime.now(UTC) - datetime.timedelta(seconds=5)
-        enrollment2.save()
-
-        course_location = locator.CourseLocator('Org3', 'Course3', 'Run3')
-        _, enrollment3 = self._create_course_and_enrollment(course_location)
-        enrollment3.created = datetime.datetime.now(UTC) - datetime.timedelta(seconds=10)
-        enrollment3.save()
-
-        course_location = locator.CourseLocator('Org4', 'Course4', 'Run4')
-        _, enrollment4 = self._create_course_and_enrollment(course_location)
-        enrollment4.created = datetime.datetime.now(UTC) - datetime.timedelta(seconds=15)
-        enrollment4.save()
-
-        course_location = locator.CourseLocator('Org5', 'Course5', 'Run5')
-        _, enrollment5 = self._create_course_and_enrollment(course_location)
-        enrollment5.created = datetime.datetime.now(UTC) - datetime.timedelta(seconds=20)
-        enrollment5.save()
+        courses = []
+        for idx, seconds_past in zip(range(2, 6), [5, 10, 15, 20]):
+            course_location = locator.CourseLocator(
+                'Org{num}'.format(num=idx),
+                'Course{num}'.format(num=idx),
+                'Run{num}'.format(num=idx)
+            )
+            course, enrollment = self._create_course_and_enrollment(course_location)
+            enrollment.created = datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds_past)
+            enrollment.save()
+            courses.append(course)
 
         courses_list = list(get_course_enrollment_pairs(self.student, None, []))
         self.assertEqual(len(courses_list), 6)
@@ -109,19 +112,42 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         recent_course_list = _get_recently_enrolled_courses(courses_list)
         self.assertEqual(len(recent_course_list), 5)
 
-        self.assertEqual(recent_course_list[1][1], enrollment2)
-        self.assertEqual(recent_course_list[2][1], enrollment3)
-        self.assertEqual(recent_course_list[3][1], enrollment4)
-        self.assertEqual(recent_course_list[4][1], enrollment5)
+        self.assertEqual(recent_course_list[1], courses[0])
+        self.assertEqual(recent_course_list[2], courses[1])
+        self.assertEqual(recent_course_list[3], courses[2])
+        self.assertEqual(recent_course_list[4], courses[3])
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_dashboard_rendering(self):
         """
         Tests that the dashboard renders the recent enrollment messages appropriately.
         """
-        config = DashboardConfiguration(recent_enrollment_time_delta=600)
-        config.save()
-        self.client = Client()
-        self.client.login(username=self.student.username, password='test')
+        self._configure_message_timeout(600)
+        self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
         self.assertContains(response, "You have successfully enrolled in")
+
+    @ddt.data(
+        (['audit', 'honor', 'verified'], False),
+        (['professional'], False),
+        (['verified'], False),
+        (['audit'], True),
+        (['honor'], True),
+        ([], True)
+    )
+    @ddt.unpack
+    def test_donate_button(self, course_modes, show_donate):
+        # Enable the enrollment success message
+        self._configure_message_timeout(10000)
+
+        # Create the course mode(s)
+        for mode in course_modes:
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Check that the donate button is or is not displayed
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+        response = self.client.get(reverse("dashboard"))
+
+        if show_donate:
+            self.assertContains(response, "donate-container")
+        else:
+            self.assertNotContains(response, "donate-container")

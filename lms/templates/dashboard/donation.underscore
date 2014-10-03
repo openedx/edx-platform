@@ -1,0 +1,6 @@
+<form class="donate-form">
+    <input type="text" name="amount" value="25.00" />
+    <input type="submit" name="Donate" value="<%- gettext('Donate') %>" />
+    <div class="donation-error-msg" />
+</form>
+<form class="payment-form"></form>

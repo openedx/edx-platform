@@ -22,6 +22,7 @@ from model_utils.managers import InheritanceManager
 
 from xmodule.modulestore.django import modulestore
 
+from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, UNENROLL_DONE
@@ -870,6 +871,11 @@ class CertificateItem(OrderItem):
                 unit_cost__gt=(CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd')))).count()
 
 
+class DonationConfiguration(ConfigurationModel):
+    """Configure whether donations are enabled on the site."""
+    pass
+
+
 class Donation(OrderItem):
     """A donation made by a user.
 
@@ -984,7 +990,7 @@ class Donation(OrderItem):
             course_id (CourseKey)
 
         Raises:
-            InvalidCartItem: The course ID is not valid.
+            CourseDoesNotExistException: The course ID is not valid.
 
         Returns:
             unicode
@@ -998,7 +1004,7 @@ class Donation(OrderItem):
                 err = _(
                     u"Could not find a course with the ID '{course_id}'"
                 ).format(course_id=course_id)
-                raise InvalidCartItem(err)
+                raise CourseDoesNotExistException(err)
 
             return _(u"Donation for {course}").format(course=course.display_name)
 

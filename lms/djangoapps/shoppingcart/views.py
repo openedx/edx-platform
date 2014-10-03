@@ -1,10 +1,13 @@
 import logging
 import datetime
+import decimal
 import pytz
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.http import (HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
-    HttpResponseBadRequest, HttpResponseForbidden, Http404)
+from django.http import (
+    HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
+    HttpResponseBadRequest, HttpResponseForbidden, Http404
+)
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.urlresolvers import reverse
@@ -14,15 +17,28 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
+from opaque_keys import InvalidKeyError
 from courseware.courses import get_course_by_id
 from courseware.views import registered_for_course
+from config_models.decorators import require_config
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment
-from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException, \
-    RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException,\
-    MultipleCouponsNotAllowedException
-from .models import Order, PaidCourseRegistration, OrderItem, Coupon, CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption
-from .processors import process_postpay_callback, render_purchase_form_html
+from .exceptions import (
+    ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
+    CourseDoesNotExistException, ReportTypeDoesNotExistException,
+    RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException,
+    MultipleCouponsNotAllowedException, InvalidCartItem
+)
+from .models import (
+    Order, PaidCourseRegistration, OrderItem, Coupon,
+    CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption,
+    Donation, DonationConfiguration
+)
+from .processors import (
+    process_postpay_callback, render_purchase_form_html,
+    get_signed_purchase_params, get_purchase_endpoint
+)
 import json
 from xmodule_django.models import CourseKeyField
 
@@ -47,6 +63,7 @@ def initialize_report(report_type, start_date, end_date, start_letter=None, end_
         if report_type in item:
             return item[1](start_date, end_date, start_letter, end_letter)
     raise ReportTypeDoesNotExistException
+
 
 @require_POST
 def add_course_to_cart(request, course_id):
@@ -306,6 +323,109 @@ def register_courses(request):
     cart = Order.get_cart_for_user(request.user)
     CourseRegistrationCode.free_user_enrollment(cart)
     return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
+
+
+@require_config(DonationConfiguration)
+@require_POST
+@login_required
+def donate(request):
+    """Add a single donation item to the cart and proceed to payment.
+
+    Warning: this call will clear all the items in the user's cart
+    before adding the new item!
+
+    Arguments:
+        request (Request): The Django request object.  This should contain
+            a JSON-serialized dictionary with "amount" (string, required),
+            and "course_id" (slash-separated course ID string, optional).
+
+    Returns:
+        HttpResponse: 200 on success with JSON-encoded dictionary that has keys
+            "payment_url" (string) and "payment_params" (dictionary).  The client
+            should POST the payment params to the payment URL.
+        HttpResponse: 400 invalid amount or course ID.
+        HttpResponse: 404 donations are disabled.
+        HttpResponse: 405 invalid request method.
+
+    Example usage:
+
+        POST /shoppingcart/donation/
+        with params {'amount': '12.34', course_id': 'edX/DemoX/Demo_Course'}
+        will respond with the signed purchase params
+        that the client can send to the payment processor.
+
+    """
+    amount = request.POST.get('amount')
+    course_id = request.POST.get('course_id')
+
+    # Check that required parameters are present and valid
+    if amount is None:
+        msg = u"Request is missing required param 'amount'"
+        log.error(msg)
+        return HttpResponseBadRequest(msg)
+    try:
+        amount = (
+            decimal.Decimal(amount)
+        ).quantize(
+            decimal.Decimal('.01'),
+            rounding=decimal.ROUND_DOWN
+        )
+    except decimal.InvalidOperation:
+        return HttpResponseBadRequest("Could not parse 'amount' as a decimal")
+
+    # Any amount is okay as long as it's greater than 0
+    # Since we've already quantized the amount to 0.01
+    # and rounded down, we can check if it's less than 0.01
+    if amount < decimal.Decimal('0.01'):
+        return HttpResponseBadRequest("Amount must be greater than 0")
+
+    if course_id is not None:
+        try:
+            course_id = CourseLocator.from_string(course_id)
+        except InvalidKeyError:
+            msg = u"Request included an invalid course key: {course_key}".format(course_key=course_id)
+            log.error(msg)
+            return HttpResponseBadRequest(msg)
+
+    # Add the donation to the user's cart
+    cart = Order.get_cart_for_user(request.user)
+    cart.clear()
+
+    try:
+        # Course ID may be None if this is a donation to the entire organization
+        Donation.add_to_order(cart, amount, course_id=course_id)
+    except InvalidCartItem as ex:
+        log.exception((
+            u"Could not create donation item for "
+            u"amount '{amount}' and course ID '{course_id}'"
+        ).format(amount=amount, course_id=course_id))
+        return HttpResponseBadRequest(unicode(ex))
+
+    # Start the purchase.
+    # This will "lock" the purchase so the user can't change
+    # the amount after we send the information to the payment processor.
+    # If the user tries to make another donation, it will be added
+    # to a new cart.
+    cart.start_purchase()
+
+    # Construct the response params (JSON-encoded)
+    callback_url = request.build_absolute_uri(
+        reverse("shoppingcart.views.postpay_callback")
+    )
+
+    response_params = json.dumps({
+        # The HTTP end-point for the payment processor.
+        "payment_url": get_purchase_endpoint(),
+
+        # Parameters the client should send to the payment processor
+        "payment_params": get_signed_purchase_params(
+            cart,
+            callback_url=callback_url,
+            extra_data=([unicode(course_id)] if course_id else None)
+        ),
+    })
+
+    return HttpResponse(response_params, content_type="text/json")
 
 
 @csrf_exempt

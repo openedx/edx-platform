@@ -20,7 +20,16 @@
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
 <%block name="nav_skip">#my-courses</%block>
 
+<%block name="header_extras">
+% for template_name in ["donation"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="dashboard/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
 <%block name="js_extra">
+  <%static:js group='dashboard'/>
   <script type="text/javascript">
   (function() {
 

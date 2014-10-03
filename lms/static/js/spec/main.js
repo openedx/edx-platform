@@ -219,6 +219,10 @@
                 exports: 'js/staff_debug_actions',
                 deps: ['gettext']
             },
+            'js/dashboard/donation.js': {
+                exports: 'js/dashboard/donation',
+                deps: ['jquery', 'underscore', 'gettext']
+            },
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/cohort': {
                 exports: 'CohortModel',
@@ -255,7 +259,8 @@
         'lms/include/js/spec/views/cohorts_spec.js',
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
-        'lms/include/js/spec/views/notification_spec.js'
+        'lms/include/js/spec/views/notification_spec.js',
+        'lms/include/js/spec/dashboard/donation.js',
     ]);
 
 }).call(this, requirejs, define);

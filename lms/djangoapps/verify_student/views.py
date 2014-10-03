@@ -241,11 +241,12 @@ def create_order(request):
     )
 
     params = get_signed_purchase_params(
-        cart, callback_url=callback_url
+        cart,
+        callback_url=callback_url,
+        extra_data=[unicode(course_id)]
     )
 
     params['success'] = True
-    params['merchant_defined_data1'] = unicode(course_id)
     return HttpResponse(json.dumps(params), content_type="text/json")
 
 

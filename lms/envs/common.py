@@ -1223,6 +1223,10 @@ PIPELINE_JS = {
         'source_filenames': instructor_dash_js,
         'output_filename': 'js/instructor_dash.js',
     },
+    'dashboard': {
+        'source_filenames': dashboard_js,
+        'output_filename': 'js/dashboard.js'
+    },
     'student_account': {
         'source_filenames': student_account_js,
         'output_filename': 'js/student_account.js'
