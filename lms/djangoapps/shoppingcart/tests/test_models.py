@@ -178,7 +178,7 @@ class OrderTest(ModuleStoreTestCase):
     def test_purchase_item_email_smtp_failure(self, error_logger):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        with patch('shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
+        with patch('shoppingcart.models.EmailMessage.send', side_effect=smtplib.SMTPException):
             cart.purchase()
             self.assertTrue(error_logger.called)
 

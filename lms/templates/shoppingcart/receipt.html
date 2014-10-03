@@ -41,10 +41,10 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
           % else:
             <% code_plural_form = 'code' %>
           % endif
-          ${_("You have successfully purchased <b>{total_registration_codes} student activation "
-           "{code} </b> for <b>{course_names}. </b>"
+          ${_("You have successfully purchased <b>{total_registration_codes} course registration codes</b> "
+           "for <b>{course_names}. </b>"
            "The following receipt has been emailed to <strong>{emails}</strong>"
-           ).format(total_registration_codes=total_registration_codes, code=code_plural_form, course_names=course_names, emails=emails)}
+           ).format(total_registration_codes=total_registration_codes, course_names=course_names, emails=emails)}
         % endif
       </div>
     </div>
