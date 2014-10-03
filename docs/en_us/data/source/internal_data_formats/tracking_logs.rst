@@ -2179,10 +2179,12 @@ Student Cohort Events
 ``edx.cohort.created``
 ----------------------------------
 
-When a cohort group is created (either automatically, when a user is assigned to
-the default cohort group or a cohort group included in the course's
-``auto_cohort_groups`` setting, or manually, via the Instructor Dashboard), the
-server emits an ``edx.cohort.created`` event.
+When a cohort group is created, the server emits an ``edx.cohort.created``
+event. A member of the course staff can create a cohort group manually via the
+Instructor Dashboard (see :ref:`instructor_cohort_events`). The system
+automatically creates the default cohort group and cohort groups included in the
+course's ``auto_cohort_groups`` setting as they are needed (e.g. when a student
+is assigned to one).
 
 **Event Source**: Server
 
@@ -2207,10 +2209,13 @@ server emits an ``edx.cohort.created`` event.
 ``edx.cohort.user_added``
 ----------------------------------
 
-When a user is added to a cohort group (either automatically, when a user is
-assigned to the default cohort group or a cohort group included in the course's
-``auto_cohort_groups`` setting, or manually, via the Instructor Dashboard), the
-server emits an ``edx.cohort.user_added`` event.
+When a user is added to a cohort group, the server emits an
+``edx.cohort.user_added`` event. A member of the course staff can add a user to
+a cohort group manually via the Instructor Dashboard (see
+:ref:`instructor_cohort_events`). The system automatically adds a user to the default
+cohort group or a cohort group included in the course's ``auto_cohort_groups``
+setting if the user accesses a discussion but has not yet been assigned to a
+cohort group.
 
 **Event Source**: Server
 
