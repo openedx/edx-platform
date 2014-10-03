@@ -1,7 +1,7 @@
 import textwrap
 
 from lettuce import world, steps
-from nose.tools import assert_in, assert_equals, assert_true
+from nose.tools import assert_in, assert_equals
 
 from common import i_am_registered_for_the_course, visit_scenario_item
 
@@ -99,74 +99,6 @@ class AnnotatableSteps(object):
         assert_equals(len(world.css_find('.annotatable-span')), count)
         assert_equals(len(world.css_find('.annotatable-span.highlight')), count)
         assert_equals(len(world.css_find('.annotatable-span.highlight-yellow')), count)
-
-    def add_problems(self, step, count):
-        r"""the course has (?P<count>\d+) annotatation problems$"""
-        count = int(count)
-
-        for i in xrange(count):
-            world.scenario_dict.setdefault('PROBLEMS', []).append(
-                world.ItemFactory(
-                    parent_location=world.scenario_dict['ANNOTATION_VERTICAL'].location,
-                    category='problem',
-                    display_name="Test Annotation Problem {}".format(i),
-                    data=PROBLEM_TEMPLATE.format(
-                        number=i,
-                        options="\n".join(
-                            OPTION_TEMPLATE.format(
-                                number=k,
-                                correctness=_correctness(k, i)
-                            )
-                            for k in xrange(count)
-                        )
-                    )
-                )
-            )
-
-    def click_reply(self, step, problem):
-        r"""I click "Reply to annotation" on passage (?P<problem>\d+)$"""
-        problem = int(problem)
-
-        annotation_span_selector = '.annotatable-span[data-problem-id="{}"]'.format(problem)
-
-        world.css_find(annotation_span_selector).first.mouse_over()
-
-        annotation_reply_selector = '.annotatable-reply[data-problem-id="{}"]'.format(problem)
-        assert_equals(len(world.css_find(annotation_reply_selector)), 1)
-        world.css_click(annotation_reply_selector)
-
-        self.active_problem = problem
-
-    def active_problem_selector(self, subselector):
-        return 'div[data-problem-id="{}"] {}'.format(
-            world.scenario_dict['PROBLEMS'][self.active_problem].location.to_deprecated_string(),
-            subselector,
-        )
-
-    def check_scroll_to_problem(self, step):
-        r"""I am scrolled to that annotation problem$"""
-        annotation_input_selector = self.active_problem_selector('.annotation-input')
-        assert_true(world.css_visible(annotation_input_selector))
-
-    def answer_problem(self, step):
-        r"""I answer that annotation problem$"""
-        world.css_fill(self.active_problem_selector('.comment'), 'Test Response')
-        world.css_click(self.active_problem_selector('.tag[data-id="{}"]'.format(self.active_problem)))
-        world.css_click(self.active_problem_selector('.check'))
-
-    def check_feedback(self, step):
-        r"""I receive feedback on that annotation problem$"""
-        world.wait_for_visible(self.active_problem_selector('.tag-status.correct'))
-        assert_equals(len(world.css_find(self.active_problem_selector('.tag-status.correct'))), 1)
-        assert_equals(len(world.css_find(self.active_problem_selector('.show'))), 1)
-
-    def click_return_to(self, step):
-        r"""I click "Return to annotation" on that problem$"""
-        world.css_click(self.active_problem_selector('.annotation-return'))
-
-    def check_scroll_to_annotatable(self, step):
-        r"""I am scrolled to the annotatable component$"""
-        assert_true(world.css_visible('.annotation-header'))
 
 # This line is required by @steps in order to actually bind the step
 # regexes

@@ -1,5 +1,5 @@
 ---
-# JavaScript test suite description
+# LMS JavaScript tests (using RequireJS).
 #
 #
 # To run all the tests and print results to the console:
@@ -16,7 +16,7 @@
 
 test_suite_name: lms
 
-test_runner: jasmine
+test_runner: jasmine_requirejs
 
 # Path prepended to source files in the coverage report (optional)
 # For example, if the source path
@@ -43,19 +43,21 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/URI.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/coffee/src/xblock
+    - xmodule_js/common_static/js/vendor/sinon-1.7.1.js
     - xmodule_js/src/capa/
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
+    - xmodule_js/common_static/js/src/
+    - xmodule_js/common_static/js/vendor/underscore-min.js
+    - xmodule_js/common_static/js/vendor/backbone-min.js
 
 # Paths to source JavaScript files
 src_paths:
-    - coffee/src
-    - js/src
     - js
+    - js/common_helpers
 
 # Paths to spec (test) JavaScript files
 spec_paths:
-    - coffee/spec
     - js/spec
 
 # Paths to fixture files (optional)
@@ -68,23 +70,13 @@ spec_paths:
 #   loadFixtures('path/to/fixture/fixture.html');
 #
 fixture_paths:
-    - coffee/fixtures
-    - js/fixtures
+    - templates/instructor/instructor_dashboard_2
 
-# Regular expressions used to exclude *.js files from
-# appearing in the test runner page.
-# Files are included by default, which means that they
-# are loaded using a <script> tag in the test runner page.
-# When loading many files, this can be slow, so
-# exclude any files you don't need.
-#exclude_from_page:
-#    - path/to/lib/exclude/*
+requirejs:
+  paths:
+    main: js/spec/main
 
-# Regular expression used to guarantee that a *.js file
-# is included in the test runner page.
-# If a file name matches both `exclude_from_page` and
-# `include_in_page`, the file WILL be included.
-# You can use this to exclude all files in a directory,
-# but make an exception for particular files.
-#include_in_page:
-#    - path/to/lib/include/*
+# Because require.js is responsible for loading all dependencies, we exclude
+# all files from being included in <script> tags
+exclude_from_page:
+    - .*

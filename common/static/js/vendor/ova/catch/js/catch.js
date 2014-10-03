@@ -546,9 +546,11 @@ CatchAnnotation.prototype = {
             // public or is equal to the person with update access, then we leave it alone,
             // otherwise we need to clean them up (i.e. disable them).
             if (self.options.userId !== '' && self.options.userId !== value.permissions.update[0]) {
-                $.each(value.highlights, function(key1, value1){
-                    $(value1).removeClass('annotator-hl');
-                });
+                if (value.highlights !== undefined) {
+                    $.each(value.highlights, function(key1, value1){
+                        $(value1).removeClass('annotator-hl');
+                    });
+                }
             }
         });
     },
@@ -872,7 +874,9 @@ CatchAnnotation.prototype = {
             var an = allannotations[item];
             // Makes sure that all images are set to transparent in case one was
             // previously selected.
-            an.highlights[0].style.background = "rgba(0, 0, 0, 0)";
+            if (an.highlights) {
+               an.highlights[0].style.background = "rgba(0, 0, 0, 0)";
+            }
             if (typeof an.id !== 'undefined' && an.id === osdaId) { // this is the annotation
                 var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
                 osda.viewer.viewport.fitBounds(bounds, false);
@@ -881,7 +885,9 @@ CatchAnnotation.prototype = {
                                         'slow');
                 // signifies a selected annotation once OSD has zoomed in on the
                 // appropriate area, it turns the background a bit yellow
-                an.highlights[0].style.background = "rgba(255, 255, 10, 0.2)";
+                if (an.highlights !== undefined) {
+                    an.highlights[0].style.background = "rgba(255, 255, 10, 0.2)";
+                }
             }
         }
     },
@@ -910,7 +916,7 @@ CatchAnnotation.prototype = {
                             startOffset = hasRanges?an.ranges[0].startOffset:'',
                             endOffset = hasRanges?an.ranges[0].endOffset:'';
 
-                        if (typeof startOffset !== 'undefined' && typeof endOffset !== 'undefined') { 
+                        if (typeof startOffset !== 'undefined' && typeof endOffset !== 'undefined' && typeof an.highlights) { 
 
                             $(an.highlights).parent().find('.annotator-hl').removeClass('api'); 
                             // change the color
@@ -1123,11 +1129,10 @@ CatchAnnotation.prototype = {
         
         // checks to make sure that Grouping is redone when switching tags in text annotations
         if (this.options.media === 'text') {
-            if (this.current_tab ==='public') {
-                this.annotator.plugins.Grouping.useGrouping = 0;
-            } else {
-                this.annotator.plugins.Grouping.useGrouping = 1;
-            }
+            if (typeof this.annotator.plugins.Grouping !== 'undefined') {
+                // this is to check if user is is MyNotes instead of the annotation component
+                this.annotator.plugins.Grouping.useGrouping = this.current_tab === 'public' ? 0 : 1;
+            } 
             this.annotator.publish("changedTabsInCatch");
         }
         // Change userid and refresh
@@ -1156,7 +1161,11 @@ CatchAnnotation.prototype = {
         var searchtype = searchtype || "";
         var searchInput = searchInput || ""; 
         this.clean = true;
-        this._clearAnnotator();
+
+        // the following cannot run in notes for there are no highlights
+        if ($("#notesHolder").length === 0) {
+            this._clearAnnotator();
+        }
         
         var annotator = this.annotator;
         var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
@@ -1196,11 +1205,11 @@ CatchAnnotation.prototype = {
         
         annotations.forEach(function(ann){
             var child, h, _i, _len, _ref;
-            if (ann.highlights !== null) {
+            if (ann.highlights !== undefined) {
                 _ref = ann.highlights;
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     h = _ref[_i];
-                    if (!(h.parentNode !== null)) {
+                    if (!(h.parentNode !== undefined)) {
                         continue;
                     }
                     child = h.childNodes[0];

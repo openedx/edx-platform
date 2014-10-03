@@ -59,6 +59,8 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 
 import random
 import string  # pylint: disable-msg=deprecated-module
+import analytics
+from eventtracking import tracker
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -67,20 +69,29 @@ from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 
+from student.models import CourseEnrollment, CourseEnrollmentException
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from logging import getLogger
+
 from . import provider
 
 
 AUTH_ENTRY_KEY = 'auth_entry'
 AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
+AUTH_ENTRY_PROFILE = 'profile'
 AUTH_ENTRY_REGISTER = 'register'
 _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_DASHBOARD,
     AUTH_ENTRY_LOGIN,
+    AUTH_ENTRY_PROFILE,
     AUTH_ENTRY_REGISTER
 ])
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
 _PASSWORD_CHARSET = string.letters + string.digits
+
+logger = getLogger(__name__)
 
 
 class AuthEntryError(AuthException):
@@ -322,6 +333,10 @@ def parse_query_params(strategy, response, *args, **kwargs):
     if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
         raise AuthEntryError(strategy.backend, 'auth_entry missing or invalid')
 
+    # Note: We expect only one member of this dictionary to be `True` at any
+    # given time. If something changes this convention in the future, please look
+    # at the `login_analytics` function in this file as well to ensure logging
+    # is still done properly
     return {
         # Whether the auth pipeline entered from /dashboard.
         'is_dashboard': auth_entry == AUTH_ENTRY_DASHBOARD,
@@ -329,15 +344,17 @@ def parse_query_params(strategy, response, *args, **kwargs):
         'is_login': auth_entry == AUTH_ENTRY_LOGIN,
         # Whether the auth pipeline entered from /register.
         'is_register': auth_entry == AUTH_ENTRY_REGISTER,
+        # Whether the auth pipeline entered from /profile.
+        'is_profile': auth_entry == AUTH_ENTRY_PROFILE,
     }
 
 
 @partial.partial
-def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboard=None, is_login=None, is_register=None, user=None, *args, **kwargs):
+def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboard=None, is_login=None, is_profile=None, is_register=None, user=None, *args, **kwargs):
     """Dispatches user to views outside the pipeline if necessary."""
 
     # We're deliberately verbose here to make it clear what the intended
-    # dispatch behavior is for the three pipeline entry points, given the
+    # dispatch behavior is for the four pipeline entry points, given the
     # current state of the pipeline. Keep in mind the pipeline is re-entrant
     # and values will change on repeated invocations (for example, the first
     # time through the login flow the user will be None so we dispatch to the
@@ -352,7 +369,7 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
     user_unset = user is None
     dispatch_to_login = is_login and (user_unset or user_inactive)
 
-    if is_dashboard:
+    if is_dashboard or is_profile:
         return
 
     if dispatch_to_login:
@@ -360,3 +377,57 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
 
     if is_register and user_unset:
         return redirect('/register', name='register_user')
+
+@partial.partial
+def login_analytics(*args, **kwargs):
+    """ Sends login info to Segment.io """
+    event_name = None
+
+    action_to_event_name = {
+        'is_login': 'edx.bi.user.account.authenticated',
+        'is_dashboard': 'edx.bi.user.account.linked',
+        'is_profile': 'edx.bi.user.account.linked',
+    }
+
+    # Note: we assume only one of the `action` kwargs (is_dashboard, is_login) to be
+    # `True` at any given time
+    for action in action_to_event_name.keys():
+        if kwargs.get(action):
+            event_name = action_to_event_name[action]
+
+    if event_name is not None:
+        registration_course_id = kwargs['request'].session.get('registration_course_id')
+        tracking_context = tracker.get_tracker().resolve_context()
+        analytics.track(
+            kwargs['user'].id,
+            event_name,
+            {
+                'category': "conversion",
+                'label': registration_course_id,
+                'provider': getattr(kwargs['backend'], 'name')
+            },
+            context={
+                'Google Analytics': {
+                    'clientId': tracking_context.get('client_id') 
+                }
+            }
+        )
+
+#@partial.partial
+def change_enrollment(*args, **kwargs):
+    """
+    If the user accessed the third party auth flow after trying to register for
+    a course, we automatically log them into that course.
+    """
+    if kwargs['strategy'].session_get('registration_course_id'):
+        try:
+            CourseEnrollment.enroll(
+                kwargs['user'],
+                SlashSeparatedCourseKey.from_deprecated_string(
+                    kwargs['strategy'].session_get('registration_course_id')
+                )
+            )
+        except CourseEnrollmentException:
+            pass
+        except Exception, e:
+            logger.exception(e)

@@ -20,6 +20,7 @@ from xmodule.x_module import STUDENT_VIEW
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
+from student.models import CourseEnrollment
 import branding
 import pdb
 
@@ -73,7 +74,13 @@ def get_course_by_id(course_key, depth=0):
         raise Http404("Course not found.")
 
 
-def get_course_with_access(user, action, course_key, depth=0):
+class UserNotEnrolled(Http404):
+    def __init__(self, course_key):
+        super(UserNotEnrolled, self).__init__()
+        self.course_key = course_key
+
+
+def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False):
     """
     Given a course_key, look up the corresponding course descriptor,
     check that the user has the access to perform the specified action
@@ -87,6 +94,11 @@ def get_course_with_access(user, action, course_key, depth=0):
     course = get_course_by_id(course_key, depth=depth)
 
     if not has_access(user, action, course, course_key):
+        if check_if_enrolled and not CourseEnrollment.is_enrolled(user, course_key):
+            # If user is not enrolled, raise UserNotEnrolled exception that will
+            # be caught by middleware
+            raise UserNotEnrolled(course_key)
+
         # Deliberately return a non-specific error message to avoid
         # leaking info about access control settings
         raise Http404("Course not found.")
@@ -221,10 +233,9 @@ def get_course_about_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_course_info_section(request, course, section_key):
+def get_course_info_section_module(request, course, section_key):
     """
-    This returns the snippet of html to be rendered on the course info page,
-    given the key for the section.
+    This returns the course info module for a given section_key.
 
     Valid keys:
     - handouts
@@ -236,7 +247,8 @@ def get_course_info_section(request, course, section_key):
 
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, request.user)
-    info_module = get_module(
+
+    return get_module(
         request.user,
         request,
         usage_key,
@@ -244,10 +256,22 @@ def get_course_info_section(request, course, section_key):
         log_if_not_found=False,
         wrap_xmodule_display=False,
         static_asset_path=course.static_asset_path
-    )
+    )    
+
+def get_course_info_section(request, course, section_key):
+    """
+    This returns the snippet of html to be rendered on the course info page,
+    given the key for the section.
+
+    Valid keys:
+    - handouts
+    - guest_handouts
+    - updates
+    - guest_updates
+    """
+    info_module = get_course_info_section_module(request, course, section_key)
 
     html = ''
-
     if info_module is not None:
         try:
             html = info_module.render(STUDENT_VIEW).content

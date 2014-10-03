@@ -167,7 +167,7 @@ class MongoContentStore(ContentStore):
                     policy.setdefault(asset['asset_key'].name, {})[attr] = value
 
         with open(assets_policy_file, 'w') as f:
-            json.dump(policy, f)
+            json.dump(policy, f, sort_keys=True, indent=4)
 
     def get_all_content_thumbnails_for_course(self, course_key):
         return self._get_all_content_for_course(course_key, get_thumbnails=True)[0]
@@ -374,6 +374,36 @@ class MongoContentStore(ContentStore):
             dbkey['run'] = _id_field['run']
         fs_entry['_id'] = dbkey
         return dbkey
+
+    def ensure_indexes(self):
+
+        # Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
+        # which can be `uploadDate`, `display_name`,
+
+        self.fs_files.create_index(
+            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('_id.name', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('content_son.name', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('uploadDate', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('_id.org', pymongo.ASCENDING), ('_id.course', pymongo.ASCENDING), ('display_name', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('uploadDate', pymongo.ASCENDING)],
+            sparse=True
+        )
+        self.fs_files.create_index(
+            [('content_son.org', pymongo.ASCENDING), ('content_son.course', pymongo.ASCENDING), ('display_name', pymongo.ASCENDING)],
+            sparse=True
+        )
 
 
 def query_for_course(course_key, category=None):

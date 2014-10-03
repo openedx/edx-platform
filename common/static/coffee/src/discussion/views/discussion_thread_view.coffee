@@ -7,14 +7,32 @@ if Backbone?
     events:
       "click .discussion-submit-post": "submitComment"
       "click .add-response-btn": "scrollToAddResponse"
+      "click .forum-thread-expand": "expand"
+      "click .forum-thread-collapse": "collapse"
 
     $: (selector) ->
       @$el.find(selector)
 
-    initialize: ->
+    isQuestion: ->
+      @model.get("thread_type") == "question"
+
+    initialize: (options) ->
       super()
+      @mode = options.mode or "inline"  # allowed values are "tab" or "inline"
+      if @mode not in ["tab", "inline"]
+        throw new Error("invalid mode: " + @mode)
+
+      # Quick fix to have an actual model when we're receiving new models from
+      # the server.
+      @model.collection.on "reset", (collection) =>
+        id = @model.get("id")
+        @model = collection.get(id) if collection.get(id)
+
       @createShowView()
       @responses = new Comments()
+      @loadedResponses = false
+      if @isQuestion()
+        @markedAnswers = new Comments()
 
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
@@ -22,7 +40,6 @@ if Backbone?
 
     render: ->
       @$el.html(@renderTemplate())
-      @initLocal()
       @delegateEvents()
 
       @renderShowView()
@@ -31,11 +48,54 @@ if Backbone?
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
       @renderAddResponseButton()
-      @responses.on("add", @renderResponse)
-      # Without a delay, jQuery doesn't add the loading extension defined in
-      # utils.coffee before safeAjax is invoked, which results in an error
-      setTimeout((=> @loadInitialResponses()), 100)
-      @
+      @responses.on("add", (response) => @renderResponseToList(response, ".js-response-list", {}))
+      if @isQuestion()
+        @markedAnswers.on("add", (response) => @renderResponseToList(response, ".js-marked-answer-list", {collapseComments: true}))
+      if @mode == "tab"
+        # Without a delay, jQuery doesn't add the loading extension defined in
+        # utils.coffee before safeAjax is invoked, which results in an error
+        setTimeout((=> @loadInitialResponses()), 100)
+        @$(".post-tools").hide()
+      else # mode == "inline"
+        @collapse()
+
+    attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
+      closed: (closed) ->
+        @$(".discussion-reply-new").toggle(not closed)
+        @$('.comment-form').closest('li').toggle(not closed)
+        @renderAddResponseButton()
+    })
+
+    expand: (event) ->
+      if event
+        event.preventDefault()
+      @$el.addClass("expanded")
+      @$el.find(".post-body").text(@model.get("body"))
+      @showView.convertMath()
+      @$el.find(".forum-thread-expand").hide()
+      @$el.find(".forum-thread-collapse").show()
+      @$el.find(".post-extended-content").show()
+      if not @loadedResponses
+        @loadInitialResponses()
+
+    collapse: (event) ->
+      if event
+        event.preventDefault()
+      @$el.removeClass("expanded")
+      @$el.find(".post-body").text(@getAbbreviatedBody())
+      @showView.convertMath()
+      @$el.find(".forum-thread-expand").show()
+      @$el.find(".forum-thread-collapse").hide()
+      @$el.find(".post-extended-content").hide()
+
+    getAbbreviatedBody: ->
+      cached = @model.get("abbreviatedBody")
+      if cached
+        cached
+      else
+        abbreviated = DiscussionUtil.abbreviateString @model.get("body"), 140
+        @model.set("abbreviatedBody", abbreviated)
+        abbreviated
 
     cleanup: ->
       if @responsesRequest?
@@ -54,10 +114,23 @@ if Backbone?
           @responseRequest = null
         success: (data, textStatus, xhr) =>
           Content.loadContentInfos(data['annotated_content_info'])
-          @responses.add(data['content']['children'])
-          @renderResponseCountAndPagination(data['content']['resp_total'])
+          if @isQuestion()
+            @markedAnswers.add(data["content"]["endorsed_responses"])
+          @responses.add(
+            if @isQuestion()
+            then data["content"]["non_endorsed_responses"]
+            else data["content"]["children"]
+          )
+          @renderResponseCountAndPagination(
+            if @isQuestion()
+            then data["content"]["non_endorsed_resp_total"]
+            else data["content"]["resp_total"]
+          )
           @trigger "thread:responses:rendered"
-        error: (xhr) =>
+          @loadedResponses = true
+        error: (xhr, textStatus) =>
+          return if textStatus == 'abort'
+
           if xhr.status == 404
             DiscussionUtil.discussionAlert(
               gettext("Sorry"),
@@ -75,16 +148,24 @@ if Backbone?
             )
 
     loadInitialResponses: () ->
-      @loadResponses(INITIAL_RESPONSE_PAGE_SIZE, @$el.find(".responses"), true)
+      @loadResponses(INITIAL_RESPONSE_PAGE_SIZE, @$el.find(".js-response-list"), true)
 
     renderResponseCountAndPagination: (responseTotal) =>
+      if @isQuestion() && @markedAnswers.length != 0
+        responseCountFormat = ngettext(
+          "%(numResponses)s other response",
+          "%(numResponses)s other responses",
+          responseTotal
+        )
+      else
+        responseCountFormat = ngettext(
+          "%(numResponses)s response",
+          "%(numResponses)s responses",
+          responseTotal
+        )
       @$el.find(".response-count").html(
         interpolate(
-          ngettext(
-            "%(numResponses)s response",
-            "%(numResponses)s responses",
-            responseTotal
-          ),
+          responseCountFormat,
           {numResponses: responseTotal},
           true
         )
@@ -126,17 +207,17 @@ if Backbone?
           loadMoreButton.click((event) => @loadResponses(responseLimit, loadMoreButton))
           responsePagination.append(loadMoreButton)
 
-    renderResponse: (response) =>
+    renderResponseToList: (response, listSelector, options) =>
         response.set('thread', @model)
-        view = new ThreadResponseView(model: response)
+        view = new ThreadResponseView($.extend({model: response}, options))
         view.on "comment:add", @addComment
         view.on "comment:endorse", @endorseThread
         view.render()
-        @$el.find(".responses").append(view.el)
+        @$el.find(listSelector).append(view.el)
         view.afterInsert()
 
-    renderAddResponseButton: ->
-      if @model.hasResponses() and @model.can('can_reply')
+    renderAddResponseButton: =>
+      if @model.hasResponses() and @model.can('can_reply') and !@model.get('closed')
         @$el.find('div.add-response').show()
       else
         @$el.find('div.add-response').hide()
@@ -150,9 +231,8 @@ if Backbone?
     addComment: =>
       @model.comment()
 
-    endorseThread: (endorsed) =>
-      is_endorsed = @$el.find(".is-endorsed").length
-      @model.set 'endorsed', is_endorsed
+    endorseThread: =>
+      @model.set 'endorsed', @$el.find(".action-answer.is-checked").length > 0
 
     submitComment: (event) ->
       event.preventDefault()
@@ -162,7 +242,7 @@ if Backbone?
       @setWmdContent("reply-body", "")
       comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, abuse_flaggers:[], endorsed: false, user_id: window.user.get("id"))
       comment.set('thread', @model.get('thread'))
-      @renderResponse(comment)
+      @renderResponseToList(comment, ".js-response-list")
       @model.addComment()
       @renderAddResponseButton()
 
@@ -181,48 +261,20 @@ if Backbone?
       @createEditView()
       @renderEditView()
 
-    update: (event) =>
-
-      newTitle = @editView.$(".edit-post-title").val()
-      newBody  = @editView.$(".edit-post-body textarea").val()
-
-      url = DiscussionUtil.urlFor('update_thread', @model.id)
-
-      DiscussionUtil.safeAjax
-          $elem: $(event.target)
-          $loading: $(event.target) if event
-          url: url
-          type: "POST"
-          dataType: 'json'
-          async: false # TODO when the rest of the stuff below is made to work properly..
-          data:
-              title: newTitle
-              body: newBody
-
-          error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
-          success: (response, textStatus) =>
-              # TODO: Move this out of the callback, this makes it feel sluggish
-              @editView.$(".edit-post-title").val("").attr("prev-text", "")
-              @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
-              @editView.$(".wmd-preview p").html("")
-
-              @model.set
-                title: newTitle
-                body: newBody
-
-              @createShowView()
-              @renderShowView()
-
     createEditView: () ->
-
       if @showView?
         @showView.undelegateEvents()
         @showView.$el.empty()
         @showView = null
 
-      @editView = new DiscussionThreadEditView(model: @model)
-      @editView.bind "thread:update", @update
-      @editView.bind "thread:cancel_edit", @cancelEdit
+      @editView = new DiscussionThreadEditView(
+        container: @$('.thread-content-wrapper')
+        model: @model
+        mode: @mode
+        course_settings: @options.course_settings
+        topicId: @model.get('commentable_id')
+      )
+      @editView.bind "thread:updated thread:cancel_edit", @closeEditView
 
     renderSubView: (view) ->
       view.setElement(@$('.thread-content-wrapper'))
@@ -230,28 +282,17 @@ if Backbone?
       view.delegateEvents()
 
     renderEditView: () ->
-      @renderSubView(@editView)
-
-    getShowViewClass: () ->
-      return DiscussionThreadShowView
+      @editView.render()
 
     createShowView: () ->
-
-      if @editView?
-        @editView.undelegateEvents()
-        @editView.$el.empty()
-        @editView = null
-
-      showViewClass = @getShowViewClass()
-      @showView = new showViewClass(model: @model)
+      @showView = new DiscussionThreadShowView({model: @model, mode: @mode})
       @showView.bind "thread:_delete", @_delete
       @showView.bind "thread:edit", @edit
 
     renderShowView: () ->
       @renderSubView(@showView)
 
-    cancelEdit: (event) =>
-      event.preventDefault()
+    closeEditView: (event) =>
       @createShowView()
       @renderShowView()
 

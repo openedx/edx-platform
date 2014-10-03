@@ -35,6 +35,7 @@ from course_modes.models import CourseMode
 import shoppingcart
 
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
+from util.views import ensure_valid_course_key
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -81,11 +82,11 @@ class ViewsTestCase(TestCase):
     Tests for views.py methods.
     """
     def setUp(self):
-        self.course = CourseFactory()
-        self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
-        self.section = ItemFactory(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
-        self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
-        self.component = ItemFactory(category='problem', parent_location=self.vertical.location)
+        self.course = CourseFactory.create()
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
+        self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
 
         self.course_key = self.course.id
         self.user = User.objects.create(username='dummy', password='123456',
@@ -382,11 +383,11 @@ class BaseDueDateTests(ModuleStoreTestCase):
 
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
-        course = CourseFactory(**course_kwargs)
-        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
-        section = ItemFactory(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
-        vertical = ItemFactory(category='vertical', parent_location=section.location)
-        ItemFactory(category='problem', parent_location=vertical.location)
+        course = CourseFactory.create(**course_kwargs)
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+        ItemFactory.create(category='problem', parent_location=vertical.location)
 
         course = modulestore().get_course(course.id)  # pylint: disable=no-member
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
@@ -463,7 +464,7 @@ class TestProgressDueDate(BaseDueDateTests):
         """ Returns the HTML for the progress page """
 
         mako_middleware_process_request(self.request)
-        return views.progress(self.request, course.id.to_deprecated_string(), self.user.id).content
+        return views.progress(self.request, course_id=course.id.to_deprecated_string(), student_id=self.user.id).content
 
 
 class TestAccordionDueDate(BaseDueDateTests):
@@ -498,7 +499,7 @@ class StartDateTests(ModuleStoreTestCase):
 
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
-        course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
+        course = CourseFactory.create(start=datetime(2013, 9, 16, 7, 17, 28))
         course = modulestore().get_course(course.id)  # pylint: disable=no-member
         return course
 
@@ -547,30 +548,30 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         MakoMiddleware().process_request(self.request)
 
-        course = CourseFactory(
+        course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
         )
         self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
 
-        self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
-        self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)
-        self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
     def test_pure_ungraded_xblock(self):
-        ItemFactory(category='acid', parent_location=self.vertical.location)
+        ItemFactory.create(category='acid', parent_location=self.vertical.location)
 
-        resp = views.progress(self.request, self.course.id.to_deprecated_string())
+        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
     def test_non_asci_grade_cutoffs(self):
-        resp = views.progress(self.request, self.course.id.to_deprecated_string())
+        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
 
-class TestVerifyCourseIdDecorator(TestCase):
+class VerifyCourseKeyDecoratorTests(TestCase):
     """
-    Tests for the verify_course_id decorator.
+    Tests for the ensure_valid_course_key decorator.
     """
 
     def setUp(self):
@@ -580,12 +581,12 @@ class TestVerifyCourseIdDecorator(TestCase):
 
     def test_decorator_with_valid_course_id(self):
         mocked_view = create_autospec(views.course_about)
-        view_function = views.verify_course_id(mocked_view)
-        view_function(self.request, self.valid_course_id)
+        view_function = ensure_valid_course_key(mocked_view)
+        view_function(self.request, course_id=self.valid_course_id)
         self.assertTrue(mocked_view.called)
 
     def test_decorator_with_invalid_course_id(self):
         mocked_view = create_autospec(views.course_about)
-        view_function = views.verify_course_id(mocked_view)
-        self.assertRaises(Http404, view_function, self.request, self.invalid_course_id)
+        view_function = ensure_valid_course_key(mocked_view)
+        self.assertRaises(Http404, view_function, self.request, course_id=self.invalid_course_id)
         self.assertFalse(mocked_view.called)

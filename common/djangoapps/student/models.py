@@ -27,22 +27,27 @@ from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 from cities.models import City
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models, IntegrityError
+from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries import CountryField
 from cities.models import City
+from config_models.models import ConfigurationModel
 from track import contexts
 from eventtracking import tracker
 from importlib import import_module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import Location
+from opaque_keys import InvalidKeyError
 
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 from functools import total_ordering
 
@@ -51,10 +56,12 @@ from course_modes.models import CourseMode
 
 from ratelimitbackend import admin
 
-unenroll_done = Signal(providing_args=["course_enrollment"])
+import analytics
+
+UNENROLL_DONE = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
-SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
+SessionStore = import_module(settings.SESSION_ENGINE).SessionStore  # pylint: disable=invalid-name
 
 
 class AnonymousUserId(models.Model):
@@ -98,7 +105,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     hasher.update(settings.SECRET_KEY)
     hasher.update(unicode(user.id))
     if course_id:
-        hasher.update(course_id.to_deprecated_string())
+        hasher.update(course_id.to_deprecated_string().encode('utf-8'))
     digest = hasher.hexdigest()
 
     if not hasattr(user, '_anonymous_id'):
@@ -133,7 +140,7 @@ def anonymous_id_for_user(user, course_id, save=True):
     return digest
 
 
-def user_by_anonymous_id(id):
+def user_by_anonymous_id(uid):
     """
     Return user by anonymous_user_id using AnonymousUserId lookup table.
 
@@ -142,11 +149,11 @@ def user_by_anonymous_id(id):
     because this function will be used inside xmodule w/o django access.
     """
 
-    if id is None:
+    if uid is None:
         return None
 
     try:
-        return User.objects.get(anonymoususerid__anonymous_user_id=id)
+        return User.objects.get(anonymoususerid__anonymous_user_id=uid)
     except ObjectDoesNotExist:
         return None
 
@@ -192,7 +199,7 @@ class UserProfile(models.Model):
     MITx fall prototype.
     """
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring
         db_table = "auth_userprofile"
 
     # CRITICAL TODO/SECURITY
@@ -252,7 +259,7 @@ class UserProfile(models.Model):
     cedula = models.CharField(max_length=132, blank=True, null=True)
     city = models.ForeignKey('cities.City', default=None, blank=True, null=True)
 
-    def get_meta(self):
+    def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
         if not js_str:
             js_str = dict()
@@ -261,8 +268,8 @@ class UserProfile(models.Model):
 
         return js_str
 
-    def set_meta(self, js):
-        self.meta = json.dumps(js)
+    def set_meta(self, meta_json):  # pylint: disable=missing-docstring
+        self.meta = json.dumps(meta_json)
 
     def set_login_session(self, session_id=None):
         """
@@ -277,6 +284,59 @@ class UserProfile(models.Model):
         meta['session_id'] = session_id
         self.set_meta(meta)
         self.save()
+
+    @transaction.commit_on_success
+    def update_name(self, new_name):
+        """Update the user's name, storing the old name in the history.
+
+        Implicitly saves the model.
+        If the new name is not the same as the old name, do nothing.
+
+        Arguments:
+            new_name (unicode): The new full name for the user.
+
+        Returns:
+            None
+
+        """
+        if self.name == new_name:
+            return
+
+        if self.name:
+            meta = self.get_meta()
+            if 'old_names' not in meta:
+                meta['old_names'] = []
+            meta['old_names'].append([self.name, u"", datetime.now(UTC).isoformat()])
+            self.set_meta(meta)
+
+        self.name = new_name
+        self.save()
+
+    @transaction.commit_on_success
+    def update_email(self, new_email):
+        """Update the user's email and save the change in the history.
+
+        Implicitly saves the model.
+        If the new email is the same as the old email, do not update the history.
+
+        Arguments:
+            new_email (unicode): The new email for the user.
+
+        Returns:
+            None
+        """
+        if self.user.email == new_email:
+            return
+
+        meta = self.get_meta()
+        if 'old_emails' not in meta:
+            meta['old_emails'] = []
+        meta['old_emails'].append([self.user.email, datetime.now(UTC).isoformat()])
+        self.set_meta(meta)
+        self.save()
+
+        self.user.email = new_email
+        self.user.save()
 
 
 class UserSignupSource(models.Model):
@@ -341,6 +401,23 @@ class PendingEmailChange(models.Model):
     user = models.OneToOneField(User, unique=True, db_index=True)
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+
+    def request_change(self, email):
+        """Request a change to a user's email.
+
+        Implicitly saves the pending email change record.
+
+        Arguments:
+            email (unicode): The proposed new email for the user.
+
+        Returns:
+            unicode: The activation code to confirm the change.
+
+        """
+        self.new_email = email
+        self.activation_key = uuid.uuid4().hex
+        self.save()
+        return self.activation_key
 
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
@@ -489,8 +566,8 @@ class PasswordHistory(models.Model):
             return True
 
         if user.is_staff and cls.is_staff_password_reuse_restricted():
-                min_diff_passwords_required = \
-                    settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
+            min_diff_passwords_required = \
+                settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
         elif cls.is_student_password_reuse_restricted():
             min_diff_passwords_required = \
                 settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
@@ -587,6 +664,22 @@ class LoginFailures(models.Model):
             entry.delete()
         except ObjectDoesNotExist:
             return
+
+
+class CourseEnrollmentException(Exception):
+    pass
+
+class NonExistentCourseError(CourseEnrollmentException):
+    pass
+
+class EnrollmentClosedError(CourseEnrollmentException):
+    pass
+
+class CourseFullError(CourseEnrollmentException):
+    pass
+
+class AlreadyEnrolledError(CourseEnrollmentException):
+    pass
 
 
 class CourseEnrollment(models.Model):
@@ -725,8 +818,8 @@ class CourseEnrollment(models.Model):
                 )
 
             else:
-                unenroll_done.send(sender=None, course_enrollment=self)
-                
+                UNENROLL_DONE.send(sender=None, course_enrollment=self)
+
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
                 dog_stats_api.increment(
@@ -777,7 +870,7 @@ class CourseEnrollment(models.Model):
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
 
     @classmethod
-    def enroll(cls, user, course_key, mode="honor"):
+    def enroll(cls, user, course_key, mode="honor", check_access=False):
         """
         Enroll a user in a course. This saves immediately.
 
@@ -787,18 +880,74 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
+        `course_key` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
 
         `mode` is a string specifying what kind of enrollment this is. The
                default is "honor", meaning honor certificate. Future options
                may include "audit", "verified_id", etc. Please don't use it
                until we have these mapped out.
 
+        `check_access`: if True, we check that an accessible course actually
+                exists for the given course_key before we enroll the student.
+                The default is set to False to avoid breaking legacy code or
+                code with non-standard flows (ex. beta tester invitations), but
+                for any standard enrollment flow you probably want this to be True.
+
+        Exceptions that can be raised: NonExistentCourseError,
+        EnrollmentClosedError, CourseFullError, AlreadyEnrolledError.  All these
+        are subclasses of CourseEnrollmentException if you want to catch all of
+        them in the same way.
+
         It is expected that this method is called from a method which has already
-        verified the user authentication and access.
+        verified the user authentication.
 
         Also emits relevant events for analytics purposes.
         """
+        from courseware.access import has_access
+
+        # All the server-side checks for whether a user is allowed to enroll.
+        try:
+            course = modulestore().get_course(course_key)
+        except ItemNotFoundError:
+            log.warning(
+                "User {0} failed to enroll in non-existent course {1}".format(
+                    user.username,
+                    course_key.to_deprecated_string()
+                )
+            )
+            raise NonExistentCourseError
+
+        if check_access:
+            if course is None:
+                raise NonExistentCourseError
+            if not has_access(user, 'enroll', course):
+                log.warning(
+                    "User {0} failed to enroll in course {1} because enrollment is closed".format(
+                        user.username,
+                        course_key.to_deprecated_string()
+                    )
+                )
+                raise EnrollmentClosedError
+
+            if CourseEnrollment.is_course_full(course):
+                log.warning(
+                    "User {0} failed to enroll in full course {1}".format(
+                        user.username,
+                        course_key.to_deprecated_string()
+                    )
+                )
+                raise CourseFullError
+        if CourseEnrollment.is_enrolled(user, course_key):
+            log.warning(
+                "User {0} attempted to enroll in {1}, but they were already enrolled".format(
+                    user.username,
+                    course_key.to_deprecated_string()
+                )
+            )
+            if check_access:
+                raise AlreadyEnrolledError
+
+        # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
         return enrollment
@@ -963,12 +1112,12 @@ class CourseEnrollment(models.Model):
         # Unfortunately, Django's "group by"-style queries look super-awkward
         query = use_read_replica_if_available(cls.objects.filter(course_id=course_id, is_active=True).values('mode').order_by().annotate(Count('mode')))
         total = 0
-        d = defaultdict(int)
+        enroll_dict = defaultdict(int)
         for item in query:
-            d[item['mode']] = item['mode__count']
+            enroll_dict[item['mode']] = item['mode__count']
             total += item['mode__count']
-        d['total'] = total
-        return d
+        enroll_dict['total'] = total
+        return enroll_dict
 
     def is_paid_course(self):
         """
@@ -1001,7 +1150,7 @@ class CourseEnrollment(models.Model):
         a verified certificate and the deadline for refunds has not yet passed.
         """
         # In order to support manual refunds past the deadline, set can_refund on this object.
-        # On unenrolling, the "unenroll_done" signal calls CertificateItem.refund_cert_callback(),
+        # On unenrolling, the "UNENROLL_DONE" signal calls CertificateItem.refund_cert_callback(),
         # which calls this method to determine whether to refund the order.
         # This can't be set directly because refunds currently happen as a side-effect of unenrolling.
         # (side-effects are bad)
@@ -1020,6 +1169,14 @@ class CourseEnrollment(models.Model):
         else:
             return True
 
+    @property
+    def username(self):
+        return self.user.username
+
+    @property
+    def course(self):
+        return modulestore().get_course(self.course_id)
+
 
 class CourseEnrollmentAllowed(models.Model):
     """
@@ -1033,7 +1190,7 @@ class CourseEnrollmentAllowed(models.Model):
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring
         unique_together = (('email', 'course_id'),)
 
     def __unicode__(self):
@@ -1057,7 +1214,7 @@ class CourseAccessRole(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True, blank=True)
     role = models.CharField(max_length=64, db_index=True)
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring
         unique_together = ('user', 'org', 'course_id', 'role')
 
     @property
@@ -1066,14 +1223,14 @@ class CourseAccessRole(models.Model):
         convenience function to make eq overrides easier and clearer. arbitrary decision
         that role is primary, followed by org, course, and then user
         """
-        return (self.role, self.org, self.course_id, self.user)
+        return (self.role, self.org, self.course_id, self.user_id)
 
     def __eq__(self, other):
         """
         Overriding eq b/c the django impl relies on the primary key which requires fetch. sometimes we
         just want to compare roles w/o doing another fetch.
         """
-        return type(self) == type(other) and self._key == other._key
+        return type(self) == type(other) and self._key == other._key  # pylint: disable=protected-access
 
     def __hash__(self):
         return hash(self._key)
@@ -1082,7 +1239,7 @@ class CourseAccessRole(models.Model):
         """
         Lexigraphic sort
         """
-        return self._key < other._key
+        return self._key < other._key  # pylint: disable=protected-access
 
     def __unicode__(self):
         return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
@@ -1109,32 +1266,32 @@ def get_user_by_username_or_email(username_or_email):
 
 
 def get_user(email):
-    u = User.objects.get(email=email)
-    up = UserProfile.objects.get(user=u)
-    return u, up
+    user = User.objects.get(email=email)
+    u_prof = UserProfile.objects.get(user=user)
+    return user, u_prof
 
 
 def user_info(email):
-    u, up = get_user(email)
-    print "User id", u.id
-    print "Username", u.username
-    print "E-mail", u.email
-    print "Name", up.name
-    print "Location", up.location
-    print "Language", up.language
-    return u, up
+    user, u_prof = get_user(email)
+    print "User id", user.id
+    print "Username", user.username
+    print "E-mail", user.email
+    print "Name", u_prof.name
+    print "Location", u_prof.location
+    print "Language", u_prof.language
+    return user, u_prof
 
 
 def change_email(old_email, new_email):
-    u = User.objects.get(email=old_email)
-    u.email = new_email
-    u.save()
+    user = User.objects.get(email=old_email)
+    user.email = new_email
+    user.save()
 
 
 def change_name(email, new_name):
-    u, up = get_user(email)
-    up.name = new_name
-    up.save()
+    _user, u_prof = get_user(email)
+    u_prof.name = new_name
+    u_prof.save()
 
 
 def user_count():
@@ -1165,10 +1322,12 @@ def remove_user_from_group(user, group):
     utg.users.remove(User.objects.get(username=user))
     utg.save()
 
-default_groups = {'email_future_courses': 'Receive e-mails about future MITx courses',
-                  'email_helpers': 'Receive e-mails about how to help with MITx',
-                  'mitx_unenroll': 'Fully unenrolled -- no further communications',
-                  '6002x_unenroll': 'Took and dropped 6002x'}
+DEFAULT_GROUPS = {
+    'email_future_courses': 'Receive e-mails about future MITx courses',
+    'email_helpers': 'Receive e-mails about how to help with MITx',
+    'mitx_unenroll': 'Fully unenrolled -- no further communications',
+    '6002x_unenroll': 'Took and dropped 6002x'
+}
 
 
 def add_user_to_default_group(user, group):
@@ -1177,7 +1336,7 @@ def add_user_to_default_group(user, group):
     except UserTestGroup.DoesNotExist:
         utg = UserTestGroup()
         utg.name = group
-        utg.description = default_groups[group]
+        utg.description = DEFAULT_GROUPS[group]
         utg.save()
     utg.users.add(User.objects.get(username=user))
     utg.save()
@@ -1190,11 +1349,12 @@ def create_comments_service_user(user):
     try:
         cc_user = cc.User.from_django_user(user)
         cc_user.save()
-    except Exception as e:
-        log = logging.getLogger("edx.discussion")
+    except Exception:  # pylint: disable=broad-except
+        log = logging.getLogger("edx.discussion")  # pylint: disable=redefined-outer-name
         log.error(
             "Could not create comments service user with id {}".format(user.id),
-            exc_info=True)
+            exc_info=True
+        )
 
 # Define login and logout handlers here in the models file, instead of the views file,
 # so that they are more likely to be loaded when a Studio user brings up the Studio admin
@@ -1203,7 +1363,7 @@ def create_comments_service_user(user):
 
 
 @receiver(user_logged_in)
-def log_successful_login(sender, request, user, **kwargs):
+def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=unused-argument
     """Handler to log when logins have occurred successfully."""
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.info(u"Login success - user.id: {0}".format(user.id))
@@ -1212,7 +1372,7 @@ def log_successful_login(sender, request, user, **kwargs):
 
 
 @receiver(user_logged_out)
-def log_successful_logout(sender, request, user, **kwargs):
+def log_successful_logout(sender, request, user, **kwargs):  # pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))
@@ -1222,7 +1382,7 @@ def log_successful_logout(sender, request, user, **kwargs):
 
 @receiver(user_logged_in)
 @receiver(user_logged_out)
-def enforce_single_login(sender, request, user, signal, **kwargs):
+def enforce_single_login(sender, request, user, signal, **kwargs):    # pylint: disable=unused-argument
     """
     Sets the current session id in the user profile,
     to prevent concurrent logins.
@@ -1233,3 +1393,20 @@ def enforce_single_login(sender, request, user, signal, **kwargs):
         else:
             key = None
         user.profile.set_login_session(key)
+
+
+class DashboardConfiguration(ConfigurationModel):
+    """Dashboard Configuration settings.
+
+    Includes configuration options for the dashboard, which impact behavior and rendering for the application.
+
+    """
+    recent_enrollment_time_delta = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of seconds in which a new enrollment is considered 'recent'. "
+                  "Used to display notifications."
+    )
+
+    @property
+    def recent_enrollment_seconds(self):
+        return self.recent_enrollment_time_delta

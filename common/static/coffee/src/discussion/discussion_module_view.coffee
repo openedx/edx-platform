@@ -7,7 +7,6 @@ if Backbone?
       "click .new-post-btn": "toggleNewPost"
       "keydown .new-post-btn":
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
-      "click .new-post-cancel": "hideNewPost"
       "click .discussion-paginator a": "navigateToPage"
 
     paginationTemplate: -> DiscussionUtil.getTemplate("_pagination")
@@ -36,9 +35,8 @@ if Backbone?
       @$("section.discussion").slideDown()
       @showed = true
 
-    hideNewPost: (event) ->
-      event.preventDefault()
-      @newPostForm.slideUp(300)
+    hideNewPost: =>
+     @newPostForm.slideUp(300)
 
     hideDiscussion: =>
       @$("section.discussion").slideUp()
@@ -101,7 +99,13 @@ if Backbone?
 
       @newPostForm = $('.new-post-article')
       @threadviews = @discussion.map (thread) ->
-        new DiscussionThreadInlineView el: @$("article#thread_#{thread.id}"), model: thread
+        new DiscussionThreadView(
+          el: @$("article#thread_#{thread.id}"),
+          model: thread,
+          mode: "inline",
+          course_settings: @course_settings,
+          topicId: discussionId
+        )
       _.each @threadviews, (dtv) -> dtv.render()
       DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
       @newPostView = new NewPostView(
@@ -111,6 +115,7 @@ if Backbone?
         topicId: discussionId
       )
       @newPostView.render()
+      @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )
       @discussion.on "add", @addThread
 
       @retrieved = true
@@ -124,7 +129,14 @@ if Backbone?
       # TODO: When doing pagination, this will need to repaginate. Perhaps just reload page 1?
       article = $("<article class='discussion-thread' id='thread_#{thread.id}'></article>")
       @$('section.discussion > .threads').prepend(article)
-      threadView = new DiscussionThreadInlineView el: article, model: thread
+
+      threadView = new DiscussionThreadView(
+        el: article,
+        model: thread,
+        mode: "inline",
+        course_settings: @course_settings,
+        topicId: @$el.data("discussion-id")
+      )
       threadView.render()
       @threadviews.unshift threadView
 

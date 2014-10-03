@@ -1,0 +1,152 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%page args="section_data"/>
+<section id="registration_code_generation_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Generate Registration Code Modal')}">
+  <div class="inner-wrapper">
+    <button class="close-modal">
+      <i class="icon-remove"></i>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <div id="registration-content">
+      <header>
+        <h2>${_("Generate Registration Codes")}</h2>
+      </header>
+
+      <div class="instructions">
+        <p>
+          ${_("Please enter the details below")}</p>
+      </div>
+
+      <form id="generate_codes" action="${section_data['generate_registration_code_csv_url']}" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        <div id="registration_code_form_error" class="modal-form-error"></div>
+        <fieldset class="group group-form group-form-requiredinformation">
+          <legend class="is-hidden">${_("Required Information")}</legend>
+
+          <ol class="list-input">
+            <li class="field required text" id="generate-registration-modal-field-company-name">
+              <label for="id_company_name"  class="required text">${_("Organization Name")}</label>
+              <input class="field required" id="id_company_name" type="text" name="company_name"
+                     placeholder="${_('Organization Name')}" aria-required="true" />
+              <span class="tip-text">
+                ${_("What is the company the seats were sold to?")}
+              </span>
+            </li>
+            <li class="field required text" id="generate-registration-modal-field-company-contact-name">
+              <label for="id_company_contact_name"  class="required text">${_("Organization Contact")}</label>
+              <input class="field required" id="id_company_contact_name" type="text" name="company_contact_name"
+                     placeholder="${_('Name')}" aria-required="true" />
+              <span class="tip-text">
+                ${_("Who is the key contact at the company the sale was made to? ")}
+              </span>
+            </li>
+            <li class="field text" id="generate-registration-modal-field-company-email">
+              <label for="id_company_contact_email"  class="text">&nbsp;</label>
+              <input class="field" id="id_company_contact_email" type="email" value="" name="company_contact_email"
+                     placeholder="${_('Email')}"  aria-required="true" />
+            </li>
+            <div class="clearfix"></div>
+            <li class="field required text" id="generate-registration-modal-field-recipient-name">
+              <label for="id_recipient_name" class="required text">${_("Invoice Recipient")}</label>
+              <input class="field required" id="id_recipient_name" type="text" name="recipient_name"
+                     placeholder="${_('Name')}" aria-required="true"/>
+              <span class="tip-text">
+                ${_("Who at the company should the invoice be sent to?")}
+              </span>
+            </li>
+            <li class="field text" id="generate-registration-modal-field-recipient-email">
+              <label for="id_recipient_email"  class="text">&nbsp;</label>
+              <input class="field required" id="id_recipient_email" type="email" value="" placeholder="${_('Email')}"
+                     name="recipient_email" aria-required="true"/>
+            </li>
+            <div class="clearfix"></div>
+            <li class="field required text address_fields"  id="generate-registration-modal-field-address-line-1">
+              <label for="id_address_line_1"  class="required text">${_("Organization Billing Address")}</label>
+              <input class="field required" id="id_address_line_1" type="text" name="address_line_1"
+                    placeholder="${_('Address Line 1')}" aria-required="true" />
+            </li>
+            <li class="field text address_fields" id="generate-registration-modal-field-address-line-2">
+              <label for="id_address_line_2"  class="text">&nbsp;</label>
+              <input class="field" id="id_address_line_2" type="text" name="address_line_2"
+                      placeholder="${_('Address Line 2')}" aria-required="true" />
+            </li>
+            <li class="field text address_fields" id="generate-registration-modal-field-address-line-3">
+              <label for="id_address_line_3"  class="text">&nbsp;</label>
+              <input class="field" id="id_address_line_3" type="text" name="address_line_3"
+                      placeholder="${_('Address Line 3')}" aria-required="true" />
+            </li>
+            <li class="field text address_fields" id="generate-registration-modal-field-city">
+              <label for="id_city"  class="text">&nbsp;</label>
+              <input class="field" id="id_city" type="text" name="city"
+                      placeholder="${_('City')}" aria-required="true" />
+            </li>
+            <li class="field text address_fields" id="generate-registration-modal-field-state">
+              <label for="id_state"  class="text">&nbsp;</label>
+              <input class="field" id="id_state" type="text" name="state"
+                    placeholder="${_('State/Province')}" aria-required="true" />
+            </li>
+            <li class="field text address_fields" id="generate-registration-modal-field-zipcode">
+              <label for="id_zip"  class="text">&nbsp;</label>
+              <input class="field" id="id_zip" type="text" name="zip"
+                    placeholder="${_('Zip')}" aria-required="true" />
+            </li>
+            <li class="field text address_fields" id="generate-registration-modal-field-country">
+              <label for="id_country"  class="text">&nbsp;</label>
+              <input class="field" id="id_country" type="text" name="country"
+                     placeholder="${_('Country')}" aria-required="true" />
+              <span class="tip-text">
+              </span>
+            </li>
+            <div class="clearfix"></div>
+            <li class="field required text" id="generate-registration-modal-field-total-price">
+              <label for="id_sale_price" class="required text">${_("Price of Sale")}</label>
+              <input class="field required" id="id_sale_price" type="text" name="sale_price"
+                     aria-required="true" />
+              <span class="tip-text">
+                ${_("What was the total sale price for all seats sold?")}
+              </span>
+            </li>
+            <li class="field required text" id="generate-registration-modal-field-total-codes">
+              <label for="id_total_registration_codes" class="required text">${_("Number of registrations")}</label>
+              <input class="field required" id="id_total_registration_codes" type="text" name="total_registration_codes"
+                     aria-required="true"/>
+              <span class="tip-text">
+                ${_("Number of codes to generate for the Invoice")}
+              </span>
+            </li>
+            <div class="clearfix"></div>
+            <li class="field text" id="generate-registration-modal-field-internal-reference">
+              <label for="id_internal_reference" >${_("(Optional) Sale Label")}</label>
+              <input class="field" id="id_internal_reference" type="text" name="internal_reference"
+                     aria-required="true" placeholder="BigCorp-IT-Department-1"/>
+              <span class="tip-text">
+                ${_("Internal tag to associate with the sale")}
+              </span>
+            </li>
+            <li class="field text" id="generate-registration-modal-field-custom-reference-number">
+              <label for="id_customer_reference_number" >${_("(Optional) Customer Reference Number")}</label>
+              <input class="field" id="id_customer_reference_number" type="text" name="customer_reference_number"
+                     aria-required="true" placeholder="PO #"/>
+              <span class="tip-text">
+                ${_("Any reference specific to the purchasing company, e.g. PO #")}
+              </span>
+            </li>
+            <div class="clearfix"></div>
+            <li class="field text" id="generate-registration-modal-field-invoice-copy">
+              <label for="id_invoice" >${_("Send me a copy of the invoice")}</label>
+              <input class="field" id="id_invoice" type="checkbox" name="invoice"
+                     aria-required="true"/>
+            </li>
+          </ol>
+        </fieldset>
+        <div class="submit">
+          <input name="generate-registration-codes-csv" type="submit" value="${_('Generate Registration Codes')}" data-csv="true"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

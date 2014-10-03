@@ -38,6 +38,7 @@ from warnings import simplefilter
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from dealer.git import git
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -105,7 +106,7 @@ FEATURES = {
     'ADVANCED_SECURITY': False,
 
     # Modulestore to use for new courses
-    'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
+    'DEFAULT_STORE_FOR_NEW_COURSE': None,
 }
 ENABLE_JASMINE = False
 
@@ -254,7 +255,7 @@ from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
 # Allow any XBlock in Studio
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
@@ -306,6 +307,8 @@ STATICFILES_DIRS = [
 TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = lms.envs.common.LANGUAGES
+LANGUAGE_DICT = dict(LANGUAGES)
+
 USE_I18N = True
 USE_L10N = True
 
@@ -634,7 +637,6 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 ### Apps only installed in some instances
 
 OPTIONAL_APPS = (
-    'edx_jsdraw',
     'mentoring',
 
     # edx-ora2
@@ -643,7 +645,10 @@ OPTIONAL_APPS = (
     'openassessment.assessment',
     'openassessment.fileupload',
     'openassessment.workflow',
-    'openassessment.xblock'
+    'openassessment.xblock',
+
+    # edxval
+    'edxval'
 )
 
 
@@ -699,6 +704,7 @@ ADVANCED_COMPONENT_TYPES = [
     'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
     'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
     'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
+    'profile', # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
     'split_test',
     'combinedopenended',
     'peergrading',

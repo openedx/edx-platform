@@ -35,6 +35,7 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
@@ -50,7 +51,7 @@ from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
 
 from util.json_request import JsonResponse
-from util.sandboxing import can_execute_unsafe_code
+from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
 
 log = logging.getLogger(__name__)
@@ -114,35 +115,36 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     field_data_cache must include data from the course module and 2 levels of its descendents
     '''
 
-    course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
-    if course_module is None:
-        return None
+    with modulestore().bulk_operations(course.id):
+        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
+        if course_module is None:
+            return None
 
-    chapters = list()
-    for chapter in course_module.get_display_items():
-        if chapter.hide_from_toc:
-            continue
+        chapters = list()
+        for chapter in course_module.get_display_items():
+            if chapter.hide_from_toc:
+                continue
 
-        sections = list()
-        for section in chapter.get_display_items():
+            sections = list()
+            for section in chapter.get_display_items():
 
-            active = (chapter.url_name == active_chapter and
-                      section.url_name == active_section)
+                active = (chapter.url_name == active_chapter and
+                          section.url_name == active_section)
 
-            if not section.hide_from_toc:
-                sections.append({'display_name': section.display_name_with_default,
-                                 'url_name': section.url_name,
-                                 'format': section.format if section.format is not None else '',
-                                 'due': get_extended_due_date(section),
-                                 'active': active,
-                                 'graded': section.graded,
-                                 })
+                if not section.hide_from_toc:
+                    sections.append({'display_name': section.display_name_with_default,
+                                     'url_name': section.url_name,
+                                     'format': section.format if section.format is not None else '',
+                                     'due': get_extended_due_date(section),
+                                     'active': active,
+                                     'graded': section.graded,
+                                     })
 
-        chapters.append({'display_name': chapter.display_name_with_default,
-                         'url_name': chapter.url_name,
-                         'sections': sections,
-                         'active': chapter.url_name == active_chapter})
-    return chapters
+            chapters.append({'display_name': chapter.display_name_with_default,
+                             'url_name': chapter.url_name,
+                             'sections': sections,
+                             'active': chapter.url_name == active_chapter})
+        return chapters
 
 
 def get_module(user, request, usage_key, field_data_cache,
@@ -530,6 +532,7 @@ def get_module_system_for_user(user, field_data_cache,
         s3_interface=s3_interface,
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
+        get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, course_id)),
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,

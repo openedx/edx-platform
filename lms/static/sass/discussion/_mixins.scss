@@ -1,0 +1,156 @@
+// discussion - mixins and extends
+// ====================
+
+@mixin blue-button {
+  @include linear-gradient(top, #6dccf1, #38a8e5);
+  display: block;
+  border: 1px solid #2d81ad;
+  border-radius: 3px;
+  padding: 0 ($baseline*.75);
+  height: 35px;
+  color: $white;
+  text-shadow: none;
+  font-size: 13px;
+  line-height: 35px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+
+  &:hover, &:focus {
+    @include linear-gradient(top, #4fbbe4, #2090d0);
+    border-color: #297095;
+  }
+}
+
+@mixin white-button {
+  @include linear-gradient(top, $white, $gray-l5);
+  display: block;
+  border: 1px solid #aaa;
+  border-radius: 3px;
+  padding: 0 ($baseline*.75);
+  height: 35px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+  color: $dark-gray;
+  text-shadow: none;
+  font-size: 13px;
+  line-height: 35px;
+
+  &:hover, &:focus {
+    @include linear-gradient(top, $white, $gray-l6);
+  }
+}
+
+@mixin dark-grey-button {
+  display: block;
+  border: 1px solid #222;
+  border-radius: 3px;
+  padding: 0 ($baseline*.75);
+  height: 35px;
+  background: -webkit-linear-gradient(top, #777, #555);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
+  color: $white;
+  text-shadow: none;
+  font-size: 13px;
+  line-height: 35px;
+
+  &:hover, &:focus {
+    background: -webkit-linear-gradient(top, #888, #666);
+  }
+}
+
+@mixin discussion-wmd-input {
+  @include box-sizing(border-box);
+  margin-top: 0;
+  border: 1px solid #aaa;
+  border-radius: 3px 3px 0 0;
+  padding: ($baseline/2);
+  width: 100%;
+  height: 240px;
+  background: $white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+  font-size: 13px;
+  font-family: 'Monaco', monospace;
+  line-height: 1.6;
+}
+
+@mixin discussion-wmd-preview-container {
+  @include box-sizing(border-box);
+  border: 1px solid #aaa;
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+  width: 100%;
+  background: #eee;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+}
+
+@mixin discussion-new-post-wmd-preview-container {
+  @include discussion-wmd-preview-container;
+  border-color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+}
+
+@mixin discussion-wmd-preview-label {
+  padding-top: 3px;
+  padding-left: 5px;
+  width: 100%;
+  color: #bbb;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+@mixin discussion-wmd-preview {
+  padding: 10px 20px;
+  width: 100%;
+  color: #333;
+}
+
+@-webkit-keyframes fadeIn {
+  0% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+
+// extends - content - text overflow by ellipsis
+%cont-truncated {
+  @include box-sizing(border-box);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@mixin forum-post-label($color) {
+  @extend %t-weight4;
+  @include font-size(9);
+  display: inline;
+  margin-top: ($baseline/4);
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 1px 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  border-color: $color;
+  color: $color;
+
+  .icon {
+    margin-right: ($baseline/5);
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &.is-hidden {
+    display: none;
+  }
+}
+
+@mixin forum-user-label($color) {
+  @include font-size(9);
+  @extend %t-weight5;
+  vertical-align: middle;
+  margin-left: ($baseline/4);
+  border-radius: 2px;
+  padding: 0 ($baseline/5);
+  background: $color;
+  font-style: normal;
+  text-transform: uppercase;
+  color: white;
+}

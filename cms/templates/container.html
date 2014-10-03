@@ -115,7 +115,7 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
 
             <article class="content-primary">
                 <div class="container-message wrapper-message"></div>
-                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
+                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator | h}" data-course-key="${xblock_locator.course_key | h}">
                 </section>
                 <div class="ui-loading">
                     <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
@@ -124,10 +124,19 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
             <aside class="content-supplementary" role="complimentary">
                 % if not is_unit_page:
                     <div class="bit">
-                        <h3 class="title-3">${_("What can I do on this page?")}</h3>
-                        <ul class="list-details">
-                            <li class="item-detail">${_("You can view and edit course components that contain other components on this page. In the case of experiment blocks, this allows you to confirm that you have properly configured your experiment groups and make changes to existing content.")}</li>
-                        </ul>
+                        <h3 class="title-3">${_("Adding components")}</h3>
+                        <p>${_("Select a component type under {em_start}Add New Component{em_end}. Then select a template.").format(em_start='<strong>', em_end="</strong>")}</p>
+                        <p>${_("The new component is added at the bottom of the page or group. You can then edit and move the component.")}</p>
+                        <h3 class="title-3">${_("Editing components")}</h3>
+                        <p>${_("Click the {em_start}Edit{em_end} icon in a component to edit its content.").format(em_start='<strong>', em_end="</strong>")}</p>
+                        <h3 class="title-3">${_("Reorganizing components")}</h3>
+                        <p>${_("Drag components to new locations within this component.")}</p>
+                        <p>${_("For content experiments, you can drag components to other groups.")}</p>
+                        <h3 class="title-3">${_("Working with content experiments")}</h3>
+                        <p>${_("Confirm that you have properly configured content in each of your experiment groups.")}</p>
+                    </div>
+                    <div class="bit external-help">
+                        <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about component containers")}</a>
                     </div>
                 % endif
                 % if is_unit_page:
@@ -138,7 +147,7 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
                         <div class="wrapper-unit-id bar-mod-content">
                             <h5 class="title">${_("Location ID")}</h5>
                             <p class="unit-id">
-                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name | h}</span>
                                 <span class="tip"><span class="sr">Tip: </span>${_("Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.")}</span>
                             </p>
                         </div>

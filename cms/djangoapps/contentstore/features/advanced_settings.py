@@ -82,8 +82,8 @@ def it_is_formatted(step):
 @step('I get an error on save$')
 def error_on_save(step):
     assert_regexp_matches(
-        world.css_text('#notification-error-description'),
-        "Incorrect format for field '{}'.".format(DISPLAY_NAME_KEY)
+        world.css_text('.error-item-message'),
+        "Value stored in a .* must be .*, found .*"
     )
 
 

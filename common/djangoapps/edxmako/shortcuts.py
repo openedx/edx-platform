@@ -77,6 +77,42 @@ def marketing_link_context_processor(request):
     )
 
 
+def header_footer_context_processor(request):
+    """
+    A django context processor to pass feature flags through to all Django
+    Templates that are related to the display of the header and footer in
+    the edX platform.
+    """
+    # TODO: ECOM-136 Remove this processor with the corresponding header and footer feature flags.
+    return dict(
+        [
+            ("ENABLE_NEW_EDX_HEADER", settings.FEATURES.get("ENABLE_NEW_EDX_HEADER", False)),
+            ("ENABLE_NEW_EDX_FOOTER", settings.FEATURES.get("ENABLE_NEW_EDX_FOOTER", False))
+        ]
+    )
+
+
+def open_source_footer_context_processor(request):
+    """
+    Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
+    """
+    return dict(
+        [
+            ("IS_EDX_DOMAIN", settings.FEATURES.get('IS_EDX_DOMAIN', False))
+        ]
+    )
+
+
+def microsite_footer_context_processor(request):
+    """
+    Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
+    """
+    return dict(
+        [
+            ("IS_REQUEST_IN_MICROSITE", microsite.is_request_in_microsite())
+        ]
+    )
+
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
 
     # see if there is an override template defined in the microsite

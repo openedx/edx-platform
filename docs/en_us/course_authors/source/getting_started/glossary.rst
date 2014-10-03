@@ -10,6 +10,12 @@ Glossary
 A
 ****
 
+.. _AB Test:
+
+**A/B Test**
+
+  See `Content Experiment`_.
+
 .. _About Page:
 
 **About Page**
@@ -88,6 +94,15 @@ C
   contain one or more components. For more information, see :ref:`Developing
   Course Components`.
 
+.. _Content Experiment:
+
+**Content Experiment**
+
+  You can define alternative course content to be delivered to different,
+  randomly assigned groups of students. Also known as A/B or split testing, you
+  use content experiments to compare the performance of students who have been
+  exposed to different versions of of the content. For more information, see
+  :ref:`Creating Content Experiments`.
 
 .. _Course Accordion:
  
@@ -161,7 +176,13 @@ D
  
 **Discussion**
 
-  The set of topics defined to promote course-wide or unit-specific dialog. Students use the discussion topics to communicate with each other and the course staff in threaded excahnges. 
+  The set of topics defined to promote course-wide or unit-specific
+  conversation. Students use the discussion topics to communicate with each
+  other and the course staff in threaded exchanges.
+
+  A discussion is also a type of contribution that you can make to a topic to
+  start an open-ended dialogue. You can also contribute questions to the
+  discussion topics.
 
   See :ref:`Discussions` for more information.
 
@@ -433,6 +454,31 @@ P
 The page in the learning management system that shows students their scores on graded assignments in the course.
 
 
+
+.. _Public Unit:
+ 
+.. **Public Unit**
+
+..  A unit whose **Visibility** option is set to Public so that the unit is
+..  visible to students, if the subsection that contains the unit has been
+..  released.
+
+..  See :ref:`Public and Private Units` for more information.
+
+.. _Q:
+
+*****
+Q
+*****
+
+**Question**
+
+  A question is a type of contribution that you can make to a course discussion
+  topic to surface an issue that the course staff or other students can
+  resolve. 
+
+  See :ref:`Discussions` for more information.
+  
 .. _R:
 
 ****
@@ -483,6 +529,11 @@ S
 
   The graphical user interface in a Problem component that contains formatting buttons and is available for some problem types. For more information, see :ref:`Problem Studio View`.
 
+.. _Split_Test:
+
+**Split Test**
+
+  See `Content Experiment`_.
 
 
 .. _Subsection:

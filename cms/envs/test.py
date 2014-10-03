@@ -73,17 +73,6 @@ STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
 PIPELINE_ENABLED=False
 
-# Add split as another store for testing
-MODULESTORE['default']['OPTIONS']['stores'].append(
-    {
-        'NAME': 'split',
-        'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': {
-            'render_template': 'edxmako.shortcuts.render_to_string',
-        }
-    },
-)
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,
@@ -200,9 +189,6 @@ PASSWORD_HASHERS = (
 SEGMENT_IO_KEY = '***REMOVED***'
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
-
-# This is to disable a test under the common directory that will not pass when run under CMS
-FEATURES['DISABLE_RESET_EMAIL_TEST'] = True
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True

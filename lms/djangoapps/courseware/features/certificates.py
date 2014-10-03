@@ -20,13 +20,12 @@ def create_cert_course():
     world.scenario_dict['COURSE'] = world.CourseFactory.create(
         org=org, number=number, display_name=name)
 
-    audit_mode = world.CourseModeFactory.create(
-        course_id=course_id,
-        mode_slug='audit',
-        mode_display_name='audit course',
+    honor_mode = world.CourseModeFactory.create(
+        course_id=world.scenario_dict['course_id'],
+        mode_slug='honor',
+        mode_display_name='honor mode',
         min_price=0,
-        )
-    assert isinstance(audit_mode, CourseMode)
+    )
 
     verfied_mode = world.CourseModeFactory.create(
         course_id=course_id,
@@ -36,7 +35,6 @@ def create_cert_course():
         suggested_prices='32,64,128',
         currency='usd',
         )
-    assert isinstance(verfied_mode, CourseMode)
 
 
 def register():
@@ -48,23 +46,11 @@ def register():
     assert world.is_css_present('section.wrapper h3.title')
 
 
-@step(u'the course has an honor mode')
-def the_course_has_an_honor_mode(step):
-    create_cert_course()
-    honor_mode = world.CourseModeFactory.create(
-        course_id=world.scenario_dict['course_id'],
-        mode_slug='honor',
-        mode_display_name='honor mode',
-        min_price=0,
-    )
-    assert isinstance(honor_mode, CourseMode)
-
-
 @step(u'I select the audit track$')
 def select_the_audit_track(step):
     create_cert_course()
     register()
-    btn_css = 'input[value="Select Audit"]'
+    btn_css = 'input[name="honor_mode"]'
     world.wait(1)  # TODO remove this after troubleshooting JZ
     world.css_find(btn_css)
     world.css_click(btn_css)
@@ -292,18 +278,4 @@ def see_the_payment_page(step):
 @step(u'I edit my name$')
 def edit_my_name(step):
     btn_css = 'a.retake-photos'
-    world.css_click(btn_css)
-
-
-@step(u'I select the honor code option$')
-def give_a_reason_why_i_cannot_pay(step):
-    register()
-
-    link_css = 'h5 i.expandable-icon'
-    world.css_click(link_css)
-
-    cb_css = 'input#honor-code'
-    world.css_click(cb_css)
-
-    btn_css = 'input[value="Select Certificate"]'
     world.css_click(btn_css)

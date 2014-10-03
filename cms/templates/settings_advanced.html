@@ -10,7 +10,7 @@
 <%block name="bodyclass">is-signedin course advanced view-settings</%block>
 
 <%block name="jsextra">
-% for template_name in ["advanced_entry"]:
+% for template_name in ["advanced_entry", "basic-modal", "modal-button", "validation-error-modal"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>

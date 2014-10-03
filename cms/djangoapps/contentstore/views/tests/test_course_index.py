@@ -106,8 +106,8 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
-        self.assertEqual(json_response['display_name'], 'Robot Super Course')
+        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
 
@@ -116,7 +116,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(first_child_response['id'], unicode(chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
@@ -227,8 +227,8 @@ class TestCourseOutline(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
-        self.assertEqual(json_response['display_name'], 'Robot Super Course')
+        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
 
@@ -237,7 +237,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)

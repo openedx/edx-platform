@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.conf import settings %>
+<%! from microsite_configuration import microsite %>
 
 <%inherit file="../main.html" />
 
@@ -22,7 +23,7 @@
   <section class="wrapper cart-list">
     <div class="wrapper-content-main">
       <article class="content-main">
-        <h1>${_(settings.PLATFORM_NAME + " (" + settings.SITE_NAME + ")" + " Electronic Receipt")}</h1>
+        <h1>${_("{platform_name} ({site_name}) Electronic Receipt").format(platform_name=microsite.get_value('platform_name', settings.PLATFORM_NAME), site_name=microsite.get_value('SITE_NAME', settings.SITE_NAME))}</h1>
         <hr />
 
         <table class="order-receipt">
@@ -51,7 +52,7 @@
               % if item.status == "purchased":
                 <td>${item.qty}</td>
                 <td>${item.line_desc}</td>
-                <td><a href="${course_id}" class="enter-course">${_('View Course')}</a></td>
+                <td><a href="${course_id | h}" class="enter-course">${_('View Course')}</a></td>
                 <td>${"{0:0.2f}".format(item.unit_cost)}
                     % if item.list_price != None:
                         <span class="old-price"> ${"{0:0.2f}".format(item.list_price)}</span>

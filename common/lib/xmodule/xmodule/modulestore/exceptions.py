@@ -54,20 +54,16 @@ class DuplicateItemError(Exception):
             self, Exception.__str__(self, *args, **kwargs)
         )
 
+
 class VersionConflictError(Exception):
     """
     The caller asked for either draft or published head and gave a version which conflicted with it.
     """
     def __init__(self, requestedLocation, currentHeadVersionGuid):
-        super(VersionConflictError, self).__init__()
-        self.requestedLocation = requestedLocation
-        self.currentHeadVersionGuid = currentHeadVersionGuid
-
-    def __str__(self, *args, **kwargs):
-        """
-        Print requested and current head info
-        """
-        return u'Requested {} but {} is current head'.format(self.requestedLocation, self.currentHeadVersionGuid)
+        super(VersionConflictError, self).__init__(u'Requested {}, but current head is {}'.format(
+            requestedLocation,
+            currentHeadVersionGuid
+        ))
 
 
 class DuplicateCourseError(Exception):
@@ -78,7 +74,9 @@ class DuplicateCourseError(Exception):
         """
         existing_entry will have the who, when, and other properties of the existing entry
         """
-        super(DuplicateCourseError, self).__init__()
+        super(DuplicateCourseError, self).__init__(
+            u'Cannot create course {}, which duplicates {}'.format(course_id, existing_entry)
+        )
         self.course_id = course_id
         self.existing_entry = existing_entry
 
@@ -88,9 +86,6 @@ class InvalidBranchSetting(Exception):
     Raised when the process' branch setting did not match the required setting for the attempted operation on a store.
     """
     def __init__(self, expected_setting, actual_setting):
-        super(InvalidBranchSetting, self).__init__()
+        super(InvalidBranchSetting, self).__init__(u"Invalid branch: expected {} but got {}".format(expected_setting, actual_setting))
         self.expected_setting = expected_setting
         self.actual_setting = actual_setting
-
-    def __unicode__(self, *args, **kwargs):
-        return u"Invalid branch: expected {} but got {}".format(self.expected_setting, self.actual_setting)

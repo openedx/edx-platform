@@ -1,11 +1,13 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Adam Łukasiak <adamus160@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
+# Mateusz <blue90pl@gmail.com>, 2014
 # Cairath, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Dyfeomorfizm <ximixd@gmail.com>, 2014
@@ -18,6 +20,7 @@
 # kuba11p <jakubsw.p@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
+# Mateusz <blue90pl@gmail.com>, 2014
 # Cairath, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
@@ -26,19 +29,21 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Fundacja_Eduprojekt.org <maciej@eduprojekt.org>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Mateusz <blue90pl@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-22 11:23-0400\n"
-"PO-Revision-Date: 2014-08-19 15:50+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-09-24 13:34-0400\n"
+"PO-Revision-Date: 2014-09-24 18:00+0000\n"
+"Last-Translator: Mateusz <blue90pl@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -496,8 +501,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr ""
@@ -1531,6 +1534,38 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Play"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Pause"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Mute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Unmute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Exit full browser"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Fill browser"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
 msgstr ""
 
@@ -1584,22 +1619,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Pause"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Play"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Fill browser"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Exit full browser"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
@@ -1668,6 +1687,7 @@ msgstr ""
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
@@ -1711,31 +1731,74 @@ msgid "…"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "Open"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "remove vote"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to remove your vote)"
-msgid_plural "votes (click to remove your vote)"
+msgid "currently %(numVotes)s vote"
+msgid_plural "currently %(numVotes)s votes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to vote)"
-msgid_plural "votes (click to vote)"
+msgid "%(numVotes)s Vote"
+msgid_plural "%(numVotes)s Votes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble subscribing you to this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble unsubscribing you from this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble marking this response as an answer.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing this response as an answer.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble marking this response endorsed.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble removing this endorsement.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble saving your vote.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble pinning this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble unpinning this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing your flag on this post.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reporting this post.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble closing this thread.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reopening this thread.  Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -1778,42 +1841,6 @@ msgstr ""
 msgid "Show posts by %(username)s."
 msgstr ""
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to remove report"
-msgstr ""
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Report Misuse"
-msgstr ""
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to unpin"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pin Thread"
-msgstr ""
-
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -1826,6 +1853,13 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "%(numResponses)s other response"
+msgid_plural "%(numResponses)s other responses"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
@@ -1861,24 +1895,12 @@ msgstr ""
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "Your post will be discarded."
+msgstr ""
+
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "staff"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Community TA"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, click to remove report"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
@@ -2233,11 +2255,11 @@ msgstr "Niedziela|Poniedziałek|Wtorek|Środa|Czwartek|Piątek|Sobota"
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Now"
-msgstr "Teraz"
+msgstr ""
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Clock"
-msgstr "Czas"
+msgstr ""
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Choose a time"
@@ -2245,15 +2267,15 @@ msgstr ""
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Midnight"
-msgstr "Północ"
+msgstr ""
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "6 a.m."
-msgstr "6 rano"
+msgstr ""
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Noon"
-msgstr "Południe"
+msgstr ""
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
@@ -2262,7 +2284,7 @@ msgstr "Dzisiaj"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Calendar"
-msgstr "Kalendarz"
+msgstr ""
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Yesterday"
@@ -2288,7 +2310,6 @@ msgstr ""
 #. message appears when there is an error getting the data on grade
 #. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
 msgid "Error fetching distribution."
 msgstr ""
 
@@ -2358,12 +2379,6 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
-msgstr ""
-
-#. Translators: A rolename appears this sentence. A rolename is something like
-#. "staff" or "beta tester".;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Error fetching list for role"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -3248,6 +3263,14 @@ msgstr ""
 msgid "Deleting"
 msgstr ""
 
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
+msgstr ""
+
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
 msgstr ""
@@ -3412,6 +3435,18 @@ msgstr ""
 msgid "Editing: %(title)s"
 msgstr ""
 
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Validation Error While Saving"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Undo Changes"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Change Manually"
+msgstr ""
+
 #: cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr ""
@@ -3559,6 +3594,34 @@ msgstr ""
 
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -4091,6 +4154,18 @@ msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
+msgstr ""
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"There were {strong_start}{num_errors} validation error(s){strong_end} while "
+"trying to save the course setting(s) in the database."
+msgstr ""
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"Please check the following validation feedbacks and reflect them in your "
+"course settings:"
 msgstr ""
 
 #: cms/templates/js/xblock-string-field-editor.underscore

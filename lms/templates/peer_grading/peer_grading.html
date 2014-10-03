@@ -41,7 +41,7 @@ criteria.{end_li_tag}
                             %if problem['closed']:
                                 ${problem['problem_name']}
                             %else:
-                                <a href="#problem" data-location="${problem['location'].to_deprecated_string()}" class="problem-button">${problem['problem_name']}</a>
+                                <a href="#problem" data-location="${problem['location'] | h}" class="problem-button">${problem['problem_name']}</a>
                             %endif
                         </td>
                         <td>

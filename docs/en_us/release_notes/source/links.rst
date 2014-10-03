@@ -3,6 +3,8 @@
 
 .. _edX Product and Engineering Newsletter: http://us5.campaign-archive2.com/?u=1822a33c054dc20e223ca40e2&id=090cb3ea4c&e=4a41f5542a
 
+.. _End of August Product Announcement: http://us5.campaign-archive1.com/?u=1822a33c054dc20e223ca40e2&id=2f58184233
+
 .. _edX Release Announcements mailing list: http://eepurl.com/U84tj
 
 .. _edX Edge: https://edge.edx.org
@@ -16,9 +18,14 @@
 
 .. _edX Status: http://status.edx.org/
 
+.. _docs.edx.org: http://docs.edx.org
+
 .. _edX roadmap: https://openedx.atlassian.net/wiki/display/PROD/Product+Roadmap
 
 .. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
+
+
+.. _Using edX Insights: http://edx-insights.readthedocs.org/en/latest/
 
 .. _Installing, Configuring, and Running the edX Platform: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/
 
@@ -43,6 +50,8 @@
 .. _Working with Video Components: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_video.html
 
 .. _Bulk Email: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/course_launching.html#bulk-email
+
+.. _Example Messages to Students: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/course_launching.html#example-messages-to-students
 
 .. _Enrollment: http://ca.readthedocs.org/en/latest/running_course/course_enrollment.html#enrollment
 
@@ -187,6 +196,9 @@
 
 .. _Developing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/index.html
 
+.. _New Course Run Announcement: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/course_launching.html#new-course-run-announcement
+
+.. _Add Content Experiments to Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/content_experiments/content_experiments_add.html
 
 .. Peer Assessments
 

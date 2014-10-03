@@ -472,7 +472,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     def revert_to_published(self, location, user_id):
         """
         Reverts an item to its last published version (recursively traversing all of its descendants).
-        If no published version exists, a VersionConflictError is thrown.
+        If no published version exists, an InvalidVersionError is thrown.
 
         If a published version exists but there is no draft version of this item or any of its descendants, this
         method is a no-op.
@@ -540,7 +540,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             )
         )
 
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
         Returns whether this xblock is draft, public, or private.
 
@@ -552,7 +552,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         course_id = xblock.scope_ids.usage_id.course_key
         store = self._get_modulestore_for_courseid(course_id)
-        return store.compute_publish_state(xblock)
+        return store.has_published_version(xblock)
 
     @strip_key
     def publish(self, location, user_id, **kwargs):
@@ -645,11 +645,22 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             yield
 
     @contextmanager
-    def bulk_write_operations(self, course_id):
+    def bulk_operations(self, course_id):
         """
-        A context manager for notifying the store of bulk write events.
+        A context manager for notifying the store of bulk operations.
         If course_id is None, the default store is used.
         """
         store = self._get_modulestore_for_courseid(course_id)
-        with store.bulk_write_operations(course_id):
+        with store.bulk_operations(course_id):
             yield
+
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+
+        This method is intended for use by tests and administrative commands, and not
+        to be run during server startup.
+        """
+        for store in self.modulestores:
+            store.ensure_indexes()

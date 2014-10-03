@@ -1,0 +1,27 @@
+<h2 class="section-title">
+    <span class="value"><%- gettext('Cohort Management') %></span>
+    <span class="description"></span>
+</h2>
+
+<!-- nav -->
+<div class="cohort-management-nav">
+    <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
+        <div class="cohort-management-nav-form-select field field-select">
+            <label for="cohort-select" class="label sr">${_("Select a cohort group to manage")}</label>
+            <select class="input cohort-select" name="cohort-select" id="cohort-select">
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button class="form-submit button action-primary action-view sr"><%- gettext('View Cohort Group') %></button>
+        </div>
+    </form>
+
+    <a href="" class="action-primary action-create">
+        <i class="icon icon-plus"></i>
+        <%- gettext('Add Cohort Group') %>
+    </a>
+</div>
+
+<!-- individual group -->
+<div class="cohort-management-group"></div>

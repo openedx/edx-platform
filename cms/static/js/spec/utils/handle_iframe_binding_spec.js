@@ -38,9 +38,8 @@ function ($, _, IframeBinding) {
 
             //after calling iframeBinding function: src url of iframes should have "wmode=transparent" in its querystring
             //and embed objects should have "wmode='transparent'" as an attribute
-            expect(iframe_html).toEqual('<iframe src="http://www.youtube.com/embed/NHd27UvY-lw?wmode=transparent" frameborder="0" height="350" width="618"></iframe>' +
-                '<iframe src="http://www.youtube.com/embed/NHd27UvY-lw?wmode=transparent&amp;allowFullScreen=false" frameborder="0" height="350" width="618"></iframe>' +
-                '<embed wmode="transparent" type="application/x-shockwave-flash" src="http://www.youtube.com/embed/NHd27UvY-lw" height="315" width="560">');
+            expect(iframe_html).toContain('<iframe src="http://www.youtube.com/embed/NHd27UvY-lw?wmode=transparent"');
+            expect(iframe_html).toContain('<embed wmode="transparent" type="application/x-shockwave-flash" src="http://www.youtube.com/embed/NHd27UvY-lw"');
         });
 
         it("does not modify src url of DOM iframe if it is empty", function () {

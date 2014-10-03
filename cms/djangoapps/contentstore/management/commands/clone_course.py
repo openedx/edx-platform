@@ -38,7 +38,7 @@ class Command(BaseCommand):
 
         print("Cloning course {0} to {1}".format(source_course_id, dest_course_id))
 
-        with mstore.bulk_write_operations(dest_course_id):
+        with mstore.bulk_operations(dest_course_id):
             if mstore.clone_course(source_course_id, dest_course_id, ModuleStoreEnum.UserID.mgmt_command):
                 print("copying User permissions...")
                 # purposely avoids auth.add_user b/c it doesn't have a caller to authorize

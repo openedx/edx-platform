@@ -24,6 +24,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
+import functools
+import threading
 
 log = logging.getLogger('edx.modulestore')
 
@@ -90,14 +92,171 @@ class ModuleStoreEnum(object):
         test = -3
 
 
-class PublishState(object):
+class BulkOpsRecord(object):
     """
-    The legacy publish state for a given xblock-- either 'draft', 'private', or 'public'. These states
-    are no longer used in Studio, but they are still referenced in a few places in LMS.
+    For handling nesting of bulk operations
     """
-    draft = 'draft'
-    private = 'private'
-    public = 'public'
+    def __init__(self):
+        self._active_count = 0
+
+    @property
+    def active(self):
+        """
+        Return whether this bulk write is active.
+        """
+        return self._active_count > 0
+
+    def nest(self):
+        """
+        Record another level of nesting of this bulk write operation
+        """
+        self._active_count += 1
+
+    def unnest(self):
+        """
+        Record the completion of a level of nesting of the bulk write operation
+        """
+        self._active_count -= 1
+
+    @property
+    def is_root(self):
+        """
+        Return whether the bulk write is at the root (first) level of nesting
+        """
+        return self._active_count == 1
+
+
+class ActiveBulkThread(threading.local):
+    """
+    Add the expected vars to the thread.
+    """
+    def __init__(self, bulk_ops_record_type, **kwargs):
+        super(ActiveBulkThread, self).__init__(**kwargs)
+        self.records = defaultdict(bulk_ops_record_type)
+
+
+class BulkOperationsMixin(object):
+    """
+    This implements the :meth:`bulk_operations` modulestore semantics which handles nested invocations
+
+    In particular, it implements :meth:`_begin_bulk_operation` and
+    :meth:`_end_bulk_operation` to provide the external interface
+
+    Internally, this mixin records the set of all active bulk operations (keyed on the active course),
+    and only writes those values when :meth:`_end_bulk_operation` is called.
+    If a bulk write operation isn't active, then the changes are immediately written to the underlying
+    mongo_connection.
+    """
+    def __init__(self, *args, **kwargs):
+        super(BulkOperationsMixin, self).__init__(*args, **kwargs)
+        self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
+
+    @contextmanager
+    def bulk_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk operations. This affects only the current thread.
+
+        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
+        until the bulk operation is completed.
+        """
+        try:
+            self._begin_bulk_operation(course_id)
+            yield
+        finally:
+            self._end_bulk_operation(course_id)
+
+    # the relevant type of bulk_ops_record for the mixin (overriding classes should override
+    # this variable)
+    _bulk_ops_record_type = BulkOpsRecord
+
+    def _get_bulk_ops_record(self, course_key, ignore_case=False):
+        """
+        Return the :class:`.BulkOpsRecord` for this course.
+        """
+        if course_key is None:
+            return self._bulk_ops_record_type()
+
+        # Retrieve the bulk record based on matching org/course/run (possibly ignoring case)
+        if ignore_case:
+            for key, record in self._active_bulk_ops.records.iteritems():
+                if (
+                    key.org.lower() == course_key.org.lower() and
+                    key.course.lower() == course_key.course.lower() and
+                    key.run.lower() == course_key.run.lower()
+                ):
+                    return record
+        return self._active_bulk_ops.records[course_key.for_branch(None)]
+
+    @property
+    def _active_records(self):
+        """
+        Yield all active (CourseLocator, BulkOpsRecord) tuples.
+        """
+        for course_key, record in self._active_bulk_ops.records.iteritems():
+            if record.active:
+                yield (course_key, record)
+
+    def _clear_bulk_ops_record(self, course_key):
+        """
+        Clear the record for this course
+        """
+        del self._active_bulk_ops.records[course_key.for_branch(None)]
+
+    def _start_outermost_bulk_operation(self, bulk_ops_record, course_key):
+        """
+        The outermost nested bulk_operation call: do the actual begin of the bulk operation.
+
+        Implementing classes must override this method; otherwise, the bulk operations are a noop
+        """
+        pass
+
+    def _begin_bulk_operation(self, course_key):
+        """
+        Begin a bulk operation on course_key.
+        """
+        bulk_ops_record = self._get_bulk_ops_record(course_key)
+
+        # Increment the number of active bulk operations (bulk operations
+        # on the same course can be nested)
+        bulk_ops_record.nest()
+
+        # If this is the highest level bulk operation, then initialize it
+        if bulk_ops_record.is_root:
+            self._start_outermost_bulk_operation(bulk_ops_record, course_key)
+
+    def _end_outermost_bulk_operation(self, bulk_ops_record, course_key):
+        """
+        The outermost nested bulk_operation call: do the actual end of the bulk operation.
+
+        Implementing classes must override this method; otherwise, the bulk operations are a noop
+        """
+        pass
+
+    def _end_bulk_operation(self, course_key):
+        """
+        End the active bulk operation on course_key.
+        """
+        # If no bulk op is active, return
+        bulk_ops_record = self._get_bulk_ops_record(course_key)
+        if not bulk_ops_record.active:
+            return
+
+        bulk_ops_record.unnest()
+
+        # If this wasn't the outermost context, then don't close out the
+        # bulk operation.
+        if bulk_ops_record.active:
+            return
+
+        self._end_outermost_bulk_operation(bulk_ops_record, course_key)
+
+        self._clear_bulk_ops_record(course_key)
+
+    def _is_in_bulk_operation(self, course_key, ignore_case=False):
+        """
+        Return whether a bulk operation is active on `course_key`.
+        """
+        return self._get_bulk_ops_record(course_key, ignore_case).active
 
 
 class ModuleStoreRead(object):
@@ -307,15 +466,9 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
-        Returns whether this xblock is draft, public, or private.
-
-        Returns:
-            PublishState.draft - content is in the process of being edited, but still has a previous
-                version deployed to LMS
-            PublishState.public - content is locked and deployed to LMS
-            PublishState.private - content is editable and not deployed to LMS
+        Returns true if this xblock exists in the published course regardless of whether it's up to date
         """
         pass
 
@@ -323,6 +476,23 @@ class ModuleStoreRead(object):
     def close_connections(self):
         """
         Closes any open connections to the underlying databases
+        """
+        pass
+
+    @contextmanager
+    def bulk_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk operations. This affects only the current thread.
+        """
+        yield
+
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+
+        This method is intended for use by tests and administrative commands, and not
+        to be run during server startup.
         """
         pass
 
@@ -444,7 +614,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
 
-class ModuleStoreReadBase(ModuleStoreRead):
+class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
     '''
     Implement interface functionality that can be shared.
     '''
@@ -464,7 +634,9 @@ class ModuleStoreReadBase(ModuleStoreRead):
         '''
         Set up the error-tracking logic.
         '''
+        super(ModuleStoreReadBase, self).__init__(**kwargs)
         self._course_errors = defaultdict(make_error_tracker)  # location -> ErrorLog
+        # TODO move the inheritance_cache_subsystem to classes which use it
         self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
@@ -529,11 +701,11 @@ class ModuleStoreReadBase(ModuleStoreRead):
                 None
             )
 
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
-        Returns PublishState.public since this is a read-only store.
+        Returns True since this is a read-only store.
         """
-        return PublishState.public
+        return True
 
     def heartbeat(self):
         """
@@ -558,6 +730,38 @@ class ModuleStoreReadBase(ModuleStoreRead):
         if self.get_modulestore_type(None) != store_type:
             raise ValueError(u"Cannot set default store to type {}".format(store_type))
         yield
+
+    @staticmethod
+    def memoize_request_cache(func):
+        """
+        Memoize a function call results on the request_cache if there's one. Creates the cache key by
+        joining the unicode of all the args with &; so, if your arg may use the default &, it may
+        have false hits
+        """
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if self.request_cache:
+                cache_key = '&'.join([hashvalue(arg) for arg in args])
+                if cache_key in self.request_cache.data.setdefault(func.__name__, {}):
+                    return self.request_cache.data[func.__name__][cache_key]
+
+                result = func(self, *args, **kwargs)
+
+                self.request_cache.data[func.__name__][cache_key] = result
+                return result
+            else:
+                return func(self, *args, **kwargs)
+        return wrapper
+
+
+def hashvalue(arg):
+    """
+    If arg is an xblock, use its location. otherwise just turn it into a string
+    """
+    if isinstance(arg, XBlock):
+        return unicode(arg.location)
+    else:
+        return unicode(arg)
 
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
@@ -658,29 +862,6 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         parent = self.get_item(parent_usage_key)
         parent.children.append(item.location)
         self.update_item(parent, user_id)
-
-    @contextmanager
-    def bulk_write_operations(self, course_id):
-        """
-        A context manager for notifying the store of bulk write events.
-
-        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
-        until the bulk operation is completed.
-        """
-        # TODO
-        # Make this multi-process-safe if future operations need it.
-        # Right now, only Import Course, Clone Course, and Delete Course use this, so
-        # it's ok if the cached metadata in the memcache is invalid when another
-        # request comes in for the same course.
-        try:
-            if hasattr(self, '_begin_bulk_write_operation'):
-                self._begin_bulk_write_operation(course_id)
-            yield
-        finally:
-            # check for the begin method here,
-            # since it's an error if an end method is not defined when a begin method is
-            if hasattr(self, '_begin_bulk_write_operation'):
-                self._end_bulk_write_operation(course_id)
 
 
 def only_xmodules(identifier, entry_points):

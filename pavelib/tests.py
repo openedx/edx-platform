@@ -79,7 +79,7 @@ def test_system(options):
 ])
 def test_lib(options):
     """
-    Run tests for common/lib/
+    Run tests for common/lib/ and pavelib/ (paver-tests)
     """
     lib = getattr(options, 'lib', None)
     test_id = getattr(options, 'test_id', lib)
@@ -91,7 +91,10 @@ def test_lib(options):
     }
 
     if test_id:
-        lib = '/'.join(test_id.split('/')[0:3])
+        if '/' in test_id:
+            lib = '/'.join(test_id.split('/')[0:3])
+        else:
+            lib = 'common/lib/' + test_id.split('.')[0]
         opts['test_id'] = test_id
         lib_tests = [suites.LibTestSuite(lib, **opts)]
     else:

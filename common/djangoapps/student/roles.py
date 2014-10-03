@@ -6,6 +6,7 @@ adding users, removing users, and listing members
 from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User
+
 from student.models import CourseAccessRole
 from xmodule_django.models import CourseKeyField
 
@@ -127,6 +128,7 @@ class RoleBase(AccessRole):
         """
         # silently ignores anonymous and inactive users so that any that are
         # legit get updated.
+        from student.models import CourseAccessRole
         for user in users:
             if user.is_authenticated and user.is_active and not self.has_user(user):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)

@@ -20,11 +20,6 @@ from util.testing import UrlResetMixin
 class NotificationPrefViewTest(UrlResetMixin, TestCase):
     INITIALIZATION_VECTOR = "\x00" * 16
 
-    @classmethod
-    def setUpClass(cls):
-        # Make sure global state is set up appropriately
-        Client().get("/")
-
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(NotificationPrefViewTest, self).setUp()

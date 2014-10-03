@@ -9,8 +9,7 @@ Working with Video Components
 Introduction to Videos
 **********************
 You can create a video of your lecture and add it to your course with other
-components—such as discussions and problems—to promote active learning. Adding a
-video to your course has several steps.
+components—such as discussions and problems—to promote active learning. Adding a video to your course has several steps.
 
 #. :ref:`Create the Video`.
 #. :ref:`Create Transcript`.
@@ -25,6 +24,8 @@ Also see:
 
 .. note:: Review :ref:`Best Practices for Accessible Media` before adding videos
  to your course.
+
+note:: To help course teams protect video assets, the edX video player hides video URLs from students by default. This functionality is in effect for all video files, including YouTube videos and videos that you have posted in other locations. Students can still download videos if you select the **Video Download Allowed** option for your Video components. For more information about posting non-YouTube videos online, see :ref:`Post the Video Online`. For more information about options that you can set when you create a video component, see :ref:`Video Advanced Options` under :ref:`Create a Video Component`.
 
 .. _Create the Video:
 

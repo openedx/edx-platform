@@ -1,5 +1,6 @@
-import ddt
 import unittest
+import decimal
+import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
@@ -11,6 +12,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.models import CourseEnrollment
 
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
@@ -30,7 +32,7 @@ class CourseModeViewTest(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password="edx")
 
     @ddt.data(
-        # is_active?, enrollment_mode, upgrade?, redirect? auto_register?
+        # is_active?, enrollment_mode, upgrade?, redirect?, auto_register?
         (True, 'verified', True, True, False),     # User is already verified
         (True, 'verified', False, True, False),    # User is already verified
         (True, 'honor', True, False, False),       # User isn't trying to upgrade
@@ -160,9 +162,9 @@ class CourseModeViewTest(ModuleStoreTestCase):
     # Mapping of course modes to the POST parameters sent
     # when the user chooses that mode.
     POST_PARAMS_FOR_COURSE_MODE = {
-        'audit': {'audit_mode': True},
-        'honor': {'honor-code': True},
-        'verified': {'certificate_mode': True}
+        'honor': {'honor_mode': True},
+        'verified': {'verified_mode': True, 'contribution': '1.23'},
+        'unsupported': {'unsupported_mode': True},
     }
 
     # TODO (ECOM-16): Remove the auto-register flag once the AB-test completes
@@ -170,10 +172,8 @@ class CourseModeViewTest(ModuleStoreTestCase):
     @ddt.data(
         (False, 'honor', 'dashboard'),
         (False, 'verified', 'show_requirements'),
-        (False, 'audit', 'dashboard'),
         (True, 'honor', 'dashboard'),
         (True, 'verified', 'show_requirements'),
-        (True, 'audit', 'dashboard'),
     )
     @ddt.unpack
     def test_choose_mode_redirect(self, auto_register, course_mode, expected_redirect):
@@ -189,7 +189,7 @@ class CourseModeViewTest(ModuleStoreTestCase):
 
         # Choose the mode (POST request)
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-        resp = self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE[course_mode])
+        response = self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE[course_mode])
 
         # Verify the redirect
         if expected_redirect == 'dashboard':
@@ -202,4 +202,53 @@ class CourseModeViewTest(ModuleStoreTestCase):
         else:
             self.fail("Must provide a valid redirect URL name")
 
-        self.assertRedirects(resp, redirect_url)
+        self.assertRedirects(response, redirect_url)
+
+    def test_remember_donation_for_course(self):
+        # Create the course modes
+        for mode in ('honor', 'verified'):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Choose the mode (POST request)
+        choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE['verified'])
+
+        # Expect that the contribution amount is stored in the user's session
+        self.assertIn('donation_for_course', self.client.session)
+        self.assertIn(unicode(self.course.id), self.client.session['donation_for_course'])
+
+        actual_amount = self.client.session['donation_for_course'][unicode(self.course.id)]
+        expected_amount = decimal.Decimal(self.POST_PARAMS_FOR_COURSE_MODE['verified']['contribution'])
+        self.assertEqual(actual_amount, expected_amount)
+
+    # TODO (ECOM-16): Remove auto-register booleans once the AB-test completes
+    @ddt.data(False, True)
+    def test_successful_honor_enrollment(self, auto_register):
+        # TODO (ECOM-16): Remove once we complete the auto-reg AB test.
+        if auto_register:
+            self.client.session['auto_register'] = True
+            self.client.session.save()
+
+        # Create the course modes
+        for mode in ('honor', 'verified'):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Choose the mode (POST request)
+        choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE['honor'])
+
+        # Verify the enrollment
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertEqual(mode, 'honor')
+        self.assertEqual(is_active, True)
+
+    def test_unsupported_enrollment_mode_failure(self):
+        # Create the supported course modes
+        for mode in ('honor', 'verified'):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Choose an unsupported mode (POST request)
+        choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE['unsupported'])
+
+        self.assertEqual(400, response.status_code)

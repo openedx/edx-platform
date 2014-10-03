@@ -24,7 +24,7 @@ from xmodule.modulestore.django import modulestore
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
-from student.models import CourseEnrollment, unenroll_done
+from student.models import CourseEnrollment, UNENROLL_DONE
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
 
@@ -32,16 +32,25 @@ from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
                          AlreadyEnrolledInCourseException, CourseDoesNotExistException,
-                         CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException,
-                         RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException)
+                         MultipleCouponsNotAllowedException, RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException)
 
 from microsite_configuration import microsite
 
 log = logging.getLogger("shoppingcart")
 
 ORDER_STATUSES = (
+    # The user is selecting what he/she wants to purchase.
     ('cart', 'cart'),
+
+    # The user has been sent to the external payment processor.
+    # At this point, the order should NOT be modified.
+    # If the user returns to the payment flow, he/she will start a new order.
+    ('paying', 'paying'),
+
+    # The user has successfully purchased the items in the order.
     ('purchased', 'purchased'),
+
+    # The user's order has been refunded.
     ('refunded', 'refunded'),
 )
 
@@ -128,6 +137,22 @@ class Order(models.Model):
         Clear out all the items in the cart
         """
         self.orderitem_set.all().delete()
+
+    @transaction.commit_on_success
+    def start_purchase(self):
+        """
+        Start the purchase process.  This will set the order status to "paying",
+        at which point it should no longer be modified.
+
+        Future calls to `Order.get_cart_for_user()` will filter out orders with
+        status "paying", effectively creating a new (empty) cart.
+        """
+        if self.status == 'cart':
+            self.status = 'paying'
+            self.save()
+
+            for item in OrderItem.objects.filter(order=self).select_subclasses():
+                item.start_purchase()
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
@@ -269,6 +294,14 @@ class OrderItem(models.Model):
         self.fulfilled_time = datetime.now(pytz.utc)
         self.save()
 
+    def start_purchase(self):
+        """
+        Start the purchase process.  This will set the order item status to "paying",
+        at which point it should no longer be modified.
+        """
+        self.status = 'paying'
+        self.save()
+
     def purchased_callback(self):
         """
         This is called on each inventory item in the shopping cart when the
@@ -317,6 +350,31 @@ class OrderItem(models.Model):
         return ''
 
 
+class Invoice(models.Model):
+    """
+         This table capture all the information needed to support "invoicing"
+         which is when a user wants to purchase Registration Codes,
+         but will not do so via a Credit Card transaction.
+    """
+    company_name = models.CharField(max_length=255, db_index=True)
+    company_contact_name = models.CharField(max_length=255)
+    company_contact_email = models.CharField(max_length=255)
+    recipient_name = models.CharField(max_length=255)
+    recipient_email = models.CharField(max_length=255)
+    address_line_1 = models.CharField(max_length=255)
+    address_line_2 = models.CharField(max_length=255, null=True)
+    address_line_3 = models.CharField(max_length=255, null=True)
+    city = models.CharField(max_length=255, null=True)
+    state = models.CharField(max_length=255, null=True)
+    zip = models.CharField(max_length=15, null=True)
+    country = models.CharField(max_length=64, null=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    total_amount = models.FloatField()
+    internal_reference = models.CharField(max_length=255, null=True)
+    customer_reference_number = models.CharField(max_length=63, null=True)
+    is_valid = models.BooleanField(default=True)
+
+
 class CourseRegistrationCode(models.Model):
     """
     This table contains registration codes
@@ -324,9 +382,10 @@ class CourseRegistrationCode(models.Model):
     """
     code = models.CharField(max_length=32, db_index=True, unique=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
-    transaction_group_name = models.CharField(max_length=255, db_index=True, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_by_user')
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order")
+    invoice = models.ForeignKey(Invoice, null=True)
 
     @classmethod
     @transaction.commit_on_success
@@ -352,7 +411,7 @@ class RegistrationCodeRedemption(models.Model):
     """
     This model contains the registration-code redemption info
     """
-    order = models.ForeignKey(Order, db_index=True)
+    order = models.ForeignKey(Order, db_index=True, null=True)
     registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
     redeemed_by = models.ForeignKey(User, db_index=True)
     redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
@@ -385,6 +444,15 @@ class RegistrationCodeRedemption(models.Model):
 
         log.warning("Course item does not exist against registration code '{0}'".format(course_reg_code.code))
         raise ItemDoesNotExistAgainstRegCodeException
+
+    @classmethod
+    def create_invoice_generated_registration_redemption(cls, course_reg_code, user):
+        """
+        This function creates a RegistrationCodeRedemption entry in case the registration codes were invoice generated
+        and thus the order_id is missing.
+        """
+        code_redemption = RegistrationCodeRedemption(registration_code=course_reg_code, redeemed_by=user)
+        code_redemption.save()
 
 
 class SoftDeleteCouponManager(models.Manager):
@@ -439,31 +507,33 @@ class CouponRedemption(models.Model):
         return value - discount
 
     @classmethod
-    def add_coupon_redemption(cls, coupon, order):
+    def add_coupon_redemption(cls, coupon, order, cart_items):
         """
         add coupon info into coupon_redemption model
         """
-        cart_items = order.orderitem_set.all().select_subclasses()
+        is_redemption_applied = False
+        coupon_redemptions = cls.objects.filter(order=order, user=order.user)
+        for coupon_redemption in coupon_redemptions:
+            if coupon_redemption.coupon.code != coupon.code or coupon_redemption.coupon.id == coupon.id:
+                log.exception("Coupon redemption already exist for user '{0}' against order id '{1}'"
+                              .format(order.user.username, order.id))
+                raise MultipleCouponsNotAllowedException
 
         for item in cart_items:
             if getattr(item, 'course_id'):
                 if item.course_id == coupon.course_id:
-                    coupon_redemption, created = cls.objects.get_or_create(order=order, user=order.user, coupon=coupon)
-                    if not created:
-                        log.exception("Coupon '{0}' already exist for user '{1}' against order id '{2}'"
-                                      .format(coupon.code, order.user.username, order.id))
-                        raise CouponAlreadyExistException
-
+                    coupon_redemption = cls(order=order, user=order.user, coupon=coupon)
+                    coupon_redemption.save()
                     discount_price = cls.get_discount_price(coupon.percentage_discount, item.unit_cost)
                     item.list_price = item.unit_cost
                     item.unit_cost = discount_price
                     item.save()
                     log.info("Discount generated for user {0} against order id '{1}' "
                              .format(order.user.username, order.id))
-                    return coupon_redemption
+                    is_redemption_applied = True
+                    return is_redemption_applied
 
-        log.warning("Course item does not exist for coupon '{0}'".format(coupon.code))
-        raise ItemDoesNotExistAgainstCouponException
+        return is_redemption_applied
 
 
 class PaidCourseRegistration(OrderItem):
@@ -478,8 +548,11 @@ class PaidCourseRegistration(OrderItem):
         """
         Is the course defined by course_id contained in the order?
         """
-        return course_id in [item.paidcourseregistration.course_id
-                             for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")]
+        return course_id in [
+            item.course_id
+            for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")
+            if isinstance(item, cls)
+        ]
 
     @classmethod
     def get_total_amount_of_purchased_item(cls, course_key):
@@ -574,7 +647,7 @@ class PaidCourseRegistration(OrderItem):
         Generates instructions when the user has purchased a PaidCourseRegistration.
         Basically tells the user to visit the dashboard to see their new classes
         """
-        notification = (_('Please visit your <a href="{dashboard_link}">dashboard</a> to see your new enrollments.')
+        notification = (_('Please visit your <a href="{dashboard_link}">dashboard</a>  to see your new course.')
                         .format(dashboard_link=reverse('dashboard')))
 
         return self.pk_with_subclass, set([notification])
@@ -614,7 +687,7 @@ class CertificateItem(OrderItem):
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
-    @receiver(unenroll_done)
+    @receiver(UNENROLL_DONE)
     def refund_cert_callback(sender, course_enrollment=None, **kwargs):
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment

@@ -70,7 +70,7 @@ General Exercises and Tools
           :width: 100
           :alt: Example problem with adaptive hint
      - :ref:`Problem with Adaptive Hint`
-     - A problem with an adaptive hint evaluates a student's response, then gives the student feedback or a hint based on that response so that the student is more likely to answer correctly on the next attempt. These problems can be text input or multiple choice problems.
+     - A problem with an adaptive hint evaluates a student's response, then gives the student feedback or a hint based on that response so that the student is more likely to answer correctly on the next attempt. These problems can be text input, multiple choice, numerical input, or math expression input problems.
    * - .. image:: /Images/ProblemWrittenInLaTeX.png
           :width: 100
           :alt: Example problem written in LaTeX
@@ -185,11 +185,16 @@ STEM Exercises and Tools
           :alt: Example molecule editor problem
      - :ref:`Molecule Editor`
      - The molecule editor allows students to draw molecules that follow the rules for covalent bond formation and formal charge, even if the molecules are chemically impossible, are unstable, or do not exist in living systems.
+   * - .. image:: /Images/MoleculeViewer.png
+          :width: 100
+          :alt: Example molecule viewer
+     - :ref:`Molecule Viewer`
+     - With the molecule viewer, you can create three-dimensional representations of molecules for your students to see.
    * - .. image:: /Images/image292.png
           :width: 100
           :alt: Example numerical input problem
      - :ref:`Numerical Input`
-     - The simpler of Studio's two types of math problems. In numerical input problems, students enter numbers or specific and relatively simple mathematical expressions to answer a question. These problems only allow integers and a few select constants. You can specify a margin of error, and you can specify a correct answer either explicitly or by using a Python script.
+     - The simpler of Studio's two types of math problems. In numerical input problems, students enter numbers or specific and relatively simple mathematical expressions to answer a question. You can specify a margin of error, and you can specify a correct answer either explicitly or by using a Python script.
    * - .. image:: /Images/Periodic_Table.png
           :width: 100
           :alt: Example periodic table problem

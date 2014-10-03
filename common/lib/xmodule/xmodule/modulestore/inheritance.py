@@ -75,13 +75,13 @@ class InheritanceMixin(XBlockMixin):
         deprecated=True
     )
     annotation_storage_url = String(
-        help=_("Enter the secret string for annotation storage. The textannotation, videoannotation, and imageannotation advanced modules require this string."),
+        help=_("Enter the location of the annotation storage server. The textannotation, videoannotation, and imageannotation advanced modules require this setting."),
         scope=Scope.settings,
         default="http://your_annotation_storage.com",
         display_name=_("URL for Annotation Storage")
     )
     annotation_token_secret = String(
-        help=_("Enter the location of the annotation storage server. The textannotation, videoannotation, and imageannotation advanced modules require this setting."),
+        help=_("Enter the secret string for annotation storage. The textannotation, videoannotation, and imageannotation advanced modules require this string."),
         scope=Scope.settings,
         default="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         display_name=_("Secret Token String for Annotation")
@@ -214,11 +214,19 @@ class InheritingFieldData(KvsFieldData):
         """
         The default for an inheritable name is found on a parent.
         """
-        if name in self.inheritable_names and block.parent is not None:
-            parent = block.get_parent()
-            if parent:
-                return getattr(parent, name)
-        super(InheritingFieldData, self).default(block, name)
+        if name in self.inheritable_names:
+            # Walk up the content tree to find the first ancestor
+            # that this field is set on. Use the field from the current
+            # block so that if it has a different default than the root
+            # node of the tree, the block's default will be used.
+            field = block.fields[name]
+            ancestor = block.get_parent()
+            while ancestor is not None:
+                if field.is_set_on(ancestor):
+                    return field.read_json(ancestor)
+                else:
+                    ancestor = ancestor.get_parent()
+        return super(InheritingFieldData, self).default(block, name)
 
 
 def inheriting_field_data(kvs):

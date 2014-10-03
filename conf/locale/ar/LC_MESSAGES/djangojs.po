@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -32,6 +32,7 @@
 # Translators:
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
+# Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
@@ -45,6 +46,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # mohammad hamdi <babrica@hotmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -57,13 +59,14 @@
 # may <may@qordoba.com>, 2014
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014
+# Saramami.mami <saramami.mami@yahoo.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-22 11:23-0400\n"
-"PO-Revision-Date: 2014-08-19 15:50+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-09-24 13:34-0400\n"
+"PO-Revision-Date: 2014-09-22 06:00+0000\n"
+"Last-Translator: Saramami.mami <saramami.mami@yahoo.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -110,7 +113,7 @@ msgstr "إلغاء"
 msgid "This link will open in a new browser window/tab"
 msgstr ""
 "#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
-"هذا الرابط سيُفتح في نافذة/علامة تبويب جديدة\n"
+"هذا الرابط سيُفتح في نافذة متصفح /علامة تبويب جديدة\n"
 "#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
 "سيُفتح هذا الرابط في نافذة متصفّح/علامة تبويب جديدة"
 
@@ -146,11 +149,11 @@ msgstr "حفظ"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
-msgstr "إظهار الحواشي "
+msgstr "إظهار الملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Hide Annotations"
-msgstr "إخفاء الحواشي"
+msgstr "إخفاء الملاحظات التوضيحية"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Expand Instructions"
@@ -166,7 +169,7 @@ msgstr "التعليق"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
-msgstr "الرد على الحواشي"
+msgstr "الرد على الملاحظات التوضيحية"
 
 #. Translators: %(earned)s is the number of points earned. %(total)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -278,7 +281,7 @@ msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
 msgstr ""
-"الرجاء التأكيد على رغبتك تقديم ملفاتك، حيث لن تتمكن من إجراء أية تعديلات بعد"
+"الرجاء التأكيد على رغبتك تقديم ملفاتك، حيث لن تتمكن من إجراء أية تغييرات بعد"
 " أن تقوم بالتقديم."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
@@ -293,7 +296,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
-msgstr "هل أنت متأكد من رغبتك إزالة إجابتك السابقة على هذا السؤال؟"
+msgstr "هل أنت متأكد من رغبتك إزالة ردك السابق على هذا السؤال؟"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Moved to next step."
@@ -527,8 +530,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr "إغلاق "
@@ -1547,8 +1548,40 @@ msgid ""
 "Sequence error! Cannot navigate to tab %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
-"خطأ في التسلسل! ليس بالإمكان الانتقال إلى علامة التبويب %(tab_name)s في "
+"حدث خطأ في التسلسل! ليس بالإمكان الانتقال إلى علامة التبويب %(tab_name)s في "
 "الـSequenceModule الحالي. الرجاء الاتصال بطاقم المساق."
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Play"
+msgstr "تشغيل"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Pause"
+msgstr "إيقاف"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Mute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Unmute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Exit full browser"
+msgstr "الخروج من المتصفح "
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Fill browser"
+msgstr "ملء المتصفح"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Speed"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
@@ -1607,23 +1640,7 @@ msgstr "الرجاء محاولة استخدام متصفّح آخر، مثل ج
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
-msgstr "تمرير مقطع الفيديو"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Pause"
-msgstr "إيقاف"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Play"
-msgstr "تشغيل"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Fill browser"
-msgstr "ملء المتصفح"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Exit full browser"
-msgstr "الخروج من المتصفح "
+msgstr "شريط تمرير الفيديو"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
@@ -1636,11 +1653,11 @@ msgstr "الدقة العالية غير مفعّلة"
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
-msgstr "تحديد الموضع على مقطع الفيديو"
+msgstr "تحديد الموضع على الفيديو"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr "انتهى مقطع الفيديو"
+msgstr "انتهى الفيديو"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
@@ -1700,6 +1717,7 @@ msgstr "إظهار النقاش"
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
@@ -1729,8 +1747,8 @@ msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any unsaved work and then reload the page."
 msgstr ""
-"هناك مشكلة ما في عملية تنفيذ طلبك. الرجاء التأكد من قيامك بنسخ أي مواد لم "
-"يتم حفظها إلى مكان آخر، ومن ثمّ قم بإعادة تحميل الصفحة."
+"هناك مشكلة ما في إجراء العملية الخاصة بطلبك. الرجاء التأكد من قيامك بنسخ أي "
+"مواد لم يتم حفظها إلى مكان آخر، ومن ثمّ قم بإعادة تحميل الصفحة."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
@@ -1749,37 +1767,80 @@ msgid "…"
 msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "Open"
-msgstr "فتح"
+msgid "currently %(numVotes)s vote"
+msgid_plural "currently %(numVotes)s votes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "remove vote"
-msgstr "إزالة التصويت"
+msgid "%(numVotes)s Vote"
+msgid_plural "%(numVotes)s Votes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote"
-msgstr "تصويت"
+msgid "We had some trouble subscribing you to this thread. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to remove your vote)"
-msgid_plural "votes (click to remove your vote)"
-msgstr[0] "التصويت ( اضغط هتا لإلغاء التصويت)"
-msgstr[1] "التصويت ( اضغط هتا لإلغاء التصويت)"
-msgstr[2] "التصويت ( اضغط هتا لإلغاء التصويت)"
-msgstr[3] "التصويت ( اضغط هتا لإلغاء التصويت)"
-msgstr[4] "التصويت ( اضغط هتا لإلغاء التصويت)"
-msgstr[5] "الأصوات ( اضغط هتا لإلغاء تصويتك)"
+msgid ""
+"We had some trouble unsubscribing you from this thread. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to vote)"
-msgid_plural "votes (click to vote)"
-msgstr[0] "التصويت (اضغط هنا للتصويت)"
-msgstr[1] "التصويت (اضغط هنا للتصويت)"
-msgstr[2] "التصويت (اضغط هنا للتصويت)"
-msgstr[3] "التصويت (اضغط هنا للتصويت)"
-msgstr[4] "التصويت (اضغط هنا للتصويت)"
-msgstr[5] "الأصوات (اضغط هنا للتصويت)"
+msgid ""
+"We had some trouble marking this response as an answer.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing this response as an answer.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble marking this response endorsed.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble removing this endorsement.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble saving your vote.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble pinning this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble unpinning this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing your flag on this post.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reporting this post.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble closing this thread.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reopening this thread.  Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -1828,48 +1889,10 @@ msgstr "لا توجد مواضيع مطابقة لاستفسارك."
 msgid "Show posts by %(username)s."
 msgstr "عرض المنشورات وفقاً لـ %(username)s."
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to remove report"
-msgstr "اضغط هنا لإزالة التقرير"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
-msgstr ""
-"تم الإبلاغ عن إساءة استخدام %(start_sr_span)s، أنقر هنا لحذف التقرير "
-"%(end_span)s"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Report Misuse"
-msgstr "الإبلاغ عن إساءة استعمال"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr "مُثبَّت %(start_sr_span)s، أنقر لإزالة التثبيت %(end_span)s"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to unpin"
-msgstr "أنقر لإزالة التثبيت"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned"
-msgstr "مُثبَّت"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pin Thread"
-msgstr "ثبّت الموضوع "
-
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
-msgstr "الموضوع الذي قمت باختياره قد تم إلغاؤه. الرجاء اختيار موضوع آخر."
+msgstr "الموضوع الذي قمت باختياره قد تم حذفه. الرجاء اختيار موضوع آخر."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
@@ -1878,6 +1901,16 @@ msgstr "هناك مشكلة ما في عملية تحميل الردود. الر
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr "هناك مشكلة ما في عملية تحميل المزيد من الردود. الرجاء إعادة المحاولة."
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "%(numResponses)s other response"
+msgid_plural "%(numResponses)s other responses"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
@@ -1913,36 +1946,24 @@ msgstr "تحميل الـ %(numResponses)s رداً التالية"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
-msgstr "هل أنت متأكد من أنك تودّ إلغاء هذه المشاركة؟ "
+msgstr "هل أنت متأكد من أنك تودّ حذف هذا المنشور؟ "
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "هناك مشكلة في عملية تحميل الصفحة التي طلبتها. الرجاء إعادة المحاولة لاحقاً."
 
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "Your post will be discarded."
+msgstr ""
+
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
 msgstr "مجهول"
 
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "staff"
-msgstr "طاقم المساق"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Community TA"
-msgstr "مساعد المشرف للمجموعة"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, click to remove report"
-msgstr "تم الإبلاغ عن إساءة الاستخدام، اضغط لإزالة التقرير"
-
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr "هل أنت متأكد من رغبتك إلغاء هذا التعليق؟"
+msgstr "هل أنت متأكد من رغبتك حذف هذا التعليق؟"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
@@ -1950,7 +1971,7 @@ msgstr "حدثت مشكلة ما لدى محاولة إلغاء هذا التع�
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr "هل أنت متأكد من أنك تودّ إلغاء هذا الرد؟"
+msgstr "هل أنت متأكد من أنك تودّ حذف هذا الرد؟"
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -2116,7 +2137,7 @@ msgstr "المستخدم"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Annotation"
-msgstr "حواشي توضيحية"
+msgstr "الملاحظات التوضيحية"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Start"
@@ -2170,7 +2191,7 @@ msgstr "بطاقات التعريف"
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Annotation Text"
-msgstr "نصّ الحواشي"
+msgstr "نصّ الملاحظات التوضيحية"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
@@ -2192,7 +2213,7 @@ msgstr "النص"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Video"
-msgstr "مقطع فيديو"
+msgstr "فيديو"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Image"
@@ -2220,11 +2241,11 @@ msgstr ""
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Type into this box to filter down the list of available %s."
-msgstr "اطبع داخل هذا المربع لتقليل الخيارات في قائمة الـ %s المتاحة."
+msgstr "اطبع داخل هذا المربع لفلترة الخيارات في قائمة الـ %s المتاحة."
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Filter"
-msgstr "تقليل خيارات البحث"
+msgstr "فلترة"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Choose all"
@@ -2279,7 +2300,7 @@ msgid ""
 "action, your unsaved changes will be lost."
 msgstr ""
 "لديك بعض التغييرات التي لم يتم حفظها على حقول فردية قابلة للتعديل. إذا قمت "
-"بتشغيل أي إجراء، ستلغى كافة التغييرات التي لم يتم حفظها."
+"بتشغيل أي عملية، ستلغى كافة التغييرات التي لم يتم حفظها."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -2287,7 +2308,7 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
-"لقد قمت باختيار إجراء، إلا أنك لم تقم بحفظ التغييرات التي قمت بها على الحقول"
+"لقد قمت باختيار عملية، إلا أنك لم تقم بحفظ التغييرات التي قمت بها على الحقول"
 " الفردية حتى الآن. الرجاء الضغط على OK للحفظ. ستحتاج إلى إعادة ذلك الإجراء "
 "مرة أخرى."
 
@@ -2297,7 +2318,7 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"لقد قمت باختيار إجراء، إلا أنك لم تقم بأي تغييرات على الحقول الفردية. على "
+"لقد قمت باختيار عملية، إلا أنك لم تقم بأي تغييرات على الحقول الفردية. على "
 "الأرجح أنك تبحث على زر GO عوضاً عن زر الحفظ."
 
 #. Translators: the names of months, keep the pipe (|) separators.
@@ -2379,13 +2400,12 @@ msgstr "إغلاق الآلة الحاسبة "
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
-msgstr "محتوى المشاركة"
+msgstr "محتوى المنشور"
 
 #. Translators: "Distribution" refers to a grade distribution. This error
 #. message appears when there is an error getting the data on grade
 #. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
 msgid "Error fetching distribution."
 msgstr "حدث خطأ في عملية استرجاع التوزيع."
 
@@ -2415,15 +2435,15 @@ msgstr "جاري التحميل..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
-msgstr "خطأ في الحصول على قائمة الطلاب."
+msgstr "حدث خطأ في الحصول على قائمة الطلاب."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
-msgstr "خطأ في استرجاع الإعدادات الخاصة بالتقييم."
+msgstr "حدث خطأ في استرجاع ضبط الإعدادات الخاصة بالتقييم."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
-msgstr "خطأ في عملية حساب وإعداد الدرجات. الرجاء إعادة المحاولة."
+msgstr "حدث خطأ في عملية حساب وإعداد الدرجات. الرجاء إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
@@ -2458,16 +2478,10 @@ msgstr "أدخل اسم المستخدم أو البريد الإكتروني"
 msgid "Please enter a username or email."
 msgstr "الرجاء إدخال اسم مستخدم او عنوان بريد إلكتروني."
 
-#. Translators: A rolename appears this sentence. A rolename is something like
-#. "staff" or "beta tester".;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Error fetching list for role"
-msgstr "خطأ في محاولة استرجاع القائمة الخاصة بالأدوار"
-
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
-msgstr "خطأ في تغيير صلاحيات المستخدم."
+msgstr "حدث خطأ في تغيير صلاحيات المستخدم."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
@@ -2481,44 +2495,47 @@ msgid ""
 "Error: User '<%= username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
-"خطأ: المستخدم '<%= username %>' لم يقم بتفعل حسابه بعد. المستخدمون يجب أن "
-"ينشئوا و يفعلوا حساباتهم قبل أن يمكن إسناد الأدوار إليهم  "
+"حدث خطأ: المستخدم '<%= username %>' لم يقم بتفعل حسابه بعد. المستخدمون يجب "
+"أن ينشئوا و يفعلوا حساباتهم قبل أن يمكن إسناد الأدوار إليهم  "
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr "خطأ: لا يمكنك حذف نفسك من مجموعة الموجّهين!"
+msgstr "حدث خطأ: لا يمكنك حذف نفسك من مجموعة موجّهي المساق!"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
-msgstr "حدث خطأ في عملية إضافة/إلغاء مستخدمين كأعضاء في فريق اختبار بيتا."
+msgstr ""
+"حدث خطأ في عملية إضافة/إلغاء مستخدمين كأعضاء في مختبر النسخة التجريبية"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
-msgstr "تم بنجاح إضافة هؤلاء المستخدمين إلى قائمة أعضاء فريق اختبار بيتا:"
+msgstr ""
+"تم بنجاح إضافة هؤلاء المستخدمين إلى قائمة أعضاء مختبر النسخة التجريبية"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
-msgstr "تم بنجاح إلغاء هؤلاء المستخدمين من قائمة أعضاء فريق اختبار بيتا:"
+msgstr ""
+"تم بنجاح إلغاء هؤلاء المستخدمين من قائمة أعضاء مختبر النسخة التجريبية:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
-msgstr "لم تتم إضافة هؤلاء المستخدمين إلى قائمة أعضاء فريق اختبار بيتا:"
+msgstr "لم تتم إضافة هؤلاء المستخدمين إلى قائمة أعضاء مختبر النسخة التجريبية:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
-msgstr "لم يتم إلغاء هؤلاء المستخدمين من قائمة أعضاء فريق اختبار بيتا:"
+msgstr "لم يتم إلغاء هؤلاء المستخدمين من قائمة أعضاء مختبر النسخة التجريبية:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
 msgstr ""
-"يتعين على المستخدمين إنشاء وتفعيل حسابهم قبل أن يمكن ترقيتهم لعضو فريق "
-"اختبار بيتا."
+"يتعين على المستخدمين إنشاء وتفعيل حسابهم قبل أن يمكن ترقيتهم لعضو مختبر "
+"النسخة التجريبية."
 
 #. Translators: A list of identifiers (which are email addresses and/or
 #. usernames) appears after this sentence;
@@ -2532,7 +2549,7 @@ msgstr "حدث خطأ في عملية تسجيل/إلغاء تسجيل المس�
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following email addresses and/or usernames are invalid:"
-msgstr "عناوين البريد الإلكتروني و/أو الأسماء التالية غير صحيحة:"
+msgstr "عناوين البريد الإلكتروني و/أو أسماءالمستخدمين التالية غير صحيحة:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
@@ -2565,7 +2582,7 @@ msgid ""
 "enrolled once they register:"
 msgstr ""
 "تم بنجاح إرسال بريد إلكتروني حول التسجيل إلى المستخدمين التالية أسماؤهم. "
-"وسيتم إلحاقهم بالمساق بمجرد قيامهم بالتسجيل:"
+"وسيتم تسجيلهم بالمساق بمجرد قيامهم بالتسجيل:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2602,11 +2619,11 @@ msgstr "ينبغي ملء خانة الموضوع لرسالة البريد ال
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
-msgstr "ينبغي لرسالة البريد الإلكتروني الخاصة بك أن تتضمن محتوى."
+msgstr "ينبغي لرسالة البريد الإلكتروني الخاصة بك ألا تكون صفحة فارغة."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
-msgstr "تم بنجاح إدراج رسالتك ضمن قائمة الرسائل التي تنتظر الإرسال."
+msgstr "تم بنجاح إدراج رسالتك ضمن الرسائل التي تنتظر الإرسال."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -2639,14 +2656,14 @@ msgid ""
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
-"تم بنجاح إدراج رسالتك ضمن قائمة الرسائل التي تنتظر الإرسال. الرجاء أخذ العلم"
-" بأنه في حالة الصفوف الكبيرة، قد يستغرق إرسال كافة الرسائل الإلكترونية ما "
-"يصل إلى الساعة (أو أكثر، في حال كانت المساقات الأخرى تقوم بإرسال رسائل "
-"إلكترونية بالتزامن مع هذا المساق). "
+"تم بنجاح إدراج رسالتك ضمن الرسائل التي تنتظر الإرسال. الرجاء أخذ العلم بأنه "
+"في حالة الصفوف الكبيرة، قد يستغرق إرسال كافة الرسائل الإلكترونية ما يصل إلى "
+"الساعة (أو أكثر، في حال كانت المساقات الأخرى تقوم بإرسال رسائل إلكترونية "
+"بالتزامن مع هذا المساق). "
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
-msgstr "خطأ في إرسال البريد الإلكتروني."
+msgstr "حدث خطأ في إرسال البريد الإلكتروني."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
@@ -2676,7 +2693,7 @@ msgid ""
 "Error getting student progress url for '<%= student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
-"ثمّة خطأ في الحصول على الرابط الإلكتروني لسجل تقدُّم الطالب الذي يحمل الرقم "
+"حدث خطأ في الحصول على الرابط الإلكتروني لسجل تقدُّم الطالب الذي يحمل الرقم "
 "’<%= student_id %>‘. الرجاء التحقّق من إدخال رقم الطالب بالشكل الصحيح."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -2711,8 +2728,8 @@ msgstr ""
 msgid ""
 "Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
 msgstr ""
-"إلغاء حالة الطالب رقم '<%= student_id %>' بالنسبة للمسألة رقم '<%= "
-"problem_id %>'؟"
+"حذف حالة الطالب رقم '<%= student_id %>' بالنسبة للمسألة رقم '<%= problem_id "
+"%>'؟"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2726,7 +2743,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
-msgstr "تم بنجاح إلغاء حالة الوحدة التعليمية."
+msgstr "تم بنجاح حذف حالة الوحدة التعليمية."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2827,7 +2844,7 @@ msgstr "مدخلات المهمة "
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task ID"
-msgstr "رمز المهمة"
+msgstr "رمز المهمّة"
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
@@ -2997,7 +3014,7 @@ msgstr "\"عنوان اختياري\""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Image (upload file or type url)"
-msgstr "إدخال صورة (تحميل ملف أو طباعة الرابط الإلكتروني url) "
+msgstr "إدخال صورة (تحميل ملف أو طباعة الرابط url) "
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
@@ -3089,7 +3106,7 @@ msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
-msgstr "حدث خطأ ما."
+msgstr "حدث خطأ غير معروف."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
@@ -3160,7 +3177,7 @@ msgid ""
 "connection. Try refreshing the page or making sure you are online."
 msgstr ""
 "قد يحدث ذلك بسبب خطأٍ ما على المخدّم الخاص بنا أو بسبب اتصال الإنترنت لديك. "
-"الرجاء محاولة تحديث الصفحة أو التأكد من جودة اتصالك بالإنترنت."
+"الرجاء محاولة تحديث الصفحة أو التأكد من جودة اتصالك عبر الإنترنت."
 
 #: cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
@@ -3262,7 +3279,7 @@ msgstr "أو"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
-msgstr "لابد من تعيين تاريخ بدء المساق."
+msgstr "لابد من أن يكون للمساق تاريخ بدء معيّن."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course end date cannot be before the course start date."
@@ -3289,7 +3306,7 @@ msgstr "يجب أن يحتوي المفتاح على حروف، أو أرقام�
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
-msgstr "هنالك بالفعل واجب آخر يحمل نفس هذا الاسم."
+msgstr "هنالك بالفعل نوع واجب آخر يحمل نفس هذا الاسم."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer between 0 and 100."
@@ -3305,7 +3322,7 @@ msgstr "الرجاء إدخال عدد صحيح غير سالب."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <% attrs.types %> than will assigned."
-msgstr "لا يمكن إتاحة أنواع <% attrs.types %> أكثر مما سيتم تعيينه."
+msgstr "لا يمكن إسقاط أنواع <% attrs.types %> أكثر مما سيتم تعيينه."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -3357,7 +3374,7 @@ msgstr "هل أنت متأكد من رغبتك في حذف هذا التحديث
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr "لا يمكن عكس هذا الإجراء أو إلغاؤه."
+msgstr "لا يمكن عكس هذه العملية أو إلغاؤها."
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
@@ -3434,6 +3451,14 @@ msgstr ""
 msgid "Deleting"
 msgstr "جاري الحذف"
 
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
+msgstr ""
+
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
 msgstr "حدث خطأ في عملية التحميل "
@@ -3442,7 +3467,7 @@ msgstr "حدث خطأ في عملية التحميل "
 msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
-msgstr "صيغة الملف غير مدعومة. الرجاء تحميل ملف بلاحقة <code>tar.gz</code>."
+msgstr "صيغة الملف غير مدعومة. الرجاء تحميل ملف بتمديد <code>tar.gz</code>."
 
 #: cms/static/js/views/metadata.js
 msgid "Upload File"
@@ -3450,15 +3475,15 @@ msgstr "تحميل ملف"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
-msgstr "طي جميع الأقسام"
+msgstr "تصغير جميع الأقسام"
 
 #: cms/static/js/views/overview.js
 msgid "Expand All Sections"
-msgstr "تمديد كل الأقسام"
+msgstr "تكبير كل الأقسام"
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
-msgstr "تاريخ النشر:"
+msgstr "تاريخ الإصدار:"
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
@@ -3466,7 +3491,7 @@ msgstr "{month}/{day}/{year} at {hour}:{minute} التوقيت العالمي"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
-msgstr "تعديل تاريخ نشر القسم"
+msgstr "تعديل تاريخ إصدار القسم"
 
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Not Graded"
@@ -3516,7 +3541,7 @@ msgid ""
 " your courseware's navigation will also be removed."
 msgstr ""
 "لا يمكن الرجوع أو عكس عملية حذف الكتاب، وحال القيام بها سيتم كذلك إزالة أي "
-"مرجعٍ لهذا الكتاب في تصفح محتويات المساق الخاص بك."
+"مرجعٍ لهذا الكتاب في تصفح منهاج المساق الخاص بك."
 
 #: cms/static/js/views/uploads.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
@@ -3535,7 +3560,7 @@ msgstr "نعتذر، حدث خطأ ما"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
-msgstr "لقد قمت ببعض التعديلات"
+msgstr "لقد قمت ببعض التغييرات"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes will not take effect until you save your progress."
@@ -3600,11 +3625,23 @@ msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
-msgstr "العنصر"
+msgstr "مكوِّن"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
 msgstr "تعديل: %(title)s"
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Validation Error While Saving"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Undo Changes"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Change Manually"
+msgstr ""
 
 #: cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
@@ -3710,8 +3747,8 @@ msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than 65 characters."
 msgstr ""
-"الطول الكلي لحقول اسم المؤسسة، ورقم المساق، ورمز تشغيل المنهاج لا يمكن أن "
-"تتجاوز 65 حرف. "
+"الطول الكلّي لحقول اسم المؤسسة، ورقم المساق، ورمز تشغيله لا يمكن أن يزيد 65 "
+"حرف. "
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "component"
@@ -3765,13 +3802,41 @@ msgstr "تكبير"
 msgid "Zoom Out"
 msgstr "تصغير"
 
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
+msgstr ""
+
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr "أنواع المسائل الشائعة"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
-msgstr "إضافة عنصر جديد"
+msgstr "إضافة مكوِّن جديد"
 
 #: cms/templates/js/advanced_entry.underscore
 msgid "Deprecated"
@@ -3779,24 +3844,24 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "List of uploaded files and assets in this course"
-msgstr "قائمة بالملفات والموجودات المحملة ضمن هذا المساق"
+msgstr "قائمة بالملفات والمواد الملحقة المحملة ضمن هذا المساق"
 
 #: cms/templates/js/asset-library.underscore
 msgid "Embed URL"
-msgstr "تضمين الرابط الإلكتروني "
+msgstr "تضمين الرابط"
 
 #: cms/templates/js/asset-library.underscore
 msgid "External URL"
-msgstr "الرابط الإلكتروني الخارجي"
+msgstr "الرابط الخارجي"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
 msgid "Actions"
-msgstr "الإجراءات"
+msgstr "العمليات"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
-msgstr "لم تتمّ إضافة أية ملحقات إلى هذا المساق حتّى الآن. "
+msgstr "لم تتمّ إضافة أية مواد ملحقةإلى هذا المساق حتّى الآن. "
 
 #: cms/templates/js/asset-library.underscore
 msgid "Upload your first asset"
@@ -3940,7 +4005,7 @@ msgstr "العدد الإجمالي"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "total exercises assigned"
-msgstr "إجمالي التمارين التي تمّ تعيينها"
+msgstr "إجمالي التمارين المعيّنة"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Number of Droppable"
@@ -4015,7 +4080,7 @@ msgstr "حذف الفصل"
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "error.message"
-msgstr "رسالة.الخطأ"
+msgstr "رسالةحدث لخطأ"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Textbook information"
@@ -4300,6 +4365,18 @@ msgstr ""
 msgid "File upload succeeded"
 msgstr "تمّ تحميل الملف بنجاح"
 
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"There were {strong_start}{num_errors} validation error(s){strong_end} while "
+"trying to save the course setting(s) in the database."
+msgstr ""
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"Please check the following validation feedbacks and reflect them in your "
+"course settings:"
+msgstr ""
+
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit the name"
@@ -4345,7 +4422,7 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
-msgstr "إضافة روابط إلكترونية للإصدارات الإضافية"
+msgstr "إضافة روابط للإصدارات الإضافية"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid ""
@@ -4354,11 +4431,11 @@ msgid ""
 "another version. These URLs cannot be YouTube URLs. The first listed video "
 "that\\'s compatible with the student\\'s computer will play."
 msgstr ""
-"للتأكّد من إمكانية دخول كافة الطلاب لمقطع الفيديو، نوصي بتقديم نسخة من نوع "
-".mp4 وأخرى من نوع .webm  من مقطع الفيديو الخاص بك. الرجاء الضغط أدناه لإضافة"
-" رابط إلكتروني لنسخة أخرى. يجب أن لا تكون هذه الروابط الإلكترونية روابط على "
-"موقع يوتيوب. سيتمّ تشغيل أول مقطع فيديو ضمن القائمة يكون متوافقاً مع جهاز "
-"الكمبيوتر الخاص بالطالب."
+"للتأكّد من إمكانية دخول كافة الطلاب لفيديو، نوصي بتقديم نسخة من نوع .mp4 "
+"وأخرى من نوع .webm  من مقطع الفيديو الخاص بك. الرجاء الضغط أدناه لإضافة رابط"
+" إلكتروني لنسخة أخرى. يجب أن لا تكون هذه الروابط روابط على موقع يوتيوب. "
+"سيتمّ تشغيل أول مقطع فيديو ضمن القائمة يكون متوافقاً مع جهاز الكمبيوتر الخاص"
+" بالطالب."
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Default Timed Transcript"
@@ -4389,7 +4466,7 @@ msgstr "ما هو النص محدّد التوقيت الذي ترغب في اس
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Error."
-msgstr "خطأ."
+msgstr "حدث خطأ."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-choose.underscore
 msgid "Timed Transcript from"
@@ -4405,9 +4482,9 @@ msgid ""
 "transcript, you can download, edit, and re-upload the existing transcript. "
 "If you want to replace this transcript, upload a new .srt transcript file."
 msgstr ""
-"لدى EdX نص محدّد التوقيت لمقطع الفيديو هذا. في حال رغبت بتعديل هذا النصّ، "
-"بإمكانك تنزيل وتعديل وإعادة تحميل النص الحالي. أما إذا رغبت في استبداله، "
-"الرجاء تحميل ملف نص جديد بصيغة .srt ."
+"لدى EdX نص محدّد التوقيت لهذا الفيديو. في حال رغبت بتعديل هذا النصّ، بإمكانك"
+" تنزيل وتعديل وإعادة تحميل النص الحالي. أما إذا رغبت في استبداله، الرجاء "
+"تحميل ملف نص جديد بصيغة .srt ."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
@@ -4447,9 +4524,8 @@ msgid ""
 " a transcript on YouTube. You can import the YouTube transcript or upload "
 "your own .srt transcript file."
 msgstr ""
-"ليس لدى EdX نص محدّد التوقيت لمقطع الفيديو هذا في استوديو، لكنّنا وجدنا "
-"نصّاً على يوتيوب. بإمكانك استيراد نص اليوتيوب أو تحميل ملف نص خاص بك بصيغة "
-".srt."
+"ليس لدى EdX نص محدّد التوقيت لهذا الفيديو في استوديو، لكنّنا وجدنا نصّاً على"
+" يوتيوب. بإمكانك استيراد نص اليوتيوب أو تحميل ملف نص خاص بك بصيغة .srt."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
@@ -4465,15 +4541,15 @@ msgid ""
 "EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
 "file."
 msgstr ""
-"ليس لدى EdX نص محدّد التوقيت لمقطع الفيديو هذا. الرجاء تحميل ملف بصيغة .srt."
+"ليس لدى EdX نص محدّد التوقيت لهذا الفيديو. الرجاء تحميل ملف بصيغة .srt."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
 "The timed transcript for this video on edX is out of date, but YouTube has a"
 " current timed transcript for this video."
 msgstr ""
-"النص محدّد التوقيت الخاص بمقطع الفيديو هذا على EdX قديم، لكن يمكن العثور على"
-" نص حديث لمقطع الفيديو هذا على يوتيوب."
+"النص محدّد التوقيت الخاص بهذا الفيديو على EdX قديم، لكن يمكن العثور على نص "
+"حديث لمقطع الفيديو هذا على يوتيوب."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Do you want to replace the edX transcript with the YouTube transcript?"
@@ -4495,9 +4571,9 @@ msgid ""
 "transcript, upload a new .srt transcript file. If you want to edit this "
 "transcript, you can download, edit, and re-upload the existing transcript."
 msgstr ""
-"لدى Edx نص محدّد التوقيت لمقطع الفيديو هذا. في حال رغبت باستبدال هذا النص، "
-"الرجاء تحميل ملف نص جديد بصيغة .srt . أما إن رغبت بتعديل هذا النصّ، بإمكانك "
-"تنزيل وتعديل وإعادة تحميل النص السابق. "
+"لدى Edx نص محدّد التوقيت لهذا الفيديو. في حال رغبت باستبدال هذا النص، الرجاء"
+" تحميل ملف نص جديد بصيغة .srt . أما إن رغبت بتعديل هذا النصّ، بإمكانك تنزيل "
+"وتعديل وإعادة تحميل النص السابق. "
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Confirm Timed Transcript"
@@ -4509,9 +4585,9 @@ msgid ""
 "you want to use the current timed transcript or upload a new .srt transcript"
 " file?"
 msgstr ""
-"لقد قمت بتغيير الرابط الإلكتروني الخاص بالفيديو، لكنّك لم تقم بتغيير ملف "
-"النص محدّد التوقيت. هل ترغب باستخدام النص محدّد التوقيت الحالي أم تحميل ملف "
-"نص جديد بصيغة .srt ؟"
+"لقد قمت بتغيير الرابط الخاص بالفيديو، لكنّك لم تقم بتغيير ملف النص محدّد "
+"التوقيت. هل ترغب باستخدام النص محدّد التوقيت الحالي أم تحميل ملف نص جديد "
+"بصيغة .srt ؟"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore

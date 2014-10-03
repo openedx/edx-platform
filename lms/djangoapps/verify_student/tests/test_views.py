@@ -13,6 +13,7 @@ verify_student/start?course_id=MITx/6.002x/2013_Spring # create
 import json
 import mock
 import urllib
+import decimal
 from mock import patch, Mock
 import pytz
 from datetime import timedelta, datetime
@@ -31,6 +32,7 @@ from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory
 from course_modes.models import CourseMode
+from shoppingcart.models import Order, CertificateItem
 from verify_student.views import render_to_response
 from verify_student.models import SoftwareSecurePhotoVerification
 from reverification.tests.factories import MidcourseReverificationWindowFactory
@@ -62,6 +64,105 @@ class StartView(TestCase):
 
     def must_be_logged_in(self):
         self.assertHttpForbidden(self.client.get(self.start_url()))
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestCreateOrderView(ModuleStoreTestCase):
+    """
+    Tests for the create_order view of verified course registration process
+    """
+    def setUp(self):
+        self.user = UserFactory.create(username="rusty", password="test")
+        self.client.login(username="rusty", password="test")
+        self.course_id = 'Robot/999/Test_Course'
+        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        verified_mode = CourseMode(
+            course_id=SlashSeparatedCourseKey("Robot", "999", 'Test_Course'),
+            mode_slug="verified",
+            mode_display_name="Verified Certificate",
+            min_price=50
+        )
+        verified_mode.save()
+        course_mode_post_data = {
+            'certificate_mode': 'Select Certificate',
+            'contribution': 50,
+            'contribution-other-amt': '',
+            'explain': ''
+        }
+        self.client.post(
+            reverse("course_modes_choose", kwargs={'course_id': self.course_id}),
+            course_mode_post_data
+        )
+
+    def test_invalid_photos_data(self):
+        """
+        Test that the invalid photo data cannot be submitted
+        """
+        create_order_post_data = {
+            'contribution': 50,
+            'course_id': self.course_id,
+            'face_image': '',
+            'photo_id_image': ''
+        }
+        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        json_response = json.loads(response.content)
+        self.assertFalse(json_response.get('success'))
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_invalid_amount(self):
+        """
+        Test that the user cannot give invalid amount
+        """
+        create_order_post_data = {
+            'contribution': '1.a',
+            'course_id': self.course_id,
+            'face_image': ',',
+            'photo_id_image': ','
+        }
+        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        self.assertEquals(response.status_code, 400)
+        self.assertIn('Selected price is not valid number.', response.content)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_invalid_mode(self):
+        """
+        Test that the course without verified mode cannot be processed
+        """
+        course_id = 'Fake/999/Test_Course'
+        CourseFactory.create(org='Fake', number='999', display_name='Test Course')
+        create_order_post_data = {
+            'contribution': '50',
+            'course_id': course_id,
+            'face_image': ',',
+            'photo_id_image': ','
+        }
+        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        self.assertEquals(response.status_code, 400)
+        self.assertIn('This course doesn\'t support verified certificates', response.content)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_create_order_success(self):
+        """
+        Test that the order is created successfully when given valid data
+        """
+        create_order_post_data = {
+            'contribution': 50,
+            'course_id': self.course_id,
+            'face_image': ',',
+            'photo_id_image': ','
+        }
+        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response.get('success'))
+        self.assertIsNotNone(json_response.get('orderNumber'))
+
+        # Verify that the order exists and is configured correctly
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.status, 'paying')
+        item = CertificateItem.objects.get(order=order)
+        self.assertEqual(item.status, 'paying')
+        self.assertEqual(item.course_id, self.course.id)
+        self.assertEqual(item.mode, 'verified')
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
@@ -98,6 +199,21 @@ class TestVerifyView(ModuleStoreTestCase):
         response = self.client.get(url, {'upgrade': "True"})
         self.assertIn("You are upgrading your registration for", response.content)
 
+    def test_show_selected_contribution_amount(self):
+        # Set the donation amount in the client's session
+        session = self.client.session
+        session['donation_for_course'] = {
+            unicode(self.course_key): decimal.Decimal('1.23')
+        }
+        session.save()
+
+        # Retrieve the page
+        url = reverse('verify_student_verify', kwargs={"course_id": unicode(self.course_key)})
+        response = self.client.get(url)
+
+        # Expect that the user's contribution amount is shown on the page
+        self.assertContains(response, '1.23')
+
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestVerifiedView(ModuleStoreTestCase):
@@ -125,6 +241,25 @@ class TestVerifiedView(ModuleStoreTestCase):
         self.assertTrue(response.status_code, 302)
         # Location should contains dashboard.
         self.assertIn('dashboard', response._headers.get('location')[1])
+
+    def test_show_selected_contribution_amount(self):
+        # Configure the course to have a verified mode
+        for mode in ('audit', 'honor', 'verified'):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Set the donation amount in the client's session
+        session = self.client.session
+        session['donation_for_course'] = {
+            unicode(self.course_id): decimal.Decimal('1.23')
+        }
+        session.save()
+
+        # Retrieve the page
+        url = reverse('verify_student_verified', kwargs={"course_id": unicode(self.course_id)})
+        response = self.client.get(url)
+
+        # Expect that the user's contribution amount is shown on the page
+        self.assertContains(response, '1.23')
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
@@ -547,6 +682,29 @@ class TestCreateOrder(ModuleStoreTestCase):
         # (configured by test settings)
         data = json.loads(response.content)
         self.assertEqual(data['override_custom_receipt_page'], "http://testserver/shoppingcart/postpay_callback/")
+
+        # Verify that the course ID is included in "merchant-defined data"
+        self.assertEqual(data['merchant_defined_data1'], unicode(self.course.id))
+
+    def test_create_order_set_donation_amount(self):
+        # Verify the student so we don't need to submit photos
+        self._verify_student()
+
+        # Create an order
+        url = reverse('verify_student_create_order')
+        params = {
+            'course_id': unicode(self.course.id),
+            'contribution': '1.23'
+        }
+        self.client.post(url, params)
+
+        # Verify that the client's session contains the new donation amount
+        self.assertIn('donation_for_course', self.client.session)
+        self.assertIn(unicode(self.course.id), self.client.session['donation_for_course'])
+
+        actual_amount = self.client.session['donation_for_course'][unicode(self.course.id)]
+        expected_amount = decimal.Decimal('1.23')
+        self.assertEqual(actual_amount, expected_amount)
 
     def _verify_student(self):
         """ Simulate that the student's identity has already been verified. """

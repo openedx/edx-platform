@@ -72,7 +72,7 @@ def delete_course_and_groups(course_key, user_id):
     """
     module_store = modulestore()
 
-    with module_store.bulk_write_operations(course_key):
+    with module_store.bulk_operations(course_key):
         module_store.delete_course(course_key, user_id)
 
         print 'removing User permissions from course....'

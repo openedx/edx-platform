@@ -62,24 +62,26 @@
 
         <aside class="content-supplementary" role="complimentary">
             <div class="bit">
-                <h3 class="title-3">${_("What files are listed here?")}</h3>
-            	<p>${_("In addition to the files you upload on this page, any files that you add to the course appear in this list. These files include your course image, textbook chapters, and files that appear on your Course Handouts sidebar.")}</p>
+                <h3 class="title-3">${_("Adding Files for Your Course")}</h3>
+
+                <p>${_("To add files to use in your course, click {em_start}Upload New File{em_end}. Then follow the prompts to upload a file from your computer.").format(em_start='<strong>', em_end="</strong>")}</p>
+
+                <p>${_("{em_start}Caution{em_end}: edX recommends that you limit the file size to {em_start}10 MB{em_end}. In addition, do not upload video or audio files. You should use a third party service to host multimedia files.").format(em_start='<strong>', em_end="</strong>")}</p>
+
+            	<p>${_("The course image, textbook chapters, and files that appear on your Course Handouts sidebar also appear in this list.")}</p>
             </div>
             <div class="bit">
-                <h3 class="title-3">${_("File URLs")}</h3>
-                 <ul class="list-details">
-                    <li class="item-detail">${_("You use the Embed URL value to link to the file or image from a component, a course update, or a course handout.")}</li>
-                    <li class="item-detail">${_("You use the External URL value to reference the file or image from outside of your course. Do not use the External URL as a link value within your course.")}</li>
-          			
-        		</ul>
+                <h3 class="title-3">${_("Using File URLs")}</h3>
+                
+                <p>${_("Use the {em_start}Embed URL{em_end} value to link to the file or image from a component, a course update, or a course handout.").format(em_start='<strong>', em_end="</strong>")}</p>
+                
+                <p>${_("Use the {em_start}External URL{em_end} value to reference the file or image only from outside of your course.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${_("Click in the Embed URL or External URL column to select the value, then copy it.")}</p>
             </div>
-             <div class="bit">
-                <h3 class="title-3">${_("What can I do on this page?")}</h3>
-                 <ul class="list-details">
-                    <li class="item-detail">${_("You can upload new files or view, download, or delete existing files. You can lock a file so that people who are not enrolled in your course cannot access that file.")}</li>
-                    
-                </ul>
+            <div class="bit external-help">
+                <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about managing files")}</a>
             </div>
+
         </aside>
     </section>
 </div>

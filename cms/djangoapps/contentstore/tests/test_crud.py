@@ -198,17 +198,15 @@ class TemplateTests(unittest.TestCase):
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',
-            parent_location=BlockUsageLocator.make_relative(
-                test_course.location.version_agnostic(), block_type='problem', block_id=sub.location.block_id
-            ),
+            parent_location=sub.location.version_agnostic(),
             user_id='testbot', category='problem',
             data="<problem></problem>"
         )
 
-        # course root only updated 2x
+        # The draft course root has 2 revisions: the published revision, and then the subsequent
+        # changes to the draft revision
         version_history = self.split_store.get_block_generations(test_course.location)
-        # create course causes 2 versions for the time being; skip the first.
-        version_history = version_history.children[0]
+        self.assertIsNotNone(version_history)
         self.assertEqual(version_history.locator.version_guid, test_course.location.version_guid)
         self.assertEqual(len(version_history.children), 1)
         self.assertEqual(version_history.children[0].children, [])

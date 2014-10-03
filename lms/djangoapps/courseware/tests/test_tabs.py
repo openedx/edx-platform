@@ -47,7 +47,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     def test_invalid_course_key(self):
         request = get_request_for_user(UserFactory.create())
         with self.assertRaises(Http404):
-            static_tab(request, 'edX/toy', 'new_tab')
+            static_tab(request, course_id='edX/toy', tab_slug='new_tab')
 
     @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     def test_get_static_tab_contents(self):
@@ -95,4 +95,3 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
-

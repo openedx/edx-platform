@@ -28,12 +28,17 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 
 
 COMMON_DOCSTORE_CONFIG = {
     'host': MONGO_HOST,
     'port': MONGO_PORT_NUM,
 }
+
+
+XBLOCK_MIXINS = (InheritanceMixin, XModuleMixin)
 
 
 class MemoryCache(object):
@@ -95,7 +100,9 @@ class MongoModulestoreBuilder(object):
             render_template=repr,
             branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
             metadata_inheritance_cache_subsystem=MemoryCache(),
+            xblock_mixins=XBLOCK_MIXINS,
         )
+        modulestore.ensure_indexes()
 
         try:
             yield modulestore
@@ -138,7 +145,9 @@ class VersioningModulestoreBuilder(object):
             doc_store_config,
             fs_root,
             render_template=repr,
+            xblock_mixins=XBLOCK_MIXINS,
         )
+        modulestore.ensure_indexes()
 
         try:
             yield modulestore
@@ -187,7 +196,13 @@ class MixedModulestoreBuilder(object):
             # Generate a fake list of stores to give the already generated stores appropriate names
             stores = [{'NAME': name, 'ENGINE': 'This space deliberately left blank'} for name in names]
 
-            modulestore = MixedModuleStore(contentstore, self.mappings, stores, create_modulestore_instance=create_modulestore_instance)
+            modulestore = MixedModuleStore(
+                contentstore,
+                self.mappings,
+                stores,
+                create_modulestore_instance=create_modulestore_instance,
+                xblock_mixins=XBLOCK_MIXINS,
+            )
 
             yield modulestore
 
@@ -210,6 +225,7 @@ class MongoContentstoreBuilder(object):
             collection='content',
             **COMMON_DOCSTORE_CONFIG
         )
+        contentstore.ensure_indexes()
 
         try:
             yield contentstore
@@ -266,8 +282,8 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                 with dest_content_builder.build() as dest_content:
                     # Construct the modulestore for storing the second import (using the second contentstore)
                     with dest_builder.build(dest_content) as dest_store:
-                        source_course_key = source_store.make_course_key('source', 'course', 'key')
-                        dest_course_key = dest_store.make_course_key('dest', 'course', 'key')
+                        source_course_key = source_store.make_course_key('a', 'course', 'course')
+                        dest_course_key = dest_store.make_course_key('a', 'course', 'course')
 
                         import_from_xml(
                             source_store,
@@ -284,20 +300,30 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                             source_content,
                             source_course_key,
                             self.export_dir,
-                            'exported_course',
+                            'exported_source_course',
                         )
 
                         import_from_xml(
                             dest_store,
                             'test_user',
                             self.export_dir,
+                            course_dirs=['exported_source_course'],
                             static_content_store=dest_content,
                             target_course_id=dest_course_key,
                             create_new_course_if_not_present=True,
                         )
 
+                        export_to_xml(
+                            dest_store,
+                            dest_content,
+                            dest_course_key,
+                            self.export_dir,
+                            'exported_dest_course',
+                        )
+
                         self.exclude_field(None, 'wiki_slug')
                         self.exclude_field(None, 'xml_attributes')
+                        self.exclude_field(None, 'parent')
                         self.ignore_asset_key('_id')
                         self.ignore_asset_key('uploadDate')
                         self.ignore_asset_key('content_son')

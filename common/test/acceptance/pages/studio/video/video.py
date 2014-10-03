@@ -9,6 +9,7 @@ from bok_choy.javascript import wait_for_js, js_defined
 from ....tests.helpers import YouTubeStubConfig
 from ...lms.video.video import VideoPage
 from selenium.webdriver.common.keys import Keys
+from ..utils import wait_for_notification
 
 
 CLASS_SELECTORS = {
@@ -59,6 +60,7 @@ DEFAULT_SETTINGS = [
     ['Default Timed Transcript', '', False],
     ['Download Transcript Allowed', 'False', False],
     ['Downloadable Transcript URL', '', False],
+    ['EdX Video ID', '', False],
     ['Show Transcript', 'True', False],
     ['Transcript Languages', '', False],
     ['Upload Handout', '', False],
@@ -118,9 +120,21 @@ class VideoComponentPage(VideoPage):
             self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_init']).present, 'Video Player Initialized')
             self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['video_spinner']).visible,
                            'Video Buffering Completed')
-            self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_controls']).visible, 'Player Controls are Visible')
+            self._wait_for(self.is_controls_visible, 'Player Controls are Visible')
 
-    def click_button(self, button_name, index=0):
+    @wait_for_js
+    def is_controls_visible(self):
+        """
+        Get current visibility sate of all video controls.
+
+        Returns:
+            bool: True means video controls are visible for all videos, False means video controls are not visible
+            for one or more videos
+
+        """
+        return self.q(css=CLASS_SELECTORS['video_controls']).visible
+
+    def click_button(self, button_name, index=0, require_notification=False):
         """
         Click on a button as specified by `button_name`
 
@@ -130,6 +144,8 @@ class VideoComponentPage(VideoPage):
 
         """
         self.q(css=BUTTON_SELECTORS[button_name]).nth(index).click()
+        if require_notification:
+            wait_for_notification(self)
         self.wait_for_ajax()
 
     @staticmethod
@@ -225,7 +241,7 @@ class VideoComponentPage(VideoPage):
         Create a Video Component by clicking on Video button and wait for rendering completion.
         """
         # Create video
-        self.click_button('create_video')
+        self.click_button('create_video', require_notification=True)
         self.wait_for_video_component_render()
 
     def xblocks(self):
@@ -503,7 +519,6 @@ class VideoComponentPage(VideoPage):
             self.click_button('collapse_link')
 
         self.q(css=CLASS_SELECTORS['url_inputs']).nth(field_number - 1).fill(url)
-
         time.sleep(DELAY)
         self.wait_for_ajax()
 
@@ -518,10 +533,11 @@ class VideoComponentPage(VideoPage):
             str: status/error message
 
         """
-        if self.q(css=CLASS_SELECTORS[message_type]).visible:
-            return self.q(css=CLASS_SELECTORS[message_type]).text[0]
-        else:
-            return ''
+        if message_type == 'status':
+            self.wait_for_element_visibility(CLASS_SELECTORS[message_type],
+                                             '{} message is Visible'.format(message_type.title()))
+
+        return self.q(css=CLASS_SELECTORS[message_type]).text[0]
 
     def url_field_status(self, *field_numbers):
         """
@@ -548,6 +564,19 @@ class VideoComponentPage(VideoPage):
 
         return statuses
 
+    def clear_field(self, index):
+        """
+        Clear a video url field at index specified by `index`.
+        """
+        self.q(css=CLASS_SELECTORS['url_inputs']).nth(index - 1).fill('')
+
+        # Trigger an 'input' event after filling the field with an empty value.
+        self.browser.execute_script(
+            "$('{}:eq({})').trigger('{}')".format(CLASS_SELECTORS['url_inputs'], index, 'input'))
+
+        time.sleep(DELAY)
+        self.wait_for_ajax()
+
     def clear_fields(self):
         """
         Clear video url fields.
@@ -562,6 +591,13 @@ class VideoComponentPage(VideoPage):
         self.browser.execute_script(script)
         time.sleep(DELAY)
         self.wait_for_ajax()
+
+    def revert_field(self, field_name):
+        """
+        Revert a field.
+        """
+        _, setting = self._get_setting_entry(field_name)
+        setting.find_element_by_class_name('setting-clear').click()
 
     def is_transcript_button_visible(self, button_name, index=0, button_text=None):
         """

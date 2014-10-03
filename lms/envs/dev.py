@@ -46,12 +46,6 @@ FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 
 WIKI_ENABLED = True
 
-LOGGING = get_logger_config(ENV_ROOT / "log",
-                            logging_env="dev",
-                            local_loglevel="DEBUG",
-                            dev_env=True,
-                            debug=True)
-
 DJFS = {
     'type': 'osfs',
     'directory_root': 'lms/static/djpyfs',
@@ -216,9 +210,16 @@ OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
+############################## OAUTH2 Provider ################################
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+
 ######################## MIT Certificates SSL Auth ############################
 
 FEATURES['AUTH_USE_CERTIFICATES'] = False
+
+########################### External REST APIs #################################
+FEATURES['ENABLE_MOBILE_REST_API'] = True
+FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
 ################################# CELERY ######################################
 

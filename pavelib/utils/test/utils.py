@@ -4,10 +4,10 @@ Helper functions for test tasks
 from paver.easy import sh, task
 from pavelib.utils.envs import Env
 import os
+import subprocess
 
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
-
 
 __test__ = False  # do not collect
 
@@ -53,3 +53,23 @@ def clean_mongo():
         port=MONGO_PORT_NUM,
         repo_root=Env.REPO_ROOT,
     ))
+
+def check_firefox_version():
+    """
+    Check that firefox is the correct version.
+    """
+    expected_firefox_ver = "Mozilla Firefox 28.0"
+    firefox_ver = subprocess.check_output("firefox --version", shell=True).strip()
+
+    if firefox_ver != expected_firefox_ver:
+        raise Exception(
+            'Required firefox version not found.\n\n'
+            'To install the required version:\n'
+            'As the root user in devstack, run the following:\n\n'
+            '\t$ sudo wget -O /tmp/firefox_28.deb https://s3.amazonaws.com/vagrant.testeng.edx.org/firefox_28.0%2Bbuild2-0ubuntu0.12.04.1_amd64.deb\n'
+            '\t$ sudo gdebi -nq /tmp/firefox_28.deb\n\n'
+            'Confirm the new version:\n'
+            '\t$ firefox --version\n'
+            '\t{version}'.format(version=expected_firefox_ver)
+        )
+

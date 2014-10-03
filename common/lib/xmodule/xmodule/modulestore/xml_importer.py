@@ -42,6 +42,7 @@ from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -206,7 +207,7 @@ def import_from_xml(
                 )
                 continue
 
-        with store.bulk_write_operations(dest_course_id):
+        with store.bulk_operations(dest_course_id):
             source_course = xml_module_store.get_course(course_key)
             # STEP 1: find and import course module
             course, course_data_path = _import_course_module(
@@ -588,6 +589,7 @@ def _import_course_draft(
 
                             # IMPORTANT: Be sure to update the sequential in the NEW namespace
                             seq_location = seq_location.map_into_course(target_course_id)
+
                             sequential = store.get_item(seq_location, depth=0)
 
                             non_draft_location = module.location.map_into_course(target_course_id)
@@ -607,7 +609,7 @@ def _import_course_draft(
                     _import_module(descriptor)
 
                 except Exception:
-                    logging.exception('There while importing draft descriptor %s', descriptor)
+                    logging.exception('while importing draft descriptor %s', descriptor)
 
 
 def allowed_metadata_by_category(category):

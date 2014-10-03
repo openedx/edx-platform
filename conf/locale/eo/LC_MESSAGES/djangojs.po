@@ -1,13 +1,11 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file
-# This English source file is machine-generated. Do not check it into github.
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2014.
 # 
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file
-# This English source file is machine-generated. Do not check it into github.
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2014.
@@ -28,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-27 17:10+0000\n"
-"PO-Revision-Date: 2014-08-27 17:13:12.251493\n"
+"POT-Creation-Date: 2014-09-24 14:15-0400\n"
+"PO-Revision-Date: 2014-09-24 18:16:48.345620\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -54,8 +52,8 @@ msgstr "ÖK Ⱡ'#"
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/show_syllabus.js cms/static/js/views/show_textbook.js
-#: cms/static/js/views/validation.js cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
+#: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -64,7 +62,6 @@ msgstr "ÖK Ⱡ'#"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/course_info_handouts.underscore
-#: cms/templates/js/edit-syllabus.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/section-name-edit.underscore
@@ -79,15 +76,16 @@ msgstr "Thïs lïnk wïll öpén ïn ä néw ßröwsér wïndöw/täß Ⱡ'σя�
 
 #: cms/static/js/views/asset.js
 #: cms/static/js/views/group_configuration_item.js
-#: cms/static/js/views/show_syllabus.js cms/static/js/views/show_textbook.js
+#: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course_grade_policy.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/group-configuration-edit.underscore
-#: cms/templates/js/show-syllabus.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -109,7 +107,6 @@ msgstr "Nämé Ⱡ'σяєм#"
 #: cms/static/js/views/modals/base_modal.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course_info_handouts.underscore
-#: cms/templates/js/edit-syllabus.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/section-name-edit.underscore
@@ -503,8 +500,6 @@ msgstr "Çléär förmättïng Ⱡ'σ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ι#"
@@ -668,7 +663,6 @@ msgstr "Édït HTML #"
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/show-syllabus.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
@@ -1554,6 +1548,38 @@ msgstr ""
 "αмєт, ¢ση#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Play"
+msgstr "Pläý Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Pause"
+msgstr "Päüsé Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Mute"
+msgstr "Müté Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Unmute"
+msgstr "Ûnmüté Ⱡ'σяєм ιρѕ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Exit full browser"
+msgstr "Éxït füll ßröwsér Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Fill browser"
+msgstr "Fïll ßröwsér Ⱡ#"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Speed"
+msgstr "Spééd Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
 msgstr "Völümé Ⱡ'σяєм ιρѕ#"
 
@@ -1611,22 +1637,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
 msgstr "Vïdéö slïdér Ⱡ#"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Pause"
-msgstr "Päüsé Ⱡ'σяєм ι#"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Play"
-msgstr "Pläý Ⱡ'σяєм#"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Fill browser"
-msgstr "Fïll ßröwsér Ⱡ#"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Exit full browser"
-msgstr "Éxït füll ßröwsér Ⱡ'σ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
@@ -1691,6 +1701,7 @@ msgstr "Shöw Dïsçüssïön Ⱡ'#"
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
@@ -1743,29 +1754,97 @@ msgid "…"
 msgstr "… #"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "Open"
-msgstr "Öpén Ⱡ'σяєм#"
+msgid "currently %(numVotes)s vote"
+msgid_plural "currently %(numVotes)s votes"
+msgstr[0] "çürréntlý %(numVotes)s vöté Ⱡ'σ#"
+msgstr[1] "çürréntlý %(numVotes)s vötés Ⱡ'σя#"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "remove vote"
-msgstr "rémövé vöté Ⱡ#"
+msgid "%(numVotes)s Vote"
+msgid_plural "%(numVotes)s Votes"
+msgstr[0] "%(numVotes)s Vöté #"
+msgstr[1] "%(numVotes)s Vötés #"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote"
-msgstr "vöté Ⱡ'σяєм#"
+msgid "We had some trouble subscribing you to this thread. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé süßsçrïßïng ýöü tö thïs thréäd. Pléäsé trý ägäïn. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to remove your vote)"
-msgid_plural "votes (click to remove your vote)"
-msgstr[0] "vöté (çlïçk tö rémövé ýöür vöté) Ⱡ'σяєм ι#"
-msgstr[1] "vötés (çlïçk tö rémövé ýöür vöté) Ⱡ'σяєм ι#"
+msgid ""
+"We had some trouble unsubscribing you from this thread. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé ünsüßsçrïßïng ýöü fröm thïs thréäd. Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to vote)"
-msgid_plural "votes (click to vote)"
-msgstr[0] "vöté (çlïçk tö vöté) Ⱡ'σя#"
-msgstr[1] "vötés (çlïçk tö vöté) Ⱡ'σя#"
+msgid ""
+"We had some trouble marking this response as an answer.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé märkïng thïs réspönsé äs än änswér.  Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing this response as an answer.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé rémövïng thïs réspönsé äs än änswér.  Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble marking this response endorsed.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé märkïng thïs réspönsé éndörséd.  Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble removing this endorsement.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé rémövïng thïs éndörsémént.  Pléäsé trý ägäïn. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble saving your vote.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé sävïng ýöür vöté.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble pinning this thread. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé pïnnïng thïs thréäd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble unpinning this thread. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé ünpïnnïng thïs thréäd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing your flag on this post.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé rémövïng ýöür fläg ön thïs pöst.  Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reporting this post.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé répörtïng thïs pöst.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble closing this thread.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé çlösïng thïs thréäd.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reopening this thread.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé réöpénïng thïs thréäd.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -1811,44 +1890,6 @@ msgstr "Nö thréäds mätçhéd ýöür qüérý. Ⱡ'σяєм #"
 msgid "Show posts by %(username)s."
 msgstr "Shöw pösts ßý %(username)s. Ⱡ'σ#"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to remove report"
-msgstr "Çlïçk tö rémövé répört Ⱡ'σяє#"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
-msgstr ""
-"Mïsüsé Répörtéd%(start_sr_span)s, çlïçk tö rémövé répört%(end_span)s Ⱡ'σяєм "
-"ιρѕυм#"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Report Misuse"
-msgstr "Répört Mïsüsé Ⱡ'#"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr "Pïnnéd%(start_sr_span)s, çlïçk tö ünpïn%(end_span)s Ⱡ'σяєм #"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to unpin"
-msgstr "Çlïçk tö ünpïn Ⱡ'#"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned"
-msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pin Thread"
-msgstr "Pïn Thréäd Ⱡ#"
-
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -1867,6 +1908,12 @@ msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
 "Wé häd sömé tröüßlé löädïng möré réspönsés. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
 "∂σłσя#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "%(numResponses)s other response"
+msgid_plural "%(numResponses)s other responses"
+msgstr[0] "%(numResponses)s öthér réspönsé Ⱡ'σ#"
+msgstr[1] "%(numResponses)s öthér réspönsés Ⱡ'σя#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
@@ -1902,25 +1949,13 @@ msgstr ""
 "Wé häd sömé tröüßlé löädïng thé pägé ýöü réqüéstéd. Pléäsé trý ägäïn. Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕ#"
 
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "Your post will be discarded."
+msgstr "Ýöür pöst wïll ßé dïsçärdéd. Ⱡ'σяєм #"
+
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
 msgstr "änönýmöüs #"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "staff"
-msgstr "stäff Ⱡ'σяєм ι#"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Community TA"
-msgstr "Çömmünïtý TÀ Ⱡ#"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, click to remove report"
-msgstr "Mïsüsé Répörtéd, çlïçk tö rémövé répört Ⱡ'σяєм ιρѕ#"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
@@ -2338,6 +2373,33 @@ msgstr "Çlösé Çälçülätör Ⱡ'σ#"
 msgid "Post body"
 msgstr "Pöst ßödý #"
 
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "Error fetching distribution."
+msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
+
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
@@ -2366,22 +2428,6 @@ msgid ""
 msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
@@ -3181,6 +3227,14 @@ msgid "Group name is required"
 msgstr "Gröüp nämé ïs réqüïréd Ⱡ'σяє#"
 
 #: cms/static/js/models/group_configuration.js
+msgid "Group A"
+msgstr "Gröüp À #"
+
+#: cms/static/js/models/group_configuration.js
+msgid "Group B"
+msgstr "Gröüp B #"
+
+#: cms/static/js/models/group_configuration.js
 msgid "Group Configuration name is required."
 msgstr "Gröüp Çönfïgürätïön nämé ïs réqüïréd. Ⱡ'σяєм ιρѕ#"
 
@@ -3325,7 +3379,7 @@ msgstr "Ûplöäd ä néw PDF tö “<%= name %>” Ⱡ'σяєм#"
 msgid "Please select a PDF file to upload."
 msgstr "Pléäsé séléçt ä PDF fïlé tö üplöäd. Ⱡ'σяєм ιρ#"
 
-#: cms/static/js/views/edit_syllabus.js cms/static/js/views/edit_textbook.js
+#: cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/group_configuration_edit.js
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
@@ -3376,9 +3430,17 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕ#"
 
 #: cms/static/js/views/group_configuration_item.js
-#: cms/static/js/views/show_syllabus.js cms/static/js/views/show_textbook.js
+#: cms/static/js/views/show_textbook.js
 msgid "Deleting"
 msgstr "Délétïng #"
+
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr "Çhöösé néw fïlé Ⱡ'#"
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
+msgstr "Érrör ïmpörtïng çöürsé Ⱡ'σяє#"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
@@ -3456,18 +3518,9 @@ msgstr "Ýöür çhängé çöüld nöt ßé sävéd Ⱡ'σяєм #"
 msgid "Return and resolve this issue"
 msgstr "Rétürn änd résölvé thïs ïssüé Ⱡ'σяєм #"
 
-#: cms/static/js/views/show_syllabus.js cms/static/js/views/show_textbook.js
+#: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
 msgstr "Délété “<%= name %>”? Ⱡ'#"
-
-#: cms/static/js/views/show_syllabus.js
-msgid ""
-"Deleting a syllabus cannot be undone and once deleted any reference to it in"
-" your courseware's navigation will also be removed."
-msgstr ""
-"Délétïng ä sýlläßüs çännöt ßé ündöné änd önçé délétéd äný référénçé tö ït ïn"
-" ýöür çöürséwäré's nävïgätïön wïll älsö ßé rémövéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυ#"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -3565,6 +3618,18 @@ msgstr "Çömpönént #"
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
 msgstr "Édïtïng: %(title)s Ⱡ#"
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Validation Error While Saving"
+msgstr "Välïdätïön Érrör Whïlé Sävïng Ⱡ'σяєм #"
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Undo Changes"
+msgstr "Ûndö Çhängés Ⱡ#"
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Change Manually"
+msgstr "Çhängé Mänüällý Ⱡ'#"
 
 #: cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
@@ -3736,6 +3801,34 @@ msgstr "Zööm Ìn #"
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
 msgstr "Zööm Öüt #"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr "Thïs pöst ïs vïsïßlé önlý tö %(group_name)s. Ⱡ'σяєм ι#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr "Thïs pöst ïs vïsïßlé tö évérýöné. Ⱡ'σяєм ι#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr "%(post_type)s pöstéd %(time_ago)s ßý %(author)s Ⱡ'σя#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr "Répörtéd #"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr "Çlöséd Ⱡ'σяєм ιρѕ#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
+msgstr "(thïs pöst ïs äßöüt %(courseware_title_linked)s) Ⱡ'σяє#"
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
@@ -3992,41 +4085,10 @@ msgstr "Ûplöäd PDF Ⱡ#"
 msgid "delete chapter"
 msgstr "délété çhäptér Ⱡ'#"
 
-#: cms/templates/js/edit-syllabus.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "error.message"
 msgstr "érrör.méssägé Ⱡ'#"
-
-#: cms/templates/js/edit-syllabus.underscore
-msgid "Syllabus information"
-msgstr "Sýlläßüs ïnförmätïön Ⱡ'σя#"
-
-#: cms/templates/js/edit-syllabus.underscore
-msgid "Syllabus Name"
-msgstr "Sýlläßüs Nämé Ⱡ'#"
-
-#: cms/templates/js/edit-syllabus.underscore
-#: cms/templates/js/edit-textbook.underscore
-msgid "Introduction to Cookie Baking"
-msgstr "Ìntrödüçtïön tö Çöökïé Bäkïng Ⱡ'σяєм #"
-
-#: cms/templates/js/edit-syllabus.underscore
-#: cms/templates/js/edit-textbook.underscore
-msgid ""
-"provide the title/name of the text book as you would like your students to "
-"see it"
-msgstr ""
-"prövïdé thé tïtlé/nämé öf thé téxt ßöök äs ýöü wöüld lïké ýöür stüdénts tö "
-"séé ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/templates/js/edit-syllabus.underscore
-msgid "Topic(s) information"
-msgstr "Töpïç(s) ïnförmätïön Ⱡ'σя#"
-
-#: cms/templates/js/edit-syllabus.underscore
-msgid "Add a Topic"
-msgstr "Àdd ä Töpïç Ⱡ#"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Textbook information"
@@ -4037,45 +4099,24 @@ msgid "Textbook Name"
 msgstr "Téxtßöök Nämé Ⱡ'#"
 
 #: cms/templates/js/edit-textbook.underscore
+msgid "Introduction to Cookie Baking"
+msgstr "Ìntrödüçtïön tö Çöökïé Bäkïng Ⱡ'σяєм #"
+
+#: cms/templates/js/edit-textbook.underscore
+msgid ""
+"provide the title/name of the text book as you would like your students to "
+"see it"
+msgstr ""
+"prövïdé thé tïtlé/nämé öf thé téxt ßöök äs ýöü wöüld lïké ýöür stüdénts tö "
+"séé ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/edit-textbook.underscore
 msgid "Chapter information"
 msgstr "Çhäptér ïnförmätïön Ⱡ'σя#"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
 msgstr "Àdd ä Çhäptér Ⱡ'#"
-
-#: cms/templates/js/edit-topic.underscore
-msgid "Topic Name"
-msgstr "Töpïç Nämé Ⱡ#"
-
-#: cms/templates/js/edit-topic.underscore
-#: cms/templates/js/edit-topic.underscore
-msgid "Topic %s"
-msgstr "Töpïç %s #"
-
-#: cms/templates/js/edit-topic.underscore
-msgid "provide the title/name of the topic that will be used in navigating"
-msgstr ""
-"prövïdé thé tïtlé/nämé öf thé töpïç thät wïll ßé üséd ïn nävïgätïng Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕ#"
-
-#: cms/templates/js/edit-topic.underscore
-msgid "String Description"
-msgstr "Strïng Désçrïptïön Ⱡ'σ#"
-
-#: cms/templates/js/edit-topic.underscore
-msgid "provide the description of the topic that will be used in navigating"
-msgstr ""
-"prövïdé thé désçrïptïön öf thé töpïç thät wïll ßé üséd ïn nävïgätïng Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕ#"
-
-#: cms/templates/js/edit-topic.underscore
-msgid "Description %s"
-msgstr "Désçrïptïön %s Ⱡ'#"
-
-#: cms/templates/js/edit-topic.underscore
-msgid "delete string"
-msgstr "délété strïng Ⱡ'#"
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
@@ -4088,6 +4129,11 @@ msgstr "Grädé äs: #"
 #: cms/templates/js/group-configuration-details.underscore
 msgid "ID"
 msgstr "ÌD Ⱡ'#"
+
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/group-configuration-edit.underscore
+msgid "Cannot delete when in use by an experiment"
+msgstr "Çännöt délété whén ïn üsé ßý än éxpérïmént Ⱡ'σяєм ιρѕυ#"
 
 #: cms/templates/js/group-configuration-details.underscore
 msgid "This Group Configuration is used in:"
@@ -4155,10 +4201,6 @@ msgstr ""
 msgid "Create"
 msgstr "Çréäté Ⱡ'σяєм ιρѕ#"
 
-#: cms/templates/js/group-configuration-edit.underscore
-msgid "Cannot delete when in use by an experiment"
-msgstr "Çännöt délété whén ïn üsé ßý än éxpérïmént Ⱡ'σяєм ιρѕυ#"
-
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
 msgstr "délété gröüp Ⱡ#"
@@ -4193,14 +4235,6 @@ msgstr "Ýöü hävén't çréätéd äný gröüp çönfïgürätïöns ýét. 
 #: cms/templates/js/no-group-configurations.underscore
 msgid "Add your first Group Configuration"
 msgstr "Àdd ýöür fïrst Gröüp Çönfïgürätïön Ⱡ'σяєм ιρ#"
-
-#: cms/templates/js/no-syllabuses.underscore
-msgid "You haven't added any syllabus to this course yet."
-msgstr "Ýöü hävén't äddéd äný sýlläßüs tö thïs çöürsé ýét. Ⱡ'σяєм ιρѕυм ∂#"
-
-#: cms/templates/js/no-syllabuses.underscore
-msgid "Add your first syllabus"
-msgstr "Àdd ýöür fïrst sýlläßüs Ⱡ'σяє#"
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
@@ -4311,7 +4345,6 @@ msgstr "Réléäsé Tïmé ïn ÛTÇ: Ⱡ'σя#"
 msgid "Clear Release Date/Time"
 msgstr "Çléär Réléäsé Däté/Tïmé Ⱡ'σяє#"
 
-#: cms/templates/js/show-syllabus.underscore
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Vïéw Lïvé #"
@@ -4360,6 +4393,23 @@ msgstr ""
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
 msgstr "Fïlé üplöäd süççéédéd Ⱡ'σя#"
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"There were {strong_start}{num_errors} validation error(s){strong_end} while "
+"trying to save the course setting(s) in the database."
+msgstr ""
+"Théré wéré {strong_start}{num_errors} välïdätïön érrör(s){strong_end} whïlé "
+"trýïng tö sävé thé çöürsé séttïng(s) ïn thé dätäßäsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σ#"
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"Please check the following validation feedbacks and reflect them in your "
+"course settings:"
+msgstr ""
+"Pléäsé çhéçk thé föllöwïng välïdätïön féédßäçks änd réfléçt thém ïn ýöür "
+"çöürsé séttïngs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore

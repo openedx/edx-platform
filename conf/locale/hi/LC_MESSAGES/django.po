@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -26,7 +26,7 @@
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)
+# edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -71,8 +71,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-22 11:24-0400\n"
-"PO-Revision-Date: 2014-08-14 21:21+0000\n"
+"POT-Creation-Date: 2014-09-24 13:35-0400\n"
+"PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
 "MIME-Version: 1.0\n"
@@ -126,6 +126,14 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unit"
 msgstr "यूनिट"
+
+#: common/djangoapps/course_groups/views.py
+msgid "Requested page must be numeric"
+msgstr ""
+
+#: common/djangoapps/course_groups/views.py
+msgid "Requested page must be greater than zero"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -228,6 +236,10 @@ msgstr ""
 msgid "Course id not specified"
 msgstr "पाठ्यक्रम आईडी स्पष्ट नहीं है"
 
+#: common/djangoapps/student/views.py lms/djangoapps/dashboard/support.py
+msgid "Invalid course id"
+msgstr ""
+
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
 msgstr "पाठ्यक्रम आईडी अमान्य है"
@@ -249,14 +261,23 @@ msgstr "आप इस पाठ्यक्रम में दाखिल न�
 msgid "Enrollment action is invalid"
 msgstr "नामांकन क्रिया अमान्य है"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like
-#. Google or LinkedIn).
 #: common/djangoapps/student/views.py
 msgid ""
-"There is no {platform_name} account associated with your {provider_name} "
-"account. Please use your {platform_name} credentials or pick another "
-"provider."
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"If you don't have an {platform_name} account yet, click <strong>Register "
+"Now</strong> at the top of the page."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -401,12 +422,12 @@ msgid "You are missing one or more required fields"
 msgstr ""
 
 #: common/djangoapps/student/views.py
-msgid "Username cannot be more than {0} characters long"
-msgstr "यूज़र का नाम {0} अक्षरों से लम्बा नहीं हो सकता है"
+msgid "Username cannot be more than {num} characters long"
+msgstr ""
 
 #: common/djangoapps/student/views.py
-msgid "Email cannot be more than {0} characters long"
-msgstr "ई-मेल {0} अक्षरों से लम्बी नहीं हो सकती है"
+msgid "Email cannot be more than {num} characters long"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
@@ -955,6 +976,10 @@ msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "Error running code."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid "Cannot connect to the queue"
 msgstr ""
 
@@ -1067,8 +1092,12 @@ msgstr "इस समस्या के लिए स्टाफ़ के ज
 msgid "error"
 msgstr ""
 
+#. Translators: this is the last choice of a number of choices of how to log
+#. in
+#. to the site.
 #: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
+#: common/templates/course_modes/choose.html lms/templates/login.html
+#: lms/templates/register.html
 msgid "or"
 msgstr "या"
 
@@ -1636,7 +1665,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -1757,6 +1786,16 @@ msgstr ""
 msgid ""
 "Enter true or false. If true, the course appears in the list of new courses "
 "on edx.org, and a New! badge temporarily appears next to the course image."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Mobile Course Available"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, the course will be available to mobile "
+"devices."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2371,6 +2410,12 @@ msgid ""
 "Type in number corresponding to following modes:  'instructor' or 'everyone'"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "No email address found."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
@@ -2574,6 +2619,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Which child module students in a particular group_id should see"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "{group_name} (inactive)"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -2782,8 +2831,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter the secret string for annotation storage. The textannotation, "
-"videoannotation, and imageannotation advanced modules require this string."
+"Enter the location of the annotation storage server. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this setting."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -2792,8 +2841,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter the location of the annotation storage server. The textannotation, "
-"videoannotation, and imageannotation advanced modules require this setting."
+"Enter the secret string for annotation storage. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this string."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3339,6 +3388,19 @@ msgstr ""
 msgid "Upload Handout"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Optional. Use this for videos where download and streaming URLs for the "
+"videos are completely managed by edX. This will override the settings for "
+"\"Default Video URL\", \"Video File URLs\", and all YouTube IDs. If you do "
+"not know what this setting is, you can leave it blank and continue to use "
+"these other settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "EdX Video ID"
+msgstr ""
+
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
 msgstr "नेविगेशन"
@@ -3367,6 +3429,8 @@ msgstr "सर्वाधिकार"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
@@ -3500,8 +3564,7 @@ msgstr "निर्दिष्ट दूरस्थ शाखा उपलब
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr "निर्दिष्ट शाखा पर स्विच करने में असमर्थ. अपनी शाखा नाम की जाँच करें."
 
-#: lms/djangoapps/dashboard/support.py cms/templates/login.html
-#: cms/templates/register.html
+#: lms/djangoapps/dashboard/support.py
 msgid "Email Address"
 msgstr ""
 
@@ -3513,10 +3576,6 @@ msgstr "पाठ्यक्रम आईडी"
 
 #: lms/djangoapps/dashboard/support.py
 msgid "User not found"
-msgstr ""
-
-#: lms/djangoapps/dashboard/support.py
-msgid "Invalid course id"
 msgstr ""
 
 #: lms/djangoapps/dashboard/support.py
@@ -3714,10 +3773,6 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Course Name"
 msgstr "पाठ्यक्रम का नाम"
 
@@ -3838,6 +3893,26 @@ msgid "Task is already running."
 msgstr "कार्य पहले से ही चल रहा है।"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Invoice number '{0}' does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The sale associated with this invoice has already been invalidated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invoice number {0} has been invalidated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "This invoice is already active."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "The registration codes for invoice {0} have been re-activated."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "User ID"
 msgstr ""
 
@@ -3845,6 +3920,8 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
 msgstr "ई-मेल"
 
@@ -3939,25 +4016,16 @@ msgid "coupon with the coupon id ({coupon_id}) updated successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon with the coupon code ({code}) already exist"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
-#: lms/djangoapps/instructor/views/coupons.py
 msgid ""
 "The code ({code}) that you have tried to define is already in use as a "
 "registration code"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
-#: lms/djangoapps/instructor/views/coupons.py
 msgid "Please Enter the Integer Value for Coupon Discount"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
-#: lms/djangoapps/instructor/views/coupons.py
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please Enter the Coupon Discount Value Less than or Equal to 100"
 msgstr ""
 
@@ -3966,12 +4034,12 @@ msgid "coupon with the coupon code ({code}) added successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
-#: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon id not found"
+msgid "coupon with the coupon code ({code}) already exists for this course"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon with the coupon id ({coupon_id}) already exists"
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon id not found"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -3980,8 +4048,9 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid ""
-"To gain insights into student enrollment and participation, "
-"{link_start}visit the new dashboard for course analytics{link_end}."
+"To gain insights into student enrollment and participation {link_start}visit"
+" {analytics_dashboard_name}, our new dashboard for course "
+"analytics{link_end}."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -4678,11 +4747,9 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
-"Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
-" enrollments."
+"Please visit your <a href=\"{dashboard_link}\">dashboard</a>  to see your "
+"new course."
 msgstr ""
-"अपने नए नामांकन देखने के लिए अपने <a href=\"{dashboard_link}\">डैशबोर्ड</a> "
-"पर जाएं।"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
@@ -4905,7 +4972,7 @@ msgid "Code '{0}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{0}' already used."
+msgid "Only one coupon redemption is allowed against an order"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -5341,6 +5408,14 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"Sorry! Our payment processor sent us back a message saying that you have "
+"cancelled this transaction. The items in your shopping cart will exist for "
+"future purchase. If you feel that this is in error, please contact us with "
+"payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "Sorry!  Your payment could not be processed because an unexpected exception "
 "occurred.  Please contact us at {email} for assistance."
 msgstr ""
@@ -5664,6 +5739,7 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Required Information"
 msgstr "आवश्यक जानकारी"
@@ -5773,8 +5849,6 @@ msgstr "लेख को नष्ट करें"
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Delete"
 msgstr "नष्ट करें"
 
@@ -5815,10 +5889,7 @@ msgstr "आप एक लेख को नष्ट कर रहे हैं�
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "बदलें"
@@ -5842,10 +5913,9 @@ msgstr "पूर्वावलोकन"
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/signup_modal.html
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
@@ -6247,19 +6317,6 @@ msgstr ""
 msgid "Missing branch on fresh clone"
 msgstr ""
 
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid "Command was: {0!r}. Working directory was: {1!r}"
-msgstr ""
-
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid "Command output was: {0!r}"
-msgstr ""
-
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid ""
-"Directory already exists, doing a git reset and pull instead of git clone."
-msgstr ""
-
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "मेरे नोट्स"
@@ -6471,8 +6528,6 @@ msgstr "लोड हो रहा है..."
 #: cms/templates/course-create-rerun.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -6482,14 +6537,14 @@ msgid "Cancel"
 msgstr "रद्द करें"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/settings.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: lms/templates/courseware/course_about.html
+#: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "पाठ्यक्रम संख्या"
+
+#: cms/templates/course_outline.html cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
+msgid "Dismiss"
+msgstr "ख़ारिज करें"
 
 #: cms/templates/group_configurations.html cms/templates/manage_users.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -6513,15 +6568,25 @@ msgid "Course Number:"
 msgstr "पाठ्यक्रम संख्या:"
 
 #: cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid "Dismiss"
-msgstr "ख़ारिज करें"
-
-#: cms/templates/index.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
 #: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "Pending"
 msgstr "बाकी है"
+
+#: cms/templates/login.html cms/templates/register.html
+#: lms/templates/help_modal.html lms/templates/login.html
+#: lms/templates/provider_login.html lms/templates/provider_login.html
+#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/signup_modal.html
+msgid "E-mail"
+msgstr "ई-मेल"
+
+#: cms/templates/login.html cms/templates/manage_users.html
+#: lms/templates/login.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
+msgid "example: username@domain.com"
+msgstr "उदाहरण: username@domain.com"
 
 #: cms/templates/login.html lms/templates/login.html
 msgid "Forgot password?"
@@ -6539,6 +6604,11 @@ msgstr "पासवर्ड"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
 msgstr "व्यवस्थापक"
+
+#: cms/templates/manage_users.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Staff"
+msgstr ""
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
@@ -6584,14 +6654,16 @@ msgstr ""
 msgid "Terms of Service"
 msgstr "सेवा की शर्तें"
 
-#: cms/templates/widgets/footer.html lms/templates/edx_footer.html
-#: lms/templates/footer.html lms/templates/static_templates/privacy.html
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "निजता नीति"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
 #: lms/templates/help_modal.html lms/templates/navigation.html
+#: lms/templates/original_navigation.html
 #: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
@@ -6635,65 +6707,6 @@ msgstr "इस पाठ्यक्रम के लिए अपने यो�
 #: lms/templates/verify_student/photo_verification.html
 msgid "):"
 msgstr "):"
-
-#: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I want a free honor code certificate?"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Why do I have to pay?"
-msgstr "मुझे भुगतान क्यों करना होगा? "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"As a not-for-profit, edX uses your contribution to support our mission to "
-"provide quality education to everyone around the world, and to improve "
-"learning through research. While we have established a minimum fee, we ask "
-"that you contribute as much as you can."
-msgstr ""
-"edX एक ग़ैर लाभ संगठन है और हमारा उद्देश्य दुनिया भर में अच्छी शिक्षा "
-"पहुंचाने का है और शोध के ज़रिये विद्या को बढ़ावा देने का है। इस हैसियत से हम"
-" आपके सहयोग पर क़ाफ़ी हद तक निर्भर हैं। हमनें अपने पाठ्यक्रमों के लिए "
-"न्यूनतम शुल्क रखा है लेकिन हमारा आग्रह है कि आप जितना योगदान कर सकें, उतना "
-"करें।"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"I'd like to pay more than the minimum.  Is my contribution tax deductible?"
-msgstr ""
-"मैं न्यूनतम से अधिक भुगतान करना चाहता हूं। क्या मेरे योगदान को आयकर विभाग से"
-" कुछ छूट मिलेगी?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please check with your tax advisor to determine whether your contribution is"
-" tax deductible."
-msgstr ""
-"आपके योगदान से कर घटाया जा सकता है कि नहीं यह जानने के लिए कृपया अपने कर "
-"सलाहकार से संपर्क करें।"
-
-#: common/templates/course_modes/choose.html
-msgid "What if I can't afford it or don't have the necessary equipment?"
-msgstr ""
-"तब क्या अगर मैं इस शुल्क का भार नहीं उठा सकता या सकती और मेरे पास आवश्यक "
-"उपकरण भी नहीं है?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you would like to pursue the honor code certificate, please check the "
-"honor code certificate box and then click the 'Select Certificate' button to"
-" complete your registration."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Select Honor Code Certificate"
-msgstr "ऑनर कोड प्रमाणपत्र चुनें"
 
 #: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
@@ -6744,10 +6757,13 @@ msgid "Audit This Course"
 msgstr "इस पाठ्यक्रम को ऑडिट करें"
 
 #: common/templates/course_modes/choose.html
-msgid "Sign up to audit this course for free and track your own progress."
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
 msgstr ""
-"इस पाठ्यक्रम को निःशुल्क ऑडिट करने के लिए और अपनी खुद की प्रगति को ट्रैक "
-"करने के लिए साइन अप करें।"
 
 #: common/templates/course_modes/choose.html
 msgid "Select Audit"
@@ -6775,13 +6791,6 @@ msgid ""
 "Plan to use your completed coursework for job applications, career "
 "advancement, or school applications? Then work toward a Verified Certificate"
 " of Achievement to document your accomplishment. A minimum fee applies."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"You can audit this course and still have complete access to the course "
-"material. If you complete and pass the course you will automatically earn an"
-" Honor Code Certificate free of charge."
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -6824,13 +6833,13 @@ msgstr "दृष्टि"
 msgid "Faq"
 msgstr "अक़्सर पूछे गए सवाल"
 
-#: lms/templates/contact.html lms/templates/edx_footer.html
-#: lms/templates/footer.html
+#: lms/templates/contact.html lms/templates/footer-edx.html
 msgid "Press"
 msgstr "मीडिया"
 
-#: lms/templates/contact.html lms/templates/edx_footer.html
-#: lms/templates/footer.html lms/templates/static_templates/contact.html
+#: lms/templates/contact.html lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr "संपर्क करें"
@@ -6919,13 +6928,13 @@ msgid "An error occurred. Please try again later."
 msgstr "कुछ गड़बड़ हो गई। कृपया बाद में फिर से कोशिश कीजिए।"
 
 #: lms/templates/dashboard.html
-msgid "Please verify your new email"
-msgstr "कृपया अपना नया ई-मेल वैरीफ़ाई करें"
+msgid "Please verify your new email address"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid ""
-"You'll receive a confirmation in your inbox. Please click the link in the "
-"email to confirm the email change."
+"You'll receive a confirmation in your inbox. Please follow the link in the "
+"email to confirm your email address change."
 msgstr ""
 
 #. Translators: this message is displayed when a user tries to link their
@@ -6937,9 +6946,8 @@ msgstr ""
 #. edX deployment.
 #: lms/templates/dashboard.html
 msgid ""
-"The selected {provider_name} account is already linked to another "
-"{platform_name} account. Please {link_start}log out{link_end}, then log in "
-"with your {provider_name} account."
+"The {provider_name} account you selected is already linked to another "
+"{platform_name} account."
 msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
@@ -6952,21 +6960,29 @@ msgstr "बदलें"
 #. (for example, Google and LinkedIn) the user can link with or unlink from
 #. their edX account.
 #: lms/templates/dashboard.html
-msgid "Account Links"
+msgid "Connected Accounts"
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Linked"
+msgstr ""
+
+#: lms/templates/dashboard.html
+msgid "Not Linked"
 msgstr ""
 
 #. Translators: clicking on this removes the link between a user's edX account
 #. and their account with an external authentication provider (like Google or
 #. LinkedIn).
 #: lms/templates/dashboard.html
-msgid "unlink"
+msgid "Unlink"
 msgstr ""
 
 #. Translators: clicking on this creates a link between a user's edX account
 #. and their account with an external authentication provider (like Google or
 #. LinkedIn).
 #: lms/templates/dashboard.html
-msgid "link"
+msgid "Link"
 msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
@@ -6975,7 +6991,7 @@ msgstr "पासवर्ड रीसेट"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr "मौजूदा पाठ्यक्रम"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
@@ -7032,10 +7048,9 @@ msgstr "अपने पासवर्ड की पुष्टि करे�
 
 #: lms/templates/dashboard.html
 msgid ""
-"We will send a confirmation to both {email} and your new email as part of "
-"the process."
+"We will send a confirmation to both {email} and your new email address as "
+"part of the process."
 msgstr ""
-"पुष्टिकरण के लिए हम {email} और आपकी नई ई-मेल, दोनों पर ही सूचना भेजेंगे।"
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
@@ -7047,10 +7062,8 @@ msgstr "अपना नाम बदलें"
 #: lms/templates/dashboard.html
 msgid ""
 "To uphold the credibility of your {platform} {cert_name_short}, all name "
-"changes will be logged and recorded."
+"changes will be recorded."
 msgstr ""
-" {platform} {cert_name_short} की विश्वस्नीयता को बनाए रखने के लिए, हर नाम "
-"में किए गए परिवर्तन को रिकॉर्ड किया जाएगा।"
 
 #. Translators: note that {platform} {cert_name_short} will look something
 #. like: "edX certificate". Please do not change the order of these
@@ -7074,13 +7087,16 @@ msgstr "मेरा नाम बदलें"
 
 #: lms/templates/dashboard.html
 msgid ""
-"<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
-"info\"></span>"
+"<span id='track-info'></span> {course_number}?  <span id='refund-"
+"info'></span>"
 msgstr ""
-"<span id=\"track-info\"></span>{course_number}? <span id=\"refund-"
-"info\"></span>"
 
 #: lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -7092,43 +7108,6 @@ msgstr "अपंजीकृत करें"
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
 msgstr ""
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-msgid "About"
-msgstr "के बारे में"
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-#: lms/templates/static_templates/jobs.html
-#: lms/templates/static_templates/jobs.html
-msgid "Jobs"
-msgstr "नौकरियां"
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-#: lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "अक़्सर पूछे गए सवाल"
-
-#: lms/templates/edx_footer.html
-msgid "edX Logo"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid ""
-"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
-" mission is to bring the best of higher education to students of all ages "
-"anywhere in the world, wherever there is Internet access. {EdX}'s free "
-"online MOOCs are interactive and subjects include computer science, public "
-"health, and artificial intelligence."
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "&copy; 2014 edX, some rights reserved."
-msgstr ""
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-msgid "Terms of Service and Honor Code"
-msgstr "सेवा और ऑनर कोड की शर्तें"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -7227,6 +7206,108 @@ msgstr "पहेली का leaderboard"
 msgid "User"
 msgstr "उपयोगकर्ता"
 
+#: lms/templates/footer-edx-new.html
+msgid "About edX"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid ""
+"{EdX} offers interactive online classes and MOOCs from the world's best "
+"universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
+" many other universities. Topics include biology, business, chemistry, "
+"computer science, economics, finance, electronics, engineering, food and "
+"nutrition, history, humanities, law, literature, math, medicine, music, "
+"philosophy, physics, science, statistics and more. {EdX} is a non-profit "
+"online initiative created by founding partners {Harvard} and {MIT}."
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+msgid "&copy; 2014 edX, some rights reserved."
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html
+msgid "Terms of Service and Honor Code"
+msgstr "सेवा और ऑनर कोड की शर्तें"
+
+#: lms/templates/footer-edx-new.html
+msgid "(Revised 4/16/2014)"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "About & Company Info"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html
+msgid "About"
+msgstr "के बारे में"
+
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+msgid "News"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "अक़्सर पूछे गए सवाल"
+
+#: lms/templates/footer-edx-new.html
+msgid "edX Blog"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Donate to edX"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Jobs at edX"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Follow Us"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Meetup"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "LinkedIn"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Google+"
+msgstr ""
+
+#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/jobs.html
+msgid "Jobs"
+msgstr "नौकरियां"
+
+#: lms/templates/footer-edx.html
+msgid "edX Logo"
+msgstr ""
+
+#: lms/templates/footer-edx.html
+msgid ""
+"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
+" mission is to bring the best of higher education to students of all ages "
+"anywhere in the world, wherever there is Internet access. {EdX}'s free "
+"online MOOCs are interactive and subjects include computer science, public "
+"health, and artificial intelligence."
+msgstr ""
+
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
 msgstr ""
@@ -7316,14 +7397,6 @@ msgstr ""
 "कृपया नोट करें: {platform_name} की टीम अंग्रेज़ी बोलती है। चाहे आपके सवाल "
 "किसी भी भाषा में हो सकते हैं लेकिन हमारा जवाब अंग्रेज़ी में ही दिया जाएगा।"
 
-#: lms/templates/help_modal.html lms/templates/login.html
-#: lms/templates/provider_login.html lms/templates/provider_login.html
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/signup_modal.html
-msgid "E-mail"
-msgstr "ई-मेल"
-
 #: lms/templates/help_modal.html
 msgid "Briefly describe your issue"
 msgstr "संक्षिप्त में अपनी समस्या बताएं"
@@ -7344,8 +7417,6 @@ msgstr ""
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -7539,8 +7610,8 @@ msgid "We're Sorry, {platform_name} accounts are unavailable currently"
 msgstr "हम क्षमा चाहते हैं, {platform_name} के खाते इस वक्त उपलब्ध नहीं हैं।"
 
 #: lms/templates/login.html
-msgid "The following errors occurred while logging you in:"
-msgstr "लॉग इन करते दौरान निम्नलिखित त्रुटियां हुई:"
+msgid "We couldn't log you in."
+msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
@@ -7556,11 +7627,6 @@ msgstr ""
 "आवश्यक फ़ील्ड को <strong class=\"indicator\">मोटे अक्षर और तारांकित "
 "(*)</strong> से पहचाना जाता है।"
 
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/register.html
-msgid "example: username@domain.com"
-msgstr "उदाहरण: username@domain.com"
-
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "खाते की प्राथमिकताएं"
@@ -7569,18 +7635,9 @@ msgstr "खाते की प्राथमिकताएं"
 msgid "Remember me"
 msgstr "मुझे याद रखें"
 
-#. Translators: this is the last choice of a number of choices of how to log
-#. in
-#. to the site.
-#: lms/templates/login.html
-msgid "or, if you have connected one of these providers, log in below."
-msgstr ""
-
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like Google or LinkedIn).
-#: lms/templates/login.html lms/templates/register.html
+#: lms/templates/login.html
 msgid "Sign in with {provider_name}"
 msgstr ""
 
@@ -7703,53 +7760,51 @@ msgstr "पुष्टि करें"
 msgid "Reject"
 msgstr ""
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html lms/templates/original_navigation.html
 msgid "Global Navigation"
 msgstr "ग्लोबल नैविगेशन"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/original_navigation.html
 msgid "Find Courses"
 msgstr "पाठ्यक्रम ढूंढें"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html lms/templates/original_navigation.html
 msgid "Dashboard for:"
 msgstr "इसके लिए डैशबोर्ड : "
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html lms/templates/original_navigation.html
 msgid "More options dropdown"
 msgstr "और विकल्पों के लिए ड्रॉपडाउन करें"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html lms/templates/original_navigation.html
 msgid "Log Out"
 msgstr "लॉग आउट"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html lms/templates/original_navigation.html
 msgid "Shopping Cart"
 msgstr ""
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html lms/templates/original_navigation.html
 msgid "How it Works"
 msgstr "यह कैसे काम करता है"
 
-#: lms/templates/navigation.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/courseware/courses.html
-msgid "Courses"
-msgstr "पाठ्यक्रम"
-
 #: lms/templates/navigation.html
-msgid "Schools"
-msgstr "विश्वविद्यालय"
+msgid "Schools & Partners"
+msgstr ""
 
 #: lms/templates/navigation.html lms/templates/navigation.html
-msgid "Register Now"
-msgstr "पंजीकरण करें"
+#: lms/templates/register.html
+msgid "Register"
+msgstr "रजिस्टर करें"
 
 #: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/original_navigation.html
+#: lms/templates/original_navigation.html lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "लॉग इन"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation.html lms/templates/original_navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -7759,6 +7814,22 @@ msgstr ""
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
 msgstr "आपके कोई नोट्स नहीं है।"
+
+#: lms/templates/original_navigation.html
+#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/courseware/courses.html
+msgid "Courses"
+msgstr "पाठ्यक्रम"
+
+#: lms/templates/original_navigation.html
+msgid "Schools"
+msgstr "विश्वविद्यालय"
+
+#: lms/templates/original_navigation.html
+#: lms/templates/original_navigation.html
+msgid "Register Now"
+msgstr "पंजीकरण करें"
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -7821,6 +7892,7 @@ msgid "The following errors occurred while processing your registration:"
 msgstr "आपके रजिस्ट्रेशन को प्रोसेस करते समय ये त्रुटियां हुईः"
 
 #: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -7867,10 +7939,6 @@ msgstr "रजिस्ट्रेशन सहायता"
 #: lms/templates/register-sidebar.html
 msgid "Already registered?"
 msgstr "पहले से ही पंजीकृत?"
-
-#: lms/templates/register-sidebar.html
-msgid "Click here to log in."
-msgstr "लॉग इन करने के लिए यहां क्लिक करें।"
 
 #: lms/templates/register-sidebar.html
 msgid "Welcome to {platform_name}"
@@ -7948,14 +8016,14 @@ msgstr "आपका स्वागत है!"
 msgid "Register below to create your {platform_name} account"
 msgstr "अपने {platform_name} का खाता बनाने के लिए नीचे रजिस्टर करें"
 
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like Google or LinkedIn).
 #: lms/templates/register.html
-msgid "Register to start learning today!"
+msgid "Sign up with {provider_name}"
 msgstr ""
 
 #: lms/templates/register.html
-msgid ""
-"or create your own {platform_name} account by completing all "
-"<strong>required*</strong> fields below."
+msgid "Create your own {platform_name} account below"
 msgstr ""
 
 #. Translators: selected_provider is the name of an external, third-party user
@@ -7965,7 +8033,8 @@ msgid "You've successfully signed in with {selected_provider}."
 msgstr ""
 
 #: lms/templates/register.html
-msgid "Finish your account registration below to start learning."
+msgid ""
+"We just need a little more information before you start learning with edX."
 msgstr ""
 
 #: lms/templates/register.html
@@ -7996,11 +8065,12 @@ msgstr "एक सार्वजनिक उपयोगकर्ता ना
 msgid "Public Display Name"
 msgstr "सार्वजनिक उपयोगकर्ता नाम"
 
-#: lms/templates/register.html lms/templates/register.html
-msgid "Extra Personal Information"
-msgstr "अतिरिक्त व्यक्तिगत जानकारी"
+#: lms/templates/register.html
+msgid "Additional Personal Information"
+msgstr ""
 
 #: lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "City"
 msgstr "शहर"
 
@@ -8009,6 +8079,7 @@ msgid "example: New York"
 msgstr "उदाहरण: न्यू यॉर्क"
 
 #: lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Country"
 msgstr "देश"
 
@@ -8024,10 +8095,6 @@ msgstr "जन्म का वर्ष"
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr "हमें बताएं कि आपने {platform_name} के साथ क्यों रजिस्टर किया है"
-
-#: lms/templates/register.html
-msgid "Register"
-msgstr "रजिस्टर करें"
 
 #: lms/templates/register.html lms/templates/signup_modal.html
 msgid "Create My Account"
@@ -8120,12 +8187,6 @@ msgstr ""
 #: lms/templates/split_test_author_view.html
 msgid "Inactive Groups"
 msgstr ""
-
-#. Translators: The 'Group' here refers to the group of users that has been
-#. sorted into group_id
-#: lms/templates/split_test_staff_view.html
-msgid "Group {group_id}"
-msgstr "समूह {group_id}"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
@@ -8627,7 +8688,10 @@ msgstr "फ़ीडबैक सबमिट करें"
 msgid "Response"
 msgstr "जवाब"
 
+#. Translators: This is a menu option for showing only unanswered forum
+#. question threads
 #: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/discussion/_thread_list_template.html
 msgid "Unanswered"
 msgstr "अनुत्तरित"
 
@@ -8804,8 +8868,18 @@ msgid "Staff view"
 msgstr "स्टाफ़ व्यू"
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Course is not yet visible to students."
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student view"
 msgstr "छात्र की नज़र से"
+
+#: lms/templates/courseware/course_navigation.html
+msgid ""
+"You cannot view the course as a student or beta tester before the course "
+"release date."
+msgstr ""
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from leading universities."
@@ -8954,6 +9028,16 @@ msgstr "छात्रों को खोजें"
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
 msgstr "{course_number} पाठ्यक्रम की जानकारी"
+
+#: lms/templates/courseware/info.html
+msgid "You are not enrolled yet"
+msgstr ""
+
+#: lms/templates/courseware/info.html
+msgid ""
+"You are not currently enrolled in this course. Sign up for it "
+"{link_start}here{link_end}!"
+msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
@@ -9631,6 +9715,7 @@ msgstr "हमारे कोर्स का प्रतिक्रिया
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Cover Image"
 msgstr "{course_number} {course_name} कवर इमेज"
 
@@ -9647,6 +9732,12 @@ msgstr ": के रूप में नामांकन"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "Verified"
 msgstr ""
 
@@ -9693,10 +9784,6 @@ msgid "Course Starts - {start_date}"
 msgstr "पाठ्यक्रम शुरू होता है - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Document your accomplishment!"
-msgstr "अपनी उपलब्धि के प्रति रूप बनाएं!"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Challenge Yourself!"
 msgstr "अपने आप को चुनौती दें!"
 
@@ -9721,26 +9808,45 @@ msgid "Upgrade to Verified Track"
 msgstr "वैरिफाईड ट्रैक के लिए अपग्रेड करें "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You can no longer access this course because payment has not yet been "
+"received. you can <a href=\"#\">contact the account holder</a> to request "
+"payment, or you can"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "unregister"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "for this course."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
 msgstr "संग्रहित कोर्स देखें "
 
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "View Course"
 msgstr "पाठयक्रम देखें"
 
-#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Are you sure you want to unregister from the purchased course"
 msgstr ""
 
-#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Are you sure you want to unregister from"
 msgstr "क्या आप वाकई यहां से अपनी रजिस्ट्रेशन रद्द करना चाहते हैं?"
 
-#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -9750,6 +9856,7 @@ msgstr ""
 "क्या आपको पूरा विश्वास है कि आप वैरीफ़ाइड {cert_name_long} के ट्रैक से अपना "
 "रजिस्ट्रेशन रद्द करना चाहते हैं"
 
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "ई-मेल सेटिंग्स"
@@ -9895,10 +10002,6 @@ msgid "All Discussions"
 msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
-msgid "Flagged Discussions"
-msgstr ""
-
-#: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "मेरे द्वारा अनुसरण किए गए पोस्ट दिखाएं "
 
@@ -9916,6 +10019,7 @@ msgid "Hide"
 msgstr "छिपाएं"
 
 #: lms/templates/discussion/_thread_list_template.html
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Discussion topics; current selection is: "
 msgstr "चर्चा के विषय, वर्तमान चयन है:"
 
@@ -9923,12 +10027,39 @@ msgstr "चर्चा के विषय, वर्तमान चयन ह
 msgid "Search all posts"
 msgstr ""
 
+#. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
-msgid "View all cohorts"
+msgid "Filter:"
+msgstr ""
+
+#. Translators: This is a menu option for showing all forum threads unfiltered
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Show all"
+msgstr ""
+
+#. Translators: This is a menu option for showing only unread forum threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Unread"
+msgstr ""
+
+#. Translators: This is a menu option for showing only forum threads flagged
+#. for abuse
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Flagged"
+msgstr ""
+
+#. Translators: This labels a cohort menu in forum navigation
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Cohort:"
 msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "View as {cohort_name}"
+msgid "in all cohorts"
+msgstr ""
+
+#. Translators: This labels a sort menu in forum navigation
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Sort:"
 msgstr ""
 
 #. Translators: This is a menu option for sorting forum threads
@@ -9947,63 +10078,25 @@ msgid "by most votes"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Add A Response"
 msgstr "जवाब दें"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "This thread is closed."
 msgstr "यह कड़ी बंद हो चुकी है।"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Post a response:"
 msgstr "जवाब पोस्ट करें:"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-#: lms/templates/discussion/mustache/_profile_thread.mustache
-msgid "anonymous"
-msgstr "गुमनाम"
+msgid "Expand discussion"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "&bull; This thread is closed."
-msgstr "&bull; यह कड़ी बंद हो चुकी है।"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "follow"
-msgstr "फ़ॉलो"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Follow this post"
-msgstr "इस पोस्ट को फ़ॉलो करें  "
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Report Misuse"
-msgstr "दुरुपयोग रिपोर्ट करें"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pin Thread"
-msgstr "इस कड़ी को इंगित करें"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "Pinned"
-msgstr " इंगित कर दिया गया"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr "(यह पोस्ट %(courseware_title_linked)s के बारे में है)"
+msgid "Collapse discussion"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
@@ -10024,6 +10117,10 @@ msgid "Update post"
 msgstr "पोस्ट अपडेट करें"
 
 #: lms/templates/discussion/_underscore_templates.html
+msgid "Show Comments (%(num_comments)s)"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Add a comment"
 msgstr "टिप्पणी जोड़ें"
 
@@ -10032,8 +10129,25 @@ msgid "Add a comment..."
 msgstr "टिप्पणी जोड़ें..."
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "endorse"
-msgstr "समर्थन करें"
+msgid "marked as answer %(time_ago)s by %(user)s"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "marked as answer %(time_ago)s"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "endorsed %(time_ago)s by %(user)s"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "endorsed %(time_ago)s"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Reported"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing response"
@@ -10044,13 +10158,8 @@ msgid "Update response"
 msgstr "जवाब अपडेट करें"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Delete Comment"
-msgstr "टिप्पणी नष्ट करें"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "-posted %(time_ago)s by"
-msgstr "-%(time_ago)s पोस्ट की गई, इनके द्वारा"
+msgid "posted %(time_ago)s by %(author)s"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing comment"
@@ -10061,17 +10170,27 @@ msgid "Update comment"
 msgstr "टिप्पणी अपडेट करें"
 
 #: lms/templates/discussion/_underscore_templates.html
+msgid "discussion"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "answered question"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "unanswered question"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pinned"
+msgstr " इंगित कर दिया गया"
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "By: Staff"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "By: Community TA"
-msgstr ""
-
-#. Translators: This is a label for a forum thread with a response that was
-#. endorsed by the course staff
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Endorsed response"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -10146,21 +10265,64 @@ msgstr ""
 "आपने जिन पोस्टों का अनुसरण किया हुआ है उनकी नई और बिना पढ़ी हुई गतिविधियों के"
 " बारे में रोज़ एक ई-मेल पाने के लिए इस बॉक्स पर काटे का निशान डालें।"
 
+#. Translators: This is the label for a control to
+#. select a forum post type
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Create new post about:"
-msgstr "इसके बारे में नई पोस्ट बनाएं:"
+msgid "Post type:"
+msgstr ""
+
+#. Translators: This is a forum post type
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Question"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Show All Discussions"
-msgstr "सभी चर्चाएं दिखाएं"
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations."
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Filter List"
-msgstr "फ़िल्टर सूची"
+msgid "Topic Area:"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Filter discussion areas"
-msgstr "अलग-अलग चर्चाओं को फ़िल्टर करें"
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Filter topics"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Add your post to a relevant topic to help others find it."
+msgstr ""
+
+#. Translators: This labels the selector for which group of students can view
+#. a
+#. post
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Visible To:"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "All Groups"
+msgstr "सभी समूह"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid ""
+"Instructors can set whether a post in a cohorted topic is visible to all "
+"cohorts or only to a specific cohort."
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Title:"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Add a clear and descriptive title to encourage participation."
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Enter your question or comment…"
+msgstr "अपना प्रश्न लिखें या टिप्पणी दें..."
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "follow this post"
@@ -10174,28 +10336,70 @@ msgstr "गुमनाम रूप से पोस्ट करें"
 msgid "post anonymously to classmates"
 msgstr "सहपाठियों को गुमनाम रूप से पोस्ट करें"
 
-#. Translators: This labels the selector for which group of students can view
-#. a
-#. post
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Make visible to:"
-msgstr "इनको दिखाएं:"
+msgid "Add Post"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "All Groups"
-msgstr "सभी समूह"
+msgid "Endorse"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "new post title"
-msgstr "नई पोस्ट का शीर्षक"
+msgid "Unendorse"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Enter your question or comment…"
-msgstr "अपना प्रश्न लिखें या टिप्पणी दें..."
+msgid "Mark as Answer"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "Add post"
-msgstr "पोस्ट करें"
+msgid "Unmark as Answer"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Follow"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Unfollow"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Vote"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Report abuse"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Report"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Unreport"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pin"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Unpin"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Open"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "More"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_profile_thread.mustache
+msgid "anonymous"
+msgstr "गुमनाम"
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
@@ -10233,20 +10437,6 @@ msgstr ""
 msgid "User Profile"
 msgstr "उपयोगकर्ता की प्रोफ़ाइल"
 
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Expand discussion"
-msgstr ""
-
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Collapse discussion"
-msgstr ""
-
-#: lms/templates/discussion/mustache/_inline_thread_show.mustache
-msgid "This thread has been pinned by course staff."
-msgstr "यह कड़ी पाठ्यक्रम कर्मचारी द्वारा पिन की गई है।"
-
 #: lms/templates/discussion/mustache/_pagination.mustache
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "…"
@@ -10261,9 +10451,36 @@ msgid "Active Threads"
 msgstr "सक्रिय कड़ियां"
 
 #: lms/templates/emails/activation_email.txt
+msgid "Thank you for signing up for {platform_name}."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
 msgid ""
-"Thank you for signing up for {platform_name}! To activate your account, "
-"please copy and paste this address into your web browser's address bar:"
+"To get started, please activate your account by clicking on the link below "
+"(you may also copy and paste the link into your browser's address bar)."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+msgid ""
+"Activation ensures that you can register for {platform_name} courses and "
+"access the courseware. If you require assistance, please use our web form at"
+" {contact_us} or email {info_address}."
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+msgid "We hope you enjoy learning with {platform_name}!"
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+msgid "The {platform_name} Team"
+msgstr ""
+
+#: lms/templates/emails/activation_email.txt
+msgid ""
+"This email was automatically sent by {site_name} because someone attempted "
+"to create an {platform_name} account using this email address. If you did "
+"not attempt to create this account and do not activate the account, you will"
+" no longer receive emails from {platform_name}."
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -10275,15 +10492,14 @@ msgid ""
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/email_change.txt
 msgid ""
 "If you didn't request this, you don't need to do anything; you won't receive"
 " any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the {platform_name} web site."
+"assistance, check the help section of the {platform_name} website."
 msgstr ""
 
 #: lms/templates/emails/activation_email_subject.txt
-msgid "Your account for {platform_name}"
+msgid "Activate Your {platform_name} Account"
 msgstr ""
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
@@ -10348,6 +10564,13 @@ msgid ""
 "We received a request to change the e-mail associated with your "
 "{platform_name} account from {old_email} to {new_email}. If this is correct,"
 " please confirm your new e-mail address by visiting:"
+msgstr ""
+
+#: lms/templates/emails/email_change.txt
+msgid ""
+"If you didn't request this, you don't need to do anything; you won't receive"
+" any more email from us. Please do not reply to this e-mail; if you require "
+"assistance, check the help section of the {platform_name} web site."
 msgstr ""
 
 #: lms/templates/emails/email_change_subject.txt
@@ -10465,6 +10688,147 @@ msgstr ""
 #: lms/templates/shoppingcart/receipt.html
 msgid "#:"
 msgstr "#:"
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Thank you for your purchase of {course_name}!"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid ""
+"An invoice for ${total_price} is attached. Payment is due immediately.  "
+"Information on payment methods can be found on the invoice."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid ""
+"A CSV file of your registration codes is attached. Please distribute "
+"registration codes to each student planning to enroll using the email "
+"template below."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Thanks,"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Your {platform_name} Team"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Dear [[Name]]:"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid ""
+"We have provided an enrollment for you in the course {course_name} from "
+"{platform_name}. Please follow the instructions below to claim your access."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Your redeem code is: [[Enter Redeem Code here from the attached CSV]]"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(1) Register for an account at https://{site_name}."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(2) Once registered, navigate to https://{course_url}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(3) Click 'Add {course_number} to Cart'"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid ""
+"(4) On the shopping cart page, enter your redeem code and click apply code. "
+"This will make payment equal to $0."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(5) Click 'Register'"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid ""
+"(6) You should be able to see your course on your student dashboard at "
+"https://{dashboard_url}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid ""
+"(7) Course materials will not be available until the course start date."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Sincerely,"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "[[Your Signature]]"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "INVOICE"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Invoice No: {invoice_number}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Terms: Due Immediately"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Due Date: {date}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Bill to:"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Customer Reference Number: {reference_number}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Balance Due: ${sale_price}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Course: {course_name}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid ""
+"Price:         ${course_price}  Quantity:      {quantity}  Sub-Total:    "
+"${sub_total}  Discount:  ${discount}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Total:      ${sale_price}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Payment instructions"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid ""
+"Failure to pay this invoice will result the invalidation of student "
+"enrollment that use these codes. All purchases are final. Please refer to "
+"the cancellation policy on {site_name} for more information."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "If you have payment questions, please contact {contact_email}"
+msgstr ""
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
@@ -10589,6 +10953,7 @@ msgstr "आगे बढ़ें"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Add Coupon"
 msgstr ""
 
@@ -10782,7 +11147,21 @@ msgstr ""
 "समाप्त हो जायेगी।"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Generate Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Course Registrations Codes:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -10790,7 +11169,15 @@ msgid "Download Registration Codes"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Active Course Registrations Codes:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Active Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Spent Course Registrations Codes:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -10804,6 +11191,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Course Price: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Set Price"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -10824,19 +11216,47 @@ msgid "Download All e-Commerce Purchases"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Sales"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file for all sales records in this course"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download All e-Commerce Sales"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Enter the invoice number to invalidate or re-validate sale"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Enter Invoice Number"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Invalidate Sale"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Revalidate Sale"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupons List"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Coupon Codes:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download coupon codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupons Information"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "+ Add Coupon"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Course_id"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -10848,30 +11268,43 @@ msgid "Count"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Please Enter the Coupon Code"
+msgid "{code}"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Please Enter the Value Greater than 0"
+msgid "{description}"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Please Enter the Coupon Discount Value Greater than 0"
+msgid "{discount}"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Please Enter the Course Price"
+msgid "Invoice number should not be empty."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Please Enter the Numeric value for Discount"
+msgid "Please enter the course price"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Please Select the Currency"
+msgid "Please enter the numeric value for course price"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please select the currency"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please enter the coupon code"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please enter the coupon discount value less than or equal to 100"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please enter the numeric value for discount"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -10885,6 +11318,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon Information"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "example: A123DS"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -10978,6 +11415,99 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
 msgstr "छात्र की देय तारीख को रीसेट करें"
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Generate Registration Code Modal"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Please enter the details below"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Organization Name"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "What is the company the seats were sold to?"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Organization Contact"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Who is the key contact at the company the sale was made to? "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Invoice Recipient"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Who at the company should the invoice be sent to?"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Organization Billing Address"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Address Line 1"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Address Line 2"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Address Line 3"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "State/Province"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Zip"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Price of Sale"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "What was the total sale price for all seats sold?"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Number of registrations"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Number of codes to generate for the Invoice"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "(Optional) Sale Label"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Internal tag to associate with the sale"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "(Optional) Customer Reference Number"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Any reference specific to the purchasing company, e.g. PO #"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Send me a copy of the invoice"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Active Students"
@@ -11388,10 +11918,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Please enter Course Mode detail below"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Set Price"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -11875,8 +12401,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
-msgstr "() इलेक्ट्रॉनिक रसीद"
+msgid "{platform_name} ({site_name}) Electronic Receipt"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Order #"
@@ -11913,6 +12439,64 @@ msgstr ""
 msgid "Billed To:"
 msgstr "इनको बिल किया गया हैः"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "Confirm Enrollment"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{site_name} -  Confirm Enrollment"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "Confirm your enrollment for:"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "course dates"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{course_name}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{start_date}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{end_date}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You've clicked a link for an enrollment code that has already been used. "
+"Check your <a href={dashboard_url}>course dashboard</a> to see if you're "
+"enrolled in the course, or contact your company's administrator."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You have successfully enrolled in {course_name}. This course has now been "
+"added to your dashboard."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You're already registered for this course. Visit your <a "
+"href={dashboard_url}>dashboard</a> to see the course."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You're about to activate an enrollment code for {course_name} by "
+"{site_name}. This code can only be used one time, so you should only "
+"activate this code if you're its intended recipient."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course &nbsp; &nbsp; &#x25b8;"
+msgstr ""
+
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
 msgstr "रसीद (Order"
@@ -11926,12 +12510,6 @@ msgid "Registered as: "
 msgstr "के रूप में पंजीकृत:"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "ID Verified"
 msgstr "आईडी वैरीफाईड"
 
@@ -12092,13 +12670,16 @@ msgstr ""
 "बारे में बताएं।"
 
 #: lms/templates/static_templates/about.html
+#: lms/templates/static_templates/blog.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/copyright.html
+#: lms/templates/static_templates/donate.html
 #: lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/help.html
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/media-kit.html
+#: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/tos.html
@@ -12110,31 +12691,36 @@ msgstr ""
 " जाता लेकिन यहां इसलिए छोड़ा गया है ताकि अगर ज़रूरत पड़े तो Open edX इस पेज "
 "का उपयोग कर सकें।"
 
+#: lms/templates/static_templates/blog.html
+#: lms/templates/static_templates/blog.html
+msgid "Blog"
+msgstr ""
+
+#: lms/templates/static_templates/donate.html
+#: lms/templates/static_templates/donate.html
+msgid "Donate"
+msgstr ""
+
 #: lms/templates/static_templates/embargo.html
 msgid "This Course Unavailable In Your Country"
 msgstr "यह कोर्स आपके देश में उपलब्ध नहीं है"
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
-"Our system indicates that you are trying to access an edX course from an IP "
-"address associated with a country currently subjected to U.S. economic and "
-"trade sanctions. Unfortunately, at this time edX must comply with export "
-"controls, and we cannot allow you to access this particular course. Feel "
-"free to browse our catalogue to find other courses you may be interested in "
-"taking."
+"Our system indicates that you are trying to access an edX course from a "
+"country currently subject to U.S. economic and trade sanctions. "
+"Unfortunately, at this time edX must comply with export controls, and we "
+"cannot allow you to access this particular course. Feel free to browse our "
+"catalogue to find other courses you may be interested in taking."
 msgstr ""
-"हमारे सिस्टम के मुताबिक आप edX के किसी पाठ्यक्रम में एक ऐसे आई पी एड्रेस से "
-"प्रवेश पाने की कोशिश कर रहे हैं जो कि किसी ऐसे देश से जुड़ा हुआ है जिस पर "
-"अमेरिका ने आर्थिक और व्यापारिक प्रतिबंध लगाएं हुए हैं। हमें खेद है कि इस समय"
-" edX को निर्यात नियंत्रण का पालन करना होगा और हम आपको इस पाठ्यक्रम में "
-"प्रवेश करने की अनुमति नहीं दे सकते। लेकिन आप अगर चाहे तो हमारे कैटेलॉग में "
-"कोई और दिलचस्प पाठ्क्रम खोज सकते हैं।"
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
 msgid "Media Kit"
 msgstr "मीडिया किट"
 
+#: lms/templates/static_templates/news.html
+#: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
 #: lms/templates/static_templates/press.html
 msgid "In the Press"
@@ -12207,13 +12793,10 @@ msgstr "कोई तकनीकी परेशानी हो रही ह�
 #: lms/templates/verify_student/_reverification_support.html
 msgid ""
 "Please make sure your browser is updated to the <strong>{a_start}most recent"
-" version possible{a_end}</strong>. Also, please make sure your <strong>web "
-"cam is plugged in, turned on, and allowed to function in your web browser "
-"(commonly adjustable in your browser settings)</strong>"
+" version possible{a_end}</strong>. Also, please make sure your "
+"<strong>webcam is plugged in, turned on, and allowed to function in your web"
+" browser (commonly adjustable in your browser settings)</strong>"
 msgstr ""
-"कृपया पक्का कर लें कि आपका ब्राउज़र <strong>{a_start}नए से नए संस्करण{a_end}</strong> से अपडेट किया गया है। और कृपया यह भी पक्का कर लें कि <strong>वैबकैमरे का प्लग लगा हुआ है, उसका स्विच ऑन है और आपको उसे वैब ब्राउज़र पर चलाने की अनुमति है (आप यह आराम से ब्राउज़र सेटिंग्स में जा कर ठीक कर सकते हैं)</strong>\n"
-"\n"
-" "
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
@@ -12245,6 +12828,10 @@ msgstr "आप फिर से वैरिफ़ाई कर रहें ह
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "आप इस के लिए पंजीकृत हो रहे हैं:"
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -12293,9 +12880,9 @@ msgstr "तकनीकी आवश्यकताएं"
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
-" possible{a_end}. Also, please make sure your <strong>web cam is plugged in,"
-" turned on, and allowed to function in your web browser (commonly adjustable"
-" in your browser settings).</strong>"
+" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
+"turned on, and allowed to function in your web browser (commonly adjustable "
+"in your browser settings).</strong>"
 msgstr ""
 
 #: lms/templates/verify_student/face_upload.html
@@ -12932,6 +13519,7 @@ msgstr ""
 "{a_end} को चुनें।"
 
 #: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
 msgstr "आपके ऑर्डर प्रोसेसिंग में कुछ गड़बड़ हुई"
 
@@ -12944,6 +13532,13 @@ msgstr ""
 "ओह! कुछ गड़बड़ हो गई। अपने द्वारा दी गई सारी सूचनाओं को ठीक से जांच लें और "
 "भुगतान करने के लिए बटन दबाएं। अगर फिर भी कोई गड़बड़ हो तो, कृपया बाद में "
 "कोशिश करें।"
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"We're sorry, there has been an error on this page. Please refresh the page "
+"and retake your photos. If you are still having trouble, please contact us "
+"at {email_address}"
+msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take Your Photo"
@@ -13085,11 +13680,9 @@ msgstr "अपने ई-मेल की जांच करें"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"you need an active edX account before registering - check your email for "
-"instructions"
+"You need to activate your {platform_name} account before you can register "
+"for courses. Check your inbox for an activation email."
 msgstr ""
-"रजिस्ट्रेशन से पहले आपके Edx खाते का सक्रिय होना आवश्यक है - निर्देश के लिए "
-"अपने ई-मेल की जांच करें"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Identification"
@@ -13101,11 +13694,9 @@ msgstr "फोटो पहचान दस्तावेज़"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"a drivers license, passport, or other goverment or school-issued ID with "
-"your name and picture on it"
+"A driver's license, passport, or other government or school-issued ID with "
+"your name and picture on it."
 msgstr ""
-"चालक लाइसेंस, पासपोर्ट, या अन्य सरकारी या स्कूल द्वारा ज़ारी पहचान पत्र जिस "
-"पर आपका नाम और तस्वीर हो।"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Webcam"
@@ -13115,11 +13706,17 @@ msgstr "वेब कैमरा"
 msgid "A webcam and a modern browser"
 msgstr "एक वेब कैमरा और एक आधुनिक ब्राउज़र"
 
+#. Translators: This phrase will look like this: "Internet Explorer 9 or
+#. later"
+#: lms/templates/verify_student/show_requirements.html
+msgid "{internet_explorer_version} or later"
+msgstr ""
+
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"Please make sure your browser is updated to the most recent version possible"
+"Please make sure your browser is updated to the most recent version "
+"possible."
 msgstr ""
-"कृपया पक्का कर लें कि आपका ब्राउज़र नए से नए संस्करण से अपडेट किया गया है"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Credit or Debit Card"
@@ -13131,11 +13728,9 @@ msgstr "कोई जाना-माना क्रेडिट या डे�
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"Visa, Master Card, American Express, Discover, Diners Club, JCB with "
-"Discover logo"
+"Visa, MasterCard, American Express, Discover, Diners Club, or JCB with the "
+"Discover logo."
 msgstr ""
-"वीज़ा, मास्टर कार्ड, अमेरिकन एक्सप्रेस, डाइनर क्लब, जेसीबी - डिस्कवर लोगो के"
-" साथ।"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
@@ -13296,7 +13891,7 @@ msgstr "विषय-वस्तु"
 #: cms/templates/course_info.html cms/templates/course_outline.html
 #: cms/templates/edit-tabs.html cms/templates/group_configurations.html
 #: cms/templates/index.html cms/templates/manage_users.html
-#: cms/templates/textbooks.html cms/templates/ux/reference/container.html
+#: cms/templates/textbooks.html
 msgid "Page Actions"
 msgstr ""
 
@@ -13309,43 +13904,52 @@ msgid "Loading&hellip;"
 msgstr ""
 
 #: cms/templates/asset_index.html
-msgid "What files are listed here?"
+msgid "Adding Files for Your Course"
 msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"In addition to the files you upload on this page, any files that you add to "
-"the course appear in this list. These files include your course image, "
-"textbook chapters, and files that appear on your Course Handouts sidebar."
-msgstr ""
-
-#: cms/templates/asset_index.html
-msgid "File URLs"
+"To add files to use in your course, click {em_start}Upload New File{em_end}."
+" Then follow the prompts to upload a file from your computer."
 msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the Embed URL value to link to the file or image from a component, a"
-" course update, or a course handout."
+"{em_start}Caution{em_end}: edX recommends that you limit the file size to "
+"{em_start}10 MB{em_end}. In addition, do not upload video or audio files. "
+"You should use a third party service to host multimedia files."
 msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the External URL value to reference the file or image from outside "
-"of your course. Do not use the External URL as a link value within your "
-"course."
+"The course image, textbook chapters, and files that appear on your Course "
+"Handouts sidebar also appear in this list."
 msgstr ""
 
-#: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/group_configurations.html cms/templates/settings_graders.html
-msgid "What can I do on this page?"
+#: cms/templates/asset_index.html
+msgid "Using File URLs"
 msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"You can upload new files or view, download, or delete existing files. You "
-"can lock a file so that people who are not enrolled in your course cannot "
-"access that file."
+"Use the {em_start}Embed URL{em_end} value to link to the file or image from "
+"a component, a course update, or a course handout."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"Use the {em_start}External URL{em_end} value to reference the file or image "
+"only from outside of your course."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"Click in the Embed URL or External URL column to select the value, then copy"
+" it."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid "Learn more about managing files"
 msgstr ""
 
 #: cms/templates/asset_index.html
@@ -13416,8 +14020,13 @@ msgstr ""
 msgid "View Live Version"
 msgstr ""
 
-#: cms/templates/container.html cms/templates/ux/reference/container.html
+#: cms/templates/container.html
 msgid "Preview Changes"
+msgstr ""
+
+#: cms/templates/container.html cms/templates/group_configurations.html
+#: cms/templates/settings_graders.html
+msgid "What can I do on this page?"
 msgstr ""
 
 #: cms/templates/container.html
@@ -13451,50 +14060,34 @@ msgid "Create a Course Rerun of:"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Create a re-run of a course"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "You are creating a re-run from:"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid ""
 "Provide identifying information for this re-run of the course. The original "
 "course is not affected in any way by a re-run."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid ""
 "Note: Together, the organization, course number, and course run must "
 "uniquely identify this new course instance."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Required Information to Create a re-run of a course"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "e.g. Introduction to Computer Science"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid ""
 "The public display name for the new course. (This name is often the same as "
 "the original course name.)"
@@ -13502,26 +14095,14 @@ msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Organization"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid ""
 "The name of the organization sponsoring the new course. (This name is often "
 "the same as the original organization name.)"
@@ -13530,34 +14111,14 @@ msgstr ""
 #: cms/templates/course-create-rerun.html
 #: cms/templates/course-create-rerun.html
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Note: No spaces or special characters are allowed."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "e.g. CS101"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid ""
 "The unique number that identifies the new course within the organization.  "
 "(This number is often the same as the original course number.)"
@@ -13565,40 +14126,24 @@ msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Course Run"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "e.g. 2014_T1"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid ""
 "The term in which the new course will run. (This value is often different "
 "than the original course run value.)"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Create Re-run"
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "When will my course re-run start?"
 msgstr ""
 
@@ -13607,7 +14152,6 @@ msgid "The new course is set to start on January 1, 2030 at midnight (UTC)."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "What transfers from the original course?"
 msgstr ""
 
@@ -13619,7 +14163,6 @@ msgid ""
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "What does not transfer from the original course?"
 msgstr ""
 
@@ -13661,13 +14204,10 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"Be sure to review and reset all dates (the Course Start Date has been "
-"changed to a future date); set up the course team; review course updates and"
-" other assets for dated material; and seed the discussions and wiki."
-msgstr ""
-
-#: cms/templates/course_outline.html
-msgid "Dimiss"
+"No course content is currently visible, and no students are enrolled. Be "
+"sure to review and reset all dates, including the Course Start Date; set up "
+"the course team; review course updates and other assets for dated material; "
+"and seed the discussions and wiki."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -13752,9 +14292,8 @@ msgid ""
 "subsection, or unit, then select {em_start}Hide from students{em_end}."
 msgstr ""
 
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/textbooks.html
-msgid "Learn More"
+#: cms/templates/course_outline.html
+msgid "Learn more about the course outline"
 msgstr ""
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
@@ -14081,6 +14620,10 @@ msgid ""
 "You can delete a group configuration only if it is not in use in an "
 "experiment. To delete a configuration, hover over its box and click the "
 "delete icon."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -14503,7 +15046,6 @@ msgid "You currently aren't associated with any Studio Courses."
 msgstr ""
 
 #: cms/templates/index.html
-#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Please correct the highlighted fields below."
 msgstr ""
 
@@ -14777,10 +15319,6 @@ msgid "User's Email Address"
 msgstr ""
 
 #: cms/templates/manage_users.html
-msgid "e.g. jane.doe@gmail.com"
-msgstr ""
-
-#: cms/templates/manage_users.html
 msgid ""
 "Please provide the email address of the course staff member you'd like to "
 "add"
@@ -14796,10 +15334,6 @@ msgstr ""
 
 #: cms/templates/manage_users.html cms/templates/manage_users.html
 msgid "You!"
-msgstr ""
-
-#: cms/templates/manage_users.html
-msgid "Staff"
 msgstr ""
 
 #: cms/templates/manage_users.html
@@ -15318,6 +15852,10 @@ msgid ""
 "Name field."
 msgstr ""
 
+#: cms/templates/textbooks.html
+msgid "Learn more about textbooks"
+msgstr ""
+
 #: cms/templates/emails/activation_email.txt
 msgid ""
 "Thank you for signing up for edX Studio! To activate your account, please "
@@ -15379,88 +15917,6 @@ msgstr ""
 msgid ""
 "An activation link has been sent to {email}, along with instructions for "
 "activating your account."
-msgstr ""
-
-#: cms/templates/ux/reference/container.html
-msgid "View Published Version"
-msgstr ""
-
-#: cms/templates/ux/reference/container.html
-#: cms/templates/ux/reference/container.html
-#: cms/templates/ux/reference/container.html
-#: cms/templates/ux/reference/container.html
-#: cms/templates/ux/reference/container.html
-msgid "Publishing Status"
-msgstr ""
-
-#: cms/templates/ux/reference/container.html
-msgid "Draft (Never published)"
-msgstr ""
-
-#: cms/templates/ux/reference/container.html
-#: cms/templates/ux/reference/container.html
-msgid "Published"
-msgstr ""
-
-#: cms/templates/ux/reference/container.html
-#: cms/templates/ux/reference/container.html
-msgid "Draft (Unpublished changes)"
-msgstr ""
-
-#: cms/templates/ux/reference/course-create-rerun.html
-msgid "Create a Course Rerun of HarvardX SW12.2x T2_2014"
-msgstr ""
-
-#: cms/templates/ux/reference/course-create-rerun.html
-msgid ""
-"A course already has that organization, course number, and course run. "
-"Change one or more of these values to give the new course a unique URL."
-msgstr ""
-
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-msgid "Cancel and Return to Dashboard"
-msgstr ""
-
-#: cms/templates/ux/reference/course-create-rerun.html
-msgid "Processing Re-run Request"
-msgstr ""
-
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-#: cms/templates/ux/reference/course-create-rerun.html
-msgid ""
-"Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Sed "
-"posuere consectetur est at lobortis. Maecenas faucibus mollis interdum."
-msgstr ""
-
-#: cms/templates/ux/reference/modal_bulkpublish-section.html
-msgid "Publish [section name]"
-msgstr ""
-
-#: cms/templates/ux/reference/modal_bulkpublish-section.html
-msgid "Publish all unpublished changes for this section?"
-msgstr ""
-
-#: cms/templates/ux/reference/modal_bulkpublish-section.html
-#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
-msgid "The following will be published:"
-msgstr ""
-
-#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
-msgid "Publish [subsection name]"
-msgstr ""
-
-#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
-msgid "Publish all unpublished changes for this subsection?"
-msgstr ""
-
-#: cms/templates/ux/reference/modal_bulkpublish-unit.html
-msgid "Publish [unit name]"
-msgstr ""
-
-#: cms/templates/ux/reference/modal_bulkpublish-unit.html
-msgid "Publish all unpublished changes for this unit?"
 msgstr ""
 
 #: cms/templates/widgets/footer.html

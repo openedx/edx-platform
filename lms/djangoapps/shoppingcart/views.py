@@ -6,21 +6,28 @@ from django.contrib.auth.models import Group
 from django.http import (HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
     HttpResponseBadRequest, HttpResponseForbidden, Http404)
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
+from microsite_configuration import microsite
+from util.bad_request_rate_limiter import BadRequestRateLimiter
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from courseware.courses import get_course_by_id
+from courseware.views import registered_for_course
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException, \
-    CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException, RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException
+    RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException,\
+    MultipleCouponsNotAllowedException
 from .models import Order, PaidCourseRegistration, OrderItem, Coupon, CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption
 from .processors import process_postpay_callback, render_purchase_form_html
 import json
+from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger("shoppingcart")
+AUDIT_LOG = logging.getLogger("audit")
 
 EVENT_NAME_USER_UPGRADED = 'edx.course.enrollment.upgrade.succeeded'
 
@@ -126,7 +133,14 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
     """
     try:
         # Try to remove redemption information of coupon code, If exist.
-        coupon_redemption = CouponRedemption.objects.get(user=user, order=item.order_id)
+        coupon_redemption = CouponRedemption.objects.get(
+            user=user,
+            coupon__course_id=order_item_course_id if order_item_course_id else CourseKeyField.Empty,
+            order=item.order_id
+        )
+        coupon_redemption.delete()
+        log.info('Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'
+                 .format(coupon_redemption.coupon.code, user, item_id))
     except CouponRedemption.DoesNotExist:
         try:
             # Try to remove redemption information of registration code, If exist.
@@ -138,11 +152,7 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
                 reg_code_redemption.delete()
                 log.info('Registration code "{0}" redemption entry removed for user "{1}" for order item "{2}"'
                          .format(reg_code_redemption.registration_code.code, user, item_id))
-    else:
-        if order_item_course_id == coupon_redemption.coupon.course_id:
-            coupon_redemption.delete()
-            log.info('Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'
-                     .format(coupon_redemption.coupon.code, user, item_id))
+
 
 @login_required
 def use_code(request):
@@ -154,9 +164,8 @@ def use_code(request):
     Valid Code can be either coupon or registration code.
     """
     code = request.POST["code"]
-    try:
-        coupon = Coupon.objects.get(code=code, is_active=True)
-    except Coupon.DoesNotExist:
+    coupons = Coupon.objects.filter(code=code, is_active=True)
+    if not coupons:
         # If not coupon code then we check that code against course registration code
         try:
             course_reg = CourseRegistrationCode.objects.get(code=code)
@@ -165,7 +174,91 @@ def use_code(request):
 
         return use_registration_code(course_reg, request.user)
 
-    return use_coupon_code(coupon, request.user)
+    return use_coupon_code(coupons, request.user)
+
+
+def get_reg_code_validity(registration_code, request, limiter):
+    """
+    This function checks if the registration code is valid, and then checks if it was already redeemed.
+    """
+    reg_code_already_redeemed = False
+    course_registration = None
+    try:
+        course_registration = CourseRegistrationCode.objects.get(code=registration_code)
+    except CourseRegistrationCode.DoesNotExist:
+        reg_code_is_valid = False
+    else:
+        reg_code_is_valid = True
+        try:
+            RegistrationCodeRedemption.objects.get(registration_code__code=registration_code)
+        except RegistrationCodeRedemption.DoesNotExist:
+            reg_code_already_redeemed = False
+        else:
+            reg_code_already_redeemed = True
+
+    if not reg_code_is_valid:
+        #tick the rate limiter counter
+        AUDIT_LOG.info("Redemption of a non existing RegistrationCode {code}".format(code=registration_code))
+        limiter.tick_bad_request_counter(request)
+        raise Http404()
+
+    return reg_code_is_valid, reg_code_already_redeemed, course_registration
+
+
+@require_http_methods(["GET", "POST"])
+@login_required
+def register_code_redemption(request, registration_code):
+    """
+    This view allows the student to redeem the registration code
+    and enroll in the course.
+    """
+
+    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
+    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Rate limit exceeded in registration code redemption.")
+        return HttpResponseForbidden()
+
+    template_to_render = 'shoppingcart/registration_code_receipt.html'
+    if request.method == "GET":
+        reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
+                                                                                                  request, limiter)
+        course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
+        context = {
+            'reg_code_already_redeemed': reg_code_already_redeemed,
+            'reg_code_is_valid': reg_code_is_valid,
+            'reg_code': registration_code,
+            'site_name': site_name,
+            'course': course,
+            'registered_for_course': registered_for_course(course, request.user)
+        }
+        return render_to_response(template_to_render, context)
+    elif request.method == "POST":
+        reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
+                                                                                                  request, limiter)
+
+        course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
+        if reg_code_is_valid and not reg_code_already_redeemed:
+            #now redeem the reg code.
+            RegistrationCodeRedemption.create_invoice_generated_registration_redemption(course_registration, request.user)
+            CourseEnrollment.enroll(request.user, course.id)
+            context = {
+                'redemption_success': True,
+                'reg_code': registration_code,
+                'site_name': site_name,
+                'course': course,
+            }
+        else:
+            context = {
+                'reg_code_is_valid': reg_code_is_valid,
+                'reg_code_already_redeemed': reg_code_already_redeemed,
+                'redemption_success': False,
+                'reg_code': registration_code,
+                'site_name': site_name,
+                'course': course,
+            }
+        return render_to_response(template_to_render, context)
 
 
 def use_registration_code(course_reg, user):
@@ -183,17 +276,23 @@ def use_registration_code(course_reg, user):
     return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
 
 
-def use_coupon_code(coupon, user):
+def use_coupon_code(coupons, user):
     """
     This method utilize course coupon code
     """
-    try:
-        cart = Order.get_cart_for_user(user)
-        CouponRedemption.add_coupon_redemption(coupon, cart)
-    except CouponAlreadyExistException:
-        return HttpResponseBadRequest(_("Coupon '{0}' already used.".format(coupon.code)))
-    except ItemDoesNotExistAgainstCouponException:
-        return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupon.code)))
+    cart = Order.get_cart_for_user(user)
+    cart_items = cart.orderitem_set.all().select_subclasses()
+    is_redemption_applied = False
+    for coupon in coupons:
+        try:
+            if CouponRedemption.add_coupon_redemption(coupon, cart, cart_items):
+                is_redemption_applied = True
+        except MultipleCouponsNotAllowedException:
+            return HttpResponseBadRequest(_("Only one coupon redemption is allowed against an order"))
+
+    if not is_redemption_applied:
+        log.warning("Course item does not exist for coupon '{0}'".format(coupons[0].code))
+        return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupons[0].code)))
 
     return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
 

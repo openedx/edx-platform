@@ -370,7 +370,7 @@ class XMLModuleStore(ModuleStoreReadBase):
     """
     def __init__(
         self, data_dir, default_class=None, course_dirs=None, course_ids=None,
-        load_error_modules=True, i18n_service=None, pyfs_service=None, **kwargs
+        load_error_modules=True, i18n_service=None, fs_service=None, **kwargs
     ):
         """
         Initialize an XMLModuleStore from data_dir
@@ -409,7 +409,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
 
         self.i18n_service = i18n_service
-        self.pyfs_service = pyfs_service
+        self.fs_service = fs_service
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -555,8 +555,8 @@ class XMLModuleStore(ModuleStoreReadBase):
             if self.i18n_service:
                 services['i18n'] = self.i18n_service
 
-            if self.pyfs_service:
-                services['fs'] = self.pyfs_service
+            if self.fs_service:
+                services['fs'] = self.fs_service
 
             system = ImportSystem(
                 xmlstore=self,

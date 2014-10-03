@@ -6,26 +6,36 @@ import mock
 import pygeoip
 import unittest
 
+from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.test import TestCase, Client
+from django.db import connection, transaction
 from django.test.utils import override_settings
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+import ddt
+
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, mixed_store_config
+)
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
 from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class EmbargoMiddlewareTests(TestCase):
+# Since we don't need any XML course fixtures, use a modulestore configuration
+# that disables the XML modulestore.
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+
+@ddt.ddt
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class EmbargoMiddlewareTests(ModuleStoreTestCase):
     """
     Tests of EmbargoMiddleware
     """
     def setUp(self):
-        self.client = Client()
         self.user = UserFactory(username='fred', password='secret')
         self.client.login(username='fred', password='secret')
         self.embargo_course = CourseFactory.create()
@@ -69,7 +79,6 @@ class EmbargoMiddlewareTests(TestCase):
         }
         return ip_dict.get(ip_addr, 'US')
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_countries(self):
         # Accessing an embargoed page from a blocked IP should cause a redirect
         response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
@@ -95,7 +104,6 @@ class EmbargoMiddlewareTests(TestCase):
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_countries_ipv6(self):
         # Accessing an embargoed page from a blocked IP should cause a redirect
         response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='2001:1340::', REMOTE_ADDR='2001:1340::')
@@ -121,7 +129,6 @@ class EmbargoMiddlewareTests(TestCase):
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='2001:250::', REMOTE_ADDR='2001:250::')
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_ip_exceptions(self):
         # Explicitly whitelist/blacklist some IPs
         IPFilter(
@@ -157,7 +164,6 @@ class EmbargoMiddlewareTests(TestCase):
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_ip_network_exceptions(self):
         # Explicitly whitelist/blacklist some IP networks
         IPFilter(
@@ -213,7 +219,73 @@ class EmbargoMiddlewareTests(TestCase):
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @ddt.data(
+        (None, False),
+        ("", False),
+        ("us", False),
+        ("CU", True),
+        ("Ir", True),
+        ("sy", True),
+        ("sd", True)
+    )
+    @ddt.unpack
+    def test_embargo_profile_country(self, profile_country, is_embargoed):
+        # Set the country in the user's profile
+        profile = self.user.profile
+        profile.country = profile_country
+        profile.save()
+
+        # Attempt to access an embargoed course
+        response = self.client.get(self.embargoed_page)
+
+        # If the user is from an embargoed country, verify that
+        # they are redirected to the embargo page.
+        if is_embargoed:
+            embargo_url = reverse('embargo')
+            self.assertRedirects(response, embargo_url)
+
+        # Otherwise, verify that the student can access the page
+        else:
+            self.assertEqual(response.status_code, 200)
+
+        # For non-embargoed courses, the student should be able to access
+        # the page, even if he/she is from an embargoed country.
+        response = self.client.get(self.regular_page)
+        self.assertEqual(response.status_code, 200)
+
+    def test_embargo_profile_country_cache(self):
+        # Set the country in the user's profile
+        profile = self.user.profile
+        profile.country = "us"
+        profile.save()
+
+        # Warm the cache
+        with self.assertNumQueries(16):
+            self.client.get(self.embargoed_page)
+
+        # Access the page multiple times, but expect that we hit
+        # the database to check the user's profile only once
+        with self.assertNumQueries(10):
+            self.client.get(self.embargoed_page)
+
+    def test_embargo_profile_country_db_null(self):
+        # Django country fields treat NULL values inconsistently.
+        # When saving a profile with country set to None, Django saves an empty string to the database.
+        # However, when the country field loads a NULL value from the database, it sets
+        # `country.code` to `None`.  This caused a bug in which country values created by
+        # the original South schema migration -- which defaulted to NULL -- caused a runtime
+        # exception when the embargo middleware treated the value as a string.
+        # In order to simulate this behavior, we can't simply set `profile.country = None`.
+        # (because when we save it, it will set the database field to an empty string instead of NULL)
+        query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
+        connection.cursor().execute(query, [str(self.user.profile.id)])
+        transaction.commit_unless_managed()
+
+        # Attempt to access an embargoed course
+        # Verify that the student can access the page without an error
+        response = self.client.get(self.embargoed_page)
+        self.assertEqual(response.status_code, 200)
+
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': False})
     def test_countries_embargo_off(self):
         # When the middleware is turned off, all requests should go through
@@ -242,7 +314,6 @@ class EmbargoMiddlewareTests(TestCase):
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': False, 'SITE_EMBARGOED': True})
     def test_embargo_off_embargo_site_on(self):
         # When the middleware is turned on with SITE, main site access should be restricted
@@ -254,7 +325,6 @@ class EmbargoMiddlewareTests(TestCase):
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': False, 'SITE_EMBARGOED': True})
     @override_settings(EMBARGO_SITE_REDIRECT_URL='https://www.edx.org/')
     def test_embargo_off_embargo_site_on_with_redirect_url(self):

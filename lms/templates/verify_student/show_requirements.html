@@ -103,7 +103,7 @@
             <div class="copy">
               <p>
                 <span class="copy-super">${_("Check your email")}</span>
-                <span class="copy-sub">${_("you need an active edX account before registering - check your email for instructions")}</span>
+                <span class="copy-sub">${_("You need to activate your {platform_name} account before you can register for courses. Check your inbox for an activation email.").format(platform_name=settings.PLATFORM_NAME)}</span>
               </p>
             </div>
           </li>
@@ -119,7 +119,7 @@
             <div class="copy">
               <p>
                 <span class="copy-super">${_("A photo identification document")}</span>
-                <span class="copy-sub">${_("a drivers license, passport, or other goverment or school-issued ID with your name and picture on it")}</span>
+                <span class="copy-sub">${_("A driver's license, passport, or other government or school-issued ID with your name and picture on it.")}</span>
               </p>
             </div>
           </li>
@@ -133,7 +133,13 @@
             <div class="copy">
               <p>
                 <span class="copy-super">${_("A webcam and a modern browser")}</span>
-                <span class="copy-sub"><strong><a rel="external" href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>, <a rel="external" href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>, <a rel="external" href="http://www.apple.com/safari/">Safari</a>, <a rel="external" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">IE9+</a></strong> - ${_("Please make sure your browser is updated to the most recent version possible")}
+                <span class="copy-sub"><strong>
+                  <a rel="external" href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>, 
+                  <a rel="external" href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>, 
+                  <a rel="external" href="http://www.apple.com/safari/">Safari</a>,
+                  ## Translators: This phrase will look like this: "Internet Explorer 9 or later" 
+                  <a rel="external" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">${_("{internet_explorer_version} or later").format(internet_explorer_version="Internet Explorer 9")}</a></strong>. 
+                  ${_("Please make sure your browser is updated to the most recent version possible.")}
                 </span>
               </p>
             </div>
@@ -148,7 +154,7 @@
             <div class="copy">
               <p>
                 <span class="copy-super">${_("A major credit or debit card")}</span>
-                <span class="copy-sub">${_("Visa, Master Card, American Express, Discover, Diners Club, JCB with Discover logo")}</span>
+                <span class="copy-sub">${_("Visa, MasterCard, American Express, Discover, Diners Club, or JCB with the Discover logo.")}</span>
               </p>
             </div>
           </li>

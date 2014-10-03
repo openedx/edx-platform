@@ -217,6 +217,13 @@ OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
+############################## OAUTH2 Provider ################################
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+
+########################### External REST APIs #################################
+FEATURES['ENABLE_MOBILE_REST_API'] = True
+FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
+
 ###################### Payment ##############################3
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
@@ -330,7 +337,8 @@ MICROSITE_CONFIGURATION = {
         "show_homepage_promo_video": False,
         "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
         "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
+        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>",
+        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
     },
     "default": {
         "university": "default_university",
@@ -338,6 +346,8 @@ MICROSITE_CONFIGURATION = {
     }
 }
 MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
+MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
+
 FEATURES['USE_MICROSITES'] = True
 
 # add extra template directory for test-only templates

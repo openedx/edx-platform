@@ -1,6 +1,5 @@
 from datetime import timedelta
 from xmodule.modulestore.django import modulestore
-from xblock.fields import Scope
 
 
 class CourseGradingModel(object):

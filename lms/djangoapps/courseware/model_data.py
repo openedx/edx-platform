@@ -21,6 +21,7 @@ from django.contrib.auth.models import User
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
 from xblock.fields import Scope, UserScope
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -109,7 +110,8 @@ class FieldDataCache(object):
 
             return descriptors
 
-        descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
+        with modulestore().bulk_operations(descriptor.location.course_key):
+            descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
 
         return FieldDataCache(descriptors, course_id, user, select_for_update)
 

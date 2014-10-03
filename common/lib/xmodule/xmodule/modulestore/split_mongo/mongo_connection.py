@@ -3,8 +3,97 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 """
 import re
 import pymongo
-from bson import son
+import time
+
+# Import this just to export it
+from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+
+from contracts import check
+from functools import wraps
+from pymongo.errors import AutoReconnect
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore.split_mongo import BlockKey
+from datetime import tzinfo
+import datetime
+import pytz
+
+
+def structure_from_mongo(structure):
+    """
+    Converts the 'blocks' key from a list [block_data] to a map
+        {BlockKey: block_data}.
+    Converts 'root' from [block_type, block_id] to BlockKey.
+    Converts 'blocks.*.fields.children' from [[block_type, block_id]] to [BlockKey].
+    N.B. Does not convert any other ReferenceFields (because we don't know which fields they are at this level).
+    """
+    check('seq[2]', structure['root'])
+    check('list(dict)', structure['blocks'])
+    for block in structure['blocks']:
+        if 'children' in block['fields']:
+            check('list(list[2])', block['fields']['children'])
+
+    structure['root'] = BlockKey(*structure['root'])
+    new_blocks = {}
+    for block in structure['blocks']:
+        if 'children' in block['fields']:
+            block['fields']['children'] = [BlockKey(*child) for child in block['fields']['children']]
+        new_blocks[BlockKey(block['block_type'], block.pop('block_id'))] = block
+    structure['blocks'] = new_blocks
+
+    return structure
+
+
+def structure_to_mongo(structure):
+    """
+    Converts the 'blocks' key from a map {BlockKey: block_data} to
+        a list [block_data], inserting BlockKey.type as 'block_type'
+        and BlockKey.id as 'block_id'.
+    Doesn't convert 'root', since namedtuple's can be inserted
+        directly into mongo.
+    """
+    check('BlockKey', structure['root'])
+    check('dict(BlockKey: dict)', structure['blocks'])
+    for block in structure['blocks'].itervalues():
+        if 'children' in block['fields']:
+            check('list(BlockKey)', block['fields']['children'])
+
+    new_structure = dict(structure)
+    new_structure['blocks'] = []
+
+    for block_key, block in structure['blocks'].iteritems():
+        new_block = dict(block)
+        new_block.setdefault('block_type', block_key.type)
+        new_block['block_id'] = block_key.id
+        new_structure['blocks'].append(new_block)
+
+    return new_structure
+
+
+def autoretry_read(wait=0.1, retries=5):
+    """
+    Automatically retry a read-only method in the case of a pymongo
+    AutoReconnect exception.
+
+    See http://emptysqua.re/blog/save-the-monkey-reliably-writing-to-mongodb/
+    for a discussion of this technique.
+    """
+    def decorate(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            for attempt in xrange(retries):
+                try:
+                    return fn(*args, **kwargs)
+                    break
+                except AutoReconnect:
+                    # Reraise if we failed on our last attempt
+                    if attempt == retries - 1:
+                        raise
+
+                    if wait:
+                        time.sleep(wait)
+        return wrapper
+    return decorate
+
 
 class MongoConnection(object):
     """
@@ -21,7 +110,6 @@ class MongoConnection(object):
                 host=host,
                 port=port,
                 tz_aware=tz_aware,
-                document_class=son.SON,
                 **kwargs
             ),
             db
@@ -51,87 +139,148 @@ class MongoConnection(object):
         else:
             raise HeartbeatFailure("Can't connect to {}".format(self.database.name))
 
+    @autoretry_read()
     def get_structure(self, key):
         """
         Get the structure from the persistence mechanism whose id is the given key
         """
-        return self.structures.find_one({'_id': key})
+        return structure_from_mongo(self.structures.find_one({'_id': key}))
 
-    def find_matching_structures(self, query):
+    @autoretry_read()
+    def find_structures_by_id(self, ids):
         """
-        Find the structure matching the query. Right now the query must be a legal mongo query
-        :param query: a mongo-style query of {key: [value|{$in ..}|..], ..}
+        Return all structures that specified in ``ids``.
+
+        Arguments:
+            ids (list): A list of structure ids
         """
-        return self.structures.find(query)
+        return [structure_from_mongo(structure) for structure in self.structures.find({'_id': {'$in': ids}})]
+
+    @autoretry_read()
+    def find_structures_derived_from(self, ids):
+        """
+        Return all structures that were immediately derived from a structure listed in ``ids``.
+
+        Arguments:
+            ids (list): A list of structure ids
+        """
+        return [structure_from_mongo(structure) for structure in self.structures.find({'previous_version': {'$in': ids}})]
+
+    @autoretry_read()
+    def find_ancestor_structures(self, original_version, block_key):
+        """
+        Find all structures that originated from ``original_version`` that contain ``block_key``.
+
+        Arguments:
+            original_version (str or ObjectID): The id of a structure
+            block_key (BlockKey): The id of the block in question
+        """
+        return [structure_from_mongo(structure) for structure in self.structures.find({
+            'original_version': original_version,
+            'blocks': {
+                '$elemMatch': {
+                    'block_id': block_key.id,
+                    'block_type': block_key.type,
+                    'edit_info.update_version': {'$exists': True},
+                }
+            }
+        })]
 
     def insert_structure(self, structure):
         """
-        Create the structure in the db
+        Insert a new structure into the database.
         """
-        self.structures.insert(structure)
+        self.structures.insert(structure_to_mongo(structure))
 
-    def update_structure(self, structure):
-        """
-        Update the db record for structure
-        """
-        self.structures.update({'_id': structure['_id']}, structure)
-
+    @autoretry_read()
     def get_course_index(self, key, ignore_case=False):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
-        case_regex = ur"(?i)^{}$" if ignore_case else ur"{}"
-        return self.course_index.find_one(
-            son.SON([
-                (key_attr, re.compile(case_regex.format(getattr(key, key_attr))))
+        if ignore_case:
+            query = {
+                key_attr: re.compile(u'^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
                 for key_attr in ('org', 'course', 'run')
-            ])
-        )
+            }
+        else:
+            query = {
+                key_attr: getattr(key, key_attr)
+                for key_attr in ('org', 'course', 'run')
+            }
+        return self.course_index.find_one(query)
 
-    def find_matching_course_indexes(self, query):
+    @autoretry_read()
+    def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
-        Find the course_index matching the query. Right now the query must be a legal mongo query
-        :param query: a mongo-style query of {key: [value|{$in ..}|..], ..}
+        Find the course_index matching particular conditions.
+
+        Arguments:
+            branch: If specified, this branch must exist in the returned courses
+            search_targets: If specified, this must be a dictionary specifying field values
+                that must exist in the search_targets of the returned courses
         """
+        query = {}
+        if branch is not None:
+            query['versions.{}'.format(branch)] = {'$exists': True}
+
+        if search_targets:
+            for key, value in search_targets.iteritems():
+                query['search_targets.{}'.format(key)] = value
+
         return self.course_index.find(query)
 
     def insert_course_index(self, course_index):
         """
         Create the course_index in the db
         """
+        course_index['last_update'] = datetime.datetime.now(pytz.utc)
         self.course_index.insert(course_index)
 
-    def update_course_index(self, course_index):
+    def update_course_index(self, course_index, from_index=None):
         """
-        Update the db record for course_index
+        Update the db record for course_index.
+
+        Arguments:
+            from_index: If set, only update an index if it matches the one specified in `from_index`.
         """
-        self.course_index.update(
-            son.SON([('org', course_index['org']), ('course', course_index['course']), ('run', course_index['run'])]),
-            course_index
-        )
+        if from_index:
+            query = {"_id": from_index["_id"]}
+            # last_update not only tells us when this course was last updated but also helps
+            # prevent collisions
+            if 'last_update' in from_index:
+                query['last_update'] = from_index['last_update']
+        else:
+            query = {
+                'org': course_index['org'],
+                'course': course_index['course'],
+                'run': course_index['run'],
+            }
+        course_index['last_update'] = datetime.datetime.now(pytz.utc)
+        self.course_index.update(query, course_index, upsert=False,)
 
     def delete_course_index(self, course_index):
         """
         Delete the course_index from the persistence mechanism whose id is the given course_index
         """
-        return self.course_index.remove(son.SON([
-            ('org', course_index['org']),
-            ('course', course_index['course']),
-            ('run', course_index['run'])
-        ]))
+        return self.course_index.remove({
+            'org': course_index['org'],
+            'course': course_index['course'],
+            'run': course_index['run'],
+        })
 
+    @autoretry_read()
     def get_definition(self, key):
         """
         Get the definition from the persistence mechanism whose id is the given key
         """
         return self.definitions.find_one({'_id': key})
 
-    def find_matching_definitions(self, query):
+    @autoretry_read()
+    def get_definitions(self, definitions):
         """
-        Find the definitions matching the query. Right now the query must be a legal mongo query
-        :param query: a mongo-style query of {key: [value|{$in ..}|..], ..}
+        Retrieve all definitions listed in `definitions`.
         """
-        return self.definitions.find(query)
+        return self.definitions.find({'$in': {'_id': definitions}})
 
     def insert_definition(self, definition):
         """
@@ -139,4 +288,20 @@ class MongoConnection(object):
         """
         self.definitions.insert(definition)
 
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+
+        This method is intended for use by tests and administrative commands, and not
+        to be run during server startup.
+        """
+        self.course_index.create_index(
+            [
+                ('org', pymongo.ASCENDING),
+                ('course', pymongo.ASCENDING),
+                ('run', pymongo.ASCENDING)
+            ],
+            unique=True
+        )
 

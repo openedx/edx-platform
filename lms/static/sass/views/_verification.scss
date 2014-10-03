@@ -108,6 +108,11 @@
     color: $m-gray-d4;
   }
 
+  // reset: navigation (needed due to edX's new global-header styling)
+  .global-new .nav-global a {
+    padding-bottom: ($baseline +1);
+  }
+
   // HACK: nasty override due to our bad input/button styling
   button, input[type="submit"], input[type="button"], button[type="submit"] {
     @include font-size(16);
@@ -368,14 +373,22 @@
 
         .sts-track-value {
           @extend %copy-badge;
-          color: $white;
+          display: inline-block;
           background: $verified-color-lvl3;
+          color: $white;
+          font-weight: 600;
 
           .context {
-            margin-right: ($baseline/4);
             opacity: 0.80;
             color: $white;
             letter-spacing: 0.1rem;
+          }
+        }
+
+        &.professional-ed {
+
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
           }
         }
       }
@@ -461,7 +474,14 @@
       display: inline-block;
 
       .sts-track-value {
-        background: $m-blue-l1;
+        background: $verified-color-lvl3;
+      }
+
+      &.professional-ed {
+
+        .sts-track-value {
+          background-color: $professional-color-lvl1;
+        }
       }
     }
   }
@@ -1250,12 +1270,24 @@
     .register-choice-audit {
       border-color: $m-blue-d1;
 
+      .deco-ribbon {
+        position: relative;
+        top: -($baseline*2.5);
+        right: -($baseline*0.35);
+        float: right;
+        display: block;
+        width: ($baseline*2.9);
+        height: ($baseline*4.2);
+        background: transparent url('../images/honor-ribbon.png') no-repeat 0 0;
+      }
+
       .wrapper-copy {
         width: flex-grid(8,8);
       }
 
       .list-actions {
         width: flex-grid(8,8);
+        margin: ($baseline/3) 0;
       }
 
       .action-select input {
@@ -1278,8 +1310,7 @@
       }
 
       .list-actions {
-        margin: ($baseline/2) 0;
-        border-top: ($baseline/10) solid $m-gray-t1;
+        margin: ($baseline/3) 0;
       }
 
       .action-intro, .action-select {

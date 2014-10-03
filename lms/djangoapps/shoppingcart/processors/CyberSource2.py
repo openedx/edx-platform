@@ -101,7 +101,7 @@ def processor_hash(value):
 
     """
     secret_key = get_processor_config().get('SECRET_KEY', '')
-    hash_obj = hmac.new(secret_key, value, sha256)
+    hash_obj = hmac.new(secret_key.encode('utf-8'), value.encode('utf-8'), sha256)
     return binascii.b2a_base64(hash_obj.digest())[:-1]  # last character is a '\n', which we don't want
 
 
@@ -126,6 +126,12 @@ def verify_signatures(params):
             (missing keys, wrong types)
 
     """
+
+    # First see if the user cancelled the transaction
+    # if so, then not all parameters will be passed back so we can't yet verify signatures
+    if params.get('decision') == u'CANCEL':
+        raise CCProcessorUserCancelled()
+
     # Validate the signature to ensure that the message is from CyberSource
     # and has not been tampered with.
     signed_fields = params.get('signed_field_names', '').split(',')
@@ -272,6 +278,7 @@ def get_purchase_params(cart, callback_url=None):
 
     if callback_url is not None:
         params['override_custom_receipt_page'] = callback_url
+        params['override_custom_cancel_page'] = callback_url
 
     return params
 
@@ -458,6 +465,16 @@ def _get_processor_exception_html(exception):
                 u"Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}."
             ).format(
                 msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
+                email=payment_support_email
+            )
+        )
+    elif isinstance(exception, CCProcessorUserCancelled):
+        return _format_error_html(
+            _(
+                u"Sorry! Our payment processor sent us back a message saying that you have cancelled this transaction. "
+                u"The items in your shopping cart will exist for future purchase. "
+                u"If you feel that this is in error, please contact us with payment-specific questions at {email}."
+            ).format(
                 email=payment_support_email
             )
         )

@@ -3,45 +3,41 @@
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 <%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
+<%include file="generate_registarion_codes_modal.html" args="section_data=section_data" />
 <div class="ecommerce-wrapper">
-   <h3 class="coupon-errors" id="code-error"></h3>
+   <h3 class="error-msgs" id="error-msg"></h3>
    <div id = "accordion">
       <div class="wrap">
-         <h2>Registration Codes</h2>
+         <h2>${_('Registration Codes')}</h2>
          <div>
-            <p>Enter the transaction group name and number of registration codes that you want to generate. Click to generate a CSV :</p>
-            <p>
-            <form action="${ section_data['generate_registration_code_csv_url'] }" id="course_codes_number" method="post">
-               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="transaction_group_name" placeholder="Transaction Group Name"/>
-               <input type="text" name="course_registration_code_number" placeholder="Number of Registration Codes" maxlength="4"/>
-               <input type="submit" name="generate-registration-codes-csv" value="${_("Generate Registration Codes")}" data-csv="true">
-            </form>
-            </p>
-            <p>Click to generate a CSV file of all Course Registrations Codes:</p>
+            <span class="code_tip">${_('Click to generate Registration Codes')}
+            <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Generate Registration Codes')}</a>
+            </span>
+            <p>${_('Click to generate a CSV file of all Course Registrations Codes:')}</p>
             <p>
             <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="download_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="text" name="download_company_name" placeholder="Company Name (Optional)"/>
                <input type="submit" name="list-registration-codes-csv" value="${_("Download Registration Codes")}" data-csv="true">
             </form>
             </p>
-            <p>Click to generate a CSV file of all Active Course Registrations Codes:</p>
+            <p>${_('Click to generate a CSV file of all Active Course Registrations Codes:')}</p>
             <p>
             <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="active_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="text" name="active_company_name" placeholder="Company Name (Optional)"/>
                <input type="submit" name="active-registration-codes-csv" value="${_("Active Registration Codes")}" data-csv="true">
             </form>
             </p>
-            <p>Click to generate a CSV file of all Spent Course Registrations Codes:</p>
+            <p>${_('Click to generate a CSV file of all Spent Course Registrations Codes:')}</p>
             <p>
             <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="spent_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="text" name="spent_company_name" placeholder="Company Name (Optional)"/>
                <input type="submit" name="spent-registration-codes-csv" value="${_("Spent Registration Codes")}" data-csv="true">
             </form>
             </p>
+           <a id="registration_code_generation_link-trigger" href="#registration_code_generation_modal" rel="leanModal"></a>
          </div>
       </div>
       <!-- end wrap -->
@@ -50,7 +46,7 @@
          <div>
             <span class="tip">${_("Course Price: ")}<span>$${section_data['course_price']}</span>
             %if section_data['access']['finance_admin'] is True:
-            <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ Set Price</a>
+            <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ ${_('Set Price')}</a>
             %endif
             </span>
          </div>
@@ -63,18 +59,39 @@
             %if section_data['total_amount'] is not None:
             <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
             %endif
-            <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
-            <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
+
+            <span class="csv_tip">${_("Click to generate a CSV file for all purchase transactions in this course")}
+                <input class="add blue-button"  type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true">
+            </span>
          </div>
-      </div>
-      <!-- end wrap -->
+      </div><!-- end wrap -->
+      <div class="wrap">
+         <h2>${_("Sales")}</h2>
+         <div>
+            <span class="csv_tip">${_("Click to generate a CSV file for all sales records in this course")}
+                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All e-Commerce Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true"></p></td>
+            </span>
+             <hr>
+             <p>${_("Enter the invoice number to invalidate or re-validate sale")}</p>
+            <span class="invalid_sale">
+               <input type="number" id="invoice_number" placeholder= "${_("Enter Invoice Number")}"/>
+               <input type="button" class="add blue-button" id="invalidate_invoice" value="${_("Invalidate Sale")}">
+               <input type="button" class="add blue-button" id="re_validate_invoice" value="${_("Revalidate Sale")}">
+            </span>
+
+         </div>
+      </div><!-- end wrap -->
       %endif
       <div class="wrap">
          <h2>${_("Coupons List")}</h2>
          <div>
-            <h3 class="coupon-errors" id="coupon-error"></h3>
+
+            <span class="csv_tip">${_("Click to generate a CSV file of all Coupon Codes:")}
+                <input class="add blue-button" type="button" name="download-coupon-codes-csv" value="${_("Download coupon codes")}" data-endpoint="${ section_data['download_coupon_codes_url'] }" data-csv="true">
+            </span>
+
             <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
-               class="add blue-button">${_("+ Add Coupon")}</a></span>
+               class="add blue-button">+ ${_("Add Coupon")}</a></span>
             <div class="wrapper-content wrapper">
                <section class="content">
                   %if len(section_data['coupons']):
@@ -83,7 +100,6 @@
                         <tr class="coupons-headings">
                            <th class="c_code">${_("Code")}</th>
                            <th class="c_dsc">${_("Description")}</th>
-                           <th class="c_course_id">${_("Course_id")}</th>
                            <th class="c_discount">${_("Discount (%)")}</th>
                            <th class="c_count">${_("Count")}</th>
                            <th class="c_action">${_("Actions")}</th>
@@ -96,15 +112,14 @@
                            %else:
                         <tr class="coupons-items">
                            %endif
-                           <td>${coupon.code}</td>
-                           <td>${coupon.description}</td>
-                           <td>${coupon.course_id.to_deprecated_string()}</td>
-                           <td>${coupon.percentage_discount}</td>
+                            <td>${_('{code}').format(code=coupon.code)}</td>
+                            <td>${_('{description}').format(description=coupon.description)}</td>
+                            <td>${_('{discount}').format(discount=coupon.percentage_discount)}</td>
                            <td>
                               ${ coupon.couponredemption_set.all().count() }
                            </td>
                            <!--<td>${coupon.is_active}</td>-->
-                           <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">Edit</a></td>
+                           <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">${_('Edit')}</a></td>
                         </tr>
                         %endfor
                      </tbody>
@@ -119,8 +134,8 @@
    </div>
 </div>
 <script>
-   $(function () {
 
+   $(function () {
        var icons = {
            header: "ui-icon-circle-arrow-e",
            activeHeader: "ui-icon-circle-arrow-s"
@@ -133,13 +148,17 @@
                     var active = jQuery("#accordion").accordion('option', 'active');
                     $.cookie('saved_index', null);
                     $.cookie('saved_index', active);
+                    $('#error-msg').val('');
+                    $("#error-msg").fadeOut(2000 , function(){
+                        $('#error-msg').hide()
+                    });
                    },
                    animate: 400,
                    header: "> div.wrap >h2",
                    icons:icons,
                    active:isNaN(parseInt($.cookie('saved_index'))) ? 0 : parseInt($.cookie('saved_index')),
                    collapsible: true
-        });
+               });
 
      $('a[rel*=leanModal]').leanModal();
      $.each($("a.edit-right"), function () {
@@ -152,6 +171,46 @@
          $(this).removeAttr('href')
        }
      });
+     $('#registration_code_generation_link').click(function(event){
+         event.preventDefault();
+
+         $.ajax({
+         type: "POST",
+         url: "${section_data['get_user_invoice_preference_url']}",
+         success: function (data) {
+             $('#invoice-copy').prop('checked', data.invoice_copy);
+             $('#registration_code_generation_link-trigger').click();
+           }
+       });
+
+     });
+     $('#invalidate_invoice, #re_validate_invoice').click(function (event) {
+         event.preventDefault();
+         var event_type = "re_validate"
+         if($(event.target).attr('id')=='invalidate_invoice'){
+             event_type = "invalidate"
+         }
+         if($('#invoice_number').val() == "") {
+                     $('#error-msg').attr('class','error-msgs')
+                     $('#error-msg').html("${_("Invoice number should not be empty.")}").show();
+                     return
+         }
+         $.ajax({
+             type: "POST",
+             data: {invoice_number: $('#invoice_number').val(), event_type:event_type},
+             url: "${section_data['sale_validation_url']}",
+             success: function (data) {
+                 $('#error-msg').attr('class','success-msgs')
+                 $('#error-msg').html(data.message).show();
+                 $('#invoice_number').val('');
+             },
+             error: function(jqXHR, textStatus, errorThrown) {
+                 $('#error-msg').attr('class','error-msgs')
+                 $('#error-msg').html(jqXHR.responseText).show();
+             }
+         });
+     });
+
      $('a.edit-right').click(function (event) {
        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: none');
        $('#edit_coupon_form #coupon_form_error').text();
@@ -167,8 +226,8 @@
          data: {id: coupon_id},
          url: "${section_data['ajax_get_coupon_info']}",
          success: function (data) {
-             $('#coupon-error').val('');
-             $('#coupon-error').attr('style', 'display: none');
+             $('#error-msg').val('');
+             $('#error-msg').hide()
              $('input#edit_coupon_code').val(data.coupon_code);
              $('input#edit_coupon_discount').val(data.coupon_discount);
              $('textarea#edit_coupon_description').val(data.coupon_description);
@@ -177,7 +236,8 @@
            },
          error: function(jqXHR, textStatus, errorThrown) {
            var data = $.parseJSON(jqXHR.responseText);
-           $('#coupon-error').html(data.message).show();
+           $('#error-msg').attr('class','error-msgs')
+           $('#error-msg').html(data.message).show();
          }
        });
      });
@@ -189,7 +249,7 @@
        anchor.data("disabled", "disabled");
        event.preventDefault();
        if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
-         return false;
+           return false;
        }
        $.ajax({
          type: "POST",
@@ -201,48 +261,141 @@
            },
          error: function(jqXHR, textStatus, errorThrown) {
            var data = $.parseJSON(jqXHR.responseText);
-           $('#coupon-error').html(data.message).show();
+           $('#error-msg').attr('class','error-msgs')
+           $('#error-msg').html(data.message).show();
            anchor.removeData("disabled");
          }
        });
      });
+     var generate_registration_code_form = $("form#generate_codes");
+     var generate_registration_button = $('input[name="generate-registration-codes-csv"]');
+     var registration_code_error = $('#generate_codes #registration_code_form_error');
+
+     function validateEmail(sEmail) {
+      filter = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/
+      return filter.test(sEmail)
+     }
+     generate_registration_code_form.submit(function () {
+      registration_code_error.attr('style', 'display: none');
+      generate_registration_button.attr('disabled', true);
+      var total_registration_codes = $('input[name="total_registration_codes"]').val();
+      var recipient_name = $('input[name="recipient_name"]').val();
+      var recipient_email = $('input[name="recipient_email"]').val();
+      var sale_price = $('input[name="sale_price"]').val();
+      var company_name = $('input[name="company_name"]').val();
+      var company_contact_name = $('input[name="company_contact_name"]').val();
+      var company_contact_email = $('input[name="company_contact_email"]').val();
+
+      var address_line = $('input[name="address_line_1"]').val();
+
+      if (company_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the company name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (($.isNumeric(company_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the non-numeric value for company name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (company_contact_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the company contact name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (($.isNumeric(company_contact_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the non-numeric value for company contact name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (company_contact_email == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the company contact email');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (!(validateEmail(company_contact_email))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the valid email address');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (recipient_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the recipient name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (($.isNumeric(recipient_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the non-numeric value for recipient name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (recipient_email == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the recipient email');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (!(validateEmail(recipient_email))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the valid email address');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (address_line == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the billing address');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (sale_price == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the sale price');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (!($.isNumeric(sale_price))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the numeric value for sale price');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (total_registration_codes == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the total registration codes');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (!($.isNumeric(total_registration_codes))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the numeric value for total registration codes');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      var modal_overLay = $('#lean_overlay')
+      var registration_code_modal = $('#registration_code_generation_modal');
+      registration_code_modal.hide();
+      modal_overLay.hide();
+     });
+
      $('#edit_coupon_form').submit(function () {
        $("#update_coupon_button").attr('disabled', true);
-       // Get the Code and Discount value and trim it
-       var code = $.trim($('#edit_coupon_code').val());
-       var coupon_discount = $.trim($('#edit_coupon_discount').val());
-
-       // Check if empty of not
-       if (code === '') {
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
-         $("#update_coupon_button").removeAttr('disabled');
-         return false;
-       }
-       if (coupon_discount == '0') {
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Value Greater than 0')}");
-         $("#update_coupon_button").removeAttr('disabled');
-         return false;
-       }
-       if (parseInt(coupon_discount) > 100) {
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
-         $("#update_coupon_button").removeAttr('disabled');
-         return false;
-       }
-       if (!$.isNumeric(coupon_discount)) {
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
-         $("#update_coupon_button").removeAttr('disabled');
-         return false;
-       }
      });
      $('#course_price_link').click(function () {
        reset_input_fields();
      });
      $('#add_coupon_link').click(function () {
        reset_input_fields();
+     });
+      $('#registration_code_generation_link').click(function () {
+        reset_input_fields();
+        $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
      });
      $('#set_price_form').submit(function () {
        $("#set_course_button").attr('disabled', true);
@@ -253,19 +406,19 @@
        // Check if empty of not
        if (course_price === '') {
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Please Enter the Course Price')}");
+         $('#set_price_form #course_form_error').text("${_('Please enter the course price')}");
          $("#set_course_button").removeAttr('disabled');
          return false;
        }
        if (!$.isNumeric(course_price)) {
          $("#set_course_button").removeAttr('disabled');
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Please Enter the Numeric value for Discount')}");
+         $('#set_price_form #course_form_error').text("${_('Please enter the numeric value for course price')}");
          return false;
        }
        if (currency == '') {
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Please Select the Currency')}");
+         $('#set_price_form #course_form_error').text("${_('Please select the currency')}");
          $("#set_course_button").removeAttr('disabled');
          return false;
        }
@@ -280,25 +433,19 @@
        if (code === '') {
          $("#add_coupon_button").removeAttr('disabled');
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
-         return false;
-       }
-       if (coupon_discount == '0') {
-         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
-         $("#add_coupon_button").removeAttr('disabled');
+         $('#add_coupon_form #coupon_form_error').text("${_('Please enter the coupon code')}");
          return false;
        }
        if (parseInt(coupon_discount) > 100) {
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Please enter the coupon discount value less than or equal to 100')}");
          $("#add_coupon_button").removeAttr('disabled');
          return false;
        }
        if (!$.isNumeric(coupon_discount)) {
          $("#add_coupon_button").removeAttr('disabled');
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Numeric value for Discount')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Please enter the numeric value for discount')}");
          return false;
        }
      });
@@ -337,6 +484,7 @@
        $("#update_coupon_button").removeAttr('disabled');
        $("#add_coupon_button").removeAttr('disabled');
        $("#set_course_button").removeAttr('disabled');
+       $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
        reset_input_fields();
        e.preventDefault();
      });
@@ -347,9 +495,11 @@
        $("#edit-coupon-modal").attr("aria-hidden", "true");
        $(".edit-right").focus();
        $("#set-course-mode-price-modal").attr("aria-hidden", "true");
+       $("#registration_code_generation_modal").attr("aria-hidden", "true");
        $("#add_coupon_button").removeAttr('disabled');
        $("#set_course_button").removeAttr('disabled');
        $("#update_coupon_button").removeAttr('disabled');
+       $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
        reset_input_fields();
      };
 
@@ -366,11 +516,12 @@
 
      $("#add-coupon-modal .close-modal").click(onModalClose);
      $("#edit-coupon-modal .close-modal").click(onModalClose);
+     $('#registration_code_generation_modal .close-modal').click(onModalClose);
      $("#set-course-mode-price-modal .close-modal").click(reset_input_fields);
 
 
      // Hitting the ESC key will exit the modal
-     $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal").on("keydown", function (e) {
+     $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal").on("keydown", function (e) {
        var keyCode = e.keyCode || e.which;
        // 27 is the ESC key
        if (keyCode === 27) {
@@ -378,19 +529,38 @@
          $("#add-coupon-modal .close-modal").click();
          $("#set-course-mode-price-modal .close-modal").click();
          $("#edit-coupon-modal .close-modal").click();
+         $('#registration_code_generation_modal .close-modal').click();
        }
      });
    });
    var reset_input_fields = function () {
-     $('#coupon-error').val('');
-     $('#coupon-error').attr('style', 'display: none');
+     $('#error-msg').val('');
+     $('#error-msg').hide()
      $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
      $('#set_price_form #course_form_error').attr('style', 'display: none');
+     $('#generate_codes #registration_code_form_error').attr('style', 'display: none');
      $('#add_coupon_form #coupon_form_error').text();
      $('input#mode_price').val('');
      $('input#coupon_code').val('');
      $('input#coupon_discount').val('');
      $('textarea#coupon_description').val('');
-
+     $('input[name="company_name"]').val('');
+     $('input[name="total_registration_codes"]').val('');
+     $('input[name="address_line_1"]').val('');
+     $('input[name="address_line_2"]').val('');
+     $('input[name="address_line_3"]').val('');
+     $('input[name="city"]').val('');
+     $('input[name="state"]').val('');
+     $('input[name="zip"]').val('');
+     $('input[name="country"]').val('');
+     $('input[name="customer_reference_number"]').val('');
+     $('input[name="recipient_name"]').val('');
+     $('input[name="sale_price"]').val('');
+     $('input[name="recipient_email"]').val('');
+     $('input[name="company_contact_name"]').val('');
+     $('input[name="company_contact_email"]').val('');
+     $('input[name="invoice"]').attr('checked', 'checked');
+     $('input[name="company_reference"]').val('');
+     $('input[name="internal_reference"]').val('');
    }
 </script>
