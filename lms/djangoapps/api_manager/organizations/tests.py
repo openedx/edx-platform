@@ -342,7 +342,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
 
     def test_organizations_metrics_get_courses_filter(self):
         users = []
-        for i in xrange(1, 10):
+        for i in xrange(1, 12):
             data = {
                 'email': 'test{}@example.com'.format(i),
                 'username': 'test_user{}'.format(i),
@@ -367,8 +367,11 @@ class OrganizationsApiTests(ModuleStoreTestCase):
                 StudentGradebook.objects.create(user=user, grade=0.72, proforma_grade=0.78, course_id=course3.id)
             elif i < 9:
                 StudentGradebook.objects.create(user=user, grade=0.94, proforma_grade=0.67, course_id=course1.id)
-            else:
+            elif i < 11:
                 StudentGradebook.objects.create(user=user, grade=0.90, proforma_grade=0.91, course_id=course2.id)
+            else:
+                # Not started student - should be considered incomplete
+                StudentGradebook.objects.create(user=user, grade=0.00, proforma_grade=0.00, course_id=course2.id)
 
         data = {
             'name': self.test_organization_name,
