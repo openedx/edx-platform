@@ -212,7 +212,6 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         self.course.cohort_config = {"cohorted": False, "cohorted_discussions": ["Topic_A"]}
         check_cohorted_topics([])
 
-
     def test_single_inline(self):
         self.create_discussion("Chapter", "Discussion")
         self.assertCategoryMapEquals(

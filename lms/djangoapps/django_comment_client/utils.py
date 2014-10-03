@@ -96,7 +96,7 @@ def _filter_unstarted_categories(category_map):
     unfiltered_queue = [category_map]
     filtered_queue = [result_map]
 
-    while len(unfiltered_queue) > 0:
+    while unfiltered_queue:
 
         unfiltered_map = unfiltered_queue.pop()
         filtered_map = filtered_queue.pop()

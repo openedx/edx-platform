@@ -40,7 +40,7 @@ from django_comment_client.utils import (
     permalink,
     add_thread_group_name,
     get_group_id_for_comments_service,
-    get_discussion_id_map,
+    get_discussion_categories_ids
 )
 from util.html import strip_tags
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
