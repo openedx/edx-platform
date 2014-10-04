@@ -27,8 +27,9 @@ sections:
 
 * :ref:`Close_discussions`
   
-For information about how enabling the cohort feature for a course affects the 
-course discussions, see :ref:`Moderating Discussions for Cohorts`.
+For information about how enabling the cohort feature for a course affects
+options for moderating course discussions, see :ref:`Moderating Discussions for
+Cohorts`.
 
 .. _Overview_discussions:
 
@@ -93,9 +94,9 @@ that contains it. Students cannot contribute to these discussion topics until
 that date.
 
 .. note:: In courses that include the cohort feature, all of the 
- content-specific discussion topics are private. Student posts to these topics
- can only be read, and responded to, by members of the same cohort group. See
- :ref:`Cohorts Overview`.
+ content-specific discussion topics are divided by cohort. Student posts to
+ these topics can only be read, and responded to, by members of the same cohort
+ group. See :ref:`Cohorts Overview`.
 
 .. _Create CourseWide Discussion Topics:
 
@@ -153,10 +154,10 @@ Discussion list now includes the topic you added.
   :alt: Image of a new topic named Course Q&A in the list of discussions
 
 .. note:: In courses that include the cohort feature, the course-wide 
- discussion topics that you add are public. All of the posts can be read, and
+ discussion topics that you add are unified. All of the posts can be read, and
  responded to, by every student, regardless of their assignement to a cohort
- group. You can configure course-wide discussion topics to be private. See
- :ref:`Identifying Private CourseWide Discussion Topics`.
+ group. You have the option to configure these topics to be divided by cohort.
+ See :ref:`Identifying Private CourseWide Discussion Topics`.
 
 .. _Assigning_discussion_roles:
 
