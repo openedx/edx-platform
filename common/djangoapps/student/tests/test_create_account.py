@@ -71,7 +71,7 @@ class TestCreateAccount(TestCase):
         request.user = AnonymousUser()
 
         mako_middleware_process_request(request)
-        with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
+        with mock.patch('student.views.send_mail') as mock_send_mail:
             student.views.create_account(request)
 
         # check that send_mail is called
