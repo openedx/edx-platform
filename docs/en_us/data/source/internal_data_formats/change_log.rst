@@ -4,10 +4,19 @@
 Change Log
 ###########
 
-.. **********************
-.. October-December 2014
-.. **********************
+**********************
+October-December 2014
+**********************
 
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 10/07/14
+     - Added new student and instructor events relating to cohort use to the
+       :ref:`Tracking Logs` chapter.
 
 **********************
 July-September 2014
