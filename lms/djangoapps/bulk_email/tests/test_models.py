@@ -29,6 +29,23 @@ class CourseEmailTest(TestCase):
         self.assertEquals(email.html_message, html_message)
         self.assertEquals(email.sender, sender)
 
+    def test_creation_with_optional_attributes(self):
+        course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
+        sender = UserFactory.create()
+        to_option = SEND_TO_STAFF
+        subject = "dummy subject"
+        html_message = "<html>dummy message</html>"
+        template_name = "branded_template"
+        from_addr = "branded@branding.com"
+        email = CourseEmail.create(course_id, sender, to_option, subject, html_message, template_name=template_name, from_addr=from_addr)
+        self.assertEquals(email.course_id, course_id)
+        self.assertEquals(email.to_option, SEND_TO_STAFF)
+        self.assertEquals(email.subject, subject)
+        self.assertEquals(email.html_message, html_message)
+        self.assertEquals(email.sender, sender)
+        self.assertEquals(email.template_name, template_name)
+        self.assertEquals(email.from_addr, from_addr)
+
     def test_bad_to_option(self):
         course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
         sender = UserFactory.create()
@@ -72,9 +89,18 @@ class CourseEmailTemplateTest(TestCase):
         return context
 
     def test_get_template(self):
+        # Get the default template, which has name=None
         template = CourseEmailTemplate.get_template()
         self.assertIsNotNone(template.html_template)
         self.assertIsNotNone(template.plain_template)
+
+    def test_get_branded_template(self):
+        # Get a branded (non default) template and make sure we get what we expect
+        template = CourseEmailTemplate.get_template(name="branded.template")
+        self.assertIsNotNone(template.html_template)
+        self.assertIsNotNone(template.plain_template)
+        self.assertIn(u"THIS IS A BRANDED HTML TEMPLATE", template.html_template)
+        self.assertIn(u"THIS IS A BRANDED TEXT TEMPLATE", template.plain_template)
 
     def test_render_html_without_context(self):
         template = CourseEmailTemplate.get_template()
