@@ -1451,10 +1451,25 @@ def send_email(request, course_id):
     subject = request.POST.get("subject")
     message = request.POST.get("message")
 
+    # allow two branding points to come from Microsites: which CourseEmailTemplate should be used
+    # and what the 'from' field in the email should be
+    #
+    # If these are None (because we are not in a Microsite or they are undefined in Microsite config) than
+    # the system will use normal system defaults
+    template_name = microsite.get_value('course_email_template_name')
+    from_addr = microsite.get_value('course_email_from_addr')
+
     # Create the CourseEmail object.  This is saved immediately, so that
     # any transaction that has been pending up to this point will also be
     # committed.
-    email = CourseEmail.create(course_id, request.user, send_to, subject, message)
+    email = CourseEmail.create(
+        course_id,
+        request.user,
+        send_to,
+        subject,message,
+        template_name=template_name,
+        from_addr=from_addr
+    )
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
     instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
