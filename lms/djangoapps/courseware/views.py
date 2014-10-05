@@ -559,41 +559,42 @@ def course_info(request, course_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
-    masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
-    reverifications = fetch_reverify_banner_info(request, course_key)
-    studio_url = get_studio_url(course, 'course_info')
+    with modulestore().bulk_operations(course_key):
+        course = get_course_with_access(request.user, 'load', course_key)
+        staff_access = has_access(request.user, 'staff', course)
+        masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
+        reverifications = fetch_reverify_banner_info(request, course_key)
+        studio_url = get_studio_url(course, 'course_info')
 
-    # link to where the student should go to enroll in the course:
-    # about page if there is not marketing site, SITE_NAME if there is
-    url_to_enroll = reverse(course_about, args=[course_id])
-    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
-        url_to_enroll = marketing_link('COURSES')
+        # link to where the student should go to enroll in the course:
+        # about page if there is not marketing site, SITE_NAME if there is
+        url_to_enroll = reverse(course_about, args=[course_id])
+        if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+            url_to_enroll = marketing_link('COURSES')
 
-    show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(request.user, course.id)
+        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(request.user, course.id)
 
-    context = {
-        'request': request,
-        'course_id': course_key.to_deprecated_string(),
-        'cache': None,
-        'course': course,
-        'staff_access': staff_access,
-        'masquerade': masq,
-        'studio_url': studio_url,
-        'reverifications': reverifications,
-        'show_enroll_banner': show_enroll_banner,
-        'url_to_enroll': url_to_enroll,
-    }
+        context = {
+            'request': request,
+            'course_id': course_key.to_deprecated_string(),
+            'cache': None,
+            'course': course,
+            'staff_access': staff_access,
+            'masquerade': masq,
+            'studio_url': studio_url,
+            'reverifications': reverifications,
+            'show_enroll_banner': show_enroll_banner,
+            'url_to_enroll': url_to_enroll,
+        }
 
-    now = datetime.now(UTC())
-    effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
-    if staff_access and now < effective_start:
-        # Disable student view button if user is staff and
-        # course is not yet visible to students.
-        context['disable_student_access'] = True
+        now = datetime.now(UTC())
+        effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
+        if staff_access and now < effective_start:
+            # Disable student view button if user is staff and
+            # course is not yet visible to students.
+            context['disable_student_access'] = True
 
-    return render_to_response('courseware/info.html', context)
+        return render_to_response('courseware/info.html', context)
 
 
 @ensure_csrf_cookie

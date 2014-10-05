@@ -246,23 +246,25 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     a student's dashboard.
     """
     for enrollment in CourseEnrollment.enrollments_for_user(user):
-        course = modulestore().get_course(enrollment.course_id)
-        if course and not isinstance(course, ErrorDescriptor):
+        store = modulestore()
+        with store.bulk_operations(enrollment.course_id):
+            course = store.get_course(enrollment.course_id)
+            if course and not isinstance(course, ErrorDescriptor):
 
-            # if we are in a Microsite, then filter out anything that is not
-            # attributed (by ORG) to that Microsite
-            if course_org_filter and course_org_filter != course.location.org:
-                continue
-            # Conversely, if we are not in a Microsite, then let's filter out any enrollments
-            # with courses attributed (by ORG) to Microsites
-            elif course.location.org in org_filter_out_set:
-                continue
+                # if we are in a Microsite, then filter out anything that is not
+                # attributed (by ORG) to that Microsite
+                if course_org_filter and course_org_filter != course.location.org:
+                    continue
+                # Conversely, if we are not in a Microsite, then let's filter out any enrollments
+                # with courses attributed (by ORG) to Microsites
+                elif course.location.org in org_filter_out_set:
+                    continue
 
-            yield (course, enrollment)
-        else:
-            log.error("User {0} enrolled in {2} course {1}".format(
-                user.username, enrollment.course_id, "broken" if course else "non-existent"
-            ))
+                yield (course, enrollment)
+            else:
+                log.error("User {0} enrolled in {2} course {1}".format(
+                    user.username, enrollment.course_id, "broken" if course else "non-existent"
+                ))
 
 
 def _cert_info(user, course, cert_status):
