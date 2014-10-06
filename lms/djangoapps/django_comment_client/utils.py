@@ -1,3 +1,4 @@
+import json
 import pytz
 from collections import defaultdict
 import logging
@@ -8,6 +9,8 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
+from django.utils.timezone import UTC
+
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 
@@ -16,11 +19,10 @@ import pystache_custom as pystache
 
 from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted
 from course_groups.models import CourseUserGroup
-from xmodule.modulestore.django import modulestore
-from django.utils.timezone import UTC
+from courseware.courses import get_course_by_id
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
-import json
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -393,6 +395,8 @@ def prepare_content(content, course_key, is_staff=False):
     @TODO: not all response pre-processing steps are currently integrated into
     this function.
     """
+    course = get_course_by_id(course_key)
+
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
@@ -438,9 +442,13 @@ def prepare_content(content, course_key, is_staff=False):
             ]
             content[child_content_key] = children
 
-    # Augment the specified thread info to include the group name if a group id is present.
-    if content.get('group_id') is not None:
-        content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
+    if course.is_cohorted:
+        # Augment the specified thread info to include the group name if a group id is present.
+        if content.get('group_id') is not None:
+            content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
+    else:
+        # Remove any cohort information that might remain if the course had previously been cohorted.
+        content.pop('group_id', None)
 
     return content
 
