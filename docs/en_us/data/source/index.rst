@@ -20,21 +20,3 @@ This document is intended for researchers and data czars at edX partner institut
    internal_data_formats/tracking_logs.rst
    internal_data_formats/event_list.rst
 
-
-********************
-Course Data Formats
-********************
-
-The `Building and Running an edX Course <http://edx.readthedocs.org/projects/ca/en/latest/>`_ guide provides complete information on how to construct a course.
-
-The following sections of this document do not specifically pertain to researchers, but rather provide supplemental information on XML formats used to build an edX course. Over time, this information is being migrated to *Building and Running an edX Course*, as shown in the :ref:`Change Log`. 
-
-.. toctree::
-   :maxdepth: 2
-
-   course_data_formats/course_xml.rst
-   course_data_formats/graphical_slider_tool/graphical_slider_tool.rst
-   course_data_formats/symbolic_response.rst
-
-
-
