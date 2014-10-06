@@ -7,13 +7,24 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment, UserProfile
 from util.testing import UrlResetMixin
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from mock import patch
+import ddt
 
-
+@ddt.ddt
 class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
     """
     Tests for the Auto auth view that we have for load testing.
     """
+
+    COURSE_ID_MONGO = 'edX/Test101/2014_Spring'
+    COURSE_ID_SPLIT = 'course-v1:edX+Test101+2014_Spring'
+    COURSE_IDS_DDT = (
+        (COURSE_ID_MONGO, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_MONGO)),
+        (COURSE_ID_SPLIT, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_SPLIT)),
+        (COURSE_ID_MONGO, CourseLocator.from_string(COURSE_ID_MONGO)),
+        (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
+        )
 
     @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):
@@ -24,8 +35,6 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         super(AutoAuthEnabledTestCase, self).setUp()
         self.url = '/auto_auth'
         self.client = Client()
-        self.course_id = 'edX/Test101/2014_Spring'
-        self.course_key = SlashSeparatedCourseKey.from_deprecated_string(self.course_id)
 
     def test_create_user(self):
         """
@@ -83,42 +92,48 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         user = User.objects.get(username='test')
         self.assertFalse(user.is_staff)
 
-    def test_course_enrollment(self):
+    @ddt.data(*COURSE_IDS_DDT)
+    @ddt.unpack
+    def test_course_enrollment(self, course_id, course_key):
 
         # Create a user and enroll in a course
-        self._auto_auth(username='test', course_id=self.course_id)
+        self._auto_auth(username='test', course_id=course_id)
 
         # Check that a course enrollment was created for the user
         self.assertEqual(CourseEnrollment.objects.count(), 1)
-        enrollment = CourseEnrollment.objects.get(course_id=self.course_key)
+        enrollment = CourseEnrollment.objects.get(course_id=course_key)
         self.assertEqual(enrollment.user.username, "test")
 
-    def test_double_enrollment(self):
+    @ddt.data(*COURSE_IDS_DDT)
+    @ddt.unpack
+    def test_double_enrollment(self, course_id, course_key):
 
         # Create a user and enroll in a course
-        self._auto_auth(username='test', course_id=self.course_id)
+        self._auto_auth(username='test', course_id=course_id)
 
         # Make the same call again, re-enrolling the student in the same course
-        self._auto_auth(username='test', course_id=self.course_id)
+        self._auto_auth(username='test', course_id=course_id)
 
         # Check that only one course enrollment was created for the user
         self.assertEqual(CourseEnrollment.objects.count(), 1)
-        enrollment = CourseEnrollment.objects.get(course_id=self.course_key)
+        enrollment = CourseEnrollment.objects.get(course_id=course_key)
         self.assertEqual(enrollment.user.username, "test")
 
-    def test_set_roles(self):
-        seed_permissions_roles(self.course_key)
-        course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=self.course_key))
+    @ddt.data(*COURSE_IDS_DDT)
+    @ddt.unpack
+    def test_set_roles(self, course_id, course_key):
+        seed_permissions_roles(course_key)
+        course_roles = dict((r.name, r) for r in Role.objects.filter(course_id=course_key))
         self.assertEqual(len(course_roles), 4)  # sanity check
 
         # Student role is assigned by default on course enrollment.
-        self._auto_auth(username='a_student', course_id=self.course_id)
+        self._auto_auth(username='a_student', course_id=course_id)
         user = User.objects.get(username='a_student')
         user_roles = user.roles.all()
         self.assertEqual(len(user_roles), 1)
         self.assertEqual(user_roles[0], course_roles[FORUM_ROLE_STUDENT])
 
-        self._auto_auth(username='a_moderator', course_id=self.course_id, roles='Moderator')
+        self._auto_auth(username='a_moderator', course_id=course_id, roles='Moderator')
         user = User.objects.get(username='a_moderator')
         user_roles = user.roles.all()
         self.assertEqual(
@@ -127,7 +142,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
                 course_roles[FORUM_ROLE_MODERATOR]]))
 
         # check multiple roles work.
-        self._auto_auth(username='an_admin', course_id=self.course_id,
+        self._auto_auth(username='an_admin', course_id=course_id,
                         roles='{},{}'.format(FORUM_ROLE_MODERATOR, FORUM_ROLE_ADMINISTRATOR))
         user = User.objects.get(username='an_admin')
         user_roles = user.roles.all()
