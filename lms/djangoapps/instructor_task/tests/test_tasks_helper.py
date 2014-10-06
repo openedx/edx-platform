@@ -19,7 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from instructor_task.models import ReportStore
-from instructor_task.tasks_helper import push_grades_to_s3, push_students_csv_to_s3, UPDATE_STATUS_SUCCEEDED
+from instructor_task.tasks_helper import upload_grades_csv, upload_students_csv, UPDATE_STATUS_SUCCEEDED
 
 
 class TestReport(ModuleStoreTestCase):
@@ -55,7 +55,7 @@ class TestInstructorGradeReport(TestReport):
         self.current_task.update_state = Mock()
         with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
-            result = push_grades_to_s3(None, None, self.course.id, None, 'graded')
+            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
         #This assertion simply confirms that the generation completed with no errors
         self.assertEquals(result['succeeded'], result['attempted'])
 
@@ -68,7 +68,7 @@ class TestStudentReport(TestReport):
     def test_success(self):
         task_input = {'features': []}
         with patch('instructor_task.tasks_helper._get_current_task'):
-            result = push_students_csv_to_s3(None, None, self.course.id, task_input, 'calculated')
+            result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
         report_store = ReportStore.from_config()
         links = report_store.links_for(self.course.id)
 
@@ -95,6 +95,6 @@ class TestStudentReport(TestReport):
         }
         with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
-            result = push_students_csv_to_s3(None, None, self.course.id, task_input, 'calculated')
+            result = upload_students_csv(None, None, self.course.id, task_input, 'calculated')
         #This assertion simply confirms that the generation completed with no errors
         self.assertEquals(result, UPDATE_STATUS_SUCCEEDED)

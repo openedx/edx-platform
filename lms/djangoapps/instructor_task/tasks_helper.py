@@ -505,7 +505,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
     )
 
 
-def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a grades CSV file for all students that
     are enrolled, and store using a `ReportStore`. Once created, the files can
@@ -596,7 +596,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
     return update_task_progress()
 
 
-def push_students_csv_to_s3(_xmodule_instance_args, _entry_id, course_id, task_input, _action_name):
+def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input, _action_name):
     """
     For a given `course_id`, generate a CSV file containing profile
     information for all students that are enrolled, and store using a
