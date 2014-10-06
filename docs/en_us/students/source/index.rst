@@ -11,6 +11,8 @@ edX Guide for Students
    :numbered:
    :maxdepth: 2
 
+   change_log
    SFD_certificates
    SFD_mathformatting
    SFD_ORA
+   sfd_discussions/index
