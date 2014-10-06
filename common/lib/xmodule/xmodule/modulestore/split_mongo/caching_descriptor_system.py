@@ -76,6 +76,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
     @contract(usage_key="BlockUsageLocator | BlockKey", course_entry_override="CourseEnvelope | None")
     def _load_item(self, usage_key, course_entry_override=None, **kwargs):
+        """
+        Instantiate the xblock fetching it either from the cache or from the structure
+
+        :param course_entry_override: the course_info with the course_key to use (defaults to cached)
+        """
         # usage_key is either a UsageKey or just the block_key. if a usage_key,
         if isinstance(usage_key, BlockUsageLocator):
 
@@ -90,21 +95,25 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     raise ItemNotFoundError
             else:
                 block_key = BlockKey.from_usage_key(usage_key)
+                version_guid = self.course_entry.course_key.version_guid
         else:
             block_key = usage_key
 
             course_info = course_entry_override or self.course_entry
             course_key = course_info.course_key
+            version_guid = course_key.version_guid
 
-        if course_entry_override:
-            structure_id = course_entry_override.structure.get('_id')
-        else:
-            structure_id = self.course_entry.structure.get('_id')
+        # look in cache
+        cached_module = self.modulestore.get_cached_block(course_key, version_guid, block_key)
+        if cached_module:
+            return cached_module
 
         json_data = self.get_module_data(block_key, course_key)
 
         class_ = self.load_block_type(json_data.get('block_type'))
-        return self.xblock_from_json(class_, course_key, block_key, json_data, course_entry_override, **kwargs)
+        block = self.xblock_from_json(class_, course_key, block_key, json_data, course_entry_override, **kwargs)
+        self.modulestore.cache_block(course_key, version_guid, block_key, block)
+        return block
 
     @contract(block_key=BlockKey, course_key=CourseLocator)
     def get_module_data(self, block_key, course_key):

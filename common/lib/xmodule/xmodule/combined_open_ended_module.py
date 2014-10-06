@@ -240,7 +240,7 @@ class CombinedOpenEndedFields(object):
         help=_("The number of times the student can try to answer this problem."),
         default=1,
         scope=Scope.settings,
-        values={"min": 1 }
+        values={"min": 1}
     )
     accept_file_upload = Boolean(
         display_name=_("Allow File Uploads"),
