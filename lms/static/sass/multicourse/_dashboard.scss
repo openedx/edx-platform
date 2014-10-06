@@ -5,27 +5,6 @@
   @include clearfix;
   padding: ($baseline*2) 0 0 0;
 
-  .dashboard-banner {
-    background: $yellow;
-    border: 1px solid rgb(200,200,200);
-    box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
-    padding: 10px;
-    margin-bottom: 30px;
-
-    &:empty {
-      display: none;
-      background-color: #FFF;
-    }
-
-    h2 {
-      margin-bottom: 0;
-    }
-
-    p {
-      margin-bottom: 0;
-    }
-  }
-
   .profile-sidebar {
     float: left;
     margin-right: flex-gutter();
@@ -1165,4 +1144,32 @@
     @extend .cover;
     opacity: 0.5;
   }
+
+.dashboard-banner {
+
+  &:empty {
+    display: none;
+  }
+
+  .wrapper-msg {
+    padding-bottom: 0;
+  }
+
+  .msg {
+    @include clearfix();
+    font-family: $sans-serif;
+    padding-bottom: $baseline;
+    border-bottom: thin solid $gray;
+
+    &.title {
+      @extend %t-title5;
+      @extend %t-weight4;
+      font-family: $f-sans-serif;
+
+      // Overriding Platform h2 styles
+      text-transform: none;
+      letter-spacing: 0;
+    }
+  }
+}
 

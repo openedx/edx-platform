@@ -24,6 +24,13 @@
   <script type="text/javascript">
   (function() {
 
+    // On initialization, set focus to the first notification available
+    // for screen readers.
+    var notifications = $('.dashboard-notifications');
+    if (notifications.children().length > 0) {
+        notifications.focus();
+    }
+
     $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
 
     function toggleExpandMessage(e) {
@@ -178,30 +185,34 @@
   </script>
 </%block>
 
-% if reverifications["must_reverify"] or reverifications["denied"]:
-  <section class="dashboard-banner">
-    <%include file='dashboard/_dashboard_prompt_midcourse_reverify.html' />
-  </section>
-% endif
+<div class="dashboard-notifications" tabindex="-1">
+    % if reverifications["must_reverify"] or reverifications["denied"]:
+        ## Section Element must be outside of the re-verify template. The template is re-used for courseware, and has separate styling.
+        <section class="dashboard-banner">
+            <%include file='dashboard/_dashboard_prompt_midcourse_reverify.html' />
+        </section>
+    % endif
 
-<section class="container dashboard" id="dashboard-main" aria-hidden="false">
+    %if message:
+        <section class="dashboard-banner">
+            ${message}
+        </section>
+    %endif
 
-  %if message:
-    <section class="dashboard-banner">
-      ${message}
-    </section>
-  %endif
+    % if duplicate_provider:
+        <section class="dashboard-banner third-party-auth">
+            <%include file='dashboard/_dashboard_third_party_error.html' />
+        </section>
+    % endif
 
-  %if enrollment_message:
-      ${enrollment_message}
-  %endif
+    %if enrollment_message:
+        <section class="dashboard-banner">
+            ${enrollment_message}
+        </section>
+    %endif
+</div>
 
-  % if duplicate_provider:
-    <section class="dashboard-banner third-party-auth">
-      ## Translators: this message is displayed when a user tries to link their account with a third-party authentication provider (for example, Google or LinkedIn) with a given edX account, but their third-party account is already associated with another edX account. provider_name is the name of the third-party authentication provider, and platform_name is the name of the edX deployment.
-      <p>${_("The {provider_name} account you selected is already linked to another {platform_name} account.").format(provider_name='<strong>%s</strong>' % duplicate_provider.NAME, platform_name=platform_name)}
-    </section>
-  % endif
+<section class="container dashboard" id="dashboard-main">
 
   <section class="profile-sidebar">
     <header class="profile">
