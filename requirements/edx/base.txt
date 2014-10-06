@@ -11,6 +11,7 @@ html5lib==0.999
 boto==2.13.3
 celery==3.0.19
 dealer==0.2.3
+defusedxml==0.4.1
 distribute>=0.6.28, <0.7
 django-babel-underscore==0.1.0
 django-celery==3.0.17

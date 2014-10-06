@@ -1,6 +1,7 @@
 """
 Module with code executed during Studio startup
 """
+
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
@@ -13,6 +14,11 @@ def run():
     """
     Executed during django startup
     """
+
+    # Patch the xml libs.
+    from safe_lxml import defuse_xml_libs
+    defuse_xml_libs()
+
     autostartup()
 
     add_mimetypes()
