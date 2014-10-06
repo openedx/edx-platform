@@ -58,14 +58,14 @@ Documentation for course teams is available on the docs.edx.org web page.
   .csv files that course teams can use to gain information about student
   background and activity.
 
-.. about student background, activity, and progress.
-
 * `edX Course Staff Release Notes`_ summarize the changes in each new version
   of the edX Studio and LMS software.
 
 * `Creating a Peer Assessment`_ describes features for students to provide
   peer- and self- evaluations of responses to a question. Note that this new
   feature is in limited release.
+
+* `edX Open Learning XML Guide`_ provides guidelines for building edX courses with Open Learning XML (OLX). Note that this guide is currently an Alpha version.
 
 These guides open in your web browser. The left side of each page includes a
 **Search docs** field and links to that guide's contents. To open or save a PDF
@@ -152,6 +152,8 @@ Documentation for developers is available on the docs.edx.org web page.
 * XBlock_: Open edX courseware components provides preliminary documentation
   on the XBlock component architecture for building courses.
 
+* `edX Open Learning XML Guide`_ provides guidelines for building edX courses with Open Learning XML (OLX). Note that this guide is currently an Alpha version.
+
 GitHub
 -------
 
@@ -204,6 +206,15 @@ get more information about the PRs.
 Resources for Students
 **************************
 
+Documentation
+-------------
+
+The `edX Guide for Students`_ is available on the docs.edx.org web page. As
+students are not currently guided to this resource through the coursware, we
+encourage course staff to provide links to students as needed in course updates
+or discussions. Note that this guide is currently an Alpha version.
+
+
 In a Course
 ------------
 
@@ -237,7 +248,9 @@ email message to info@edx.org.
 For opportunities to meet others who are interested in edX courses, check the
 edX Global Community meetup_ group.
 
+.. _edX Guide for Students: http://edx-guide-for-students.readthedocs.org/en/latest/
 
+.. _edX Open Learning XML Guide: http://edx-open-learning-xml.readthedocs.org/en/latest/index.html
 
 .. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
 .. _Using edX Insights: http://edx-insights.readthedocs.org/en/latest/
