@@ -16,5 +16,5 @@ class Command(BaseCommand):
         try:
             course = get_course_by_id(args[0])
             fix_missing_extensions(course)
-        except Http404 as e:
+        except (ValueError, Http404) as e:
             raise CommandError(e)
