@@ -30,8 +30,8 @@ from instructor_task.tasks_helper import (
     rescore_problem_module_state,
     reset_attempts_module_state,
     delete_problem_module_state,
-    push_grades_to_s3,
-    push_students_csv_to_s3
+    upload_grades_csv,
+    upload_students_csv
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
@@ -139,7 +139,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('graded')
-    task_fn = partial(push_grades_to_s3, xmodule_instance_args)
+    task_fn = partial(upload_grades_csv, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 
@@ -151,5 +151,5 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('generated')
-    task_fn = partial(push_students_csv_to_s3, xmodule_instance_args)
+    task_fn = partial(upload_students_csv, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
