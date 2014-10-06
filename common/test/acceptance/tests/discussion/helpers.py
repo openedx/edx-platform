@@ -47,7 +47,19 @@ class CohortTestMixin(object):
                 u"cohort_config": {
                     "auto_cohort_groups": auto_cohort_groups or [],
                     "cohorted_discussions": [],
-                    "cohorted": True
+                    "cohorted": True,
+                },
+            },
+        })
+
+    def disable_cohorting(self, course_fixture):
+        """
+        Disables cohorting for the current course fixture.
+        """
+        course_fixture._update_xblock(course_fixture._course_location, {
+            "metadata": {
+                u"cohort_config": {
+                    "cohorted": False
                 },
             },
         })

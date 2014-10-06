@@ -45,11 +45,16 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
     def test_cohort_visibility_label(self):
         # Must be moderator to view content in a cohort other than your own
         AutoAuthPage(self.browser, course_id=self.course_id, roles="Moderator").visit()
-        self.setup_thread(1, group_id=self.cohort_1_id)
+        self.thread_id = self.setup_thread(1, group_id=self.cohort_1_id)
         self.assertEquals(
             self.thread_page.get_group_visibility_label(),
             "This post is visible only to {}.".format(self.cohort_1_name)
         )
+
+        # Disable cohorts and verify that the post now shows as visible to everyone.
+        self.disable_cohorting(self.course_fixture)
+        self.refresh_thread_page(self.thread_id)
+        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
 
 class DiscussionTabSingleThreadTest(UniqueCourseTest):
@@ -67,6 +72,10 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest):
     def setup_thread_page(self, thread_id):
         self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint:disable=W0201
         self.thread_page.visit()
+
+    def refresh_thread_page(self, thread_id):
+        self.browser.refresh()
+        self.thread_page.wait_for_page()
 
 
 @attr('shard_1')
@@ -113,11 +122,18 @@ class InlineDiscussionTest(UniqueCourseTest):
 
     def setup_thread_page(self, thread_id):
         CoursewarePage(self.browser, self.course_id).visit()
+        self.show_thread(thread_id)
+
+    def show_thread(self, thread_id):
         discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         discussion_page.expand_discussion()
         self.assertEqual(discussion_page.get_num_displayed_threads(), 1)
         self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint:disable=W0201
         self.thread_page.expand()
+
+    def refresh_thread_page(self, thread_id):
+        self.browser.refresh()
+        self.show_thread(thread_id)
 
 
 @attr('shard_1')
