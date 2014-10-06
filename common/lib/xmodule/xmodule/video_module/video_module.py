@@ -36,6 +36,7 @@ from xmodule.x_module import XModule, module_attr
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
+from xmodule.license import parse_license
 
 from .transcripts_utils import Transcript, VideoTranscriptsMixin
 from .video_utils import create_youtube_string, get_video_from_cdn
@@ -222,7 +223,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student()
 
-        return self.system.render_template('video.html', {
+
+
+        context = {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             # This won't work when we move to data that
@@ -253,7 +256,23 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
-        })
+        }
+
+        # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
+        course_id = module_attr('course_id')
+        if course_id is not None and hasattr(self.runtime, 'modulestore'):
+            course = self.runtime.modulestore.get_course(course_id)
+            if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.licenseable:
+                if not(self.license):
+                    self.license = course.license
+                    self.license_version = course.license_version
+
+                context['license'] = parse_license(
+                    self.license,
+                    self.license_version
+                )
+
+        return self.system.render_template('video.html', context)
 
 
 class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, TabsEditingDescriptor, EmptyDataRawDescriptor):
@@ -313,6 +332,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 if not download_video['explicitly_set']:
                     self.download_video = True
 
+        # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and not(self.license):
+            course = modulestore().get_course(course_id)
+
+            self.license = course.license
+            self.license_version = course.license_version
+
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,
         # we should enable `download_track` if following is true:
@@ -366,6 +392,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             editable_fields['source']['non_editable'] = True
         else:
             editable_fields.pop('source')
+
+        if not(hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False)):
+            editable_fields.pop('license', None)
+            editable_fields.pop('license_version', None)
 
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
         languages.sort(key=lambda l: l['label'])
@@ -430,6 +460,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'download_track': json.dumps(self.download_track),
             'download_video': json.dumps(self.download_video),
         }
+
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            attrs['license'] = self.license
+            attrs['license_version'] = self.license_version
+
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
@@ -471,6 +506,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         display_name = metadata_fields['display_name']
         video_url = metadata_fields['html5_sources']
+
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
@@ -502,8 +538,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         metadata = {
             'display_name': display_name,
-            'video_url': video_url
+            'video_url': video_url,
         }
+
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            metadata['license'] = metadata_fields['license']
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
         return _context
@@ -553,6 +592,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'from': 'start_time',
             'to': 'end_time'
         }
+
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            license = xml.get('license')
+            if license is not None:
+                field_data['license_version'] = parse_license(license).version
+
         sources = xml.findall('source')
         if sources:
             field_data['html5_sources'] = [ele.get('src') for ele in sources]

@@ -1,6 +1,6 @@
 define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/views/utils/create_course_utils",
-    "js/views/utils/view_utils"],
-    function (domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, ViewUtils) {
+    "js/views/utils/view_utils", "js/views/license-selector"],
+    function (domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, ViewUtils, LicenseSelector) {
         var CreateCourseUtils = CreateCourseUtilsFactory({
             name: '.new-course-name',
             org: '.new-course-org',
@@ -32,12 +32,14 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             var org = $newCourseForm.find('.new-course-org').val();
             var number = $newCourseForm.find('.new-course-number').val();
             var run = $newCourseForm.find('.new-course-run').val();
+            var license = $newCourseForm.find('.license').val();
 
             course_info = {
                 org: org,
                 number: number,
                 display_name: display_name,
-                run: run
+                run: run,
+                license: license
             };
 
             analytics.track('Created a Course', course_info);
@@ -54,7 +56,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             $('.wrapper-create-course').removeClass('is-shown');
             // Clear out existing fields and errors
             _.each(
-                ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+                ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run', '#create-course-form .license'],
                 function (field) {
                     $(field).val('');
                 }
@@ -85,6 +87,10 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
                 ViewUtils.reload();
             }));
             $('.action-reload').bind('click', ViewUtils.reload);
+
+            // Licencing in new course form
+            var licenseSelector = new LicenseSelector();
+            $('#field-course-license').html(licenseSelector.render().$el);
         };
 
         domReady(onReady);

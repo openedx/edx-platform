@@ -138,6 +138,163 @@ form {
   }
 }
 
+
+@mixin license-button {
+  @include grey-button;
+  @extend %t-action2;
+
+  padding: ($baseline/2) !important;
+  display: inline-block;
+
+  text-align: center;
+  vertical-align: middle !important;
+
+  width: 100%;
+  max-width: 18%;
+  height: 200px;
+
+  cursor: pointer;
+  
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  .icon {
+      width: 64px;
+      height: 64px;
+      display: inline-block;
+      vertical-align: middle !important;
+      margin: 3px;
+  }
+
+  .buttontext {
+    font-size: 11px;
+    font-weight: normal;
+    line-height: 1.5;
+    vertical-align: middle !important;
+
+
+    h4 {
+      font-size: 13px;
+      font-weight: bold;
+    }
+  }
+
+  &.selected {
+    @include blue-button;
+  }
+
+  &.size-small {
+    .buttontext {
+      display: none !important;
+    }
+  }
+
+  &.size-middle {
+    .icon {
+      display: none !important;
+    }
+  }
+
+  &[data-license^="ARR"] .icon {
+    background: url(../img/arr/arr.png) no-repeat center;
+  }
+
+  &[data-license^="CC0"] .icon {
+    background: url(../img/cc/zero.png) no-repeat center;
+  }
+
+  &[data-license^="BY"] .icon {
+    background: url(../img/cc/by.png) no-repeat center;
+  }
+
+  &[data-license^="NC"] .icon {
+    background: url(../img/cc/nc.png) no-repeat center;
+  }
+
+  &[data-license^="ND"] .icon {
+    background: url(../img/cc/nd.png) no-repeat center;
+  }
+
+  &[data-license^="SA"] .icon {
+    background: url(../img/cc/sa.png) no-repeat center;
+  }
+}
+
+.license-img {
+  padding: 4px;
+}
+
+//ELEM: license selector wraper
+.license-selector {
+  text-align: middle;
+
+  .license-buttons {
+    margin: 3px;
+    text-align: center;
+    display: inline-block;
+    border: 1px solid grey;
+    border-radius: 4px;
+  }
+
+  .license-allornothing, .license-cc {
+    padding: ($baseline/2);
+    text-align: center;
+    display: inline-block;
+    width: 100%;
+
+  }
+
+  .license-allornothing {
+    li {
+      @include license-button;
+      max-width: 39%;
+      height: auto;
+
+      .buttontext {
+        display: inline-block;
+        max-width: 75%;
+      }
+
+      &.size-middle {
+        height: 100px;
+      }
+    }
+  }
+
+  .license-cc {
+    li {
+      @include license-button;
+      
+      .buttontext {
+        margin-top: 5px;
+      }
+
+      &.size-middle {
+        height: 200px;
+      }
+   }
+  }
+
+  .selected-license-text {
+    label {
+      font-weight: bold !important;
+      margin: 1px;
+      display: inline-block !important;
+      vertical-align: middle;
+    }
+
+    .selected-license {
+      display: inline-block;
+      vertical-align: bottom;
+    }  
+
+  }
+}
+
 // ELEM: form
 // form styling for creating a new content item (course, user, textbook)
 // TODO: refactor this into a placeholder to extend.

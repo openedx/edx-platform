@@ -18,6 +18,9 @@
             <th class="date-col sortable-column"><span class="column-sort-link" id="js-asset-date-col"><%= gettext("Date Added") %></span></th>
             <th class="embed-col"><%= gettext("Embed URL") %></th>
             <th class="embed-col"><%= gettext("External URL") %></th>
+            <% if (licenseable === true) { %>
+            <th class="embed-col"><%= gettext("License") %></th>
+            <% } %>
             <th class="actions-col"><span class="sr"><%= gettext("Actions") %></span></th>
         </tr>
         </thead>

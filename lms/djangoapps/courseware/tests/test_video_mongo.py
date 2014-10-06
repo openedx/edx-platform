@@ -14,6 +14,7 @@ from xmodule.video_module import create_youtube_string, VideoDescriptor
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.test_video import VideoDescriptorTestBase
+from xmodule.license import parse_license
 
 from edxval.api import (
     ValVideoNotFoundError,

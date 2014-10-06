@@ -1,14 +1,16 @@
-define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_prompt", "js/views/feedback_notification"],
-    function(BaseView, _, gettext, PromptView, NotificationView) {
+define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/license-selector","js/utils/modal"],
+    function(BaseView, _, gettext, PromptView, NotificationView, LicenseSelector, ModalUtils) {
 var AssetView = BaseView.extend({
   initialize: function() {
     this.template = this.loadTemplate("asset");
     this.listenTo(this.model, "change:locked", this.updateLockState);
+    this.licenseSelector = new LicenseSelector({model:this.model.get('license'), buttonSize: 'middle'});
   },
   tagName: "tr",
   events: {
     "click .remove-asset-button": "confirmDelete",
-    "click .lock-checkbox": "lockAsset"
+    "click .lock-checkbox": "lockAsset",
+    "click .change-asset-license-button": "showLicenseModal",
   },
 
   render: function() {
@@ -18,10 +20,13 @@ var AssetView = BaseView.extend({
       thumbnail: this.model.get('thumbnail'),
       date_added: this.model.get('date_added'),
       url: this.model.get('url'),
+      licenseable: this.licenseable,
+      license_img: this.licenseSelector.img(),
       external_url: this.model.get('external_url'),
       portable_url: this.model.get('portable_url'),
       uniqueId: uniqueId
     }));
+    this.licenseSelector.render();
     this.updateLockState();
     return this;
   },
@@ -74,6 +79,15 @@ var AssetView = BaseView.extend({
     }).show();
   },
 
+  showLicenseModal: function(e) {
+    ModalUtils.showModal(".change-license-modal");
+    $(".change-license-modal .modal-body .license-selector").remove();
+    $(".change-license-modal .modal-body").append(this.licenseSelector.render().$el);
+    this.licenseSelector.delegateEvents();
+    $(".change-license-modal .save-license-button").unbind().bind('click',$.proxy(this,'changeLicense'));
+
+  },
+
   lockAsset: function(e) {
     var asset = this.model;
     var saving = new NotificationView.Mini({
@@ -83,6 +97,28 @@ var AssetView = BaseView.extend({
       wait: true, // This means we won't re-render until we get back the success state.
       success: function() {
           saving.hide();
+      }
+    });
+    },
+
+  changeLicense: function() {
+    if (this.licenseSelector.getLicense() == this.model.get('license')) {
+      ModalUtils.hideModal(null,".change-license-modal");
+      return;
+    }
+
+    var asset = this.model;
+    var view = this;
+
+    var saving = new NotificationView.Mini({
+      title: gettext("Saving&hellip;")
+    }).show();
+    asset.save({'license': this.licenseSelector.getLicense()}, {
+      wait: true, // This means we won't re-render until we get back the success state.
+      success: function() {
+          saving.hide();
+          view.$el.find('.license-img').html(view.licenseSelector.img());
+          ModalUtils.hideModal(null,".change-license-modal");
       }
     });
     }

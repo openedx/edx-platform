@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponse, Http404
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
 
 from xblock.fields import Scope
 from xblock.fragment import Fragment
@@ -30,6 +31,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
+from xmodule.license import parse_license
 
 from xmodule.course_module import DEFAULT_START_DATE
 from django.contrib.auth.models import User
@@ -508,6 +510,15 @@ def _create_item(request):
                 )
             )
             store.update_item(course, request.user.id)
+
+        if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and course.licenseable:
+            license = request.json.get('license')
+            if license is not None:
+                metadata['license'] = license
+                metadata['license_version'] = parse_license(license).version
+            else:
+                metadata['license'] = course.license
+                metadata['license_version'] = course.license_version
 
         return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 

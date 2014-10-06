@@ -9,6 +9,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.utils import course_image_url
 from models.settings import course_grading
 from xmodule.fields import Date
+from xmodule.license import License
 from xmodule.modulestore.django import modulestore
 
 class CourseDetails(object):
@@ -17,6 +18,7 @@ class CourseDetails(object):
         self.org = org
         self.course_id = course_id
         self.run = run
+        self.license = None
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
         self.enrollment_start = None
@@ -37,6 +39,7 @@ class CourseDetails(object):
         descriptor = modulestore().get_course(course_key)
         course_details = cls(course_key.org, course_key.course, course_key.run)
 
+        course_details.license = descriptor.license
         course_details.start_date = descriptor.start
         course_details.end_date = descriptor.end
         course_details.enrollment_start = descriptor.enrollment_start
@@ -114,6 +117,11 @@ class CourseDetails(object):
         # into the model is nasty, convert the JSON Date to a Python date, which is what the
         # setter expects as input.
         date = Date()
+
+        if 'license' in jsondict and jsondict['license'] != str(descriptor.license):
+            descriptor.license = jsondict['license']
+            descriptor.license_version = None
+            dirty = True
 
         if 'start_date' in jsondict:
             converted = date.from_json(jsondict['start_date'])
@@ -212,5 +220,7 @@ class CourseSettingsEncoder(json.JSONEncoder):
             return obj.dict()
         elif isinstance(obj, datetime.datetime):
             return Date().to_json(obj)
+        elif isinstance(obj, License):
+            return License().to_json(obj)
         else:
             return JSONEncoder.default(self, obj)

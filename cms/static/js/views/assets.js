@@ -33,6 +33,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('li a.upload-button').on('click', this.showUploadModal);
                 $('.upload-modal .close-button').on('click', this.hideModal);
                 $('.upload-modal .choose-file-button').on('click', this.showFileSelectionMenu);
+                $('.change-license-modal .close-button').on('click', this.hideModal);
                 return this;
             },
 
@@ -42,7 +43,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     ViewUtils.hideLoadingIndicator();
 
                     // Create the table
-                    this.$el.html(this.template());
+                    this.$el.html(this.template({
+                        licenseable: this.licenseable,
+                    }));
                     tableBody = this.$('#asset-table-body');
                     this.tableBody = tableBody;
                     this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
@@ -66,7 +69,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 if (hasAssets) {
                     assets.each(
                         function(asset) {
-                            var view = new AssetView({model: asset});
+                            var view = new AssetView({model: asset, licenseable: this.licenseable});
                             tableBody.append(view.render().el);
                         }
                     );
@@ -117,7 +120,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var self = assetsView;
                 event.preventDefault();
                 self.resetUploadModal();
-                ModalUtils.showModal();
+                ModalUtils.showModal(".upload-modal");
                 $('.file-input').bind('change', self.startUpload);
                 $('.upload-modal .file-chooser').fileupload({
                     dataType: 'json',

@@ -70,6 +70,7 @@ class MongoContentStore(ContentStore):
                               displayname=content.name, content_son=content_son,
                               thumbnail_location=thumbnail_location,
                               import_path=content.import_path,
+                              license=getattr(content, 'license', None),
                               # getattr b/c caching may mean some pickled instances don't have attr
                               locked=getattr(content, 'locked', False)) as fp:
             if hasattr(content.data, '__iter__'):
@@ -318,6 +319,7 @@ class MongoContentStore(ContentStore):
                 source_content.read(),
                 _id=asset_id, filename=asset['filename'], content_type=asset['contentType'],
                 displayname=asset['displayname'], content_son=asset_key,
+                license=asset['license'],
                 # thumbnail is not technically correct but will be functionally correct as the code
                 # only looks at the name which is not course relative.
                 thumbnail_location=asset['thumbnail_location'],

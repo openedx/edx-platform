@@ -1,6 +1,21 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.conf import settings %>
+<%! from xmodule.license import parse_license %>
 
 <%inherit file="base.html" />
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+  % for template_name in ["license-selector"]:
+  <script type="text/template" id="${template_name}-tpl">
+      <%static:include path="js/${template_name}.underscore" />
+  </script>
+  % endfor
+% endif
+</%block>
+
 <%def name="online_help_token()"><% return "home" %></%def>
 <%block name="title">${_("My Courses")}</%block>
 <%block name="bodyclass">is-signedin index view-dashboard</%block>
@@ -117,6 +132,10 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                   <span class="tip">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
+                % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+                <li class="field text" id="field-course-license">
+                </li>
+                % endif
               </ol>
 
             </fieldset>
@@ -156,6 +175,11 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                     <span class="course-run metadata-item">
                       <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
                     </span>
+                    % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course_info['licenseable']:
+                    <span class="course-license metadata-item">
+                      <span class="label">${_("Course License:")}</span> <span class="value">${course_info['license'].small_img}</span>
+                    </span>
+                    % endif
                   </div>
                 </div>
 
@@ -194,6 +218,11 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                     <span class="course-run metadata-item">
                       <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
                     </span>
+                    % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course_info['licenseable']:
+                    <span class="course-license metadata-item">
+                      <span class="label">${_("Course License:")}</span> <span class="value">${course_info['license'].small_img}</span>
+                    </span>
+                    % endif
                   </div>
                 </div>
 
@@ -244,6 +273,11 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 <span class="course-run metadata-item">
                   <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
                 </span>
+                % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course_info['licenseable']:
+                <span class="course-license metadata-item">
+                  <span class="label">${_("Course License:")}</span> <span class="value">${course_info['license'].small_img}</span>
+                </span>
+                % endif
               </div>
             </a>
 

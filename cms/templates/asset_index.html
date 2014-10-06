@@ -3,6 +3,7 @@
 <%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
+  from django.conf import settings
 %>
 <%block name="title">${_("Files &amp; Uploads")}</%block>
 <%block name="bodyclass">is-signedin course uploads view-uploads</%block>
@@ -10,7 +11,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% for template_name in ["asset-library", "asset", "paging-header", "paging-footer"]:
+% for template_name in ["asset-library", "asset", "paging-header", "paging-footer", "license-selector"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -24,7 +25,15 @@
 
         var assets = new AssetCollection();
         assets.url = "${asset_callback_url}";
-        var assetsView = new AssetsView({collection: assets, el: $('.assets-wrapper')});
+        var assetsView = new AssetsView({
+            collection: assets, el: $('.assets-wrapper'),
+
+            % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and context_course.licenseable:
+            licenseable: true
+            % else:
+            licenseable: false
+            % endif
+        });
         assetsView.render();
 
     }); // end of require()
@@ -105,6 +114,17 @@
         </form>
     </div>
 </div>
+
+% if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and context_course.licenseable:
+<div class="change-license-modal modal">
+    <a href="#" class="close-button"><i class="icon-remove-sign"></i> <span class="sr">${_('close')}</span></a>
+    <div class="modal-body">
+        <h2>Change Asset License</h2>
+    </div>
+    <a href="#" class="save-license-button button">${_("Save License")}</a>
+    <div class="button-spacer"></div>
+</div>
+% endif
 
 
 </%block>

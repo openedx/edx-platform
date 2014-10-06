@@ -20,6 +20,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.keys import CourseKey, AssetKey
+from xmodule.license import parse_license
 
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
@@ -127,8 +128,9 @@ def _assets_json(request, course_key):
         if thumbnail_location:
             thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4])
 
+        _license = asset.get('license', None)
         asset_locked = asset.get('locked', False)
-        asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
+        asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked, _license))
 
     return JsonResponse({
         'start': start,
@@ -163,7 +165,7 @@ def _upload_asset(request, course_key):
     # Does the course actually exist?!? Get anything from it to prove its
     # existence
     try:
-        modulestore().get_course(course_key)
+        course_module = modulestore().get_course(course_key)
     except ItemNotFoundError:
         # no return it as a Bad Request response
         logging.error("Could not find course: %s", course_key)
@@ -200,6 +202,14 @@ def _upload_asset(request, course_key):
     # now store thumbnail location only if we could create it
     if thumbnail_content is not None:
         content.thumbnail_location = thumbnail_location
+
+    if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and course_module.licenseable:
+        # Set default license
+        content.license = course_module.license
+        content.license_version = course_module.license_version
+    else:
+        content.license = None
+        content.license_version = None
 
     # then commit the content
     contentstore().save(content)
@@ -267,23 +277,43 @@ def _update_asset(request, course_key, asset_key):
                 modified_asset = json.loads(request.body)
             except ValueError:
                 return HttpResponseBadRequest()
+
             contentstore().set_attr(asset_key, 'locked', modified_asset['locked'])
+
+            # Does the course actually exist?!? Get anything from it to prove its
+            # existence
+            try:
+                course_module = modulestore().get_course(course_key)
+            except ItemNotFoundError:
+                # no return it as a Bad Request response
+                logging.error("Could not find course: %s", course_key)
+                return HttpResponseBadRequest()
+
+            if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and course_module.licenseable:
+                contentstore().set_attr(asset_key, 'license', modified_asset['license'])
+                contentstore().set_attr(asset_key, 'license_version', parse_license(modified_asset['license']).version)
+
             # Delete the asset from the cache so we check the lock status the next time it is requested.
             del_cached_content(asset_key)
             return JsonResponse(modified_asset, status=201)
 
 
-def _get_asset_json(display_name, date, location, thumbnail_location, locked):
+def _get_asset_json(display_name, date, location, thumbnail_location, locked, license=None, license_version=None):
     """
     Helper method for formatting the asset information to send to client.
     """
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
     external_url = settings.LMS_BASE + asset_url
+    if license_version is None and license is not None:
+        license_version = parse_license(license).version
+
     return {
         'display_name': display_name,
         'date_added': get_default_time_display(date),
         'url': asset_url,
         'external_url': external_url,
+        'license': license,
+        'license_version': license_version,
         'portable_url': StaticContent.get_static_path_from_location(location),
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,

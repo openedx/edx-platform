@@ -17,6 +17,7 @@ def url_class(is_active):
 <%! from django.conf import settings %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from xmodule.license import parse_license %>
 <%! from courseware.views import notification_image_for_tab %>
 <%! from student.models import CourseEnrollment%>
 <%
@@ -93,4 +94,16 @@ masq = (function(){
 }() );
 </script>
   % endif
+% endif
+
+% if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.licenseable and course.license:
+  <script type="text/javascript">
+        $(document).ready(function() {
+          $(".copyright").append($("#license").show());
+          $(".copyright").find("a").attr("target","_blank");
+        });
+  </script>
+  <div id="license" style="display:none;">
+    ${parse_license(course.license, course.license_version).html}
+  </div>
 % endif

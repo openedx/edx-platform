@@ -85,6 +85,7 @@ define(["jquery", "underscore", "js/common_helpers/ajax_helpers", "js/common_hel
             TemplateHelpers.installTemplate('metadata-editor');
             TemplateHelpers.installTemplate('metadata-number-entry', false, 'metadata-number-entry');
             TemplateHelpers.installTemplate('metadata-string-entry', false, 'metadata-string-entry');
+            TemplateHelpers.installTemplate('metadata-license-entry', false, 'metadata-license-entry');        
         };
 
         showEditModal = function(requests, xblockElement, model, mockHtml, options) {

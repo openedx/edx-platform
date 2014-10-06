@@ -290,6 +290,8 @@ FEATURES = {
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
+        # Whether or not to enable Creative Commons Licensing ability for courses
+    'CREATIVE_COMMONS_LICENSING': False,
 
     # Video Abstraction Layer used to allow video teams to manage video assets
     # independently of courseware. https://github.com/edx/edx-val

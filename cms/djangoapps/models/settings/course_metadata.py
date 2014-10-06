@@ -1,6 +1,7 @@
 from xblock.fields import Scope
 from xmodule.modulestore.django import modulestore
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 
 class CourseMetadata(object):
@@ -27,7 +28,9 @@ class CourseMetadata(object):
                      'user_partitions',
                      'name',  # from xblock
                      'tags',  # from xblock
-                     'visible_to_staff_only'
+                     'visible_to_staff_only',
+                     'license',
+                     'license_version'
     ]
 
     @classmethod
@@ -43,6 +46,9 @@ class CourseMetadata(object):
                 continue
 
             if field.name in cls.FILTERED_LIST:
+                continue
+
+            if not settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and field.name is 'licenseable':
                 continue
 
             result[field.name] = {
