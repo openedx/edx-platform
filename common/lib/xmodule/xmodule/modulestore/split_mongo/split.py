@@ -117,6 +117,8 @@ class SplitBulkWriteRecord(BulkOpsRecord):
         self.index = None
         self.structures = {}
         self.structures_in_db = set()
+        # dict(version_guid, dict(BlockKey, module))
+        self.modules = defaultdict(dict)
         self.definitions = {}
         self.definitions_in_db = set()
 
@@ -308,6 +310,38 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             bulk_write_record.structures[structure['_id']] = structure
         else:
             self.db_connection.insert_structure(structure)
+
+    def get_cached_block(self, course_key, version_guid, block_id):
+        """
+        If there's an active bulk_operation, see if it's cached this module and just return it
+        Don't do any extra work to get the ones which are not cached. Make the caller do the work & cache them.
+        """
+        bulk_write_record = self._get_bulk_ops_record(course_key)
+        if bulk_write_record.active:
+            return bulk_write_record.modules[version_guid].get(block_id, None)
+        else:
+            return None
+
+    def cache_block(self, course_key, version_guid, block_key, block):
+        """
+        The counterpart to :method `get_cached_block` which caches a block.
+        Returns nothing.
+        """
+        bulk_write_record = self._get_bulk_ops_record(course_key)
+        if bulk_write_record.active:
+            bulk_write_record.modules[version_guid][block_key] = block
+
+    def decache_block(self, course_key, version_guid, block_key):
+        """
+        Write operations which don't write from blocks must remove the target blocks from the cache.
+        Returns nothing.
+        """
+        bulk_write_record = self._get_bulk_ops_record(course_key)
+        if bulk_write_record.active:
+            try:
+                del bulk_write_record.modules[version_guid][block_key]
+            except KeyError:
+                pass
 
     def get_definition(self, course_key, definition_guid):
         """
@@ -637,8 +671,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     @contract(course_entry=CourseEnvelope, block_keys="list(BlockKey)", depth="int | None")
     def _load_items(self, course_entry, block_keys, depth=0, lazy=True, **kwargs):
         '''
-        Load & cache the given blocks from the course. Prefetch down to the
-        given depth. Load the definitions into each block if lazy is False;
+        Load & cache the given blocks from the course. May return the blocks in any order.
+
+        Load the definitions into each block if lazy is False;
         otherwise, use the lazy definition placeholder.
         '''
         runtime = self._get_cache(course_entry.structure['_id'])
@@ -646,6 +681,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             runtime = self.create_runtime(course_entry, lazy)
             self._add_cache(course_entry.structure['_id'], runtime)
             self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy)
+
         return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
 
     def _get_cache(self, course_version_guid):
@@ -1364,6 +1400,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 # if the parent hadn't been previously changed in this bulk transaction, indicate that it's
                 # part of the bulk transaction
                 self.version_block(parent, user_id, new_structure['_id'])
+            self.decache_block(parent_usage_key.course_key, new_structure['_id'], block_id)
 
             # db update
             self.update_structure(parent_usage_key.course_key, new_structure)
@@ -1957,6 +1994,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 parent_block['edit_info']['edited_by'] = user_id
                 parent_block['edit_info']['previous_version'] = parent_block['edit_info']['update_version']
                 parent_block['edit_info']['update_version'] = new_id
+                self.decache_block(usage_locator.course_key, new_id, parent_block_key)
 
             self._remove_subtree(BlockKey.from_usage_key(usage_locator), new_blocks)
 
