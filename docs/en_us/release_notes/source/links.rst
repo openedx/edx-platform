@@ -1,6 +1,10 @@
 
 .. Links
 
+.. _Open Learning XML (OLX) Format: http://engineering.edx.org/2014/10/open-learning-xml-olx-format/
+
+.. _edX Open Learning XML Guide: http://edx-open-learning-xml.readthedocs.org/en/latest/index.html
+
 .. _edX Product and Engineering Newsletter: http://us5.campaign-archive2.com/?u=1822a33c054dc20e223ca40e2&id=090cb3ea4c&e=4a41f5542a
 
 .. _End of August Product Announcement: http://us5.campaign-archive1.com/?u=1822a33c054dc20e223ca40e2&id=2f58184233
@@ -24,6 +28,7 @@
 
 .. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
 
+.. _molecule viewer tool: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/molecule_viewer.html
 
 .. _Using edX Insights: http://edx-insights.readthedocs.org/en/latest/
 
@@ -32,6 +37,8 @@
 .. _Installing the edX Production Stack: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/prodstack/install_prodstack.html
 
 .. _Creating Peer Assessments: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/
+
+.. _EdX Guide for Students: http://edx-guide-for-students.readthedocs.org/en/latest/
 
 .. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
 
@@ -42,6 +49,8 @@
 .. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html
 
 .. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/testing_courseware.html
+
+.. _Cohorts: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/cohorts/index.html
 
 .. _Switch Between Studio and Your Live Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/testing_courseware.html#view-your-live-course
 
@@ -171,6 +180,7 @@
 
 .. _Drag and Drop Problem: http://ca.readthedocs.org/en/latest/exercises_tools/drag_and_drop.html
 
+.. _Creating Exercises and Tools: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/index.html
 
 .. _Assign Discussion Administration Roles: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/discussions.html#assigning-discussion-roles
 
