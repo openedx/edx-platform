@@ -47,8 +47,6 @@ urlpatterns = patterns('',  # nopep8
         name='show_unit_extensions'),
     url(r'^show_student_extensions$', 'instructor.views.api.show_student_extensions',
         name='show_student_extensions'),
-    url(r'^fix_extensions$', 'instructor.views.api.fix_extensions',
-        name='fix_extensions'),
 
     # Grade downloads...
     url(r'^list_report_downloads$',

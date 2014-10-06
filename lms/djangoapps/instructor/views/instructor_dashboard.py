@@ -190,7 +190,6 @@ def _section_extensions(course):
         'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': course.id}),
         'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': course.id}),
         'show_student_extensions_url': reverse('show_student_extensions', kwargs={'course_id': course.id}),
-        'fix_extensions_url': reverse('fix_extensions', kwargs={'course_id': course.id}),
     }
     return section_data
 
