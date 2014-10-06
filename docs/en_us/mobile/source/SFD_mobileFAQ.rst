@@ -84,6 +84,20 @@ Testers** Google group page for updates.
   help you get to know the edX learning experience. Perfect to take before you
   start another course.
 
+* `MITx 6.002x - Circuits and Electronics
+  <https://www.edx.org/course/mitx/mitx-6-002x-circuits-
+  electronics-2606#.VDKwoSldV58>`_: A course that teaches the fundamentals of
+  circuit and electronic analysis.
+
+* `MITx 4.605x - A Global History of Architecture — Part 1
+  <https://www.edx.org/course/mitx/mitx-4-605x-global-history-
+  architecture-2721#.VDKwoildV58>`_: A history of architecture from a global
+  perspective.
+
+* `DelftX ET.3034TU - Solar Energy <https://www.edx.org/course/delftx/delftx-et-
+  3034tu-solar-energy-1996#.VDKwpCldV58>`_: A course that allows students to
+  discover the power of solar energy and design a complete photovoltaic system.
+
 ========================================================
 Can I take a course entirely on my mobile device?
 ========================================================
