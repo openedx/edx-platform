@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="carnegie_theme_enabled"/>
 <%! from datetime import datetime %>
 <%! import pytz %>
 <%! from django.conf import settings %>
@@ -12,7 +13,11 @@
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
-  <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
+  % if carnegie_theme_enabled():
+    <a href="mailto:claslite_techsupport@carnegiescience.edu" role="button">${_("Help")}</a>
+  % else :
+    <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
+  %endif
 </div>
 
 <section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=platform_name)}">
