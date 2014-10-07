@@ -342,9 +342,9 @@
 
         <li class="field select" id="patient_population_container">
           <label for="patient_population">Patient population</label>
-          <select id="patient_population" name="patient_population" class="select-controller">
+          <select id="patient_population" name="patient_population">
             <option value="">--</option>
-            %for code, patient_population in patient_population_choices:
+            %for code, patient_population in CmeUserProfile.PATIENT_POPULATION_CHOICES:
               <option value="${code}" class="specialty-${code} sub_specialty">${patient_population}</option>
             %endfor
           </select>
@@ -356,10 +356,13 @@
           ## Specialty Select Field
           #####################################################
          
-          <li class="field select" style="display: none;" id="specialty-container">
+          <li class="field select" id="specialty-container">
             <label for="specialty">Specialty</label>
             <select id="specialty" name="specialty" class="controller select-controller">
               <option value="">--</option>
+              %for code, specialty in CmeUserProfile.SPECIALTY_CHOICES:
+                <option value="${code}" class="sub_specialty-${code}">${specialty}</option>
+              %endfor
             </select>
            
             <div class="field controlled" id="specialty_free_container" style="display: none;">
@@ -367,27 +370,6 @@
               <input id="specialty_free" type="text" name="specialty_free" title="Please enter your Specialty here." placeholder="Please enter your Specialty here." />
            </div>
           </li>
-         
-          <div id="specialty-Adult" class="specialty-container" style="display: none;">
-            <option value="">--</option>
-            %for code, specialty in specialty_choices['Adult']:
-              <option value="${code}" class="sub_specialty-${code}">${specialty}</option>
-            %endfor
-          </div>
-         
-          <div id="specialty-Pediatric" class="specialty-container" style="display: none;">
-            <option value="">--</option>
-            %for code, specialty in specialty_choices['Pediatric']:
-              <option value="${code}" class="sub_specialty-${code}">${specialty}</option>
-            %endfor
-          </div>
-         
-          <div id="specialty-Both" class="specialty-container" style="display: none;">
-            <option value="">--</option>
-            %for code, specialty in specialty_choices['Both']:
-              <option value="${code}" class="sub_specialty-${code}">${specialty}</option>
-            %endfor
-          </div>
        
        
           #####################################################
