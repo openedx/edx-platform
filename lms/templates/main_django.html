@@ -13,6 +13,7 @@
   {% compressed_css 'style-app-extend2' %}
   {% compressed_css 'style-course-vendor' %}
   {% compressed_css 'style-course' %}
+  {% compressed_css 'style-discussion-app' %}
 
   {% block main_vendor_js %}
   {% compressed_js 'main_vendor' %}
@@ -49,6 +50,8 @@
   {% else %}
     {% include "footer.html" %}
   {% endif %}
+
+  {% include "mathjax_include.html" %}
 
   {% compressed_js 'application' %}
   {% compressed_js 'module-js' %}

@@ -37,6 +37,11 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 
+from discussion_app.views import (
+    get_js_urls as discussion_get_js_urls,
+    get_css_urls as discussion_get_css_urls
+)
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
@@ -983,7 +988,7 @@ main_vendor_js = [
     'js/vendor/URI.min.js',
 ]
 
-discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+discussion_js = discussion_get_js_urls()
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1029,6 +1034,10 @@ PIPELINE_CSS = {
             'sass/application-extend2.css',
         ],
         'output_filename': 'css/lms-style-app-extend2.css',
+    },
+    'style-discussion-app': {
+        'source_filenames': discussion_get_css_urls(),
+        'output_filename': 'css/lms-style-discussion-app.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1355,6 +1364,7 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'notes',
+    'discussion_app',
 
     # Splash screen
     'splash',
@@ -1459,7 +1469,9 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
         'cors_csrf.middleware.CorsCSRFMiddleware',
     ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ()
+    CORS_ORIGIN_WHITELIST = ('devstack.local', 'apros.devstack.local')
+    CORS_ORIGIN_REGEX_WHITELIST = ('^http?://(\w+\.)?devstack\.local$',)
+
 
 ###################### Registration ##################################
 

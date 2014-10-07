@@ -35,7 +35,12 @@ from user_api.models import UserPreference
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import Location
 
+from django.contrib.auth.models import User
+from user_api.models import UserPreference
+from notification_prefs import NOTIFICATION_PREF_KEY
+
 TEST_API_KEY = str(uuid.uuid4())
+
 
 class SecureClient(Client):
 
