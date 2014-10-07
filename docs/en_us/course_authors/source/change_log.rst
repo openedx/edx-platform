@@ -15,9 +15,6 @@ October, 2014
      - Change
    * - 10/7/14
      - Added the :ref:`Including Student Cohorts` chapter.
-   * - 10/7/14
-     - Updated :ref:`Set Important Dates for Your Course` to reflect change
-       that course dates now use UTC.
        
 *****************
 September, 2014
@@ -32,23 +29,18 @@ September, 2014
    * - 09/30/14
      - Added information about accessing edX Insights to the :ref:`Course Data`
        and :ref:`Enrollment` chapters.
-   * - 09/26/14
-     - Added :ref:`Molecule Viewer` to :ref:`Create Exercises`
    * - 09/04/14
      - Updated the :ref:`Discussions` and :ref:`Discussions for Students and
        Staff` chapters to include information about choosing the type of post
        and to reflect changes in the user interface.
    * - 09/11/14
-     - Added info about possible problem types to :ref:`Problem with Adaptive
-       Hint`.
+     - Added info about possible problem types to :ref:`Problem with Adaptive Hint`.
    * - 
-     - Removed "These problems only allow integers and a few select constants"
-       from table of problem types in :ref:`Create Exercises`.
+     - Removed "These problems only allow integers and a few select constants" from table of problem types in :ref:`Create Exercises`.
    * - 
-     - Added a note about angle bracket characters to the :ref:`Dropdown`
-       topic.
-
-
+     - Added a note about angle bracket characters to the :ref:`Dropdown` topic.
+   * - 09/26/14
+     - Added :ref:`Molecule Viewer` to :ref:`Create Exercises`
 
 **************
 August, 2014
