@@ -18,11 +18,16 @@ from pytz import UTC
 from freezegun import freeze_time
 from datetime import datetime, timedelta
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, mixed_store_config
+)
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.views import _can_download_report, _get_date_from_str
-from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, Coupon, CourseRegistrationCode, RegistrationCodeRedemption
+from shoppingcart.models import (
+    Order, CertificateItem, PaidCourseRegistration,
+    Coupon, CourseRegistrationCode, RegistrationCodeRedemption,
+    Donation
+)
 from student.tests.factories import UserFactory, AdminFactory
 from courseware.tests.factories import InstructorFactory
 from student.models import CourseEnrollment
@@ -33,7 +38,7 @@ from shoppingcart.admin import SoftDeleteCouponAdmin
 from mock import patch, Mock
 from shoppingcart.views import initialize_report
 from decimal import Decimal
-from student.tests.factories import AdminFactory
+
 
 def mock_render_purchase_form_html(*args, **kwargs):
     return render_purchase_form_html(*args, **kwargs)
@@ -48,7 +53,12 @@ render_mock = Mock(side_effect=mock_render_to_response)
 postpay_mock = Mock()
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+# Since we don't need any XML course fixtures, use a modulestore configuration
+# that disables the XML modulestore.
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
         patcher = patch('student.models.tracker')
@@ -739,7 +749,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(template, cert_item.single_item_receipt_template)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
     """
     Test suite for RegistrationCodeRedemption Course Enrollments
@@ -857,7 +867,57 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class DonationReceiptViewTest(ModuleStoreTestCase):
+    """Tests for the receipt page when the user pays for a donation. """
+
+    COST = Decimal('23.45')
+    PASSWORD = "password"
+
+    def setUp(self):
+        """Create a test user and order. """
+        super(DonationReceiptViewTest, self).setUp()
+
+        # Create and login a user
+        self.user = UserFactory.create()
+        self.user.set_password(self.PASSWORD)
+        self.user.save()
+        result = self.client.login(username=self.user.username, password=self.PASSWORD)
+        self.assertTrue(result)
+
+        # Create an order for the user
+        self.cart = Order.get_cart_for_user(self.user)
+
+    def test_donation_for_org_receipt(self):
+        # Purchase the donation
+        Donation.add_to_order(self.cart, self.COST)
+        self.cart.start_purchase()
+        self.cart.purchase()
+
+        # Verify the receipt page
+        self._assert_receipt_contains("tax deductible")
+
+    def test_donation_for_course_receipt(self):
+        # Create a test course
+        self.course = CourseFactory.create(display_name="Test Course")
+
+        # Purchase the donation for the course
+        Donation.add_to_order(self.cart, self.COST, course_id=self.course.id)
+        self.cart.start_purchase()
+        self.cart.purchase()
+
+        # Verify the receipt page
+        self._assert_receipt_contains("tax deductible")
+        self._assert_receipt_contains(self.course.display_name)
+
+    def _assert_receipt_contains(self, expected_text):
+        """Load the receipt page and verify that it contains the expected text."""
+        url = reverse("shoppingcart.views.show_receipt", kwargs={"ordernum": self.cart.id})
+        resp = self.client.get(url)
+        self.assertContains(resp, expected_text)
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class CSVReportViewsTest(ModuleStoreTestCase):
     """
     Test suite for CSV Purchase Reporting
