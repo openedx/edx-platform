@@ -1,6 +1,7 @@
 """ Centralized access to LMS courseware app """
 from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
+from django.conf import settings
 
 from courseware import courses, module_render
 from courseware.model_data import FieldDataCache
@@ -62,12 +63,13 @@ def get_course_total_score(course_summary):
     return score
 
 
-def get_course_leaf_nodes(course_key, detached_categories):
+def get_course_leaf_nodes(course_key):
     """
     Get count of the leaf nodes with ability to exclude some categories
     """
     nodes = []
-    verticals = get_modulestore().get_items(course_key, category='vertical')
+    detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
+    verticals = get_modulestore().get_items(course_key,  qualifiers={'category': 'vertical'})
     for vertical in verticals:
         nodes.extend([unit for unit in vertical.children
                       if getattr(unit, 'category') not in detached_categories])
