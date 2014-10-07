@@ -22,6 +22,8 @@ class CourseUserGroup(models.Model):
     which may be treated specially.  For example, a user can be in at most one cohort per
     course, and cohorts are used to split up the forums by group.
     """
+    default_cohort_name = "default_cohort"
+
     class Meta(object):
         unique_together = (('name', 'course_id'), )
 
