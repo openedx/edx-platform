@@ -8,7 +8,7 @@ class User(models.Model):
 
     accessible_fields = ['username', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
                          'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
-                         'subscribed_thread_ids', 'subscribed_commentable_ids',
+                         'group_id', 'subscribed_thread_ids', 'subscribed_commentable_ids',
                          'subscribed_course_ids', 'threads_count', 'comments_count',
                          'default_sort_key'
                         ]
@@ -120,6 +120,8 @@ class User(models.Model):
         retrieve_params.update(kwargs)
         if self.attributes.get('course_id'):
             retrieve_params['course_id'] = self.course_id.to_deprecated_string()
+        if self.attributes.get('group_id'):
+            retrieve_params['group_id'] = self.group_id
         try:
             response = perform_request(
                 'get',

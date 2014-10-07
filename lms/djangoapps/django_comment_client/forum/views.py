@@ -325,8 +325,6 @@ def user_profile(request, course_id, user_id):
     #TODO: Allow sorting?
     course = get_course_with_access(request.user, 'load_forum', course_key)
     try:
-        profiled_user = cc.User(id=user_id, course_id=course_key)
-
         query_params = {
             'page': request.GET.get('page', 1),
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
@@ -338,6 +336,9 @@ def user_profile(request, course_id, user_id):
             return HttpResponseBadRequest("Invalid group_id")
         if group_id is not None:
             query_params['group_id'] = group_id
+            profiled_user = cc.User(id=user_id, course_id=course_key, group_id=group_id)
+        else:
+            profiled_user = cc.User(id=user_id, course_id=course_key)
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page
