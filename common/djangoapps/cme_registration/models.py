@@ -45,14 +45,60 @@ class CmeUserProfile(UserProfile):
                                 ('Resident', 'Resident'),
                                 ('Fellow', 'Fellow'),
                                 ('Retired', 'Retired'))
-    physician_status = models.CharField(blank=True, null=True, max_length=8)
+    physician_status = models.CharField(blank=True, null=True, max_length=8, choices=PHYSICIAN_STATUS_CHOICES)
 
     PATIENT_POPULATION_CHOICES = (('Adult', 'Adult'),
                                   ('Pediatric', 'Pediatric'),
                                   ('Both', 'Both'),
                                   ('None', 'None'))
     patient_population = models.CharField(blank=True, null=True, max_length=25, choices=PATIENT_POPULATION_CHOICES)
-    specialty = models.CharField(blank=True, null=True, max_length=255)
+
+    SPECIALTY_CHOICES = (('Addiction_Medicine', 'Addiction Medicine'),
+                         ('Adolescent_Medicine', 'Adolescent Medicine'),
+                         ('Allergy', 'Allergy'),
+                         ('Anesthesiology', 'Anesthesiology'),
+                         ('Cardiology', 'Cardiology'),
+                         ('Complimentary_Medicine', 'Complimentary Medicine'),
+                         ('Critical_Care_Medicine_&_ICU', 'Critical Care Medicine & ICU'),
+                         ('Dentistry', 'Dentistry'),
+                         ('Dermatology', 'Dermatology'),
+                         ('Emergency_Medicine', 'Emergency Medicine'),
+                         ('Endocrinology', 'Endocrinology'),
+                         ('Family_Practice', 'Family Practice'),
+                         ('Gastroenterology_&_Hepatology', 'Gastroenterology & Hepatology'),
+                         ('General_Practice', 'General Practice'),
+                         ('Gerontology', 'Gerontology'),
+                         ('Head_&_Neck_Surgery', 'Head & Neck Surgery'),
+                         ('Health_Education', 'Health Education'),
+                         ('Hematology', 'Hematology'),
+                         ('Immunology_&_Rheumatology', 'Immunology & Rheumatology'),
+                         ('Infectious_Disease', 'Infectious Disease'),
+                         ('Internal_Medicine', 'Internal Medicine'),
+                         ('Neonatology', 'Neonatology'),
+                         ('Nephrology', 'Nephrology'),
+                         ('Neurology', 'Neurology'),
+                         ('Neurosurgery', 'Neurosurgery'),
+                         ('Nutrition', 'Nutrition'),
+                         ('Obstetrics_&_Gynecology', 'Obstetrics & Gynecology'),
+                         ('Oncology', 'Oncology'),
+                         ('Ophthalmology', 'Ophthalmology'),
+                         ('Orthopaedic_Surgery', 'Orthopaedic Surgery'),
+                         ('Palliative_Care', 'Palliative Care'),
+                         ('Pathology', 'Pathology'),
+                         ('Pediatrics', 'Pediatrics'),
+                         ('Pharmacology', 'Pharmacology'),
+                         ('Physical_Medicine_&_Rehabilitation', 'Physical Medicine & Rehabilitation'),
+                         ('Psychiatry', 'Psychiatry'),
+                         ('Psychology', 'Psychology'),
+                         ('Public_Health', 'Public Health'),
+                         ('Pulmonology', 'Pulmonology'),
+                         ('Radiation_Oncology', 'Radiation Oncology'),
+                         ('Radiology', 'Radiology'),
+                         ('Surgery', 'Surgery'),
+                         ('Transplant', 'Transplant'),
+                         ('Urology', 'Urology'))
+
+    specialty = models.CharField(blank=True, null=True, max_length=255, choices=SPECIALTY_CHOICES)
     sub_specialty = models.CharField(blank=True, null=True, max_length=255)
 
     AFFILIATION_CHOICES = (('Lucile Packard Children\'s Hospital Stanford', 'Lucile Packard Children\'s Hospital Stanford'),
