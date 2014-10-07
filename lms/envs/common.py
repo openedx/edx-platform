@@ -432,6 +432,11 @@ FEATURES = {
     # In order to use the gradebook, you must add it to the list of INSTALLED_APPS in
     # addition to setting the flag to True here.  A reference is available in aws.py
     'STUDENT_GRADEBOOK': False,
+
+    # Enable the Student Progress, which is essentially a cache of module completions
+    # In order to use the "progress", you must add it to the list of INSTALLED_APPS in
+    # addition to setting the flag to True here.  A reference is available in aws.py
+    'STUDENT_PROGRESS': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -612,7 +617,8 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
-
+# Modules having these categories would be excluded from progress calculations
+PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
 ############################## EVENT TRACKING #################################
 
 # FIXME: Should we be doing this truncation?
