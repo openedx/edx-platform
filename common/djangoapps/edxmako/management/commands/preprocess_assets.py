@@ -16,6 +16,8 @@ from django.conf import settings
 from mako.template import Template
 import textwrap
 
+from shutil import rmtree, copytree
+
 class Command(NoArgsCommand):
     """
     Basic management command to preprocess asset template files.
@@ -24,6 +26,33 @@ class Command(NoArgsCommand):
     help = "Preprocess asset template files to ready them for compilation."
 
     def handle_noargs(self, **options):
+        self.__rtl_sass()
+        self.__preprocess_mako()
+
+    def __rtl_sass(self):
+        for staticfiles_dir in getattr(settings, "STATICFILES_DIRS", []):
+            # Cribbed from the django-staticfiles app at:
+            # https://github.com/jezdez/django-staticfiles/blob/develop/staticfiles/finders.py#L52
+            if isinstance(staticfiles_dir, (list, tuple)):
+                prefix, staticfiles_dir = staticfiles_dir
+
+            ltr_sass = os.path.join(staticfiles_dir, 'sass')
+            rtl_sass = os.path.join(staticfiles_dir, 'sass-rtl')
+
+            if settings.FEATURES.get('ENABLE_RTL', False):
+                if os.path.exists(ltr_sass):
+                    if os.path.exists(rtl_sass):
+                        rmtree(rtl_sass)
+
+                    copytree(ltr_sass, rtl_sass)
+
+            elif os.path.exists(rtl_sass):
+                # Removes the RTL files after switching off ENABLE_RTL feature
+                # To avoid compilation
+                rmtree(rtl_sass)
+
+
+    def __preprocess_mako(self):
         """
         Walk over all of the static files directories specified in the
         settings file, looking for asset template files (indicated by
@@ -42,11 +71,13 @@ class Command(NoArgsCommand):
                     outfile, extension = os.path.splitext(filename)
                     # We currently only handle Mako templates
                     if extension == ".mako":
+                        is_rtl = 'sass-rtl' in root
                         self.__preprocess(os.path.join(root, filename),
-                                          os.path.join(root, outfile))
+                                          os.path.join(root, outfile),
+                                          is_rtl)
 
 
-    def __context(self):
+    def __context(self, is_rtl=False):
         """
         Return a dict that contains all of the available context
         variables to the asset template.
@@ -55,11 +86,12 @@ class Command(NoArgsCommand):
         # TODO: do this with the django-settings-context-processor
         return {
             "FEATURES": settings.FEATURES,
-            "THEME_NAME" : getattr(settings, "THEME_NAME", None),
+            "RTL": is_rtl,
+            "THEME_NAME": getattr(settings, "THEME_NAME", None),
         }
 
 
-    def __preprocess(self, infile, outfile):
+    def __preprocess(self, infile, outfile, is_rtl=False):
         """
         Run `infile` through the Mako template engine, storing the
         result in `outfile`.
@@ -72,5 +104,5 @@ class Command(NoArgsCommand):
              * %s
              */
             """ % infile))
-            _outfile.write(Template(filename=str(infile)).render(env=self.__context()))
+            _outfile.write(Template(filename=str(infile)).render(env=self.__context(is_rtl)))
 
