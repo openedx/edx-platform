@@ -27,7 +27,7 @@ from django_comment_client.utils import (
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_id_map,
+    get_discussion_categories_ids
 )
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
@@ -149,8 +149,8 @@ def update_thread(request, course_id, thread_id):
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         course = get_course_with_access(request.user, 'load', course_key)
-        id_map = get_discussion_id_map(course)
-        if request.POST.get("commentable_id") in id_map:
+        commentable_ids = get_discussion_categories_ids(course)
+        if request.POST.get("commentable_id") in commentable_ids:
             thread.commentable_id = request.POST["commentable_id"]
         else:
             return JsonError(_("Topic doesn't exist"))

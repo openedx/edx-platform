@@ -77,7 +77,7 @@
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
         location.href = "${reverse('signin_user')}?course_id=" +
-          encodeURIComponont($("#unenroll_course_id").val()) + "&enrollment_action=unenroll";
+          encodeURIComponent($("#unenroll_course_id").val()) + "&enrollment_action=unenroll";
       } else {
         $('#unenroll_error').html(
           xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}"

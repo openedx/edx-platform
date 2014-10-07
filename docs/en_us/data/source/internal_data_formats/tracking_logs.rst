@@ -301,6 +301,8 @@ outside the Instructor Dashboard.
 
 * :ref:`AB_Event_Types`
 
+* :ref:`student_cohort_events`
+
 * :ref:`ora`
 
 The descriptions that follow include what each event represents, the system
@@ -1747,7 +1749,7 @@ After a user executes a text search in the navigation sidebar of the course
 **Event Source**: Server
 
 **History**: Added 16 May 2014.  The ``corrected_text`` field was added 5
-Jun 2014.
+Jun 2014. The ``group_id`` field was added 7 October 2014.
 
 ``event`` **Fields**:
 
@@ -1761,6 +1763,15 @@ Jun 2014.
    * - ``query``
      - string
      - The text entered into the search box by the user.
+   * - ``group_id``
+     - integer
+     - The numeric ID of the cohort group to which the user's search is
+       restricted, or ``null`` if the search is not restricted in this way. In a
+       course with cohorts enabled, a student's searches will always be
+       restricted to the student's cohort group. Discussion Admins, Moderators, and
+       Community TAs in such a course can search all discussions
+       without specifying a cohort group, which leaves this field
+       ``null`, or they can specify a single cohort group to search.
    * - ``page``
      - integer
      - Results are returned in sets of 20 per page. Identifies the page of
@@ -2158,6 +2169,106 @@ the child module that was shown to the student.
    * - ``child-id``
      - string
      - ID of the module that displays to the student. 
+
+.. _student_cohort_events:
+
+==========================
+Student Cohort Events
+==========================
+
+``edx.cohort.created``
+----------------------------------
+
+When a cohort group is created, the server emits an ``edx.cohort.created``
+event. A member of the course staff can create a cohort group manually via the
+Instructor Dashboard (see :ref:`instructor_cohort_events`). The system
+automatically creates the default cohort group and cohort groups included in the
+course's ``auto_cohort_groups`` setting as they are needed (e.g. when a student
+is assigned to one).
+
+**Event Source**: Server
+
+**History** Added 7 Oct 2014.
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``cohort_id``
+     - integer
+     - The numeric ID of the cohort group.
+   * - ``cohort_name``
+     - string
+     - The display name of the cohort group.
+
+``edx.cohort.user_added``
+----------------------------------
+
+When a user is added to a cohort group, the server emits an
+``edx.cohort.user_added`` event. A member of the course staff can add a user to
+a cohort group manually via the Instructor Dashboard (see
+:ref:`instructor_cohort_events`). The system automatically adds a user to the default
+cohort group or a cohort group included in the course's ``auto_cohort_groups``
+setting if the user accesses a discussion but has not yet been assigned to a
+cohort group.
+
+**Event Source**: Server
+
+**History** Added 7 Oct 2014.
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``user_id``
+     - integer
+     - The numeric ID (from auth_user.id) of the added user.
+   * - ``cohort_id``
+     - integer
+     - The numeric ID of the cohort group.
+   * - ``cohort_name``
+     - string
+     - The display name of the cohort group.
+
+``edx.cohort.user_removed``
+----------------------------------
+
+When a user is removed from a cohort group (by being assigned to a different
+cohort group via the Instructor Dashboard), the server emits an
+``edx.cohort.user_removed`` event.
+
+**Event Source**: Server
+
+**History** Added 7 Oct 2014.
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``user_id``
+     - integer
+     - The numeric ID (from auth_user.id) of the removed user.
+   * - ``cohort_id``
+     - integer
+     - The numeric ID of the cohort group.
+   * - ``cohort_name``
+     - string
+     - The display name of the cohort group.
 
 .. _ora:
 
@@ -2592,6 +2703,83 @@ members also generate enrollment events.
   server emits a ``edx.course.enrollment.deactivated`` for each unenrollment.
 
 For details about the enrollment events, see :ref:`enrollment`.
+
+.. _instructor_cohort_events:
+
+=============================
+Instructor Cohort Events
+=============================
+
+In addition to the cohort events that are generated when students are assigned
+to cohort groups (which can happen automatically or manually via the Instructor
+Dashboard; see :ref:`student_cohort_events`), actions by instructors and course
+staff members generate additional events.
+
+``edx.cohort.creation_requested``
+----------------------------------
+
+When an instructor or course staff member manually creates a cohort group via
+the Instructor Dashboard, the server emits an ``edx.cohort.creation_requested``
+event.
+
+**Event Source**: Server
+
+**History** Added 7 Oct 2014.
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``cohort_id``
+     - integer
+     - The numeric ID of the cohort group.
+   * - ``cohort_name``
+     - string
+     - The display name of the cohort group.
+
+``edx.cohort.user_add_requested``
+----------------------------------
+
+When an instructor or course staff member adds a student to a cohort group via
+the Instructor Dashboard, the server emits an ``edx.cohort.user_add_requested``
+event.
+
+**Event Source**: Server
+
+**History** Added 7 Oct 2014.
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``user_id``
+     - integer
+     - The numeric ID (from auth_user.id) of the added user.
+   * - ``cohort_id``
+     - integer
+     - The numeric ID of the cohort group.
+   * - ``cohort_name``
+     - string
+     - The display name of the cohort group.
+   * - ``previous_cohort_id``
+     - integer
+     - The numeric ID of the cohort group that the user was previously assigned
+       to (or null if the user was not previously assigned to a cohort group).
+   * - ``previous_cohort_name``
+     - string
+     - The display name of the cohort group that the user was previously
+       assigned to (or null if the user was not previously assigned to a cohort
+       group).
 
 
 .. _Creating a Peer Assessment: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/

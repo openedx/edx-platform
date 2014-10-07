@@ -90,7 +90,7 @@ def _filter_unstarted_categories(category_map):
     unfiltered_queue = [category_map]
     filtered_queue = [result_map]
 
-    while len(unfiltered_queue) > 0:
+    while unfiltered_queue:
 
         unfiltered_map = unfiltered_queue.pop()
         filtered_map = filtered_queue.pop()
@@ -200,6 +200,23 @@ def get_discussion_category_map(course):
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
     return _filter_unstarted_categories(category_map)
+
+
+def get_discussion_categories_ids(course):
+    """
+    Returns a list of available ids of categories for the course.
+    """
+    ids = []
+    queue = [get_discussion_category_map(course)]
+    while queue:
+        category_map = queue.pop()
+        for child in category_map["children"]:
+            if child in category_map["entries"]:
+                ids.append(category_map["entries"][child]["id"])
+            else:
+                queue.append(category_map["subcategories"][child])
+
+    return ids
 
 
 class JsonResponse(HttpResponse):

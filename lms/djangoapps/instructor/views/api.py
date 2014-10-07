@@ -80,6 +80,7 @@ from .tools import (
     bulk_email_is_enabled_for_course,
     add_block_ids,
 )
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 
@@ -690,7 +691,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     TO DO accept requests for different attribute sets.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
+    course = get_course_by_id(course_key)
 
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES
 
@@ -703,8 +705,6 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
             'goals'
         ]
-
-    student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
@@ -723,9 +723,15 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         'goals': _('Goals'),
     }
 
+    if course.is_cohorted:
+        # Translators: 'Cohort' refers to a group of students within a course.
+        query_features.append('cohort')
+        query_features_names['cohort'] = _('Cohort')
+
     if not csv:
+        student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
         response_payload = {
-            'course_id': course_id.to_deprecated_string(),
+            'course_id': unicode(course_key),
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
@@ -734,8 +740,13 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         }
         return JsonResponse(response_payload)
     else:
-        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+        try:
+            instructor_task.api.submit_calculate_students_features_csv(request, course_key, query_features)
+            success_status = _("Your enrolled student profile report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+            return JsonResponse({"status": success_status})
+        except AlreadyRunningError:
+            already_running_status = _("An enrolled student profile report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
+            return JsonResponse({"status": already_running_status})
 
 
 @ensure_csrf_cookie
