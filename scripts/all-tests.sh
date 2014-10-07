@@ -55,6 +55,10 @@ set -e
 #
 ###############################################################################
 
+# Violations thresholds for failing the build
+PYLINT_THRESHOLD=4800
+PEP8_THRESHOLD=675
+
 source $HOME/jenkins_env
 
 # Clean up previous builds
@@ -103,8 +107,8 @@ SHARD=${SHARD:="all"}
 case "$TEST_SUITE" in
 
     "quality")
-        paver run_pep8 -l 725 > pep8.log || { cat pep8.log; EXIT=1; }
-        paver run_pylint -l 4800 > pylint.log || { cat pylint.log; EXIT=1; }
+        paver run_pep8 -l $PEP8_THRESHOLD > pep8.log || { cat pep8.log; EXIT=1; }
+        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
         paver run_quality
 
         # Need to create an empty test result so the post-build
