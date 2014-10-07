@@ -1707,26 +1707,62 @@ class CoursesApiTests(TestCase):
         self.assertEqual(len(response.data['leaders']), 0)
 
     def test_courses_completions_leaders_list_get(self):
-        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
+        course = CourseFactory.create(
+            number='4033',
+            name='leaders_by_completions',
+            start=datetime(2014, 9, 16, 14, 30),
+            end=datetime(2015, 1, 16)
+        )
+
+        chapter = ItemFactory.create(
+            category="chapter",
+            parent_location=course.location,
+            data=self.test_data,
+            due=datetime(2014, 5, 16, 14, 30),
+            display_name="Overview"
+        )
+
+        sub_section = ItemFactory.create(
+            parent_location=chapter.location,
+            category="sequential",
+            display_name=u"test subsection",
+        )
+        unit = ItemFactory.create(
+            parent_location=sub_section.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"test unit",
+        )
+
+        # create 5 users
+        USER_COUNT = 5
+        users = [UserFactory.create(username="testuser_cctest" + str(__), profile='test') for __ in xrange(USER_COUNT)]
+
+        for user in users:
+            CourseEnrollmentFactory.create(user=user, course_id=course.id)
+
+        test_course_id = unicode(course.id)
+        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, test_course_id)
+        leaders_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, test_course_id)
         # Make last user as observer to make sure that data is being filtered out
-        allow_access(self.course, self.users[USER_COUNT-1], 'observer')
+        allow_access(course, users[USER_COUNT-1], 'observer')
 
         for i in xrange(1, 26):
             local_content_name = 'Video_Sequence{}'.format(i)
             local_content = ItemFactory.create(
                 category="videosequence",
-                parent_location=self.unit.location,
+                parent_location=unit.location,
                 data=self.test_data,
                 display_name=local_content_name
             )
             if i < 3:
-                user_id = self.users[0].id
+                user_id = users[0].id
             elif i < 10:
-                user_id = self.users[1].id
+                user_id = users[1].id
             elif i < 17:
-                user_id = self.users[2].id
+                user_id = users[2].id
             else:
-                user_id = self.users[3].id
+                user_id = users[3].id
 
             content_id = unicode(local_content.scope_ids.usage_id)
             completions_data = {'content_id': content_id, 'user_id': user_id}
@@ -1735,39 +1771,61 @@ class CoursesApiTests(TestCase):
 
             # observer should complete everything, so we can assert that it is filtered out
             response = self.do_post(completion_uri, {
-                'content_id': content_id, 'user_id': self.users[USER_COUNT-1].id
+                'content_id': content_id, 'user_id': users[USER_COUNT-1].id
             })
             self.assertEqual(response.status_code, 201)
 
-        test_uri = '{}/{}/metrics/completions/leaders/?{}'.format(self.base_courses_uri, self.test_course_id, 'count=6')
+        expected_course_avg = '25.000'
+        test_uri = '{}?count=6'.format(leaders_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 4)
-        self.assertEqual(response.data['course_avg'], 20)
+        self.assertEqual('{0:.3f}'.format(response.data['course_avg']), expected_course_avg)
 
         # without count filter and user_id
-        test_uri = '{}/{}/metrics/completions/leaders/?user_id={}'.format(self.base_courses_uri, self.test_course_id,
-                                                                          self.users[1].id)
+        test_uri = '{}?user_id={}'.format(leaders_uri, users[1].id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 3)
+        self.assertEqual(len(response.data['leaders']), 4)
         self.assertEqual(response.data['position'], 2)
-        self.assertEqual(response.data['completions'], 28)
+        self.assertEqual('{0:.3f}'.format(response.data['completions']), '28.000')
 
         # with skipleaders filter
-        test_uri = '{}/{}/metrics/completions/leaders/?user_id={}&skipleaders=true'.format(self.base_courses_uri,
-                                                                                           self.test_course_id,
-                                                                                           self.users[1].id)
+        test_uri = '{}?user_id={}&skipleaders=true'.format(leaders_uri, users[1].id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.data.get('leaders', None))
-        self.assertIsNone(response.data.get('position', None))
-        self.assertEqual(response.data['completions'], 28)
+        self.assertEqual('{0:.3f}'.format(response.data['course_avg']), expected_course_avg)
+        self.assertEqual('{0:.3f}'.format(response.data['completions']), '28.000')
 
         # test with bogus course
         test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
+
+        #filter course module completion by organization
+        data = {
+            'name': 'Test Organization',
+            'display_name': 'Test Org Display Name',
+            'users': [users[1].id]
+        }
+        response = self.do_post(self.base_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}?organizations={}'.format(leaders_uri, response.data['id'])
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['leaders']), 1)
+        self.assertEqual(response.data['leaders'][0]['id'], users[1].id)
+        self.assertEqual('{0:.3f}'.format(response.data['leaders'][0]['completions']), '28.000')
+        self.assertEqual('{0:.3f}'.format(response.data['course_avg']), '28.000')
+
+        # test with unknown user
+        test_uri = '{}?user_id={}&skipleaders=true'.format(leaders_uri, '909999')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data.get('leaders', None))
+        self.assertEqual(response.data['position'], 0)
+        self.assertEqual(response.data['completions'], 0)
 
     def test_courses_metrics_grades_list_get(self):
         # Retrieve the list of grades for this course
