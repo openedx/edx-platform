@@ -8,19 +8,19 @@ Cohorts create smaller communities of students within a course. Students who
 are in a cohort can communicate and share experiences privately within course
 discussion topics.
 
-When you enable the cohort feature for your course, the discussion topics
-that you include in units by adding discussion components are divided by
-cohort. This means that each post that a student makes to those 
-content-specific topics can only be read, and responded to, by members of the same
-cohort. However, any course-wide discussion topics that you set up for your
-course remain unified. This means that all posts can be read, and responded to,
-by every student. You can change some, or all, of your course-wide topics to be
-divided by cohort. See :ref:`Options for Discussion Topics`.
+When you enable the cohort feature for your course, the discussion topics that
+you include in units by adding discussion components are divided by cohort.
+This means that each post that a student makes to those content-specific topics
+can only be read, and responded to, by members of the same cohort. However, any
+course-wide discussion topics that you set up for your course remain unified.
+This means that all posts can be read, and responded to, by every student. You
+can change some, or all, of your course-wide topics to be divided by cohort.
+See :ref:`Options for Discussion Topics`.
 
 This section also describes your options for :ref:`assigning students to cohort
 groups<Options for Assigning Students to Cohorts>`. When you enable the cohort
-feature, you define a set of cohort groups to reflect the student cohorts, and
-select a strategy for assigning students to the groups. Note that:
+feature, you define a set of cohort groups to reflect communities of students,
+and select a strategy for assigning students to those groups. Note that:
 
 * Every student must be assigned to a cohort group. This assures that every
   student has the ability to read and contribute to all of the course
@@ -47,7 +47,7 @@ Options for Discussion Topics
 
 By enabling the cohort feature in a course, you provide students with the
 ability to ask questions of, and have conversations with, other members of
-their cohort. By offering these cohort-only discussion oppotunities, the cohort
+their cohort. By offering cohort-only discussion oppotunities, the cohort
 feature can help students develop a sense of community, provide specialized
 experiences, and encourage deeper, more meaningful course involvement.
 
@@ -241,9 +241,16 @@ when they visit the **Discussion** page or a discussion topic in the course
 content.
 
 Students who are assigned to the default cohort group see a cohort name of
-"Default Group" in discussion posts. See :ref:`Read the Cohort Indicator in
-Posts`. If you want students to see a different cohort name, add an auto cohort
-group with the name that you prefer. See :ref:`Define Auto Cohort Groups`.
+"Default Group" in discussion posts. 
+
+.. image:: ../Images/post_visible_default.png
+ :alt: A discussion topic post with "This post is visible to Default Group" 
+       above the title
+
+If you want students to see a different cohort name when your course starts,
+you can add an auto cohort group with the name that you prefer. See
+:ref:`Define Auto Cohort Groups`. (Adding an auto cohort group to your course 
+for this purpose is not recommended after your course starts.)
 
 You can check the :ref:`student profile information report<View and download
 student data>` for your course to see if any students are assigned to the
