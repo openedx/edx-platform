@@ -371,6 +371,38 @@ class OptionInput(InputTypeBase):
     template = "optioninput.html"
     tags = ['optioninput']
 
+    def __init__(self, system, xml, state):
+        super(OptionInput, self).__init__(system, xml, state)
+        self._option_elements_to_attribute_string()  # if the problem follows the latest schema
+
+    def _option_elements_to_attribute_string(self):
+        """
+        Check the problem XML for the schema to which the problem adheres. If it is the expected
+        schema, find all the option elements, create the old-style 'options' attribute string from
+        those elements, and insert the manufactured attribute string into the XML file. Thus, while
+        the XML storage format has changed this function hides that fact, making the XML look like
+        it did previously so no code is broken.
+        :return: None
+        """
+        options_string = "("
+        correct_option = ''
+        delimiter = ''
+        for option_element in self.xml.xpath('//optioninput [@id="' + self.input_id + '"]/option'):
+            option_name = option_element.text.strip()
+            options_string += delimiter + "'" + option_name + "'"
+            delimiter = ','
+            if option_element.attrib['correct'] == 'True':
+                correct_option = option_name
+
+        options_string += ')'
+        option_input_elements = self.xml.xpath('//optioninput [@id="' + self.input_id + '"]')
+        if option_input_elements:
+            # in this case there will only be a single element. self.xml is actually a fragment with
+            # 'optioninput' as the root element and with 'id' equal to the value in the test.
+            option_input_element = option_input_elements[0]
+            option_input_element.attrib.update({'options': options_string})
+            option_input_element.attrib.update({'correct': correct_option})
+
     @staticmethod
     def parse_options(options):
         """
@@ -483,15 +515,17 @@ class ChoiceGroup(InputTypeBase):
         _ = i18n.ugettext
 
         for choice in element:
-            if choice.tag != 'choice':
-                msg = u"[capa.inputtypes.extract_choices] {error_message}".format(
-                    # Translators: '<choice>' is a tag name and should not be translated.
-                    error_message=_("Expected a <choice> tag; got {given_tag} instead").format(
-                        given_tag=choice.tag
+            if choice.tag == 'choice':
+                choices.append((choice.get("name"), stringify_children(choice)))
+            else:
+                if choice.tag != 'booleanhint':
+                    msg = u"[capa.inputtypes.extract_choices] {error_message}".format(
+                        # Translators: '<choice>' and '<booleanhint>' are tag names and should not be translated.
+                        error_message=_("Expected a <choice> or <booleanhint> tag; got {given_tag} instead").format(
+                            given_tag=choice.tag
+                        )
                     )
-                )
-                raise Exception(msg)
-            choices.append((choice.get("name"), stringify_children(choice)))
+                    raise Exception(msg)
         return choices
 
     def get_user_visible_answer(self, internal_answer):
@@ -1521,12 +1555,14 @@ class AnnotationInput(InputTypeBase):
 
     template = "annotationinput.html"
     tags = ['annotationinput']
+    debug = False
+    return_to_annotation = True
 
     def setup(self):
         xml = self.xml
 
-        self.debug = False  # set to True to display extra debug info with input
-        self.return_to_annotation = True  # return only works in conjunction with annotatable xmodule
+        self.debug = False   # set to True to display extra debug info with input
+        self.return_to_annotation = True   # return only works in conjunction with annotatable xmodule
 
         self.title = xml.findtext('./title', 'Annotation Exercise')
         self.text = xml.findtext('./text')

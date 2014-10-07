@@ -391,7 +391,9 @@ class LoncapaProblem(object):
                 results = responder.evaluate_answers(student_answers, oldcmap)
             else:
                 results = responder.evaluate_answers(self.student_answers, oldcmap)
-            newcmap.update(results)
+
+            if results:                 # if this responder had anything to add to the correct map
+                newcmap.update(results)
 
         self.correct_map = newcmap
         return newcmap

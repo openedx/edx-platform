@@ -1,0 +1,65 @@
+<problem schema="edXML/1.0">
+    <p>Select all the fruits from the list</p>
+    <choiceresponse>
+      <checkboxgroup label="Select all the fruits from the list" direction="vertical">
+        <choice correct="true">Apple
+                   <choicehint selected="true">You are right that apple is a fruit.
+                   </choicehint>
+                   <choicehint selected="false">Remember that apple is also a fruit.
+                   </choicehint>
+        </choice>
+        <choice correct="false">Mushroom
+                   <choicehint selected="true">Mushroom is a fungus, not a fruit.
+                   </choicehint>
+                   <choicehint selected="false">You are right that mushrooms are not fruit
+                   </choicehint>
+        </choice>
+        <choice correct="true">Grape
+                   <choicehint selected="true">You are right that grape is a fruit
+                   </choicehint>
+                   <choicehint selected="false">Remember that grape is also a fruit.
+                   </choicehint>
+        </choice>
+        <choice correct="false">Mustang</choice>
+        <choice correct="false">Camero
+                   <choicehint selected="true">I do not know what a Camero is but it is not a fruit.
+                   </choicehint>
+                   <choicehint selected="false">What is a camero anyway?
+                   </choicehint>
+        </choice>
+        <booleanhint value="A*B" label="Almost right"> You are right that apple is a fruit, but there is one you are missing. Also, mushroom is not a fruit.
+        </booleanhint>
+        <booleanhint value="B*C"> You are right that grape is a fruit, but there is one you are missing. Also, mushroom is not a fruit.
+        </booleanhint>
+      </checkboxgroup>
+    </choiceresponse>
+    <p>Select all the vegetables from the list</p>
+    <choiceresponse>
+      <checkboxgroup label="Select all the vegetables from the list" direction="vertical">
+        <choice correct="false">Banana
+                   <choicehint selected="true">No, sorry, a banana is a fruit.
+                   </choicehint>
+                   <choicehint selected="false">poor banana.
+                   </choicehint>
+        </choice>
+        <choice correct="false">Ice Cream</choice>
+        <choice correct="false">Mushroom
+                   <choicehint selected="true" label="SORRY:">Mushroom is a fungus, not a vegetable.
+                   </choicehint>
+                   <choicehint selected="false">You are right that mushrooms are not vegatbles
+                   </choicehint>
+        </choice>
+        <choice correct="true">Brussel Sprout
+                   <choicehint selected="true">Brussel sprouts are vegetables.
+                   </choicehint>
+                   <choicehint selected="false">Brussel sprout is the only vegetable in this list.
+                   </choicehint>
+        </choice>
+        <booleanhint value="A*B" label="Very funny"> Making a banana split?
+        </booleanhint>
+        <booleanhint value="B*D"> That will make a horrible dessert: a brussel sprout split?
+        </booleanhint>
+      </checkboxgroup>
+    </choiceresponse>
+</problem>
+
