@@ -11,7 +11,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
 from django_comment_client.tests.group_id import (
-    GroupIdAssertionMixin,
     CohortedTopicGroupIdTestMixin,
     NonCohortedTopicGroupIdTestMixin
 )
@@ -570,7 +569,13 @@ class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicG
 class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/active_threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+    def call_view_for_profiled_user(
+            self, mock_request, requesting_user, profiled_user, group_id, pass_group_id, is_ajax=False
+    ):
+        """
+        Calls "user_profile" view method on behalf of "requesting_user" to get information about
+        the user "profiled_user".
+        """
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
@@ -587,12 +592,17 @@ class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopi
             data=request_data,
             **headers
         )
-        request.user = user
+        request.user = requesting_user
         mako_middleware_process_request(request)
         return views.user_profile(
             request,
             self.course.id.to_deprecated_string(),
-            user.id
+            profiled_user.id
+        )
+
+    def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+        return self.call_view_for_profiled_user(
+            mock_request, user, user, group_id, pass_group_id=pass_group_id, is_ajax=is_ajax
         )
 
     def test_group_info_in_html_response(self, mock_request):
@@ -616,6 +626,109 @@ class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopi
         self._assert_json_response_contains_group_info(
             response, lambda d: d['discussion_data'][0]
         )
+
+    def _test_group_id_passed_to_user_profile(
+            self, mock_request, expect_group_id_in_request, requesting_user, profiled_user, group_id, pass_group_id
+    ):
+        """
+        Helper method for testing whether or not group_id was passed to the user_profile request.
+        """
+
+        def get_params_from_user_info_call(for_specific_course):
+            """
+            Returns the request parameters for the user info call with either course_id specified or not,
+            depending on value of 'for_specific_course'.
+            """
+            # There will be 3 calls from user_profile. One has the cs_endpoint "active_threads", and it is already
+            # tested. The other 2 calls are for user info; one of those calls is for general information about the user,
+            # and it does not specify a course_id. The other call does specify a course_id, and if the caller did not
+            # have discussion moderator privileges, it should also contain a group_id.
+            for r_call in mock_request.call_args_list:
+                if not r_call[0][1].endswith(self.cs_endpoint):
+                    params = r_call[1]["params"]
+                    has_course_id = "course_id" in params
+                    if (for_specific_course and has_course_id) or (not for_specific_course and not has_course_id):
+                        return params
+            self.assertTrue(
+                False,
+                "Did not find appropriate user_profile call for 'for_specific_course'=" + for_specific_course
+            )
+
+        mock_request.reset_mock()
+        self.call_view_for_profiled_user(
+            mock_request,
+            requesting_user,
+            profiled_user,
+            group_id,
+            pass_group_id=pass_group_id,
+            is_ajax=False
+        )
+        # Should never have a group_id if course_id was not included in the request.
+        params_without_course_id = get_params_from_user_info_call(False)
+        self.assertNotIn("group_id", params_without_course_id)
+
+        params_with_course_id = get_params_from_user_info_call(True)
+        if expect_group_id_in_request:
+            self.assertIn("group_id", params_with_course_id)
+            self.assertEqual(group_id, params_with_course_id["group_id"])
+        else:
+            self.assertNotIn("group_id", params_with_course_id)
+
+    def test_group_id_passed_to_user_profile_student(self, mock_request):
+        """
+        Test that the group id is always included when requesting user profile information for a particular
+        course if the requester does not have discussion moderation privileges.
+        """
+        def verify_group_id_always_present(profiled_user, pass_group_id):
+            """
+            Helper method to verify that group_id is always present for student in course
+            (non-privileged user).
+            """
+            self._test_group_id_passed_to_user_profile(
+                mock_request, True, self.student, profiled_user, self.student_cohort.id, pass_group_id
+            )
+
+        # In all these test cases, the requesting_user is the student (non-privileged user).
+        # The profile returned on behalf of the student is for the profiled_user.
+        verify_group_id_always_present(profiled_user=self.student, pass_group_id=True)
+        verify_group_id_always_present(profiled_user=self.student, pass_group_id=False)
+        verify_group_id_always_present(profiled_user=self.moderator, pass_group_id=True)
+        verify_group_id_always_present(profiled_user=self.moderator, pass_group_id=False)
+
+    def test_group_id_user_profile_moderator(self, mock_request):
+        """
+        Test that the group id is only included when a privileged user requests user profile information for a
+        particular course and user if the group_id is explicitly passed in.
+        """
+        def verify_group_id_present(profiled_user, pass_group_id, requested_cohort=self.moderator_cohort):
+            """
+            Helper method to verify that group_id is present.
+            """
+            self._test_group_id_passed_to_user_profile(
+                mock_request, True, self.moderator, profiled_user, requested_cohort.id, pass_group_id
+            )
+
+        def verify_group_id_not_present(profiled_user, pass_group_id, requested_cohort=self.moderator_cohort):
+            """
+            Helper method to verify that group_id is not present.
+            """
+            self._test_group_id_passed_to_user_profile(
+                mock_request, False, self.moderator, profiled_user, requested_cohort.id, pass_group_id
+            )
+
+        # In all these test cases, the requesting_user is the moderator (privileged user).
+
+        # If the group_id is explicitly passed, it will be present in the request.
+        verify_group_id_present(profiled_user=self.student, pass_group_id=True)
+        verify_group_id_present(profiled_user=self.moderator, pass_group_id=True)
+        verify_group_id_present(
+            profiled_user=self.student, pass_group_id=True, requested_cohort=self.student_cohort
+        )
+
+        # If the group_id is not explicitly passed, it will not be present because the requesting_user
+        # has discussion moderator privileges.
+        verify_group_id_not_present(profiled_user=self.student, pass_group_id=False)
+        verify_group_id_not_present(profiled_user=self.moderator, pass_group_id=False)
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
