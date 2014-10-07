@@ -254,7 +254,7 @@ def dump_student_extensions(course, student):
         "data": data}
 
 
-def fix_missing_extensions(course):
+def reapply_all_extensions(course):
     units = get_units_with_due_date(course)
     units = dict([(u.location.url(), u) for u in units])
     msks = units.keys()
