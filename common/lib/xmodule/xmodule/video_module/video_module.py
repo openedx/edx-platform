@@ -583,15 +583,14 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     # If the user has specified html5 sources, make sure we don't use the default video
                     if youtube_id != '' or 'html5_sources' in field_data:
                         field_data['youtube_id_{0}'.format(normalized_speed.replace('.', '_'))] = youtube_id
+            elif attr in conversions:
+                field_data[attr] = conversions[attr](value)
+            elif attr not in cls.fields:
+                field_data.setdefault('xml_attributes', {})[attr] = value
             else:
-                #  Convert XML attrs into Python values.
-                if attr in conversions:
-                    value = conversions[attr](value)
-                else:
                 # We export values with json.dumps (well, except for Strings, but
                 # for about a month we did it for Strings also).
-                    value = deserialize_field(cls.fields[attr], value)
-                field_data[attr] = value
+                field_data[attr] = deserialize_field(cls.fields[attr], value)
 
         # For backwards compatibility: Add `source` if XML doesn't have `download_video`
         # attribute.
