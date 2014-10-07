@@ -646,14 +646,14 @@ class LoncapaProblem(object):
             code = unescape(script.text, XMLESC)
             all_code += code
 
-        # An asset named python_lib.zip can be imported by Python code.
         extra_files = []
-        zip_lib = self.capa_system.get_python_lib_zip()
-        if zip_lib is not None:
-            extra_files.append(("python_lib.zip", zip_lib))
-            python_path.append("python_lib.zip")
-
         if all_code:
+            # An asset named python_lib.zip can be imported by Python code.
+            zip_lib = self.capa_system.get_python_lib_zip()
+            if zip_lib is not None:
+                extra_files.append(("python_lib.zip", zip_lib))
+                python_path.append("python_lib.zip")
+
             try:
                 safe_exec(
                     all_code,
