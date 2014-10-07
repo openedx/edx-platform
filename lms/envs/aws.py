@@ -486,6 +486,10 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set(ENV_TOKENS.get('AUTO_REGISTRATIO
 if FEATURES.get('STUDENT_GRADEBOOK') and "'gradebook'" not in INSTALLED_APPS:
     INSTALLED_APPS += ('gradebook',)
 
+############# Student Progress #################
+if FEATURES.get('STUDENT_PROGRESS') and "progress" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('progress',)
+
 ##### SET THE LIST OF ALLOWED IP ADDRESSES FOR THE API ######
 API_ALLOWED_IP_ADDRESSES = ENV_TOKENS.get('API_ALLOWED_IP_ADDRESSES')
 
