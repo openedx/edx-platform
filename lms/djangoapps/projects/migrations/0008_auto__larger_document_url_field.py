@@ -9,13 +9,49 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
+        # Changing field 'WorkgroupSubmissionReview.question'
+        db.alter_column('projects_workgroupsubmissionreview', 'question', self.gf('django.db.models.fields.CharField')(max_length=1024))
+
+        # Changing field 'WorkgroupSubmissionReview.answer'
+        db.alter_column('projects_workgroupsubmissionreview', 'answer', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'WorkgroupPeerReview.question'
+        db.alter_column('projects_workgrouppeerreview', 'question', self.gf('django.db.models.fields.CharField')(max_length=1024))
+
+        # Changing field 'WorkgroupPeerReview.answer'
+        db.alter_column('projects_workgrouppeerreview', 'answer', self.gf('django.db.models.fields.TextField')())
+
         # Changing field 'WorkgroupSubmission.document_url'
         db.alter_column('projects_workgroupsubmission', 'document_url', self.gf('django.db.models.fields.CharField')(max_length=2048))
 
+        # Changing field 'WorkgroupReview.question'
+        db.alter_column('projects_workgroupreview', 'question', self.gf('django.db.models.fields.CharField')(max_length=1024))
+
+        # Changing field 'WorkgroupReview.answer'
+        db.alter_column('projects_workgroupreview', 'answer', self.gf('django.db.models.fields.TextField')())
+
     def backwards(self, orm):
+
+        # Changing field 'WorkgroupSubmissionReview.question'
+        db.alter_column('projects_workgroupsubmissionreview', 'question', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'WorkgroupSubmissionReview.answer'
+        db.alter_column('projects_workgroupsubmissionreview', 'answer', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'WorkgroupPeerReview.question'
+        db.alter_column('projects_workgrouppeerreview', 'question', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'WorkgroupPeerReview.answer'
+        db.alter_column('projects_workgrouppeerreview', 'answer', self.gf('django.db.models.fields.CharField')(max_length=255))
 
         # Changing field 'WorkgroupSubmission.document_url'
         db.alter_column('projects_workgroupsubmission', 'document_url', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'WorkgroupReview.question'
+        db.alter_column('projects_workgroupreview', 'question', self.gf('django.db.models.fields.CharField')(max_length=255))
+
+        # Changing field 'WorkgroupReview.answer'
+        db.alter_column('projects_workgroupreview', 'answer', self.gf('django.db.models.fields.CharField')(max_length=255))
 
     models = {
         'api_manager.organization': {
@@ -89,24 +125,24 @@ class Migration(SchemaMigration):
         },
         'projects.workgrouppeerreview': {
             'Meta': {'object_name': 'WorkgroupPeerReview'},
-            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'answer': ('django.db.models.fields.TextField', [], {}),
             'content_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'question': ('django.db.models.fields.CharField', [], {'max_length': '1024'}),
             'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'workgroup_peer_reviewees'", 'to': "orm['auth.User']"}),
             'workgroup': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'peer_reviews'", 'to': "orm['projects.Workgroup']"})
         },
         'projects.workgroupreview': {
             'Meta': {'object_name': 'WorkgroupReview'},
-            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'answer': ('django.db.models.fields.TextField', [], {}),
             'content_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'question': ('django.db.models.fields.CharField', [], {'max_length': '1024'}),
             'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'workgroup': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'workgroup_reviews'", 'to': "orm['projects.Workgroup']"})
         },
@@ -124,12 +160,12 @@ class Migration(SchemaMigration):
         },
         'projects.workgroupsubmissionreview': {
             'Meta': {'object_name': 'WorkgroupSubmissionReview'},
-            'answer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'answer': ('django.db.models.fields.TextField', [], {}),
             'content_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('model_utils.fields.AutoLastModifiedField', [], {'default': 'datetime.datetime.now'}),
-            'question': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'question': ('django.db.models.fields.CharField', [], {'max_length': '1024'}),
             'reviewer': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'submission': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'reviews'", 'to': "orm['projects.WorkgroupSubmission']"})
         }
