@@ -396,7 +396,7 @@
 
       .info {
         @include clearfix;
-        @include padding(0 10px 0 230px);
+        @include padding(0, 10px, 0, 230px);
 
         > hgroup {
           padding: 0;

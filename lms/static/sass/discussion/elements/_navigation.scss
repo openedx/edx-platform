@@ -275,8 +275,8 @@
     width: 0;
     height: 0;
     border-style: solid;
-    @include border-width(0 ($baseline/4) ($baseline/4) 0);
-    @include border-color(transparent $gray-l3 transparent transparent);
+    @include border-width(0, ($baseline/4), ($baseline/4), 0);
+    @include border-color(transparent, $gray-l3, transparent, transparent);
   }
 
   &.is-unread {

@@ -1,7 +1,5 @@
-// setting the layout to output css for right to left languages
-@import 'vendor/bi-app/bi-app-rtl';
-
 @import 'bourbon/bourbon';
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 @import 'base/reset';
 @import 'base/font_face';

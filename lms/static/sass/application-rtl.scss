@@ -4,14 +4,12 @@
  * /edx/app/edxapp/edx-platform/lms/static/sass/application-rtl.scss.mako
  */
 
-// setting the layout to output css for right to left languages
-@import 'vendor/bi-app/bi-app-rtl';
-
 // lms - css application architecture
 // ====================
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 // BASE  *default edX offerings*
 // ====================

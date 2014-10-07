@@ -274,7 +274,7 @@
 
       .field {
         @include float(left);
-        @include margin(0 ($baseline*1.5) 0 0);
+        @include margin(0, ($baseline*1.5), 0, 0);
         display: block;
         border-bottom: none;
         padding-bottom: 0;

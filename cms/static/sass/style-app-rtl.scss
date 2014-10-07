@@ -1,8 +1,7 @@
 // studio - css architecture
 // ====================
 
-// setting the layout to output css for right to left languages
-@import 'vendor/bi-app/bi-app-rtl';
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon

@@ -1,13 +1,11 @@
 ## NOTE: This Sass infrastructure is redundant, but needed in order to address an IE9 rule limit within CSS - http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx
 
-// setting the layout to output css for right to left languages
-@import 'vendor/bi-app/bi-app-rtl';
-
 // lms - css application architecture (platform)
 // ====================
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 // BASE  *default edX offerings*
 // ====================
