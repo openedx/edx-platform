@@ -1,6 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-
 % if reverifications["must_reverify"]:
   % if len(reverifications["must_reverify"]) > 1:
 
@@ -32,7 +31,6 @@
         </nav>
       </div>
     </div>
-  </div>
 
   % elif reverifications["must_reverify"]:
   <div class="wrapper-msg urgency-high">
@@ -57,13 +55,12 @@
         </nav>
       </div>
     </div>
-  </div>
   % endfor
   %endif
 %endif
 
 %if reverifications["denied"] and denied_banner:
-<div class="wrapper-msg urgency-low" id="failed-verification-banner">
+<div class="wrapper-msg urgency-high" id="failed-verification-banner">
   <div class="msg msg-reverify is-dismissable">
       <div class="msg-content">
         <h2 class="title">${_("Your re-verification failed")}</h2>
@@ -79,13 +76,12 @@
 	    )}
           </p>
         </div>
+        % endif
+        % endfor
       </div>
       <div class="action-dismiss">
         <button class="button-dismiss" id="failed-verification-button-dismiss"><i class="icon-remove-sign"></i> <span class="sr">${_('Dismiss')}</span></button>
       </div>
     </div>
   </div>
-</div>
-% endif
-% endfor
 %endif

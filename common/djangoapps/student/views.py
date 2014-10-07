@@ -480,7 +480,10 @@ def dashboard(request):
 
     message = ""
     if not user.is_active:
-        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
+        message = render_to_string(
+            'registration/activate_account_notice.html',
+            {'email': user.email, 'platform_name': settings.PLATFORM_NAME}
+        )
 
     # Global staff can see what courses errored on their dashboard
     staff_access = False

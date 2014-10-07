@@ -16,4 +16,4 @@ Feature: LMS.Sign in
     And I check the checkbox named "terms_of_service"
     And I check the checkbox named "honor_code"
     And I submit the registration form
-    Then I should see "THANKS FOR REGISTERING!" in the dashboard banner
+    Then I should see "Thanks for Registering!" in the dashboard banner
