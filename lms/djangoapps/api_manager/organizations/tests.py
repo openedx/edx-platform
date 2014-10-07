@@ -339,6 +339,7 @@ class OrganizationsApiTests(TestCase):
         metrics_uri = '{}metrics/'.format(test_uri)
         response = self.do_get(metrics_uri)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_grade_average'], 0.838)
         self.assertEqual(response.data['users_grade_complete_count'], 4)
 
 
@@ -391,7 +392,7 @@ class OrganizationsApiTests(TestCase):
         metrics_uri = '{}metrics/'.format(test_uri)
         response = self.do_get(metrics_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users_grade_complete_count'], 5)
+        self.assertEqual(response.data['users_grade_complete_count'], 6)
 
         courses = {'courses': unicode(course1.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
@@ -399,8 +400,14 @@ class OrganizationsApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_complete_count'], 2)
 
+        courses = {'courses': unicode(course2.id)}
+        filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
+        response = self.do_get(filtered_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_grade_complete_count'], 4)
+
         courses = {'courses': '{},{}'.format(course1.id, course2.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
         response = self.do_get(filtered_metrics_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users_grade_complete_count'], 5)
+        self.assertEqual(response.data['users_grade_complete_count'], 6)
