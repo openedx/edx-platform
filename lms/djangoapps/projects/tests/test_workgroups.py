@@ -182,7 +182,7 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             response.data['id'],
             self.test_workgroup_name
         )
-        cohort = get_cohort_by_name(self.test_course.id, cohort_name, CourseUserGroup.WORKGROUP)
+        cohort = get_cohort_by_name(self.test_course.id, cohort_name)
         self.assertIsNotNone(cohort)
 
     def test_workgroups_detail_get(self):
@@ -276,9 +276,9 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             response.data['id'],
             self.test_workgroup_name
         )
-        cohort = get_cohort_by_name(self.test_course.id, cohort_name, CourseUserGroup.WORKGROUP)
+        cohort = get_cohort_by_name(self.test_course.id, cohort_name)
         self.assertIsNotNone(cohort)
-        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
+        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id))
 
 
     def test_workgroups_users_post_preexisting_workgroup(self):
@@ -360,15 +360,15 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         )
 
         # now let's remove existing cohort users
-        cohort = get_cohort_by_name(self.test_course.id, cohort_name, CourseUserGroup.WORKGROUP)
-        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
+        cohort = get_cohort_by_name(self.test_course.id, cohort_name)
+        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id))
 
-        remove_user_from_cohort(cohort, self.test_user.username, CourseUserGroup.WORKGROUP)
-        self.assertFalse(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
+        remove_user_from_cohort(cohort, self.test_user.username)
+        self.assertFalse(is_user_in_cohort(cohort, self.test_user.id))
 
         # delete cohort
-        delete_empty_cohort(self.test_course.id, cohort_name, CourseUserGroup.WORKGROUP)
-        self.assertEqual(0, len(get_course_cohort_names(self.test_course.id, CourseUserGroup.WORKGROUP)))
+        delete_empty_cohort(self.test_course.id, cohort_name)
+        self.assertEqual(0, len(get_course_cohort_names(self.test_course.id)))
 
         # add a 2nd user and make sure a discussion cohort was created and users were backfilled
         test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
@@ -378,10 +378,10 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 201)
 
         # now inspect cohort and assert that things are as we anticipate (i.e. both users are in there)
-        cohort = get_cohort_by_name(self.test_course.id, cohort_name, CourseUserGroup.WORKGROUP)
+        cohort = get_cohort_by_name(self.test_course.id, cohort_name)
         self.assertIsNotNone(cohort)
-        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
-        self.assertTrue(is_user_in_cohort(cohort, self.test_user2.id, CourseUserGroup.WORKGROUP))
+        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id))
+        self.assertTrue(is_user_in_cohort(cohort, self.test_user2.id))
 
     def test_workgroups_users_delete(self):
         data = {

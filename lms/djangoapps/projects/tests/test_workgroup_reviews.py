@@ -77,7 +77,7 @@ class WorkgroupReviewsApiTests(ModuleStoreTestCase):
             name="Test Workgroup",
             project=self.test_project,
         )
-        self.test_workgroup.users.add(self.test_user)
+        self.test_workgroup.add_user(self.test_user)
         self.test_workgroup.save()
 
         self.test_submission = WorkgroupSubmission.objects.create(
