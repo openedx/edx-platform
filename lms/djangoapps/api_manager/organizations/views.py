@@ -4,7 +4,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import F
+from django.db.models import Avg, F
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -43,9 +43,14 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             for course_string in courses_filter:
                 courses.append(get_course_key(course_string))
             org_user_grades = org_user_grades.filter(course_id__in=courses)
+
+        users_grade_average = org_user_grades.aggregate(Avg('grade'))
+        response_data['users_grade_average'] = float('{0:.3f}'.format(float(users_grade_average['grade__avg'])))
+
         users_grade_complete_count = org_user_grades\
             .filter(proforma_grade__lte=F('grade') + grade_complete_match_range, proforma_grade__gt=0).count()
         response_data['users_grade_complete_count'] = users_grade_complete_count
+
         return Response(response_data, status=status.HTTP_200_OK)
 
     @action(methods=['get', 'post'])
