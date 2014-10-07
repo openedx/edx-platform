@@ -254,7 +254,12 @@ def dump_student_extensions(course, student):
         "data": data}
 
 
-def reapply_all_extensions(course):
+def reapply_all_extensions(course, dry_run=False):
+    """
+    Recursively reapply all extensions to each extended unit in course. This
+    fixes an issue where new xmodule children (ie new <problem> children) don't
+    inherit the same 'extended_due' as their parent.
+    """
     units = get_units_with_due_date(course)
     units = dict([(u.location.url(), u) for u in units])
     msks = units.keys()
@@ -272,9 +277,13 @@ def reapply_all_extensions(course):
             if not edue:
                 continue
             unit = units.get(module.module_state_key)
-            print('reapplying extension %s to %s for user %s' %
-                  (edue, unit.location.url(), student.username))
-            set_due_date_extension(course, unit, student, edue)
+            if dry_run:
+                print('would reapply extension %s to %s for user %s' %
+                      (edue, unit.location.url(), student.username))
+            else:
+                print('reapplying extension %s to %s for user %s' %
+                      (edue, unit.location.url(), student.username))
+                set_due_date_extension(course, unit, student, edue)
             r = reapplied.get(student.username, [])
             r.append(unit.location.url())
             reapplied[student.username] = r
