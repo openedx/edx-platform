@@ -405,6 +405,36 @@ def is_user_in_cohort(cohort, user_id, group_type=CourseUserGroup.COHORT):
         group_type=group_type).exists()
 
 
+def remove_user_from_cohort(cohort, username_or_email):
+    """
+    Look up the given user, and if successful, remove them to the specified cohort.
+
+    Arguments:
+        cohort: CourseUserGroup
+        username_or_email: string.  Treated as email if has '@'
+
+    Returns:
+        User object that has been removed from the cohort
+
+    Raises:
+        User.DoesNotExist if can't find user.
+
+        ValueError if user is not in this cohort.
+    """
+
+    user = get_user_by_username_or_email(username_or_email)
+
+    course_cohorts = CourseUserGroup.objects.filter(
+        course_id=cohort.course_id,
+        users__id=user.id,
+        group_type=CourseUserGroup.COHORT,
+    )
+    if course_cohorts.exists():
+        cohort.users.remove(user)
+
+    return user
+
+
 def get_group_info_for_cohort(cohort, use_cached=False):
     """
     Get the ids of the group and partition to which this cohort has been linked

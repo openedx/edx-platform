@@ -2,6 +2,7 @@
 
 from django.contrib.auth.models import Group, User
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from model_utils.models import TimeStampedModel
 
@@ -34,7 +35,8 @@ class Workgroup(TimeStampedModel):
     """
     name = models.CharField(max_length=255, null=True, blank=True)
     project = models.ForeignKey(Project, related_name="workgroups")
-    users = models.ManyToManyField(User, related_name="workgroups", blank=True, null=True)
+    users = models.ManyToManyField(User, related_name="workgroups",
+                                   through="WorkgroupUser", blank=True, null=True)
     groups = models.ManyToManyField(Group, related_name="workgroups", blank=True, null=True)
 
     @property
@@ -52,6 +54,35 @@ class Workgroup(TimeStampedModel):
             workgroup_id,
             workgroup_name
         )
+
+    def add_user(self, user):
+        workgroup_user = WorkgroupUser(workgroup=self, user=user)
+        workgroup_user.save()
+
+    def remove_user(self, user):
+        workgroup_user = WorkgroupUser.objects.get(workgroup=self, user=user)
+        workgroup_user.delete()
+
+
+class WorkgroupUser(models.Model):
+    """A Folder to store some data between a client and its insurance"""
+
+    workgroup = models.ForeignKey(Workgroup, null=False)
+    user = models.ForeignKey(User, null=False)
+
+    class Meta:
+        db_table = 'projects_workgroup_users'
+
+    def clean(self):
+        # Ensure the user is not already assigned to a workgroup for this course
+        existing_workgroups = Workgroup.objects.filter(users=self.user).filter(project__course_id=self.workgroup.project.course_id)
+        if len(existing_workgroups):
+            raise ValidationError('User {} is already assigned to a workgroup for this course'.format(self.user.username))
+
+    def save(self, **kwargs):
+        self.clean()
+        return super(WorkgroupUser, self).save(**kwargs)
+
 
 class WorkgroupReview(TimeStampedModel):
     """
