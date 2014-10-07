@@ -23,7 +23,7 @@ html.video-fullscreen{
 
   .instructor-info-action {
     @extend %t-copy-sub2;
-    float: flip(right, left);
+    @include float(left);
     margin-left: ($baseline/2);
     padding: ($baseline/4) ($baseline/2);
     border-radius: ($baseline/4);

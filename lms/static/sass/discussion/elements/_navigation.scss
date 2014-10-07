@@ -3,7 +3,7 @@
 
 .forum-nav {
   @include box-sizing(border-box);
-  float: flip(left, right);
+  @include float(left);
   position: relative;
   width: 31%;
   border: 1px solid #aaa;
@@ -34,7 +34,7 @@
 
   .icon {
     @include font-size(14);
-    #{$margin-right}: ($baseline/4);
+    @include margin-right($baseline/4);
   }
 }
 
@@ -43,7 +43,7 @@
 }
 
 .forum-nav-browse-drop-arrow {
-  #{$margin-left}: ($baseline/4);
+  @include margin-left($baseline/4);
 }
 
 .forum-nav-search {
@@ -60,7 +60,7 @@
   position: absolute;
   margin-top: -6px;
   top: 50%;
-  #{$right}: ($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+  @include right($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
 }
 
 .forum-nav-search-input {
@@ -115,7 +115,7 @@
 }
 
 .forum-nav-browse-title .icon {
-  #{$margin-right}: ($baseline/2);
+  @include margin-right($baseline/2);
 }
 
 // -------------------
@@ -135,14 +135,14 @@
   @include box-sizing(border-box);
   display: inline-block;
   width: 50%;
-  text-align: $left;
+  @include text-align(left);
 }
 
 .forum-nav-filter-cohort, .forum-nav-sort {
   @include box-sizing(border-box);
   display: inline-block;
   width: 50%;
-  text-align: $right;
+  @include text-align(right);
 }
 
 %forum-nav-select {
@@ -202,7 +202,10 @@
     @include font-size(14);
 
     &:before {
-      @include transform(scale(flip(1, -1), 1)); // RTL for font awesome question mark
+
+      @include rtl {
+        @include transform(scale(-1, 1)); // RTL for font awesome question mark
+      }
     }
   }
 
@@ -227,7 +230,7 @@
 .forum-nav-thread-wrapper-2 {
   @extend %forum-nav-thread-wrapper;
   width: 13%;
-  text-align: $right;
+  @include text-align(right);
 }
 
 .forum-nav-thread-title {
@@ -255,7 +258,7 @@
   @extend %forum-nav-thread-wrapper-2-content;
   @extend %t-weight4;
   position: relative;
-  #{$margin-left}: ($baseline/4);
+  @include margin-left($baseline/4);
   margin-bottom: ($baseline/4); // Because tail is position: absolute
   border-radius: 2px;
   padding: ($baseline/10) ($baseline/5);
@@ -268,13 +271,12 @@
     display: block;
     position: absolute;
     bottom: (-$baseline/4);
-    #{$right}: ($baseline/4);
+    @include right($baseline/4);
     width: 0;
     height: 0;
     border-style: solid;
-
-    border-width: flip(0 ($baseline/4) ($baseline/4) 0, ($baseline/4) ($baseline/4) 0 0);
-    border-color: flip(transparent $gray-l3 transparent transparent, $gray-l3 transparent transparent transparent);
+    @include border-width(0 ($baseline/4) ($baseline/4) 0);
+    @include border-color(transparent $gray-l3 transparent transparent);
   }
 
   &.is-unread {

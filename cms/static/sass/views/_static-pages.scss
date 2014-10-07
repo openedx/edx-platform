@@ -203,7 +203,7 @@
       position: absolute;
       display: block;
       top: 0;
-      #{$right}: 0;
+      @include right(0);
       z-index: 11;
       width: 35px;
       height: 100%;
@@ -238,8 +238,8 @@
     .component-actions,
     .course-nav-item-actions {
       display: inline-block;
-      float: flip(right, left);
-      #{$margin-right}: ($baseline*2);
+      @include float(right);
+      @include margin-right($baseline*2);
       padding: 8px 0px;
       vertical-align: middle;
       text-align: center;

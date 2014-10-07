@@ -27,14 +27,14 @@
   }
 
   .wrapper-l {
-    float: flip(left, right);
+    @include float(left);
     width: flex-grid(7,12);
   }
 
   .wrapper-r {
-    float: flip(right, left);
+    @include float(right);
     width: flex-grid(4,12);
-    text-align: $right;
+    @include text-align(right);
   }
 
   .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
@@ -128,8 +128,8 @@
 
   // specific elements - course name/info
   .info-course {
-    #{$margin-right}: flex-gutter();
-    #{$border-right}: 1px solid $gray-l4;
+    @include margin-right(flex-gutter());
+    @include border-right(1px solid $gray-l4);
     padding: ($baseline*0.75) flex-gutter() ($baseline*0.75) 0;
 
     .course-org, .course-number {
@@ -144,7 +144,7 @@
     }
 
     .course-org {
-      #{$margin-right}: ($baseline/4);
+      @include margin-right($baseline/4);
     }
 
     .course-title {
@@ -184,7 +184,7 @@
     padding: ($baseline*0.75) 0;
 
     .nav-sub {
-      text-align: $left;
+      @include text-align(left);
     }
 
     .nav-account-help {
@@ -238,7 +238,7 @@
 
   .branding {
     width: 20%;
-    #{$margin-right}: 2%;
+    @include margin-right(2%);
   }
 
   .nav-account {
@@ -263,7 +263,7 @@
 
     .branding {
       width: 20%;
-      #{$margin-right}: 2%;
+      @include margin-right(2%);
     }
 
     .info-course {

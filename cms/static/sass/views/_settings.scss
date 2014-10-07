@@ -66,16 +66,16 @@
       .title-2 {
         width: flex-grid(4, 9);
         margin: 0;
-        #{$margin-right}: flex-gutter();
-        float: flip(left, right);
+        @include margin-right(flex-gutter());
+        @include float(left);
       }
 
       .tip {
         @extend %t-copy-sub2;
         width: flex-grid(5, 9);
-        float: flip(right, left);
+        @include float(right);
         margin-top: ($baseline/2);
-        text-align: $right;
+        @include text-align(right);
         color: $gray-l2;
       }
     }
@@ -371,7 +371,7 @@
         }
 
         .field {
-          float: flip(left, right);
+          @include float(left);
           width: flex-grid(3, 9);
           margin-bottom: ($baseline/4);
           margin-right: flex-gutter();
@@ -383,7 +383,7 @@
           .tip {
             position: absolute;
             top: 0;
-            #{$right}: 0;
+            @include right(0);
           }
         }
       }

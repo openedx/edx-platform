@@ -35,7 +35,7 @@
 
       [class^="icon-"] {
         @extend %t-icon6;
-        #{$margin-right}: ($baseline/4);
+        @include margin-right($baseline/4);
       }
 
       &:hover {
@@ -84,11 +84,11 @@
         @include clearfix();
 
         .action-item {
-          float: flip(left, right);
-          #{$margin-right}: ($baseline/2);
+          @include float(left);
+          @include margin-right($baseline/2);
 
           &:last-child {
-            #{$margin-right}: 0;
+            @include margin-right(0);
           }
 
           .action {
@@ -98,7 +98,7 @@
             [class^="icon-"] {
               @extend %t-icon4;
               vertical-align: middle;
-              #{$margin-right}: $baseline/4;
+              @include margin-right($baseline/4);
 
             }
 

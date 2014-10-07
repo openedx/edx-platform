@@ -17,8 +17,8 @@ header.global {
   }
 
   h1.logo {
-    float: flip(left, right);
-    margin: flip(-2px 39px 0 0, -2px 0 0 39px);
+    @include float(left);
+    @include margin(-2px 39px 0 0);
     position: relative;
 
     a {
@@ -27,11 +27,11 @@ header.global {
   }
 
   .left {
-    float: flip(left, right);
+    @include float(left);
   }
 
   .guest {
-    float: flip(right, left);
+    @include float(right);
   }
 
   > li {
@@ -104,7 +104,7 @@ header.global {
   }
 
   .user {
-    float: flip(right,left);
+    @include float(right);
     margin-top: 4px;
 
     > .primary {
@@ -194,7 +194,7 @@ header.global {
         height: 0px;
         position: absolute;
         @include transform(rotate(-45deg));
-        #{$right}: 12px;
+        @include right(12px);
         top: -6px;
         width: 0px;
       }
@@ -279,7 +279,7 @@ header.global {
   }
 
   .nav-courseware {
-    float: $right;
+    @include float(right);
     margin-top: ($baseline/4);
     list-style: none;
 

@@ -8,7 +8,7 @@
   .response-actions-list,
   .comment-actions-list {
     @extend %ui-no-list;
-    text-align: $right;
+    @include text-align(right);
 
     .actions-item {
       @include box-sizing(border-box);
@@ -58,7 +58,7 @@
       &:after,
       &:before {
         bottom: 100%;
-        #{$right}: 3px;
+        @include right(3px);
         border: solid transparent;
         content: " ";
         height: 0;
@@ -71,7 +71,7 @@
         border-color: $transparent;
         border-bottom-color: $white;
         border-width: 6px;
-        #{$margin-right}: 1px;
+        @include margin-right(1px);
       }
 
       &:before {
@@ -254,7 +254,7 @@
       display: block;
       padding: ($baseline/10) 0;
       white-space: nowrap;
-      text-align: $right;
+      @include text-align(right);
       color: $gray-l1;
 
       &:hover, &:focus {

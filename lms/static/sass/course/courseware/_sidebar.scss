@@ -1,8 +1,8 @@
 .course-index {
   @extend .sidebar;
   @extend .tran;
-  border-radius: flip(3px 0 0 3px, 0 3px 3px 0);
-  #{$border-right}: 1px solid $border-color-2;
+  @include border-right(1px solid $border-color-2);
+  @include border-radius(3px 0 0 3px);
 
   #open_close_accordion {
     display: none;
@@ -47,7 +47,7 @@
         a {
           border-radius: 0;
           box-shadow: none;
-          #{$padding-left}: 19px;
+          @include padding-left(19px);
           color: $link-color;
         }
 
@@ -61,13 +61,18 @@
         }
 
         span.ui-icon {
-          left: flip(0, auto);
-          right: flip(0, auto);
-          background-image: url("/static/images/ui-icons_222222_256x240.png");
+          @include left(0);
           opacity: 0.3;
+          background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
 
-          &.ui-icon-triangle-1-e { // jQuery UI east arrow
-            background-position: flip(-32px -16px, -96px -16px); // flip(jQuery UI east arrow, jQuery UI west arrow)
+          &.ui-icon-triangle-1-e {
+            @include ltr {
+              background-position: -32px -16px; // jQuery UI east arrow position
+            }
+
+            @include rtl {
+              background-position: -96px -16px; // jQuery UI west arrow position
+            }
           }
         }
       }

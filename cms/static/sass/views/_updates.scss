@@ -164,8 +164,8 @@
 	width: 30%;
 	padding: 20px 30px;
 	margin: 0;
-	border-radius: flip(0 3px 3px 0, 3px 0 0 3px);
-	#{$border-left}: none;
+	@include border-radius(0 3px 3px 0);
+	@include border-left(none);
 	background: $lightGrey;
 
 	.title {
@@ -184,7 +184,7 @@
 
     .edit-icon,
     .delete-icon {
-      #{$margin-right}: 4px;
+      @include margin-right(4px);
     }
   }
 

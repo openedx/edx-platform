@@ -1,0 +1,65 @@
+// studio - css architecture
+// ====================
+
+// setting the layout to output css for right to left languages
+@import 'vendor/bi-app/bi-app-rtl';
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+
+// VENDOR + REBASE *referenced/used vendor presentation and reset*
+// ====================
+@import 'reset';
+
+// BASE  *default edX offerings*
+// ====================
+// base - utilities
+@import 'config';
+@import 'variables';
+@import 'mixins';
+@import 'mixins-inherited';
+
+// base - assets
+@import 'assets/fonts';
+@import 'assets/graphics'; // sprites, basic img/figure/svg styling
+@import 'assets/anims'; // animations
+
+// base - starter
+@import 'base';
+
+// base - elements
+@import 'elements/typography';
+@import 'elements/icons'; // references to icons used
+@import 'elements/controls'; // buttons, link styles, sliders, etc.
+@import 'elements/xblocks'; //  studio rendering chrome for xblocks
+@import 'elements/modules'; //  content module patterns
+@import 'elements/layout'; // various standard layouts
+
+// base - specific views
+@import 'views/account';
+@import 'views/assets';
+@import 'views/updates';
+@import 'views/dashboard';
+@import 'views/export';
+@import 'views/index';
+@import 'views/course-create';
+@import 'views/import';
+@import 'views/outline';
+@import 'views/settings';
+@import 'views/static-pages';
+@import 'views/unit';
+@import 'views/container';
+@import 'views/users';
+@import 'views/checklists';
+@import 'views/textbooks';
+@import 'views/export-git';
+@import 'views/group-configuration';
+
+// base - contexts
+@import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
+
+// temp - inherited
+@import 'assets/content-types';
+
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss

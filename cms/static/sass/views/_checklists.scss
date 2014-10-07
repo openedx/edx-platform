@@ -57,15 +57,15 @@
         @include transition(color $tmg-f2 ease-in-out 0s);
         width: flex-grid(6, 9);
         margin: 0;
-        #{$margin-right}: flex-gutter();
-        float: flip(left, right);
+        @include margin-right(flex-gutter());
+        @include float(left);
 
         .ui-toggle-expansion {
           @include transition(all $tmg-f2 ease-in-out 0s);
           @extend %t-action1;
           display: inline-block;
           vertical-align: middle;
-          #{$margin-right}: ($baseline/2);
+          @include margin-right($baseline/2);
           color: $gray-l4;
         }
 
@@ -85,9 +85,9 @@
       .checklist-status {
         @extend %t-copy-sub1;
         width: flex-grid(3, 9);
-        float: flip(right, left);
+        @include float(right);
         margin-top: ($baseline/2);
-        text-align: $right;
+        @include text-align(right);
         color: $gray-l2;
 
 
@@ -126,7 +126,7 @@
 
       .action-primary {
         @include green-button();
-        float: flip(left, right);
+        @include float(left);
 
         .icon-add {
           @extend %t-icon7;
@@ -140,7 +140,7 @@
         @include grey-button();
         @extend %t-action3;
         @extend %t-regular;
-        float: flip(right, left);
+        @include float(right);
 
         .icon-delete {
           @extend %t-icon7;
@@ -226,16 +226,16 @@
       .task-input {
         display: inline-block;
         vertical-align: text-top;
-        float: flip(left, right);
+        @include float(left);
         margin-top: ($baseline/2);
-        #{$margin-right}: flex-gutter();
+        @include margin-right(flex-gutter());
       }
 
       .task-details {
         @extend %t-strong;
         display: inline-block;
         vertical-align: text-top;
-        float: flip(left, right);
+        @include float(left);
         width: flex-grid(6,9);
 
         .task-name {
@@ -264,7 +264,7 @@
         @include clearfix();
         display: inline-block;
         vertical-align: middle;
-        float: flip(right, left);
+        @include float(right);
         width: flex-grid(2,9);
         margin: ($baseline/2) 0 0 flex-gutter();
         opacity: 0.0;

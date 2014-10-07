@@ -29,7 +29,7 @@
         .textbook-title {
           @extend %t-title4;
           @extend %t-strong;
-          #{$margin-right}: ($baseline*14);
+          @include margin-right($baseline*14);
         }
 
         .ui-toggle-expansion {
@@ -83,7 +83,7 @@
           opacity: 0.0;
           position: absolute;
           top: $baseline;
-          #{$right}: $baseline;
+          @include right($baseline);
 
           .action {
             display: inline-block;
@@ -303,9 +303,9 @@
             display: block;
             width: 46%;
             border-bottom: none;
-            margin: flip(0 ($baseline*0.75) 0 0, 0 0 0 ($baseline*0.75));
+            @include margin(0 ($baseline*0.75) 0 0);
             padding: ($baseline/4) 0 0 0;
-            float: $left;
+            @include float(left);
             position: relative;
 
             input, textarea {
@@ -316,7 +316,7 @@
                 @extend %ui-btn-flat-outline;
                 position: absolute;
                 top: 3px;
-                #{$right}: 0;
+                @include right(0);
             }
 
           }

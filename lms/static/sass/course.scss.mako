@@ -1,3 +1,6 @@
+// setting the layout to output css for left to right languages
+@import 'vendor/bi-app/bi-app-ltr';
+
 @import 'bourbon/bourbon';
 
 @import 'base/reset';

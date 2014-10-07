@@ -1,0 +1,63 @@
+/*
+ * This file is dynamically generated and ignored by Git.
+ * DO NOT MAKE CHANGES HERE. Instead, go edit its template:
+ * /edx/app/edxapp/edx-platform/lms/static/sass/application-extend2-rtl.scss.mako
+ */
+
+// setting the layout to output css for right to left languages
+@import 'vendor/bi-app/bi-app-rtl';
+
+// lms - css application architecture (platform)
+// ====================
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+
+// BASE  *default edX offerings*
+// ====================
+
+// base - utilities
+@import 'base/reset';
+@import 'base/config';
+@import 'base/variables';
+@import 'base/mixins';
+
+
+@import 'base/base';
+
+// base - assets
+@import 'base/font_face';
+@import 'base/extends';
+@import 'base/animations';
+
+// base - starter
+@import 'base/base';
+
+// base - elements
+@import 'elements/typography';
+@import 'elements/controls';
+@import 'elements/system-feedback';
+
+// base - specific views
+@import 'views/verification';
+@import 'views/shoppingcart';
+
+// applications
+@import "discussion/utilities/variables";
+@import "discussion/mixins";
+@import 'discussion/discussion'; // Process old file after definitions but before everything else
+@import "discussion/elements/actions";
+@import "discussion/elements/editor";
+@import "discussion/elements/labels";
+@import "discussion/elements/navigation";
+@import "discussion/views/thread";
+@import "discussion/views/create-edit-post";
+@import "discussion/views/response";
+@import 'discussion/utilities/developer';
+@import 'discussion/utilities/shame';
+
+@import 'news';
+
+// temp - shame and developer
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss

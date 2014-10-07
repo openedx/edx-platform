@@ -59,10 +59,17 @@
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
-  <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
-  <%static:css group='style-app-extend1'/>
-  <%static:css group='style-app-extend2'/>
+  % if get_language_bidi():
+    <%static:css group='style-vendor'/>
+    <%static:css group='style-app-rtl'/>
+    <%static:css group='style-app-extend1-rtl'/>
+    <%static:css group='style-app-extend2-rtl'/>
+  % else:
+    <%static:css group='style-vendor'/>
+    <%static:css group='style-app'/>
+    <%static:css group='style-app-extend1'/>
+    <%static:css group='style-app-extend2'/>
+  % endif
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
