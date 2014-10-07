@@ -81,9 +81,9 @@ In Studio, from the **Settings** menu, select **Schedule and Details**.
 
 Follow the on-screen text to enter the course and enrollment schedule.
 
-.. note:: 
- The Time fields on this page, and the times that students see, use UTC
- (Universal Coordinated Time).
+.. note:: The Time fields on this page reflect the current time zone in your
+ browser, depending on your geography. Course start times for students are
+ shown as UTC.
 
 
 .. _The Course Start Date:
@@ -93,7 +93,7 @@ The Course Start Date
 ***********************************
 
 .. note:: The default **Course Start Date** is set far into the future, to
- **01/01/2030**. This is to ensure that your course does not start before
+ **01/01/2030 GMT**. This is to ensure that your course does not start before
  you intend it to.  You must change the course start date to the date you want
  students to begin using the course.
 
