@@ -21,6 +21,7 @@ from course_action_state.managers import CourseRerunUIStateManager
 from django.conf import settings
 import ddt
 import threading
+import pytz
 
 
 class TestCourseIndex(CourseTestCase):
@@ -304,7 +305,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(_get_release_date(response), 'Unscheduled')
         _assert_settings_link_present(response)
 
-        self.course.start = datetime.datetime(2014, 1, 1)
+        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
 
@@ -332,6 +333,5 @@ class OutlinePerfTest(TestCourseOutline):
         with check_mongo_calls(5 * num_threads, 0):
             outline_threads = [threading.Thread(target=test_client) for __ in range(num_threads)]
             [thread.start() for thread in outline_threads]
-            self.assertTrue(all(thread.is_alive() for thread in outline_threads))
             # now wait until they all finish
             [thread.join() for thread in outline_threads]
