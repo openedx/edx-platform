@@ -18,6 +18,12 @@ from rest_framework.response import Response
 from courseware import grades, module_render
 from courseware.model_data import FieldDataCache
 from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
+from course_groups.models import CourseUserGroup
+from course_groups.cohorts import (
+    get_cohort_by_name,
+    add_cohort,
+    add_user_to_cohort
+)
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
@@ -716,6 +722,15 @@ class UsersCoursesList(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         base_uri = generate_base_uri(request)
         course_enrollment = CourseEnrollment.enroll(user, course_key)
+        # Ensure the user is in a cohort. Add it explicitly in the default_cohort
+        try:
+            default_cohort = get_cohort_by_name(course_id, CourseUserGroup.default_cohort_name)
+        except CourseUserGroup.DoesNotExist:
+            default_cohort = add_cohort(course_id, CourseUserGroup.default_cohort_name)
+        add_user_to_cohort(default_cohort, user.username)
+        log.debug('User "{}" has been automatically added in cohort "{}" for course "{}"'.format(
+            user.username, default_cohort.name, course_descriptor.display_name)
+        )
         response_data['uri'] = '{}/{}'.format(base_uri, course_id)
         response_data['id'] = unicode(course_key)
         response_data['name'] = course_descriptor.display_name

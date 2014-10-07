@@ -84,7 +84,7 @@ class PeerReviewsApiTests(TestCase):
             name="Test Workgroup",
             project=self.test_project,
         )
-        self.test_workgroup.users.add(self.test_peer_user)
+        self.test_workgroup.add_user(self.test_peer_user)
         self.test_workgroup.save()
 
         self.client = SecureClient()

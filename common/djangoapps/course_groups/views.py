@@ -228,7 +228,7 @@ def remove_user_from_cohort(request, course_key_string, cohort_id):
     cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
     try:
         user = User.objects.get(username=username)
-        cohort.users.remove(user)
+        cohorts.remove_user_from_cohort(cohort, user.username)
         return json_http_response({'success': True})
     except User.DoesNotExist:
         log.debug('no user')
