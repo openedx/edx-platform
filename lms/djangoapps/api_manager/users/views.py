@@ -337,9 +337,6 @@ class UsersList(SecureListAPIView):
         if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
             enable_notifications(user)
 
-        if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
-            enable_notifications(user)
-
         # add this account creation to password history
         # NOTE, this will be a NOP unless the feature has been turned on in configuration
         password_history_entry = PasswordHistory()
