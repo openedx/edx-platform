@@ -23,6 +23,7 @@ from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
 from django_comment_common.models import FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
+from progress.models import StudentProgress
 from instructor.access import revoke_access, update_forum_role
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole
@@ -1515,15 +1516,15 @@ class CoursesMetrics(SecureAPIView):
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
         users_enrolled_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         organization = request.QUERY_PARAMS.get('organization', None)
+        org_ids = None
         if organization:
             users_enrolled_qs = users_enrolled_qs.filter(organizations=organization)
+            org_ids = [organization]
 
-        users_started_qs = CourseModuleCompletion.objects.filter(course_id=course_id).exclude(user_id__in=exclude_users)
-        if organization:
-            users_started_qs = users_started_qs.filter(user__organizations=organization)
+        users_started = StudentProgress.get_num_users_started(course_key, exclude_users=exclude_users, org_ids=org_ids)
         data = {
             'users_enrolled': users_enrolled_qs.count(),
-            'users_started': users_started_qs.values('user').distinct().count(),
+            'users_started': users_started,
             'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
 
@@ -1601,50 +1602,43 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         GET /api/courses/{course_id}/metrics/completions/leaders/
         """
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
-        count = self.request.QUERY_PARAMS.get('count', 3)
+        count = self.request.QUERY_PARAMS.get('count', None)
         skipleaders = str2bool(self.request.QUERY_PARAMS.get('skipleaders', 'false'))
         data = {}
         course_avg = 0
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
-        detached_categories = ['discussion-course', 'group-project', 'discussion-forum']
-        total_possible_completions = float(len(get_course_leaf_nodes(course_key, detached_categories)))
+        total_possible_completions = float(len(get_course_leaf_nodes(course_key)))
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
-        cat_list = [Q(content_id__contains=item.strip()) for item in detached_categories]
-        cat_list = reduce(lambda a, b: a | b, cat_list)
+        orgs_filter = self.request.QUERY_PARAMS.get('organizations', None)
+        if orgs_filter:
+            upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+            orgs_filter = orgs_filter.split(",")[:upper_bound]
 
-        queryset = CourseModuleCompletion.objects.filter(course_id=course_key)\
-            .exclude(user__in=exclude_users).exclude(cat_list)
-        total_actual_completions = queryset.filter(user__is_active=True).count()
+        total_actual_completions = StudentProgress.get_total_completions(course_key, exclude_users=exclude_users,
+                                                                         org_ids=orgs_filter)
         if user_id:
-            user_queryset = CourseModuleCompletion.objects.filter(course_id=course_key, user__id=user_id)\
-                .exclude(cat_list)
-            user_completions = user_queryset.count()
-            if not skipleaders:
-                user_time_completed = user_queryset.aggregate(time_completed=Max('created'))
-                user_time_completed = user_time_completed['time_completed'] or timezone.now()
-                completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
-                    .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
-                    .filter(Q(completions__gt=user_completions) | Q(completions=user_completions,
-                                                                    time_completed__lt=user_time_completed)).count()
-                data['position'] = completions_above_user + 1
+            user_data = StudentProgress.get_user_position(course_key, user_id, exclude_users=exclude_users)
+            data['position'] = user_data['position']
+            user_completions = user_data['completions']
             completion_percentage = 0
             if total_possible_completions > 0:
-                completion_percentage = 100 * user_completions/total_possible_completions
+                completion_percentage = 100 * (user_completions/total_possible_completions)
             data['completions'] = completion_percentage
 
-        total_users = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
+        total_users_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+        if orgs_filter:
+            total_users_qs = total_users_qs.filter(organizations__in=orgs_filter)
+        total_users = total_users_qs.count()
         if total_users and total_actual_completions:
             course_avg = total_actual_completions / float(total_users)
-            course_avg = 100 * course_avg / total_possible_completions  # avg in percentage
+            course_avg = 100 * (course_avg / total_possible_completions)  # avg in percentage
         data['course_avg'] = course_avg
+
         if not skipleaders:
-            queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username',
-                                                                    'user__profile__title',
-                                                                    'user__profile__avatar_url')\
-                           .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
-                           .order_by('-completions', 'time_completed')[:count]
+            queryset = StudentProgress.generate_leaderboard(course_key, count=count, exclude_users=exclude_users,
+                                                            org_ids=orgs_filter)
             serializer = CourseCompletionsLeadersSerializer(queryset, many=True,
                                                             context={'total_completions': total_possible_completions})
             data['leaders'] = serializer.data  # pylint: disable=E1101
