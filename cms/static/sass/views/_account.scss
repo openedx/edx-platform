@@ -37,7 +37,7 @@
       .action {
         @extend %t-action3;
         position: absolute;
-        #{$right}: 0;
+        @include right(0);
         top: 40%;
       }
     }
@@ -241,7 +241,7 @@
       @extend %t-action3;
       position: absolute;
       top: 0;
-      #{$right}: 0;
+      @include right(0);
     }
   }
 }

@@ -1,13 +1,13 @@
 section.outside-app {
   @extend .container;
-  text-align: flip(left, right);
+  @include text-align(left);
   padding: 80px 0;
 
   h1 {
     @extend h2;
     margin-bottom: 40px;
   }
-  
+
   p {
     max-width: 600px;
     margin: 0 auto;

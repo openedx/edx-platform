@@ -148,7 +148,7 @@ nav {
     }
 
     .nav-sub {
-      text-align: $left;
+      @include text-align(left);
 
       // ui triangle/nub
       &:after {
@@ -167,20 +167,20 @@ nav {
   &.ui-right {
 
     .wrapper-nav-sub {
-      #{$left}: none;
-      #{$right}: 0;
+      @include left(none);
+      @include right(0);
     }
 
     .nav-sub {
 
       // ui triangle/nub
       &:after {
-        #{$right}: $baseline;
+        @include right($baseline);
         margin-right: -10px;
       }
 
       &:before {
-        #{$right}: $baseline;
+        @include right($baseline);
         margin-right: -11px;
       }
     }

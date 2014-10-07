@@ -1069,6 +1069,25 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-app-extend2.css',
     },
+    'style-app-rtl': {
+        'source_filenames': [
+            'sass/application-rtl.css',
+            'sass/ie-rtl.css'
+        ],
+        'output_filename': 'css/lms-style-app-rtl.css',
+    },
+    'style-app-extend1-rtl': {
+        'source_filenames': [
+            'sass/application-extend1-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend1-rtl.css',
+    },
+    'style-app-extend2-rtl': {
+        'source_filenames': [
+            'sass/application-extend2-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend2-rtl.css',
+    },
     'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
@@ -1083,6 +1102,13 @@ PIPELINE_CSS = {
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-style-course.css',
+    },
+    'style-course-rtl': {
+        'source_filenames': [
+            'sass/course-rtl.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-style-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [

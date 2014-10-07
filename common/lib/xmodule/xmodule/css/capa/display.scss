@@ -61,7 +61,7 @@ div.problem {
     width: 100px;
 
     label {
-      float: flip(left, right);
+      @include float(left);
       clear: both;
       margin-bottom: 5px;
 
@@ -81,23 +81,23 @@ div.problem {
     }
 
     .indicator_container {
-      float: flip(left, right);
+      @include float(left);
       width: 25px;
       height: 1px;
-      #{$margin-right}: 15px;
+      @include margin-right(15px);
     }
 
     fieldset {
       @include box-sizing(border-box);
       margin: 0px 0px $baseline;
-      #{$padding-left}: $baseline;
-      #{$border-left}: 1px solid #ddd;
+      @include padding-left($baseline);
+      @include border-left(1px solid #ddd);
     }
 
     input[type="radio"],
     input[type="checkbox"] {
-      float: flip(left, right);
-      margin: flip(4px 8px 0 0, 4px 0 0 8px);
+      @include float(left);
+      @include margin(4px 8px 0 0);
     }
 
     text {
@@ -634,7 +634,7 @@ div.problem {
       // margin-top: 10px;
       display: inline-block;
       margin-top: 8px;
-      #{$margin-left}: $baseline/2;
+      @include margin-left($baseline/2);
       color: #666;
       font-style: italic;
       -webkit-font-smoothing: antialiased;

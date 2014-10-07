@@ -1,6 +1,6 @@
 h1.top-header {
   border-bottom: 1px solid $border-color-2;
-  text-align: $left;
+  @include text-align(left);
   font-size: em(24);
   font-weight: 100;
   padding-bottom: lh();

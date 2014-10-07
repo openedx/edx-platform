@@ -1,34 +1,6 @@
 // studio - utilities - mixins and extends
 // ====================
 
-// right to left mixins and variables
-// thanks to https://gist.github.com/Integralist/7269907
-@function flip($value_ltr, $value_rtl) {
-  @if $rtl { @return $value_rtl; }
-  @else { @return $value_ltr; }
-}
-
-$padding-left:    padding-left;
-$padding-right:   padding-right;
-$margin-left:     margin-left;
-$margin-right:    margin-right;
-$border-left:     border-left;
-$border-right:    border-right;
-$left:            left;
-$right:           right;
-
-@if $rtl {
-  $padding-left:  padding-right;
-  $padding-right: padding-left;
-  $margin-left:   margin-right;
-  $margin-right:  margin-left;
-  $border-left:   border-right;
-  $border-right:  border-left;
-  $left:          right;
-  $right:         left;
-}
-
-
 // mixins - font sizing
 @mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
@@ -118,13 +90,13 @@ $right:           right;
 // layout placeholders
 %ui-col-wide  {
   width: flex-grid(9, 12);
-  #{$margin-right}: flex-gutter();
-  float: flip(left, right);
+  @include margin-right(flex-gutter());
+  @include float(left);
 }
 
 %ui-col-narrow  {
   width: flex-grid(3, 12);
-  float: flip(left, right);
+  @include float(left);
 }
 
 
