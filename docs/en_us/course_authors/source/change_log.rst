@@ -13,11 +13,15 @@ October, 2014
 
    * - Date
      - Change
+   * - 10/16/14
+     - Updated :ref:`Set Important Dates for Your Course` to reflect change
+       that course dates now use UTC.
    * - 10/14/14
      - Removed the chapter on the Vital Source E-Reader tool, as it is no
        longer supported in the edX Platform.
    * - 10/7/14
      - Added the :ref:`Including Student Cohorts` chapter.
+       
        
 *****************
 September, 2014
