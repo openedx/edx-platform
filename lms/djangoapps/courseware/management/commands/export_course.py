@@ -6,6 +6,7 @@ If <filename> is '-', it pipes the file to stdout
 """
 
 import os
+import re
 import shutil
 import tarfile
 from tempfile import mktemp, mkdtemp
@@ -18,7 +19,7 @@ from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_exporter import export_to_xml
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class Command(BaseCommand):
@@ -30,9 +31,9 @@ class Command(BaseCommand):
     help = dedent(__doc__).strip()
 
     def handle(self, *args, **options):
-        course_id, filename, pipe_results = self._parse_arguments(args)
+        course_key, filename, pipe_results = self._parse_arguments(args)
 
-        export_course_to_tarfile(course_id, filename)
+        export_course_to_tarfile(course_key, filename)
 
         results = self._get_results(filename) if pipe_results else None
 
@@ -41,7 +42,7 @@ class Command(BaseCommand):
     def _parse_arguments(self, args):
         """Parse command line arguments"""
         try:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+            course_key = CourseKey.from_string(args[0])
             filename = args[1]
         except InvalidKeyError:
             raise CommandError("Unparsable course_id")
@@ -54,7 +55,7 @@ class Command(BaseCommand):
             filename = mktemp()
             pipe_results = True
 
-        return course_id, filename, pipe_results
+        return course_key, filename, pipe_results
 
     def _get_results(self, filename):
         """Load results from file"""
@@ -64,32 +65,37 @@ class Command(BaseCommand):
         return results
 
 
-def export_course_to_tarfile(course_id, filename):
+def export_course_to_tarfile(course_key, filename):
     """Exports a course into a tar.gz file"""
     tmp_dir = mkdtemp()
     try:
-        course_dir = export_course_to_directory(course_id, tmp_dir)
+        course_dir = export_course_to_directory(course_key, tmp_dir)
         compress_directory(course_dir, filename)
     finally:
         shutil.rmtree(tmp_dir)
 
 
-def export_course_to_directory(course_id, root_dir):
+def export_course_to_directory(course_key, root_dir):
     """Export course into a directory"""
     store = modulestore()
-    course = store.get_course(course_id)
+    course = store.get_course(course_key)
     if course is None:
         raise CommandError("Invalid course_id")
 
-    course_name = course.id.to_deprecated_string().replace('/', '-')
-    export_to_xml(store, None, course.id, root_dir, course_name)
+    # The safest characters are A-Z, a-z, 0-9, <underscore>, <period> and <hyphen>.
+    # We represent the first four with \w, but generalize to all unicode alphanumerics.
+    replacement_char = u'-'
+    course_dir = replacement_char.join([course.id.org, course.id.course, course.id.run])
+    course_dir = re.sub(r'[^\w\.\-]', replacement_char, course_dir, flags=re.UNICODE)
 
-    course_dir = path(root_dir) / course_name
-    return course_dir
+    export_to_xml(store, None, course.id, root_dir, course_dir)
+
+    export_dir = path(root_dir) / course_dir
+    return export_dir
 
 
 def compress_directory(directory, filename):
-    """Compress a directrory into a tar.gz file"""
+    """Compress a directory into a tar.gz file"""
     mode = 'w:gz'
     name = path(directory).name
     with tarfile.open(filename, mode) as tar_file:
