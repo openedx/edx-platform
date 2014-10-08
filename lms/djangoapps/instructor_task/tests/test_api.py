@@ -2,6 +2,7 @@
 Test for LMS instructor background task queue management
 """
 
+from mock import MagicMock, patch
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware.tests.factories import UserFactory
@@ -15,14 +16,18 @@ from instructor_task.api import (
     submit_reset_problem_attempts_for_all_students,
     submit_delete_problem_state_for_all_students,
     submit_bulk_course_email,
+    submit_ora2_request_task,
 )
 
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import InstructorTask, PROGRESS
-from instructor_task.tests.test_base import (InstructorTaskTestCase,
-                                             InstructorTaskCourseTestCase,
-                                             InstructorTaskModuleTestCase,
-                                             TEST_COURSE_KEY)
+from instructor_task.tasks import get_ora2_responses
+from instructor_task.tests.test_base import (
+    InstructorTaskTestCase,
+    InstructorTaskCourseTestCase,
+    InstructorTaskModuleTestCase,
+    TEST_COURSE_KEY
+)
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -181,3 +186,12 @@ class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
 
         with self.assertRaises(AlreadyRunningError):
             instructor_task = submit_bulk_course_email(self.create_task_request(self.instructor), self.course.id, email_id)
+
+    def test_submit_ora2_request_task(self):
+        request = self.create_task_request(self.instructor)
+
+        with patch('instructor_task.api.submit_task') as mock_submit_task:
+            mock_submit_task.return_value = MagicMock()
+            submit_ora2_request_task(request, self.course.id)
+
+            mock_submit_task.assert_called_once_with(request, 'ora2_responses', get_ora2_responses, self.course.id, {}, '')

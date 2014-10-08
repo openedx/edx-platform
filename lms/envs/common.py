@@ -1552,6 +1552,15 @@ STUDENT_SUBMISSIONS_DOWNLOAD = {
     'ROOT_PATH': '/tmp/edx-s3/student-submissions',
 }
 
+##################### ORA2 Responses Download #######################
+ORA2_RESPONSES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+
+ORA2_RESPONSES_DOWNLOAD = {
+    'STORAGE_TYPE': 'localfs',
+    'BUCKET': 'edx-grades',
+    'ROOT_PATH': '/tmp/edx-s3/ora2-responses',
+}
+
 ######################## PROGRESS SUCCESS BUTTON ##############################
 # The following fields are available in the URL: {course_id} {student_id}
 PROGRESS_SUCCESS_BUTTON_URL = 'http://<domain>/<path>/{course_id}'

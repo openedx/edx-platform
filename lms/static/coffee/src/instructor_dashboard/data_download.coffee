@@ -22,7 +22,6 @@ class DataDownload
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     @$grades_btn = @$section.find ".grades-download-container input[type='button']"
-    @$ora2_btn = @$section.find("input[name='ora2-response-btn']'")
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
@@ -51,11 +50,6 @@ class DataDownload
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
-      location.href = url
-
-    # Handles an Ora2 data request
-    @$ora2_btn.click (e) =>
-      url = @$ora2_btn.data 'endpoint'
       location.href = url
 
     @$list_studs_btn.click (e) =>
@@ -112,8 +106,10 @@ class DataDownload
         error: std_ajax_err =>
           if e.target.name == 'calculate-grades-csv'
             @$grades_request_response_error.text gettext("Error generating grades. Please try again.")
-          else
+          else if e.target.name == 'get-student-submissions'
             @$grades_request_response_error.text gettext("Error getting student submissions. Please try again.")
+          else if e.target.name == 'ora2-response-btn'
+            @$grades_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
           @$grades_request_response.text data['status']
