@@ -2,7 +2,7 @@
 Discussion Components
 #################################
 
-You can add inline discussion components to a vertical, or unit, in your
+You can add inline discussion components to any container in your
 course.
 
 See:
@@ -22,13 +22,26 @@ discussion component in your course.
 The name of the XML file must match the value of the @url_name attribute of the
 ``discussion`` element in the vertical XML file.
 
-For example, if the vertical XML file contains:
+In-line, you can create, if the vertical XML file contains:
 
 .. code-block:: xml
   
    <vertical display_name="Lesson_1_Unit_1">
-      <discussion url_name="Introduce_Yourself"/>
-      . . .
+      <discussion 
+          discussion_category="Essays" 
+          discussion_id="peer_grading_component" 
+          discussion_target="Peer Grading" 
+          display_name="Peer Grading"
+	  url_name="peer_grading_discussion"
+       /> 
+  </vertical>
+
+If you prefer to split this up, you can also create: 
+
+   <vertical display_name="Lesson_1_Unit_1">
+      <discussion 
+	  url_name="Introduce_Yourself"
+       /> 
   </vertical>
 
 You create the file ``discussion/Introduce_Yourself.xml`` to define the inline

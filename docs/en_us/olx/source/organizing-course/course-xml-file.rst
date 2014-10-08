@@ -20,8 +20,6 @@ The ``course.xml`` File
 
 The root element of the ``course.xml`` file is ``course``. 
 
-The ``course`` element does not contain any child elements.
-
 For example, the ``course.xml`` file may contain:
 
 .. code-block:: xml
@@ -82,7 +80,7 @@ For example:
 Course Chapters
 *******************************
 
-You create a course chapter with the ``chapter`` element, as a child of the root ``course`` element. 
+You create a course chapter with the ``chapter`` element, as a child of the root ``course`` element. Chapter elements are top-level pages in the course. The edX platform renders navigation chrome around them (tab-set on top and accordion on the left). It is possible to disable chrome for specific chapters using the ``chrome`` option. It is possible to associate chapters with different elements of the tabset with the ``default_tab`` option. It is possible to hide them from the navigation using the ``hide_from_toc`` option. 
 
 For example, if the course outline file contains:
 
@@ -114,10 +112,7 @@ For example, if the course outline file contains:
 ``chapter`` Children
 =========================
 
-The ``chapter`` element contains one or more child ``sequential`` elements. 
-
-The ``sequential`` element references a sequential, or subsection, in the
-course.
+The ``chapter`` element contains one or more children. Studio uses ``sequential`` elements for all children of chapters, and calls these ``subsections``.
 
 The following example shows a chapter with two sequentials, or subsections. :
 

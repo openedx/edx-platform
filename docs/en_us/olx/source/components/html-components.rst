@@ -4,7 +4,12 @@
 HTML Components
 #################################
 
-To add an HTML component to your course, you create both XML and HTML files.
+To add an HTML component to your course, you can either in-line it in
+the parent XML file, or split it up into either 1 or 2 additional
+files. HTML configuration can be broken out into a .xml file in the
+html directory. In addition, HTML content can be broken out into an
+additional .html file in the same directory. Breaking out HTML content
+is especially useful if you are embedding HTML which is not valid XML. 
 
 See:
 
@@ -15,11 +20,20 @@ See:
 * `Create the HTML File for an HTML Component`_
 * `Example HTML Component Content`_
 
+*************************************
+In-line HTML Example
+*************************************
+
+.. code-block:: xml
   
-Both files, for each component, must be in the ``html`` directory.
+   <vertical display_name="Lesson_1_Unit_1">
+      ...
+      <html>The above has an error. <b>x</b> should be <b>y</b> in the second equation.</html>
+  </vertical>
+
 
 *********************************************
-Create the XML File for an HTML Component
+Fully split HTML file example and explanation
 *********************************************
 
 You create an XML file in the ``html`` directory for each HTML component in your course.
@@ -43,7 +57,7 @@ HTML Component XML File Elements
 
 The root element of the XML file for the HTML component is file is ``html``. 
 
-The ``html`` element contains not children.
+In this case, the ``html`` element contains no children.
 
 *************************************
 ``html`` Element Attributes
@@ -112,6 +126,4 @@ file for the edX Demo course:
     really cool interactive labs we&rsquo;ve created for past courses.
     &nbsp;They&rsquo;re fun to play with. &nbsp;Many courses will have tools
     and labs that you need to use to complete homework assignments.</p>
-
-
 
