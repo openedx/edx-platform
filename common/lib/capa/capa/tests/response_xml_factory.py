@@ -678,6 +678,9 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *additional_answers*: list of additional asnwers.
 
+            *non_attribute_answers*: list of additional answers to be coded in the
+                non-attribute format
+
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
@@ -686,6 +689,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         hint_fn = kwargs.get('hintfn', None)
         regexp = kwargs.get('regexp', None)
         additional_answers = kwargs.get('additional_answers', [])
+        non_attribute_answers = kwargs.get('non_attribute_answers', [])
         assert answer
 
         # Create the <stringresponse> element
@@ -723,7 +727,12 @@ class StringResponseXMLFactory(ResponseXMLFactory):
                 hintgroup_element.set("hintfn", hint_fn)
 
         for additional_answer in additional_answers:
-            etree.SubElement(response_element, "additional_answer").text = additional_answer
+            additional_node = etree.SubElement(response_element, "additional_answer")  # pylint: disable=no-member
+            additional_node.set("answer", additional_answer)
+
+        for answer in non_attribute_answers:
+            additional_node = etree.SubElement(response_element, "additional_answer")  # pylint: disable=no-member
+            additional_node.text = answer
 
         return response_element
 
