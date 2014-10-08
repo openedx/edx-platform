@@ -22,6 +22,7 @@ class DataDownload
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     @$grades_btn = @$section.find ".grades-download-container input[type='button']"
+    @$ora2_btn = @$section.find("input[name='ora2-response-btn']'")
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
@@ -31,6 +32,7 @@ class DataDownload
     @$grades                        = @$section.find '.grades-download-container'
     @$grades_request_response       = @$grades.find '.request-response'
     @$grades_request_response_error = @$grades.find '.request-response-error'
+
 
     @report_downloads = new ReportDownloads(@$section)
     @instructor_tasks = new (PendingInstructorTasks()) @$section
@@ -49,6 +51,11 @@ class DataDownload
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
+      location.href = url
+
+    # Handles an Ora2 data request
+    @$ora2_btn.click (e) =>
+      url = @$ora2_btn.data 'endpoint'
       location.href = url
 
     @$list_studs_btn.click (e) =>
