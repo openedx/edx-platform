@@ -53,12 +53,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # A locked asset
         self.locked_asset = self.course_key.make_asset_key('asset', 'sample_static.txt')
-        self.url_locked = self.locked_asset.to_deprecated_string()
+        self.url_locked = unicode(self.locked_asset)
         self.contentstore.set_attr(self.locked_asset, 'locked', True)
 
         # An unlocked asset
         self.unlocked_asset = self.course_key.make_asset_key('asset', 'another_static.txt')
-        self.url_unlocked = self.unlocked_asset.to_deprecated_string()
+        self.url_unlocked = unicode(self.unlocked_asset)
         self.length_unlocked = self.contentstore.get_attr(self.unlocked_asset, 'length')
 
     def test_unlocked_asset(self):

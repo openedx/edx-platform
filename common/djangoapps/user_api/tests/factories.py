@@ -3,7 +3,7 @@ from factory.django import DjangoModelFactory
 from factory import SubFactory
 from student.tests.factories import UserFactory
 from user_api.models import UserPreference, UserCourseTag
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232, C0111
@@ -19,6 +19,6 @@ class UserCourseTagFactory(DjangoModelFactory):
     FACTORY_FOR = UserCourseTag
 
     user = SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+    course_id = CourseKey.from_string('org/course/run')
     key = None
     value = None

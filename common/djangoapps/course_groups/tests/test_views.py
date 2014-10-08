@@ -85,7 +85,7 @@ class ListCohortsTestCase(CohortViewsTestCase):
         """
         request = RequestFactory().get("dummy_url")
         request.user = self.staff_user
-        response = list_cohorts(request, course.id.to_deprecated_string())
+        response = list_cohorts(request, unicode(course.id))
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
@@ -125,7 +125,7 @@ class ListCohortsTestCase(CohortViewsTestCase):
         """
         Verify that we cannot access list_cohorts if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(list_cohorts, "GET", [self.course.id.to_deprecated_string()])
+        self._verify_non_staff_cannot_access(list_cohorts, "GET", [unicode(self.course.id)])
 
     def test_no_cohorts(self):
         """
