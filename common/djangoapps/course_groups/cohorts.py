@@ -136,6 +136,9 @@ def get_cohort(user, course_key):
     except Http404:
         raise ValueError("Invalid course_key")
 
+    if not course.is_cohorted:
+        return None
+
     try:
         return CourseUserGroup.objects.get(course_id=course_key,
                                             group_type=CourseUserGroup.COHORT,
@@ -144,7 +147,7 @@ def get_cohort(user, course_key):
         # Didn't find the group.  We'll go on to create one if needed.
         pass
 
-    if not course.is_cohorted or not course.auto_cohort:
+    if not course.auto_cohort:
         return None
 
     choices = course.auto_cohort_groups
