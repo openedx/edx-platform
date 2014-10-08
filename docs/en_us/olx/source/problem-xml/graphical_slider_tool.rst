@@ -1,5 +1,7 @@
+.. _Graphical Slider Tool:
+
 *********************************************
-XML format of graphical slider tool [xmodule]
+Graphical Slider Tool
 *********************************************
 
 .. module:: xml_format_gst
