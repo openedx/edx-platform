@@ -9,6 +9,7 @@ from opaque_keys.edx import locator
 from pytz import UTC
 import unittest
 import ddt
+from shoppingcart.models import DonationConfiguration
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -124,7 +125,7 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         self._configure_message_timeout(600)
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
-        self.assertContains(response, "You have successfully enrolled in")
+        self.assertContains(response, "Thank you for enrolling in")
 
     @ddt.data(
         (['audit', 'honor', 'verified'], False),
@@ -138,6 +139,9 @@ class TestRecentEnrollments(ModuleStoreTestCase):
     def test_donate_button(self, course_modes, show_donate):
         # Enable the enrollment success message
         self._configure_message_timeout(10000)
+
+        # Enable donations
+        DonationConfiguration(enabled=True).save()
 
         # Create the course mode(s)
         for mode in course_modes:
