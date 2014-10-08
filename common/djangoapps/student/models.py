@@ -257,7 +257,6 @@ class UserProfile(models.Model):
     # "nonregistered" users are auto-created and have no meaningful profile info
     nonregistered = models.BooleanField(default=False)
 
-    def get_meta(self):
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
         if not js_str:
