@@ -46,3 +46,14 @@ class City(models.Model):
     class Meta:
         verbose_name_plural = _('Cities')
     
+
+class PublicEntity(models.Model):
+    """
+    """
+    name = models.CharField(max_length=256, verbose_name="Instit. Pública")
+
+    def __unicode__(self):
+        return u'%s' % self.name
+
+    class Meta:
+        verbose_name_plural = "Instituciones Públicas"

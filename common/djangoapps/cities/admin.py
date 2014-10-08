@@ -13,3 +13,10 @@ class StateAdmin(admin.ModelAdmin):
     search_fields = ['code', 'name']
 
 admin.site.register(State, StateAdmin)
+
+class PublicEntityAdmin(admin.ModelAdmin):
+    ordering = ['name']
+    search_fields = ['name']
+
+admin.site.register(PublicEntity, PublicEntityAdmin)
+
