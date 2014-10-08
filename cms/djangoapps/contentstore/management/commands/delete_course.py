@@ -6,7 +6,6 @@ from .prompt import query_yes_no
 from contentstore.utils import delete_course_and_groups
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
 
 class Command(BaseCommand):
@@ -16,10 +15,7 @@ class Command(BaseCommand):
         if len(args) != 1 and len(args) != 2:
             raise CommandError("delete_course requires one or more arguments: <course_id> |commit|")
 
-        try:
-            course_key = CourseKey.from_string(args[0])
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+        course_key = CourseKey.from_string(args[0])
 
         commit = False
         if len(args) == 2:

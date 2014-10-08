@@ -6,7 +6,6 @@ from xmodule.modulestore.django import modulestore
 from student.roles import CourseInstructorRole, CourseStaffRole
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -21,10 +20,7 @@ class Command(BaseCommand):
         """
         Convert the command line arg into a course key
         """
-        try:
-            return CourseKey.from_string(arg)
-        except InvalidKeyError:
-            return SlashSeparatedCourseKey.from_deprecated_string(arg)
+        return CourseKey.from_string(arg)
 
     def handle(self, *args, **options):
         "Execute the command"

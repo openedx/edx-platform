@@ -8,7 +8,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.split_migrator import SplitMigrator
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -45,10 +44,7 @@ class Command(BaseCommand):
                 "a course_key and a user identifier (email or ID)"
             )
 
-        try:
-            course_key = CourseKey.from_string(args[0])
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+        course_key = CourseKey.from_string(args[0])
 
         try:
             user = user_from_str(args[1])
