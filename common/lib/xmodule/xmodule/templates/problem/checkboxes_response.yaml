@@ -3,21 +3,46 @@ metadata:
     display_name: Checkboxes
     markdown: |
       A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.
-      >>Select the answer that matches<<
+      
+      Ideally, compound feedback would be provided for all possible combinations of answers.  In practice, that is extremely difficult for problems with more than 3 options.  A good compromise is to write individual feedback for each option, and compound feedback for common combinations of answers or combinations of answers that address common student misconceptions.  
 
-      [x] correct
-      [ ] incorrect
-      [x] correct
+      The compound feedback will be shown first if it exists for a given set of answer options.  If no compound feedback is present, individual feedback is shown.  Feedback is defined for each answer option, for both the selected (checked) and unselected (unchecked) states.  This is indicated using the keywords "selected" (or "S") and "unselected (or "U").
+
+      Compound feedback is specified by using A, B, C, etc to indicate the relevant answer options, with each letter separated by a space.  For example, "(A C)" indicates that the feedback will be provided if the student has checked the first and third answer options.  Try it below!
+      
+      >>Select all the fruits from the list<<
+
+      [x] Apple  {{ selected: You are right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
+      [ ] Mushroom   {{U: You are right that mushrooms aren't fruit}, { selected: Mushroom is a fungus, not a fruit.}}
+      [x] Grape  {{ selected: You are right that grape is a fruit }, {unselected: Remember that grape is also a fruit.}}
+
+
+      {{ ((A C)) Yes, both Apple and Grape belong to the fruit family. }}
+      {{ ((A B C)) Almost, but mushroom is not a fruit }}
 
 data: |
       <problem>
         <p>A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.</p>
-        <p>Select the answer that matches</p>
+        <p>Ideally, compound feedback would be provided for all possible combinations of answers.  In practice, that is extremely difficult for problems with more than 3 options.  A good compromise is to write individual feedback for each option, and compound feedback for common combinations of answers or combinations of answers that address common student misconceptions.  </p>
+        <p>The compound feedback will be shown first if it exists for a given set of answer options.  If no compound feedback is present, individual feedback is shown.  Feedback is defined for each answer option, for both the selected (checked) and unselected (unchecked) states.  This is indicated using the keywords "selected" (or "S") and "unselected (or "U").</p>
+        <p>Compound feedback is specified by using A, B, C, etc to indicate the relevant answer options, with each letter separated by a space.  For example, "(A C)" indicates that the feedback will be provided if the student has checked the first and third answer options.  Try it below!</p>
+        <p>Select all the fruits from the list</p>
         <choiceresponse>
-          <checkboxgroup direction="vertical" label="Select the answer that matches">
-            <choice correct="true">correct</choice>
-            <choice correct="false">incorrect</choice>
-            <choice correct="true">correct</choice>
+          <checkboxgroup label="Select all the fruits from the list" direction="vertical">
+            <choice correct="true">Apple      
+              <choicehint selected="true">You are right that apple is a fruit.</choicehint>
+              <choicehint selected="false">Remember that apple is also a fruit.</choicehint>
+            </choice>
+            <choice correct="false">Mushroom
+              <choicehint selected="true">Mushroom is a fungus, not a fruit.</choicehint>
+              <choicehint selected="false">You are right that mushrooms aren't fruit</choicehint>
+            </choice>
+            <choice correct="true">Grape
+              <choicehint selected="true">You are right that grape is a fruit</choicehint>
+              <choicehint selected="false">Remember that grape is also a fruit.</choicehint>
+            </choice>
+            <compoundhint value="A C">Yes, both Apple and Grape belong to the fruit family.</compoundhint>
+            <compoundhint value="A B C">Almost, but mushroom is not a fruit</compoundhint>
           </checkboxgroup>
         </choiceresponse>
       </problem>

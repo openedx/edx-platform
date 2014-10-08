@@ -6,14 +6,13 @@ metadata:
     
         The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear.
     
-        >>Which US state has Lansing as its capital?<<
+        Alternate answers can be defined using "or=", and feedback can be provided for expected answers.
 
-        = Michigan
-        
+        >>In which country would you find the city of Paris?<<
 
-        [explanation]
-        Lansing is the capital of Michigan, although it is not Michigan's largest city, or even the seat of the county in which it resides.
-        [explanation]
+        =France {{Good job!!::The answer is France}}
+        or=USA {{Yes, there is a Paris, Texas in the USA}}
+
 data: |
     <problem>
     <p>
@@ -25,15 +24,14 @@ data: |
     <p>
     The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear. 
     </p>
+    <p>Alternate answers can be defined using "or=", and feedback can be provided for expected answers.</p>
 
-     <p>Which US state has Lansing as its capital? </p>
-     <stringresponse answer="Michigan" type="ci">
-      <textline size="20" label="Which US state has Lansing as its capital?"/>
+     <p>In which country would you find the city of Paris?</p>
+
+     <stringresponse answer="France" type="ci" >
+       <correcthint label="Good job!!">The answer is France</correcthint>
+       <additional_answer answer="USA"><correcthint>Yes, there is a Paris, Texas in the USA</correcthint></additional_answer>
+       <textline label="In which country would you find the city of Paris?" size="20"/>
      </stringresponse>
-        <solution>
-            <div class="detailed-solution">
-                <p>Explanation</p>
-                <p>Lansing is the capital of Michigan, although it is not Michigan's largest city, or even the seat of the county in which it resides.</p>
-            </div>
-        </solution>
+
     </problem>

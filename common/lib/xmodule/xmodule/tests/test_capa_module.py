@@ -1722,7 +1722,6 @@ class TestProblemCheckTracking(unittest.TestCase):
             factory.input_key(3): 'choice_0',
             factory.input_key(4): ['choice_0', 'choice_1'],
         }
-
         event = self.get_event_for_answers(module, answer_input_dict)
 
         self.assertEquals(event['submission'], {
@@ -1823,6 +1822,71 @@ class TestProblemCheckTracking(unittest.TestCase):
             factory.answer_key(2, 2): {
                 'question': '',
                 'answer': 'yellow',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': False,
+                'variant': '',
+            },
+        })
+
+    def test_optioninput_extended_xml(self):
+        """Test the new XML form of writing with <option> tag instead of options= attribute."""
+        factory = self.capa_factory_for_problem_xml("""\
+            <problem display_name="Woo Hoo">
+              <p>Are you the Gatekeeper?</p>
+                <optionresponse>
+                   <optioninput>
+                       <option correct="True" label="Good Job">
+                           apple
+                           <optionhint>
+                               banana
+                           </optionhint>
+                       </option>
+                       <option correct="False" label="blorp">
+                           cucumber
+                           <optionhint>
+                               donut
+                           </optionhint>
+                       </option>
+                   </optioninput>
+
+                   <optioninput>
+                       <option correct="True">
+                           apple
+                           <optionhint>
+                               banana
+                           </optionhint>
+                       </option>
+                       <option correct="False">
+                           cucumber
+                           <optionhint>
+                               donut
+                           </optionhint>
+                       </option>
+                   </optioninput>
+                 </optionresponse>
+            </problem>
+            """)
+        module = factory.create()
+
+        answer_input_dict = {
+            factory.input_key(2, 1): 'apple',
+            factory.input_key(2, 2): 'cucumber',
+        }
+
+        event = self.get_event_for_answers(module, answer_input_dict)
+        self.assertEquals(event['submission'], {
+            factory.answer_key(2, 1): {
+                'question': '',
+                'answer': 'apple',
+                'response_type': 'optionresponse',
+                'input_type': 'optioninput',
+                'correct': True,
+                'variant': '',
+            },
+            factory.answer_key(2, 2): {
+                'question': '',
+                'answer': 'cucumber',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
                 'correct': False,

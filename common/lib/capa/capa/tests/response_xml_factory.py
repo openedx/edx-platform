@@ -699,6 +699,8 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *additional_answers*: list of additional asnwers.
 
+            *old_answers*: list of additional answers to be coded in old format
+
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
@@ -707,6 +709,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         hint_fn = kwargs.get('hintfn', None)
         regexp = kwargs.get('regexp', None)
         additional_answers = kwargs.get('additional_answers', [])
+        old_answers = kwargs.get('old_answers', [])
         assert answer
 
         # Create the <stringresponse> element
@@ -744,7 +747,12 @@ class StringResponseXMLFactory(ResponseXMLFactory):
                 hintgroup_element.set("hintfn", hint_fn)
 
         for additional_answer in additional_answers:
-            etree.SubElement(response_element, "additional_answer").text = additional_answer
+            additional_node = etree.SubElement(response_element, "additional_answer")
+            additional_node.set("answer", additional_answer)
+
+        for old_answer in old_answers:
+            additional_node = etree.SubElement(response_element, "additional_answer")
+            additional_node.text = old_answer
 
         return response_element
 

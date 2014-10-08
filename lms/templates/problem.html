@@ -12,9 +12,14 @@
 
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
-
+    % if show_demand_hint:
+    <div class="problem_hint">${demand_hint}</div>
+    % endif
     % if check_button:
     <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
+    % endif
+    % if show_hint_button:
+    <input class="hint_button" type="button" value="${_('Hint')}" next_hint_index="${ next_hint_index }"/>
     % endif
     % if reset_button:
     <input class="reset" type="button" value="${_('Reset')}" />
