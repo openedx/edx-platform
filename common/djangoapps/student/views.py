@@ -477,6 +477,9 @@ def dashboard(request):
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = list(get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set))
 
+    # sort the enrollment pairs by the enrollment date
+    course_enrollment_pairs.sort(key=lambda x: x[1].created, reverse=True)
+
     # Retrieve the course modes for each course
     course_modes_by_course = {
         course.id: CourseMode.modes_for_course_dict(course.id)
@@ -666,10 +669,9 @@ def _get_recently_enrolled_courses(course_enrollment_pairs):
 
     """
     seconds = DashboardConfiguration.current().recent_enrollment_time_delta
-    sorted_list = sorted(course_enrollment_pairs, key=lambda created: created[1].created, reverse=True)
     time_delta = (datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds))
     return [
-        course for course, enrollment in sorted_list
+        course for course, enrollment in course_enrollment_pairs
         # If the enrollment has no created date, we are explicitly excluding the course
         # from the list of recent enrollments.
         if enrollment.is_active and enrollment.created > time_delta
