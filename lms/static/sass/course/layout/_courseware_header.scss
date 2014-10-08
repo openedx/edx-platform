@@ -16,7 +16,7 @@ nav.course-material {
     @include border-top-radius(4px);
     @include clearfix;
     padding: 28px 0 10px 0;
-    margin-left: 10px;
+    @include margin-left(10px);
 
     li {
       @include float(left);

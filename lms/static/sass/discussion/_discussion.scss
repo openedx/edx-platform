@@ -3,11 +3,11 @@
 body.discussion {
 
   .course-tabs .right {
-    float: right;
+    @include float(right);
 
     .new-post-btn {
       @include blue-button;
-      margin-right: 4px;
+      @include margin-right(4px);
     }
 
     .new-post-icon {
@@ -377,7 +377,7 @@ body.discussion {
             display: inline-block;
             text-align: center;
             vertical-align: middle;
-            @include margin-right($baseline/2);
+            @include margin-left($baseline/2);
           }
 
           .icon {
