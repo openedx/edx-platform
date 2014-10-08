@@ -72,6 +72,7 @@ import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
+from shoppingcart.models import DonationConfiguration
 from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
@@ -645,14 +646,14 @@ def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
             {
                 "course_id": course.id,
                 "course_name": course.display_name,
-                "allow_donation": not CourseMode.has_verified_mode(course_modes[course.id])
+                "allow_donation": _allow_donation(course_modes, course.id)
             }
             for course in recently_enrolled_courses
         ]
 
         return render_to_string(
             'enrollment/course_enrollment_message.html',
-            {'course_enrollment_messages': messages}
+            {'course_enrollment_messages': messages, 'platform_name': settings.PLATFORM_NAME}
         )
 
 
@@ -676,6 +677,22 @@ def _get_recently_enrolled_courses(course_enrollment_pairs):
         # from the list of recent enrollments.
         if enrollment.is_active and enrollment.created > time_delta
     ]
+
+
+def _allow_donation(course_modes, course_id):
+    """Determines if the dashboard will request donations for the given course.
+
+    Check if donations are configured for the platform, and if the current course is accepting donations.
+
+    Args:
+        course_modes (dict): Mapping of course ID's to course mode dictionaries.
+        course_id (str): The unique identifier for the course.
+
+    Returns:
+        True if the course is allowing donations.
+
+    """
+    return DonationConfiguration.current().enabled and not CourseMode.has_verified_mode(course_modes[course_id])
 
 
 def try_change_enrollment(request):
