@@ -21,7 +21,6 @@ from courseware.views import get_module_for_descriptor, save_child_position, get
 from course_groups.models import CourseUserGroup
 from course_groups.cohorts import (
     get_cohort_by_name,
-    get_cohort,
     add_cohort,
     add_user_to_cohort,
     remove_user_from_cohort
@@ -903,9 +902,15 @@ class UsersCoursesDetail(SecureAPIView):
         if not course_exists(request, user, course_id):
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         course_key = get_course_key(course_id)
-        cohort = get_cohort(user, course_key)
-        if cohort:
+        try:
+            cohort = CourseUserGroup.objects.get(
+                course_id=course_key,
+                users__id=user.id,
+                group_type=CourseUserGroup.COHORT,
+            )
             remove_user_from_cohort(cohort, user.username)
+        except ObjectDoesNotExist:
+            pass
         CourseEnrollment.unenroll(user, course_key)
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
