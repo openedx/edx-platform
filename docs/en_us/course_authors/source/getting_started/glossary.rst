@@ -10,6 +10,12 @@ Glossary
 A
 ****
 
+.. _AB Test:
+
+**A/B Test**
+
+  See `Content Experiment`_.
+
 .. _About Page:
 
 **About Page**
@@ -75,10 +81,15 @@ C
 
 .. _Cohort:
  
-.. **Cohort**
+**Cohort**
 
-..  A group of students that participate in the class together. A cohort can have forum discussions apart from the rest of the students.
+  A group of students who participate in a class together. Students who are in
+  the same cohort group can communicate and share experiences in private
+  discussions.
 
+  Cohorts are an optional feature of courses on the edX platform. For
+  information about how you enable the cohort feature, set up cohort groups,
+  and assign students to them, see :ref:`Cohorts Overview`.
 
 .. _Component_g:
  
@@ -88,6 +99,26 @@ C
   contain one or more components. For more information, see :ref:`Developing
   Course Components`.
 
+.. _Content Experiment:
+
+**Content Experiment**
+
+  You can define alternative course content to be delivered to different,
+  randomly assigned groups of students. Also known as A/B or split testing, you
+  use content experiments to compare the performance of students who have been
+  exposed to different versions of of the content. For more information, see
+  :ref:`Creating Content Experiments`.
+
+**Content-Specific Discussion Topic**
+
+  A category within the course discussion that appears at a defined point in
+  the course to encourage questions and conversations. To add a 
+  content-specific discussion topic to your course, you add a discussion 
+  component to a unit. Students cannot contribute to a content-specific 
+  discussion topic until the release date of the section that contains it.
+
+  For more information, see :ref:`Working with Discussion Components` and
+  :ref:`Organizing_discussions`.
 
 .. _Course Accordion:
  
@@ -133,6 +164,14 @@ C
 
   The page where students access the primary instructional materials for your course. Sections, subsections, units, and components are all accessed from the Courseware page.
 
+**Course-Wide Discussion Topic**
+
+  Optional categories that you create to guide how students find and share
+  information in the course discussion. Examples of course-wide discussion
+  topics include Announcements and Frequently Asked Questions. Students can
+  contribute to these topics as soon as your course starts.
+
+  For more information, see :ref:`Organizing_discussions`.
 
 .. _Custom Response Problem:
  
@@ -161,7 +200,13 @@ D
  
 **Discussion**
 
-  The set of topics defined to promote course-wide or unit-specific dialog. Students use the discussion topics to communicate with each other and the course staff in threaded excahnges. 
+  The set of topics defined to promote course-wide or unit-specific
+  conversation. Students use the discussion topics to communicate with each
+  other and the course staff in threaded exchanges.
+
+  A discussion is also a type of contribution that you can make to a topic to
+  start an open-ended dialogue. You can also contribute questions to the
+  discussion topics.
 
   See :ref:`Discussions` for more information.
 
@@ -170,7 +215,11 @@ D
  
 **Discussion Component**
 
-  Discussion topics that course staff add directly to units. For example, a Video component can be followed by a Discussion component so that students can discuss the video content without having to leave the page.
+  Discussion topics that course staff add directly to units. For example, a
+  Video component can be followed by a Discussion component so that students
+  can discuss the video content without having to leave the page. When you add
+  a dicussion component to a unit, you create a content-specific discussion
+  topic.
 
   See :ref:`Working with Discussion Components` for more information.
 
@@ -433,6 +482,31 @@ P
 The page in the learning management system that shows students their scores on graded assignments in the course.
 
 
+
+.. _Public Unit:
+ 
+.. **Public Unit**
+
+..  A unit whose **Visibility** option is set to Public so that the unit is
+..  visible to students, if the subsection that contains the unit has been
+..  released.
+
+..  See :ref:`Public and Private Units` for more information.
+
+.. _Q:
+
+*****
+Q
+*****
+
+**Question**
+
+  A question is a type of contribution that you can make to a course discussion
+  topic to surface an issue that the course staff or other students can
+  resolve. 
+
+  See :ref:`Discussions` for more information.
+  
 .. _R:
 
 ****
@@ -483,6 +557,11 @@ S
 
   The graphical user interface in a Problem component that contains formatting buttons and is available for some problem types. For more information, see :ref:`Problem Studio View`.
 
+.. _Split_Test:
+
+**Split Test**
+
+  See `Content Experiment`_.
 
 
 .. _Subsection:

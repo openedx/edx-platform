@@ -2,6 +2,8 @@
 Base class for pages specific to a course in Studio.
 """
 
+import os
+from opaque_keys.edx.locator import CourseLocator
 from bok_choy.page_object import PageObject
 from . import BASE_URL
 
@@ -34,5 +36,12 @@ class CoursePage(PageObject):
         """
         Construct a URL to the page within the course.
         """
-        course_key = "{course_org}/{course_num}/{course_run}".format(**self.course_info)
-        return "/".join([BASE_URL, self.url_path, course_key])
+        # TODO - is there a better way to make this agnostic to the underlying default module store?
+        default_store = os.environ.get('DEFAULT_STORE', 'draft')
+        course_key = CourseLocator(
+            self.course_info['course_org'],
+            self.course_info['course_num'],
+            self.course_info['course_run'],
+            deprecated=(default_store == 'draft')
+        )
+        return "/".join([BASE_URL, self.url_path, unicode(course_key)])

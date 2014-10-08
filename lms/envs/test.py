@@ -18,7 +18,13 @@ from path import path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 
+# mongo connection settings
+MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
+MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
+
 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
+
+THIS_UUID = uuid4().hex[:5]
 
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
@@ -109,6 +115,13 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
+# Avoid having to run collectstatic before the unit test suite
+# If we don't add these settings, then Django templates that can't
+# find pipelined assets will raise a ValueError.
+# http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
+STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
+PIPELINE_ENABLED=False
+
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
@@ -118,16 +131,19 @@ update_module_store_settings(
         'data_dir': COMMON_TEST_DATA_ROOT,
     },
     doc_store_settings={
+        'host': MONGO_HOST,
+        'port': MONGO_PORT_NUM,
         'db': 'test_xmodule',
-        'collection': 'test_modulestore{0}'.format(uuid4().hex[:5]),
+        'collection': 'test_modulestore{0}'.format(THIS_UUID),
     },
 )
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
-        'host': 'localhost',
+        'host': MONGO_HOST,
         'db': 'xcontent',
+        'port': MONGO_PORT_NUM,
     }
 }
 
@@ -201,9 +217,17 @@ OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
+############################## OAUTH2 Provider ################################
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+
+########################### External REST APIs #################################
+FEATURES['ENABLE_MOBILE_REST_API'] = True
+FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
+
 ###################### Payment ##############################3
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
+
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
 # the same settings, we can generate this randomly and guarantee
@@ -215,10 +239,13 @@ RANDOM_SHARED_SECRET = ''.join(
     for x in range(250)
 )
 
-CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = RANDOM_SHARED_SECRET
-CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
-CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
-CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
+CC_PROCESSOR_NAME = 'CyberSource2'
+CC_PROCESSOR['CyberSource2']['SECRET_KEY'] = RANDOM_SHARED_SECRET
+CC_PROCESSOR['CyberSource2']['ACCESS_KEY'] = "0123456789012345678901"
+CC_PROCESSOR['CyberSource2']['PROFILE_ID'] = "edx"
+CC_PROCESSOR['CyberSource2']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
+
+FEATURES['STORE_BILLING_INFO'] = True
 
 ########################### SYSADMIN DASHBOARD ################################
 FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
@@ -310,7 +337,8 @@ MICROSITE_CONFIGURATION = {
         "show_homepage_promo_video": False,
         "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
         "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
+        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>",
+        "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
     },
     "default": {
         "university": "default_university",
@@ -318,6 +346,8 @@ MICROSITE_CONFIGURATION = {
     }
 }
 MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
+MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
+
 FEATURES['USE_MICROSITES'] = True
 
 # add extra template directory for test-only templates
@@ -337,4 +367,13 @@ VERIFY_STUDENT["SOFTWARE_SECURE"] = {
 
 VIDEO_CDN_URL = {
     'CN': 'http://api.xuetangx.com/edx/video?s3_url='
+}
+
+######### dashboard git log settings #########
+MONGODB_LOG = {
+    'host': MONGO_HOST,
+    'port': MONGO_PORT_NUM,
+    'user': '',
+    'password': '',
+    'db': 'xlog',
 }

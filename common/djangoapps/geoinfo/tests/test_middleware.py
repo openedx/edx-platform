@@ -41,6 +41,7 @@ class CountryMiddlewareTests(TestCase):
             '117.79.83.1': 'CN',
             '117.79.83.100': 'CN',
             '4.0.0.0': 'SD',
+            '2001:da8:20f:1502:edcf:550b:4a9c:207d': 'CN',
         }
         return ip_dict.get(ip_addr, 'US')
 
@@ -106,3 +107,19 @@ class CountryMiddlewareTests(TestCase):
         # No country code exists after request processing.
         self.assertNotIn('country_code', request.session)
         self.assertNotIn('ip_address', request.session)
+
+    def test_ip_address_is_ipv6(self):
+        request = self.request_factory.get(
+            '/somewhere',
+            HTTP_X_FORWARDED_FOR='2001:da8:20f:1502:edcf:550b:4a9c:207d'
+        )
+        request.user = self.authenticated_user
+        self.session_middleware.process_request(request)
+        # No country code exists before request.
+        self.assertNotIn('country_code', request.session)
+        self.assertNotIn('ip_address', request.session)
+        self.country_middleware.process_request(request)
+        # Country code added to session.
+        self.assertEqual('CN', request.session.get('country_code'))
+        self.assertEqual(
+            '2001:da8:20f:1502:edcf:550b:4a9c:207d', request.session.get('ip_address'))

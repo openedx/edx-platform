@@ -466,10 +466,7 @@ def generate_email(start_ref, end_ref, release_date=None):
 
         https://edx-wiki.atlassian.net/wiki/display/ENG/Release+Page%3A+{date}
 
-        The staging servers are:
-
-        https://www.stage.edx.org
-        https://stage-edge.edx.org
+        The staging server is: https://www.stage.edx.org
 
         Note that you are responsible for verifying any pull requests that you
         merged, whether you wrote the code or not. (If you didn't write the code,

@@ -1,7 +1,8 @@
-define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_helpers",
+        "js/common_helpers/template_helpers", "js/spec_helpers/edit_helpers",
         "js/views/feedback_prompt", "js/views/pages/container", "js/views/pages/container_subviews",
         "js/models/xblock_info", "js/views/utils/xblock_utils"],
-    function ($, _, str, create_sinon, edit_helpers, Prompt, ContainerPage, ContainerSubviews,
+    function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
               XBlockInfo, XBlockUtils) {
         var VisibilityState = XBlockUtils.VisibilityState;
 
@@ -13,11 +14,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
             beforeEach(function () {
-                edit_helpers.installTemplate('xblock-string-field-editor');
-                edit_helpers.installTemplate('publish-xblock');
-                edit_helpers.installTemplate('publish-history');
-                edit_helpers.installTemplate('unit-outline');
-                edit_helpers.installTemplate('container-message');
+                TemplateHelpers.installTemplate('xblock-string-field-editor');
+                TemplateHelpers.installTemplate('publish-xblock');
+                TemplateHelpers.installTemplate('publish-history');
+                TemplateHelpers.installTemplate('unit-outline');
+                TemplateHelpers.installTemplate('container-message');
                 appendSetFixtures(mockContainerPage);
             });
 
@@ -38,11 +39,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             };
 
             createContainerPage = function (test, options) {
-                requests = create_sinon.requests(test);
+                requests = AjaxHelpers.requests(test);
                 model = new XBlockInfo(createXBlockInfo(options), { parse: true });
                 containerPage = new ContainerPage({
                     model: model,
-                    templates: edit_helpers.mockComponentTemplates,
+                    templates: EditHelpers.mockComponentTemplates,
                     el: $('#content'),
                     isUnitPage: true
                 });
@@ -56,7 +57,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             respondWithHtml = function(html) {
                 var requestIndex = requests.length - 1;
-                create_sinon.respondWithJson(
+                AjaxHelpers.respondWithJson(
                     requests,
                     { html: html, "resources": [] },
                     requestIndex
@@ -64,7 +65,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             };
 
             respondWithJson = function(json, requestIndex) {
-                create_sinon.respondWithJson(
+                AjaxHelpers.respondWithJson(
                     requests,
                     json,
                     requestIndex
@@ -124,6 +125,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     lastDraftCss = ".wrapper-last-draft",
                     releaseDateTitleCss = ".wrapper-release .title",
                     releaseDateContentCss = ".wrapper-release .copy",
+                    releaseDateDateCss = ".wrapper-release .copy .release-date",
+                    releaseDateWithCss = ".wrapper-release .copy .release-with",
                     promptSpies, sendDiscardChangesToServer, verifyPublishingBitUnscheduled;
 
                 sendDiscardChangesToServer = function() {
@@ -140,7 +143,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     expect(promptSpies.constructor).toHaveBeenCalled();
                     promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
 
-                    create_sinon.expectJsonRequest(requests, "POST", "/xblock/locator-container",
+                    AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "discard_changes"}
                     );
                 };
@@ -217,7 +220,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
 
                 it('can publish private content', function () {
-                    var notificationSpy = edit_helpers.createNotificationSpy();
+                    var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
                     expect(containerPage.$(bitPublishingCss)).not.toHaveClass(hasWarningsClass);
                     expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
@@ -225,17 +228,17 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Click publish
                     containerPage.$(publishButtonCss).click();
-                    edit_helpers.verifyNotificationShowing(notificationSpy, /Publishing/);
+                    EditHelpers.verifyNotificationShowing(notificationSpy, /Publishing/);
 
-                    create_sinon.expectJsonRequest(requests, "POST", "/xblock/locator-container",
+                    AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "make_public"}
                     );
 
                     // Response to publish call
                     respondWithJson({"id": "locator-container", "data": null, "metadata":{}});
-                    edit_helpers.verifyNotificationHidden(notificationSpy);
+                    EditHelpers.verifyNotificationHidden(notificationSpy);
 
-                    create_sinon.expectJsonRequest(requests, "GET", "/xblock/locator-container");
+                    AjaxHelpers.expectJsonRequest(requests, "GET", "/xblock/locator-container");
                     // Response to fetch
                     respondWithJson(createXBlockInfo({
                         published: true, has_changes: false, visibility_state: VisibilityState.ready
@@ -256,7 +259,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     var numRequests = requests.length;
                     // Respond with failure
-                    create_sinon.respondWithError(requests);
+                    AjaxHelpers.respondWithError(requests);
 
                     expect(requests.length).toEqual(numRequests);
 
@@ -269,7 +272,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 it('can discard changes', function () {
                     var notificationSpy, renderPageSpy, numRequests;
                     createContainerPage(this);
-                    notificationSpy = edit_helpers.createNotificationSpy();
+                    notificationSpy = EditHelpers.createNotificationSpy();
                     renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough();
 
                     sendDiscardChangesToServer();
@@ -277,7 +280,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Respond with success.
                     respondWithJson({"id": "locator-container"});
-                    edit_helpers.verifyNotificationHidden(notificationSpy);
+                    EditHelpers.verifyNotificationHidden(notificationSpy);
 
                     // Verify other requests are sent to the server to update page state.
                     // Response to fetch, specifying the very next request (as multiple requests will be sent to server)
@@ -295,7 +298,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     numRequests = requests.length;
 
                     // Respond with failure
-                    create_sinon.respondWithError(requests);
+                    AjaxHelpers.respondWithError(requests);
 
                     expect(requests.length).toEqual(numRequests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
@@ -342,8 +345,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                             release_date: "Jul 02, 2014 at 14:20 UTC", release_date_from: 'Section "Week 1"'
                         });
                         expect(containerPage.$(releaseDateTitleCss).text()).toContain("Scheduled:");
-                        expect(containerPage.$(releaseDateContentCss).text()).
-                            toContain('Jul 02, 2014 at 14:20 UTC with Section "Week 1"');
+                        expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
+                        expect(containerPage.$(releaseDateWithCss).text()).toContain('with Section "Week 1"');
                     });
 
                     it('renders correctly when released', function () {
@@ -353,8 +356,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                             release_date: "Jul 02, 2014 at 14:20 UTC", release_date_from: 'Section "Week 1"'
                         });
                         expect(containerPage.$(releaseDateTitleCss).text()).toContain("Released:");
-                        expect(containerPage.$(releaseDateContentCss).text()).
-                            toContain('Jul 02, 2014 at 14:20 UTC with Section "Week 1"');
+                        expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
+                        expect(containerPage.$(releaseDateWithCss).text()).toContain('with Section "Week 1"');
                     });
 
                     it('renders correctly when the release date is not set', function () {
@@ -375,52 +378,77 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         });
                         containerPage.xblockPublisher.render();
                         expect(containerPage.$(releaseDateTitleCss).text()).toContain("Release:");
-                        expect(containerPage.$(releaseDateContentCss).text()).
-                            toContain('Jul 02, 2014 at 14:20 UTC with Section "Week 1"');
+                        expect(containerPage.$(releaseDateDateCss).text()).toContain('Jul 02, 2014 at 14:20 UTC');
+                        expect(containerPage.$(releaseDateWithCss).text()).toContain('with Section "Week 1"');
                     });
                 });
 
                 describe("Content Visibility", function () {
-                    var requestStaffOnly, verifyStaffOnly, promptSpy,
+                    var requestStaffOnly, verifyStaffOnly, verifyExplicitStaffOnly, verifyImplicitStaffOnly, promptSpy,
                         visibilityTitleCss = '.wrapper-visibility .title';
 
                     requestStaffOnly = function(isStaffOnly) {
+                        var newVisibilityState;
+
                         containerPage.$('.action-staff-lock').click();
 
-                        // If removing the staff lock, click 'Yes' to confirm
-                        if (!isStaffOnly) {
-                            edit_helpers.confirmPrompt(promptSpy);
+                        // If removing explicit staff lock with no implicit staff lock, click 'Yes' to confirm
+                        if (!isStaffOnly && !containerPage.model.get('ancestor_has_staff_lock')) {
+                            EditHelpers.confirmPrompt(promptSpy);
                         }
 
-                        create_sinon.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
+                        AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
                             publish: 'republish',
                             metadata: { visible_to_staff_only: isStaffOnly ? true : null }
                         });
-                        create_sinon.respondWithJson(requests, {
+                        AjaxHelpers.respondWithJson(requests, {
                             data: null,
                             id: "locator-container",
                             metadata: {
                                 visible_to_staff_only: isStaffOnly ? true : null
                             }
                         });
-                        create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
-                        create_sinon.respondWithJson(requests, createXBlockInfo({
+
+                        AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
+                        if (isStaffOnly || containerPage.model.get('ancestor_has_staff_lock')) {
+                            newVisibilityState = VisibilityState.staffOnly;
+                        } else {
+                            newVisibilityState = VisibilityState.live;
+                        }
+                        AjaxHelpers.respondWithJson(requests, createXBlockInfo({
                             published: containerPage.model.get('published'),
-                            visibility_state: isStaffOnly ? VisibilityState.staffOnly : VisibilityState.live,
+                            has_explicit_staff_lock: isStaffOnly,
+                            visibility_state: newVisibilityState,
                             release_date: "Jul 02, 2000 at 14:20 UTC"
                         }));
                     };
 
                     verifyStaffOnly = function(isStaffOnly) {
+                        var visibilityCopy = containerPage.$('.wrapper-visibility .copy').text().trim();
+                        if (isStaffOnly) {
+                            expect(visibilityCopy).toContain('Staff Only');
+                            expect(containerPage.$(bitPublishingCss)).toHaveClass(staffOnlyClass);
+                        } else {
+                            expect(visibilityCopy).toBe('Staff and Students');
+                            expect(containerPage.$(bitPublishingCss)).not.toHaveClass(staffOnlyClass);
+                            verifyExplicitStaffOnly(false);
+                            verifyImplicitStaffOnly(false);
+                        }
+                    };
+
+                    verifyExplicitStaffOnly = function(isStaffOnly) {
                         if (isStaffOnly) {
                             expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check');
-                            expect(containerPage.$('.wrapper-visibility .copy').text()).toBe('Staff Only');
-                            expect(containerPage.$(bitPublishingCss)).toHaveClass(staffOnlyClass);
-                            expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
                         } else {
                             expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check-empty');
-                            expect(containerPage.$('.wrapper-visibility .copy').text()).toBe('Staff and Students');
-                            expect(containerPage.$(bitPublishingCss)).not.toHaveClass(staffOnlyClass);
+                        }
+                    };
+
+                    verifyImplicitStaffOnly = function(isStaffOnly) {
+                        if (isStaffOnly) {
+                            expect(containerPage.$('.wrapper-visibility .inherited-from')).toExist();
+                        } else {
+                            expect(containerPage.$('.wrapper-visibility .inherited-from')).not.toExist();
                         }
                     };
 
@@ -444,36 +472,79 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                             published: true,
                             has_changes: true
                         });
-                        expect(containerPage.$(visibilityTitleCss).text()).toContain('Will Be Visible To')
+                        expect(containerPage.$(visibilityTitleCss).text()).toContain('Will Be Visible To');
                     });
 
-                    it("can be set to staff only", function() {
+                    it("can be explicitly set to staff only", function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         requestStaffOnly(true);
+                        verifyExplicitStaffOnly(true);
+                        verifyImplicitStaffOnly(false);
                         verifyStaffOnly(true);
                     });
 
-                    it("can remove staff only setting", function() {
-                        promptSpy = edit_helpers.createPromptSpy();
+                    it("can be implicitly set to staff only", function() {
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
-                            release_date: "Jul 02, 2000 at 14:20 UTC"
+                            ancestor_has_staff_lock: true,
+                            staff_lock_from: "Section Foo"
+                        });
+                        verifyImplicitStaffOnly(true);
+                        verifyExplicitStaffOnly(false);
+                        verifyStaffOnly(true);
+                    });
+
+                    it("can be explicitly and implicitly set to staff only", function() {
+                        renderContainerPage(this, mockContainerXBlockHtml, {
+                            visibility_state: VisibilityState.staffOnly,
+                            ancestor_has_staff_lock: true,
+                            staff_lock_from: "Section Foo"
+                        });
+                        requestStaffOnly(true);
+                        // explicit staff lock overrides the display of implicit staff lock
+                        verifyImplicitStaffOnly(false);
+                        verifyExplicitStaffOnly(true);
+                        verifyStaffOnly(true);
+                    });
+
+                    it("can remove explicit staff only setting without having implicit staff only", function() {
+                        promptSpy = EditHelpers.createPromptSpy();
+                        renderContainerPage(this, mockContainerXBlockHtml, {
+                            visibility_state: VisibilityState.staffOnly,
+                            has_explicit_staff_lock: true,
+                            ancestor_has_staff_lock: false
                         });
                         requestStaffOnly(false);
                         verifyStaffOnly(false);
                     });
 
-                    it("does not refresh if removing staff only is canceled", function() {
-                        var requestCount;
-                        promptSpy = edit_helpers.createPromptSpy();
+                    it("can remove explicit staff only setting while having implicit staff only", function() {
+                        promptSpy = EditHelpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
-                            release_date: "Jul 02, 2000 at 14:20 UTC"
+                            ancestor_has_staff_lock: true,
+                            has_explicit_staff_lock: true,
+                            staff_lock_from: "Section Foo"
+                        });
+                        requestStaffOnly(false);
+                        verifyExplicitStaffOnly(false);
+                        verifyImplicitStaffOnly(true);
+                        verifyStaffOnly(true);
+                    });
+
+                    it("does not refresh if removing staff only is canceled", function() {
+                        var requestCount;
+                        promptSpy = EditHelpers.createPromptSpy();
+                        renderContainerPage(this, mockContainerXBlockHtml, {
+                            visibility_state: VisibilityState.staffOnly,
+                            has_explicit_staff_lock: true,
+                            ancestor_has_staff_lock: false
                         });
                         requestCount = requests.length;
                         containerPage.$('.action-staff-lock').click();
-                        edit_helpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
+                        EditHelpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
                         expect(requests.length).toBe(requestCount);
+                        verifyExplicitStaffOnly(true);
                         verifyStaffOnly(true);
                     });
 
@@ -482,7 +553,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockContainerXBlockHtml);
                         containerPage.$('.lock-checkbox').click();
                         requestCount = requests.length;
-                        create_sinon.respondWithError(requests);
+                        AjaxHelpers.respondWithError(requests);
                         expect(requests.length).toBe(requestCount);
                         verifyStaffOnly(false);
                     });
@@ -519,7 +590,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             describe("Message Area", function() {
                 var messageSelector = '.container-message .warning',
-                    warningMessage = 'Caution: The last published version of this unit is live. By publishing changes you will change the student experience.';
+                    warningMessage = 'Caution: The last published version of this unit is live. ' +
+                        'By publishing changes you will change the student experience.';
 
                 it('is empty for a unit that is not currently visible to students', function() {
                     renderContainerPage(this, mockContainerXBlockHtml, {

@@ -29,13 +29,13 @@
           <ol class="list-input">
             <li class="field required text" id="edit-coupon-modal-field-code">
               <label for="edit_coupon_code" class="required">${_("Code")}</label>
-              <input class="field" id="edit_coupon_code" type="text" name="code" maxlength="16" value="" placeholder="example: A123DS"
-                    aria-required="true"/>
+              <input class="field readonly" id="edit_coupon_code" type="text" name="code" maxlength="16" value="" placeholder="${_('example: A123DS')}"
+                    readonly aria-required="true"/>
             </li>
             <li class="field required text" id="edit-coupon-modal-field-discount">
               <label for="edit_coupon_discount" class="required">${_("Percentage Discount")}</label>
-              <input class="field" id="edit_coupon_discount" type="text" name="discount" value="" maxlength="3"
-                     aria-required="true"/>
+              <input class="field readonly" id="edit_coupon_discount" type="text" name="discount" value="" maxlength="3"
+                     readonly aria-required="true"/>
             </li>
 
             <li class="field" id="edit-coupon-modal-field-description">
@@ -49,7 +49,6 @@
               <input class="field readonly" id="edit_coupon_course_id" type="text" name="course_id" value=""
                      readonly aria-required="true"/>
             </li>
-
           </ol>
         </fieldset>
 

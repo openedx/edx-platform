@@ -3,7 +3,7 @@
 
 import urllib
 from lettuce import world
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.contentstore.django import _CONTENTSTORE
@@ -33,7 +33,7 @@ def log_in(username='robot', password='test', email='robot@edx.org', name="Robot
     Use the auto_auth feature to programmatically log the user in
     """
     url = '/auto_auth'
-    params = { 'username': username, 'password': password, 'email': email, 'full_name': name }
+    params = {'username': username, 'password': password, 'email': email, 'full_name': name}
     url += "?" + urllib.urlencode(params)
     world.visit(url)
 

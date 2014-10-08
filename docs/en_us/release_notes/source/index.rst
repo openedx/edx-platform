@@ -7,18 +7,18 @@
 edX Course Staff Release Notes
 ####################################
 
-The *edX Course Staff Release Notes* provide a cumulative list of changes
-that affect course authoring in edX Studio and the edX Learning Management
-System.
+The *edX Course Staff Release Notes* provide a cumulative list of changes that
+affect the use of edX Studio, the edX Learning Management System, and edX
+Insights.
 
 This document contains a page for each update to the edX system, which includes
 both `edx.org`_ and `edX Edge`_. Each page contains information on new or
 changed documentation, as well as new features and changes in edX Studio, the
-edX Learning Management System, Discussion Forums, Analytics, accessibility, and
-more.
+edX Learning Management System, edX Insights, Course Discussions, Analytics,
+accessibility, and more.
 
-You can sign up for the new `edX Release Announcements mailing list`_ to get an
-email message when we have updated the edX Course Staff Release Notes.
+You can sign up for the `edX Release Announcements mailing list`_ to get an
+email message each time we update the edX Course Staff Release Notes.
 
 
 
@@ -31,6 +31,14 @@ email message when we have updated the edX Course Staff Release Notes.
 
    read_me
    preface
+   browsers
+   09-30-2014
+   09-25-2014
+   09-18-2014
+   09-09-2014
+   09-04-2014
+   08-28-2014
+   08-12-2014
    08-07-2014
    07-30-2014
    07-23-2014

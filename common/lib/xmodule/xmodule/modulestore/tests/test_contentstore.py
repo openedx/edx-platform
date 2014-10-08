@@ -1,6 +1,7 @@
 """
  Test contentstore.mongo functionality
 """
+import os
 import logging
 from uuid import uuid4
 import unittest
@@ -17,12 +18,12 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 import ddt
 from __builtin__ import delattr
-
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 log = logging.getLogger(__name__)
 
-HOST = 'localhost'
-PORT = 27017
+HOST = MONGO_HOST
+PORT = MONGO_PORT_NUM
 DB = 'test_mongo_%s' % uuid4().hex[:5]
 
 

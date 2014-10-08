@@ -229,13 +229,18 @@ define([
     "js/spec/views/xblock_editor_spec",
     "js/spec/views/xblock_string_field_editor_spec",
 
+    "js/spec/views/utils/view_utils_spec",
+
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",
     "js/spec/views/pages/group_configurations_spec",
     "js/spec/views/pages/course_outline_spec",
+    "js/spec/views/pages/course_rerun_spec",
+    "js/spec/views/pages/index_spec",
 
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
+    "js/spec/views/modals/validation_error_modal_spec",
 
     "js/spec/xblock/cms.runtime.v1_spec",
 

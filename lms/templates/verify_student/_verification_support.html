@@ -1,5 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
 
+## TODO (ECOM-16): This is part of an AB-test of auto-registration.
+## Once the test completes, we can make the winning configuration the default
+## and remove this flag.
+%if not autoreg:
+<!-- /experiment-control -->
 <div class="wrapper-content-supplementary">
   <aside class="content-supplementary">
     <ul class="list-help">
@@ -29,9 +34,32 @@
       <li class="help-item help-item-technical">
         <h3 class="title">${_("Technical Requirements")}</h3>
         <div class="copy">
-          <p>${_("Please make sure your browser is updated to the {a_start}most recent version possible{a_end}. Also, please make sure your <strong>web cam is plugged in, turned on, and allowed to function in your web browser (commonly adjustable in your browser settings).</strong>").format(a_start='<strong><a rel="external" href="http://browsehappy.com/">', a_end="</a></strong>")}</p>
+          <p>${_("Please make sure your browser is updated to the {a_start}most recent version possible{a_end}. Also, please make sure your <strong>webcam is plugged in, turned on, and allowed to function in your web browser (commonly adjustable in your browser settings).</strong>").format(a_start='<strong><a rel="external" href="http://browsehappy.com/">', a_end="</a></strong>")}</p>
         </div>
       </li>
     </ul>
   </aside>
 </div> <!-- /wrapper-content-supplementary -->
+
+%else:
+<!-- /experiment-variant-A -->
+<div class="wrapper-content-supplementary exp-variant-A">
+  <aside class="content-supplementary">
+    <ul class="list-help">
+      <li class="help-item help-item-questions">
+        <h3 class="title">${_("Have questions?")}</h3>
+        <div class="copy">
+            <p>${_("Please read {a_start}our FAQs to view common questions about our certificates{a_end}.").format(a_start='<a rel="external" href="'+ marketing_link('WHAT_IS_VERIFIED_CERT') + '">', a_end="</a>")}</p>
+        </div>
+      </li>
+
+      <li class="help-item help-item-technical">
+        <h3 class="title">${_("Technical Requirements")}</h3>
+        <div class="copy">
+          <p>${_("Please make sure your browser is updated to the {a_start}most recent version possible{a_end}. Also, please make sure your <strong>webcam is plugged in, turned on, and allowed to function in your web browser (commonly adjustable in your browser settings).</strong>").format(a_start='<strong><a rel="external" href="http://browsehappy.com/">', a_end="</a></strong>")}</p>
+        </div>
+      </li>
+    </ul>
+  </aside>
+</div> <!-- /wrapper-content-supplementary -->
+%endif

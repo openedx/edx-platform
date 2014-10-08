@@ -11,7 +11,7 @@ import json
 from collections import OrderedDict
 from functools import partial
 from static_replace import replace_static_urls
-from xmodule_modifiers import wrap_xblock
+from xmodule_modifiers import wrap_xblock, request_token
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -24,21 +24,22 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
-from xmodule.modulestore import ModuleStoreEnum, PublishState
+from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
 
 from xmodule.course_module import DEFAULT_START_DATE
-from contentstore.utils import find_release_date_source
 from django.contrib.auth.models import User
 from util.date_utils import get_default_time_display
 
 from util.json_request import expect_json, JsonResponse
 
 from .access import has_course_access
-from contentstore.utils import is_currently_visible_to_students
+from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
+    ancestor_has_staff_lock
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock
 from contentstore.views.preview import get_preview_fragment
@@ -153,7 +154,7 @@ def xblock_handler(request, usage_key_string):
                 request.user,
                 _get_xblock(usage_key, request.user),
                 data=request.json.get('data'),
-                children=request.json.get('children'),
+                children_strings=request.json.get('children'),
                 metadata=request.json.get('metadata'),
                 nullout=request.json.get('nullout'),
                 grader_type=request.json.get('graderType'),
@@ -179,6 +180,7 @@ def xblock_handler(request, usage_key_string):
             "Only instance creation is supported without a usage key.",
             content_type="text/plain"
         )
+
 
 # pylint: disable=unused-argument
 @require_http_methods(("GET"))
@@ -206,7 +208,12 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
-        xblock.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
+        xblock.runtime.wrappers.append(partial(
+            wrap_xblock,
+            'StudioRuntime',
+            usage_id_serializer=unicode,
+            request_token=request_token(request),
+        ))
 
         if view_name == STUDIO_VIEW:
             try:
@@ -294,7 +301,23 @@ def xblock_outline_handler(request, usage_key_string):
         return Http404
 
 
-def _save_xblock(user, xblock, data=None, children=None, metadata=None, nullout=None,
+def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
+    """
+    Updates the xblock in the modulestore.
+    But before doing so, it calls the xblock's editor_saved callback function.
+    """
+    if callable(getattr(xblock, "editor_saved", None)):
+        if old_metadata is None:
+            old_metadata = own_metadata(xblock)
+        if old_content is None:
+            old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+        xblock.editor_saved(user, old_metadata, old_content)
+
+    # Update after the callback so any changes made in the callback will get persisted.
+    return modulestore().update_item(xblock, user.id)
+
+
+def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,
                  grader_type=None, publish=None):
     """
     Saves xblock w/ its fields. Has special processing for grader_type, publish, and nullout and Nones in metadata.
@@ -302,95 +325,127 @@ def _save_xblock(user, xblock, data=None, children=None, metadata=None, nullout=
     to default).
     """
     store = modulestore()
+    # Perform all xblock changes within a (single-versioned) transaction
+    with store.bulk_operations(xblock.location.course_key):
 
-    # Don't allow updating an xblock and discarding changes in a single operation (unsupported by UI).
-    if publish == "discard_changes":
-        store.revert_to_published(xblock.location, user.id)
-        # Returning the same sort of result that we do for other save operations. In the future,
-        # we may want to return the full XBlockInfo.
-        return JsonResponse({'id': unicode(xblock.location)})
+        # Don't allow updating an xblock and discarding changes in a single operation (unsupported by UI).
+        if publish == "discard_changes":
+            store.revert_to_published(xblock.location, user.id)
+            # Returning the same sort of result that we do for other save operations. In the future,
+            # we may want to return the full XBlockInfo.
+            return JsonResponse({'id': unicode(xblock.location)})
 
-    old_metadata = own_metadata(xblock)
-    old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
+        old_metadata = own_metadata(xblock)
+        old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
 
-    if data:
-        # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
-        xblock.data = data
-    else:
-        data = old_content['data'] if 'data' in old_content else None
+        if data:
+            # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
+            xblock.data = data
+        else:
+            data = old_content['data'] if 'data' in old_content else None
 
-    if children is not None:
-        children_usage_keys = []
-        for child in children:
-            child_usage_key = usage_key_with_run(child)
-            children_usage_keys.append(child_usage_key)
-        xblock.children = children_usage_keys
+        if children_strings is not None:
+            children = []
+            for child_string in children_strings:
+                children.append(usage_key_with_run(child_string))
 
-    # also commit any metadata which might have been passed along
-    if nullout is not None or metadata is not None:
-        # the postback is not the complete metadata, as there's system metadata which is
-        # not presented to the end-user for editing. So let's use the original (existing_item) and
-        # 'apply' the submitted metadata, so we don't end up deleting system metadata.
-        if nullout is not None:
-            for metadata_key in nullout:
-                setattr(xblock, metadata_key, None)
-
-        # update existing metadata with submitted metadata (which can be partial)
-        # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
-        # the intent is to make it None, use the nullout field
-        if metadata is not None:
-            for metadata_key, value in metadata.items():
-                field = xblock.fields[metadata_key]
-
-                if value is None:
-                    field.delete_from(xblock)
+            # if new children have been added, remove them from their old parents
+            new_children = set(children) - set(xblock.children)
+            for new_child in new_children:
+                old_parent_location = store.get_parent_location(new_child)
+                if old_parent_location:
+                    old_parent = store.get_item(old_parent_location)
+                    old_parent.children.remove(new_child)
+                    old_parent = _update_with_callback(old_parent, user)
                 else:
-                    try:
-                        value = field.from_json(value)
-                    except ValueError:
-                        return JsonResponse({"error": "Invalid data"}, 400)
-                    field.write_to(xblock, value)
+                    # the Studio UI currently doesn't present orphaned children, so assume this is an error
+                    return JsonResponse({"error": "Invalid data, possibly caused by concurrent authors."}, 400)
 
-    if callable(getattr(xblock, "editor_saved", None)):
-        xblock.editor_saved(user, old_metadata, old_content)
+            # make sure there are no old children that became orphans
+            # In a single-author (no-conflict) scenario, all children in the persisted list on the server should be
+            # present in the updated list.  If there are any children that have been dropped as part of this update,
+            # then that would be an error.
+            #
+            # We can be even more restrictive in a multi-author (conflict), by returning an error whenever
+            # len(old_children) > 0. However, that conflict can still be "merged" if the dropped child had been
+            # re-parented. Hence, the check for the parent in the any statement below.
+            #
+            # Note that this multi-author conflict error should not occur in modulestores (such as Split) that support
+            # atomic write transactions.  In Split, if there was another author who moved one of the "old_children"
+            # into another parent, then that child would have been deleted from this parent on the server. However,
+            # this is error could occur in modulestores (such as Draft) that do not support atomic write-transactions
+            old_children = set(xblock.children) - set(children)
+            if any(
+                    store.get_parent_location(old_child) == xblock.location
+                    for old_child in old_children
+            ):
+                # since children are moved as part of a single transaction, orphans should not be created
+                return JsonResponse({"error": "Invalid data, possibly caused by concurrent authors."}, 400)
 
-    # commit to datastore
-    store.update_item(xblock, user.id)
+            # set the children on the xblock
+            xblock.children = children
 
-    # for static tabs, their containing course also records their display name
-    if xblock.location.category == 'static_tab':
-        course = store.get_course(xblock.location.course_key)
-        # find the course's reference to this tab and update the name.
-        static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
-        # only update if changed
-        if static_tab and static_tab['name'] != xblock.display_name:
-            static_tab['name'] = xblock.display_name
-            store.update_item(course, user.id)
+        # also commit any metadata which might have been passed along
+        if nullout is not None or metadata is not None:
+            # the postback is not the complete metadata, as there's system metadata which is
+            # not presented to the end-user for editing. So let's use the original (existing_item) and
+            # 'apply' the submitted metadata, so we don't end up deleting system metadata.
+            if nullout is not None:
+                for metadata_key in nullout:
+                    setattr(xblock, metadata_key, None)
 
-    result = {
-        'id': unicode(xblock.location),
-        'data': data,
-        'metadata': own_metadata(xblock)
-    }
+            # update existing metadata with submitted metadata (which can be partial)
+            # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
+            # the intent is to make it None, use the nullout field
+            if metadata is not None:
+                for metadata_key, value in metadata.items():
+                    field = xblock.fields[metadata_key]
 
-    if grader_type is not None:
-        result.update(CourseGradingModel.update_section_grader_type(xblock, grader_type, user))
+                    if value is None:
+                        field.delete_from(xblock)
+                    else:
+                        try:
+                            value = field.from_json(value)
+                        except ValueError:
+                            return JsonResponse({"error": "Invalid data"}, 400)
+                        field.write_to(xblock, value)
 
-    # If publish is set to 'republish' and this item has previously been published, then this
-    # new item should be republished. This is used by staff locking to ensure that changing the draft
-    # value of the staff lock will also update the published version.
-    if publish == 'republish':
-        published = modulestore().compute_publish_state(xblock) != PublishState.private
-        if published:
-            publish = 'make_public'
+        # update the xblock and call any xblock callbacks
+        xblock = _update_with_callback(xblock, user, old_metadata, old_content)
 
-    # Make public after updating the xblock, in case the caller asked for both an update and a publish.
-    # Used by Bok Choy tests and by republishing of staff locks.
-    if publish == 'make_public':
-        modulestore().publish(xblock.location, user.id)
+        # for static tabs, their containing course also records their display name
+        if xblock.location.category == 'static_tab':
+            course = store.get_course(xblock.location.course_key)
+            # find the course's reference to this tab and update the name.
+            static_tab = CourseTabList.get_tab_by_slug(course.tabs, xblock.location.name)
+            # only update if changed
+            if static_tab and static_tab['name'] != xblock.display_name:
+                static_tab['name'] = xblock.display_name
+                store.update_item(course, user.id)
 
-    # Note that children aren't being returned until we have a use case.
-    return JsonResponse(result)
+        result = {
+            'id': unicode(xblock.location),
+            'data': data,
+            'metadata': own_metadata(xblock)
+        }
+
+        if grader_type is not None:
+            result.update(CourseGradingModel.update_section_grader_type(xblock, grader_type, user))
+
+        # If publish is set to 'republish' and this item is not in direct only categories and has previously been published,
+        # then this item should be republished. This is used by staff locking to ensure that changing the draft
+        # value of the staff lock will also update the published version, but only at the unit level.
+        if publish == 'republish' and xblock.category not in DIRECT_ONLY_CATEGORIES:
+            if modulestore().has_published_version(xblock):
+                publish = 'make_public'
+
+        # Make public after updating the xblock, in case the caller asked for both an update and a publish.
+        # Used by Bok Choy tests and by republishing of staff locks.
+        if publish == 'make_public':
+            modulestore().publish(xblock.location, user.id)
+
+        # Note that children aren't being returned until we have a use case.
+        return JsonResponse(result, encoder=EdxJSONEncoder)
 
 
 @login_required
@@ -406,54 +461,55 @@ def _create_item(request):
         raise PermissionDenied()
 
     store = modulestore()
-    parent = store.get_item(usage_key)
-    dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
+    with store.bulk_operations(usage_key.course_key):
+        parent = store.get_item(usage_key)
+        dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
 
-    # get the metadata, display_name, and definition from the request
-    metadata = {}
-    data = None
-    template_id = request.json.get('boilerplate')
-    if template_id:
-        clz = parent.runtime.load_block_type(category)
-        if clz is not None:
-            template = clz.get_template(template_id)
-            if template is not None:
-                metadata = template.get('metadata', {})
-                data = template.get('data')
+        # get the metadata, display_name, and definition from the request
+        metadata = {}
+        data = None
+        template_id = request.json.get('boilerplate')
+        if template_id:
+            clz = parent.runtime.load_block_type(category)
+            if clz is not None:
+                template = clz.get_template(template_id)
+                if template is not None:
+                    metadata = template.get('metadata', {})
+                    data = template.get('data')
 
-    if display_name is not None:
-        metadata['display_name'] = display_name
+        if display_name is not None:
+            metadata['display_name'] = display_name
 
-    # TODO need to fix components that are sending definition_data as strings, instead of as dicts
-    # For now, migrate them into dicts here.
-    if isinstance(data, basestring):
-        data = {'data': data}
+        # TODO need to fix components that are sending definition_data as strings, instead of as dicts
+        # For now, migrate them into dicts here.
+        if isinstance(data, basestring):
+            data = {'data': data}
 
-    created_block = store.create_child(
-        request.user.id,
-        usage_key,
-        dest_usage_key.block_type,
-        block_id=dest_usage_key.block_id,
-        definition_data=data,
-        metadata=metadata,
-        runtime=parent.runtime,
-    )
-
-    # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-    # if we add one then we need to also add it to the policy information (i.e. metadata)
-    # we should remove this once we can break this reference from the course to static tabs
-    if category == 'static_tab':
-        display_name = display_name or _("Empty") # Prevent name being None
-        course = store.get_course(dest_usage_key.course_key)
-        course.tabs.append(
-            StaticTab(
-                name=display_name,
-                url_slug=dest_usage_key.name,
-            )
+        created_block = store.create_child(
+            request.user.id,
+            usage_key,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
+            definition_data=data,
+            metadata=metadata,
+            runtime=parent.runtime,
         )
-        store.update_item(course, request.user.id)
 
-    return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        if category == 'static_tab':
+            display_name = display_name or _("Empty")  # Prevent name being None
+            course = store.get_course(dest_usage_key.course_key)
+            course.tabs.append(
+                StaticTab(
+                    name=display_name,
+                    url_slug=dest_usage_key.name,
+                )
+            )
+            store.update_item(course, request.user.id)
+
+        return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
@@ -461,52 +517,53 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
     store = modulestore()
-    source_item = store.get_item(duplicate_source_usage_key)
-    # Change the blockID to be unique.
-    dest_usage_key = source_item.location.replace(name=uuid4().hex)
-    category = dest_usage_key.block_type
+    with store.bulk_operations(duplicate_source_usage_key.course_key):
+        source_item = store.get_item(duplicate_source_usage_key)
+        # Change the blockID to be unique.
+        dest_usage_key = source_item.location.replace(name=uuid4().hex)
+        category = dest_usage_key.block_type
 
-    # Update the display name to indicate this is a duplicate (unless display name provided).
-    duplicate_metadata = own_metadata(source_item)
-    if display_name is not None:
-        duplicate_metadata['display_name'] = display_name
-    else:
-        if source_item.display_name is None:
-            duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+        # Update the display name to indicate this is a duplicate (unless display name provided).
+        duplicate_metadata = own_metadata(source_item)
+        if display_name is not None:
+            duplicate_metadata['display_name'] = display_name
         else:
-            duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+            if source_item.display_name is None:
+                duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+            else:
+                duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
-    dest_module = store.create_item(
-        user.id,
-        dest_usage_key.course_key,
-        dest_usage_key.block_type,
-        block_id=dest_usage_key.block_id,
-        definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
-        metadata=duplicate_metadata,
-        runtime=source_item.runtime,
-    )
+        dest_module = store.create_item(
+            user.id,
+            dest_usage_key.course_key,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
+            definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
+            metadata=duplicate_metadata,
+            runtime=source_item.runtime,
+        )
 
-    # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
-    # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-    if source_item.has_children:
-        dest_module.children = []
-        for child in source_item.children:
-            dupe = _duplicate_item(dest_module.location, child, user=user)
-            dest_module.children.append(dupe)
-        store.update_item(dest_module, user.id)
+        # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
+        # Because DAGs are not fully supported, we need to actually duplicate each child as well.
+        if source_item.has_children:
+            dest_module.children = []
+            for child in source_item.children:
+                dupe = _duplicate_item(dest_module.location, child, user=user)
+                dest_module.children.append(dupe)
+            store.update_item(dest_module, user.id)
 
-    if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
-        parent = store.get_item(parent_usage_key)
-        # If source was already a child of the parent, add duplicate immediately afterward.
-        # Otherwise, add child to end.
-        if source_item.location in parent.children:
-            source_index = parent.children.index(source_item.location)
-            parent.children.insert(source_index + 1, dest_module.location)
-        else:
-            parent.children.append(dest_module.location)
-        store.update_item(parent, user.id)
+        if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
+            parent = store.get_item(parent_usage_key)
+            # If source was already a child of the parent, add duplicate immediately afterward.
+            # Otherwise, add child to end.
+            if source_item.location in parent.children:
+                source_index = parent.children.index(source_item.location)
+                parent.children.insert(source_index + 1, dest_module.location)
+            else:
+                parent.children.append(dest_module.location)
+            store.update_item(parent, user.id)
 
-    return dest_module.location
+        return dest_module.location
 
 
 def _delete_item(usage_key, user):
@@ -516,16 +573,17 @@ def _delete_item(usage_key, user):
     """
     store = modulestore()
 
-    # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-    # if we add one then we need to also add it to the policy information (i.e. metadata)
-    # we should remove this once we can break this reference from the course to static tabs
-    if usage_key.category == 'static_tab':
-        course = store.get_course(usage_key.course_key)
-        existing_tabs = course.tabs or []
-        course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]
-        store.update_item(course, user.id)
+    with store.bulk_operations(usage_key.course_key):
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        if usage_key.category == 'static_tab':
+            course = store.get_course(usage_key.course_key)
+            existing_tabs = course.tabs or []
+            course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != usage_key.name]
+            store.update_item(course, user.id)
 
-    store.delete_item(usage_key, user.id)
+        store.delete_item(usage_key, user.id)
 
 
 # pylint: disable=W0613
@@ -563,17 +621,18 @@ def _get_xblock(usage_key, user):
     in the CREATE_IF_NOT_FOUND list, an xblock will be created and saved automatically.
     """
     store = modulestore()
-    try:
-        return store.get_item(usage_key)
-    except ItemNotFoundError:
-        if usage_key.category in CREATE_IF_NOT_FOUND:
-            # Create a new one for certain categories only. Used for course info handouts.
-            return store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
-        else:
-            raise
-    except InvalidLocationError:
-        log.error("Can't find item by location.")
-        return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
+    with store.bulk_operations(usage_key.course_key):
+        try:
+            return store.get_item(usage_key, depth=None)
+        except ItemNotFoundError:
+            if usage_key.category in CREATE_IF_NOT_FOUND:
+                # Create a new one for certain categories only. Used for course info handouts.
+                return store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
+            else:
+                raise
+        except InvalidLocationError:
+            log.error("Can't find item by location.")
+            return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
 
 def _get_module_info(xblock, rewrite_static_links=True):
@@ -581,16 +640,20 @@ def _get_module_info(xblock, rewrite_static_links=True):
     metadata, data, id representation of a leaf module fetcher.
     :param usage_key: A UsageKey
     """
-    data = getattr(xblock, 'data', '')
-    if rewrite_static_links:
-        data = replace_static_urls(
-            data,
-            None,
-            course_id=xblock.location.course_key
-        )
+    with modulestore().bulk_operations(xblock.location.course_key):
+        data = getattr(xblock, 'data', '')
+        if rewrite_static_links:
+            data = replace_static_urls(
+                data,
+                None,
+                course_id=xblock.location.course_key
+            )
 
-    # Note that children aren't being returned until we have a use case.
-    return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
+        # Pre-cache has changes for the entire course because we'll need it for the ancestor info
+        modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
+
+        # Note that children aren't being returned until we have a use case.
+        return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
@@ -629,7 +692,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         return None
 
     is_xblock_unit = is_unit(xblock, parent_xblock)
-    is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock)
+    # this should not be calculated for Sections and Subsections on Unit page
+    has_changes = modulestore().has_changes(xblock) if (is_xblock_unit or course_outline) else None
 
     if graders is None:
         graders = CourseGradingModel.fetch(xblock.location.course_key).graders
@@ -648,7 +712,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
-    published = modulestore().compute_publish_state(xblock) != PublishState.private
+    if xblock.category != 'course':
+        visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
+    else:
+        visibility_state = None
+    published = modulestore().has_published_version(xblock)
 
     xblock_info = {
         "id": unicode(xblock.location),
@@ -656,17 +724,19 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
-        "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
-        'studio_url': xblock_studio_url(xblock, parent_xblock),
+        "published_on": get_default_time_display(xblock.published_on) if xblock.published_on else None,
+        "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
-        "visibility_state": _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None,
+        "visibility_state": visibility_state,
+        "has_explicit_staff_lock": xblock.fields['visible_to_staff_only'].is_set_on(xblock),
         "start": xblock.fields['start'].to_json(xblock.start),
         "graded": xblock.graded,
         "due_date": get_default_time_display(xblock.due),
         "due": xblock.fields['due'].to_json(xblock.due),
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
+        "has_changes": has_changes,
     }
     if data is not None:
         xblock_info["data"] = data
@@ -676,16 +746,31 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock, course_outline)
     if child_info:
         xblock_info['child_info'] = child_info
-    # Currently, 'edited_by', 'published_by', and 'release_date_from', and 'has_changes' are only used by the
+    if visibility_state == VisibilityState.staff_only:
+        xblock_info["ancestor_has_staff_lock"] = ancestor_has_staff_lock(xblock, parent_xblock)
+    else:
+        xblock_info["ancestor_has_staff_lock"] = False
+
+    # Currently, 'edited_by', 'published_by', and 'release_date_from' are only used by the
     # container page when rendering a unit. Since they are expensive to compute, only include them for units
     # that are not being rendered on the course outline.
     if is_xblock_unit and not course_outline:
         xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
         xblock_info["published_by"] = safe_get_username(xblock.published_by)
         xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
-        xblock_info['has_changes'] = is_unit_with_changes
         if release_date:
             xblock_info["release_date_from"] = _get_release_date_from(xblock)
+        if visibility_state == VisibilityState.staff_only:
+            xblock_info["staff_lock_from"] = _get_staff_lock_from(xblock)
+        else:
+            xblock_info["staff_lock_from"] = None
+    if course_outline:
+        if xblock_info["has_explicit_staff_lock"]:
+            xblock_info["staff_only_message"] = True
+        elif child_info and child_info["children"]:
+            xblock_info["staff_only_message"] = all([child["staff_only_message"] for child in child_info["children"]])
+        else:
+            xblock_info["staff_only_message"] = False
 
     return xblock_info
 
@@ -728,7 +813,7 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
         return VisibilityState.needs_attention
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = datetime.now(UTC) > xblock.start
-    children = child_info and child_info['children']
+    children = child_info and child_info.get('children', [])
     if children and len(children) > 0:
         all_staff_only = True
         all_unscheduled = True
@@ -813,9 +898,21 @@ def _get_release_date_from(xblock):
     """
     Returns a string representation of the section or subsection that sets the xblock's release date
     """
-    source = find_release_date_source(xblock)
-    # Translators: this will be a part of the release date message.
-    # For example, 'Released: Jul 02, 2014 at 4:00 UTC with Section "Week 1"'
+    return _xblock_type_and_display_name(find_release_date_source(xblock))
+
+
+def _get_staff_lock_from(xblock):
+    """
+    Returns a string representation of the section or subsection that sets the xblock's release date
+    """
+    source = find_staff_lock_source(xblock)
+    return _xblock_type_and_display_name(source) if source else None
+
+
+def _xblock_type_and_display_name(xblock):
+    """
+    Returns a string representation of the xblock's type and display name
+    """
     return _('{section_or_subsection} "{display_name}"').format(
-        section_or_subsection=xblock_type_display_name(source),
-        display_name=source.display_name_with_default)
+        section_or_subsection=xblock_type_display_name(xblock),
+        display_name=xblock.display_name_with_default)

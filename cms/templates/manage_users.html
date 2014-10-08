@@ -34,7 +34,7 @@
     <article class="content-primary" role="main">
       %if allow_actions:
       <div class="wrapper-create-element animate wrapper-create-user">
-        <form class="create-user" id="create-user-form" name="create-user-form">
+        <form class="form-create create-user" id="create-user-form" name="create-user-form">
           <div class="wrapper-form">
             <h3 class="title">${_("Add a User to Your Course's Team")}</h3>
 
@@ -44,7 +44,7 @@
                 <ol class="list-input">
                   <li class="field text required create-user-email">
                     <label for="user-email-input">${_("User's Email Address")}</label>
-                    <input id="user-email-input" name="user-email" type="text" placeholder="${_('e.g. jane.doe@gmail.com')}" value="">
+                    <input id="user-email-input" name="user-email" type="text" placeholder="${_('example: username@domain.com')}" value="">
                     <span class="tip tip-stacked">${_("Please provide the email address of the course staff member you'd like to add")}</span>
                   </li>
                 </ol>
@@ -147,7 +147,7 @@
       <div class="bit">
         <h3 class="title-3">${_("Course Team Roles")}</h3>
         <p>${_("Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content.")}</p>
-        <p>${_("Admins are course team members who can add and remove other course team members.")}</p>      
+        <p>${_("Admins are course team members who can add and remove other course team members.")}</p>
       </div>
 
       % if user_is_instuctor and len(instructors) == 1:

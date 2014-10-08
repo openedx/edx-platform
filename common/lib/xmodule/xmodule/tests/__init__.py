@@ -12,18 +12,21 @@ import os
 import pprint
 import unittest
 
+from contextlib import contextmanager
+from lazy import lazy
 from mock import Mock
+from operator import attrgetter
 from path import path
 
 from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds, Scope
+from xblock.fields import ScopeIds, Scope, Reference, ReferenceList, ReferenceValueDict
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
-from xmodule.modulestore import PublishState, ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 
@@ -159,12 +162,100 @@ class LogicTest(unittest.TestCase):
         return json.loads(self.xmodule.handle_ajax(dispatch, data))
 
 
-class CourseComparisonTest(unittest.TestCase):
+def map_references(value, field, actual_course_key):
+    """
+    Map the references in value to actual_course_key and return value
+    """
+    if not value:  # if falsey
+        return value
+    if isinstance(field, Reference):
+        return value.map_into_course(actual_course_key)
+    if isinstance(field, ReferenceList):
+        return [sub.map_into_course(actual_course_key) for sub in value]
+    if isinstance(field, ReferenceValueDict):
+        return {key: ele.map_into_course(actual_course_key) for key, ele in value.iteritems()}
+    return value
+
+
+class BulkAssertionManager(object):
+    """
+    This provides a facility for making a large number of assertions, and seeing all of
+    the failures at once, rather than only seeing single failures.
+    """
+    def __init__(self, test_case):
+        self._equal_expected = []
+        self._equal_actual = []
+        self._test_case = test_case
+
+    def assertEqual(self, expected, actual, description=None):
+        if description is None:
+            description = u"{!r} does not equal {!r}".format(expected, actual)
+        if expected != actual:
+            self._equal_expected.append((description, expected))
+            self._equal_actual.append((description, actual))
+
+    def run_assertions(self):
+        super(BulkAssertionTest, self._test_case).assertEqual(self._equal_expected, self._equal_actual)
+
+
+class BulkAssertionTest(unittest.TestCase):
+    """
+    This context manager provides a BulkAssertionManager to assert with,
+    and then calls `run_assertions` at the end of the block to validate all
+    of the assertions.
+    """
+
+    def setUp(self, *args, **kwargs):
+        super(BulkAssertionTest, self).setUp(*args, **kwargs)
+        self._manager = None
+
+    @contextmanager
+    def bulk_assertions(self):
+        if self._manager:
+            yield
+        else:
+            try:
+                self._manager = BulkAssertionManager(self)
+                yield
+            finally:
+                self._manager.run_assertions()
+                self._manager = None
+
+    def assertEqual(self, expected, actual, message=None):
+        if self._manager is not None:
+            self._manager.assertEqual(expected, actual, message)
+        else:
+            super(BulkAssertionTest, self).assertEqual(expected, actual, message)
+    assertEquals = assertEqual
+
+
+class LazyFormat(object):
+    """
+    An stringy object that delays formatting until it's put into a string context.
+    """
+    __slots__ = ('template', 'args', 'kwargs', '_message')
+
+    def __init__(self, template, *args, **kwargs):
+        self.template = template
+        self.args = args
+        self.kwargs = kwargs
+        self._message = None
+
+    def __unicode__(self):
+        if self._message is None:
+            self._message = self.template.format(*self.args, **self.kwargs)
+        return self._message
+
+    def __repr__(self):
+        return unicode(self)
+
+class CourseComparisonTest(BulkAssertionTest):
     """
     Mixin that has methods for comparing courses for equality.
     """
 
     def setUp(self):
+        super(CourseComparisonTest, self).setUp()
         self.field_exclusions = set()
         self.ignored_asset_keys = set()
 
@@ -187,6 +278,65 @@ class CourseComparisonTest(unittest.TestCase):
         """
         self.ignored_asset_keys.add(key_name)
 
+    def assertReferenceRelativelyEqual(self, reference_field, expected_block, actual_block):
+        """
+        Assert that the supplied reference field is identical on the expected_block and actual_block,
+        assoming that the references are only relative (that is, comparing only on block_type and block_id,
+        not course_key).
+        """
+        def extract_key(usage_key):
+            if usage_key is None:
+                return None
+            else:
+                return (usage_key.block_type, usage_key.block_id)
+        expected = reference_field.read_from(expected_block)
+        actual = reference_field.read_from(actual_block)
+        if isinstance(reference_field, Reference):
+            expected = extract_key(expected)
+            actual = extract_key(actual)
+        elif isinstance(reference_field, ReferenceList):
+            expected = [extract_key(key) for key in expected]
+            actual = [extract_key(key) for key in actual]
+        elif isinstance(reference_field, ReferenceValueDict):
+            expected = {key: extract_key(val) for (key, val) in expected.iteritems()}
+            actual = {key: extract_key(val) for (key, val) in actual.iteritems()}
+        self.assertEqual(
+            expected,
+            actual,
+            LazyFormat(
+                "Field {} doesn't match between usages {} and {}: {!r} != {!r}",
+                reference_field.name,
+                expected_block.scope_ids.usage_id,
+                actual_block.scope_ids.usage_id,
+                expected,
+                actual
+            )
+        )
+
+    def assertBlocksEqualByFields(self, expected_block, actual_block):
+        self.assertEqual(expected_block.fields, actual_block.fields)
+        for field in expected_block.fields.values():
+            self.assertFieldEqual(field, expected_block, actual_block)
+
+    def assertFieldEqual(self, field, expected_block, actual_block):
+        if isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):
+            self.assertReferenceRelativelyEqual(field, expected_block, actual_block)
+        else:
+            expected = field.read_from(expected_block)
+            actual = field.read_from(actual_block)
+            self.assertEqual(
+                expected,
+                actual,
+                LazyFormat(
+                    "Field {} doesn't match between usages {} and {}: {!r} != {!r}",
+                    field.name,
+                    expected_block.scope_ids.usage_id,
+                    actual_block.scope_ids.usage_id,
+                    expected,
+                    actual
+                )
+            )
+
     def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key):
         """
         Assert that the courses identified by ``expected_course_key`` in ``expected_store`` and
@@ -197,90 +347,85 @@ class CourseComparisonTest(unittest.TestCase):
         will be ignored for the purpose of equality checking.
         """
         # compare published
-        expected_items = expected_store.get_items(expected_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
-        actual_items = actual_store.get_items(actual_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
-        self.assertGreater(len(expected_items), 0)
-        self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
+        with expected_store.branch_setting(ModuleStoreEnum.Branch.published_only, expected_course_key):
+            with actual_store.branch_setting(ModuleStoreEnum.Branch.published_only, actual_course_key):
+                expected_items = expected_store.get_items(expected_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
+                actual_items = actual_store.get_items(actual_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
+                self.assertGreater(len(expected_items), 0)
+                self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
 
-        # compare draft
-        if expected_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
-            revision = ModuleStoreEnum.RevisionOption.draft_only
-        else:
-            revision = None
-        expected_items = expected_store.get_items(expected_course_key, revision=revision)
-        if actual_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
-            revision = ModuleStoreEnum.RevisionOption.draft_only
-        else:
-            revision = None
-        actual_items = actual_store.get_items(actual_course_key, revision=revision)
-        self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
+        with expected_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, expected_course_key):
+            with actual_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, actual_course_key):
+                # compare draft
+                if expected_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
+                    revision = ModuleStoreEnum.RevisionOption.draft_only
+                else:
+                    revision = None
+                expected_items = expected_store.get_items(expected_course_key, revision=revision)
+                if actual_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
+                    revision = ModuleStoreEnum.RevisionOption.draft_only
+                else:
+                    revision = None
+                actual_items = actual_store.get_items(actual_course_key, revision=revision)
+                self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
 
     def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key, expect_drafts=False):
-        self.assertEqual(len(expected_items), len(actual_items))
+        with self.bulk_assertions():
+            self.assertEqual(len(expected_items), len(actual_items))
 
-        actual_item_map = {
-            item.location.block_id: item
-            for item in actual_items
-        }
+            def map_key(usage_key):
+                return (usage_key.block_type, usage_key.block_id)
 
-        for expected_item in expected_items:
-            actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)
-            # split and old mongo use different names for the course root but we don't know which
-            # modulestore actual's come from here; so, assume old mongo and if that fails, assume split
-            if expected_item.location.category == 'course':
-                actual_item_location = actual_item_location.replace(name=actual_item_location.run)
-            actual_item = actual_item_map.get(actual_item_location.block_id)
-            # must be split
-            if actual_item is None and expected_item.location.category == 'course':
-                actual_item_location = actual_item_location.replace(name='course')
-                actual_item = actual_item_map.get(actual_item_location.block_id)
-            self.assertIsNotNone(actual_item, u'cannot find {} in {}'.format(actual_item_location, actual_item_map))
+            actual_item_map = {
+                map_key(item.location): item
+                for item in actual_items
+            }
 
-            # compare fields
-            self.assertEqual(expected_item.fields, actual_item.fields)
+            for expected_item in expected_items:
+                actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)
+                # split and old mongo use different names for the course root but we don't know which
+                # modulestore actual's come from here; so, assume old mongo and if that fails, assume split
+                if expected_item.location.category == 'course':
+                    actual_item_location = actual_item_location.replace(name=actual_item_location.run)
+                actual_item = actual_item_map.get(map_key(actual_item_location))
+                # must be split
+                if actual_item is None and expected_item.location.category == 'course':
+                    actual_item_location = actual_item_location.replace(name='course')
+                    actual_item = actual_item_map.get(map_key(actual_item_location))
 
-            for field_name in expected_item.fields:
-                if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
-                    continue
+                # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
+                self.assertIsNotNone(actual_item, LazyFormat(u'cannot find {} in {}', map_key(actual_item_location), actual_item_map))
 
-                if (None, field_name) in self.field_exclusions:
-                    continue
+                # compare fields
+                self.assertEqual(expected_item.fields, actual_item.fields)
 
-                # Children are handled specially
-                if field_name == 'children':
-                    continue
+                for field_name, field in expected_item.fields.iteritems():
+                    if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
+                        continue
 
-                exp_value = getattr(expected_item, field_name)
-                actual_value = getattr(actual_item, field_name)
-                self.assertEqual(
-                    exp_value,
-                    actual_value,
-                    "Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
-                        field_name,
-                        expected_item.scope_ids.usage_id,
-                        actual_item.scope_ids.usage_id,
-                        exp_value,
-                        actual_value,
-                    )
-                )
+                    if (None, field_name) in self.field_exclusions:
+                        continue
 
-            # compare children
-            self.assertEqual(expected_item.has_children, actual_item.has_children)
-            if expected_item.has_children:
-                actual_course_key = actual_item.location.course_key.version_agnostic()
-                expected_children = [
-                    course1_item_child.location.map_into_course(actual_course_key)
-                    for course1_item_child in expected_item.get_children()
-                    # get_children was returning drafts for published parents :-(
-                    if expect_drafts or not getattr(course1_item_child, 'is_draft', False)
-                ]
-                actual_children = [
-                    item_child.location.version_agnostic()
-                    for item_child in actual_item.get_children()
-                    # get_children was returning drafts for published parents :-(
-                    if expect_drafts or not getattr(item_child, 'is_draft', False)
-                ]
-                self.assertEqual(expected_children, actual_children)
+                    # Children are handled specially
+                    if field_name == 'children':
+                        continue
+
+                    self.assertFieldEqual(field, expected_item, actual_item)
+
+                # compare children
+                self.assertEqual(expected_item.has_children, actual_item.has_children)
+                if expected_item.has_children:
+                    expected_children = [
+                        (expected_item_child.location.block_type, expected_item_child.location.block_id)
+                        # get_children() rather than children to strip privates from public parents
+                        for expected_item_child in expected_item.get_children()
+                    ]
+                    actual_children = [
+                        (item_child.location.block_type, item_child.location.block_id)
+                        # get_children() rather than children to strip privates from public parents
+                        for item_child in actual_item.get_children()
+                    ]
+                    self.assertEqual(expected_children, actual_children)
 
     def assertAssetEqual(self, expected_course_key, expected_asset, actual_course_key, actual_asset):
         """
@@ -323,10 +468,12 @@ class CourseComparisonTest(unittest.TestCase):
         expected_content, expected_count = expected_store.get_all_content_for_course(expected_course_key)
         actual_content, actual_count = actual_store.get_all_content_for_course(actual_course_key)
 
-        self.assertEqual(expected_count, actual_count)
-        self._assertAssetsEqual(expected_course_key, expected_content, actual_course_key, actual_content)
+        with self.bulk_assertions():
 
-        expected_thumbs = expected_store.get_all_content_thumbnails_for_course(expected_course_key)
-        actual_thumbs = actual_store.get_all_content_thumbnails_for_course(actual_course_key)
+            self.assertEqual(expected_count, actual_count)
+            self._assertAssetsEqual(expected_course_key, expected_content, actual_course_key, actual_content)
 
-        self._assertAssetsEqual(expected_course_key, expected_thumbs, actual_course_key, actual_thumbs)
+            expected_thumbs = expected_store.get_all_content_thumbnails_for_course(expected_course_key)
+            actual_thumbs = actual_store.get_all_content_thumbnails_for_course(actual_course_key)
+
+            self._assertAssetsEqual(expected_course_key, expected_thumbs, actual_course_key, actual_thumbs)

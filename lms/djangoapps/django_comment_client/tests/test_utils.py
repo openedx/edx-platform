@@ -42,7 +42,7 @@ class DictionaryTestCase(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class AccessUtilsTestCase(TestCase):
+class AccessUtilsTestCase(ModuleStoreTestCase):
     def setUp(self):
         self.course = CourseFactory.create()
         self.course_id = self.course.id
@@ -148,7 +148,7 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         self.course.discussion_topics = {}
         self.course.save()
         self.discussion_num = 0
-        self.maxDiff = None # pylint: disable=C0103
+        self.maxDiff = None  # pylint: disable=C0103
 
     def create_discussion(self, discussion_category, discussion_target, **kwargs):
         self.discussion_num += 1
@@ -193,7 +193,7 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                 }
             )
 
-        check_cohorted_topics([]) # default (empty) cohort config
+        check_cohorted_topics([])  # default (empty) cohort config
 
         self.course.cohort_config = {"cohorted": False, "cohorted_discussions": []}
         check_cohorted_topics([])
@@ -210,7 +210,6 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         # unlikely case, but make sure it works.
         self.course.cohort_config = {"cohorted": False, "cohorted_discussions": ["Topic_A"]}
         check_cohorted_topics([])
-
 
     def test_single_inline(self):
         self.create_discussion("Chapter", "Discussion")
@@ -336,7 +335,6 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         # explicitly enabled cohorting
         self.course.cohort_config = {"cohorted": True}
         check_cohorted(True)
-
 
     def test_start_date_filter(self):
         now = datetime.now()
@@ -562,6 +560,46 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                 },
                 "children": ["Chapter A", "Chapter B", "Chapter C"]
             }
+        )
+
+    def test_ids_empty(self):
+        self.assertEqual(utils.get_discussion_categories_ids(self.course), [])
+
+    def test_ids_configured_topics(self):
+        self.course.discussion_topics = {
+            "Topic A": {"id": "Topic_A"},
+            "Topic B": {"id": "Topic_B"},
+            "Topic C": {"id": "Topic_C"}
+        }
+        self.assertItemsEqual(
+            utils.get_discussion_categories_ids(self.course),
+            ["Topic_A", "Topic_B", "Topic_C"]
+        )
+
+    def test_ids_inline(self):
+        self.create_discussion("Chapter 1", "Discussion 1")
+        self.create_discussion("Chapter 1", "Discussion 2")
+        self.create_discussion("Chapter 2", "Discussion")
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
+        self.create_discussion("Chapter 3 / Section 1", "Discussion")
+        self.assertItemsEqual(
+            utils.get_discussion_categories_ids(self.course),
+            ["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"]
+        )
+
+    def test_ids_mixed(self):
+        self.course.discussion_topics = {
+            "Topic A": {"id": "Topic_A"},
+            "Topic B": {"id": "Topic_B"},
+            "Topic C": {"id": "Topic_C"}
+        }
+        self.create_discussion("Chapter 1", "Discussion 1")
+        self.create_discussion("Chapter 2", "Discussion")
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
+        self.assertItemsEqual(
+            utils.get_discussion_categories_ids(self.course),
+            ["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"]
         )
 
 

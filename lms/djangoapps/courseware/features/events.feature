@@ -5,10 +5,10 @@ Feature: LMS.Events
   Scenario Outline: An event is emitted for each request
     Given: I am registered for the course "6.002x"
     And I visit the url "<url>"
-    Then a "<url>" server event is emitted
+    Then a course url "<url>" event is emitted
 
   Examples:
-    | url                                        |
-    | /dashboard                                 |
-    | /courses/edx/6.002x/Test_Course/info       |
-    | /courses/edx/6.002x/Test_Course/courseware |
+    | url                    |
+    | /dashboard             |
+    | /courses/{}/info       |
+    | /courses/{}/courseware |

@@ -4,7 +4,7 @@
 Problem with Adaptive Hint
 ################################
 
-A problem with an adaptive hint evaluates a student's response, then gives the student feedback or a hint based on that response so that the student is more likely to answer correctly on the next attempt. These problems can be text input problems.
+A problem with an adaptive hint evaluates a student's response, then gives the student feedback or a hint based on that response so that the student is more likely to answer correctly on the next attempt. These problems can be multiple choice, text input, numerical input, or math expression input problems.
 
 .. image:: /Images/ProblemWithAdaptiveHintExample.png
  :alt: Image of a problem with an adaptive hint

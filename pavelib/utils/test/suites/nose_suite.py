@@ -99,12 +99,6 @@ class SystemTestSuite(NoseTestSuite):
     def __enter__(self):
         super(SystemTestSuite, self).__enter__()
 
-        if not self.fasttest:
-            # TODO: Fix the tests so that collectstatic isn't needed ever
-            # add --skip-collect to this when the tests are fixed
-            args = [self.root, '--settings=test']
-            call_task('pavelib.assets.update_assets', args=args)
-
     @property
     def cmd(self):
         cmd = (

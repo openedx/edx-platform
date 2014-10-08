@@ -30,17 +30,17 @@
   <ul class="list-input">
     <li class="field text is-not-editable" id="field-course-organization">
       <label for="course-organization">${_("Organization:")}</label>
-      <b>${ section_data['course_id'].org }</b>
+      <b>${ section_data['course_id'].org | h}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-number">
       <label for="course-number">${_("Course Number:")}</label>
-      <b>${ section_data['course_id'].course }</b>
+      <b>${ section_data['course_id'].course | h}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-name">
       <label for="course-name">${_("Course Name:")}</label>
-      <b>${ section_data['course_id'].run }</b>
+      <b>${ section_data['course_id'].run | h}</b>
     </li>
 
     <li class="field text is-not-editable" id="field-course-display-name">
@@ -76,10 +76,13 @@
   <div class="running-tasks-container action-type-container">
     <hr>
     <h2> ${_("Pending Instructor Tasks")} </h2>
-    <p>${_("The status for any active tasks appears in a table below.")} </p>
-    <br />
+    <div class="running-tasks-section">
+      <p>${_("The status for any active tasks appears in a table below.")} </p>
+      <br />
 
-    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+      <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+    </div>
+    <div class="no-pending-tasks-message"></div>
   </div>
 
 %endif

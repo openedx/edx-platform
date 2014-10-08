@@ -55,7 +55,7 @@
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         var url = json.redirect_url || "${reverse('dashboard')}";
-        location.href = appendParameter(url, "signin", "initial");
+        location.href = url;
       });
 
       $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
@@ -116,33 +116,37 @@
         <ul class="message-copy"> </ul>
       </div>
 
-      % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+      % if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')):
 
         % if not running_pipeline:
-
-        <p class="instructions">
-          ${_("Register to start learning today!")}
-        </p>
 
         <div class="form-actions form-third-party-auth">
 
         % for enabled in provider.Registry.enabled():
           ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
-          <button type="submit" class="button button-primary" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_REGISTER)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
+          <button type="submit" class="button button-primary button-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_REGISTER)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign up with {provider_name}').format(provider_name=enabled.NAME)}</button>
         % endfor
 
         </div>
 
+        <span class="deco-divider">
+          ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.
+          ## Translators: this is the last choice of a number of choices of how to log in to the site.
+          <span class="copy">${_('or')}</span>
+        </span>
+
         <p class="instructions">
-          ${_('or create your own {platform_name} account by completing all <strong>required*</strong> fields below.').format(platform_name=platform_name)}
+          ${_('Create your own {platform_name} account below').format(platform_name=platform_name)}
+          <span class="note">${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}</span>
         </p>
+
 
         % else:
 
         <p class="instructions">
           ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
           ${_("You've successfully signed in with {selected_provider}.").format(selected_provider='<strong>%s</strong>' % selected_provider)}<br />
-          ${_("Finish your account registration below to start learning.")}
+          ${_("We just need a little more information before you start learning with edX.")}
         </p>
 
         % endif
@@ -235,7 +239,7 @@
       </div>
 
       <div class="group group-form group-form-secondary group-form-personalinformation">
-        <h2 class="sr">${_("Extra Personal Information")}</h2>
+        <h2 class="sr">${_("Additional Personal Information")}</h2>
 
         <ol class="list-input">
           % if settings.REGISTRATION_EXTRA_FIELDS['city'] != 'hidden':
@@ -258,7 +262,7 @@
           </li>
           % endif
           % if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] != 'hidden':
-          <li class="field-group">
+          <li class="field-group field-education-level">
           <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['level_of_education']} select" id="field-education-level">
               <label for="education-level">${_("Highest Level of Education Completed")}</label>
               <select id="education-level" name="level_of_education" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] == 'required' else ''}>
@@ -271,7 +275,7 @@
           </li>
           % endif
           % if settings.REGISTRATION_EXTRA_FIELDS['gender'] != 'hidden':
-          <li class="field-group">
+          <li class="field-group field-gender">
             <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['gender']} select" id="field-gender">
               <label for="gender">${_("Gender")}</label>
               <select id="gender" name="gender" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['gender'] == 'required' else ''}>
@@ -284,7 +288,7 @@
           </li>
           % endif
           % if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] != 'hidden':
-          <li class="field-group">
+          <li class="field-group field-yob">
             <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['year_of_birth']} select" id="field-yob">
               <label for="yob">${_("Year of Birth")}</label>
               <select id="yob" name="year_of_birth" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] == 'required' else ''}>
@@ -300,8 +304,6 @@
       </div>
 
       <div class="group group-form group-form-personalinformation2">
-        <h2 class="sr">${_("Extra Personal Information")}</h2>
-
         <ol class="list-input">
           % if settings.REGISTRATION_EXTRA_FIELDS['mailing_address'] != 'hidden':
           <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['mailing_address']} text" id="field-address-mailing">

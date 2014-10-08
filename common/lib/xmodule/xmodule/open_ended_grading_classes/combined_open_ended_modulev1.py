@@ -1229,7 +1229,6 @@ class CombinedOpenEndedV1Descriptor():
 
         return {'task_xml': parse_task('task'), 'prompt': parse('prompt'), 'rubric': parse('rubric')}
 
-
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
         elt = etree.Element('combinedopenended')

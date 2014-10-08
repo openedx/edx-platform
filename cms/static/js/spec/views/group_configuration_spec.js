@@ -5,13 +5,13 @@ define([
     'js/views/group_configurations_list', 'js/views/group_configuration_edit',
     'js/views/group_configuration_item', 'js/models/group',
     'js/collections/group', 'js/views/group_edit',
-    'js/views/feedback_notification', 'js/spec_helpers/create_sinon',
-    'js/spec_helpers/edit_helpers', 'jasmine-stealth'
+    'js/views/feedback_notification', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
+    'js/spec_helpers/view_helpers', 'jasmine-stealth'
 ], function(
     _, Course, GroupConfigurationModel, GroupConfigurationCollection,
     GroupConfigurationDetails, GroupConfigurationsList, GroupConfigurationEdit,
     GroupConfigurationItem, GroupModel, GroupCollection, GroupEdit,
-    Notification, create_sinon, view_helpers
+    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers
 ) {
     'use strict';
     var SELECTORS = {
@@ -33,7 +33,12 @@ define([
         usageText: '.group-configuration-usage-text',
         usageTextAnchor: '.group-configuration-usage-text > a',
         usageUnit: '.group-configuration-usage-unit',
-        usageUnitAnchor: '.group-configuration-usage-unit > a',
+        usageUnitAnchor: '.group-configuration-usage-unit a',
+        usageUnitMessage: '.group-configuration-validation-message',
+        usageUnitWarningIcon: '.group-configuration-usage-unit i.icon-warning-sign',
+        usageUnitErrorIcon: '.group-configuration-usage-unit i.icon-exclamation-sign',
+        warningMessage: '.group-configuration-validation-text',
+        warningIcon: '.wrapper-group-configuration-validation > i',
         note: '.wrapper-delete-button'
     };
 
@@ -87,7 +92,7 @@ define([
 
     describe('GroupConfigurationDetails', function() {
         beforeEach(function() {
-            view_helpers.installTemplate('group-configuration-details', true);
+            TemplateHelpers.installTemplate('group-configuration-details', true);
 
             this.model = new GroupConfigurationModel({
                 name: 'Configuration',
@@ -162,12 +167,10 @@ define([
         it('should show non-empty usage appropriately', function() {
             var usageUnitAnchors;
 
-            this.model.set('usage',
-                [
-                    {'label': 'label1', 'url': 'url1'},
-                    {'label': 'label2', 'url': 'url2'}
-                ]
-            );
+            this.model.set('usage', [
+                {'label': 'label1', 'url': 'url1'},
+                {'label': 'label2', 'url': 'url2'}
+            ]);
             this.model.set('showGroups', false);
             this.view.$('.show-groups').click();
 
@@ -205,6 +208,55 @@ define([
             expect(this.view.$(SELECTORS.usageCount))
                 .toContainText('Used in 2 units');
         });
+
+        it('should show validation warning icon and message appropriately', function() {
+            this.model.set('usage', [
+                {
+                    'label': 'label1',
+                    'url': 'url1',
+                    'validation': {
+                        'message': "Warning message",
+                        'type': 'warning'
+                    }
+                }
+            ]);
+            this.model.set('showGroups', false);
+            this.view.$('.show-groups').click();
+
+            expect(this.view.$(SELECTORS.usageUnitMessage)).toContainText('Warning message');
+            expect(this.view.$(SELECTORS.usageUnitWarningIcon)).toExist();
+        });
+
+        it('should show validation error icon and message appropriately', function() {
+            this.model.set('usage', [
+                {
+                    'label': 'label1',
+                    'url': 'url1',
+                    'validation': {
+                        'message': "Error message",
+                        'type': 'error'
+                    }
+                }
+            ]);
+            this.model.set('showGroups', false);
+            this.view.$('.show-groups').click();
+
+            expect(this.view.$(SELECTORS.usageUnitMessage)).toContainText('Error message');
+            expect(this.view.$(SELECTORS.usageUnitErrorIcon)).toExist();
+        });
+
+        it('should hide validation icons and messages appropriately', function() {
+            this.model.set('usage', [
+                {'label': 'label1', 'url': 'url1'},
+                {'label': 'label2', 'url': 'url2'}
+            ]);
+            this.model.set('showGroups', true);
+            this.view.$('.hide-groups').click();
+
+            expect(this.view.$(SELECTORS.usageUnitMessage)).not.toExist();
+            expect(this.view.$(SELECTORS.usageUnitWarningIcon)).not.toExist();
+            expect(this.view.$(SELECTORS.usageUnitErrorIcon)).not.toExist();
+        });
     });
 
     describe('GroupConfigurationEdit', function() {
@@ -218,8 +270,8 @@ define([
         };
 
         beforeEach(function() {
-            view_helpers.installViewTemplates();
-            view_helpers.installTemplates([
+            ViewHelpers.installViewTemplates();
+            TemplateHelpers.installTemplates([
                 'group-configuration-edit', 'group-edit'
             ]);
 
@@ -252,8 +304,8 @@ define([
         });
 
         it('should save properly', function() {
-            var requests = create_sinon.requests(this),
-                notificationSpy = view_helpers.createNotificationSpy(),
+            var requests = AjaxHelpers.requests(this),
+                notificationSpy = ViewHelpers.createNotificationSpy(),
                 groups;
 
             this.view.$('.action-add-group').click();
@@ -263,9 +315,9 @@ define([
             });
 
             this.view.$('form').submit();
-            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
             requests[0].respond(200);
-            view_helpers.verifyNotificationHidden(notificationSpy);
+            ViewHelpers.verifyNotificationHidden(notificationSpy);
 
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'New Configuration',
@@ -279,14 +331,14 @@ define([
         });
 
         it('does not hide saving message if failure', function() {
-            var requests = create_sinon.requests(this),
-                notificationSpy = view_helpers.createNotificationSpy();
+            var requests = AjaxHelpers.requests(this),
+                notificationSpy = ViewHelpers.createNotificationSpy();
 
             setValuesToInputs(this.view, { inputName: 'New Configuration' });
             this.view.$('form').submit();
-            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
-            create_sinon.respondWithError(requests);
-            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            AjaxHelpers.respondWithError(requests);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
         });
 
         it('does not save on cancel', function() {
@@ -321,7 +373,7 @@ define([
         });
 
         it('should be possible to correct validation errors', function() {
-            var requests = create_sinon.requests(this);
+            var requests = AjaxHelpers.requests(this);
 
             // Set incorrect value
             setValuesToInputs(this.view, { inputName: '' });
@@ -329,7 +381,7 @@ define([
             this.view.$('form').submit();
             // See error message
             expect(this.view.$(SELECTORS.errorMessage)).toContainText(
-                'Group Configuration name is required'
+                'Group Configuration name is required.'
             );
             // No request
             expect(requests.length).toBe(0);
@@ -418,13 +470,31 @@ define([
             );
             expect(this.view.$('.delete')).toHaveClass('is-disabled');
         });
+
+        it('contains warning message if it is in use', function () {
+            this.model.set('usage', [ {'label': 'label1', 'url': 'url1'} ]);
+            this.view.render();
+            expect(this.view.$(SELECTORS.warningMessage)).toContainText(
+                'This configuration is currently used in content ' +
+                'experiments. If you make changes to the groups, you may ' +
+                'need to edit those experiments.'
+            );
+            expect(this.view.$(SELECTORS.warningIcon)).toExist();
+        });
+
+        it('does not contain warning message if it is not in use', function () {
+            this.model.set('usage', []);
+            this.view.render();
+            expect(this.view.$(SELECTORS.warningMessage)).not.toExist();
+            expect(this.view.$(SELECTORS.warningIcon)).not.toExist();
+        });
     });
 
     describe('GroupConfigurationsList', function() {
         var emptyMessage = 'You haven\'t created any group configurations yet.';
 
         beforeEach(function() {
-            view_helpers.installTemplate('no-group-configurations', true);
+            TemplateHelpers.installTemplate('no-group-configurations', true);
 
             this.model = new GroupConfigurationModel({ id: 0 });
             this.collection = new GroupConfigurationCollection();
@@ -463,7 +533,7 @@ define([
         var clickDeleteItem;
 
         beforeEach(function() {
-            view_helpers.installTemplates([
+            TemplateHelpers.installTemplates([
                 'group-configuration-edit', 'group-configuration-details'
             ], true);
             this.model = new GroupConfigurationModel({ id: 0 });
@@ -477,9 +547,9 @@ define([
 
         clickDeleteItem = function (view, promptSpy) {
             view.$('.delete').click();
-            view_helpers.verifyPromptShowing(promptSpy, /Delete this Group Configuration/);
-            view_helpers.confirmPrompt(promptSpy);
-            view_helpers.verifyPromptHidden(promptSpy);
+            ViewHelpers.verifyPromptShowing(promptSpy, /Delete this Group Configuration/);
+            ViewHelpers.confirmPrompt(promptSpy);
+            ViewHelpers.verifyPromptHidden(promptSpy);
         };
 
         it('should render properly', function() {
@@ -494,43 +564,43 @@ define([
         });
 
         it('should destroy itself on confirmation of deleting', function () {
-            var requests = create_sinon.requests(this),
-                promptSpy = view_helpers.createPromptSpy(),
-                notificationSpy = view_helpers.createNotificationSpy();
+            var requests = AjaxHelpers.requests(this),
+                promptSpy = ViewHelpers.createPromptSpy(),
+                notificationSpy = ViewHelpers.createNotificationSpy();
 
             clickDeleteItem(this.view, promptSpy);
             // Backbone.emulateHTTP is enabled in our system, so setting this
             // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
             // setting the X-HTTP-Method-Override header with the true method.
-            create_sinon.expectJsonRequest(requests, 'POST', '/group_configurations/0');
+            AjaxHelpers.expectJsonRequest(requests, 'POST', '/group_configurations/0');
             expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
-            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            create_sinon.respondToDelete(requests);
-            view_helpers.verifyNotificationHidden(notificationSpy);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            AjaxHelpers.respondToDelete(requests);
+            ViewHelpers.verifyNotificationHidden(notificationSpy);
             expect($(SELECTORS.itemView)).not.toExist();
         });
 
         it('does not hide deleting message if failure', function() {
-            var requests = create_sinon.requests(this),
-                promptSpy = view_helpers.createPromptSpy(),
-                notificationSpy = view_helpers.createNotificationSpy();
+            var requests = AjaxHelpers.requests(this),
+                promptSpy = ViewHelpers.createPromptSpy(),
+                notificationSpy = ViewHelpers.createNotificationSpy();
 
             clickDeleteItem(this.view, promptSpy);
             // Backbone.emulateHTTP is enabled in our system, so setting this
             // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
             // setting the X-HTTP-Method-Override header with the true method.
-            create_sinon.expectJsonRequest(requests, 'POST', '/group_configurations/0');
+            AjaxHelpers.expectJsonRequest(requests, 'POST', '/group_configurations/0');
             expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
-            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            create_sinon.respondWithError(requests);
-            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            AjaxHelpers.respondWithError(requests);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
             expect($(SELECTORS.itemView)).toExist();
         });
     });
 
     describe('GroupEdit', function() {
         beforeEach(function() {
-            view_helpers.installTemplate('group-edit', true);
+            TemplateHelpers.installTemplate('group-edit', true);
 
             this.model = new GroupModel({
                 name: 'Group A'

@@ -38,6 +38,7 @@ from warnings import simplefilter
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from dealer.git import git
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -104,11 +105,8 @@ FEATURES = {
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
 
-    # Toggles Group Configuration editing functionality
-    'ENABLE_GROUP_CONFIGURATIONS': os.environ.get('FEATURE_GROUP_CONFIGURATIONS'),
-
     # Modulestore to use for new courses
-    'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
+    'DEFAULT_STORE_FOR_NEW_COURSE': None,
 }
 ENABLE_JASMINE = False
 
@@ -129,7 +127,7 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
-
+GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
@@ -257,7 +255,7 @@ from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
 # Allow any XBlock in Studio
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
@@ -310,6 +308,8 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 LANGUAGES = lms.envs.common.LANGUAGES
+LANGUAGE_DICT = dict(LANGUAGES)
+
 USE_I18N = True
 USE_L10N = True
 
@@ -373,6 +373,23 @@ PIPELINE_CSS = {
             'sass/style-xmodule.css',
         ],
         'output_filename': 'css/cms-style-xmodule.css',
+    },
+    'style-xmodule-annotations': {
+        'source_filenames': [
+            'css/vendor/ova/annotator.css',
+            'css/vendor/ova/edx-annotator.css',
+            'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/rangeslider.css',
+            'css/vendor/ova/share-annotator.css',
+            'css/vendor/ova/richText-annotator.css',
+            'css/vendor/ova/tags-annotator.css',
+            'css/vendor/ova/flagging-annotator.css',
+            'css/vendor/ova/diacritic-annotator.css',
+            'css/vendor/ova/grouping-annotator.css',
+            'css/vendor/ova/ova.css',
+            'js/vendor/ova/catch/css/main.css'
+        ],
+        'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
 }
 
@@ -552,7 +569,10 @@ INSTALLED_APPS = (
     'monitoring',
 
     # Course action state
-    'course_action_state'
+    'course_action_state',
+
+    # Additional problem types
+    'edx_jsme',    # Molecular Structure
 )
 
 
@@ -615,7 +635,6 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 ### Apps only installed in some instances
 
 OPTIONAL_APPS = (
-    'edx_jsdraw',
     'mentoring',
 
     # edx-ora2
@@ -624,7 +643,10 @@ OPTIONAL_APPS = (
     'openassessment.assessment',
     'openassessment.fileupload',
     'openassessment.workflow',
-    'openassessment.xblock'
+    'openassessment.xblock',
+
+    # edxval
+    'edxval'
 )
 
 
@@ -667,6 +689,7 @@ ADVANCED_COMPONENT_TYPES = [
     'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
     'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
     'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
+    'profile', # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
     'split_test',
     'combinedopenended',
     'peergrading',

@@ -27,6 +27,12 @@ update_module_store_settings(
     }
 )
 
+DJFS = {
+    'type': 'osfs',
+    'directory_root': 'cms/static/djpyfs',
+    'url_root': '/static/djpyfs'
+}
+
 # cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
 # This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
 CONTENTSTORE = {
@@ -128,7 +134,7 @@ PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon
 CELERY_ALWAYS_EAGER = True
 
 ################################ DEBUG TOOLBAR #################################
-INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
+INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo', 'djpyfs')
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
 
@@ -159,6 +165,7 @@ DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
 # Enable URL that shows information about the status of variuous services
 FEATURES['ENABLE_SERVICE_STATUS'] = True
+FEATURES['ALLOW_COURSE_RERUNS'] = True
 
 ############################# SEGMENT-IO ##################################
 

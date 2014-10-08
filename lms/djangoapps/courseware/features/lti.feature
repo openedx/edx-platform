@@ -44,7 +44,7 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works
   Given the course has correct LTI credentials with registered Instructor
   And the course has an LTI component with correct fields:
-  | open_in_a_new_page | weight | is_graded | has_score |
+  | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 1 question
   And I click on the "Progress" tab
@@ -71,7 +71,7 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works with beta testers
   Given the course has correct LTI credentials with registered BetaTester
   And the course has an LTI component with correct fields:
-  | open_in_a_new_page | weight | is_graded | has_score |
+  | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 1 question
   And I click on the "Progress" tab
@@ -82,7 +82,7 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works with LTI2v0 PUT callback
   Given the course has correct LTI credentials with registered Instructor
   And the course has an LTI component with correct fields:
-  | open_in_a_new_page | weight | is_graded | has_score |
+  | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 2 question
   And I click on the "Progress" tab
@@ -101,7 +101,7 @@ Feature: LMS.LTI component
   Scenario: Graded LTI component in LMS is correctly works with LTI2v0 PUT delete callback
   Given the course has correct LTI credentials with registered Instructor
   And the course has an LTI component with correct fields:
-  | open_in_a_new_page | weight | is_graded | has_score |
+  | open_in_a_new_page | weight | graded    | has_score |
   | False              | 10     | True      | True      |
   And I submit answer to LTI 2 question
   And I visit the LTI component
@@ -137,3 +137,73 @@ Feature: LMS.LTI component
   | True               | True        |
   Then in the LTI component I do not see an provider iframe
   Then I see LTI component module title with text "LTI (EXTERNAL RESOURCE)"
+
+  #13
+  Scenario: LTI component button text is correctly displayed
+  Given the course has correct LTI credentials with registered Instructor
+  And the course has an LTI component with correct fields:
+  | button_text        |
+  | Launch Application |
+  Then I see LTI component button with text "Launch Application"
+
+  #14
+  Scenario: LTI component description is correctly displayed
+  Given the course has correct LTI credentials with registered Instructor
+  And the course has an LTI component with correct fields:
+  | description             |
+  | Application description |
+  Then I see LTI component description with text "Application description"
+
+  #15
+  Scenario: LTI component requests permission for username and is rejected
+  Given the course has correct LTI credentials with registered Instructor
+  And the course has an LTI component with correct fields:
+  | ask_to_send_username |
+  | True                 |
+  Then I view the permission alert
+  Then I reject the permission alert and do not view the LTI
+  
+  #16
+  Scenario: LTI component requests permission for username and displays LTI when accepted
+  Given the course has correct LTI credentials with registered Instructor
+  And the course has an LTI component with correct fields:
+  | ask_to_send_username |
+  | True                 |
+  Then I view the permission alert
+  Then I accept the permission alert and view the LTI
+
+  #17
+  Scenario: LTI component requests permission for email and is rejected
+  Given the course has correct LTI credentials with registered Instructor
+  And the course has an LTI component with correct fields:
+  | ask_to_send_email |
+  | True              |
+  Then I view the permission alert
+  Then I reject the permission alert and do not view the LTI
+  
+  #18
+  Scenario: LTI component requests permission for email and displays LTI when accepted
+  Given the course has correct LTI credentials with registered Instructor
+  And the course has an LTI component with correct fields:
+  | ask_to_send_email |
+  | True              |
+  Then I view the permission alert
+  Then I accept the permission alert and view the LTI
+
+  #19
+  Scenario: LTI component requests permission for email and username and is rejected
+  Given the course has correct LTI credentials with registered Instructor
+  And the course has an LTI component with correct fields:
+  | ask_to_send_email | ask_to_send_username |
+  | True              | True                 |
+  Then I view the permission alert
+  Then I reject the permission alert and do not view the LTI
+  
+  #20
+  Scenario: LTI component requests permission for email and username and displays LTI when accepted
+  Given the course has correct LTI credentials with registered Instructor
+  And the course has an LTI component with correct fields:
+  | ask_to_send_email | ask_to_send_username |
+  | True              | True                 |
+  Then I view the permission alert
+  Then I accept the permission alert and view the LTI

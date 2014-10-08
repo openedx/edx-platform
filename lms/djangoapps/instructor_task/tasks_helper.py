@@ -23,6 +23,8 @@ from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
+from instructor_analytics.basic import enrolled_students_features
+from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from student.models import CourseEnrollment
 
@@ -372,9 +374,17 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     xqueue_callback_url_prefix = xmodule_instance_args.get('xqueue_callback_url_prefix', '') \
         if xmodule_instance_args is not None else ''
 
-    return get_module_for_descriptor_internal(student, module_descriptor, field_data_cache, course_id,
-                                              make_track_function(), xqueue_callback_url_prefix,
-                                              grade_bucket_type=grade_bucket_type)
+    return get_module_for_descriptor_internal(
+        user=student,
+        descriptor=module_descriptor,
+        field_data_cache=field_data_cache,
+        course_id=course_id,
+        track_function=make_track_function(),
+        xqueue_callback_url_prefix=xqueue_callback_url_prefix,
+        grade_bucket_type=grade_bucket_type,
+        # This module isn't being used for front-end rendering
+        request_token=None,
+    )
 
 
 @transaction.autocommit
@@ -469,6 +479,32 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     return UPDATE_STATUS_SUCCEEDED
 
 
+def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
+    """
+    Upload data as a CSV using ReportStore.
+
+    Arguments:
+        rows: CSV data in the following format (first column may be a
+            header):
+            [
+                [row1_colum1, row1_colum2, ...],
+                ...
+            ]
+        csv_name: Name of the resulting CSV
+        course_id: ID of the course
+    """
+    report_store = ReportStore.from_config()
+    report_store.store_rows(
+        course_id,
+        u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
+            course_prefix=urllib.quote(unicode(course_id).replace("/", "_")),
+            csv_name=csv_name,
+            timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
+        ),
+        rows
+    )
+
+
 def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a grades CSV file for all students that
@@ -539,7 +575,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
             # possible for a student to have a 0.0 show up in their row but
             # still have 100% for the course.
             row_percents = [percents.get(label, 0.0) for label in header]
-            rows.append([student.id, student.email, student.username, gradeset['percent']] + row_percents)
+            rows.append([student.id, student.email.encode('utf-8'), student.username, gradeset['percent']] + row_percents)
         else:
             # An empty gradeset means we failed to grade a student.
             num_failed += 1
@@ -549,25 +585,30 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
     curr_step = "Uploading CSVs"
     update_task_progress()
 
-    # Generate parts of the file name
-    timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
-    course_id_prefix = urllib.quote(course_id.to_deprecated_string().replace("/", "_"))
-
     # Perform the actual upload
-    report_store = ReportStore.from_config()
-    report_store.store_rows(
-        course_id,
-        u"{}_grade_report_{}.csv".format(course_id_prefix, timestamp_str),
-        rows
-    )
+    upload_csv_to_report_store(rows, 'grade_report', course_id, start_time)
 
     # If there are any error rows (don't count the header), write them out as well
     if len(err_rows) > 1:
-        report_store.store_rows(
-            course_id,
-            u"{}_grade_report_{}_err.csv".format(course_id_prefix, timestamp_str),
-            err_rows
-        )
+        upload_csv_to_report_store(err_rows, 'grade_report_err', course_id, start_time)
 
     # One last update before we close out...
     return update_task_progress()
+
+
+def push_students_csv_to_s3(_xmodule_instance_args, _entry_id, course_id, task_input, _action_name):
+    """
+    For a given `course_id`, generate a CSV file containing profile
+    information for all students that are enrolled, and store using a
+    `ReportStore`.
+    """
+    # compute the student features table and format it
+    query_features = task_input.get('features')
+    student_data = enrolled_students_features(course_id, query_features)
+    header, rows = format_dictlist(student_data, query_features)
+    rows.insert(0, header)
+
+    # Perform the upload
+    upload_csv_to_report_store(rows, 'student_profile_info', course_id, datetime.now(UTC))
+
+    return UPDATE_STATUS_SUCCEEDED

@@ -30,13 +30,13 @@
 
         .textbook-title {
           @extend %t-title4;
+          @extend %t-strong;
           margin-right: ($baseline*14);
-          font-weight: bold;
         }
 
         .ui-toggle-expansion {
           @include transition(rotate .15s ease-in-out .25s);
-          @include font-size(21);
+          @extend %t-action1;
           display: inline-block;
           width: ($baseline*0.75);
           vertical-align: text-bottom;
@@ -147,21 +147,21 @@
 
         .action-primary {
           @include blue-button;
-          @extend %t-action2;
           @include transition(all .15s);
+          @extend %t-action2;
+          @extend %t-strong;
           display: inline-block;
           padding: ($baseline/5) $baseline;
-          font-weight: 600;
           text-transform: uppercase;
         }
 
         .action-secondary {
           @include grey-button;
-          @extend %t-action2;
           @include transition(all .15s);
+          @extend %t-action2;
+          @extend %t-strong;
           display: inline-block;
           padding: ($baseline/5) $baseline;
-          font-weight: 600;
           text-transform: uppercase;
         }
 
@@ -175,7 +175,7 @@
 
 
         strong {
-          font-weight: 600;
+          @extend %t-strong;
         }
 
 
@@ -195,7 +195,7 @@
           &.required {
 
             label {
-              font-weight: 600;
+              @extend %t-strong;
             }
 
             label:after {
@@ -325,7 +325,7 @@
 
           .action-close {
             @include transition(color 0.25s ease-in-out);
-            @include font-size(22);
+            @extend %t-action1;
             display: inline-block;
             float: right;
             margin-top: ($baseline*2);
@@ -344,12 +344,11 @@
 
       .action-add-chapter {
         @extend %ui-btn-flat-outline;
-        @include font-size(16);
+        @extend %t-action1;
         display: block;
         width: 100%;
         margin: ($baseline*1.5) 0 0 0;
         padding: ($baseline/2);
-        font-weight: 600;
       }
     }
   }

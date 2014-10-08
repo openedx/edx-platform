@@ -115,7 +115,7 @@
   }
 
   .introduction {
-    padding: ($baseline*2) $baseline 0 $baseline;
+    padding: 0;
 
     header {
       position: relative;
@@ -230,6 +230,21 @@
         margin: 0 0 ($baseline/4) 0;
       }
     }
+
+    .cta-login {
+
+      h3.title,
+      .instructions {
+        display: inline-block;
+        margin-bottom: 0;
+      }
+
+      .cta-login-action {
+        @extend %btn-secondary-grey-outline;
+        padding: ($baseline/10) ($baseline*.75);
+        margin-left: ($baseline/4);
+      }
+    }
   }
 
   // forms
@@ -275,6 +290,17 @@
       }
     }
 
+    .group-form-personalinformation {
+
+      .field-education-level,
+      .field-gender,
+      .field-yob {
+        display: inline-block;
+        vertical-align: top;
+        margin-bottom: 0;
+      }
+    }
+
     // individual fields
     .field {
       margin: 0 0 $baseline 0;
@@ -302,6 +328,16 @@
         margin-top: ($baseline/4);
         color: $lighter-base-font-color;
         font-size: em(13);
+      }
+
+      &.password {
+        position: relative;
+
+        .tip {
+          position: absolute;
+          top: 0;
+          right: 0;
+        }
       }
 
       input, textarea {
@@ -423,6 +459,7 @@
 
     button[type="submit"] {
       @extend %m-btn-primary;
+      @extend %t-action2;
 
       &:disabled, &.is-disabled {
         opacity: 0.3;
@@ -431,9 +468,7 @@
     }
 
     .action-primary {
-      float: left;
       width: flex-grid(8,8);
-      margin-right: flex-gutter(0);
     }
 
     .action-secondary {
@@ -451,16 +486,80 @@
   }
 
   // forms - third-party auth
-  .form-third-party-auth {
+
+  // UI: deco - divider
+  .deco-divider {
+    position: relative;
+    display: block;
+    margin: ($baseline*1.5) 0;
+    border-top: ($baseline/5) solid $m-gray-l4;
+
+    .copy {
+      @extend %t-copy-lead1;
+      @extend %t-weight4;
+      position: absolute;
+      top: -($baseline);
+      left: 43%;
+      padding: ($baseline/4) ($baseline*1.5);
+      background: white;
+      text-align: center;
+      color: $m-gray-l2;
+    }
+  }
+
+  // downplay required note
+  .instructions .note {
+    @extend %t-copy-sub2;
+    display: block;
+    font-weight: normal;
+    color: $gray;
+  }
+
+  .form-actions.form-third-party-auth {
+    width: flex-grid(8,8);
     margin-bottom: $baseline;
 
-    button {
-      margin-right: $baseline;
+    button[type="submit"] {
+      @extend %btn-secondary-blue-outline;
+      width: flex-grid(4,8);
+      margin-right: ($baseline/2);
 
       .icon {
         color: inherit;
         margin-right: $baseline/2;
       }
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &.button-Google:hover, &.button-Google:focus {
+        background-color: #dd4b39;
+        border: 1px solid #A5382B;
+      }
+
+      &.button-Google:hover {
+        box-shadow: 0 2px 1px 0 #8D3024;
+      }
+
+      &.button-Facebook:hover, &.button-Facebook:focus {
+        background-color: #3b5998;
+        border: 1px solid #263A62;
+      }
+
+      &.button-Facebook:hover {
+        box-shadow: 0 2px 1px 0 #30487C;
+      }
+
+      &.button-LinkedIn:hover , &.button-LinkedIn:focus {
+        background-color: #0077b5;
+        border: 1px solid #06527D;
+      }
+
+      &.button-LinkedIn:hover {
+        box-shadow: 0 2px 1px 0 #005D8E;
+      }
+
     }
   }
 
@@ -520,6 +619,14 @@
         display: block;
       }
     }
+
+    .third-party-signin.message {
+      display: none;
+
+      &.is-shown {
+        display: block;
+      }
+    }
   }
 }
 
@@ -533,11 +640,8 @@
   }
 
   .introduction {
-    padding: 0;
-
     header {
       height: 120px;
-      border-bottom: 1px solid $m-gray;
       background: transparent $login-banner-image 0 0 no-repeat;
     }
   }
@@ -547,11 +651,8 @@
 .view-register {
 
   .introduction {
-    padding: 0;
-
     header {
       height: 120px;
-      border-bottom: 1px solid $m-gray;
       background: transparent $register-banner-image 0 0 no-repeat;
     }
   }
@@ -559,26 +660,21 @@
 
 // password reset
 .view-passwordreset {
-  background: $sidebar-color;
 
-  header.global {
-
-    h1 {
-      float: none;
-    }
+  header.global .nav-courseware .cta-login {
+    display: none;
   }
 
   .introduction {
-    width: auto;
-    padding: 0;
-
-    header h1 {
-      margin: 0;
+    header {
+      height: 120px;
+      border-bottom: 1px solid $m-gray;
+      background: transparent $passwordreset-banner-image 0 0 no-repeat;
     }
   }
 
   .content {
-    margin-top: 0;
+    padding: 0;
   }
 }
 

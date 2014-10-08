@@ -108,6 +108,11 @@
     color: $m-gray-d4;
   }
 
+  // reset: navigation (needed due to edX's new global-header styling)
+  .global-new .nav-global a {
+    padding-bottom: ($baseline +1);
+  }
+
   // HACK: nasty override due to our bad input/button styling
   button, input[type="submit"], input[type="button"], button[type="submit"] {
     @include font-size(16);
@@ -368,14 +373,22 @@
 
         .sts-track-value {
           @extend %copy-badge;
-          color: $white;
+          display: inline-block;
           background: $verified-color-lvl3;
+          color: $white;
+          font-weight: 600;
 
           .context {
-            margin-right: ($baseline/4);
             opacity: 0.80;
             color: $white;
             letter-spacing: 0.1rem;
+          }
+        }
+
+        &.professional-ed {
+
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
           }
         }
       }
@@ -411,6 +424,64 @@
         @include line-height(28);
         @extend %t-weight4;
         display: block;
+      }
+    }
+  }
+
+  // CASE: page header - experiment variant A overrides
+  .page-header.exp-variant-A {
+    margin-bottom: 0;
+    border-bottom: none;
+
+    .title {
+      margin: 0;
+    }
+
+
+    .sts-label {
+      display: inline-block;
+      margin: 0;
+      border: none;
+      padding: 0;
+      text-transform: none;
+    }
+
+    .sts-course-org {
+      margin-right: 0;
+    }
+
+    .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
+      @extend %t-title5;
+      @extend %t-weight4;
+      @include font-size(14);
+      @include line-height(14);
+      display: inline-block;
+      color: $gray;
+      text-transform: none;
+    }
+
+    .wrapper-sts {
+      display: inline-block;
+      width: flex-grid(9,12);
+      margin-bottom: ($baseline/4);
+    }
+
+    .sts-course {
+      width: initial;
+    }
+
+    .title .sts-track {
+      display: inline-block;
+
+      .sts-track-value {
+        background: $verified-color-lvl3;
+      }
+
+      &.professional-ed {
+
+        .sts-track-value {
+          background-color: $professional-color-lvl1;
+        }
       }
     }
   }
@@ -1123,6 +1194,14 @@
     }
   }
 
+  // CASE: supplemental content - experiment variant A overrides
+  .wrapper-content-supplementary.exp-variant-A {
+
+    .help-item-technical {
+      width: flex-grid(8,12);
+    }
+  }
+
   // ====================
 
   // VIEW: select a track
@@ -1191,12 +1270,24 @@
     .register-choice-audit {
       border-color: $m-blue-d1;
 
+      .deco-ribbon {
+        position: relative;
+        top: -($baseline*2.5);
+        right: -($baseline*0.35);
+        float: right;
+        display: block;
+        width: ($baseline*2.9);
+        height: ($baseline*4.2);
+        background: transparent url('../images/honor-ribbon.png') no-repeat 0 0;
+      }
+
       .wrapper-copy {
-        width: flex-grid(5,8);
+        width: flex-grid(8,8);
       }
 
       .list-actions {
-        width: flex-grid(3,8);
+        width: flex-grid(8,8);
+        margin: ($baseline/3) 0;
       }
 
       .action-select input {
@@ -1219,9 +1310,7 @@
       }
 
       .list-actions {
-        margin: ($baseline/2) 0;
-        border-top: ($baseline/10) solid $m-gray-t1;
-        padding-top: $baseline;
+        margin: ($baseline/3) 0;
       }
 
       .action-intro, .action-select {
@@ -1332,6 +1421,39 @@
         .contribution-option-other1 label, .contribution-option-other2 label {
           @extend %text-sr;
         }
+      }
+    }
+  }
+
+  // CASE: select a track - experiment variant A overrides
+  .wrapper-register-choose.exp-variant-A {
+
+    .register-choice {
+      width: flex-grid(12,12);
+    }
+
+    .deco-divider{
+      width: flex-grid(12,12);
+    }
+
+    .contribution-options {
+      width: flex-grid(8,12);
+      margin: 0;
+
+      &:after{
+        clear: none;
+        display: none;
+      }
+    }
+
+    .register-choice-certificate .list-actions {
+      border-top: none;
+      width: flex-grid(4,12);
+      float: right;
+      margin: ($baseline/4) 0;
+
+      .action-select {
+        width: initial;
       }
     }
   }

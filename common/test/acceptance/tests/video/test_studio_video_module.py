@@ -3,7 +3,7 @@
 """
 Acceptance tests for CMS Video Module.
 """
-
+from nose.plugins.attrib import attr
 from unittest import skipIf
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -95,12 +95,14 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self._install_course_fixture()
         self._navigate_to_course_unit_page()
 
-    def edit_component(self):
+    def edit_component(self, xblock_index=1):
         """
         Open component Edit Dialog for first component on page.
+
+        Arguments:
+            xblock_index: number starting from 1 (0th entry is the unit page itself)
         """
-        # The 0th entry is the unit page itself.
-        self.unit_page.xblocks[1].edit()
+        self.unit_page.xblocks[xblock_index].edit()
 
     def open_advanced_tab(self):
         """
@@ -108,6 +110,13 @@ class CMSVideoBaseTest(UniqueCourseTest):
         """
         # The 0th entry is the unit page itself.
         self.unit_page.xblocks[1].open_advanced_tab()
+
+    def open_basic_tab(self):
+        """
+        Open components basic tab.
+        """
+        # The 0th entry is the unit page itself.
+        self.unit_page.xblocks[1].open_basic_tab()
 
     def save_unit_settings(self):
         """
@@ -117,6 +126,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.unit_page.xblocks[1].save_settings()
 
 
+@attr('shard_2')
 class CMSVideoTest(CMSVideoBaseTest):
     """
     CMS Video Test Class
@@ -217,6 +227,27 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.assertFalse(self.video.is_captions_visible())
 
+    def test_video_controls_shown_correctly(self):
+        """
+        Scenario: Video controls for all videos show correctly
+        Given I have created two Video components
+        And first is private video
+        When I reload the page
+        Then video controls for all videos are visible
+        """
+        self._create_course_unit(youtube_stub_config={'youtube_api_private_video': True})
+        self.video.create_video()
+
+        # change id of first default video
+        self.edit_component(1)
+        self.open_advanced_tab()
+        self.video.set_field_value('YouTube ID', 'sampleid123')
+        self.save_unit_settings()
+
+        # again open unit page and check that video controls show for both videos
+        self._navigate_to_course_unit_page()
+        self.assertTrue(self.video.is_controls_visible())
+
     def test_captions_shown_correctly(self):
         """
         Scenario: Captions are shown correctly
@@ -281,9 +312,9 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.open_advanced_tab()
 
-        self.video.set_settings_field_value('Video Start Time', '00:00:12')
+        self.video.set_field_value('Video Start Time', '00:00:12')
 
-        self.video.set_settings_field_value('Video Stop Time', '00:00:24')
+        self.video.set_field_value('Video Stop Time', '00:00:24')
 
         self.save_unit_settings()
 

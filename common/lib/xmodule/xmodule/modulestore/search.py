@@ -60,45 +60,48 @@ def path_to_location(modulestore, usage_key):
                 # Found it!
                 path = (next_usage, path)
                 return flatten(path)
+            elif parent is None:
+                # Orphaned item.
+                return None
 
             # otherwise, add parent locations at the end
             newpath = (next_usage, path)
             queue.append((parent, newpath))
 
-        # If we're here, there is no path
-        return None
+    with modulestore.bulk_operations(usage_key.course_key):
+        if not modulestore.has_item(usage_key):
+            raise ItemNotFoundError(usage_key)
 
-    if not modulestore.has_item(usage_key):
-        raise ItemNotFoundError(usage_key)
+        path = find_path_to_course()
+        if path is None:
+            raise NoPathToItem(usage_key)
 
-    path = find_path_to_course()
-    if path is None:
-        raise NoPathToItem(usage_key)
+        n = len(path)
+        course_id = path[0].course_key
+        # pull out the location names
+        chapter = path[1].name if n > 1 else None
+        section = path[2].name if n > 2 else None
+        # Figure out the position
+        position = None
 
-    n = len(path)
-    course_id = path[0].course_key
-    # pull out the location names
-    chapter = path[1].name if n > 1 else None
-    section = path[2].name if n > 2 else None
-    # Figure out the position
-    position = None
+        # This block of code will find the position of a module within a nested tree
+        # of modules. If a problem is on tab 2 of a sequence that's on tab 3 of a
+        # sequence, the resulting position is 3_2. However, no positional modules
+        # (e.g. sequential and videosequence) currently deal with this form of
+        # representing nested positions. This needs to happen before jumping to a
+        # module nested in more than one positional module will work.
+        if n > 3:
+            position_list = []
+            for path_index in range(2, n - 1):
+                category = path[path_index].block_type
+                if category == 'sequential' or category == 'videosequence':
+                    section_desc = modulestore.get_item(path[path_index])
+                    # this calls get_children rather than just children b/c old mongo includes private children
+                    # in children but not in get_children
+                    child_locs = [c.location for c in section_desc.get_children()]
+                    # positions are 1-indexed, and should be strings to be consistent with
+                    # url parsing.
+                    position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
+            position = "_".join(position_list)
 
-    # This block of code will find the position of a module within a nested tree
-    # of modules. If a problem is on tab 2 of a sequence that's on tab 3 of a
-    # sequence, the resulting position is 3_2. However, no positional modules
-    # (e.g. sequential and videosequence) currently deal with this form of
-    # representing nested positions. This needs to happen before jumping to a
-    # module nested in more than one positional module will work.
-    if n > 3:
-        position_list = []
-        for path_index in range(2, n - 1):
-            category = path[path_index].block_type
-            if category == 'sequential' or category == 'videosequence':
-                section_desc = modulestore.get_item(path[path_index])
-                child_locs = [c.location.version_agnostic() for c in section_desc.get_children()]
-                # positions are 1-indexed, and should be strings to be consistent with
-                # url parsing.
-                position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
-        position = "_".join(position_list)
-
-    return (course_id, chapter, section, position)
+        return (course_id, chapter, section, position)

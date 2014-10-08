@@ -5,6 +5,23 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Support adding cohorts from the instructor dashboard. TNL-162
+
+LMS: Support adding students to a cohort via the instructor dashboard. TNL-163
+
+LMS: Show cohorts on the new instructor dashboard. TNL-161
+
+LMS: Mobile API available for courses that opt in using the Course Advanced
+Setting "Mobile Course Available" (only used in limited closed beta).
+
+Studio: Video Module now has an optional advanced setting "EdX Video ID" for
+courses where assets are managed entirely by the video team. This is optional
+and opt-in (only used in a limited closed beta for now).
+
+LMS: Do not allow individual due dates to be earlier than the normal due date. LMS-6563
+
+Blades: Course teams can turn off Chinese Caching from Studio. BLD-1207
+
 LMS: Instructors can request and see content of previous bulk emails sent in the instructor dashboard.
 
 Studio: New course outline and unit/container pages with revised publishing model. STUD-1790 (part 1)

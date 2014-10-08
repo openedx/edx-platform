@@ -21,6 +21,12 @@ from uuid import uuid4
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (WIKI_ENABLED, PLATFORM_NAME, SITE_NAME)
 
+# mongo connection settings
+MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
+MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
+
+THIS_UUID = uuid4().hex[:5]
+
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
@@ -59,17 +65,14 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
-# Add split as another store for testing
-MODULESTORE['default']['OPTIONS']['stores'].append(
-    {
-        'NAME': 'split',
-        'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': {
-            'render_template': 'edxmako.shortcuts.render_to_string',
-        }
-    },
-)
+# Avoid having to run collectstatic before the unit test suite
+# If we don't add these settings, then Django templates that can't
+# find pipelined assets will raise a ValueError.
+# http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
+STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
+STATIC_URL = "/static/"
+PIPELINE_ENABLED=False
+
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,
@@ -79,15 +82,18 @@ update_module_store_settings(
     },
     doc_store_settings={
         'db': 'test_xmodule',
-        'collection': 'test_modulestore{0}'.format(uuid4().hex[:5]),
+        'host': MONGO_HOST,
+        'port': MONGO_PORT_NUM,
+        'collection': 'test_modulestore{0}'.format(THIS_UUID),
     },
 )
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
-        'host': 'localhost',
+        'host': MONGO_HOST,
         'db': 'test_xcontent',
+        'port': MONGO_PORT_NUM,
         'collection': 'dont_trip',
     },
     # allow for additional options that can be keyed on a name, e.g. 'trashcan'
@@ -183,9 +189,6 @@ PASSWORD_HASHERS = (
 SEGMENT_IO_KEY = '***REMOVED***'
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
-
-# This is to disable a test under the common directory that will not pass when run under CMS
-FEATURES['DISABLE_RESET_EMAIL_TEST'] = True
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True

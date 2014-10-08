@@ -46,6 +46,15 @@
         "port": 27017,
         "user": "edxapp"
     },
+    "EVENT_TRACKING_BACKENDS": {
+        "mongo": {
+            "ENGINE": "eventtracking.backends.mongodb.MongoBackend",
+            "OPTIONS": {
+                "database": "test",
+                "collection": "events"
+            }
+        }
+    },
     "MODULESTORE": {
         "default": {
             "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
@@ -100,6 +109,16 @@
         "username": "lms"
     },
     "SECRET_KEY": "",
+    "THIRD_PARTY_AUTH": {
+        "Google": {
+            "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+            "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test"
+        },
+        "Facebook": {
+            "SOCIAL_AUTH_FACEBOOK_KEY": "test",
+            "SOCIAL_AUTH_FACEBOOK_SECRET": "test"
+        }
+    },
     "XQUEUE_INTERFACE": {
         "basic_auth": [
             "edx",

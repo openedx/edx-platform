@@ -1,7 +1,7 @@
 define([
     'jquery', 'underscore', 'js/views/pages/group_configurations',
-    'js/collections/group_configuration', 'js/models/group_configuration', 'js/spec_helpers/edit_helpers'
-], function ($, _, GroupConfigurationsPage, GroupConfigurationCollection, GroupConfigurationModel, view_helpers) {
+    'js/collections/group_configuration', 'js/common_helpers/template_helpers'
+], function ($, _, GroupConfigurationsPage, GroupConfigurationCollection, TemplateHelpers) {
     'use strict';
     describe('GroupConfigurationsPage', function() {
         var mockGroupConfigurationsPage = readFixtures(
@@ -35,7 +35,7 @@ define([
 
         beforeEach(function () {
             setFixtures(mockGroupConfigurationsPage);
-            view_helpers.installTemplates([
+            TemplateHelpers.installTemplates([
                 'no-group-configurations', 'group-configuration-edit',
                 'group-configuration-details'
             ]);
@@ -83,7 +83,7 @@ define([
         describe('Check that Group Configuration will focus and expand depending on content of url hash', function() {
             beforeEach(function () {
                 spyOn($.fn, 'focus');
-                view_helpers.installTemplate('group-configuration-details');
+                TemplateHelpers.installTemplate('group-configuration-details');
                 this.view = initializePage(true);
             });
 

@@ -549,7 +549,8 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         Test XML export with defaults.
         """
         xml = self.descriptor.definition_to_xml(None)
-        expected = '<video url_name="SampleProblem"/>\n'
+        # Check that download_video field is also set to default (False) in xml for backward compatibility
+        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
 

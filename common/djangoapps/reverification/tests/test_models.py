@@ -5,21 +5,22 @@ from datetime import timedelta, datetime
 import pytz
 
 from django.core.exceptions import ValidationError
-from django.test import TestCase
 from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from reverification.models import MidcourseReverificationWindow
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestMidcourseReverificationWindow(TestCase):
+class TestMidcourseReverificationWindow(ModuleStoreTestCase):
     """ Tests for MidcourseReverificationWindow objects """
-    def setUp(self):
-        course = CourseFactory.create()
-        self.course_id = course.id
+
+    def setUp(self, **kwargs):
+        super(TestMidcourseReverificationWindow, self).setUp()
+        self.course_id = CourseFactory.create().id
 
     def test_window_open_for_course(self):
         # Should return False if no windows exist for a course

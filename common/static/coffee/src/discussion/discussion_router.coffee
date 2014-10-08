@@ -8,7 +8,11 @@ if Backbone?
         @discussion = options['discussion']
         @course_settings = options['course_settings']
 
-        @nav = new DiscussionThreadListView(collection: @discussion, el: $(".forum-nav"))
+        @nav = new DiscussionThreadListView(
+            collection: @discussion,
+            el: $(".forum-nav"),
+            courseSettings: @course_settings
+        )
         @nav.on "thread:selected", @navigateToThread
         @nav.on "thread:removed", @navigateToAllThreads
         @nav.on "threads:rendered", @setActiveThread
@@ -23,9 +27,9 @@ if Backbone?
           mode: "tab"
         )
         @newPostView.render()
+        @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )
         $('.new-post-btn').bind "click", @showNewPost
         $('.new-post-btn').bind "keydown", (event) => DiscussionUtil.activateOnSpace(event, @showNewPost)
-        $('.new-post-cancel').bind "click", @hideNewPost
 
     allThreads: ->
       @nav.updateSidebar()
@@ -42,14 +46,27 @@ if Backbone?
       @thread.set("unread_comments_count", 0)
       @thread.set("read", true)
       @setActiveThread()
+      @showMain()
+
+    showMain: =>
       if(@main)
         @main.cleanup()
         @main.undelegateEvents()
+      unless($(".forum-content").is(":visible"))
+        $(".forum-content").fadeIn()
+      if(@newPost.is(":visible"))
+        @newPost.fadeOut()
 
-      @main = new DiscussionThreadView(el: $(".discussion-column"), model: @thread)
+      @main = new DiscussionThreadView(
+        el: $(".forum-content"),
+        model: @thread,
+        mode: "tab",
+        course_settings: @course_settings,
+      )
       @main.render()
       @main.on "thread:responses:rendered", =>
         @nav.updateSidebar()
+      @thread.on "thread:thread_type_updated", @showMain
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
@@ -59,8 +76,16 @@ if Backbone?
       @navigate("", trigger: true)
 
     showNewPost: (event) =>
-      @newPost.slideDown(300)
-      $('.new-post-title').focus()
+      $('.forum-content').fadeOut(
+        duration: 200
+        complete: =>
+          @newPost.fadeIn(200)
+          $('.new-post-title').focus()
+      )
 
-    hideNewPost: (event) =>
-      @newPost.slideUp(300)
+    hideNewPost: =>
+      @newPost.fadeOut(
+        duration: 200
+        complete: =>
+          $('.forum-content').fadeIn(200)
+      )

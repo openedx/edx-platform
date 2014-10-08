@@ -1,17 +1,17 @@
-define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define(["jquery", "underscore", "js/common_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
     "js/views/modals/edit_xblock", "js/models/xblock_info"],
-    function ($, _, create_sinon, edit_helpers, EditXBlockModal, XBlockInfo) {
+    function ($, _, AjaxHelpers, EditHelpers, EditXBlockModal, XBlockInfo) {
 
         describe("EditXBlockModal", function() {
             var model, modal, showModal;
 
             showModal = function(requests, mockHtml, options) {
                 var xblockElement = $('.xblock');
-                return edit_helpers.showEditModal(requests, xblockElement, model, mockHtml, options);
+                return EditHelpers.showEditModal(requests, xblockElement, model, mockHtml, options);
             };
 
             beforeEach(function () {
-                edit_helpers.installEditTemplates();
+                EditHelpers.installEditTemplates();
                 appendSetFixtures('<div class="xblock" data-locator="mock-xblock"></div>');
                 model = new XBlockInfo({
                     id: 'testCourse/branch/draft/block/verticalFFF',
@@ -21,7 +21,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
             });
 
             afterEach(function() {
-                edit_helpers.cancelModalIfShowing();
+                EditHelpers.cancelModalIfShowing();
             });
 
             describe("XBlock Editor", function() {
@@ -30,62 +30,62 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
                 beforeEach(function () {
-                    edit_helpers.installMockXBlock();
+                    EditHelpers.installMockXBlock();
                 });
 
                 afterEach(function() {
-                    edit_helpers.uninstallMockXBlock();
+                    EditHelpers.uninstallMockXBlock();
                 });
 
                 it('can show itself', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
-                    expect(edit_helpers.isShowingModal(modal)).toBeTruthy();
-                    edit_helpers.cancelModal(modal);
-                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
+                    expect(EditHelpers.isShowingModal(modal)).toBeTruthy();
+                    EditHelpers.cancelModal(modal);
+                    expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                 });
 
                 it('does not show the "Save" button', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
                     expect(modal.$('.action-save')).not.toBeVisible();
                     expect(modal.$('.action-cancel').text()).toBe('OK');
                 });
 
                 it('shows the correct title', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
                     expect(modal.$('.modal-window-title').text()).toBe('Editing: Component');
                 });
 
                 it('does not show any editor mode buttons', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
                     expect(modal.$('.editor-modes a').length).toBe(0);
                 });
 
                 it('hides itself and refreshes after save notification', function() {
-                    var requests = create_sinon.requests(this),
+                    var requests = AjaxHelpers.requests(this),
                         refreshed = false,
                         refresh = function() {
                             refreshed = true;
                         };
                     modal = showModal(requests, mockXBlockEditorHtml, { refresh: refresh });
-                    modal.runtime.notify('save', { state: 'start' });
-                    modal.runtime.notify('save', { state: 'end' });
-                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
+                    modal.editorView.notifyRuntime('save', { state: 'start' });
+                    modal.editorView.notifyRuntime('save', { state: 'end' });
+                    expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                     expect(refreshed).toBeTruthy();
                 });
 
                 it('hides itself and does not refresh after cancel notification', function() {
-                    var requests = create_sinon.requests(this),
+                    var requests = AjaxHelpers.requests(this),
                         refreshed = false,
                         refresh = function() {
                             refreshed = true;
                         };
                     modal = showModal(requests, mockXBlockEditorHtml, { refresh: refresh });
-                    modal.runtime.notify('cancel');
-                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
+                    modal.editorView.notifyRuntime('cancel');
+                    expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                     expect(refreshed).toBeFalsy();
                 });
 
@@ -95,7 +95,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     mockCustomButtonsHtml = readFixtures('mock/mock-xblock-editor-with-custom-buttons.underscore');
 
                     it('hides the modal\'s button bar', function() {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         modal = showModal(requests, mockCustomButtonsHtml);
                         expect(modal.$('.modal-actions')).toBeHidden();
                     });
@@ -108,29 +108,29 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-editor.underscore');
 
                 beforeEach(function() {
-                    edit_helpers.installMockXModule();
+                    EditHelpers.installMockXModule();
                 });
 
                 afterEach(function () {
-                    edit_helpers.uninstallMockXModule();
+                    EditHelpers.uninstallMockXModule();
                 });
 
                 it('can render itself', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXModuleEditorHtml);
-                    expect(edit_helpers.isShowingModal(modal)).toBeTruthy();
-                    edit_helpers.cancelModal(modal);
-                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
+                    expect(EditHelpers.isShowingModal(modal)).toBeTruthy();
+                    EditHelpers.cancelModal(modal);
+                    expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                 });
 
                 it('shows the correct title', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXModuleEditorHtml);
                     expect(modal.$('.modal-window-title').text()).toBe('Editing: Component');
                 });
 
                 it('shows the correct default buttons', function() {
-                    var requests = create_sinon.requests(this),
+                    var requests = AjaxHelpers.requests(this),
                         editorButton,
                         settingsButton;
                     modal = showModal(requests, mockXModuleEditorHtml);
@@ -144,7 +144,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 });
 
                 it('can switch tabs', function() {
-                    var requests = create_sinon.requests(this),
+                    var requests = AjaxHelpers.requests(this),
                         editorButton,
                         settingsButton;
                     modal = showModal(requests, mockXModuleEditorHtml);
@@ -164,13 +164,13 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     mockCustomTabsHtml = readFixtures('mock/mock-xmodule-editor-with-custom-tabs.underscore');
 
                     it('hides the modal\'s header', function() {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         modal = showModal(requests, mockCustomTabsHtml);
                         expect(modal.$('.modal-header')).toBeHidden();
                     });
 
                     it('shows the correct title', function() {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         modal = showModal(requests, mockCustomTabsHtml);
                         expect(modal.$('.component-name').text()).toBe('Editing: Component');
                     });
@@ -183,23 +183,23 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
 
                 beforeEach(function() {
-                    edit_helpers.installMockXModule();
+                    EditHelpers.installMockXModule();
                 });
 
                 afterEach(function () {
-                    edit_helpers.uninstallMockXModule();
+                    EditHelpers.uninstallMockXModule();
                 });
 
                 it('can render itself', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXModuleEditorHtml);
-                    expect(edit_helpers.isShowingModal(modal)).toBeTruthy();
-                    edit_helpers.cancelModal(modal);
-                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
+                    expect(EditHelpers.isShowingModal(modal)).toBeTruthy();
+                    EditHelpers.cancelModal(modal);
+                    expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
                 });
 
                 it('does not show any mode buttons', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXModuleEditorHtml);
                     expect(modal.$('.editor-modes li').length).toBe(0);
                 });

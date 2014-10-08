@@ -34,8 +34,8 @@ Feature: LMS.Login in as a registered user
     And The course "6.002x" exists
     And I am registered for the course "6.002x"
     And I am not logged in
-    And I visit the url "/courses/edx/6.002x/Test_Course/courseware"
-    And I should see that the path is "/accounts/login?next=/courses/edx/6.002x/Test_Course/courseware"
+    And I visit the url "/courses/{}/courseware"
+    And I should see that the path is "/accounts/login?next=/courses/{}/courseware"
     When I submit my credentials on the login form
     And I wait for "2" seconds
     Then the page title should contain "6.002x Courseware"

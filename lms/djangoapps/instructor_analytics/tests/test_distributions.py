@@ -17,6 +17,7 @@ class TestAnalyticsDistributions(TestCase):
 
         self.users = [UserFactory(
             profile__gender=['m', 'f', 'o'][i % 3],
+            profile__level_of_education=['a', 'hs', 'el'][i % 3],
             profile__year_of_birth=i + 1930
         ) for i in xrange(30)]
 
@@ -48,6 +49,26 @@ class TestAnalyticsDistributions(TestCase):
         self.assertEqual(distribution.choices_display_names, None)
         self.assertNotIn('no_data', distribution.data)
         self.assertEqual(distribution.data[1930], 1)
+
+    def test_gender_count(self):
+        course_enrollments = CourseEnrollment.objects.filter(
+            course_id=self.course_id, user__profile__gender='m'
+        )
+        distribution = profile_distribution(self.course_id, "gender")
+        self.assertEqual(distribution.data['m'], len(course_enrollments))
+        course_enrollments[0].deactivate()
+        distribution = profile_distribution(self.course_id, "gender")
+        self.assertEqual(distribution.data['m'], len(course_enrollments) - 1)
+
+    def test_level_of_education_count(self):
+        course_enrollments = CourseEnrollment.objects.filter(
+            course_id=self.course_id, user__profile__level_of_education='hs'
+        )
+        distribution = profile_distribution(self.course_id, "level_of_education")
+        self.assertEqual(distribution.data['hs'], len(course_enrollments))
+        course_enrollments[0].deactivate()
+        distribution = profile_distribution(self.course_id, "level_of_education")
+        self.assertEqual(distribution.data['hs'], len(course_enrollments) - 1)
 
 
 class TestAnalyticsDistributionsNoData(TestCase):

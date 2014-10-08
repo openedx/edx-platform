@@ -104,7 +104,7 @@ class CommandsTestBase(TestCase):
 
         video_id = test_course_key.make_usage_key('video', 'Welcome').to_deprecated_string()
         self.assertEqual(dump[video_id]['category'], 'video')
-        self.assertEqual(len(dump[video_id]['metadata']), 4)
+        self.assertEqual(len(dump[video_id]['metadata']), 5)
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
 
         # Check if there are the right number of elements

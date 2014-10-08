@@ -1,5 +1,7 @@
 .. _Preface:
 
+.. Doc team! Be sure that when you make any changes to this file that you also make them to the mirrored file in the edx-analytics-dashboard/docs repository. - Alison 19 Aug 14
+
 ############
 Preface
 ############
@@ -52,12 +54,18 @@ Documentation for course teams is available on the docs.edx.org web page.
   When you are working in edX Studio, you can access relevant sections of this
   guide by clicking **Help** on any page.
 
+* `Using edX Insights`_ describes the metrics, visualizations, and downloadable
+  .csv files that course teams can use to gain information about student
+  background and activity.
+
 * `edX Course Staff Release Notes`_ summarize the changes in each new version
   of the edX Studio and LMS software.
 
 * `Creating a Peer Assessment`_ describes features for students to provide
   peer- and self- evaluations of responses to a question. Note that this new
   feature is in limited release.
+
+* `edX Open Learning XML Guide`_ provides guidelines for building edX courses with Open Learning XML (OLX). Note that this guide is currently an Alpha version.
 
 These guides open in your web browser. The left side of each page includes a
 **Search docs** field and links to that guide's contents. To open or save a PDF
@@ -68,9 +76,9 @@ Email
 
 To receive and share information by email, course team members can:
 
-* Sign up to receive monthly newsletters_. 
+* Sign up to receive monthly newsletters_.
 
-* Sign up to receive release_ notes for every release. 
+* Sign up to receive release_ notes for every release.
 
 * Join the `openedx-studio`_ Google group to ask questions and participate in
   discussions with peers at other edX partner organizations and edX staffers.
@@ -97,14 +105,14 @@ educational investigators, and others for educational research.
 Documentation
 -------------
 
-The `edX Research Guide`_ is available on the docs.edx.org web page. 
+The `edX Research Guide`_ is available on the docs.edx.org web page.
 
 This guide opens in your web browser, with a **Search docs** field and links to
 that guide's contents on the left side of each page. To open or save a PDF
 version, click **v: latest** at the lower left of the page, and then click
 **PDF**.
 
-Email 
+Email
 -------
 
 To receive and share information by email, researchers can join the 
@@ -144,12 +152,16 @@ Documentation for developers is available on the docs.edx.org web page.
 * XBlock_: Open edX courseware components provides preliminary documentation
   on the XBlock component architecture for building courses.
 
+* `edX Open Learning XML Guide`_ provides guidelines for building edX courses with Open Learning XML (OLX). Note that this guide is currently an Alpha version.
+
 GitHub
 -------
 
-There are two main edX repositories on GitHub.
+These are the main edX repositories on GitHub.
 
-* The `edx/edx-platform`_ repo contains the code for the edX platform. 
+* The `edx/edx-platform`_ repo contains the code for the edX platform.
+
+* The `edx/edx-analytics-dashboard`_ repo contains the code for edX Insights.
 
 * The `edx/configuration`_ repo contains scripts to set up and operate the edX
   platform.
@@ -194,6 +206,15 @@ get more information about the PRs.
 Resources for Students
 **************************
 
+Documentation
+-------------
+
+The `edX Guide for Students`_ is available on the docs.edx.org web page. As
+students are not currently guided to this resource through the coursware, we
+encourage course staff to provide links to students as needed in course updates
+or discussions. Note that this guide is currently an Alpha version.
+
+
 In a Course
 ------------
 
@@ -218,25 +239,28 @@ From edX
 
 To help you get started with the edX learning experience, edX offers a course
 (of course!). You can find the edX Demo_ course on the edX web site. EdX also
-maintains a list of frequently_ asked questions and answers. 
+maintains a list of frequently_ asked questions and answers.
 
 If you still have questions or suggestions, you can get help from the edX
 support team: click **Contact** at the bottom of any edX web page or send an
 email message to info@edx.org.
 
 For opportunities to meet others who are interested in edX courses, check the
-edX Global Community meetup_ group. 
+edX Global Community meetup_ group.
 
+.. _edX Guide for Students: http://edx-guide-for-students.readthedocs.org/en/latest/
 
+.. _edX Open Learning XML Guide: http://edx-open-learning-xml.readthedocs.org/en/latest/index.html
 
 .. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
+.. _Using edX Insights: http://edx-insights.readthedocs.org/en/latest/
 .. _edX Course Staff Release Notes: http://edx.readthedocs.org/projects/edx-release-notes/en/latest/
 .. _Creating a Peer Assessment: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/
 .. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
 .. _newsletters: http://edx.us5.list-manage.com/subscribe?u=1822a33c054dc20e223ca40e2&id=aba723f1aa 
 .. _release: http://edx.us5.list-manage2.com/subscribe?u=1822a33c054dc20e223ca40e2&id=83e46bd293
 .. _openedx-studio: http://groups.google.com/forum/#!forum/openedx-studio
-.. _Twitter:  http://twitter.com/edXstatus/status/475026709256101888
+.. _Twitter:  http://twitter.com/edXstatus
 .. _edX Status: http://status.edx.org/
 .. _Open edX Product: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+edX+Product+Home
 .. _Open edX Public Product Roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+edX+Public+Product+Roadmap
@@ -251,6 +275,7 @@ edX Global Community meetup_ group.
 .. _edx/configuration: http://github.com/edx/configuration/wiki
 .. _site: http://code.edx.org/
 .. _edx/edx-platform: https://github.com/edx/edx-platform
+.. _edx/edx-analytics-dashboard: https://github.com/edx/edx-analytics-dashboard
 .. _dashboard: http://dash.openedx.org/age.html
 .. _Demo: http://www.edx.org/course/edx/edx-edxdemo101-edx-demo-1038
 .. _frequently: http://www.edx.org/student-faq

@@ -18,7 +18,7 @@ except ImportError:
 __test__ = False  # do not collect
 
 
-def start_servers():
+def start_servers(default_store):
     """
     Start the servers we will run tests on, returns PIDs for servers.
     """
@@ -33,9 +33,11 @@ def start_servers():
     for service, info in Env.BOK_CHOY_SERVERS.iteritems():
         address = "0.0.0.0:{}".format(info['port'])
         cmd = (
+            "DEFAULT_STORE={default_store} "
             "coverage run --rcfile={coveragerc} -m "
             "manage {service} --settings bok_choy runserver "
             "{address} --traceback --noreload".format(
+                default_store=default_store,
                 coveragerc=Env.BOK_CHOY_COVERAGERC,
                 service=service,
                 address=address,

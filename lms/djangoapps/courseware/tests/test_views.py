@@ -5,7 +5,7 @@ Tests courseware views.py
 import unittest
 from datetime import datetime
 
-from mock import MagicMock, patch
+from mock import MagicMock, patch, create_autospec
 from pytz import UTC
 
 from django.test import TestCase
@@ -35,6 +35,7 @@ from course_modes.models import CourseMode
 import shoppingcart
 
 from util.tests.test_date_utils import fake_ugettext, fake_pgettext
+from util.views import ensure_valid_course_key
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -81,11 +82,11 @@ class ViewsTestCase(TestCase):
     Tests for views.py methods.
     """
     def setUp(self):
-        self.course = CourseFactory()
-        self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
-        self.section = ItemFactory(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
-        self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
-        self.component = ItemFactory(category='problem', parent_location=self.vertical.location)
+        self.course = CourseFactory.create()
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
+        self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
 
         self.course_key = self.course.id
         self.user = User.objects.create(username='dummy', password='123456',
@@ -150,6 +151,10 @@ class ViewsTestCase(TestCase):
 
     def test_invalid_course_id(self):
         response = self.client.get('/courses/MITx/3.091X/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_incomplete_course_id(self):
+        response = self.client.get('/courses/MITx/')
         self.assertEqual(response.status_code, 404)
 
     def test_index_invalid_position(self):
@@ -258,28 +263,43 @@ class ViewsTestCase(TestCase):
         self.assertIn('Coming Soon', response.content)
 
     def test_course_mktg_register(self):
-        admin = AdminFactory()
-        self.client.login(username=admin.username, password='test')
-        url = reverse('mktg_about_course', kwargs={'course_id': self.course_key.to_deprecated_string()})
-        response = self.client.get(url)
+        response = self._load_mktg_about()
         self.assertIn('Register for', response.content)
         self.assertNotIn('and choose your student track', response.content)
 
     def test_course_mktg_register_multiple_modes(self):
-        admin = AdminFactory()
-        CourseMode.objects.get_or_create(mode_slug='honor',
-                                         mode_display_name='Honor Code Certificate',
-                                         course_id=self.course_key)
-        CourseMode.objects.get_or_create(mode_slug='verified',
-                                         mode_display_name='Verified Certificate',
-                                         course_id=self.course_key)
-        self.client.login(username=admin.username, password='test')
-        url = reverse('mktg_about_course', kwargs={'course_id': self.course_key.to_deprecated_string()})
-        response = self.client.get(url)
+        CourseMode.objects.get_or_create(
+            mode_slug='honor',
+            mode_display_name='Honor Code Certificate',
+            course_id=self.course_key
+        )
+        CourseMode.objects.get_or_create(
+            mode_slug='verified',
+            mode_display_name='Verified Certificate',
+            course_id=self.course_key
+        )
+
+        response = self._load_mktg_about()
         self.assertIn('Register for', response.content)
         self.assertIn('and choose your student track', response.content)
         # clean up course modes
         CourseMode.objects.all().delete()
+
+    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
+    def test_mktg_about_language_edx_domain(self):
+        # Since we're in an edx-controlled domain, and our marketing site
+        # supports only English, override the language setting
+        # and use English.
+        response = self._load_mktg_about(language='eo')
+        self.assertContains(response, "Register for")
+
+    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': False})
+    def test_mktg_about_language_openedx(self):
+        # If we're in an OpenEdX installation,
+        # may want to support languages other than English,
+        # so respect the language code.
+        response = self._load_mktg_about(language='eo')
+        self.assertContains(response, u"Régïstér för".encode('utf-8'))
 
     def test_submission_history_accepts_valid_ids(self):
         # log into a staff account
@@ -320,6 +340,30 @@ class ViewsTestCase(TestCase):
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
 
+    def _load_mktg_about(self, language=None):
+        """
+        Retrieve the marketing about button (iframed into the marketing site)
+        and return the HTTP response.
+
+        Keyword Args:
+            language (string): If provided, send this in the 'Accept-Language' HTTP header.
+
+        Returns:
+            Response
+
+        """
+        # Log in as an administrator to guarantee that we can access the button
+        admin = AdminFactory()
+        self.client.login(username=admin.username, password='test')
+
+        # If provided, set the language header
+        headers = {}
+        if language is not None:
+            headers['HTTP_ACCEPT_LANGUAGE'] = language
+
+        url = reverse('mktg_about_course', kwargs={'course_id': unicode(self.course_key)})
+        return self.client.get(url, **headers)
+
 
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
@@ -339,11 +383,11 @@ class BaseDueDateTests(ModuleStoreTestCase):
 
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
-        course = CourseFactory(**course_kwargs)
-        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
-        section = ItemFactory(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
-        vertical = ItemFactory(category='vertical', parent_location=section.location)
-        ItemFactory(category='problem', parent_location=vertical.location)
+        course = CourseFactory.create(**course_kwargs)
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+        ItemFactory.create(category='problem', parent_location=vertical.location)
 
         course = modulestore().get_course(course.id)  # pylint: disable=no-member
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
@@ -420,7 +464,7 @@ class TestProgressDueDate(BaseDueDateTests):
         """ Returns the HTML for the progress page """
 
         mako_middleware_process_request(self.request)
-        return views.progress(self.request, course.id.to_deprecated_string(), self.user.id).content
+        return views.progress(self.request, course_id=course.id.to_deprecated_string(), student_id=self.user.id).content
 
 
 class TestAccordionDueDate(BaseDueDateTests):
@@ -455,7 +499,7 @@ class StartDateTests(ModuleStoreTestCase):
 
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
-        course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
+        course = CourseFactory.create(start=datetime(2013, 9, 16, 7, 17, 28))
         course = modulestore().get_course(course.id)  # pylint: disable=no-member
         return course
 
@@ -504,22 +548,45 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         MakoMiddleware().process_request(self.request)
 
-        course = CourseFactory(
+        course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
         )
         self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
 
-        self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
-        self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)
-        self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
     def test_pure_ungraded_xblock(self):
-        ItemFactory(category='acid', parent_location=self.vertical.location)
+        ItemFactory.create(category='acid', parent_location=self.vertical.location)
 
-        resp = views.progress(self.request, self.course.id.to_deprecated_string())
+        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
     def test_non_asci_grade_cutoffs(self):
-        resp = views.progress(self.request, self.course.id.to_deprecated_string())
+        resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
+
+
+class VerifyCourseKeyDecoratorTests(TestCase):
+    """
+    Tests for the ensure_valid_course_key decorator.
+    """
+
+    def setUp(self):
+        self.request = RequestFactory().get("foo")
+        self.valid_course_id = "edX/test/1"
+        self.invalid_course_id = "edX/"
+
+    def test_decorator_with_valid_course_id(self):
+        mocked_view = create_autospec(views.course_about)
+        view_function = ensure_valid_course_key(mocked_view)
+        view_function(self.request, course_id=self.valid_course_id)
+        self.assertTrue(mocked_view.called)
+
+    def test_decorator_with_invalid_course_id(self):
+        mocked_view = create_autospec(views.course_about)
+        view_function = ensure_valid_course_key(mocked_view)
+        self.assertRaises(Http404, view_function, self.request, course_id=self.invalid_course_id)
+        self.assertFalse(mocked_view.called)

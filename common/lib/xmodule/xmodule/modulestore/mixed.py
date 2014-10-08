@@ -46,7 +46,7 @@ def strip_key(func):
 
         # remove version and branch, by default
         rem_vers = kwargs.pop('remove_version', True)
-        rem_branch = kwargs.pop('remove_branch', False)
+        rem_branch = kwargs.pop('remove_branch', True)
 
         # helper function for stripping individual values
         def strip_key_func(val):
@@ -91,7 +91,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
-    def __init__(self, contentstore, mappings, stores, i18n_service=None, create_modulestore_instance=None, **kwargs):
+    def __init__(self, contentstore, mappings, stores, i18n_service=None, fs_service=None, create_modulestore_instance=None, **kwargs):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration information
@@ -130,6 +130,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 store_settings.get('DOC_STORE_CONFIG', {}),
                 store_settings.get('OPTIONS', {}),
                 i18n_service=i18n_service,
+                fs_service=fs_service,
             )
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.iteritems():
@@ -170,15 +171,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         # return the default store
         return self.default_modulestore
-        # return the first store, as the default
-        return self.default_modulestore
-
-    @property
-    def default_modulestore(self):
-        """
-        Return the default modulestore
-        """
-        return self.modulestores[0]
 
     def _get_modulestore_by_type(self, modulestore_type):
         """
@@ -402,15 +394,13 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if source_modulestore == dest_modulestore:
             return source_modulestore.clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
 
-        # ensure super's only called once. The delegation above probably calls it; so, don't move
-        # the invocation above the delegation call
-        super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
-
         if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
             split_migrator = SplitMigrator(dest_modulestore, source_modulestore)
             split_migrator.migrate_mongo_course(
                 source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run, fields, **kwargs
             )
+            # the super handles assets and any other necessities
+            super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
 
     @strip_key
     def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):
@@ -482,7 +472,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     def revert_to_published(self, location, user_id):
         """
         Reverts an item to its last published version (recursively traversing all of its descendants).
-        If no published version exists, a VersionConflictError is thrown.
+        If no published version exists, an InvalidVersionError is thrown.
 
         If a published version exists but there is no draft version of this item or any of its descendants, this
         method is a no-op.
@@ -550,7 +540,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             )
         )
 
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
         Returns whether this xblock is draft, public, or private.
 
@@ -562,7 +552,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         course_id = xblock.scope_ids.usage_id.course_key
         store = self._get_modulestore_for_courseid(course_id)
-        return store.compute_publish_state(xblock)
+        return store.has_published_version(xblock)
 
     @strip_key
     def publish(self, location, user_id, **kwargs):
@@ -655,11 +645,22 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             yield
 
     @contextmanager
-    def bulk_write_operations(self, course_id):
+    def bulk_operations(self, course_id):
         """
-        A context manager for notifying the store of bulk write events.
+        A context manager for notifying the store of bulk operations.
         If course_id is None, the default store is used.
         """
         store = self._get_modulestore_for_courseid(course_id)
-        with store.bulk_write_operations(course_id):
+        with store.bulk_operations(course_id):
             yield
+
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+
+        This method is intended for use by tests and administrative commands, and not
+        to be run during server startup.
+        """
+        for store in self.modulestores:
+            store.ensure_indexes()

@@ -17,10 +17,13 @@ class TestCourseRerunStateManager(TestCase):
         self.source_course_key = CourseLocator("source_org", "source_course_num", "source_run")
         self.course_key = CourseLocator("test_org", "test_course_num", "test_run")
         self.created_user = UserFactory()
+        self.display_name = "destination course name"
         self.expected_rerun_state = {
             'created_user': self.created_user,
             'updated_user': self.created_user,
             'course_key': self.course_key,
+            'source_course_key': self.source_course_key,
+            "display_name": self.display_name,
             'action': CourseRerunUIStateManager.ACTION,
             'should_display': True,
             'message': "",
@@ -53,10 +56,16 @@ class TestCourseRerunStateManager(TestCase):
         })
         self.verify_rerun_state()
 
-    def test_rerun_initiated(self):
+    def initiate_rerun(self):
         CourseRerunState.objects.initiated(
-            source_course_key=self.source_course_key, destination_course_key=self.course_key, user=self.created_user
+            source_course_key=self.source_course_key,
+            destination_course_key=self.course_key,
+            user=self.created_user,
+            display_name=self.display_name,
         )
+
+    def test_rerun_initiated(self):
+        self.initiate_rerun()
         self.expected_rerun_state.update(
             {'state': CourseRerunUIStateManager.State.IN_PROGRESS}
         )
@@ -64,9 +73,7 @@ class TestCourseRerunStateManager(TestCase):
 
     def test_rerun_succeeded(self):
         # initiate
-        CourseRerunState.objects.initiated(
-            source_course_key=self.source_course_key, destination_course_key=self.course_key, user=self.created_user
-        )
+        self.initiate_rerun()
 
         # set state to succeed
         CourseRerunState.objects.succeeded(course_key=self.course_key)
@@ -80,18 +87,21 @@ class TestCourseRerunStateManager(TestCase):
 
     def test_rerun_failed(self):
         # initiate
-        CourseRerunState.objects.initiated(
-            source_course_key=self.source_course_key, destination_course_key=self.course_key, user=self.created_user
-        )
+        self.initiate_rerun()
 
         # set state to fail
         exception = Exception("failure in rerunning")
-        CourseRerunState.objects.failed(course_key=self.course_key, exception=exception)
-        self.expected_rerun_state.update({
-            'state': CourseRerunUIStateManager.State.FAILED,
-            'message': exception.message,
-        })
+        try:
+            raise exception
+        except:
+            CourseRerunState.objects.failed(course_key=self.course_key)
+
+        self.expected_rerun_state.update(
+            {'state': CourseRerunUIStateManager.State.FAILED}
+        )
+        self.expected_rerun_state.pop('message')
         rerun = self.verify_rerun_state()
+        self.assertIn(exception.message, rerun.message)
 
         # dismiss ui and verify
         self.dismiss_ui_and_verify(rerun)

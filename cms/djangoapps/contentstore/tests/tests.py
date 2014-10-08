@@ -4,6 +4,7 @@ This test file will test registration, login, activation, and session activity t
 import time
 import mock
 import unittest
+from ddt import ddt, data, unpack
 
 from django.test.utils import override_settings
 from django.core.cache import cache
@@ -315,3 +316,30 @@ class ForumTestCase(CourseTestCase):
         ]
         self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times2]
         self.assertFalse(self.course.forum_posts_allowed)
+
+
+@ddt
+class CourseKeyVerificationTestCase(CourseTestCase):
+    def setUp(self):
+        """
+        Create test course.
+        """
+        super(CourseKeyVerificationTestCase, self).setUp()
+        self.course = CourseFactory.create(org='edX', number='test_course_key', display_name='Test Course')
+
+    @data(('edX/test_course_key/Test_Course', 200), ('slashes:edX+test_course_key+Test_Course', 404))
+    @unpack
+    def test_course_key_decorator(self, course_key, status_code):
+        """
+        Tests for the ensure_valid_course_key decorator.
+        """
+        url = '/import/{course_key}'.format(course_key=course_key)
+        resp = self.client.get_html(url)
+        self.assertEqual(resp.status_code, status_code)
+
+        url = '/import_status/{course_key}/{filename}'.format(
+            course_key=course_key,
+            filename='xyz.tar.gz'
+        )
+        resp = self.client.get_html(url)
+        self.assertEqual(resp.status_code, status_code)

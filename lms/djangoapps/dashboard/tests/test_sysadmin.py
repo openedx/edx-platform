@@ -1,7 +1,6 @@
 """
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
-
 import glob
 import os
 import re
@@ -30,10 +29,12 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 TEST_MONGODB_LOG = {
-    'host': 'localhost',
+    'host': MONGO_HOST,
+    'port': MONGO_PORT_NUM,
     'user': '',
     'password': '',
     'db': 'test_xlog',
@@ -537,8 +538,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             with (override_settings(TIME_ZONE=timezone)):
                 date_text = get_time_display(date, tz_format, settings.TIME_ZONE)
                 response = self.client.get(reverse('gitlogs'))
-
-                self.assertIn(date_text, response.content)
+                self.assertIn(date_text, response.content.decode('UTF-8'))
 
         self._rm_edx4edx()
 

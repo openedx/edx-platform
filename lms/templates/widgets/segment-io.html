@@ -1,7 +1,5 @@
 % if settings.FEATURES.get('SEGMENT_IO_LMS'):
 <!-- begin Segment.io -->
-<%! from django.core.urlresolvers import reverse %>
-
 <script type="text/javascript">
   // Asynchronously load Segment.io's analytics.js library
   window.analytics||(window.analytics=[]),window.analytics.methods=["identify","track","trackLink","trackForm","trackClick","trackSubmit","page","pageview","ab","alias","ready","group","on","once","off"],window.analytics.factory=function(t){return function(){var a=Array.prototype.slice.call(arguments);return a.unshift(t),window.analytics.push(a),window.analytics}};for(var i=0;i<window.analytics.methods.length;i++){var method=window.analytics.methods[i];window.analytics[method]=window.analytics.factory(method)}window.analytics.load=function(t){var a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(a,n)},window.analytics.SNIPPET_VERSION="2.0.8",
@@ -9,21 +7,7 @@
   analytics.page();
 
   % if user.is_authenticated():
-    // Access the query string, stripping the leading "?"
-    var queryString = window.location.search.substring(1);
-
-    if (queryString != "") {
-      // Convert the query string to a key/value object
-      var parameters = window.parseQueryString(queryString);
-
-      if ("signin" in parameters) {
-        window.assessUserSignIn(parameters, "${user.id}", "${user.email}", "${user.username}");
-      } else {
-        window.identifyUser("${user.id}", "${user.email}", "${user.username}");
-      }
-    } else {
-      window.identifyUser("${user.id}", "${user.email}", "${user.username}");
-    }
+    window.identifyUser("${user.id}", "${user.email}", "${user.username}");
   % endif
 
   // Get current page URL
@@ -32,23 +16,27 @@
   if (url.indexOf("/register") > -1) {
     // Registration page viewed
     analytics.track("edx.bi.page.register.viewed", {
-      category: "pageview"
+      category: "pageview",
+      noninteraction: 1
     });
   } else if (url.indexOf("/login") > -1) {
     // Login page viewed
     analytics.track("edx.bi.page.login.viewed", {
-      category: "pageview"
+      category: "pageview",
+      noninteraction: 1
     });
   } else if (url.indexOf("/dashboard") > -1) {
     // Dashboard viewed
     analytics.track("edx.bi.page.dashboard.viewed", {
-      category: "pageview"
+      category: "pageview",
+      noninteraction: 1
     });
   } else {
     // This event serves as a catch-all, firing when any other page is viewed
     analytics.track("edx.bi.page.other.viewed", {
       category: "pageview",
-      url: location.host + location.pathname + location.search
+      url: location.host + location.pathname + location.search,
+      noninteraction: 1
     });
   }
 

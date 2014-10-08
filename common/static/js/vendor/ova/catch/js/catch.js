@@ -352,7 +352,7 @@ CatchAnnotation.prototype = {
         // if the default tab is instructor, we must refresh the catch to pull the ones
         // under the instructor's email. Calling changeUserId will update this.options.userId
         // and most importantly refresh not only the highlights (from Annotator) 
-        // but also the table below from the annotations database server (called Catch). 
+        // but also the table below from the annotations database server (called Catch).
         if(this.options.default_tab.toLowerCase() === 'instructor') {
             this.changeUserId(this.options.instructor_email);
         }
@@ -546,9 +546,11 @@ CatchAnnotation.prototype = {
             // public or is equal to the person with update access, then we leave it alone,
             // otherwise we need to clean them up (i.e. disable them).
             if (self.options.userId !== '' && self.options.userId !== value.permissions.update[0]) {
-                $.each(value.highlights, function(key1, value1){
-                    $(value1).removeClass('annotator-hl');
-                });
+                if (value.highlights !== undefined) {
+                    $.each(value.highlights, function(key1, value1){
+                        $(value1).removeClass('annotator-hl');
+                    });
+                }
             }
         });
     },
@@ -717,7 +719,7 @@ CatchAnnotation.prototype = {
         var isInList = false;
         var list = $('#mainCatch .annotationList .annotationRow.item');
         for (_i = 0, _len = list.length; _i < _len; _i++) {
-             if ($(list[_i]).parent().attr('annotationid') === an.id)
+             if (parseInt($(list[_i]).parent().attr('annotationid'), 10) === an.id)
                   isInList = true;
         }
         return isInList;
@@ -800,7 +802,7 @@ CatchAnnotation.prototype = {
         $(evt.target).parents('.detailHeader:first').find('#myLocationMap .map').html(imgSrc);
     },
     _onPlaySelectionClick: function(evt) {
-        var id = $(evt.target).find('.idAnnotation').html();
+        var id = parseInt($(evt.target).find('.idAnnotation').html(), 10);
         var uri = $(evt.target).find('.uri').html();
         var container = $(evt.target).find('.container').html();
         if (this.options.externalLink) {
@@ -858,7 +860,7 @@ CatchAnnotation.prototype = {
     },
     _onZoomToImageBoundsButtonClick: function(evt){
         var zoomToBounds = $(evt.target).hasClass('zoomToImageBounds')?$(evt.target):$(evt.target).parents('.zoomToImageBounds:first');
-        var osdaId = zoomToBounds.find('.idAnnotation').html();
+        var osdaId = parseInt(zoomToBounds.find('.idAnnotation').html(), 10);
         var uri = zoomToBounds.find('.uri').html();
 
         var allannotations = this.annotator.plugins['Store'].annotations;
@@ -872,7 +874,9 @@ CatchAnnotation.prototype = {
             var an = allannotations[item];
             // Makes sure that all images are set to transparent in case one was
             // previously selected.
-            an.highlights[0].style.background = "rgba(0, 0, 0, 0)";
+            if (an.highlights) {
+               an.highlights[0].style.background = "rgba(0, 0, 0, 0)";
+            }
             if (typeof an.id !== 'undefined' && an.id === osdaId) { // this is the annotation
                 var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
                 osda.viewer.viewport.fitBounds(bounds, false);
@@ -881,13 +885,15 @@ CatchAnnotation.prototype = {
                                         'slow');
                 // signifies a selected annotation once OSD has zoomed in on the
                 // appropriate area, it turns the background a bit yellow
-                an.highlights[0].style.background = "rgba(255, 255, 10, 0.2)";
+                if (an.highlights !== undefined) {
+                    an.highlights[0].style.background = "rgba(255, 255, 10, 0.2)";
+                }
             }
         }
     },
     _onQuoteMediaButton: function(evt) {
         var quote = $(evt.target).hasClass('quote')?$(evt.target):$(evt.target).parents('.quote:first');
-        var id = quote.find('.idAnnotation').html();
+        var id = parseInt(quote.find('.idAnnotation').html(), 10);
         var uri = quote.find('.uri').html();
         if (typeof id === 'undefined' || id === ''){
             this.refreshCatch();
@@ -910,7 +916,7 @@ CatchAnnotation.prototype = {
                             startOffset = hasRanges?an.ranges[0].startOffset:'',
                             endOffset = hasRanges?an.ranges[0].endOffset:'';
 
-                        if (typeof startOffset !== 'undefined' && typeof endOffset !== 'undefined') { 
+                        if (typeof startOffset !== 'undefined' && typeof endOffset !== 'undefined' && typeof an.highlights) { 
 
                             $(an.highlights).parent().find('.annotator-hl').removeClass('api'); 
                             // change the color
@@ -927,7 +933,7 @@ CatchAnnotation.prototype = {
     },
     _refreshReplies: function(evt) {
         var item = $(evt.target).parents('.annotationItem:first');
-        var anId = item.attr('annotationId');
+        var anId = parseInt(item.attr('annotationId'), 10);
             
         var replyElem = $(evt.target).parents('.annotationItem:first').find('.replies');
         var annotator = this.annotator;
@@ -954,7 +960,7 @@ CatchAnnotation.prototype = {
             if (typeof replyItems !== 'undefined' && replyItems.length > 0) {
                 annotations.forEach(function(ann) {
                     replyItems.each(function(item) {
-                        var id = $(replyItems[item]).attr('annotationid');
+                        var id = parseInt($(replyItems[item]).attr('annotationid'), 10);
                         if (id === ann.id) {
                             var perm = self.annotator.plugins.Permissions;
                             if (!perm.options.userAuthorize('delete', ann, perm.user)) {
@@ -1031,7 +1037,7 @@ CatchAnnotation.prototype = {
             if (confirm("Would you like to delete the annotation?")) {
                 var annotator = this.annotator;
                 var item = $(evt.target).parents('.annotationItem:first');
-                var id = item.attr('annotationId');
+                var id = parseInt(item.attr('annotationId'), 10);
                 var store = annotator.plugins.Store;
                 var annotations = store.annotations;
                 var permissions = annotator.plugins.Permissions;
@@ -1048,7 +1054,7 @@ CatchAnnotation.prototype = {
            
             var annotator = this.annotator;
             var item = $(evt.target).parents('.annotationItem:first');
-            var id = item.attr('annotationId');
+            var id = parseInt(item.attr('annotationId'), 10);
             var store = annotator.plugins.Store;
             var annotations = store.annotations;
             var permissions = annotator.plugins.Permissions;
@@ -1123,11 +1129,10 @@ CatchAnnotation.prototype = {
         
         // checks to make sure that Grouping is redone when switching tags in text annotations
         if (this.options.media === 'text') {
-            if (this.current_tab ==='public') {
-                this.annotator.plugins.Grouping.useGrouping = 0;
-            } else {
-                this.annotator.plugins.Grouping.useGrouping = 1;
-            }
+            if (typeof this.annotator.plugins.Grouping !== 'undefined') {
+                // this is to check if user is is MyNotes instead of the annotation component
+                this.annotator.plugins.Grouping.useGrouping = this.current_tab === 'public' ? 0 : 1;
+            } 
             this.annotator.publish("changedTabsInCatch");
         }
         // Change userid and refresh
@@ -1156,7 +1161,11 @@ CatchAnnotation.prototype = {
         var searchtype = searchtype || "";
         var searchInput = searchInput || ""; 
         this.clean = true;
-        this._clearAnnotator();
+
+        // the following cannot run in notes for there are no highlights
+        if ($("#notesHolder").length === 0) {
+            this._clearAnnotator();
+        }
         
         var annotator = this.annotator;
         var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
@@ -1196,11 +1205,11 @@ CatchAnnotation.prototype = {
         
         annotations.forEach(function(ann){
             var child, h, _i, _len, _ref;
-            if (ann.highlights !== null) {
+            if (ann.highlights !== undefined) {
                 _ref = ann.highlights;
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     h = _ref[_i];
-                    if (!(h.parentNode !== null)) {
+                    if (!(h.parentNode !== undefined)) {
                         continue;
                     }
                     child = h.childNodes[0];

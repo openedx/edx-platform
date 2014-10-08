@@ -20,10 +20,13 @@ from xmodule.fields import Date
 from .utils import CourseTestCase
 from xmodule.modulestore.django import modulestore
 from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
+import ddt
+from xmodule.modulestore import ModuleStoreEnum
 
 
 def get_url(course_id, handler_name='settings_handler'):
     return reverse_course_url(handler_name, course_id)
+
 
 class CourseDetailsTestCase(CourseTestCase):
     """
@@ -139,7 +142,6 @@ class CourseDetailsTestCase(CourseTestCase):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Short Description")
 
-
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)
 
@@ -240,6 +242,7 @@ class CourseDetailsViewTest(CourseTestCase):
             self.fail(field + " included in encoding but missing from details at " + context)
 
 
+@ddt.ddt
 class CourseGradingTest(CourseTestCase):
     """
     Tests for the course settings grading page.
@@ -258,7 +261,10 @@ class CourseGradingTest(CourseTestCase):
             subgrader = CourseGradingModel.fetch_grader(self.course.id, i)
             self.assertDictEqual(grader, subgrader, str(i) + "th graders not equal")
 
-    def test_update_from_json(self):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_update_from_json(self, store):
+        self.course = CourseFactory.create(default_store=store)
+
         test_grader = CourseGradingModel.fetch(self.course.id)
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Noop update")
@@ -266,6 +272,18 @@ class CourseGradingTest(CourseTestCase):
         test_grader.graders[0]['weight'] = test_grader.graders[0].get('weight') * 2
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Weight[0] * 2")
+
+        # test for bug LMS-11485
+        with modulestore().bulk_operations(self.course.id):
+            new_grader = test_grader.graders[0].copy()
+            new_grader['type'] += '_foo'
+            new_grader['short_label'] += '_foo'
+            new_grader['id'] = len(test_grader.graders)
+            test_grader.graders.append(new_grader)
+            # don't use altered cached def, get a fresh one
+            CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
+            altered_grader = CourseGradingModel.fetch(self.course.id)
+            self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__)
 
         test_grader.grade_cutoffs['D'] = 0.3
         altered_grader = CourseGradingModel.update_from_json(self.course.id, test_grader.__dict__, self.user)
@@ -441,22 +459,85 @@ class CourseMetadataEditingTest(CourseTestCase):
     """
     def setUp(self):
         CourseTestCase.setUp(self)
-        self.fullcourse = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.course.display_name)
 
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.fullcourse.display_name)
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
+
+    def test_validate_and_update_from_json_correct_inputs(self):
+        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "advertised_start": {"value": "start A"},
+                "days_early_for_beta": {"value": 2},
+                "advanced_modules": {"value": ['combinedopenended']},
+            },
+            user=self.user
+        )
+        self.assertTrue(is_valid)
+        self.assertTrue(len(errors) == 0)
+        self.update_check(test_model)
+
+        # fresh fetch to ensure persistence
+        fresh = modulestore().get_course(self.course.id)
+        test_model = CourseMetadata.fetch(fresh)
+        self.update_check(test_model)
+
+        # Tab gets tested in test_advanced_settings_munge_tabs
+        self.assertIn('advanced_modules', test_model, 'Missing advanced_modules')
+        self.assertEqual(test_model['advanced_modules']['value'], ['combinedopenended'], 'advanced_module is not updated')
+
+    def test_validate_and_update_from_json_wrong_inputs(self):
+        # input incorrectly formatted data
+        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
+                "days_early_for_beta": {"value": "supposed to be an integer",
+                                        "display_name": "Days Early for Beta Users", },
+                "advanced_modules": {"value": 1, "display_name": "Advanced Module List", },
+            },
+            user=self.user
+        )
+
+        # Check valid results from validate_and_update_from_json
+        self.assertFalse(is_valid)
+        self.assertEqual(len(errors), 3)
+        self.assertFalse(test_model)
+
+        error_keys = set([error_obj['model']['display_name'] for error_obj in errors])
+        test_keys = set(['Advanced Module List', 'Course Advertised Start Date', 'Days Early for Beta Users'])
+        self.assertEqual(error_keys, test_keys)
+
+        # try fresh fetch to ensure no update happened
+        fresh = modulestore().get_course(self.course.id)
+        test_model = CourseMetadata.fetch(fresh)
+
+        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')
+        self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
+                            'days_early_for beta should not be updated to a wrong value')
+
+    def test_correct_http_status(self):
+        json_data = json.dumps({
+                        "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
+                        "days_early_for_beta": {"value": "supposed to be an integer",
+                                        "display_name": "Days Early for Beta Users", },
+                        "advanced_modules": {"value": 1, "display_name": "Advanced Module List", },
+                    })
+        response = self.client.ajax_post(self.course_setting_url, json_data)
+        self.assertEqual(400, response.status_code)
 
     def test_update_from_json(self):
         test_model = CourseMetadata.update_from_json(
@@ -487,8 +568,11 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
 
     def update_check(self, test_model):
+        """
+        checks that updates were made
+        """
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.course.display_name)
         self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')
         self.assertEqual(test_model['advertised_start']['value'], 'start A', "advertised_start not expected value")
         self.assertIn('days_early_for_beta', test_model, 'Missing days_early_for_beta metadata field')
@@ -498,13 +582,13 @@ class CourseMetadataEditingTest(CourseTestCase):
         response = self.client.get_json(self.course_setting_url)
         test_model = json.loads(response.content)
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.course.display_name)
 
         response = self.client.get_json(self.fullcourse_setting_url)
         test_model = json.loads(response.content)
         self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.fullcourse.display_name)
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')

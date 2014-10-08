@@ -36,10 +36,10 @@
 	}
 
 	h2 {
+		@extend %t-title5;
+		@extend %t-light;
 		margin: 0 10px 30px;
 		color: #646464;
-		font-size: 19px;
-		font-weight: 300;
 		letter-spacing: 1px;
 		text-transform: uppercase;
 	}

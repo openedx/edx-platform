@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-
+<%! from lms.envs.common import TECH_SUPPORT_EMAIL %>
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
@@ -52,6 +52,25 @@
       <h3 class="title">${_("Error processing your order")}</h3>
       <div class="copy">
         <p>${_("Oops! Something went wrong. Please confirm your details again and click the button to move on to payment. If you are still having trouble, please try again later.")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="photo-error" style="display: none;" class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("Error processing your order")}</h3>
+      <div class="copy">
+        <p>${_("We're sorry, there has been an error on this page. Please refresh the page and retake your photos. "
+               "If you are still having trouble, please contact us at "
+               "{email_address}").format(
+                    email_address='<a href="mailto:{technical_email}">{technical_email}</a>'.format(
+                        technical_email=TECH_SUPPORT_EMAIL
+                    )
+               )}
+        </p>
       </div>
     </div>
   </div>
@@ -177,12 +196,13 @@
 
                         <dt class="faq-question">${_("What do you do with this picture?")}</dt>
                         <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
-                        <dt class="faq-question">${_("What if my camera isn't working?")}</dt>
-
-                        %if upgrade:
-                          <dd class="faq-answer">${_("You can always continue to audit the course without verifying.")}</dd>
-                        %else:
-                          <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="{}">'.format(course_modes_choose_url), a_end="</a>")}</dd>
+                        %if "professional" not in modes_dict:
+                          <dt class="faq-question">${_("What if my camera isn't working?")}</dt>
+                            %if upgrade:
+                              <dd class="faq-answer">${_("You can always continue to audit the course without verifying.")}</dd>
+                            %else:
+                              <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="{}">'.format(course_modes_choose_url), a_end="</a>")}</dd>
+                            %endif
                         %endif
                       </dl>
                     </div>
@@ -366,6 +386,7 @@
                     </ul>
                   </li>
 
+                  %if len(suggested_prices) > 0:
                   <li class="review-task  review-task-contribution">
                     <h4 class="title">${_("Check Your Contribution Level")}</h4>
 
@@ -376,12 +397,28 @@
                     <%include file="/course_modes/_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
 
                   </li>
+                  %else:
+                  <li class="review-task  review-task-contribution">
+                    <h4 class="title">${_("Your Course Total")}</h4>
+                    <div class="copy">
+                      <p>${_("To complete your registration, you will need to pay:")}</p>
+                    </div>
+                    <ul class="list-fields contribution-options">
+                        <li class="field contribution-option">
+                            <span class="deco-denomination">$</span>
+                            <span class="label-value">${chosen_price}</span>
+                            <span class="denomination-name">${currency}</span>
+                            </label>
+                        </li>
+                    </ul>
+                  </li>
+                  %endif
                 </ol>
               </div>
 
               <nav class="nav-wizard">
                 <div class="prompt-verify">
-                  <h3 class="title">Before proceeding, please confirm that your details match</h3>
+                  <h3 class="title">${_("Before proceeding, please confirm that your details match")}</h3>
 
                    <p class="copy"> ${_("Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.")}</p>
 

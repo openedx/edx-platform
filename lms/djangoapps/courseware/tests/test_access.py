@@ -83,17 +83,34 @@ class AccessTestCase(TestCase):
 
         self.assertRaises(ValueError, access._has_access_string, user, 'not_staff', 'global', self.course.course_key)
 
+    def test__has_access_error_desc(self):
+        descriptor = Mock()
+
+        self.assertFalse(access._has_access_error_desc(self.student, 'load', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_staff, 'load', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_instructor, 'load', descriptor, self.course.course_key))
+
+        self.assertFalse(access._has_access_error_desc(self.student, 'staff', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_staff, 'staff', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_instructor, 'staff', descriptor, self.course.course_key))
+
+        self.assertFalse(access._has_access_error_desc(self.student, 'instructor', descriptor, self.course.course_key))
+        self.assertFalse(access._has_access_error_desc(self.course_staff, 'instructor', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_instructor, 'instructor', descriptor, self.course.course_key))
+
+        with self.assertRaises(ValueError):
+            access._has_access_error_desc(self.course_instructor, 'not_load_or_staff', descriptor, self.course.course_key)
+
     def test__has_access_descriptor(self):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         user = Mock()
-        date = Mock()
-        date.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)  # make sure the start time is in the past
+        descriptor = Mock()
 
         # Always returns true because DISABLE_START_DATES is set in test.py
-        self.assertTrue(access._has_access_descriptor(user, 'load', date))
-        self.assertTrue(access._has_access_descriptor(user, 'instructor', date))
+        self.assertTrue(access._has_access_descriptor(user, 'load', descriptor))
+        self.assertTrue(access._has_access_descriptor(user, 'instructor', descriptor))
         with self.assertRaises(ValueError):
-            access._has_access_descriptor(user, 'not_load_or_staff', date)
+            access._has_access_descriptor(user, 'not_load_or_staff', descriptor)
 
     @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test__has_access_descriptor_staff_lock(self):

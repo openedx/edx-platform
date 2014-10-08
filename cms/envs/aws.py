@@ -213,6 +213,16 @@ if FEATURES.get('AUTH_USE_CAS'):
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
+############### XBlock filesystem field config ##########
+if 'XBLOCK_FS_STORAGE_BUCKET' in ENV_TOKENS:
+    DJFS = {
+        'type' : 's3fs',
+        'bucket' : ENV_TOKENS.get('XBLOCK_FS_STORAGE_BUCKET', None),
+        'prefix' : ENV_TOKENS.get('XBLOCK_FS_STORAGE_PREFIX', '/xblock-storage/'),
+        'aws_access_key_id' : AUTH_TOKENS.get('AWS_ACCESS_KEY_ID', None),
+        'aws_secret_access_key' : AUTH_TOKENS.get('AWS_SECRET_ACCESS_KEY', None)
+    }
+
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
 
@@ -243,6 +253,7 @@ if 'DATADOG_API' in AUTH_TOKENS:
     DATADOG['api_key'] = AUTH_TOKENS['DATADOG_API']
 
 # Celery Broker
+CELERY_ALWAYS_EAGER = ENV_TOKENS.get("CELERY_ALWAYS_EAGER", False)
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
 CELERY_BROKER_HOSTNAME = ENV_TOKENS.get("CELERY_BROKER_HOSTNAME", "")
 CELERY_BROKER_VHOST = ENV_TOKENS.get("CELERY_BROKER_VHOST", "")

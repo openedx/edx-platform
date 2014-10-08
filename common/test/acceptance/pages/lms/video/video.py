@@ -301,9 +301,7 @@ class VideoPage(PageObject):
             str: Captions Text.
 
         """
-        # wait until captions rendered completely
-        captions_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['captions_rendered'])
-        self.wait_for_element_presence(captions_rendered_selector, 'Captions Rendered')
+        self.wait_for_captions()
 
         captions_selector = self.get_element_selector(CSS_CLASS_NAMES['captions_text'])
         subs = self.q(css=captions_selector).html
@@ -349,6 +347,11 @@ class VideoPage(PageObject):
 
         """
         button_selector = self.get_element_selector(VIDEO_BUTTONS[button])
+
+        # If we are going to click pause button, Ensure that player is not in buffering state
+        if button == 'pause':
+            self.wait_for(lambda: self.state != 'buffering', 'Player is Ready for Pause')
+
         self.q(css=button_selector).first.click()
 
         button_states = {'play': 'playing', 'pause': 'pause'}
@@ -535,9 +538,7 @@ class VideoPage(PageObject):
         captions_selector = self.get_element_selector(CSS_CLASS_NAMES['captions'])
         EmptyPromise(lambda: self.q(css=captions_selector).visible, 'Subtitles Visible').fulfill()
 
-        # wait until captions rendered completely
-        captions_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['captions_rendered'])
-        self.wait_for_element_presence(captions_rendered_selector, 'Captions Rendered')
+        self.wait_for_captions()
 
         return True
 
@@ -799,3 +800,10 @@ class VideoPage(PageObject):
 
         classes = self.q(css=selector).attrs('class')[0].split()
         return 'active' in classes
+
+    def wait_for_captions(self):
+        """
+        Wait until captions rendered completely.
+        """
+        captions_rendered_selector = self.get_element_selector(CSS_CLASS_NAMES['captions_rendered'])
+        self.wait_for_element_presence(captions_rendered_selector, 'Captions Rendered')

@@ -57,7 +57,7 @@ class CourseTab(object):  # pylint: disable=incomplete-protocol
 
         self.link_func = link_func
 
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):  # pylint: disable=unused-argument
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):  # pylint: disable=unused-argument
         """
         Determines whether the tab should be displayed in the UI for the given course and a particular user.
         This method is to be overridden by subclasses when applicable.  The base class implementation
@@ -77,6 +77,8 @@ class CourseTab(object):  # pylint: disable=incomplete-protocol
 
             is_user_staff: Indicates whether the user has staff access to the course.  If the tab is of
              type StaffTab and this value is False, then can_display will return False.
+
+            is_user_enrolled: Indicates whether the user is enrolled in the course
 
         Returns:
             A boolean value to indicate whether this instance of the tab should be displayed to a
@@ -212,7 +214,7 @@ class AuthenticatedCourseTab(CourseTab):
     """
     Abstract class for tabs that can be accessed by only authenticated users.
     """
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
         return is_user_authenticated
 
 
@@ -220,8 +222,16 @@ class StaffTab(AuthenticatedCourseTab):
     """
     Abstract class for tabs that can be accessed by only users with staff access.
     """
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):  # pylint: disable=unused-argument
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):  # pylint: disable=unused-argument
         return is_user_staff
+
+class EnrolledOrStaffTab(CourseTab):
+    """
+    Abstract class for tabs that can be accessed by only users with staff access
+    or users enrolled in the course.
+    """
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):  # pylint: disable=unused-argument
+        return is_user_authenticated and (is_user_staff or is_user_enrolled)
 
 
 class HideableTab(CourseTab):
@@ -262,7 +272,7 @@ class HideableTab(CourseTab):
         return self.is_hidden == other.get('is_hidden', False)
 
 
-class CoursewareTab(CourseTab):
+class CoursewareTab(EnrolledOrStaffTab):
     """
     A tab containing the course content.
     """
@@ -300,7 +310,7 @@ class CourseInfoTab(CourseTab):
         return super(CourseInfoTab, cls).validate(tab_dict, raise_error) and need_name(tab_dict, raise_error)
 
 
-class ProgressTab(AuthenticatedCourseTab):
+class ProgressTab(EnrolledOrStaffTab):
     """
     A tab containing information about the authenticated user's progress.
     """
@@ -315,8 +325,11 @@ class ProgressTab(AuthenticatedCourseTab):
             link_func=link_reverse_func(self.type),
         )
 
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):
-        return not course.hide_progress_tab
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
+        super_can_display = super(ProgressTab, self).can_display(
+            course, settings, is_user_authenticated, is_user_staff, is_user_enrolled
+        )
+        return super_can_display and not course.hide_progress_tab
 
     @classmethod
     def validate(cls, tab_dict, raise_error=True):
@@ -339,15 +352,17 @@ class WikiTab(HideableTab):
             tab_dict=tab_dict,
         )
 
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):
-        return settings.WIKI_ENABLED
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
+        return settings.WIKI_ENABLED and (
+            course.allow_public_wiki_access or is_user_enrolled or is_user_staff
+        )
 
     @classmethod
     def validate(cls, tab_dict, raise_error=True):
         return super(WikiTab, cls).validate(tab_dict, raise_error) and need_name(tab_dict, raise_error)
 
 
-class DiscussionTab(CourseTab):
+class DiscussionTab(EnrolledOrStaffTab):
     """
     A tab only for the new Berkeley discussion forums.
     """
@@ -362,8 +377,11 @@ class DiscussionTab(CourseTab):
             link_func=link_reverse_func('django_comment_client.forum.views.forum_form_discussion'),
         )
 
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):
-        return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
+        super_can_display = super(DiscussionTab, self).can_display(
+            course, settings, is_user_authenticated, is_user_staff, is_user_enrolled
+        )
+        return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE') and super_can_display
 
     @classmethod
     def validate(cls, tab_dict, raise_error=True):
@@ -529,7 +547,7 @@ class TextbookTabs(TextbookTabsBase):
             tab_id=self.type,
         )
 
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
         return settings.FEATURES.get('ENABLE_TEXTBOOK')
 
     def items(self, course):
@@ -642,7 +660,7 @@ class SyllabusTab(CourseTab):
     """
     type = 'syllabus'
 
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
         return hasattr(course, 'syllabus_present') and course.syllabus_present
 
     def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
@@ -660,7 +678,7 @@ class NotesTab(AuthenticatedCourseTab):
     """
     type = 'notes'
 
-    def can_display(self, course, settings, is_user_authenticated, is_user_staff):
+    def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
         return settings.FEATURES.get('ENABLE_STUDENT_NOTES')
 
     def __init__(self, tab_dict=None):
@@ -773,6 +791,7 @@ class CourseTabList(List):
             settings,
             is_user_authenticated=True,
             is_user_staff=True,
+            is_user_enrolled=False
     ):
         """
         Generator method for iterating through all tabs that can be displayed for the given course and
@@ -780,7 +799,7 @@ class CourseTabList(List):
         """
         for tab in course.tabs:
             if tab.can_display(
-                    course, settings, is_user_authenticated, is_user_staff
+                    course, settings, is_user_authenticated, is_user_staff, is_user_enrolled
             ) and (not tab.is_hideable or not tab.is_hidden):
                 if tab.is_collection:
                     for item in tab.items(course):
@@ -788,7 +807,7 @@ class CourseTabList(List):
                 else:
                     yield tab
         instructor_tab = InstructorTab()
-        if instructor_tab.can_display(course, settings, is_user_authenticated, is_user_staff):
+        if instructor_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
             yield instructor_tab
 
     @staticmethod
@@ -801,7 +820,7 @@ class CourseTabList(List):
         with the provided settings.
         """
         for tab in course.tabs:
-            if tab.can_display(course, settings, is_user_authenticated=True, is_user_staff=True):
+            if tab.can_display(course, settings, is_user_authenticated=True, is_user_staff=True, is_user_enrolled=True):
                 if tab.is_collection and not len(list(tab.items(course))):
                     # do not yield collections that have no items
                     continue

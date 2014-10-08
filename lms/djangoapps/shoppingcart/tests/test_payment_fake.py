@@ -3,8 +3,8 @@ Tests for the fake payment page used in acceptance tests.
 """
 
 from django.test import TestCase
-from shoppingcart.processors.CyberSource import sign, verify_signatures, \
-    CCProcessorSignatureException
+from shoppingcart.processors.CyberSource2 import sign, verify_signatures
+from shoppingcart.processors.exceptions import CCProcessorSignatureException
 from shoppingcart.tests.payment_fake import PaymentFakeView
 from collections import OrderedDict
 
@@ -16,16 +16,19 @@ class PaymentFakeViewTest(TestCase):
     """
 
     CLIENT_POST_PARAMS = OrderedDict([
-        ('match', 'on'),
-        ('course_id', 'edx/999/2013_Spring'),
         ('amount', '25.00'),
         ('currency', 'usd'),
-        ('orderPage_transactionType', 'sale'),
+        ('transaction_type', 'sale'),
         ('orderNumber', '33'),
+        ('access_key', '123456789'),
         ('merchantID', 'edx'),
         ('djch', '012345678912'),
         ('orderPage_version', 2),
         ('orderPage_serialNumber', '1234567890'),
+        ('profile_id', "00000001"),
+        ('reference_number', 10),
+        ('locale', 'en'),
+        ('signed_date_time', '2014-08-18T13:59:31Z'),
     ])
 
     def setUp(self):
@@ -58,7 +61,7 @@ class PaymentFakeViewTest(TestCase):
         post_params = sign(self.CLIENT_POST_PARAMS)
 
         # Tamper with the signature
-        post_params['orderPage_signaturePublic'] = "invalid"
+        post_params['signature'] = "invalid"
 
         # Simulate a POST request from the payment workflow
         # page to the fake payment page.

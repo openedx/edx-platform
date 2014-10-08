@@ -27,7 +27,6 @@ class CourseMetadata(object):
                      'user_partitions',
                      'name',  # from xblock
                      'tags',  # from xblock
-                     'video_speed_optimizations',
                      'visible_to_staff_only'
     ]
 
@@ -83,10 +82,55 @@ class CourseMetadata(object):
                 raise ValueError(_("Incorrect format for field '{name}'. {detailed_message}".format(
                     name=model['display_name'], detailed_message=err.message)))
 
+        return cls.update_from_dict(key_values, descriptor, user)
+
+    @classmethod
+    def validate_and_update_from_json(cls, descriptor, jsondict, user, filter_tabs=True):
+        """
+        Validate the values in the json dict (validated by xblock fields from_json method)
+
+        If all fields validate, go ahead and update those values in the database.
+        If not, return the error objects list.
+
+        Returns:
+            did_validate: whether values pass validation or not
+            errors: list of error objects
+            result: the updated course metadata or None if error
+        """
+
+        filtered_list = list(cls.FILTERED_LIST)
+        if not filter_tabs:
+            filtered_list.remove("tabs")
+        filtered_dict = dict((k, v) for k, v in jsondict.iteritems() if k not in filtered_list)
+        did_validate = True
+        errors = []
+        key_values = {}
+        updated_data = None
+
+        for key, model in filtered_dict.iteritems():
+            try:
+                val = model['value']
+                if hasattr(descriptor, key) and getattr(descriptor, key) != val:
+                    key_values[key] = descriptor.fields[key].from_json(val)
+            except (TypeError, ValueError) as err:
+                did_validate = False
+                errors.append({'message': err.message, 'model': model})
+
+        # If did validate, go ahead and update the metadata
+        if did_validate:
+            updated_data = cls.update_from_dict(key_values, descriptor, user)
+
+        return did_validate, errors, updated_data
+
+    @classmethod
+    def update_from_dict(cls, key_values, descriptor, user):
+        """
+        Update metadata descriptor in modulestore from key_values.
+        """
         for key, value in key_values.iteritems():
             setattr(descriptor, key, value)
 
-        if len(key_values) > 0:
+        if len(key_values):
             modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)

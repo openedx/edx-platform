@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.template.defaultfilters import escapejs %>
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -14,7 +15,7 @@ var submitToPaymentProcessing = function(event) {
     var xhr = $.post(
       "${create_order_url}",
       {
-        "course_id" : "${course_id}",
+        "course_id" : "${course_id | escapejs}",
       },
       function(data) {
         for (prop in data) {
@@ -85,8 +86,11 @@ $(document).ready(function() {
         </div>
 
         <nav class="nav-wizard is-ready">
-
+        %if "professional" in modes_dict:
+          <span class="help help-inline price-value">${_("Your Course Total is $ ")} <strong>${chosen_price}</strong></span>
+        %else:
           <span class="help help-inline price-value">${_("You have decided to pay $ ")} <strong>${chosen_price}</strong></span>
+        %endif
 
           <ol class="wizard-steps">
             <li class="wizard-step step-proceed">

@@ -1,6 +1,5 @@
 from datetime import timedelta
 from xmodule.modulestore.django import modulestore
-from xblock.fields import Scope
 
 
 class CourseGradingModel(object):
@@ -206,10 +205,11 @@ class CourseGradingModel(object):
 
     @staticmethod
     def jsonize_grader(i, grader):
-        grader['id'] = i
-        if grader['weight']:
-            grader['weight'] *= 100
-        if not 'short_label' in grader:
-            grader['short_label'] = ""
-
-        return grader
+        return {
+            "id": i,
+            "type": grader["type"],
+            "min_count": grader.get('min_count', 0),
+            "drop_count": grader.get('drop_count', 0),
+            "short_label": grader.get('short_label', ""),
+            "weight": grader.get('weight', 0) * 100,
+        }

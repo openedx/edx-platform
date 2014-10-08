@@ -260,6 +260,10 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             expandElement: function (ele) {
+                // Verify all children of the element are rendered.
+                var ensureChildrenRendered = ele.data('ensureChildrenRendered');
+                if (_.isFunction(ensureChildrenRendered)) { ensureChildrenRendered(); }
+                // Update classes.
                 ele.removeClass(this.collapsedClass);
                 ele.find('.expand-collapse').first().removeClass('expand').addClass('collapse');
             },
@@ -284,17 +288,6 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     if (_.isFunction(refresh)) { refresh(collapsed); }
 
                 };
-                // If the parent has changed, update the children of the old parent.
-                if (newParentLocator !== oldParentLocator) {
-                    // Find the old parent element.
-                    oldParentEle = $(parentSelector).filter(function () {
-                        return $(this).data('locator') === oldParentLocator;
-                    });
-                    this.saveItem(oldParentEle, childrenSelector, function () {
-                        element.data('parent', newParentLocator);
-                        refreshParent(oldParentEle);
-                    });
-                }
                 saving = new NotificationView.Mini({
                     title: gettext('Saving&hellip;')
                 });
@@ -306,7 +299,18 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                 }, 1000);
                 this.saveItem(newParentEle, childrenSelector, function () {
                     saving.hide();
+
+                    // Refresh new parent.
                     refreshParent(newParentEle);
+
+                    // Refresh old parent.
+                    if (newParentLocator !== oldParentLocator) {
+                        oldParentEle = $(parentSelector).filter(function () {
+                            return $(this).data('locator') === oldParentLocator;
+                        });
+                        refreshParent(oldParentEle);
+                        element.data('parent', newParentLocator);
+                    }
                 });
             },
 
@@ -354,7 +358,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     handleClass: null,
                     droppableClass: null,
                     parentLocationSelector: null,
-                    refresh: null
+                    refresh: null,
+                    ensureChildrenRendered: null
                 }, options);
 
                 if ($(element).data('droppable-class') !== options.droppableClass) {
@@ -362,7 +367,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                       'droppable-class': options.droppableClass,
                       'parent-location-selector': options.parentLocationSelector,
                       'child-selector': options.type,
-                      'refresh': options.refresh
+                      'refresh': options.refresh,
+                      'ensureChildrenRendered': options.ensureChildrenRendered
                     });
 
                     draggable = new Draggabilly(element, {

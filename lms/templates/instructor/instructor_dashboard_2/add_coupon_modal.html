@@ -46,7 +46,7 @@
 
             <li class="field" id="add-coupon-modal-field-course_id">
               <label for="coupon_course_id">${_("Course ID")}</label>
-              <input class="field readonly" id="coupon_course_id" type="text" name="course_id" value="${section_data['course_id']}"
+              <input class="field readonly" id="coupon_course_id" type="text" name="course_id" value="${section_data['course_id'] | h}"
                      readonly aria-required="true"/>
             </li>
 

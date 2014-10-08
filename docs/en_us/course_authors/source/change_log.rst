@@ -2,6 +2,46 @@
 Change Log
 ############
 
+       
+*****************
+October, 2014
+*****************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 10/7/14
+     - Added the :ref:`Including Student Cohorts` chapter.
+       
+*****************
+September, 2014
+*****************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 09/30/14
+     - Added information about accessing edX Insights to the :ref:`Course Data`
+       and :ref:`Enrollment` chapters.
+   * - 09/04/14
+     - Updated the :ref:`Discussions` and :ref:`Discussions for Students and
+       Staff` chapters to include information about choosing the type of post
+       and to reflect changes in the user interface.
+   * - 09/11/14
+     - Added info about possible problem types to :ref:`Problem with Adaptive Hint`.
+   * - 
+     - Removed "These problems only allow integers and a few select constants" from table of problem types in :ref:`Create Exercises`.
+   * - 
+     - Added a note about angle bracket characters to the :ref:`Dropdown` topic.
+   * - 09/26/14
+     - Added :ref:`Molecule Viewer` to :ref:`Create Exercises`
+
 **************
 August, 2014
 **************
@@ -12,6 +52,20 @@ August, 2014
 
    * - Date
      - Change
+   * - 08/28/14
+     - Updated documentation in :ref:`Developing Your Course Index`
+       for new capabilities to publish or hide multiple units 
+       from the outline.
+   * - 
+     - Added documentation for :ref:`Creating Content Experiments`.
+   * - 08/22/14
+     - Added warnings about the effects of changing the course grading policy,
+       graded subsections, or graded components after the course begins.
+   * - 08/20/14
+     - Added :ref:`Browsers` to the :ref:`Getting Started Index` section.
+   * - 08/18/14
+     - Expanded the :ref:`Example Messages to Students` in the :ref:`Launch`
+       chapter.
    * - 08/12/14
      - Updated documentation to address the new publishing workflow and user
        interface. 
@@ -85,7 +139,7 @@ June, 2014
    * - Date
      - Change
    * - 06/20/14
-     - Added a :ref:`Preface` with resources for course teams, developers,
+     - Added a `Preface`_ with resources for course teams, developers,
        researchers, and students.
    * - 06/18/14    
      - In the :ref:`View and download student data` section, updated the
@@ -417,3 +471,5 @@ December, 2013
    * - 12/05/2013
      - Complete revision of edX Studio documentation and integration of edX101
        content.
+
+.. _Preface: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/

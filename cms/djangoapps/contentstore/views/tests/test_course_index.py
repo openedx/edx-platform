@@ -3,6 +3,7 @@ Unit tests for getting the list of courses and the course outline.
 """
 import json
 import lxml
+import datetime
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, add_instructor
@@ -10,6 +11,8 @@ from contentstore.views.access import has_course_access
 from contentstore.views.course import course_outline_initial_state
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.models import CourseRerunState
+from util.date_utils import get_default_time_display
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.locator import CourseLocator
@@ -103,8 +106,8 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
-        self.assertEqual(json_response['display_name'], 'Robot Super Course')
+        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
 
@@ -113,7 +116,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(first_child_response['id'], unicode(chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
@@ -224,8 +227,8 @@ class TestCourseOutline(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
-        self.assertEqual(json_response['display_name'], 'Robot Super Course')
+        self.assertEqual(json_response['id'], unicode(self.course.location))
+        self.assertEqual(json_response['display_name'], self.course.display_name)
         self.assertTrue(json_response['published'])
         self.assertIsNone(json_response['visibility_state'])
 
@@ -234,7 +237,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(json_response['published'])
         self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
@@ -273,3 +276,35 @@ class TestCourseOutline(CourseTestCase):
         expanded_locators = initial_state['expanded_locators']
         self.assertIn(unicode(self.sequential.location), expanded_locators)
         self.assertIn(unicode(self.vertical.location), expanded_locators)
+
+    def test_start_date_on_page(self):
+        """
+        Verify that the course start date is included on the course outline page.
+        """
+        def _get_release_date(response):
+            """Return the release date from the course page"""
+            parsed_html = lxml.html.fromstring(response.content)
+            return parsed_html.find_class('course-status')[0].find_class('status-release-value')[0].text_content()
+
+        def _assert_settings_link_present(response):
+            """
+            Asserts there's a course settings link on the course page by the course release date.
+            """
+            parsed_html = lxml.html.fromstring(response.content)
+            settings_link = parsed_html.find_class('course-status')[0].find_class('action-edit')[0].find('a')
+            self.assertIsNotNone(settings_link)
+            self.assertEqual(settings_link.get('href'), reverse_course_url('settings_handler', self.course.id))
+
+        outline_url = reverse_course_url('course_handler', self.course.id)
+        response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
+
+        # A course with the default release date should display as "Unscheduled"
+        self.assertEqual(_get_release_date(response), 'Unscheduled')
+        _assert_settings_link_present(response)
+
+        self.course.start = datetime.datetime(2014, 1, 1)
+        modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
+        response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
+
+        self.assertEqual(_get_release_date(response), get_default_time_display(self.course.start))
+        _assert_settings_link_present(response)

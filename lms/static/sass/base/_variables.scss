@@ -33,6 +33,20 @@ $very-light-text: #fff;
 
 // ====================
 
+// TIMING - used for animation/transition mixin syncing
+$tmg-s3: 3.0s;
+$tmg-s2: 2.0s;
+$tmg-s1: 1.0s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.50s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
+
+// ====================
+
+// COLORS - utility
+$transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
+
 // COLORS
 $black: rgb(0,0,0);
 $black-t0: rgba($black, 0.125);
@@ -217,6 +231,10 @@ $footer-bg: $white;
 $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
+$courseware-border-bottom-color: #44a2de;
+$courseware-button-border-color: #e6e6e6;
+$courseware-hover-color: #333435;
+$courseware-navigation-color: #009ee7;
 
 // ====================
 
@@ -226,6 +244,13 @@ $verified-color-lvl2: $m-green-l1;
 $verified-color-lvl3: $m-green-l2;
 $verified-color-lvl4: $m-green-l3;
 $verified-color-lvl5: $m-green-l4;
+
+// STATE: professional ed
+$professional-color-lvl1: $m-pink;
+$professional-color-lvl2: $m-pink-l1;
+$professional-color-lvl3: $m-pink-l2;
+$professional-color-lvl4: $m-pink-l3;
+$professional-color-lvl5: $m-pink-l4;
 
 // STATE: honor code
 $honorcode-color-lvl1: rgb(50, 165, 217);
@@ -375,6 +400,7 @@ $homepage-bg-image: none;
 
 $login-banner-image: url(../images/bg-banner-account.png);
 $register-banner-image: url(../images/bg-banner-account.png);
+$passwordreset-banner-image: url(../images/bg-banner-account.png);
 
 $video-thumb-url: '../images/courses/video-thumb.jpg';
 
@@ -386,6 +412,9 @@ $video-thumb-url: '../images/courses/video-thumb.jpg';
 $f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+
+// Header specific sans-serif
+$header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 
 // SPLINT: colors
 

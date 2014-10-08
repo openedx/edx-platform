@@ -24,6 +24,7 @@ _ = lambda text: text
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
+
 class StringOrDate(Date):
     def from_json(self, value):
         """
@@ -161,7 +162,7 @@ class TextbookList(List):
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
-        help=_("Enter the passports for course LTI tools in the following format: \"id\":\"client_key:client_secret\"."),
+        help=_("Enter the passports for course LTI tools in the following format: \"id:client_key:client_secret\"."),
         scope=Scope.settings
     )
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
@@ -246,7 +247,7 @@ class CourseFields(object):
     )
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
-        help=_("Enter pairs of dates between which students cannot post to discussion forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to include the \"T\" between the date and time)."),
+        help=_("Enter pairs of dates between which students cannot post to discussion forums. Each pair should be formatted as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (be sure to include the \"T\" between the date and time). An entry defining more than one blackout period might look like this: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", \"2014-10-08\"]]"),
         scope=Scope.settings
     )
     discussion_topics = Dict(
@@ -266,7 +267,7 @@ class CourseFields(object):
     )
     cohort_config = Dict(
         display_name=_("Cohort Configuration"),
-        help=_("Cohorts are not currently supported by edX."),
+        help=_("Enter policy keys and values to enable the cohort feature, define automated student assignment to groups, or identify any course-wide discussion topics as private to cohort members."),
         scope=Scope.settings
     )
     is_new = Boolean(
@@ -274,6 +275,13 @@ class CourseFields(object):
         help=_("Enter true or false. If true, the course appears in the list of new courses on edx.org, and a New! badge temporarily appears next to the course image."),
         scope=Scope.settings
     )
+    mobile_available = Boolean(
+        display_name=_("Mobile Course Available"),
+        help=_("Enter true or false. If true, the course will be available to mobile devices."),
+        default=False,
+        scope=Scope.settings
+    )
+
     no_grade = Boolean(
         display_name=_("Course Not Graded"),
         help=_("Enter true or false. If true, the course will not be graded."),

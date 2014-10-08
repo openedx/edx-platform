@@ -36,12 +36,13 @@ from xmodule.exceptions import NotFoundError
 from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
-
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 log = logging.getLogger(__name__)
 
-HOST = 'localhost'
-PORT = 27017
+HOST = MONGO_HOST
+PORT = MONGO_PORT_NUM
 DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
@@ -91,12 +92,13 @@ class TestMongoModuleStore(unittest.TestCase):
         # connect to the db
         doc_store_config = {
             'host': HOST,
+            'port': PORT,
             'db': DB,
             'collection': COLLECTION,
         }
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
-        content_store = MongoContentStore(HOST, DB)
+        content_store = MongoContentStore(HOST, DB, port=PORT)
         #
         # Also test draft store imports
         #
@@ -104,7 +106,9 @@ class TestMongoModuleStore(unittest.TestCase):
             content_store,
             doc_store_config, FS_ROOT, RENDER_TEMPLATE,
             default_class=DEFAULT_CLASS,
-            branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred
+            branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
+            xblock_mixins=(EditInfoMixin,)
+
         )
         import_from_xml(
             draft_store,
@@ -148,7 +152,7 @@ class TestMongoModuleStore(unittest.TestCase):
     def test_mongo_modulestore_type(self):
         store = DraftModuleStore(
             None,
-            {'host': HOST, 'db': DB, 'collection': COLLECTION},
+            {'host': HOST, 'db': DB, 'port': PORT, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
         )
         assert_equals(store.get_modulestore_type(''), ModuleStoreEnum.Type.mongo)
@@ -156,7 +160,7 @@ class TestMongoModuleStore(unittest.TestCase):
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
         courses = self.draft_store.get_courses()
-        assert_equals(len(courses), 5)
+        assert_equals(len(courses), 6)
         course_ids = [course.id for course in courses]
         for course_key in [
 
@@ -501,25 +505,6 @@ class TestMongoModuleStore(unittest.TestCase):
         finally:
             shutil.rmtree(root_dir)
 
-    def test_has_changes_missing_child(self):
-        """
-        Tests that has_changes() returns False when a published parent points to a child that doesn't exist.
-        """
-        location = Location('edX', 'toy', '2012_Fall', 'sequential', 'parent')
-
-        # Create the parent and point it to a fake child
-        parent = self.draft_store.create_item(
-            self.dummy_user,
-            location.course_key,
-            location.block_type,
-            block_id=location.block_id
-        )
-        parent.children += [Location('edX', 'toy', '2012_Fall', 'vertical', 'does_not_exist')]
-        parent = self.draft_store.update_item(parent, self.dummy_user)
-
-        # Check the parent for changes should return False and not throw an exception
-        self.assertFalse(self.draft_store.has_changes(parent))
-
     def _create_test_tree(self, name, user_id=None):
         """
         Creates and returns a tree with the following structure:
@@ -569,242 +554,6 @@ class TestMongoModuleStore(unittest.TestCase):
 
         return locations
 
-    def _has_changes(self, location):
-        """ Helper that returns True if location has changes, False otherwise """
-        store = self.draft_store
-        return store.has_changes(store.get_item(location))
-
-    def test_has_changes_ancestors(self):
-        """
-        Tests that has_changes() returns true on ancestors when a child is changed
-        """
-        locations = self._create_test_tree('has_changes_ancestors')
-
-        # Verify that there are no unpublished changes
-        for key in locations:
-            self.assertFalse(self._has_changes(locations[key]))
-
-        # Change the child
-        child = self.draft_store.get_item(locations['child'])
-        child.display_name = 'Changed Display Name'
-        self.draft_store.update_item(child, user_id=self.dummy_user)
-
-        # All ancestors should have changes, but not siblings
-        self.assertTrue(self._has_changes(locations['grandparent']))
-        self.assertTrue(self._has_changes(locations['parent']))
-        self.assertTrue(self._has_changes(locations['child']))
-        self.assertFalse(self._has_changes(locations['parent_sibling']))
-        self.assertFalse(self._has_changes(locations['child_sibling']))
-
-        # Publish the unit with changes
-        self.draft_store.publish(locations['parent'], self.dummy_user)
-
-        # Verify that there are no unpublished changes
-        for key in locations:
-            self.assertFalse(self._has_changes(locations[key]))
-
-    def test_has_changes_publish_ancestors(self):
-        """
-        Tests that has_changes() returns false after a child is published only if all children are unchanged
-        """
-        locations = self._create_test_tree('has_changes_publish_ancestors')
-
-        # Verify that there are no unpublished changes
-        for key in locations:
-            self.assertFalse(self._has_changes(locations[key]))
-
-        # Change both children
-        child = self.draft_store.get_item(locations['child'])
-        child_sibling = self.draft_store.get_item(locations['child_sibling'])
-        child.display_name = 'Changed Display Name'
-        child_sibling.display_name = 'Changed Display Name'
-        self.draft_store.update_item(child, user_id=self.dummy_user)
-        self.draft_store.update_item(child_sibling, user_id=self.dummy_user)
-
-        # Verify that ancestors have changes
-        self.assertTrue(self._has_changes(locations['grandparent']))
-        self.assertTrue(self._has_changes(locations['parent']))
-
-        # Publish one child
-        self.draft_store.publish(locations['child_sibling'], self.dummy_user)
-
-        # Verify that ancestors still have changes
-        self.assertTrue(self._has_changes(locations['grandparent']))
-        self.assertTrue(self._has_changes(locations['parent']))
-
-        # Publish the other child
-        self.draft_store.publish(locations['child'], self.dummy_user)
-
-        # Verify that ancestors now have no changes
-        self.assertFalse(self._has_changes(locations['grandparent']))
-        self.assertFalse(self._has_changes(locations['parent']))
-
-    def test_has_changes_add_remove_child(self):
-        """
-        Tests that has_changes() returns true for the parent when a child with changes is added
-        and false when that child is removed.
-        """
-        locations = self._create_test_tree('has_changes_add_remove_child')
-
-        # Test that the ancestors don't have changes
-        self.assertFalse(self._has_changes(locations['grandparent']))
-        self.assertFalse(self._has_changes(locations['parent']))
-
-        # Create a new child and attach it to parent
-        new_child_location = Location('edX', 'tree', 'has_changes_add_remove_child', 'vertical', 'new_child')
-        self.draft_store.create_child(
-            self.dummy_user,
-            locations['parent'],
-            new_child_location.block_type,
-            block_id=new_child_location.block_id
-        )
-
-        # Verify that the ancestors now have changes
-        self.assertTrue(self._has_changes(locations['grandparent']))
-        self.assertTrue(self._has_changes(locations['parent']))
-
-        # Remove the child from the parent
-        parent = self.draft_store.get_item(locations['parent'])
-        parent.children = [locations['child'], locations['child_sibling']]
-        self.draft_store.update_item(parent, user_id=self.dummy_user)
-
-        # Verify that ancestors now have no changes
-        self.assertFalse(self._has_changes(locations['grandparent']))
-        self.assertFalse(self._has_changes(locations['parent']))
-
-    def test_has_changes_non_direct_only_children(self):
-        """
-        Tests that has_changes() returns true after editing the child of a vertical (both not direct only categories).
-        """
-        parent_location = Location('edX', 'toy', '2012_Fall', 'vertical', 'parent')
-        child_location = Location('edX', 'toy', '2012_Fall', 'html', 'child')
-
-        parent = self.draft_store.create_item(
-            self.dummy_user,
-            parent_location.course_key,
-            parent_location.block_type,
-            block_id=parent_location.block_id
-        )
-        child = self.draft_store.create_child(
-            self.dummy_user,
-            parent_location,
-            child_location.block_type,
-            block_id=child_location.block_id
-        )
-        self.draft_store.publish(parent_location, self.dummy_user)
-
-        # Verify that there are no changes
-        self.assertFalse(self._has_changes(parent_location))
-        self.assertFalse(self._has_changes(child_location))
-
-        # Change the child
-        child.display_name = 'Changed Display Name'
-        self.draft_store.update_item(child, user_id=self.dummy_user)
-
-        # Verify that both parent and child have changes
-        self.assertTrue(self._has_changes(parent_location))
-        self.assertTrue(self._has_changes(child_location))
-
-    def test_update_edit_info_ancestors(self):
-        """
-        Tests that edited_on, edited_by, subtree_edited_on, and subtree_edited_by are set correctly during update
-        """
-        create_user = 123
-        edit_user = 456
-        locations =self._create_test_tree('update_edit_info_ancestors', create_user)
-
-        def check_node(location_key, after, before, edited_by, subtree_after, subtree_before, subtree_by):
-            """
-            Checks that the node given by location_key matches the given edit_info constraints.
-            """
-            node = self.draft_store.get_item(locations[location_key])
-            if after:
-                self.assertLess(after, node.edited_on)
-            self.assertLess(node.edited_on, before)
-            self.assertEqual(node.edited_by, edited_by)
-            if subtree_after:
-                self.assertLess(subtree_after, node.subtree_edited_on)
-            self.assertLess(node.subtree_edited_on, subtree_before)
-            self.assertEqual(node.subtree_edited_by, subtree_by)
-
-        after_create = datetime.now(UTC)
-        # Verify that all nodes were last edited in the past by create_user
-        for key in locations:
-            check_node(key, None, after_create, create_user, None, after_create, create_user)
-
-        # Change the child
-        child = self.draft_store.get_item(locations['child'])
-        child.display_name = 'Changed Display Name'
-        self.draft_store.update_item(child, user_id=edit_user)
-
-        after_edit = datetime.now(UTC)
-        ancestors = ['parent', 'grandparent']
-        others = ['child_sibling', 'parent_sibling']
-
-        # Verify that child was last edited between after_create and after_edit by edit_user
-        check_node('child', after_create, after_edit, edit_user, after_create, after_edit, edit_user)
-
-        # Verify that ancestors edit info is unchanged, but their subtree edit info matches child
-        for key in ancestors:
-            check_node(key, None, after_create, create_user, after_create, after_edit, edit_user)
-
-        # Verify that others have unchanged edit info
-        for key in others:
-            check_node(key, None, after_create, create_user, None, after_create, create_user)
-
-    def test_update_edit_info(self):
-        """
-        Tests that edited_on and edited_by are set correctly during an update
-        """
-        location = Location('edX', 'toy', '2012_Fall', 'html', 'test_html')
-
-        # Create a dummy component to test against
-        self.draft_store.create_item(
-            self.dummy_user,
-            location.course_key,
-            location.block_type,
-            block_id=location.block_id
-        )
-
-        # Store the current edit time and verify that dummy_user created the component
-        component = self.draft_store.get_item(location)
-        self.assertEqual(component.edited_by, self.dummy_user)
-        old_edited_on = component.edited_on
-
-        # Change the component
-        component.display_name = component.display_name + ' Changed'
-        self.draft_store.update_item(component, self.dummy_user)
-        updated_component = self.draft_store.get_item(location)
-
-        # Verify the ordering of edit times and that dummy_user made the edit
-        self.assertLess(old_edited_on, updated_component.edited_on)
-        self.assertEqual(updated_component.edited_by, self.dummy_user)
-
-    def test_update_published_info(self):
-        """
-        Tests that published_date and published_by are set correctly
-        """
-        location = Location('edX', 'toy', '2012_Fall', 'html', 'test_html')
-        create_user = 123
-        publish_user = 456
-
-        # Create a dummy component to test against
-        self.draft_store.create_item(
-            create_user,
-            location.course_key,
-            location.block_type,
-            block_id=location.block_id
-        )
-
-        # Store the current time, then publish
-        old_time = datetime.now(UTC)
-        self.draft_store.publish(location, publish_user)
-        updated_component = self.draft_store.get_item(location)
-
-        # Verify the time order and that publish_user caused publication
-        self.assertLessEqual(old_time, updated_component.published_date)
-        self.assertEqual(updated_component.published_by, publish_user)
-
     def test_migrate_published_info(self):
         """
         Tests that blocks that were storing published_date and published_by through CMSBlockMixin are loaded correctly
@@ -828,9 +577,58 @@ class TestMongoModuleStore(unittest.TestCase):
 
         # Retrieve the block and verify its fields
         component = self.draft_store.get_item(location)
-        self.assertEqual(component.published_date, published_date)
+        self.assertEqual(component.published_on, published_date)
         self.assertEqual(component.published_by, published_by)
 
+    def test_export_course_with_peer_component(self):
+        """
+        Test export course when link_to_location is given in peer grading interface settings.
+        """
+
+        name = "export_peer_component"
+
+        locations = self._create_test_tree(name)
+
+        # Insert the test block directly into the module store
+        problem_location = Location('edX', 'tree{}'.format(name), name, 'combinedopenended', 'test_peer_problem')
+
+        self.draft_store.create_child(
+            self.dummy_user,
+            locations["child"],
+            problem_location.block_type,
+            block_id=problem_location.block_id
+        )
+
+        interface_location = Location('edX', 'tree{}'.format(name), name, 'peergrading', 'test_peer_interface')
+
+        self.draft_store.create_child(
+            self.dummy_user,
+            locations["child"],
+            interface_location.block_type,
+            block_id=interface_location.block_id
+        )
+
+        self.draft_store._update_single_item(
+            as_draft(interface_location),
+            {
+                'definition.data': {},
+                'metadata': {
+                    'link_to_location': unicode(problem_location),
+                    'use_for_single_location': True,
+                },
+            },
+        )
+
+        component = self.draft_store.get_item(interface_location)
+        self.assertEqual(unicode(component.link_to_location), unicode(problem_location))
+
+        root_dir = path(mkdtemp())
+
+        # export_to_xml should work.
+        try:
+            export_to_xml(self.draft_store, self.content_store, interface_location.course_key, root_dir, 'test_export')
+        finally:
+            shutil.rmtree(root_dir)
 
 
 class TestMongoKeyValueStore(object):

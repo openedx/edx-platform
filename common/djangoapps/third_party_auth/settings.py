@@ -51,6 +51,8 @@ _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
 )
 _SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+_SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL = '/profile'
+_SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = '/profile'
 
 
 def _merge_auth_info(django_settings, auth_info):
@@ -95,6 +97,11 @@ def _set_global_settings(django_settings):
     # Where to send the user once social authentication is successful.
     django_settings.SOCIAL_AUTH_LOGIN_REDIRECT_URL = _SOCIAL_AUTH_LOGIN_REDIRECT_URL
 
+    # Change redirects to the profile page if we enable the new dashboard.
+    if django_settings.FEATURES.get('ENABLE_NEW_DASHBOARD', ''):
+        django_settings.SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL = _SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL
+        django_settings.SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = _SOCIAL_AUTH_DISCONNECT_REDIRECT_URL
+
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
     django_settings.SOCIAL_AUTH_PIPELINE = (
@@ -109,6 +116,8 @@ def _set_global_settings(django_settings):
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',
+        'third_party_auth.pipeline.login_analytics',
+        'third_party_auth.pipeline.change_enrollment',
     )
 
     # We let the user specify their email address during signup.

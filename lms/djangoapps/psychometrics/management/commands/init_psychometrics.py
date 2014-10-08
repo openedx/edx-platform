@@ -52,9 +52,9 @@ class Command(BaseCommand):
 
                 # get attempt times from tracking log
                 uname = sm.student.username
-                tset = TrackingLog.objects.using(db).filter(username=uname, event_type__contains='save_problem_check')
+                tset = TrackingLog.objects.using(db).filter(username=uname, event_type__contains='problem_check')
                 tset = tset.filter(event_source='server')
-                tset = tset.filter(event__contains="'%s'" % url)
+                tset = tset.filter(event__contains="'%s'" % usage_key)
                 checktimes = [x.dtcreated for x in tset]
                 pmd.checktimes = checktimes
                 if not len(checktimes) == pmd.attempts:

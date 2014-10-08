@@ -8,9 +8,12 @@
  *  - changes cause a refresh of the entire section rather than just the view for the changed xblock
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
-define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils",
-        "js/models/xblock_outline_info", "js/views/modals/edit_outline_item", "js/utils/drag_and_drop"],
-    function($, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo, EditSectionXBlockModal, ContentDragger) {
+define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils", "js/views/utils/xblock_utils",
+        "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop"],
+    function(
+        $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
+        XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
+    ) {
 
         var CourseOutlineView = XBlockOutlineView.extend({
             // takes XBlockOutlineInfo as a model
@@ -144,12 +147,30 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
             },
 
             editXBlock: function() {
-                var modal = new EditSectionXBlockModal({
-                    model: this.model,
-                    onSave: this.refresh.bind(this)
+                var modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
+                    onSave: this.refresh.bind(this),
+                    parentInfo: this.parentInfo,
+                    xblockType: XBlockViewUtils.getXBlockType(
+                        this.model.get('category'), this.parentView.model, true
+                    )
                 });
 
-                modal.show();
+                if (modal) {
+                    modal.show();
+                }
+            },
+
+            publishXBlock: function() {
+                var modal = CourseOutlineModalsFactory.getModal('publish', this.model, {
+                    onSave: this.refresh.bind(this),
+                    xblockType: XBlockViewUtils.getXBlockType(
+                        this.model.get('category'), this.parentView.model, true
+                    )
+                });
+
+                if (modal) {
+                    modal.show();
+                }
             },
 
             addButtonActions: function(element) {
@@ -157,6 +178,10 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 element.find('.configure-button').click(function(event) {
                     event.preventDefault();
                     this.editXBlock();
+                }.bind(this));
+                element.find('.publish-button').click(function(event) {
+                    event.preventDefault();
+                    this.publishXBlock();
                 }.bind(this));
             },
 
@@ -167,7 +192,8 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.section-drag-handle',
                         droppableClass: 'ol.list-sections',
                         parentLocationSelector: 'article.outline',
-                        refresh: this.refreshWithCollapsedState.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this),
+                        ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
                 else if ($(element).hasClass("outline-subsection")) {
@@ -176,7 +202,8 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.subsection-drag-handle',
                         droppableClass: 'ol.list-subsections',
                         parentLocationSelector: 'li.outline-section',
-                        refresh: this.refreshWithCollapsedState.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this),
+                        ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
                 else if ($(element).hasClass("outline-unit")) {
@@ -185,7 +212,8 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.unit-drag-handle',
                         droppableClass: 'ol.list-units',
                         parentLocationSelector: 'li.outline-subsection',
-                        refresh: this.refreshWithCollapsedState.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this),
+                        ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
             }

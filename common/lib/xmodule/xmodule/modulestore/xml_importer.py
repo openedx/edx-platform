@@ -42,6 +42,7 @@ from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -206,7 +207,7 @@ def import_from_xml(
                 )
                 continue
 
-        with store.bulk_write_operations(dest_course_id):
+        with store.bulk_operations(dest_course_id):
             source_course = xml_module_store.get_course(course_key)
             # STEP 1: find and import course module
             course, course_data_path = _import_course_module(
@@ -431,7 +432,7 @@ def _import_module_and_update_references(
                 fields[field_name] = {
                     key: _convert_reference_fields_to_new_namespace(reference)
                     for key, reference
-                    in reference_dict.items()
+                    in reference_dict.iteritems()
                 }
             elif field_name == 'xml_attributes':
                 value = field.read_from(module)
@@ -490,6 +491,46 @@ def _import_course_draft(
         mixins=xml_module_store.xblock_mixins,
         field_data=KvsFieldData(kvs=DictKeyValueStore()),
     )
+
+    def _import_module(module):
+        # IMPORTANT: Be sure to update the module location in the NEW namespace
+        module_location = module.location.map_into_course(target_course_id)
+        # Update the module's location to DRAFT revision
+        # We need to call this method (instead of updating the location directly)
+        # to ensure that pure XBlock field data is updated correctly.
+        _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
+
+        # make sure our parent has us in its list of children
+        # this is to make sure private only verticals show up
+        # in the list of children since they would have been
+        # filtered out from the non-draft store export.
+        # Note though that verticals nested below the unit level will not have
+        # a parent_sequential_url and do not need special handling.
+        if module.location.category == 'vertical' and 'parent_sequential_url' in module.xml_attributes:
+            sequential_url = module.xml_attributes['parent_sequential_url']
+            index = int(module.xml_attributes['index_in_children_list'])
+
+            course_key = descriptor.location.course_key
+            seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
+
+            # IMPORTANT: Be sure to update the sequential in the NEW namespace
+            seq_location = seq_location.map_into_course(target_course_id)
+
+            sequential = store.get_item(seq_location, depth=0)
+
+            non_draft_location = module.location.map_into_course(target_course_id)
+            if not any(child.block_id == module.location.block_id for child in sequential.children):
+                sequential.children.insert(index, non_draft_location)
+                store.update_item(sequential, user_id)
+
+        _import_module_and_update_references(
+            module, store, user_id,
+            source_course_id,
+            target_course_id,
+            runtime=mongo_runtime,
+        )
+        for child in module.get_children():
+            _import_module(child)
 
     # now walk the /vertical directory where each file in there
     # will be a draft copy of the Vertical
@@ -562,52 +603,13 @@ def _import_course_draft(
                     logging.exception('Error while parsing course xml.')
 
         # For each index_in_children_list key, there is a list of vertical descriptors.
+
         for key in sorted(drafts.iterkeys()):
             for descriptor in drafts[key]:
-                course_key = descriptor.location.course_key
                 try:
-                    def _import_module(module):
-                        # IMPORTANT: Be sure to update the module location in the NEW namespace
-                        module_location = module.location.map_into_course(target_course_id)
-                        # Update the module's location to DRAFT revision
-                        # We need to call this method (instead of updating the location directly)
-                        # to ensure that pure XBlock field data is updated correctly.
-                        _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
-
-                        # make sure our parent has us in its list of children
-                        # this is to make sure private only verticals show up
-                        # in the list of children since they would have been
-                        # filtered out from the non-draft store export.
-                        # Note though that verticals nested below the unit level will not have
-                        # a parent_sequential_url and do not need special handling.
-                        if module.location.category == 'vertical' and 'parent_sequential_url' in module.xml_attributes:
-                            sequential_url = module.xml_attributes['parent_sequential_url']
-                            index = int(module.xml_attributes['index_in_children_list'])
-
-                            seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
-
-                            # IMPORTANT: Be sure to update the sequential in the NEW namespace
-                            seq_location = seq_location.map_into_course(target_course_id)
-                            sequential = store.get_item(seq_location, depth=0)
-
-                            non_draft_location = module.location.map_into_course(target_course_id)
-                            if not any(child.block_id == module.location.block_id for child in sequential.children):
-                                sequential.children.insert(index, non_draft_location)
-                                store.update_item(sequential, user_id)
-
-                        _import_module_and_update_references(
-                            module, store, user_id,
-                            source_course_id,
-                            target_course_id,
-                            runtime=mongo_runtime,
-                        )
-                        for child in module.get_children():
-                            _import_module(child)
-
                     _import_module(descriptor)
-
                 except Exception:
-                    logging.exception('There while importing draft descriptor %s', descriptor)
+                    logging.exception('while importing draft descriptor %s', descriptor)
 
 
 def allowed_metadata_by_category(category):

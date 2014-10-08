@@ -14,6 +14,7 @@ from courseware.models import StudentModule
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.keys import UsageKey
 
 from bulk_email.models import CourseAuthorization
 
@@ -90,6 +91,21 @@ def get_student_from_identifier(unique_student_identifier):
     return student
 
 
+def require_student_from_identifier(unique_student_identifier):
+    """
+    Same as get_student_from_identifier() but will raise a DashboardError if
+    the student does not exist.
+    """
+    try:
+        return get_student_from_identifier(unique_student_identifier)
+    except User.DoesNotExist:
+        raise DashboardError(
+            _("Could not find student matching identifier: {student_identifier}").format(
+                student_identifier=unique_student_identifier
+            )
+        )
+
+
 def parse_datetime(datestr):
     """
     Convert user input date string into an instance of `datetime.datetime` in
@@ -159,10 +175,40 @@ def title_or_url(node):
     return title
 
 
+def get_extended_due(course, unit, student):
+    """
+    Get the extended due date out of a student's state for a particular unit.
+    """
+    student_module = StudentModule.objects.get(
+        student_id=student.id,
+        course_id=course.id,
+        module_state_key=unit.location
+    )
+
+    state = json.loads(student_module.state)
+    extended = state.get('extended_due', None)
+    if extended:
+        return DATE_FIELD.from_json(extended)
+
+
 def set_due_date_extension(course, unit, student, due_date):
     """
-    Sets a due date extension.
+    Sets a due date extension. Raises DashboardError if the unit or extended
+    due date is invalid.
     """
+    if due_date:
+        # Check that the new due date is valid:
+        original_due_date = getattr(unit, 'due', None)
+
+        if not original_due_date:
+            raise DashboardError(_("Unit {0} has no due date to extend.").format(unit.location))
+        if due_date < original_due_date:
+            raise DashboardError(_("An extended due date must be later than the original due date."))
+    else:
+        # We are deleting a due date extension. Check that it exists:
+        if not get_extended_due(course, unit, student):
+            raise DashboardError(_("No due date extension is set for that student and unit."))
+
     def set_due_date(node):
         """
         Recursively set the due date on a node and all of its children.
@@ -264,3 +310,13 @@ def dump_student_extensions(course, student):
         "title": _("Due date extensions for {0} {1} ({2})").format(
             student.first_name, student.last_name, student.username),
         "data": data}
+
+
+def add_block_ids(payload):
+    """
+    rather than manually parsing block_ids from module_ids on the client, pass the block_ids explicitly in the payload
+    """
+    if 'data' in payload:
+        for ele in payload['data']:
+            if 'module_id' in ele:
+                ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id

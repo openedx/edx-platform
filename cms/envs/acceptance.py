@@ -18,6 +18,9 @@ DEBUG = True
 import logging
 logging.basicConfig(filename=TEST_ROOT / "log" / "cms_acceptance.log", level=logging.ERROR)
 
+# set root logger level
+logging.getLogger().setLevel(logging.ERROR)
+
 import os
 
 
@@ -47,7 +50,8 @@ update_module_store_settings(
     module_store_options={
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': TEST_ROOT / "data",
-    }
+    },
+    default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
 CONTENTSTORE = {

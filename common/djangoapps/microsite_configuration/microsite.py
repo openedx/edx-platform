@@ -36,7 +36,7 @@ def is_request_in_microsite():
     """
     This will return if current request is a request within a microsite
     """
-    return get_configuration()
+    return bool(get_configuration())
 
 
 def get_value(val_name, default=None):

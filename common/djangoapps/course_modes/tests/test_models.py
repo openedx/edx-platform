@@ -113,3 +113,17 @@ class CourseModeModelTest(TestCase):
 
         modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestOrg', 'TestCourse', 'TestRun'))
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
+
+    def test_verified_mode_for_course(self):
+        self.create_mode('verified', 'Verified Certificate')
+
+        mode = CourseMode.verified_mode_for_course(self.course_key)
+
+        self.assertEqual(mode.slug, 'verified')
+
+        # verify that the professional mode is preferred
+        self.create_mode('professional', 'Professional Education Verified Certificate')
+
+        mode = CourseMode.verified_mode_for_course(self.course_key)
+
+        self.assertEqual(mode.slug, 'professional')

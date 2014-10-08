@@ -37,17 +37,18 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['IS_EDX_DOMAIN'] = True  # Is this an edX-owned domain? (used on instructor dashboard)
+FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
 
 FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 
 WIKI_ENABLED = True
 
-LOGGING = get_logger_config(ENV_ROOT / "log",
-                            logging_env="dev",
-                            local_loglevel="DEBUG",
-                            dev_env=True,
-                            debug=True)
+DJFS = {
+    'type': 'osfs',
+    'directory_root': 'lms/static/djpyfs',
+    'url_root': '/static/djpyfs'
+}
 
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
@@ -203,9 +204,16 @@ OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
+############################## OAUTH2 Provider ################################
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+
 ######################## MIT Certificates SSL Auth ############################
 
 FEATURES['AUTH_USE_CERTIFICATES'] = False
+
+########################### External REST APIs #################################
+FEATURES['ENABLE_MOBILE_REST_API'] = True
+FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
 ################################# CELERY ######################################
 
@@ -214,9 +222,11 @@ CELERY_ALWAYS_EAGER = True
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ('debug_toolbar',)
-MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
-                       'debug_toolbar.middleware.DebugToolbarMiddleware',)
+INSTALLED_APPS += ('debug_toolbar', 'djpyfs',)
+MIDDLEWARE_CLASSES += (
+    'django_comment_client.utils.QueryCountDebugMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+)
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
@@ -280,7 +290,12 @@ if SEGMENT_IO_LMS_KEY:
 CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = os.environ.get('CYBERSOURCE_SHARED_SECRET', '')
 CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = os.environ.get('CYBERSOURCE_MERCHANT_ID', '')
 CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = os.environ.get('CYBERSOURCE_SERIAL_NUMBER', '')
-CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = os.environ.get('CYBERSOURCE_PURCHASE_ENDPOINT', '')
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
+
+CC_PROCESSOR['CyberSource2']['SECRET_KEY'] = os.environ.get('CYBERSOURCE_SECRET_KEY', '')
+CC_PROCESSOR['CyberSource2']['ACCESS_KEY'] = os.environ.get('CYBERSOURCE_ACCESS_KEY', '')
+CC_PROCESSOR['CyberSource2']['PROFILE_ID'] = os.environ.get('CYBERSOURCE_PROFILE_ID', '')
+CC_PROCESSOR['CyberSource2']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
 ########################## USER API ##########################
 EDX_API_KEY = None

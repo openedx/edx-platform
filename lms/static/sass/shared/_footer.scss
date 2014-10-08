@@ -1,3 +1,5 @@
+// Open edX: LMS footer
+// ====================
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 rgba(0,0,0, 0.1);
   border-top: 1px solid tint($m-gray,50%);
@@ -17,13 +19,10 @@
 
     a {
       @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
-
-      &:link, &:visited, &:hover, &:focus, &:active {
-        border-bottom: none;
-        color: $link-color;
-        text-decoration: none !important;
-        font-family: $sans-serif;
-      }
+      border-bottom: none;
+      color: $link-color;
+      text-decoration: none !important;
+      font-family: $sans-serif;
 
       &:hover, &:focus, &:active {
         border-bottom: 1px dotted $link-color;
@@ -187,13 +186,214 @@
 }
 
 // marketing site design syncing
-.view-register, .view-login {
+.view-register, .view-login, .view-passwordreset {
 
   .wrapper-footer footer {
     width: 960px;
 
     .colophon-about img {
       margin-top: ($baseline*1.5);
+    }
+  }
+}
+
+
+// edX theme: LMS Footer
+// ====================
+$edx-footer-spacing: ($baseline*0.75);
+$edx-footer-link-color: rgb(0, 158, 231);
+$edx-footer-bg-color: rgb(252,252,252);
+
+%edx-footer-reset {
+  @include box-sizing(border-box);
+}
+
+%edx-footer-section {
+  float: left;
+  min-height: ($baseline*17.5);
+  margin-right: flex-gutter();
+  border-right: 1px solid rgb(230, 230, 230);
+  padding-right: ($baseline*1.5);
+
+  // CASE: last child
+  &:last-child {
+    margin-right: 0;
+    border: none;
+    padding-right: 0;
+  }
+}
+
+%edx-footer-title {
+  // TODO: refactor _typography.scss to extend this set of styling
+  @extend %t-title;
+  @extend %t-weight4;
+  @include font-size(15);
+  @include line-height(15);
+  text-transform: none;
+  letter-spacing: inherit;
+  color: rgb(61, 62, 63);
+}
+
+%edx-footer-link {
+  @extend %t-copy-sub1;
+  @include transition(color $tmg-f2 ease-in-out 0);
+  display: block;
+  margin-bottom: ($baseline/2);
+
+  // NOTE: resetting poor link styles
+  border: none;
+  padding: 0;
+  color: $edx-footer-link-color;
+
+  .copy {
+    @include transition(border-color $tmg-f2 ease-in-out 0);
+    display: inline-block;
+    border-bottom: 1px solid transparent;
+    padding: 0 0 ($baseline/20) 0;
+    color: $edx-footer-link-color;
+  }
+
+  // STATE: hover + focused
+  &:hover, &:focus {
+    color: saturate($edx-footer-link-color, 25%);
+
+    // NOTE: resetting poor link styles
+    border: none;
+
+    .copy {
+      border-bottom-color: saturate($edx-footer-link-color, 25%);
+    }
+  }
+
+  // CASE: last child
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // CASE: has visual emphasis
+  &.has-emphasis {
+    @extend %t-weight4;
+
+    .copy {
+      @extend %t-weight4;
+    }
+  }
+
+
+}
+
+.edx-footer-new {
+  width: 100%;
+  background: $edx-footer-bg-color;
+
+  // NOTE: resetting older footer styles - can be removed once not needed
+  box-shadow: none;
+  border-top: none;
+  padding: ($baseline*2) $baseline;
+
+  // about
+  // --------------------
+  .footer-about {
+    @extend %edx-footer-reset;
+    @extend %edx-footer-section;
+    width: flex-grid(6,12);
+  }
+
+  .footer-about-title {
+    @extend %edx-footer-title;
+  }
+
+  .footer-about-logo {
+    margin-bottom: $edx-footer-spacing;
+  }
+
+  .footer-about-copy {
+    @extend %t-copy-sub1;
+    margin-bottom: $edx-footer-spacing;
+    color: rgb(61, 62, 63);
+
+    p {
+      // NOTE: needed for poor LMS span styling
+      color: inherit;
+    }
+  }
+
+  .footer-about-copyright {
+    @extend %t-copy-sub1;
+    margin-bottom: $edx-footer-spacing;
+    color: rgb(138, 140, 143);
+
+    p {
+      // NOTE: needed for poor LMS span styling
+      color: inherit;
+    }
+  }
+
+  .footer-about-links {
+
+    a {
+      @extend %edx-footer-link;
+      margin-bottom: ($edx-footer-spacing/2);
+    }
+
+    .note {
+      color: rgb(138, 140, 143);
+    }
+  }
+
+  // nav (learn more links)
+  // --------------------
+  .footer-nav {
+    @extend %edx-footer-reset;
+    @extend %edx-footer-section;
+    width: flex-grid(3,12);
+  }
+
+  .footer-nav-title {
+    @extend %edx-footer-title;
+  }
+
+  .footer-nav-links {
+    margin-bottom: ($edx-footer-spacing*2.25);
+
+    a {
+      @extend %edx-footer-link;
+    }
+  }
+
+  // follow (social media)
+  // --------------------
+  .footer-follow {
+    @extend %edx-footer-reset;
+    @extend %edx-footer-section;
+    width: flex-grid(3,12);
+  }
+
+  .footer-follow-title {
+    @extend %edx-footer-title;
+  }
+
+  .footer-follow-links {
+
+    a {
+      @extend %edx-footer-link;
+
+      .icon, .copy {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .icon {
+        @extend %t-icon3;
+        margin-right: ($baseline/4);
+        text-align: center;
+        min-width: ($baseline*1.5);
+      }
+
+      .copy {
+        // NOTE: needed for poor LMS span styling
+        color: inherit;
+      }
     }
   }
 }

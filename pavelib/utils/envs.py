@@ -88,6 +88,7 @@ class Env(object):
     # reason. See issue TE-415.
     JS_TEST_ID_FILES = [
         REPO_ROOT / 'lms/static/js_test.yml',
+        REPO_ROOT / 'lms/static/js_test_coffee.yml',
         REPO_ROOT / 'cms/static/js_test.yml',
         REPO_ROOT / 'cms/static/js_test_squire.yml',
         REPO_ROOT / 'common/lib/xmodule/xmodule/js/js_test.yml',
@@ -96,6 +97,7 @@ class Env(object):
 
     JS_TEST_ID_KEYS = [
         'lms',
+        'lms-coffee',
         'cms',
         'cms-squire',
         'xmodule',
@@ -109,6 +111,7 @@ class Env(object):
     for item in (REPO_ROOT / "common/lib").listdir():
         if (REPO_ROOT / 'common/lib' / item).isdir():
             LIB_TEST_DIRS.append(path("common/lib") / item.basename())
+    LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
 
     # Directory for i18n test reports
     I18N_REPORT_DIR = REPORT_DIR / 'i18n'
