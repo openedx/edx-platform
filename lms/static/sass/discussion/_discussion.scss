@@ -30,7 +30,7 @@ body.discussion, .discussion-course, div.discussion-body {
 
     .new-post-btn {
       @include blue-button;
-      margin-right: 4px;
+      @include margin-right(4px);
     }
 
     .new-post-icon {

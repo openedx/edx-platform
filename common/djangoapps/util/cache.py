@@ -12,6 +12,8 @@ from django.core import cache
 
 # If we can't find a 'general' CACHE defined in settings.py, we simply fall back
 # to returning the default cache. This will happen with dev machines.
+from django.utils.translation import get_language
+
 try:
     cache = cache.get_cache('general')
 except Exception:
@@ -45,7 +47,7 @@ def cache_if_anonymous(view_func):
             # same view accessed through different domain names may
             # return different things, so include the domain name in the key.
             domain = str(request.META.get('HTTP_HOST')) + '.'
-            cache_key = domain + "cache_if_anonymous." + request.path
+            cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
             response = cache.get(cache_key)
             if not response:
                 response = view_func(request, *args, **kwargs)
