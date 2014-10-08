@@ -21,8 +21,10 @@ from courseware.views import get_module_for_descriptor, save_child_position, get
 from course_groups.models import CourseUserGroup
 from course_groups.cohorts import (
     get_cohort_by_name,
+    get_cohort,
     add_cohort,
-    add_user_to_cohort
+    add_user_to_cohort,
+    remove_user_from_cohort
 )
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
@@ -725,14 +727,14 @@ class UsersCoursesList(SecureAPIView):
         course_enrollment = CourseEnrollment.enroll(user, course_key)
         # Ensure the user is in a cohort. Add it explicitly in the default_cohort
         try:
-            default_cohort = get_cohort_by_name(course_id, CourseUserGroup.default_cohort_name)
+            default_cohort = get_cohort_by_name(course_key, CourseUserGroup.default_cohort_name)
         except CourseUserGroup.DoesNotExist:
-            default_cohort = add_cohort(course_id, CourseUserGroup.default_cohort_name)
+            default_cohort = add_cohort(course_key, CourseUserGroup.default_cohort_name)
         add_user_to_cohort(default_cohort, user.username)
         log.debug('User "{}" has been automatically added in cohort "{}" for course "{}"'.format(
             user.username, default_cohort.name, course_descriptor.display_name)
         )
-        response_data['uri'] = '{}/{}'.format(base_uri, course_id)
+        response_data['uri'] = '{}/{}'.format(base_uri, course_key)
         response_data['id'] = unicode(course_key)
         response_data['name'] = course_descriptor.display_name
         response_data['is_active'] = course_enrollment.is_active
@@ -901,6 +903,9 @@ class UsersCoursesDetail(SecureAPIView):
         if not course_exists(request, user, course_id):
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         course_key = get_course_key(course_id)
+        cohort = get_cohort(user, course_key)
+        if cohort:
+            remove_user_from_cohort(cohort, user.username)
         CourseEnrollment.unenroll(user, course_key)
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
