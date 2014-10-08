@@ -62,7 +62,6 @@ var DetailsView = ValidatingView.extend({
                     console.log("eventchange fired", e);
                 });
             },
-            language: "es",
             plugins: ["table"],
             menu: {
                 file: {title: 'File', items: 'save'},
