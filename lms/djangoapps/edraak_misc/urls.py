@@ -16,5 +16,5 @@ def i18n_patterns(prefix, *args):
 
 
 urlpatterns = patterns('',
-    url(r'^setlang/$', 'edraak.views.set_language', name='edraak_setlang'),
+    url(r'^setlang/$', 'edraak_misc.views.set_language', name='edraak_setlang'),
 )
