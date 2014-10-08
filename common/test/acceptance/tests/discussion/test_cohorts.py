@@ -73,6 +73,7 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest):
         self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint:disable=W0201
         self.thread_page.visit()
 
+    # pylint:disable=W0613
     def refresh_thread_page(self, thread_id):
         self.browser.refresh()
         self.thread_page.wait_for_page()

@@ -394,7 +394,6 @@ def prepare_content(content, course_key, is_staff=False):
     @TODO: not all response pre-processing steps are currently integrated into
     this function.
     """
-
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
