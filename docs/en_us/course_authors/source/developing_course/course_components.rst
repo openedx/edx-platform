@@ -298,10 +298,10 @@ The following example shows the student view of the unit described above:
 .. image:: ../Images/nested_components_student_view.png
  :alt: Image of the student's view of nested components
 
-.. note:: The visibility of nested components depends on the visibility of 
+.. note:: 
+ The visibility of nested components depends on the visibility of 
  the parent unit. The parent unit must be public for students to see nested
- components. For more information, see :ref:`Visibility of Components Contained
- by Other Components`.
+ components. For more information, see :ref:`Unit States and Visibility to Students`.
 
 
 *******************************

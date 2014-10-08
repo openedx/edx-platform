@@ -115,7 +115,7 @@ Update the New Course
 When you create a course by re-running another course, you should carefully
 review the settings and content of the new course. To assure a quality
 experience for students, be sure to test the course thoroughly before the
-course start date. See :ref:`Testing Your Course` and
+course start date. See :ref:`Testing Your Course Content` and
 :ref:`Beta_Testing`.
 
 At a minimum, you will need to make these changes to prepare the new course for
@@ -132,7 +132,7 @@ release:
   :ref:`Release Dates`.
 
 * Change the due dates of subsections that are part of your grading policy. See
-  :ref:`subsections`.
+  :ref:`Set the Assignment Type and Due Date for a Subsection`.
 
 * Delete or edit posts on the **Course Updates** page in Studio. See :ref:`Add
   a Course Update`.

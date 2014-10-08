@@ -20,3 +20,4 @@ page, see :ref:`Developing Your Course Index`.
    textbooks
    establish_grading_policy
    course_rerun
+   export_import_course
