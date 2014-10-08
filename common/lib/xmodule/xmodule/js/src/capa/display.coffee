@@ -32,6 +32,8 @@ class @Problem
     @checkButtonCheckText = @checkButtonLabel.text()
     @checkButtonCheckingText = @checkButton.data('checking')
     @checkButton.click @check_fd
+
+    @$('div.action button.hint-button').click @hint_button
     @$('div.action button.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action button.save').click @save
@@ -699,3 +701,17 @@ class @Problem
       if @has_response
         @enableCheckButton true
     window.setTimeout(enableCheckButton, 750)
+
+  hint_button: =>
+    # Store the index of the currently shown hint as an attribute.
+    # Use that to compute the next hint number when the button is clicked.
+    hint_index = @$('.problem-hint').attr('hint_index')
+    if hint_index == undefined
+      next_index = 0
+    else
+      next_index = parseInt(hint_index) + 1
+    $.postWithPrefix "#{@url}/hint_button", hint_index: next_index, input_id: @id, (response) =>
+      @$('.problem-hint').html(response.contents)
+      @$('.problem-hint').attr('hint_index', response.hint_index)
+      @$('.hint-button').focus()  # a11y focus on click, like the Check button
+

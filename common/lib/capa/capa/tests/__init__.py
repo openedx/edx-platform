@@ -55,9 +55,21 @@ def test_capa_system():
     return the_system
 
 
+def mock_capa_module():
+    """
+    capa response types needs just two things from the capa_module: location and track_function.
+    """
+    capa_module = Mock()
+    capa_module.location.to_deprecated_string.return_value = 'i4x://Foo/bar/mock/abc'
+    # The following comes into existence by virtue of being called
+    # capa_module.runtime.track_function
+    return capa_module
+
+
 def new_loncapa_problem(xml, capa_system=None, seed=723):
     """Construct a `LoncapaProblem` suitable for unit tests."""
-    return LoncapaProblem(xml, id='1', seed=seed, capa_system=capa_system or test_capa_system())
+    return LoncapaProblem(xml, id='1', seed=seed, capa_system=capa_system or test_capa_system(),
+                          capa_module=mock_capa_module())
 
 
 def load_fixture(relpath):

@@ -1,0 +1,13 @@
+<problem>
+    <choiceresponse>
+      <checkboxgroup label="Select all the vegetables from the list" direction="vertical">
+        <choice correct="false">Banana
+                   <choicehint selected="true">No, sorry, a banana is a fruit.
+                   </choicehint>
+                   <choicehint selected="false">poor banana.
+                   </choicehint>
+        </choice>
+        <badElement>  this element is not a legal sibling of 'choice' and 'booleanhint' </badElement>
+      </checkboxgroup>
+    </choiceresponse>
+</problem>
