@@ -1,5 +1,5 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date", "jquery.tinymce"],
+    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date", "tinymce", "jquery.tinymce"],
     function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
 
 var DetailsView = ValidatingView.extend({
@@ -35,30 +35,50 @@ var DetailsView = ValidatingView.extend({
             $(this).show();
         });
 
-        this.$el.find('#timezone').html("(" + tzAbbr() + ")");
 
-        //tinymce
+        // Editor tinymce
         this.editor = new tinymce.Editor('course-overview', {
-            plugins: [
-                "link image",
-                "codemirror",
-                "table",
-                "paste textcolor"
-            ],
-            theme: "modern",
-            skin: 'studio-tmce4',
-            schema: "html5",
-            codemirror: {
-                path: "" + baseUrl + "/js/vendor"
+            language: "es",
+            plugins: ["table"],
+            menu: {
+                file: {title: 'File', items: 'save'},
+                edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
+                insert: {title: 'Insert', items: '|'}, 
+                view: {title: 'View', items: 'visualaid'}, 
+                format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
+                table: {title: 'Table'}, 
+                tools: {title: 'Tools', items: 'inserttable'} 
             },
-            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
-            toolbar2: "print preview media | forecolor backcolor code",
-            image_advtab: true,
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table",
         }, tinymce.EditorManager);
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
+        tinymce.init({
+            selector: "textarea#course-overview",
+            setup: function(editor){
+                editor.on("change", function(e){
+                    console.log("eventchange fired", e);
+                });
+            },
+            language: "es",
+            plugins: ["table"],
+            menu: {
+                file: {title: 'File', items: 'save'},
+                edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
+                insert: {title: 'Insert', items: '|'}, 
+                view: {title: 'View', items: 'visualaid'}, 
+                format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
+                table: {title: 'Table'}, 
+                tools: {title: 'Tools', items: 'inserttable'} 
+            },
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table",
+        });
+    },
+
+    changeOverview: function(editor){
+        console.log("editor changed: ");
     },
 
     render: function() {
@@ -67,20 +87,19 @@ var DetailsView = ValidatingView.extend({
         this.setupDatePicker('end_date');
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
-        // tinymce
-        var cachethis = this;
-        this.editor.on('change', function(e) {
+        this.editor.render();
+        //this code can be moved out to funct
+        this.editor.on('change', function(e){
             var newVal = tinymce.activeEditor.getContent();
-            if (cachethis.model.get('overview') != newVal) {
+            if (cachethis.model.get('overview') != newVal){
                 cachethis.setAndValidate('overview', newVal);
             }
         });
-        this.editor.render();
-
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
-        this.codeMirrorize(null, $('#course-overview')[0]);
+//        this.codeMirrorize(null, $('#course-overview')[0]);
 
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
+
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
         this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
         if (this.model.has('intro_video')) {
@@ -234,11 +253,8 @@ var DetailsView = ValidatingView.extend({
         if (!this.codeMirrors[thisTarget.id]) {
             var cachethis = this;
             var field = this.selectorToField[thisTarget.id];
-
-            this.editor.setContent(this.model.attributes.overview);
-
             this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-                mode: "text/html", lineNumbers: true, lineWrapping: true, style: "display: none;"});
+                mode: "text/html", lineNumbers: true, lineWrapping: true});
             this.codeMirrors[thisTarget.id].on('change', function (mirror) {
                     mirror.save();
                     cachethis.clearValidationErrors();
