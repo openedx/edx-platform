@@ -1318,8 +1318,8 @@ def _do_create_account(post_vars, extended_profile=None):
     profile.cedula = post_vars.get('cedula')
     profile.city = city
 
-    city = City.objects.get(id=post_vars['city_id'])
-    profile.city = city
+#    city = City.objects.get(id=post_vars['city_id'])
+#    profile.city = city
 
     type_id = post_vars['type_id']
     if type_id == 'cedula':
