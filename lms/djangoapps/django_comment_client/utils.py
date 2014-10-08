@@ -17,9 +17,8 @@ from django_comment_client.permissions import check_permissions_by_view, cached_
 from edxmako import lookup_template
 import pystache_custom as pystache
 
-from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted
+from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
 from course_groups.models import CourseUserGroup
-from courseware.courses import get_course_by_id
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
@@ -395,7 +394,6 @@ def prepare_content(content, course_key, is_staff=False):
     @TODO: not all response pre-processing steps are currently integrated into
     this function.
     """
-    course = get_course_by_id(course_key)
 
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
@@ -429,7 +427,7 @@ def prepare_content(content, course_key, is_staff=False):
         # Only reveal endorser if requester can see author or if endorser is staff
         if (
             endorser and
-            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_id))
+            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_key))
         ):
             endorsement["username"] = endorser.username
         else:
@@ -442,7 +440,7 @@ def prepare_content(content, course_key, is_staff=False):
             ]
             content[child_content_key] = children
 
-    if course.is_cohorted:
+    if is_course_cohorted(course_key):
         # Augment the specified thread info to include the group name if a group id is present.
         if content.get('group_id') is not None:
             content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
