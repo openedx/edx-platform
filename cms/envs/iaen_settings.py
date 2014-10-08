@@ -1,6 +1,7 @@
 from .common import *
 
 FEATURES['ENABLE_CREATOR_GROUP'] = True
+FEATURES['ALLOW_COURSE_RERUNS'] = True
 TIME_ZONE = 'America/Guayaquil'
 LANGUAGE_CODE = 'es-419'
 USE_I18N = True
