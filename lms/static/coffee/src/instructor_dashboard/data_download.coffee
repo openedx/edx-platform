@@ -153,7 +153,7 @@ class ReportDownloads
 
     @$report_downloads_table = @$section.find ".report-downloads-table"
 
-    POLL_INTERVAL = 1000 * 60 * 5 # 5 minutes in ms
+    POLL_INTERVAL = 20000 # 20 seconds, just like the "pending instructor tasks" table
     @downloads_poller = new window.InstructorDashboard.util.IntervalManager(
       POLL_INTERVAL, => @reload_report_downloads()
     )
