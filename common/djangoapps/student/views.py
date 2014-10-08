@@ -415,7 +415,7 @@ def register_user(request, extra_context=None):
     return render_to_response('register.html', context)
 
 
-def complete_course_mode_info(course_id, enrollment):
+def complete_course_mode_info(course_id, enrollment, modes=None):
     """
     We would like to compute some more information from the given course modes
     and the user's current enrollment
@@ -424,7 +424,9 @@ def complete_course_mode_info(course_id, enrollment):
         - whether to show the course upsell information
         - numbers of days until they can't upsell anymore
     """
-    modes = CourseMode.modes_for_course_dict(course_id)
+    if modes is None:
+        modes = CourseMode.modes_for_course_dict(course_id)
+
     mode_info = {'show_upsell': False, 'days_for_upsell': None}
     # we want to know if the user is already verified and if verified is an
     # option
@@ -475,9 +477,17 @@ def dashboard(request):
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = list(get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set))
 
-    # Check to see if the student has recently enrolled in a course. If so, display a notification message confirming
-    # the enrollment.
-    enrollment_message = _create_recent_enrollment_message(course_enrollment_pairs)
+    # Retrieve the course modes for each course
+    course_modes_by_course = {
+        course.id: CourseMode.modes_for_course_dict(course.id)
+        for course, __ in course_enrollment_pairs
+    }
+
+    # Check to see if the student has recently enrolled in a course.
+    # If so, display a notification message confirming the enrollment.
+    enrollment_message = _create_recent_enrollment_message(
+        course_enrollment_pairs, course_modes_by_course
+    )
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
@@ -499,8 +509,21 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                           if has_access(request.user, 'load', course))
 
-    course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
-    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
+    # Construct a dictionary of course mode information
+    # used to render the course list.  We re-use the course modes dict
+    # we loaded earlier to avoid hitting the database.
+    course_mode_info = {
+        course.id: complete_course_mode_info(
+            course.id, enrollment,
+            modes=course_modes_by_course[course.id]
+        )
+        for course, enrollment in course_enrollment_pairs
+    }
+
+    cert_statuses = {
+        course.id: cert_info(request.user, course)
+        for course, _enrollment in course_enrollment_pairs
+    }
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
@@ -570,7 +593,7 @@ def dashboard(request):
         'staff_access': staff_access,
         'errored_courses': errored_courses,
         'show_courseware_links_for': show_courseware_links_for,
-        'all_course_modes': course_modes,
+        'all_course_modes': course_mode_info,
         'cert_statuses': cert_statuses,
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
@@ -598,23 +621,35 @@ def dashboard(request):
     return render_to_response('dashboard.html', context)
 
 
-def _create_recent_enrollment_message(course_enrollment_pairs):
+def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
     """Builds a recent course enrollment message
 
     Constructs a new message template based on any recent course enrollments for the student.
 
     Args:
         course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
+        course_modes (dict): Mapping of course ID's to course mode dictionaries.
 
     Returns:
         A string representing the HTML message output from the message template.
+        None if there are no recently enrolled courses.
 
     """
-    recent_course_enrollment_pairs = _get_recently_enrolled_courses(course_enrollment_pairs)
-    if recent_course_enrollment_pairs:
+    recently_enrolled_courses = _get_recently_enrolled_courses(course_enrollment_pairs)
+
+    if recently_enrolled_courses:
+        messages = [
+            {
+                "course_id": course.id,
+                "course_name": course.display_name,
+                "allow_donation": not CourseMode.has_verified_mode(course_modes[course.id])
+            }
+            for course in recently_enrolled_courses
+        ]
+
         return render_to_string(
             'enrollment/course_enrollment_message.html',
-            {'recent_course_enrollment_pairs': recent_course_enrollment_pairs,}
+            {'course_enrollment_messages': messages}
         )
 
 
@@ -627,14 +662,14 @@ def _get_recently_enrolled_courses(course_enrollment_pairs):
         course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
 
     Returns:
-        A list of tuples for the course and enrollment.
+        A list of courses
 
     """
     seconds = DashboardConfiguration.current().recent_enrollment_time_delta
     sorted_list = sorted(course_enrollment_pairs, key=lambda created: created[1].created, reverse=True)
     time_delta = (datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds))
     return [
-        (course, enrollment) for course, enrollment in sorted_list
+        course for course, enrollment in sorted_list
         # If the enrollment has no created date, we are explicitly excluding the course
         # from the list of recent enrollments.
         if enrollment.is_active and enrollment.created > time_delta

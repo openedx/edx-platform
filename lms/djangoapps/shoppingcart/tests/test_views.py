@@ -1,9 +1,11 @@
 """
 Tests for Shopping Cart views
 """
-from django.http import HttpRequest
+import json
 from urlparse import urlparse
+from decimal import Decimal
 
+from django.http import HttpRequest
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -17,6 +19,8 @@ from django.core.cache import cache
 from pytz import UTC
 from freezegun import freeze_time
 from datetime import datetime, timedelta
+from mock import patch, Mock
+import ddt
 
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
@@ -26,7 +30,7 @@ from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import (
     Order, CertificateItem, PaidCourseRegistration,
     Coupon, CourseRegistrationCode, RegistrationCodeRedemption,
-    Donation
+    DonationConfiguration
 )
 from student.tests.factories import UserFactory, AdminFactory
 from courseware.tests.factories import InstructorFactory
@@ -35,9 +39,8 @@ from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.admin import SoftDeleteCouponAdmin
-from mock import patch, Mock
 from shoppingcart.views import initialize_report
-from decimal import Decimal
+from shoppingcart.tests.payment_fake import PaymentFakeView
 
 
 def mock_render_purchase_form_html(*args, **kwargs):
@@ -868,15 +871,20 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
-class DonationReceiptViewTest(ModuleStoreTestCase):
-    """Tests for the receipt page when the user pays for a donation. """
+@ddt.ddt
+class DonationViewTest(ModuleStoreTestCase):
+    """Tests for making a donation.
 
-    COST = Decimal('23.45')
+    These tests cover both the single-item purchase flow,
+    as well as the receipt page for donation items.
+    """
+
+    DONATION_AMOUNT = "23.45"
     PASSWORD = "password"
 
     def setUp(self):
         """Create a test user and order. """
-        super(DonationReceiptViewTest, self).setUp()
+        super(DonationViewTest, self).setUp()
 
         # Create and login a user
         self.user = UserFactory.create()
@@ -885,36 +893,130 @@ class DonationReceiptViewTest(ModuleStoreTestCase):
         result = self.client.login(username=self.user.username, password=self.PASSWORD)
         self.assertTrue(result)
 
-        # Create an order for the user
-        self.cart = Order.get_cart_for_user(self.user)
+        # Enable donations
+        config = DonationConfiguration.current()
+        config.enabled = True
+        config.save()
 
-    def test_donation_for_org_receipt(self):
-        # Purchase the donation
-        Donation.add_to_order(self.cart, self.COST)
-        self.cart.start_purchase()
-        self.cart.purchase()
-
-        # Verify the receipt page
+    def test_donation_for_org(self):
+        self._donate(self.DONATION_AMOUNT)
         self._assert_receipt_contains("tax deductible")
 
     def test_donation_for_course_receipt(self):
-        # Create a test course
+        # Create a test course and donate to it
         self.course = CourseFactory.create(display_name="Test Course")
-
-        # Purchase the donation for the course
-        Donation.add_to_order(self.cart, self.COST, course_id=self.course.id)
-        self.cart.start_purchase()
-        self.cart.purchase()
+        self._donate(self.DONATION_AMOUNT, course_id=self.course.id)
 
         # Verify the receipt page
         self._assert_receipt_contains("tax deductible")
         self._assert_receipt_contains(self.course.display_name)
 
+    def test_smallest_possible_donation(self):
+        self._donate("0.01")
+        self._assert_receipt_contains("0.01")
+
+    @ddt.data(
+        {},
+        {"amount": "abcd"},
+        {"amount": "-1.00"},
+        {"amount": "0.00"},
+        {"amount": "0.001"},
+        {"amount": "0"},
+        {"amount": "23.45", "course_id": "invalid"}
+    )
+    def test_donation_bad_request(self, bad_params):
+        response = self.client.post(reverse('donation'), bad_params)
+        self.assertEqual(response.status_code, 400)
+
+    def test_donation_requires_login(self):
+        self.client.logout()
+        response = self.client.post(reverse('donation'), {'amount': self.DONATION_AMOUNT})
+        self.assertEqual(response.status_code, 302)
+
+    def test_no_such_course(self):
+        response = self.client.post(
+            reverse("donation"),
+            {"amount": self.DONATION_AMOUNT, "course_id": "edx/DemoX/Demo"}
+        )
+        self.assertEqual(response.status_code, 400)
+
+    @ddt.data("get", "put", "head", "options", "delete")
+    def test_donation_requires_post(self, invalid_method):
+        response = getattr(self.client, invalid_method)(
+            reverse("donation"), {"amount": self.DONATION_AMOUNT}
+        )
+        self.assertEqual(response.status_code, 405)
+
+
+    def test_donations_disabled(self):
+        config = DonationConfiguration.current()
+        config.enabled = False
+        config.save()
+
+        # Logged in -- should be a 404
+        response = self.client.post(reverse('donation'))
+        self.assertEqual(response.status_code, 404)
+
+        # Logged out -- should still be a 404
+        self.client.logout()
+        response = self.client.post(reverse('donation'))
+        self.assertEqual(response.status_code, 404)
+
+    def _donate(self, donation_amount, course_id=None):
+        """Simulate a donation to a course.
+
+        This covers the entire payment flow, except for the external
+        payment processor, which is simulated.
+
+        Arguments:
+            donation_amount (unicode): The amount the user is donating.
+
+        Keyword Arguments:
+            course_id (CourseKey): If provided, make a donation to the specific course.
+
+        Raises:
+            AssertionError
+
+        """
+        # Purchase a single donation item
+        # Optionally specify a particular course for the donation
+        params = {'amount': donation_amount}
+        if course_id is not None:
+            params['course_id'] = course_id
+
+        url = reverse('donation')
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+
+        # Use the fake payment implementation to simulate the parameters
+        # we would receive from the payment processor.
+        payment_info = json.loads(response.content)
+        self.assertEqual(payment_info["payment_url"], "/shoppingcart/payment_fake")
+
+        # If this is a per-course donation, verify that we're sending
+        # the course ID to the payment processor.
+        if course_id is not None:
+            self.assertEqual(
+                payment_info["payment_params"]["merchant_defined_data1"],
+                unicode(course_id)
+            )
+
+        processor_response_params = PaymentFakeView.response_post_params(payment_info["payment_params"])
+
+        # Use the response parameters to simulate a successful payment
+        url = reverse('shoppingcart.views.postpay_callback')
+        response = self.client.post(url, processor_response_params)
+        self.assertRedirects(response, self._receipt_url)
+
     def _assert_receipt_contains(self, expected_text):
         """Load the receipt page and verify that it contains the expected text."""
-        url = reverse("shoppingcart.views.show_receipt", kwargs={"ordernum": self.cart.id})
-        resp = self.client.get(url)
+        resp = self.client.get(self._receipt_url)
         self.assertContains(resp, expected_text)
+
+    @property
+    def _receipt_url(self):
+        order_id = Order.objects.get(user=self.user, status="purchased").id
+        return reverse("shoppingcart.views.show_receipt", kwargs={"ordernum": order_id})
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
