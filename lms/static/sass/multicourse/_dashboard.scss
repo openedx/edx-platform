@@ -1188,14 +1188,14 @@
           }
 
           .amount {
-            padding: $baseline ($baseline/2);
+            height: 40px;
             width: 80px;
             vertical-align: middle;
             text-align: left;
-            border: 2px;
+            border: 2px solid $white;
 
             &.validation-error {
-              border: 2px solid $pink;
+              border: 2px solid $error-color;
             }
           }
 

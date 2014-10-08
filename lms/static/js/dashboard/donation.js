@@ -100,7 +100,7 @@ var edx = edx || {};
                 var html = _.template($("#donation-tpl").html(), {});
                 this.$el.html(html);
                 this.$amount = $("input[name=\"amount\"]", this.$el);
-                this.$submit = $("button[type=\"submit\"]", this.$el);
+                this.$submit = $(".action-donate", this.$el);
                 this.$errorMsg = $(".donation-error-msg", this.$el);
                 this.$paymentForm = $(".payment-form", this.$el);
                 this.$submit.click(this.donate);
