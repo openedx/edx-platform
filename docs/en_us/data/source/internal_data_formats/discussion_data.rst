@@ -114,7 +114,7 @@ more readable is produced.
     ],
     "up_count": 1
   }
-}
+ }
 
 ----------------------------------------
 Comment Document Example
@@ -197,7 +197,7 @@ When pretty printed, this comment looks like this:
   "created_at": {
     "$date": 1390759901966
   }
-}
+ }
 
 *****************
 Shared Fields
