@@ -900,7 +900,7 @@ class DonationViewTest(ModuleStoreTestCase):
 
     def test_donation_for_org(self):
         self._donate(self.DONATION_AMOUNT)
-        self._assert_receipt_contains("tax deductible")
+        self._assert_receipt_contains("tax purposes")
 
     def test_donation_for_course_receipt(self):
         # Create a test course and donate to it
@@ -908,7 +908,7 @@ class DonationViewTest(ModuleStoreTestCase):
         self._donate(self.DONATION_AMOUNT, course_id=self.course.id)
 
         # Verify the receipt page
-        self._assert_receipt_contains("tax deductible")
+        self._assert_receipt_contains("tax purposes")
         self._assert_receipt_contains(self.course.display_name)
 
     def test_smallest_possible_donation(self):

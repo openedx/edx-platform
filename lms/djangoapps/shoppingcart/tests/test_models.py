@@ -578,7 +578,7 @@ class DonationTest(ModuleStoreTestCase):
             donation,
             donation_type="general",
             unit_cost=self.COST,
-            line_desc="Donation"
+            line_desc="Donation for edX"
         )
 
     def test_donate_to_course(self):
@@ -605,7 +605,7 @@ class DonationTest(ModuleStoreTestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertEquals('Order Payment Confirmation', email.subject)
-        self.assertIn("tax deductible", email.body)
+        self.assertIn("tax purposes", email.body)
 
     def test_donate_no_such_course(self):
         fake_course_id = CourseLocator(org="edx", course="fake", run="course")
