@@ -1,0 +1,55 @@
+<problem>
+    <p>In which country would you find the city of Paris?</p>
+
+    <stringresponse answer="France" type="ci" >
+        <textline label="In which country would you find the city of Paris?" size="20"/>
+        <correcthint>
+            Viva la France!
+        </correcthint>
+
+        <additional_answer answer="USA" type="ci" >
+             Less well known, but yes, there is a Paris, Texas.
+        </additional_answer>
+
+        <stringequalhint answer="Germany">
+            I do not think so.
+        </stringequalhint>
+
+        <regexphint answer=".*land">
+             The country name does not end in LAND
+        </regexphint>
+    </stringresponse>
+
+    <p>What color is the sky?</p>
+    <stringresponse answer="Blue">
+        <correcthint >The red light is scattered by water molecules leaving only blue light.
+        </correcthint>
+        <textline label="What color is the sky?" size="20"/>
+    </stringresponse>
+
+    <p>(This question will cause an illegal regular expression exception)</p>
+    <stringresponse answer="Bonk">
+        <correcthint >This hint should never appear.
+        </correcthint>
+        <textline label="Why not?" size="20"/>
+        <regexphint answer="[">
+             This hint should never appear either because the regex is illegal.
+        </regexphint>
+    </stringresponse>
+
+		<!-- work through every combination of matching and type="ci" -->
+    <stringresponse answer="A">
+        <correcthint label="Woo Hoo">hint1</correcthint>
+        <additional_answer answer="B" type="ci">  hint2  </additional_answer>
+        <additional_answer answer="C">  hint3 </additional_answer>
+        
+        <stringequalhint answer="D" type="ci"> hint4 </stringequalhint>
+        <stringequalhint answer="E"> hint5 </stringequalhint>
+        
+        <regexphint answer="FG+" type="ci"> hint6 </regexphint>
+        <regexphint answer="HI+"> hint7 </regexphint>
+        <regexphint answer="(abc" type="ci"> erroneous regex don't match anything </regexphint>
+      
+        <textline size="20"/>
+    </stringresponse>
+</problem>

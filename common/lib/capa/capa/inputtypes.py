@@ -371,6 +371,36 @@ class OptionInput(InputTypeBase):
     template = "optioninput.html"
     tags = ['optioninput']
 
+    def __init__(self, system, xml, state):
+        super(OptionInput, self).__init__(system, xml, state)
+        self.synthesize_option_attributes()
+
+
+    def synthesize_option_attributes(self):
+        """
+        The original optioninput has an option="...." attribute. With extended hints, there is 
+        format with an <option> tag for each option. This method looks for <option> tags, and uses them to
+        synthesize and install (overwriting) the old options= and correct= attributes, so all the
+        downstream logic works unchanged with the <option> tag format.
+        """
+        # TODO (nparlante) the xml schema currently requires an option= attribute, which is no longer correct, then update extended_hints_dropdown.xml
+        correct_option = None
+        child_options = []
+        for option_element in self.xml.xpath('//optioninput[@id=$id]/option', id=self.input_id):
+            option_name = option_element.text.strip()
+            if option_element.get('correct').upper() == 'TRUE':
+                correct_option = option_name
+            child_options.append("'" + option_name + "'")
+
+        if len(child_options) > 0:
+            options_string = '(' + ','.join(child_options) + ')'
+            option_input_elements = self.xml.xpath('//optioninput[@id=$id]', id=self.input_id)
+            if option_input_elements:
+                option_input_element = option_input_elements[0]
+                option_input_element.attrib.update({'options': options_string})
+                if correct_option:
+                    option_input_element.attrib.update({'correct': correct_option})
+
     @staticmethod
     def parse_options(options):
         """
@@ -483,15 +513,17 @@ class ChoiceGroup(InputTypeBase):
         _ = i18n.ugettext
 
         for choice in element:
-            if choice.tag != 'choice':
-                msg = u"[capa.inputtypes.extract_choices] {error_message}".format(
-                    # Translators: '<choice>' is a tag name and should not be translated.
-                    error_message=_("Expected a <choice> tag; got {given_tag} instead").format(
-                        given_tag=choice.tag
+            if choice.tag == 'choice':
+                choices.append((choice.get("name"), stringify_children(choice)))
+            else:
+                if choice.tag != 'booleanhint':
+                    msg = u'[capa.inputtypes.extract_choices] {error_message}'.format(
+                        # Translators: '<choice>' and '<booleanhint>' are tag names and should not be translated.
+                        error_message=_('Expected a <choice> or <booleanhint> tag; got {given_tag} instead').format(
+                            given_tag=choice.tag
+                        )
                     )
-                )
-                raise Exception(msg)
-            choices.append((choice.get("name"), stringify_children(choice)))
+                    raise Exception(msg)
         return choices
 
     def get_user_visible_answer(self, internal_answer):

@@ -23,6 +23,8 @@ LMS: Support adding students to a cohort via the instructor dashboard. TNL-163
 
 LMS: Show cohorts on the new instructor dashboard. TNL-161
 
+LMS: Extended hints feature
+
 LMS: Mobile API available for courses that opt in using the Course Advanced
 Setting "Mobile Course Available" (only used in limited closed beta).
 
