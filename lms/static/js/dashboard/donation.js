@@ -100,8 +100,8 @@ var edx = edx || {};
                 var html = _.template($("#donation-tpl").html(), {});
                 this.$el.html(html);
                 this.$amount = $("input[name=\"amount\"]", this.$el);
-                this.$submit = $("input[type=\"submit\"]", this.$el);
-                this.$errorMsg = $(".payment-form", this.$el);
+                this.$submit = $("button[type=\"submit\"]", this.$el);
+                this.$errorMsg = $(".donation-error-msg", this.$el);
                 this.$paymentForm = $(".payment-form", this.$el);
                 this.$submit.click(this.donate);
                 return this;
@@ -178,6 +178,7 @@ var edx = edx || {};
 
                 return isValid;
             },
+
 
             /**
             * Validate that the given amount is a valid currency string.
