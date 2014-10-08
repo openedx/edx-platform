@@ -45,12 +45,13 @@
     {% block body %}{% endblock %}
     {% block bodyextra %}{% endblock %}
   </div>
-
-  {% if IS_EDX_DOMAIN %}
+  {% if IS_REQUEST_IN_MICROSITE %}
+  {# For now we don't support overriden Django templates in microsites. Leave footer blank for now which is better than saying Edx.#}
+  {% elif IS_EDX_DOMAIN %}
     {% if ENABLE_NEW_EDX_FOOTER %}
-        {% include "edx_footer.html" %}
+        {% include "footer-edx-new.html" %}
     {% else %}
-        {% include "original_edx_footer.html" %}
+        {% include "footer-edx.html" %}
     {% endif %}
   {% else %}
     {% if FEATURES.USE_CUSTOM_THEME %}

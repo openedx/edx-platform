@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -18,6 +18,7 @@
 # mustafagedik <mustafa.paul@hotmail.com>, 2014
 # Onur Bektas <mustafaonurbektas@gmail.com>, 2013
 # Onur Bektas <mustafaonurbektas@gmail.com>, 2013
+# Şenol Akkaş <info@senolakkas.com>, 2014
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -52,7 +53,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-08 10:56-0400\n"
+"POT-Creation-Date: 2014-09-24 13:34-0400\n"
 "PO-Revision-Date: 2014-09-01 07:20+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -1539,6 +1540,38 @@ msgstr ""
 "gidilemedi. Lütfen ders personeline ulaşın. "
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Play"
+msgstr "Oynat"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Pause"
+msgstr "Duraklat"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Mute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Unmute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Exit full browser"
+msgstr "Tüm tarayıcıdan çıkın"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Fill browser"
+msgstr "Tarayıcıyı doldurun"
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
+msgid "Speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
 msgstr "Ses"
 
@@ -1593,22 +1626,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
 msgstr "Video kaydırıcısı"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Pause"
-msgstr "Duraklat"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Play"
-msgstr "Oynat"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Fill browser"
-msgstr "Tarayıcıyı doldurun"
-
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Exit full browser"
-msgstr "Tüm tarayıcıdan çıkın"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
@@ -1872,6 +1889,10 @@ msgstr "Bu gönderiyi silmek istiyor musunuz?"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "Your post will be discarded."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js

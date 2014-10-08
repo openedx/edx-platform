@@ -95,12 +95,14 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self._install_course_fixture()
         self._navigate_to_course_unit_page()
 
-    def edit_component(self):
+    def edit_component(self, xblock_index=1):
         """
         Open component Edit Dialog for first component on page.
+
+        Arguments:
+            xblock_index: number starting from 1 (0th entry is the unit page itself)
         """
-        # The 0th entry is the unit page itself.
-        self.unit_page.xblocks[1].edit()
+        self.unit_page.xblocks[xblock_index].edit()
 
     def open_advanced_tab(self):
         """
@@ -224,6 +226,27 @@ class CMSVideoTest(CMSVideoBaseTest):
         self.video.hide_captions()
 
         self.assertFalse(self.video.is_captions_visible())
+
+    def test_video_controls_shown_correctly(self):
+        """
+        Scenario: Video controls for all videos show correctly
+        Given I have created two Video components
+        And first is private video
+        When I reload the page
+        Then video controls for all videos are visible
+        """
+        self._create_course_unit(youtube_stub_config={'youtube_api_private_video': True})
+        self.video.create_video()
+
+        # change id of first default video
+        self.edit_component(1)
+        self.open_advanced_tab()
+        self.video.set_field_value('YouTube ID', 'sampleid123')
+        self.save_unit_settings()
+
+        # again open unit page and check that video controls show for both videos
+        self._navigate_to_course_unit_page()
+        self.assertTrue(self.video.is_controls_visible())
 
     def test_captions_shown_correctly(self):
         """

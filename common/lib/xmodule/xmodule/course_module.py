@@ -275,6 +275,13 @@ class CourseFields(object):
         help=_("Enter true or false. If true, the course appears in the list of new courses on edx.org, and a New! badge temporarily appears next to the course image."),
         scope=Scope.settings
     )
+    mobile_available = Boolean(
+        display_name=_("Mobile Course Available"),
+        help=_("Enter true or false. If true, the course will be available to mobile devices."),
+        default=False,
+        scope=Scope.settings
+    )
+
     no_grade = Boolean(
         display_name=_("Course Not Graded"),
         help=_("Enter true or false. If true, the course will not be graded."),

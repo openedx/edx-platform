@@ -653,3 +653,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_id)
         with store.bulk_operations(course_id):
             yield
+
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+
+        This method is intended for use by tests and administrative commands, and not
+        to be run during server startup.
+        """
+        for store in self.modulestores:
+            store.ensure_indexes()

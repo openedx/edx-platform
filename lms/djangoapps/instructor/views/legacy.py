@@ -3,7 +3,7 @@ Instructor Views
 """
 ## NOTE: This is the code for the legacy instructor dashboard
 ## We are no longer supporting this file or accepting changes into it.
-
+# pylint: skip-file
 from contextlib import contextmanager
 import csv
 import json
@@ -1427,6 +1427,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 
 # Gradebook has moved to instructor.api.spoc_gradebook #
 
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grade_summary(request, course_key):
     """Display the grade summary for a course."""
@@ -1816,7 +1817,7 @@ def dump_grading_context(course):
             notes = ''
             if getattr(sdesc, 'score_by_attempt', False):
                 notes = ', score by attempt!'
-            msg += "      %s (grade_format=%s, Assignment=%s%s)\n" % (s.display_name, grade_format, aname, notes)
+            msg += "      %s (grade_format=%s, Assignment=%s%s)\n" % (sdesc.display_name, grade_format, aname, notes)
     msg += "all descriptors:\n"
     msg += "length=%d\n" % len(gcontext['all_descriptors'])
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')

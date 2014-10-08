@@ -41,6 +41,7 @@ def test_capa_system():
         anonymous_student_id='student',
         cache=None,
         can_execute_unsafe_code=lambda: False,
+        get_python_lib_zip=lambda: None,
         DEBUG=True,
         filestore=fs.osfs.OSFS(os.path.join(TEST_DIR, "test_files")),
         i18n=gettext.NullTranslations(),

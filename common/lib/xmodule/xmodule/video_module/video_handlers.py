@@ -133,45 +133,6 @@ class VideoStudentViewHandlers(object):
             else:
                 return get_or_create_sjson(self)
 
-    def get_transcript(self, transcript_format='srt'):
-        """
-        Returns transcript, filename and MIME type.
-
-        Raises:
-            - NotFoundError if cannot find transcript file in storage.
-            - ValueError if transcript file is empty or incorrect JSON.
-            - KeyError if transcript file has incorrect format.
-
-        If language is 'en', self.sub should be correct subtitles name.
-        If language is 'en', but if self.sub is not defined, this means that we
-        should search for video name in order to get proper transcript (old style courses).
-        If language is not 'en', give back transcript in proper language and format.
-        """
-        lang = self.transcript_language
-
-        if lang == 'en':
-            if self.sub:  # HTML5 case and (Youtube case for new style videos)
-                transcript_name = self.sub
-            elif self.youtube_id_1_0:  # old courses
-                transcript_name = self.youtube_id_1_0
-            else:
-                log.debug("No subtitles for 'en' language")
-                raise ValueError
-
-            data = Transcript.asset(self.location, transcript_name, lang).data
-            filename = u'{}.{}'.format(transcript_name, transcript_format)
-            content = Transcript.convert(data, 'sjson', transcript_format)
-        else:
-            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
-            filename = u'{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
-            content = Transcript.convert(data, 'srt', transcript_format)
-
-        if not content:
-            log.debug('no subtitles produced in get_transcript')
-            raise ValueError
-
-        return content, filename, Transcript.mime_types[transcript_format]
-
     def get_static_transcript(self, request):
         """
         Courses that are imported with the --nostatic flag do not show
@@ -283,20 +244,7 @@ class VideoStudentViewHandlers(object):
                 response.content_type = transcript_mime_type
 
         elif dispatch == 'available_translations':
-            available_translations = []
-            if self.sub:  # check if sjson exists for 'en'.
-                try:
-                    Transcript.asset(self.location, self.sub, 'en')
-                except NotFoundError:
-                    pass
-                else:
-                    available_translations = ['en']
-            for lang in self.transcripts:
-                try:
-                    Transcript.asset(self.location, None, None, self.transcripts[lang])
-                except NotFoundError:
-                    continue
-                available_translations.append(lang)
+            available_translations = self.available_translations()
             if available_translations:
                 response = Response(json.dumps(available_translations))
                 response.content_type = 'application/json'

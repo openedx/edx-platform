@@ -5,5 +5,5 @@
 #   * One of @e0d, @jarv, or @feanil - to check system requirements
 
 # Packages to install in the Python sandbox for secured execution.
-scipy==0.11.0
-lxml==3.0.1
+scipy==0.14.0
+lxml==3.3.6

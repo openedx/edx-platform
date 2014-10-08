@@ -1,6 +1,9 @@
 import re
 from django.conf import settings
 
+# We'll make assets named this be importable by Python code in the sandbox.
+PYTHON_LIB_ZIP = "python_lib.zip"
+
 
 def can_execute_unsafe_code(course_id):
     """
@@ -25,3 +28,13 @@ def can_execute_unsafe_code(course_id):
         if re.match(regex, course_id.to_deprecated_string()):
             return True
     return False
+
+
+def get_python_lib_zip(contentstore, course_id):
+    """Return the bytes of the python_lib.zip file, if any."""
+    asset_key = course_id.make_asset_key("asset", PYTHON_LIB_ZIP)
+    zip_lib = contentstore().find(asset_key, throw_on_not_found=False)
+    if zip_lib is not None:
+        return zip_lib.data
+    else:
+        return None

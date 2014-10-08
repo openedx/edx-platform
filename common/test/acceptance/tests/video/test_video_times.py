@@ -33,6 +33,7 @@ class VideoTimesTest(VideoBaseTest):
 
         self.assertGreaterEqual(int(self.video.position.split(':')[1]), 10)
 
+    @skip("Intermittently fails 1 Oct 2014")
     def test_video_end_time_with_default_start_time(self):
         """
         Scenario: End time works for Youtube video if starts playing from beginning.
@@ -80,6 +81,7 @@ class VideoTimesTest(VideoBaseTest):
 
         self.assertEqual(self.video.position, '1:00')
 
+    @skip("Intermittently fails 23 Sept 2014")
     def test_video_start_time_and_end_time(self):
         """
         Scenario: Start time and end time work together for Youtube video.

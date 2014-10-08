@@ -48,7 +48,7 @@ This section contains the following subsections:
 
 Signing Up For An Account
 =========================
-Go to `https://www.transifex.com/signup/contributor/ <https://www.transifex.com/signup/contributor/>`_
+Go to `https://www.transifex.com/signup/ <https://www.transifex.com/signup/>`_
 and fill out the form to create your free Transifex account, if you don't already
 have one.
 

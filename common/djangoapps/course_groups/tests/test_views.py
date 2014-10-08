@@ -4,6 +4,8 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from factory import post_generation, Sequence
 from factory.django import DjangoModelFactory
+from course_groups.tests.helpers import config_course_cohorts
+from collections import namedtuple
 
 from django.http import Http404
 from django.contrib.auth.models import User
@@ -123,10 +125,18 @@ class ListCohortsTestCase(CohortViewsTestCase):
         self.assertItemsEqual(
             response_dict.get("cohorts"),
             [
-                {"name": cohort.name, "id": cohort.id}
+                {"name": cohort.name, "id": cohort.id, "user_count": cohort.user_count}
                 for cohort in expected_cohorts
             ]
         )
+
+    @staticmethod
+    def create_expected_cohort(cohort, user_count):
+        """
+        Create a tuple storing the expected cohort information.
+        """
+        cohort_tuple = namedtuple("Cohort", "name id user_count")
+        return cohort_tuple(name=cohort.name, id=cohort.id, user_count=user_count)
 
     def test_non_staff(self):
         """
@@ -145,11 +155,43 @@ class ListCohortsTestCase(CohortViewsTestCase):
         Verify that cohorts are in response for a course with some cohorts.
         """
         self._create_cohorts()
-        expected_cohorts = CourseUserGroup.objects.filter(
-            course_id=self.course.id,
-            group_type=CourseUserGroup.COHORT
-        )
+        expected_cohorts = [
+            ListCohortsTestCase.create_expected_cohort(self.cohort1, 3),
+            ListCohortsTestCase.create_expected_cohort(self.cohort2, 2),
+            ListCohortsTestCase.create_expected_cohort(self.cohort3, 2),
+        ]
         self.verify_lists_expected_cohorts(self.request_list_cohorts(self.course), expected_cohorts)
+
+    def test_auto_cohorts(self):
+        """
+        Verify that auto cohorts are included in the response.
+        """
+        config_course_cohorts(self.course, [], cohorted=True, auto_cohort=True,
+                              auto_cohort_groups=["AutoGroup1", "AutoGroup2"])
+
+        # Will create cohort1, cohort2, and cohort3. Auto cohorts remain uncreated.
+        self._create_cohorts()
+        # Get the cohorts from the course, which will cause auto cohorts to be created.
+        actual_cohorts = self.request_list_cohorts(self.course)
+        # Get references to the created auto cohorts.
+        auto_cohort_1 = CourseUserGroup.objects.get(
+            course_id=self.course.location.course_key,
+            group_type=CourseUserGroup.COHORT,
+            name="AutoGroup1"
+        )
+        auto_cohort_2 = CourseUserGroup.objects.get(
+            course_id=self.course.location.course_key,
+            group_type=CourseUserGroup.COHORT,
+            name="AutoGroup2"
+        )
+        expected_cohorts = [
+            ListCohortsTestCase.create_expected_cohort(self.cohort1, 3),
+            ListCohortsTestCase.create_expected_cohort(self.cohort2, 2),
+            ListCohortsTestCase.create_expected_cohort(self.cohort3, 2),
+            ListCohortsTestCase.create_expected_cohort(auto_cohort_1, 0),
+            ListCohortsTestCase.create_expected_cohort(auto_cohort_2, 0),
+        ]
+        self.verify_lists_expected_cohorts(actual_cohorts, expected_cohorts)
 
 
 class AddCohortTestCase(CohortViewsTestCase):

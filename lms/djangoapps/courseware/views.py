@@ -6,6 +6,7 @@ import logging
 import urllib
 import json
 
+from datetime import datetime
 from collections import defaultdict
 from django.utils import translation
 from django.utils.translation import ugettext as _
@@ -16,10 +17,11 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
+from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
@@ -27,7 +29,7 @@ from functools import wraps
 from markupsafe import escape
 
 from courseware import grades
-from courseware.access import has_access
+from courseware.access import has_access, _adjust_start_date_for_beta_testers
 from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement
 from courseware.masquerade import setup_masquerade
 from courseware.models import CoursePreference
@@ -162,7 +164,7 @@ def get_current_child(xmodule, min_depth=None):
             default_child = child_modules[0]
         else:
             content_children = [child for child in child_modules if
-                                child.has_children_at_depth(min_depth - 1)]
+                                child.has_children_at_depth(min_depth - 1) and child.get_display_items()]
             default_child = content_children[0] if content_children else None
 
         return default_child
@@ -340,6 +342,13 @@ def index(request, course_id, chapter=None, section=None,
             'reverifications': fetch_reverify_banner_info(request, course_key),
         }
 
+        now = datetime.now(UTC())
+        effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
+        if staff_access and now < effective_start:
+            # Disable student view button if user is staff and
+            # course is not yet visible to students.
+            context['disable_student_access'] = True
+
         has_content = course.has_children_at_depth(CONTENT_DEPTH)
         if not has_content:
             # Show empty courseware for a course with no units
@@ -435,8 +444,12 @@ def index(request, course_id, chapter=None, section=None,
             studio_url = get_studio_url(course, 'course')
             prev_section = get_current_child(chapter_module)
             if prev_section is None:
-                # Something went wrong -- perhaps this chapter has no sections visible to the user
-                raise Http404
+                # Something went wrong -- perhaps this chapter has no sections visible to the user.
+                # Clearing out the last-visited state and showing "first-time" view by redirecting
+                # to courseware.
+                course_module.position = None
+                course_module.save()
+                return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
             prev_section_url = reverse('courseware_section', kwargs={
                 'course_id': course_key.to_deprecated_string(),
                 'chapter': chapter_descriptor.url_name,
@@ -568,6 +581,14 @@ def course_info(request, course_id):
     reverifications = fetch_reverify_banner_info(request, course_key)
     studio_url = get_studio_url(course, 'course_info')
 
+    # link to where the student should go to enroll in the course:
+    # about page if there is not marketing site, SITE_NAME if there is
+    url_to_enroll = reverse(course_about, args=[course_id])
+    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+        url_to_enroll = marketing_link('COURSES')
+
+    show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(request.user, course.id)
+
     context = {
         'request': request,
         'course_id': course_key.to_deprecated_string(),
@@ -577,7 +598,16 @@ def course_info(request, course_id):
         'masquerade': masq,
         'studio_url': studio_url,
         'reverifications': reverifications,
+        'show_enroll_banner': show_enroll_banner,
+        'url_to_enroll': url_to_enroll,
     }
+
+    now = datetime.now(UTC())
+    effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
+    if staff_access and now < effective_start:
+        # Disable student view button if user is staff and
+        # course is not yet visible to students.
+        context['disable_student_access'] = True
 
     return render_to_response('courseware/info.html', context)
 
@@ -657,15 +687,15 @@ def course_about(request, course_id):
     Assumes the course_id is in a valid format.
     """
 
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'see_exists', course_key)
+
     if microsite.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     ):
-        raise Http404
+        return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
-    course = get_course_with_access(request.user, 'see_exists', course_key)
     regularly_registered = (registered_for_course(course, request.user) and
                             UserProfile.has_registered(request.user))
     staff_access = has_access(request.user, 'staff', course)
@@ -817,10 +847,7 @@ def _progress(request, course_key, student_id):
 
     Course staff are allowed to see the progress of students in their class.
     """
-    if not UserProfile.has_registered(request.user):
-        raise Http404
-
-    course = get_course_with_access(request.user, 'load', course_key, depth=None)
+    course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
     staff_access = has_access(request.user, 'staff', course)
 
     if student_id is None or student_id == request.user.id:

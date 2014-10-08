@@ -532,22 +532,31 @@
         margin-right: 0;
       }
 
-      &.button-Google:hover {
-        box-shadow: 0 2px 1px 0 #8D3024;
+      &.button-Google:hover, &.button-Google:focus {
         background-color: #dd4b39;
         border: 1px solid #A5382B;
       }
 
-      &.button-Facebook:hover {
-        box-shadow: 0 2px 1px 0 #30487C;
+      &.button-Google:hover {
+        box-shadow: 0 2px 1px 0 #8D3024;
+      }
+
+      &.button-Facebook:hover, &.button-Facebook:focus {
         background-color: #3b5998;
         border: 1px solid #263A62;
       }
 
-      &.button-LinkedIn:hover {
-        box-shadow: 0 2px 1px 0 #005D8E;
+      &.button-Facebook:hover {
+        box-shadow: 0 2px 1px 0 #30487C;
+      }
+
+      &.button-LinkedIn:hover , &.button-LinkedIn:focus {
         background-color: #0077b5;
         border: 1px solid #06527D;
+      }
+
+      &.button-LinkedIn:hover {
+        box-shadow: 0 2px 1px 0 #005D8E;
       }
 
     }

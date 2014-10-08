@@ -51,8 +51,8 @@ to simulate HTTP requests to the server.
 these tests simulate user interactions through the browser using
 [splinter](http://splinter.cobrateam.info/).
 
-* We use [Bok Choy](http://bok-choy.readthedocs.org/en/latest/tutorial.html) to 
-write end-user acceptance tests directly in Python, using the framework to 
+* We use [Bok Choy](http://bok-choy.readthedocs.org/en/latest/tutorial.html) to
+write end-user acceptance tests directly in Python, using the framework to
 maximize reliability and maintainability.
 
 ## Test Locations
@@ -133,15 +133,15 @@ or
 To run a single django test class:
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest
-    
-When developing tests, it is often helpful to be able to really just run one single test without the overhead of PIP installs, UX builds, etc. In this case, it is helpful to look at the output of paver, and run just the specific command (optionally, stripping away coverage metrics). At the time of this writing, the command is: 
+
+When developing tests, it is often helpful to be able to really just run one single test without the overhead of PIP installs, UX builds, etc. In this case, it is helpful to look at the output of paver, and run just the specific command (optionally, stripping away coverage metrics). At the time of this writing, the command is:
 
     python ./manage.py lms test --verbosity=1 lms/djangoapps/courseware/tests/test_courses.py   --traceback --settings=test
 
 To run a single django test:
 
     paver test_system -t lms/djangoapps/courseware/tests/tests.py:ActivateLoginTest.test_activate_login
-    
+
 To re-run all failing django tests from lms or cms, use the `--failed`,`-f` flag (see note at end of section)
 
     paver test_system -s lms --failed
@@ -197,7 +197,7 @@ Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you i
 
 Note: More on the `--failed` functionality
 * In order to use this, you must run the tests first. If you haven't already run the tests, or if no tests failed in the previous run, then using the `--failed` switch will result in **all** of the tests being run.  See more about this in the [nose documentation](http://nose.readthedocs.org/en/latest/plugins/testid.html#looping-over-failed-tests).
-* Note that `paver test_python` calls nosetests separately for cms and lms. This means that if tests failed only in lms on the previous run, then calling `paver test_python --failed` will run **all of the tests for cms** in addition to the previously failing lms tests. If you want it to run only the failing tests for lms or cms, use the `paver test_system -s lms --failed` or `paver test_system -s cms --failed` commands. 
+* Note that `paver test_python` calls nosetests separately for cms and lms. This means that if tests failed only in lms on the previous run, then calling `paver test_python --failed` will run **all of the tests for cms** in addition to the previously failing lms tests. If you want it to run only the failing tests for lms or cms, use the `paver test_system -s lms --failed` or `paver test_system -s cms --failed` commands.
 
 
 ### Running Javascript Unit Tests
@@ -232,8 +232,8 @@ We use [Bok Choy](http://bok-choy.readthedocs.org/en/latest/tutorial.html) for a
 Bok Choy is a UI-level acceptance test framework for writing robust [Selenium](http://docs.seleniumhq.org/) tests in [Python](https://www.python.org/).
 Bok Choy makes your acceptance tests reliable and maintainable by utilizing the Page Object and Promise design patterns.
 
-**Prerequisites**: 
-* These prerequisites are all automatically installed and available in [Devstack](https://github.com/edx/configuration/wiki/edX-Developer-Stack), 
+**Prerequisites**:
+* These prerequisites are all automatically installed and available in [Devstack](https://github.com/edx/configuration/wiki/edX-Developer-Stack),
 the supported development enviornment for the edX Platform.
 * Chromedriver and Chrome (see Running Lettuce Acceptance Tests below for the latest tested versions)
 * Mongo
@@ -245,24 +245,28 @@ To run all the bok choy acceptance tests:
 
     paver test_bokchoy
 
-Once the database has been set up and the static files collected, you can use the 'fast' 
+Once the database has been set up and the static files collected, you can use the 'fast'
 option to skip those tasks. This option can also be used with any of the test specs below:
 
     paver test_bokchoy --fasttest
 
-To run single test, specify the name of the test file. For example:
+To run a single test, specify the name of the test file. For example:
 
     paver test_bokchoy -t test_lms.py
 
-To run single test faster by not repeating setup tasks:
+Notice the test file location is relative to common/test/acceptance/tests. For example:
 
-    paver test_bokchoy -t test_lms.py --fasttest
+    paver test_bokchoy -t studio/test_studio_bad_data.py
+
+To run a single test faster by not repeating setup tasks:
+
+    paver test_bokchoy -t studio/test_studio_bad_data.py --fasttest
 
 To test only a certain feature, specify the file and the testcase class:
 
-    paver test_bokchoy -t test_lms.py:RegistrationTest
+    paver test_bokchoy -t studio/test_studio_bad_data.py:BadComponentTest
 
-To execute only a certain test case, specify the file name, class, and 
+To execute only a certain test case, specify the file name, class, and
 test case method:
 
     paver test_bokchoy -t test_lms.py:RegistrationTest.test_register
@@ -273,6 +277,14 @@ are captured in test_root/log.
 To put a debugging breakpoint in a test use:
 
     from nose.tools import set_trace; set_trace()
+
+By default, all bokchoy tests are run with the 'split' ModuleStore.
+To override the modulestore that is used, use the default_store option.  The currently supported stores are:
+    'split' (xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore) and
+    'draft' (xmodule.modulestore.mongo.DraftMongoModuleStore).
+For example:
+
+    paver test_bokchoy --default_store='draft'
 
 
 ### Running Lettuce Acceptance Tests
@@ -308,6 +320,14 @@ To start the debugger on failure, add the `--pdb` option to extra_args:
 
 To run tests faster by not collecting static files, you can use
 `paver test_acceptance -s lms --fasttest` and `paver test_acceptance -s cms --fasttest`.
+
+By default, all acceptance tests are run with the 'draft' ModuleStore.
+To override the modulestore that is used, use the default_store option. Currently, the possible stores for acceptance tests are:
+    'split' (xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore) and
+    'draft' (xmodule.modulestore.mongo.DraftMongoModuleStore).
+For example:
+    paver test_acceptance --default_store='draft'
+Note, however, all acceptance tests currently do not pass with 'split'.
 
 Acceptance tests will run on a randomized port and can be run in the background of paver cms and lms or unit tests.
 To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py

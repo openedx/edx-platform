@@ -323,18 +323,15 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     }, null, {
                         clientX: $('#unit-1').offset().left
                     });
-                    expect(requests.length).toEqual(2);
+                    expect(requests.length).toEqual(1);
                     expect(this.savingSpies.constructor).toHaveBeenCalled();
                     expect(this.savingSpies.show).toHaveBeenCalled();
                     expect(this.savingSpies.hide).not.toHaveBeenCalled();
                     savingOptions = this.savingSpies.constructor.mostRecentCall.args[0];
                     expect(savingOptions.title).toMatch(/Saving/);
                     expect($('#unit-1')).toHaveClass('was-dropped');
-                    expect(requests[0].requestBody).toEqual('{"children":["second-unit-id","third-unit-id"]}');
+                    expect(requests[0].requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}');
                     requests[0].respond(200);
-                    expect(this.savingSpies.hide).not.toHaveBeenCalled();
-                    expect(requests[1].requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}');
-                    requests[1].respond(200);
                     expect(this.savingSpies.hide).toHaveBeenCalled();
                     this.clock.tick(1001);
                     expect($('#unit-1')).not.toHaveClass('was-dropped');

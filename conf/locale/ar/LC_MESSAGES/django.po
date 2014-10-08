@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -42,7 +42,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)
+# edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -111,7 +111,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-08 10:58-0400\n"
+"POT-Creation-Date: 2014-09-24 13:35-0400\n"
 "PO-Revision-Date: 2014-09-02 00:40+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -462,12 +462,12 @@ msgid "You are missing one or more required fields"
 msgstr ""
 
 #: common/djangoapps/student/views.py
-msgid "Username cannot be more than {0} characters long"
-msgstr " لا يجب أن يكون اسم المستخدم أطول من {0} حرفاً"
+msgid "Username cannot be more than {num} characters long"
+msgstr ""
 
 #: common/djangoapps/student/views.py
-msgid "Email cannot be more than {0} characters long"
-msgstr " لا يجب أن يكون عنوان البريد الإلكتروني أطول من {0} حرفاً"
+msgid "Email cannot be more than {num} characters long"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
@@ -1059,6 +1059,10 @@ msgstr ""
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
 msgstr ""
 "لم يرد أي ردّ من  Xqueue في غضون {xqueue_timeout} ثواني. تمّ إيقاف العملية."
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Error running code."
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Cannot connect to the queue"
@@ -1914,6 +1918,16 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Mobile Course Available"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, the course will be available to mobile "
+"devices."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
 msgstr ""
 
@@ -2569,6 +2583,12 @@ msgid ""
 "Type in number corresponding to following modes:  'instructor' or 'everyone'"
 msgstr "كتابة الرقم المرتبط بالوضعيات التالية: \"موجّه المساق\" أو \"الجميع\""
 
+#: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "No email address found."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the name that students see for this component.  Analytics reports may "
@@ -2683,37 +2703,6 @@ msgstr ""
 "الرجاء اختيار \"صواب\" إذا أردت استخدام هذا المكوِّن بمثابة حجز خانات لغرض "
 "المزامنة مع نظام تقييم خارجي بدلاً من تشغيل أداة خارجية. يؤدي هذا الإعداد "
 "إلى إخفاء زر التشغيل وأي IFrames لهذا المكوِّن."
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Request user's username"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Requesting user's username will only work if 'Open in a new page' is set to "
-"True"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Request user's email"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Requesting user's email will only work if 'Open in a new page' is set to "
-"True"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "LTI Application Information"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid ""
-"Provide a description of the third party application. If requesting username"
-" and/or email, use this text box to inform users that their username and/or "
-"email will be forwarded to a third party application."
-msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -3073,8 +3062,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter the secret string for annotation storage. The textannotation, "
-"videoannotation, and imageannotation advanced modules require this string."
+"Enter the location of the annotation storage server. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this setting."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3083,8 +3072,8 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter the location of the annotation storage server. The textannotation, "
-"videoannotation, and imageannotation advanced modules require this setting."
+"Enter the secret string for annotation storage. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this string."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3670,6 +3659,19 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Upload Handout"
 msgstr "تحميل ورقة موزّعة"
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Optional. Use this for videos where download and streaming URLs for the "
+"videos are completely managed by edX. This will override the settings for "
+"\"Default Video URL\", \"Video File URLs\", and all YouTube IDs. If you do "
+"not know what this setting is, you can leave it blank and continue to use "
+"these other settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "EdX Video ID"
+msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -4297,10 +4299,6 @@ msgid "coupon with the coupon id ({coupon_id}) updated successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon with the coupon code ({code}) already exist"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/coupons.py
 msgid ""
 "The code ({code}) that you have tried to define is already in use as a "
 "registration code"
@@ -4319,6 +4317,10 @@ msgid "coupon with the coupon code ({code}) added successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) already exists for this course"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id not found"
 msgstr ""
@@ -4329,8 +4331,9 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid ""
-"To gain insights into student enrollment and participation, "
-"{link_start}visit the new dashboard for course analytics{link_end}."
+"To gain insights into student enrollment and participation {link_start}visit"
+" {analytics_dashboard_name}, our new dashboard for course "
+"analytics{link_end}."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -5303,7 +5306,7 @@ msgid "Code '{0}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{0}' already used."
+msgid "Only one coupon redemption is allowed against an order"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -5738,6 +5741,14 @@ msgid ""
 "that we cannot verify whether the charge went through and take further "
 "action on your order. Your credit card may possibly have been charged.  "
 "Contact us with payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Our payment processor sent us back a message saying that you have "
+"cancelled this transaction. The items in your shopping cart will exist for "
+"future purchase. If you feel that this is in error, please contact us with "
+"payment-specific questions at {email}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
@@ -6211,6 +6222,7 @@ msgstr "أنت تقوم بحذف مقال، الرجاء التأكيد."
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "تعديل"
@@ -6639,21 +6651,6 @@ msgstr "موقع المساق الذي تم تقديمه غير صحيح"
 msgid "Missing branch on fresh clone"
 msgstr "يوجد فرع ناقص على النسخة الجديدة"
 
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid "Command was: {0!r}. Working directory was: {1!r}"
-msgstr "كان الأمر المستخدم: {0!r}. ومجلّد الملفات المستخدم: {1!r}"
-
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid "Command output was: {0!r}"
-msgstr "كانت مخرجات الأمر: {0!r}"
-
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid ""
-"Directory already exists, doing a git reset and pull instead of git clone."
-msgstr ""
-"المجلد موجود بالفعل، سيتم القيام بعملية إعادة ضبط أو سحب للـ git بدلاً من "
-"استنساخ git."
-
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "ملاحظاتي"
@@ -6997,8 +6994,8 @@ msgstr ""
 msgid "Terms of Service"
 msgstr "شروط الخدمة"
 
-#: cms/templates/widgets/footer.html lms/templates/edx_footer.html
-#: lms/templates/footer.html lms/templates/original_edx_footer.html
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
@@ -7052,68 +7049,6 @@ msgid "):"
 msgstr "): "
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I want a free honor code certificate?"
-msgstr ""
-"لماذا ينبغي أن أدفع؟ ماذا لو أردت الحصول على شهادة ميثاق الشرف الأكاديمي "
-"مجانية؟"
-
-#: common/templates/course_modes/choose.html
-msgid "Why do I have to pay?"
-msgstr "لماذا علي أن أدفع؟ "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"As a not-for-profit, edX uses your contribution to support our mission to "
-"provide quality education to everyone around the world, and to improve "
-"learning through research. While we have established a minimum fee, we ask "
-"that you contribute as much as you can."
-msgstr ""
-"كمؤسسة غير ربحية، تقوم edx باستعمال مساهمتك لدعم مهمتنا التي تتمثّل في توفير"
-" تعليم عالي الجودة للجميع حول العالم، ولتطوير عملية التعلم عن طريق البحث. "
-"وفي حين أننا قمنا بفرض الحد الأدنى كرسم تسجيل، إلا أننا نطلب لطفاً مساهمتك "
-"على قدر الاستطاعة. "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"I'd like to pay more than the minimum.  Is my contribution tax deductible?"
-msgstr "أود دفع مبلغٍ سيزيد عن الحد الأدنى. هل يتم خصم مساهمتي من الضرائب؟ "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please check with your tax advisor to determine whether your contribution is"
-" tax deductible."
-msgstr ""
-"الرجاء مراجعة استشاري الضرائب الخاص بك لمعرفة ما إذا كانت مساهمتك قابلة "
-"للخصم من الضرائب. "
-
-#: common/templates/course_modes/choose.html
-msgid "What if I can't afford it or don't have the necessary equipment?"
-msgstr "ماذا إن كنت لا أستطيع تحمل تكاليفه أو أنني لا أملك المعدات اللازمة؟ "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost."
-msgstr ""
-"إذا كنت لا تستطيع تحمل الحد الأدنى من الرسوم أو أنك لا تلبي متطلبات "
-"البرنامج، تستطيع حضور المساق كمستمع أو قد تختار الحصول على شهادة ميثاق الشرف"
-" الأكاديمي دون أية تكلفة."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you would like to pursue the honor code certificate, please check the "
-"honor code certificate box and then click the 'Select Certificate' button to"
-" complete your registration."
-msgstr ""
-"إذا رغبت في الحصول على شهادة ميثاق الشرف الأكاديمي، الرجاء تحقق من مربع "
-"شهادة ميثاق الشرف الأكاديمي في الطلب، و من ثمّ الضغط على زر \"اختيار "
-"الشهادة\" لإكمال عملية التسجيل."
-
-#: common/templates/course_modes/choose.html
-msgid "Select Honor Code Certificate"
-msgstr "اختر شهادة ميثاق الشرف الأكاديمي "
-
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
 msgstr "إجراء عملية ترقية للتسجيل الخاص بك"
@@ -7162,10 +7097,13 @@ msgid "Audit This Course"
 msgstr "سجل في هذا المساق كمستمع "
 
 #: common/templates/course_modes/choose.html
-msgid "Sign up to audit this course for free and track your own progress."
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
 msgstr ""
-"قم بالتسجيل لدخول هذا المساق كمستمع بشكلٍ مجاني وتمكّن من تتبّع التقدّم الذي"
-" تحققه. "
 
 #: common/templates/course_modes/choose.html
 msgid "Select Audit"
@@ -7193,13 +7131,6 @@ msgid ""
 "Plan to use your completed coursework for job applications, career "
 "advancement, or school applications? Then work toward a Verified Certificate"
 " of Achievement to document your accomplishment. A minimum fee applies."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"You can audit this course and still have complete access to the course "
-"material. If you complete and pass the course you will automatically earn an"
-" Honor Code Certificate free of charge."
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -7242,12 +7173,12 @@ msgstr "الرؤية"
 msgid "Faq"
 msgstr "الأسئلة الأكثر تكراراً"
 
-#: lms/templates/contact.html lms/templates/original_edx_footer.html
+#: lms/templates/contact.html lms/templates/footer-edx.html
 msgid "Press"
 msgstr "الصحافة"
 
-#: lms/templates/contact.html lms/templates/edx_footer.html
-#: lms/templates/footer.html lms/templates/original_edx_footer.html
+#: lms/templates/contact.html lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
@@ -7352,16 +7283,14 @@ msgid "An error occurred. Please try again later."
 msgstr "حدث خطأ. الرجاء إعادة المحاولة في وقتٍ لاحق. "
 
 #: lms/templates/dashboard.html
-msgid "Please verify your new email"
-msgstr "الرجاء تأكيد عنوان بريدك الإلكتروني الجديد"
+msgid "Please verify your new email address"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid ""
-"You'll receive a confirmation in your inbox. Please click the link in the "
-"email to confirm the email change."
+"You'll receive a confirmation in your inbox. Please follow the link in the "
+"email to confirm your email address change."
 msgstr ""
-"ستصلك رسالة تأكيد على البريد الوارد الخاص بك. الرجاء الضغط على الرابط في "
-"الرسالة لتأكيد تغيير البريد الالكتروني."
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -7417,7 +7346,7 @@ msgstr "إعادة ضبط كلمة السر"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr "المساقات الحالية"
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
@@ -7473,11 +7402,9 @@ msgstr "الرجاء تأكيد كلمة السر الخاصة بك:"
 
 #: lms/templates/dashboard.html
 msgid ""
-"We will send a confirmation to both {email} and your new email as part of "
-"the process."
+"We will send a confirmation to both {email} and your new email address as "
+"part of the process."
 msgstr ""
-"سنقوم بإرسال رسالة تأكيد إلى كلٍ من {email} وعنوان بريدك الإلكتروني الجديد "
-"أيضاً."
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
@@ -7489,10 +7416,8 @@ msgstr "تغيير اسمك"
 #: lms/templates/dashboard.html
 msgid ""
 "To uphold the credibility of your {platform} {cert_name_short}, all name "
-"changes will be logged and recorded."
+"changes will be recorded."
 msgstr ""
-"سيتم تسجيل وحفظ كافة التغييرات على الاسم بغرض حفظ مصداقية شهادتك {platform} "
-"{cert_name_short}."
 
 #. Translators: note that {platform} {cert_name_short} will look something
 #. like: "edX certificate". Please do not change the order of these
@@ -7516,11 +7441,9 @@ msgstr "تغيير اسمي"
 
 #: lms/templates/dashboard.html
 msgid ""
-"<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
-"info\"></span>"
+"<span id='track-info'></span> {course_number}?  <span id='refund-"
+"info'></span>"
 msgstr ""
-"<span id=\"track-info\"></span> {course_number}؟ <span id=\"refund-"
-"info\"></span>"
 
 #: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -7539,83 +7462,6 @@ msgstr "إلغاء التسجيل"
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
 msgstr "عرض الوحدة في الاستديو"
-
-#: lms/templates/edx_footer.html
-msgid ""
-"{EdX} offers interactive online classes and MOOCs from the world's best "
-"universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
-" many other universities. Topics include biology, business, chemistry, "
-"computer science, economics, finance, electronics, engineering, food and "
-"nutrition, history, humanities, law, literature, math, medicine, music, "
-"philosophy, physics, science, statistics and more. {EdX} is a non-profit "
-"online initiative created by founding partners {Harvard} and {MIT}."
-msgstr ""
-
-#. Translators: The © symbol appears directly before this line.
-#: lms/templates/edx_footer.html
-msgid "2014 edX, except where noted, all rights reserved."
-msgstr ""
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-#: lms/templates/original_edx_footer.html
-msgid "Terms of Service and Honor Code"
-msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
-
-#: lms/templates/edx_footer.html
-msgid "About & Company Info"
-msgstr ""
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-#: lms/templates/original_edx_footer.html
-msgid "About"
-msgstr "نبذة عن"
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-msgid "News"
-msgstr ""
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-#: lms/templates/original_edx_footer.html
-#: lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "الأسئلة الأكثر تكراراً"
-
-#: lms/templates/edx_footer.html
-msgid "edX Blog"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "Donate to edX"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "Jobs at edX"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "Follow Us"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "Twitter"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "Facebook"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "Meetup"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "LinkedIn"
-msgstr ""
-
-#: lms/templates/edx_footer.html
-msgid "Google+"
-msgstr ""
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -7715,11 +7561,107 @@ msgstr "قائمة المتصدِرين في اللغز "
 msgid "User"
 msgstr "المستخدم"
 
-#: lms/templates/footer.html lms/templates/original_edx_footer.html
+#: lms/templates/footer-edx-new.html
+msgid "About edX"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid ""
+"{EdX} offers interactive online classes and MOOCs from the world's best "
+"universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
+" many other universities. Topics include biology, business, chemistry, "
+"computer science, economics, finance, electronics, engineering, food and "
+"nutrition, history, humanities, law, literature, math, medicine, music, "
+"philosophy, physics, science, statistics and more. {EdX} is a non-profit "
+"online initiative created by founding partners {Harvard} and {MIT}."
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+msgid "&copy; 2014 edX, some rights reserved."
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html
+msgid "Terms of Service and Honor Code"
+msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
+
+#: lms/templates/footer-edx-new.html
+msgid "(Revised 4/16/2014)"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "About & Company Info"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html
+msgid "About"
+msgstr "نبذة عن"
+
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+msgid "News"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "الأسئلة الأكثر تكراراً"
+
+#: lms/templates/footer-edx-new.html
+msgid "edX Blog"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Donate to edX"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Jobs at edX"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Follow Us"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Meetup"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "LinkedIn"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "Google+"
+msgstr ""
+
+#: lms/templates/footer-edx.html lms/templates/footer.html
 #: lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "الوظائف"
+
+#: lms/templates/footer-edx.html
+msgid "edX Logo"
+msgstr ""
+
+#: lms/templates/footer-edx.html
+msgid ""
+"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
+" mission is to bring the best of higher education to students of all ages "
+"anywhere in the world, wherever there is Internet access. {EdX}'s free "
+"online MOOCs are interactive and subjects include computer science, public "
+"health, and artificial intelligence."
+msgstr ""
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
@@ -8229,23 +8171,6 @@ msgstr ""
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
 msgstr "لا يوجد لديك أية ملاحظات."
-
-#: lms/templates/original_edx_footer.html
-msgid "edX Logo"
-msgstr ""
-
-#: lms/templates/original_edx_footer.html
-msgid ""
-"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
-" mission is to bring the best of higher education to students of all ages "
-"anywhere in the world, wherever there is Internet access. {EdX}'s free "
-"online MOOCs are interactive and subjects include computer science, public "
-"health, and artificial intelligence."
-msgstr ""
-
-#: lms/templates/original_edx_footer.html
-msgid "&copy; 2014 edX, some rights reserved."
-msgstr ""
 
 #: lms/templates/original_navigation.html
 #: lms/templates/sysadmin_dashboard.html
@@ -9313,8 +9238,18 @@ msgid "Staff view"
 msgstr "استعراض طاقم المساق"
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Course is not yet visible to students."
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
 msgid "Student view"
 msgstr "منظور الطالب "
+
+#: lms/templates/courseware/course_navigation.html
+msgid ""
+"You cannot view the course as a student or beta tester before the course "
+"release date."
+msgstr ""
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from leading universities."
@@ -9469,6 +9404,16 @@ msgstr "ابحث ضمن الطلاب"
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
 msgstr "{course_number} معلومات المساق "
+
+#: lms/templates/courseware/info.html
+msgid "You are not enrolled yet"
+msgstr ""
+
+#: lms/templates/courseware/info.html
+msgid ""
+"You are not currently enrolled in this course. Sign up for it "
+"{link_start}here{link_end}!"
+msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
@@ -10162,6 +10107,12 @@ msgstr "مسجل كـ: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "Verified"
 msgstr "تم التحقق"
 
@@ -10206,10 +10157,6 @@ msgstr "المساق لم يبدأ بعد"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Starts - {start_date}"
 msgstr "يبدأ المساق - {start_date} "
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Document your accomplishment!"
-msgstr "قم بتوثيق إنجازك!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Challenge Yourself!"
@@ -11171,113 +11118,145 @@ msgstr ""
 msgid "#:"
 msgstr "#:  "
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Professional Education Invoicing Center"
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Thank you for your purchase of {course_name}!"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Portland Street, "
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "9th floor Cambridge, MA,"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "02139 finance@edx.org"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "---------------------------------"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Bill To:"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "{company_name}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "{purchaser_name}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Customer Reference Number: {customer_reference_number}"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Registration codes:"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"Please distribute one of the following registration codes to each student "
-"who is going to enroll in the class."
+"An invoice for ${total_price} is attached. Payment is due immediately.  "
+"Information on payment methods can be found on the invoice."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"A student can redeem one of these codes by registering an account on "
-"({site_name}.edx.org), starting the purchase"
+"A CSV file of your registration codes is attached. Please distribute "
+"registration codes to each student planning to enroll using the email "
+"template below."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Thanks,"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Your {platform_name} Team"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Dear [[Name]]:"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"process on this course by adding it to their shopping cart from this page "
-"({course_url}), and"
+"We have provided an enrollment for you in the course {course_name} from "
+"{platform_name}. Please follow the instructions below to claim your access."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "entering their registration code while in the shopping cart."
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Your redeem code is: [[Enter Redeem Code here from the attached CSV]]"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(1) Register for an account at https://{site_name}."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(2) Once registered, navigate to https://{course_url}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(3) Click 'Add {course_number} to Cart'"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"Thank you for your purchase! Failure to pay this invoice will result the "
-"invalidation of student enrollments"
+"(4) On the shopping cart page, enter your redeem code and click apply code. "
+"This will make payment equal to $0."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "(5) Click 'Register'"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"that use these codes. All purchases are final. Please refer to the "
-"cancellation policy"
+"(6) You should be able to see your course on your student dashboard at "
+"https://{dashboard_url}"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "on {site_name} for more information."
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid ""
+"(7) Course materials will not be available until the course start date."
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Course: {course_name} {start_date} - {end_date}"
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "Sincerely,"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Price:     ${price}"
+#: lms/templates/emails/registration_codes_sale_email.txt
+msgid "[[Your Signature]]"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Quantity:  ${quantity}"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "INVOICE"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Sub-Total: ${sub_total}"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Date: {date}"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Discount:  ${discount}"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Invoice No: {invoice_number}"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "---------  ------"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Terms: Due Immediately"
 msgstr ""
 
-#: lms/templates/emails/registration_codes_sale_invoice.txt
-msgid "Total Due: ${total_price}"
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Due Date: {date}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Bill to:"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Customer Reference Number: {reference_number}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Balance Due: ${sale_price}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Course: {course_name}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid ""
+"Price:         ${course_price}  Quantity:      {quantity}  Sub-Total:    "
+"${sub_total}  Discount:  ${discount}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Total:      ${sale_price}"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "Payment instructions"
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid ""
+"Failure to pay this invoice will result the invalidation of student "
+"enrollment that use these codes. All purchases are final. Please refer to "
+"the cancellation policy on {site_name} for more information."
+msgstr ""
+
+#: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
+msgid "If you have payment questions, please contact {contact_email}"
 msgstr ""
 
 #: lms/templates/emails/reject_name_change.txt
@@ -11415,6 +11394,7 @@ msgstr "تخطي "
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Add Coupon"
 msgstr ""
 
@@ -11629,11 +11609,37 @@ msgstr ""
 "صلاحية نُسخ هذه الروابط في غضون 5 دقائق."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Generate Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Course Registrations Codes:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download Registration Codes"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Active Course Registrations Codes:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Active Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Spent Course Registrations Codes:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -11647,6 +11653,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Course Price: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Set Price"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -11711,15 +11722,23 @@ msgid "Coupons Information"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "+ Add Coupon"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Discount (%)"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Count"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{code}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{description}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{discount}"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -11743,10 +11762,6 @@ msgid "Please enter the coupon code"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Please enter the coupon discount value greater than 0"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please enter the coupon discount value less than or equal to 100"
 msgstr ""
 
@@ -11765,6 +11780,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon Information"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "example: A123DS"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -11862,11 +11881,6 @@ msgstr "إعادة ضبط تاريخ الاستحقاق للطالب."
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Generate Registration Code Modal"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Generate Registration Codes"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -12374,10 +12388,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 msgid "Please enter Course Mode detail below"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Set Price"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -12893,6 +12903,64 @@ msgstr "ملاحظة: تمّ رد قيمة العناصر المشطوبة عل�
 msgid "Billed To:"
 msgstr "تم تسجيل الفاتورة لـ: "
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "Confirm Enrollment"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{site_name} -  Confirm Enrollment"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "Confirm your enrollment for:"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "course dates"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{course_name}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{start_date}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{end_date}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You've clicked a link for an enrollment code that has already been used. "
+"Check your <a href={dashboard_url}>course dashboard</a> to see if you're "
+"enrolled in the course, or contact your company's administrator."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You have successfully enrolled in {course_name}. This course has now been "
+"added to your dashboard."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You're already registered for this course. Visit your <a "
+"href={dashboard_url}>dashboard</a> to see the course."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You're about to activate an enrollment code for {course_name} by "
+"{site_name}. This code can only be used one time, so you should only "
+"activate this code if you're its intended recipient."
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course &nbsp; &nbsp; &#x25b8;"
+msgstr ""
+
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
 msgstr "الإيصال (الطلب"
@@ -12906,12 +12974,6 @@ msgid "Registered as: "
 msgstr "مسجل كـ: "
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "ID Verified"
 msgstr "تم التحقق من الهوية "
 
@@ -13193,14 +13255,10 @@ msgstr "هل تواجه مشكلة تقنية؟ "
 #: lms/templates/verify_student/_reverification_support.html
 msgid ""
 "Please make sure your browser is updated to the <strong>{a_start}most recent"
-" version possible{a_end}</strong>. Also, please make sure your <strong>web "
-"cam is plugged in, turned on, and allowed to function in your web browser "
-"(commonly adjustable in your browser settings)</strong>"
+" version possible{a_end}</strong>. Also, please make sure your "
+"<strong>webcam is plugged in, turned on, and allowed to function in your web"
+" browser (commonly adjustable in your browser settings)</strong>"
 msgstr ""
-"الرجاء التأكد من تحديث المتصفّح الخاص بك إلى <strong>{a_start}النسخة الأحدث "
-"المتاحة{a_end}</strong>. كما يجب التأكد من كون <strong>كاميرا الويب لديك "
-"موصولة، ومفعّلة، ومسموح لها العمل على متصفّح الإنترنت الخاص بك (يمكن عادةً "
-"تعديله في إعدادات المتصفّح)</strong> "
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
@@ -13232,6 +13290,10 @@ msgstr "أنت تقوم بعملية إعادة التحقّق بالنسبة ل
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "تقوم بالتسجيل لـ "
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -13279,14 +13341,10 @@ msgstr "المتطلّبات التقنيّة"
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
-" possible{a_end}. Also, please make sure your <strong>web cam is plugged in,"
-" turned on, and allowed to function in your web browser (commonly adjustable"
-" in your browser settings).</strong>"
+" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
+"turned on, and allowed to function in your web browser (commonly adjustable "
+"in your browser settings).</strong>"
 msgstr ""
-"الرجاء التأكد من تحديث المتصفّح الخاص بك إلى {a_start} أحدث نسخة "
-"متاحة{a_end}. كما يجب التأكد من كون <strong>كاميرا الويب لديك موصولة، "
-"ومفعّلة، ومسموح لها العمل على متصفّح الإنترنت الخاص بك (يمكن عادةً تعديل ذلك"
-" في إعدادات المتصفّح)</strong>."
 
 #: lms/templates/verify_student/face_upload.html
 msgid "Edit Your Full Name"
@@ -14055,11 +14113,9 @@ msgstr "تحقق من بريدك الإلكتروني "
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"you need an active edX account before registering - check your email for "
-"instructions"
+"You need to activate your {platform_name} account before you can register "
+"for courses. Check your inbox for an activation email."
 msgstr ""
-"قبل القيام بالتسجيل تحتاج إلى حساب edX مفعّل - تحقق من بريدك الإلكتروني لتجد"
-" المزيد من التعليمات "
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Identification"
@@ -14072,7 +14128,7 @@ msgstr "وثيقة إثبات شخصية باستخدام الصورة "
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
 "A driver's license, passport, or other government or school-issued ID with "
-"your name and picture on it"
+"your name and picture on it."
 msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
@@ -14083,10 +14139,17 @@ msgstr "كاميرا الويب "
 msgid "A webcam and a modern browser"
 msgstr "كاميرا ويب ومتصفح حديث "
 
+#. Translators: This phrase will look like this: "Internet Explorer 9 or
+#. later"
+#: lms/templates/verify_student/show_requirements.html
+msgid "{internet_explorer_version} or later"
+msgstr ""
+
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"Please make sure your browser is updated to the most recent version possible"
-msgstr "الرجاء التأكد من أن المتصفح الخاص بك محدّث وفق آخر إصدار ممكن "
+"Please make sure your browser is updated to the most recent version "
+"possible."
+msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Credit or Debit Card"
@@ -14098,11 +14161,9 @@ msgstr "بطاقة ائتمان أو خصم مباشر رئيسية "
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"Visa, Master Card, American Express, Discover, Diners Club, JCB with "
-"Discover logo"
+"Visa, MasterCard, American Express, Discover, Diners Club, or JCB with the "
+"Discover logo."
 msgstr ""
-"فيزا، ماستر كارد، أمريكان إكسبرس، ديسكفر، داينرز كلاب، جي سي بي مع شعار "
-"ديسكافر"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
@@ -14291,53 +14352,53 @@ msgid "Loading&hellip;"
 msgstr "التحميل والمساعدة"
 
 #: cms/templates/asset_index.html
-msgid "What files are listed here?"
-msgstr "ما هي الملفات المدرجة هنا؟"
+msgid "Adding Files for Your Course"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"In addition to the files you upload on this page, any files that you add to "
-"the course appear in this list. These files include your course image, "
-"textbook chapters, and files that appear on your Course Handouts sidebar."
+"To add files to use in your course, click {em_start}Upload New File{em_end}."
+" Then follow the prompts to upload a file from your computer."
 msgstr ""
-"بالإضافة إلى الملفات التي تقوم بتحميلها على هذه الصفحة، تظهر أية ملفات تقوم "
-"بإضافتها على المساق في هذه القائمة. تتضمّن هذه الملفّات صورة المساق، وفصول "
-"الكتب، والملفات التي تظهر على جانب الأوراق الموزّعة للمساق."
-
-#: cms/templates/asset_index.html
-msgid "File URLs"
-msgstr "الروابط للملفّ"
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the Embed URL value to link to the file or image from a component, a"
-" course update, or a course handout."
+"{em_start}Caution{em_end}: edX recommends that you limit the file size to "
+"{em_start}10 MB{em_end}. In addition, do not upload video or audio files. "
+"You should use a third party service to host multimedia files."
 msgstr ""
-"استخدام قيمة الرابط التي تمّ تضمينها للارتباط بالملفّ أو الصورة من مكوِّن، "
-"أو تحديث للمساق، أو الأوراق المزّعة للمساق. "
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the External URL value to reference the file or image from outside "
-"of your course. Do not use the External URL as a link value within your "
-"course."
+"The course image, textbook chapters, and files that appear on your Course "
+"Handouts sidebar also appear in this list."
 msgstr ""
-"استخدام قيمة الرابط الخارجية للرجوع إلى الملف أو الصورة من خارج المساق. يرجى"
-" عدم استخدام الرابط الإلكتروني الخارجي بمثابة قيمة رابط ضمن مساقك."
 
-#: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/group_configurations.html cms/templates/settings_graders.html
-msgid "What can I do on this page?"
-msgstr "ما الذي يمكنني فعله على هذه الصفحة؟ "
+#: cms/templates/asset_index.html
+msgid "Using File URLs"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"You can upload new files or view, download, or delete existing files. You "
-"can lock a file so that people who are not enrolled in your course cannot "
-"access that file."
+"Use the {em_start}Embed URL{em_end} value to link to the file or image from "
+"a component, a course update, or a course handout."
 msgstr ""
-"يمكن تحميل ملفات جديدة، أو عرض أو تنزيل أو حذف الملفات الموجودة. ويمكن إقفال"
-" ملف لمنع من هو ليس مسجلاً في المساق من الوصول إليه. "
+
+#: cms/templates/asset_index.html
+msgid ""
+"Use the {em_start}External URL{em_end} value to reference the file or image "
+"only from outside of your course."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"Click in the Embed URL or External URL column to select the value, then copy"
+" it."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid "Learn more about managing files"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Choose File"
@@ -14414,6 +14475,11 @@ msgstr ""
 #: cms/templates/container.html
 msgid "Preview Changes"
 msgstr ""
+
+#: cms/templates/container.html cms/templates/group_configurations.html
+#: cms/templates/settings_graders.html
+msgid "What can I do on this page?"
+msgstr "ما الذي يمكنني فعله على هذه الصفحة؟ "
 
 #: cms/templates/container.html
 msgid ""
@@ -14684,10 +14750,9 @@ msgid ""
 "subsection, or unit, then select {em_start}Hide from students{em_end}."
 msgstr ""
 
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/textbooks.html
-msgid "Learn More"
-msgstr "معرفة المزيد"
+#: cms/templates/course_outline.html
+msgid "Learn more about the course outline"
+msgstr ""
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
@@ -15052,6 +15117,10 @@ msgid ""
 "experiment. To delete a configuration, hover over its box and click the "
 "delete icon."
 msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
+msgstr "معرفة المزيد"
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -16459,6 +16528,10 @@ msgid ""
 msgstr ""
 "إذا لم يتضمّن كتابك فصول منفردة، يمكنك تحميل النص بأكمله كفصل واحد وإدخال "
 "اسم من اختيارك في حقل إسم الفصل."
+
+#: cms/templates/textbooks.html
+msgid "Learn more about textbooks"
+msgstr ""
 
 #: cms/templates/emails/activation_email.txt
 msgid ""

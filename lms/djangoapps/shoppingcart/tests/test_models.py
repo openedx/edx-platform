@@ -102,6 +102,38 @@ class OrderTest(ModuleStoreTestCase):
         self.assertEquals(cart.orderitem_set.count(), len(course_costs))
         self.assertEquals(cart.total_cost, sum(cost for _course, cost in course_costs))
 
+    def test_start_purchase(self):
+        # Start the purchase, which will mark the cart as "paying"
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor', currency='usd')
+        cart.start_purchase()
+        self.assertEqual(cart.status, 'paying')
+        for item in cart.orderitem_set.all():
+            self.assertEqual(item.status, 'paying')
+
+        # Starting the purchase should be idempotent
+        cart.start_purchase()
+        self.assertEqual(cart.status, 'paying')
+        for item in cart.orderitem_set.all():
+            self.assertEqual(item.status, 'paying')
+
+        # If we retrieve the cart for the user, we should get a different order
+        next_cart = Order.get_cart_for_user(user=self.user)
+        self.assertNotEqual(cart, next_cart)
+        self.assertEqual(next_cart.status, 'cart')
+
+        # Complete the first purchase
+        cart.purchase()
+        self.assertEqual(cart.status, 'purchased')
+        for item in cart.orderitem_set.all():
+            self.assertEqual(item.status, 'purchased')
+
+        # Starting the purchase again should be a no-op
+        cart.start_purchase()
+        self.assertEqual(cart.status, 'purchased')
+        for item in cart.orderitem_set.all():
+            self.assertEqual(item.status, 'purchased')
+
     def test_purchase(self):
         # This test is for testing the subclassing functionality of OrderItem, but in
         # order to do this, we end up testing the specific functionality of

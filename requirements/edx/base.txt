@@ -8,7 +8,7 @@ beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 bleach==1.4
 html5lib==0.999
-boto==2.13.3
+boto==2.32.1
 celery==3.0.19
 cssselect==0.9.1
 dealer==0.2.3
@@ -33,16 +33,19 @@ django-ses==0.4.1
 django-storages==1.1.5
 django-threaded-multihost==1.4-1
 django-method-override==0.1.0
-djangorestframework==2.3.5
-django==1.4.12
+djangorestframework==2.3.14
+django==1.4.14
 feedparser==5.1.3
 firebase-token-generator==1.3.2
-fs==0.4.0
+# Master pyfs has a bug working with VPC auth. This is a fix. We should switch
+# back to master when and if this fix is merged back.
+# fs==0.4.0
+git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 GitPython==0.3.2.RC1
 glob2==0.3
 gunicorn==0.17.4
 lazy==1.1
-lxml==3.0.1
+lxml==3.3.6
 mako==0.9.1
 Markdown==2.2.1
 mongoengine==0.7.10
@@ -68,8 +71,8 @@ pytz==2012h
 pysrt==0.4.7
 PyYAML==3.10
 requests==2.3.0
-requests-oauthlib==0.4.0
-scipy==0.11.0
+requests-oauthlib==0.4.1
+scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
 sorl-thumbnail==11.12
@@ -128,6 +131,7 @@ rednose==0.3
 selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
+PyContracts==1.6.4
 
 # Used for Segment.io analytics
 analytics-python==0.4.4
@@ -138,6 +142,6 @@ git+https://github.com/mfogel/django-settings-context-processor.git
 git+https://github.com/mitocw/django-cas.git
 
 # edX packages
-edx-submissions==0.0.7
+edx-submissions==0.0.8
 
 -e git+https://github.com/pmitros/django-pyfs.git@36f64c0f1f458ce7b9ecb2347667b202d13a8317#egg=djpyfs

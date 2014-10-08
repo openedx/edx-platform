@@ -41,7 +41,7 @@ if Backbone?
           html
 
       getCohortOptions: () ->
-          if @course_settings.get("is_cohorted") and DiscussionUtil.isStaff()
+          if @course_settings.get("is_cohorted") and DiscussionUtil.isPrivilegedUser()
               user_cohort_id = $("#discussion-container").data("user-cohort-id")
               _.map @course_settings.get("cohorts"), (cohort) ->
                   {value: cohort.id, text: cohort.name, selected: cohort.id==user_cohort_id}
@@ -55,6 +55,8 @@ if Backbone?
           "click .topic-filter-label": "ignoreClick"
           "keyup .topic-filter-input": DiscussionFilter.filterDrop
           "change .post-option-input": "postOptionChange"
+          "click .cancel": "cancel"
+          "reset .forum-new-post-form": "updateStyles"
 
       # Because we want the behavior that when the body is clicked the menu is
       # closed, we need to ignore clicks in the search field and stop propagation.
@@ -102,11 +104,8 @@ if Backbone?
               success: (response, textStatus) =>
                   # TODO: Move this out of the callback, this makes it feel sluggish
                   thread = new Thread response['content']
-                  DiscussionUtil.clearFormErrors(@$(".post-errors"))
                   @$el.hide()
-                  @$(".js-post-title").val("").attr("prev-text", "")
-                  @$(".js-post-body textarea").val("").attr("prev-text", "")
-                  @$(".wmd-preview p").html("") # only line not duplicated in new post inline view
+                  @resetForm()
                   @collection.add thread
 
 
@@ -199,3 +198,24 @@ if Backbone?
               name =  gettext("…") + " / " + rawName + " " + gettext("…")
 
           return name
+
+      cancel: (event) ->
+        event.preventDefault()
+        if not confirm gettext("Your post will be discarded.")
+          return
+        @trigger('newPost:cancel')
+        @resetForm()
+
+      resetForm: =>
+        @$(".forum-new-post-form")[0].reset()
+        DiscussionUtil.clearFormErrors(@$(".post-errors"))
+        @$(".wmd-preview p").html("")
+        if @mode is "tab"
+          @setTopic(@$("a.topic-title").first())
+
+      updateStyles: =>
+        # form reset doesn't change the style of checkboxes so this event is to do that job
+        setTimeout(
+          (=> @$(".post-option-input").trigger("change")),
+          1
+        )
