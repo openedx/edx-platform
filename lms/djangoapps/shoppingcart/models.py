@@ -975,10 +975,10 @@ class Donation(OrderItem):
 
         """
         return _(
+            u"We greatly appreciate this generous contribution and your support of the {platform_name} mission.  "
             u"This receipt was prepared to support charitable contributions for tax purposes.  "
-            u"Gifts are tax deductible as permitted by law.  "
             u"We confirm that neither goods nor services were provided in exchange for this gift."
-        )
+        ).format(platform_name=settings.PLATFORM_NAME)
 
     @classmethod
     def _line_item_description(self, course_id=None):
@@ -1010,4 +1010,4 @@ class Donation(OrderItem):
 
         # The donation is for the organization as a whole, not a specific course
         else:
-            return _(u"Donation")
+            return _(u"Donation for {platform_name}").format(platform_name=settings.PLATFORM_NAME)
