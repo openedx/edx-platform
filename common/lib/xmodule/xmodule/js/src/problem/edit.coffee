@@ -283,30 +283,30 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @customLabel = ''
     return returnString  # return the feedback string but without the custom label, if any
 
-#  #________________________________________________________________________________
-#  # search for any text demarcated as a 'question hint' by the double braces {{..}}
-#  # if found, copy the text to an array for later insertion and remove that text
-#  # from the xmlString, replacing it with a unique marker for later restoration
-#  #
-#  @extractDistractorHints: (xmlString) ->
-#    @distractorHintStrings = []    # initialize the strings array
-#
-#    DOUBLE_LEFT_BRACE_MARKER = '~~~'
-#    DOUBLE_RIGHT_BRACE_MARKER = '```'
-#    xmlString = xmlString.replace(/\{\{/g, DOUBLE_LEFT_BRACE_MARKER)   # replace all double left braces with '~~~~'
-#    xmlString = xmlString.replace(/}}/g, DOUBLE_RIGHT_BRACE_MARKER)    # replace all double right braces with '```'
-#
-#    distractorHintMatches = xmlString.match(/~~~[^`]+```/gm)
-#    if distractorHintMatches
-#      index = 0
-#      for distractorHintMatch in distractorHintMatches
-#        xmlString = xmlString.replace( distractorHintMatch, '_' + index++ + '_')
-#        distractorHintMatch = distractorHintMatch.replace(/~~~/gm, '')
-#        distractorHintMatch = distractorHintMatch.replace(/```/gm, '')
-#        distractorHintMatch = distractorHintMatch.replace(/\n/gm, '_RETURN_')
-#        @distractorHintStrings.push(distractorHintMatch)   # save the string but no delimiters
-#
-#    return xmlString
+  #________________________________________________________________________________
+  # search for any text demarcated as a 'question hint' by the double braces {{..}}
+  # if found, copy the text to an array for later insertion and remove that text
+  # from the xmlString, replacing it with a unique marker for later restoration
+  #
+  @extractDistractorHints: (xmlString) ->
+    @distractorHintStrings = []    # initialize the strings array
+
+    DOUBLE_LEFT_BRACE_MARKER = '~~~'
+    DOUBLE_RIGHT_BRACE_MARKER = '```'
+    xmlString = xmlString.replace(/\{\{/g, DOUBLE_LEFT_BRACE_MARKER)   # replace all double left braces with '~~~~'
+    xmlString = xmlString.replace(/}}/g, DOUBLE_RIGHT_BRACE_MARKER)    # replace all double right braces with '```'
+
+    distractorHintMatches = xmlString.match(/~~~[^`]+```/gm)
+    if distractorHintMatches
+      index = 0
+      for distractorHintMatch in distractorHintMatches
+        xmlString = xmlString.replace( distractorHintMatch, '_' + index++ + '_')
+        distractorHintMatch = distractorHintMatch.replace(/~~~/gm, '')
+        distractorHintMatch = distractorHintMatch.replace(/```/gm, '')
+        distractorHintMatch = distractorHintMatch.replace(/\n/gm, '_RETURN_')
+        @distractorHintStrings.push(distractorHintMatch)   # save the string but no delimiters
+
+    return xmlString
 
   #________________________________________________________________________________
   # search for any text demarcated as a 'problem hint' by the double vertical bars
@@ -344,35 +344,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
     correctAnswerText = ''
     correctAnswerFound = false
-
-    debugger
-
-    questionString = xmlString.match(/(.+?)\[\[((.|\n|])+)?]]/)[2];
-
-
-    dropdownMatches = questionString.match( /(.+?)(\{\{(.|\n)*?\}\})?(,|\n|$)/ )
-
-#    a = re.findall(r'''(.+?)      # regular .+? soaking up
-#                   (\{\{(.|\n)*?\}\})?    # optional {{..}} section, can include newlines
-#                   # Note: in python at least, the { } don't have to be escaped. I would escape it anyway.
-#                   (,|\n|$)   # then there should be a comma or newline or $ to end it
-#                ''', s, re.X)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     dropdownMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
     if dropdownMatches  # the xml has an opening and closing double bracket [[...]]
       returnXmlString +=  '\n<optionresponse>\n'
@@ -651,19 +622,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>\n');
       xml = xml.replace(/\n^\=\=+$/gm, '');
       xml = xml + '\n';       // add a blank line at the end of the string (just belt and suspenders)
-
-
-
-
-
-
       xml = MarkdownEditingDescriptor.extractProblemHints(xml);    // pull out any problem hints
-
-
-
-
-
-     // xml = MarkdownEditingDescriptor.extractDistractorHints(xml);    // pull out any problem hints
+      xml = MarkdownEditingDescriptor.extractDistractorHints(xml);    // pull out any problem hints
 
       //_____________________________________________________________________
       //
