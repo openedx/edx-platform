@@ -291,7 +291,6 @@ MANAGERS = ADMINS
 
 # Static content
 STATIC_URL = '/static/' + git.revision + "/"
-ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles" / git.revision
 
 STATICFILES_DIRS = [
