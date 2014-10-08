@@ -170,7 +170,7 @@ def grade_histogram(module_id):
     WHERE courseware_studentmodule.module_id=%s
     GROUP BY courseware_studentmodule.grade"""
     # Passing module_id this way prevents sql-injection.
-    cursor.execute(q, [module_id.to_deprecated_string()])
+    cursor.execute(q, [unicode(module_id)])
 
     grades = list(cursor.fetchall())
     grades.sort(key=lambda x: x[0])  # Add ORDER BY to sql query?
