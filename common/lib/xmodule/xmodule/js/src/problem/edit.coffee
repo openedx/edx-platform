@@ -344,6 +344,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
     correctAnswerText = ''
     correctAnswerFound = false
+
     dropdownMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
     if dropdownMatches  # the xml has an opening and closing double bracket [[...]]
       returnXmlString +=  '\n<optionresponse>\n'
