@@ -191,7 +191,7 @@ class TestVerifyView(ModuleStoreTestCase):
                       kwargs={"course_id": unicode(self.course_key)})
         response = self.client.get(url)
 
-        self.assertIn("You are registering for", response.content)
+        self.assertIn("You are now registered to audit", response.content)
 
     def test_valid_course_upgrade_text(self):
         url = reverse('verify_student_verify',

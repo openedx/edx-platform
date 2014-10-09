@@ -1817,24 +1817,6 @@ ANALYTICS_DATA_TOKEN = ""
 ANALYTICS_DASHBOARD_URL = ""
 ANALYTICS_DASHBOARD_NAME = PLATFORM_NAME + " Insights"
 
-# TODO (ECOM-16): Remove once the A/B test of auto-registration completes
-AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
-    "HarvardX/SW12.2x/1T2014",
-    "HarvardX/SW12.3x/1T2014",
-    "HarvardX/SW12.4x/1T2014",
-    "HarvardX/SW12.5x/2T2014",
-    "HarvardX/SW12.6x/2T2014",
-    "HarvardX/HUM2.1x/3T2014",
-    "HarvardX/SW12x/2013_SOND",
-    "LinuxFoundationX/LFS101x/2T2014",
-    "HarvardX/CS50x/2014_T1",
-    "HarvardX/AmPoX.1/2014_T3",
-    "HarvardX/SW12.7x/3T2014",
-    "HarvardX/SW12.10x/1T2015",
-    "HarvardX/SW12.9x/3T2014",
-    "HarvardX/SW12.8x/3T2014",
-])
-
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"

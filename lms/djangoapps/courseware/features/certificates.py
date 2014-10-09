@@ -61,7 +61,7 @@ def select_contribution(amount=32):
 
 def click_verified_track_button():
     world.wait_for_ajax_complete()
-    btn_css = 'input[value="Select Certificate"]'
+    btn_css = 'input[value="Pursue a Verified Certificate"]'
     world.css_click(btn_css)
 
 
