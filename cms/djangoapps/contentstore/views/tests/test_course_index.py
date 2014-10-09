@@ -14,7 +14,8 @@ from course_action_state.models import CourseRerunState
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls, \
+    mongo_uses_error_check
 from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from course_action_state.managers import CourseRerunUIStateManager
@@ -330,7 +331,11 @@ class OutlinePerfTest(TestCourseOutline):
                     course = modulestore().get_course(self.course.id, depth=0)
                     return _course_outline_json(None, course)
 
-        with check_mongo_calls(5 * num_threads, 0):
+        if mongo_uses_error_check(modulestore()):
+            per_thread = 5
+        else:
+            per_thread = 4
+        with check_mongo_calls(per_thread * num_threads, 0):
             outline_threads = [threading.Thread(target=test_client) for __ in range(num_threads)]
             [thread.start() for thread in outline_threads]
             # now wait until they all finish
