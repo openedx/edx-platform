@@ -7,7 +7,6 @@ from xblock.fields import String
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo.draft import as_draft
 
 
