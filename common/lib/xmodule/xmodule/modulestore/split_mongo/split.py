@@ -609,6 +609,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         self.db.connection.close()
 
+    def mongo_wire_version(self):
+        """
+        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
+        """
+        return self.db.connection.max_wire_version
+
     def _drop_database(self):
         """
         A destructive operation to drop the underlying database and close all connections.

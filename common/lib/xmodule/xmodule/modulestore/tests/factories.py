@@ -279,6 +279,17 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1):
     assert_less_equal(call_count, maximum_calls)
 
 
+def mongo_uses_error_check(store):
+    """
+    Does mongo use the error check as a separate message?
+    """
+    if hasattr(store, 'mongo_wire_version'):
+        return store.mongo_wire_version() <= 1
+    if hasattr(store, 'modulestores'):
+        return any([mongo_uses_error_check(substore) for substore in store.modulestores])
+    return False
+
+
 @contextmanager
 def check_mongo_calls(num_finds=0, num_sends=None):
     """

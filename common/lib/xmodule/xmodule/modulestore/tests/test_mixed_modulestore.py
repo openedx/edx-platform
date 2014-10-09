@@ -31,7 +31,8 @@ from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, Mo
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls
+from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
+    mongo_uses_error_check
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR, CourseComparisonTest
 
@@ -672,6 +673,8 @@ class TestMixedModuleStore(CourseComparisonTest):
         Delete should reject on r/o db and work on r/w one
         """
         self.initdb(default_ms)
+        if default_ms == 'draft' and mongo_uses_error_check(self.store):
+            max_find += 1
 
         # r/o try deleting the chapter (is here to ensure it can't be deleted)
         with self.assertRaises(NotImplementedError):
@@ -703,6 +706,8 @@ class TestMixedModuleStore(CourseComparisonTest):
         behavioral properties which this deletion test gets at.
         """
         self.initdb(default_ms)
+        if default_ms == 'draft' and mongo_uses_error_check(self.store):
+            max_find += 1
         # create and delete a private vertical with private children
         private_vert = self.store.create_child(
             # don't use course_location as it may not be the repr
@@ -776,6 +781,8 @@ class TestMixedModuleStore(CourseComparisonTest):
         private_leaf.display_name = 'change me'
         private_leaf = self.store.update_item(private_leaf, self.user_id)
         # test succeeds if delete succeeds w/o error
+        if default_ms == 'draft' and mongo_uses_error_check(self.store):
+            max_find += 1
         with check_mongo_calls(max_find, max_send):
             self.store.delete_item(private_leaf.location, self.user_id)
 
@@ -1310,6 +1317,8 @@ class TestMixedModuleStore(CourseComparisonTest):
         Test calling unpublish
         """
         self.initdb(default_ms)
+        if default_ms == 'draft' and mongo_uses_error_check(self.store):
+            max_find += 1
         self._create_block_hierarchy()
 
         # publish

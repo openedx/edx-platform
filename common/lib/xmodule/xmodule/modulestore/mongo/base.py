@@ -488,6 +488,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         self.collection.database.connection.close()
 
+    def mongo_wire_version(self):
+        """
+        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
+        """
+        self.database.connection._ensure_connected()
+        return self.database.connection.max_wire_version
+
     def _drop_database(self):
         """
         A destructive operation to drop the underlying database and close all connections.
@@ -1280,7 +1287,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                         {'$set': {'definition.children': []}},
                         multi=False,
                         upsert=True,
-                        safe=self.collection.safe
                     )
                 elif ancestor_loc.category == 'course':
                     # once we reach the top location of the tree and if the location is not an orphan then the

@@ -3,7 +3,7 @@ Test the publish code (mostly testing that publishing doesn't result in orphans)
 """
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
-from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.tests.factories import check_mongo_calls, mongo_uses_error_check
 from xmodule.modulestore import ModuleStoreEnum
 
 
@@ -103,7 +103,11 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         #   delete the subtree of drafts (1 call),
         #   update the published version of each node in subtree (4 calls),
         #   update the ancestors up to course (2 calls)
-        with check_mongo_calls(19, 7):
+        if mongo_uses_error_check(self.draft_mongo):
+            max_find = 20
+        else:
+            max_find = 19
+        with check_mongo_calls(max_find, 7):
             self.draft_mongo.publish(item.location, self.user_id)
 
         # verify status
