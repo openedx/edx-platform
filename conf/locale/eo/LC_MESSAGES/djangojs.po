@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-24 14:15-0400\n"
-"PO-Revision-Date: 2014-09-24 18:16:48.345620\n"
+"POT-Creation-Date: 2014-10-01 13:57+0000\n"
+"PO-Revision-Date: 2014-10-01 13:57:56.490708\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1538,6 +1538,36 @@ msgstr ""
 "Ýöür ßröwsér döésn't süppört dïréçt äççéss tö thé çlïpßöärd. Pléäsé üsé thé "
 "Çtrl+X/Ç/V kéýßöärd shörtçüts ïnstéäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
+#: common/lib/xmodule/xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr ""
+"Çlïçk ÖK tö hävé ýöür üsérnämé änd é-mäïl äddréss sént tö ä 3rd pärtý äpplïçätïön.\n"
+"\n"
+"Çlïçk Çänçél tö rétürn tö thïs pägé wïthöüt séndïng ýöür ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+
+#: common/lib/xmodule/xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your username sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr ""
+"Çlïçk ÖK tö hävé ýöür üsérnämé sént tö ä 3rd pärtý äpplïçätïön.\n"
+"\n"
+"Çlïçk Çänçél tö rétürn tö thïs pägé wïthöüt séndïng ýöür ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your e-mail address sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr ""
+"Çlïçk ÖK tö hävé ýöür é-mäïl äddréss sént tö ä 3rd pärtý äpplïçätïön.\n"
+"\n"
+"Çlïçk Çänçél tö rétürn tö thïs pägé wïthöüt séndïng ýöür ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to tab %(tab_name)s in the current "
@@ -1747,9 +1777,7 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/coffee/src/discussion/views/new_post_view.js
-#: common/static/coffee/src/discussion/views/new_post_view.js
-#: common/static/coffee/src/discussion/views/new_post_view.js
+#: common/static/coffee/src/discussion/views/discussion_topic_menu_view.js
 msgid "…"
 msgstr "… #"
 
@@ -2373,33 +2401,6 @@ msgstr "Çlösé Çälçülätör Ⱡ'σ#"
 msgid "Post body"
 msgstr "Pöst ßödý #"
 
-#. Translators: "Distribution" refers to a grade distribution. This error
-#. message appears when there is an error getting the data on grade
-#. distribution.;
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-msgid "Error fetching distribution."
-msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
-
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
@@ -2428,6 +2429,22 @@ msgid ""
 msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
@@ -3121,6 +3138,31 @@ msgstr "Süççéssfüllý résçöréd prößlém för üsér {user} Ⱡ'σяє
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem."
 msgstr "Fäïléd tö résçöré prößlém. Ⱡ'σяєм#"
+
+#: lms/static/js/student_account/account.js
+#: lms/static/js/student_profile/profile.js
+msgid "The data could not be saved."
+msgstr "Thé dätä çöüld nöt ßé sävéd. Ⱡ'σяєм #"
+
+#: lms/static/js/student_account/account.js
+msgid "Please enter a valid email address"
+msgstr "Pléäsé éntér ä välïd émäïl äddréss Ⱡ'σяєм ιρ#"
+
+#: lms/static/js/student_account/account.js
+msgid "Please enter a valid password"
+msgstr "Pléäsé éntér ä välïd pässwörd Ⱡ'σяєм #"
+
+#: lms/static/js/student_account/account.js
+msgid "Please check your email to confirm the change"
+msgstr "Pléäsé çhéçk ýöür émäïl tö çönfïrm thé çhängé Ⱡ'σяєм ιρѕυм#"
+
+#: lms/static/js/student_profile/profile.js
+msgid "Full name cannot be blank"
+msgstr "Füll nämé çännöt ßé ßlänk Ⱡ'σяєм#"
+
+#: lms/static/js/student_profile/profile.js
+msgid "Saved"
+msgstr "Sävéd Ⱡ'σяєм ι#"
 
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
