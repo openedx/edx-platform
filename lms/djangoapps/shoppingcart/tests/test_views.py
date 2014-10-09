@@ -862,7 +862,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn(self.cart.company_contact_email, resp.content)
         self.assertIn(self.cart.recipient_email, resp.content)
         self.assertIn("Invoice #{order_id}".format(order_id=self.cart.id), resp.content)
-        self.assertIn('You have successfully purchased <b>{total_registration_codes} student activation'
+        self.assertIn('You have successfully purchased <b>{total_registration_codes} course registration codes'
                       .format(total_registration_codes=context['total_registration_codes']), resp.content)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
