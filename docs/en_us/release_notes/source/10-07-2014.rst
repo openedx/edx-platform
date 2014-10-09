@@ -47,7 +47,9 @@ edX Learning Management System
 
 * Course discussions have several new features:
 
-  * Students can now change the topic of a post after they post it. Discussion administrators, moderators, and community TAs can edit the topic for any post.
+  * Students can now change the topic of a post after they post it. Discussion
+    administrators, moderators, and community TAs can edit the topic for any
+    post.
 
   * Users no longer have the option to add comments to closed threads. (TNL-150)
 
@@ -137,7 +139,10 @@ The following documentation is available:
 
 * `edX Open Learning XML Guide`_
 
-  The edX Open Learning XML (OLX) Guide is a new manual for course teams who are working with XML courses. We'll release updates to this preliminary version of the guide over the next several months. For more information, see `Open Learning XML (OLX) Format`_.
+  The edX Open Learning XML (OLX) Guide is a new manual for course teams who are
+  working with XML courses. We'll release updates to this preliminary version of
+  the guide over the next several months. For more information, see `Open
+  Learning XML (OLX) Format`_.
 
 **************************
 Other edX Resources
