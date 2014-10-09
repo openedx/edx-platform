@@ -1,6 +1,18 @@
 
 .. Links
 
+.. _Open Learning XML (OLX) Format: http://engineering.edx.org/2014/10/open-learning-xml-olx-format/
+
+.. _edX Open Learning XML Guide: http://edx-open-learning-xml.readthedocs.org/en/latest/index.html
+
+.. _molecule viewer tool: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/molecule_viewer.html
+
+.. _EdX Guide for Students: http://edx-guide-for-students.readthedocs.org/en/latest/
+
+.. _Cohorts: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/cohorts/index.html
+
+.. _Creating Exercises and Tools: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/index.html
+
 .. _edX Product and Engineering Newsletter: http://us5.campaign-archive2.com/?u=1822a33c054dc20e223ca40e2&id=090cb3ea4c&e=4a41f5542a
 
 .. _End of August Product Announcement: http://us5.campaign-archive1.com/?u=1822a33c054dc20e223ca40e2&id=2f58184233
