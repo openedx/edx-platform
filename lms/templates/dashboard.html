@@ -31,166 +31,17 @@
 <%block name="js_extra">
   <%static:js group='dashboard'/>
   <script type="text/javascript">
-  (function() {
-
-    // On initialization, set focus to the first notification available
-    // for screen readers.
-    var notifications = $('.dashboard-notifications');
-    if (notifications.children().length > 0) {
-        notifications.focus();
-    }
-
-    $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
-
-    function toggleExpandMessage(e) {
-        (e).preventDefault();
-
-        $(this).closest('.message.is-expandable').toggleClass('is-expanded');
-
-        course = $("#upgrade-to-verified").data("course-id");
-        analytics.track('edx.bi.dashboard.upsell_copy.clicked', {
-          category: 'user-engagement',
-          label: course
-        });
-    }
-
-    $("#failed-verification-button-dismiss").click(function(event) {
-      $.ajax({
-        url: "${reverse('verify_student_toggle_failed_banner_off')}",
-        type: "post"
-        })
-      $("#failed-verification-banner").addClass('is-hidden');
-      })
-
-    $("#upgrade-to-verified").click(function(event) {
-      user = $(event.target).data("user");
-      course = $(event.target).data("course-id");
-      Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], null);
-    });
-
-    $(".email-settings").click(function(event) {
-      $("#email_settings_course_id").val( $(event.target).data("course-id") );
-      $("#email_settings_course_number").text( $(event.target).data("course-number") );
-      if($(event.target).data("optout") == "False") {
-        $("#receive_emails").prop('checked', true);
-      }
-    });
-
-    $(".unenroll").click(function(event) {
-      $("#unenroll_course_id").val( $(event.target).data("course-id") );
-      $("#unenroll_course_number").text( $(event.target).data("course-number") );
-    });
-
-    $('#unenroll_form').on('ajax:complete', function(event, xhr) {
-      if(xhr.status == 200) {
-        location.href = "${reverse('dashboard')}";
-      } else if (xhr.status == 403) {
-        location.href = "${reverse('signin_user')}?course_id=" +
-          encodeURIComponent($("#unenroll_course_id").val()) + "&enrollment_action=unenroll";
-      } else {
-        $('#unenroll_error').html(
-          xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}"
-        ).stop().css("display", "block");
-      }
-    });
-
-    $('#pwd_reset_button').click(function() {
-      $.post('${reverse("password_reset")}',
-             {"email"  : $('#id_email').val()},
-             function(data){
-               $("#password_reset_complete_link").click();
-             });
-    });
-
-    $("#submit-lang").click(function(event, xhr) {
-        event.preventDefault();
-        $.post('/lang_pref/setlang/',
-            {"language": $('#settings-language-value').val()})
-        .done(
-            function(data){
-                // submit form as normal
-                $('.settings-language-form').submit();
-            }
-        );
-    });
-
-    $("#change_email_form").submit(function(){
-      var new_email = $('#new_email_field').val();
-      var new_password = $('#new_email_password').val();
-
-      $.post('${reverse("change_email")}',
-               {"new_email" : new_email, "password" : new_password},
-               function(data) {
-                 if (data.success) {
-                   $("#change_email_title").html("${_("Please verify your new email address")}");
-                   $("#change_email_form").html("<p>${_("You'll receive a confirmation in your inbox."
-                                                    " Please follow the link in the email to confirm"
-                                                    " your email address change.")}</p>");
-                 } else {
-                   $("#change_email_error").html(data.error).stop().css("display", "block");
-                 }
-               });
-      return false;
-    });
-
-    $("#change_name_form").submit(function(){
-      var new_name = $('#new_name_field').val();
-      var rationale = $('#name_rationale_field').val();
-
-      $.post('${reverse("change_name")}',
-             {"new_name":new_name, "rationale":rationale},
-             function(data) {
-               if(data.success) {
-                 location.reload();
-               } else {
-                 $("#change_name_error").html(data.error).stop().css("display", "block");
-               }
-             });
-       return false;
-    });
-
-    $("#email_settings_form").submit(function(){
-      $.ajax({
-        type: "POST",
-        url: '${reverse("change_email_settings")}',
-        data: $(this).serializeArray(),
-        success: function(data) {
-          if(data.success) {
-            location.href = "${reverse('dashboard')}";
-          }
-        },
-        error: function(xhr, textStatus, error) {
-          if (xhr.status == 403) {
-            location.href = "${reverse('signin_user')}";
-          }
-        }
+    $(document).ready(function() {
+      edx.dashboard.legacy.init({
+        dashboard: "${reverse('dashboard')}",
+        signInUser: "${reverse('signin_user')}",
+        passwordReset: "${reverse('password_reset')}",
+        changeEmail: "${reverse('change_email')}",
+        changeEmailSettings: "${reverse('change_email_settings')}",
+        changeName: "${reverse('change_name')}",
+        verifyToggleBannerFailedOff: "${reverse('verify_student_toggle_failed_banner_off')}",
       });
-      return false;
     });
-  })(this);
-
-  $(function(){
-    accessible_modal(".edit-name", "#apply_name_change .close-modal", "#apply_name_change", "#dashboard-main");
-
-    accessible_modal(".edit-email", "#change_email .close-modal", "#change_email", "#dashboard-main");
-
-    accessible_modal("#pwd_reset_button", "#password_reset_complete .close-modal", "#password_reset_complete", "#dashboard-main");
-
-
-    $(".email-settings").each(function(index){
-      $(this).attr("id", "unenroll-" + index);
-      // a bit of a hack, but gets the unique selector for the modal trigger
-      var trigger = "#" + $(this).attr("id");
-      accessible_modal(trigger, "#email-settings-modal .close-modal", "#email-settings-modal", "#dashboard-main");
-    });
-
-    $(".unenroll").each(function(index){
-      $(this).attr("id", "email-settings-" + index);
-      // a bit of a hack, but gets the unique selector for the modal trigger
-      var trigger = "#" + $(this).attr("id");
-      accessible_modal(trigger, "#unenroll-modal .close-modal", "#unenroll-modal", "#dashboard-main");
-    });
-  });
   </script>
 </%block>
 
@@ -543,13 +394,3 @@
     </form>
   </div>
 </section>
-
-<script>
-    $(function() {
-        $("#unregister_block_course").click( function(event) {
-            $("#unenroll_course_id").val( $(event.target).data("course-id") );
-            $("#unenroll_course_number").text( $(event.target).data("course-number") );
-        });
-    });
-</script>
-
