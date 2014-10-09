@@ -22,6 +22,8 @@ if Backbone?
       if @mode not in ["tab", "inline"]
         throw new Error("invalid mode: " + @mode)
 
+      @async_thread_views = if options.async_thread_views? then options.async_thread_views else false
+
       # Quick fix to have an actual model when we're receiving new models from
       # the server.
       @model.collection.on "reset", (collection) =>
@@ -226,7 +228,7 @@ if Backbone?
 
     renderResponseToList: (response, listSelector, options) =>
         response.set('thread', @model)
-        view = new ThreadResponseView($.extend({model: response}, options))
+        view = new ThreadResponseView($.extend({model: response, async: @async_thread_views}, options))
         view.on "comment:add", @addComment
         view.on "comment:endorse", @endorseThread
         view.render()

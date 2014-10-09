@@ -12,6 +12,7 @@ if Backbone?
 
     initialize: (options) ->
       @collapseComments = options.collapseComments
+      @async = if options.async? then options.async else false;
       @createShowView()
 
     renderTemplate: ->
@@ -199,7 +200,7 @@ if Backbone?
           url: url
           type: "POST"
           dataType: 'json'
-          async: false # TODO when the rest of the stuff below is made to work properly..
+          async: @async # TODO when the rest of the stuff below is made to work properly..
           data:
               body: newBody
           error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))

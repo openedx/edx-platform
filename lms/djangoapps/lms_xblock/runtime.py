@@ -124,6 +124,22 @@ class LmsHandlerUrls(object):
         })
 
 
+class LmsUser(object):
+    """
+    A runtime mixin that provides the user object.
+
+    This must be mixed in to a runtime that already accepts and stores
+    a anonymous_student_id and has get_real_user method.
+    """
+
+    @property
+    def user(self):
+        """
+        Returns user object
+        """
+        return self.get_real_user(self.anonymous_student_id)  # pylint: disable=no-member
+
+
 class LmsPartitionService(PartitionService):
     """
     Another runtime mixin that provides access to the student partitions defined on the
@@ -188,7 +204,7 @@ class UserTagsService(object):
         )
 
 
-class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract-method
+class LmsModuleSystem(LmsHandlerUrls, LmsUser, ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """

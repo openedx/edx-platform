@@ -1,6 +1,6 @@
 // forums - main app styling
 // ====================
-body.discussion {
+body.discussion, div.discussion-body {
 
   .course-tabs .right {
     @include float(right);

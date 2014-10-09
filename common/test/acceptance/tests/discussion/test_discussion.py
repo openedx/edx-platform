@@ -464,30 +464,48 @@ class DiscussionCommentEditTest(UniqueCourseTest):
         self.assertTrue(page.is_add_comment_visible("response1"))
 
 
-@attr('shard_1')
-class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+class InlineDiscussionTestMixin(BaseDiscussionMixin):
     """
     Tests for inline discussions
     """
+    def _get_xblock_fixture_desc(self):
+        """ Returns Discussion XBlockFixtureDescriptor """
+        raise NotImplementedError()
+    
+    def _get_additional_xblock_fixture_desc(self):
+        """ Returns additional Discussion XBlockFixtureDescriptor """
+        raise NotImplementedError()
+
+    def _initial_discussion_id(self):
+        """ Returns initial discussion_id for InlineDiscussionPage """
+        raise NotImplementedError()
+    
+    def _additional_discussion_id(self):
+        """ Returns initial discussion_id for InlineDiscussionPage """
+        raise NotImplementedError()
+
+    @property
+    def discussion_id(self):
+        """ Returns selected discussion_id """
+        raise NotImplementedError()
+    
+    @property
+    def additional_discussion_id(self):
+        """ Returns additional discussion id """
+        raise NotImplemented()
+
+    def __init__(self, *args, **kwargs):
+        self._discussion_id = None
+        super(InlineDiscussionTestMixin, self).__init__(*args, **kwargs)
 
     def setUp(self):
-        super(InlineDiscussionTest, self).setUp()
-        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-        self.additional_discussion_id = "test_discussion_{}".format(uuid4().hex)
+        super(InlineDiscussionTestMixin, self).setUp()
         self.course_fix = CourseFixture(**self.course_info).add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection").add_children(
                     XBlockFixtureDesc("vertical", "Test Unit").add_children(
-                        XBlockFixtureDesc(
-                            "discussion",
-                            "Test Discussion",
-                            metadata={"discussion_id": self.discussion_id}
-                        ),
-                        XBlockFixtureDesc(
-                            "discussion",
-                            "Test Discussion 1",
-                            metadata={"discussion_id": self.additional_discussion_id}
-                        )
+                        self._get_xblock_fixture_desc(),
+                        self._get_additional_xblock_fixture_desc()
                     )
                 )
             )
@@ -497,8 +515,9 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.courseware_page.visit()
-        self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
-        self.additional_discussion_page = InlineDiscussionPage(self.browser, self.additional_discussion_id)
+        self.discussion_page = InlineDiscussionPage(self.browser, self._initial_discussion_id())
+        self.additional_discussion_page = InlineDiscussionPage(self.browser, self._additional_discussion_id())
+        
 
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
@@ -559,6 +578,73 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.thread_page.is_comment_editable("comment2"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
+
+
+@attr('shard_1')
+class DiscussionXModuleInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+    """ Discussion XModule inline mode tests """
+    def _get_xblock_fixture_desc(self):
+        """ Returns Discussion XBlockFixtureDescriptor """
+        return XBlockFixtureDesc(
+            'discussion',
+            "Test Discussion",
+            metadata={"discussion_id": self.discussion_id}
+        )
+    
+    def _get_additional_xblock_fixture_desc(self):
+        """ Returns Discussion XBlockFixtureDescriptor """
+        return XBlockFixtureDesc(
+            'discussion',
+            "Test Discussion",
+            metadata={"discussion_id": self.discussion_id}
+        )
+
+    def _initial_discussion_id(self):
+        """ Returns initial discussion_id for InlineDiscussionPage """
+        return self.discussion_id
+    
+    def _addiional_discussion_id(self):
+        """ Returns initial discussion_id for InlineDiscussionPage """
+        return self.additional_discussion_id
+
+    @property
+    def discussion_id(self):
+        """ Returns selected discussion_id """
+        if getattr(self, '_discussion_id', None) is None:
+            self._discussion_id = "test_discussion_{}".format(uuid4().hex)
+        return self._discussion_id
+    
+    @property
+    def additional_discussion_id(self):
+        """ Returns selected discussion_id """
+        if getattr(self, '_additional_discussion_id', None) is None:
+            self._discussion_id = "test_discussion_{}".format(uuid4().hex)
+        return self._discussion_id
+
+
+@attr('shard_1')
+class DiscussionXBlockInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+    """ Discussion XBlock inline mode tests """
+    def _get_xblock_fixture_desc(self):
+        """ Returns Discussion XBlockFixtureDescriptor """
+        return XBlockFixtureDesc(
+            'discussion-forum',
+            "Test Discussion"
+        )
+
+    def _initial_discussion_id(self):
+        """ Returns initial discussion_id for InlineDiscussionPage """
+        return None
+
+    @property
+    def discussion_id(self):
+        """ Returns selected discussion_id """
+        return self.discussion_page.get_discussion_id()
+    
+    @property
+    def additional_discussion_id(self):
+        """ Returns additional discussion_id """
+        return self.additional_discussion_page.get_discussion_id()
 
     def test_dual_discussion_module(self):
         """
