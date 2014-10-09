@@ -79,19 +79,16 @@
   else:
     header_extra_file = None
 
-    if settings.FEATURES.get("ENABLE_NEW_EDX_HEADER", False):
-        header_file = microsite.get_template_path('navigation.html')
+    if settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
+        header_file = microsite.get_template_path('navigation-edx.html')
     else:
-        header_file = microsite.get_template_path('original_navigation.html')
-
+        header_file = microsite.get_template_path('navigation.html')
 
     google_analytics_file = microsite.get_template_path('google_analytics.html')
 
     if settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
-        if settings.FEATURES.get('ENABLE_NEW_EDX_FOOTER', False):
-            footer_file = microsite.get_template_path('footer-edx-new.html')
-        else:
-            footer_file = microsite.get_template_path('footer-edx.html')
+        footer_file = microsite.get_template_path('footer-edx-new.html')
+
     else:
       footer_file = microsite.get_template_path('footer.html')
 

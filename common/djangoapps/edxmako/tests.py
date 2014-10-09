@@ -14,7 +14,6 @@ from edxmako import add_lookup, LOOKUP
 from edxmako.shortcuts import (
     marketing_link,
     render_to_string,
-    header_footer_context_processor,
     open_source_footer_context_processor
 )
 from student.tests.factories import UserFactory
@@ -39,17 +38,6 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             expected_link = reverse('login')
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
-
-    @ddt.data((True, True), (False, False), (False, True), (True, False))
-    @ddt.unpack
-    def test_header_and_footer(self, header_setting, footer_setting):
-        with patch.dict('django.conf.settings.FEATURES', {
-            'ENABLE_NEW_EDX_HEADER': header_setting,
-            'ENABLE_NEW_EDX_FOOTER': footer_setting,
-        }):
-            result = header_footer_context_processor({})
-            self.assertEquals(footer_setting, result.get('ENABLE_NEW_EDX_FOOTER'))
-            self.assertEquals(header_setting, result.get('ENABLE_NEW_EDX_HEADER'))
 
     @ddt.data((True, None), (False, None))
     @ddt.unpack

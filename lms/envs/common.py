@@ -288,7 +288,7 @@ FEATURES = {
     # when the styles appropriately match the edX.org website.
     'ENABLE_NEW_EDX_HEADER': False,
     
-     # When a logged in user goes to the homepage ('/') should the user be
+    # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,    
@@ -446,9 +446,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.open_source_footer_context_processor',
-
-    # TODO: Used for header and footer feature flags. Remove as part of ECOM-136
-    'edxmako.shortcuts.header_footer_context_processor',
 
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
