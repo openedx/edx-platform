@@ -801,9 +801,11 @@ class CourseTabList(List):
         the given user with the provided access settings.
         """
         for tab in course.tabs:
-            if (tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled) and
-                    (not is_user_sneakpeek or
-                     any([isinstance(tab, t) for t in CourseTabList.SNEAKPEEK_TAB_TYPES]))):
+            if (
+                tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled) and
+                (not tab.is_hideable or not tab.is_hidden) and
+                (not is_user_sneakpeek or any([isinstance(tab, t) for t in CourseTabList.SNEAKPEEK_TAB_TYPES]))
+            ):
                 if tab.is_collection:
                     for item in tab.items(course):
                         yield item
