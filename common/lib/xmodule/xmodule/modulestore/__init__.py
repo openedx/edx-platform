@@ -382,6 +382,7 @@ class ModuleStoreRead(object):
         If target is a list, do any of the list elements meet the criteria
         If the criteria is a regex, does the target match it?
         If the criteria is a function, does invoking it on the target yield something truthy?
+        If criteria is a dict {($nin|$in): []}, then do (none|any) of the list elements meet the criteria
         Otherwise, is the target == criteria
         '''
         if isinstance(target, list):
@@ -390,6 +391,12 @@ class ModuleStoreRead(object):
             return criteria.search(target) is not None
         elif callable(criteria):
             return criteria(target)
+        elif isinstance(criteria, dict) and '$in' in criteria:
+            # note isn't handling any other things in the dict other than in
+            return any(self._value_matches(target, test_val) for test_val in criteria['$in'])
+        elif isinstance(criteria, dict) and '$nin' in criteria:
+            # note isn't handling any other things in the dict other than nin
+            return not any(self._value_matches(target, test_val) for test_val in criteria['$nin'])
         else:
             return criteria == target
 

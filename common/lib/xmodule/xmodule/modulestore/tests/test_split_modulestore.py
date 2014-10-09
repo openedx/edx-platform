@@ -884,6 +884,11 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertFalse(modulestore()._value_matches('I need some help', re.compile(r'Help')))
         self.assertTrue(modulestore()._value_matches(['I need some help', 'today'], re.compile(r'Help', re.IGNORECASE)))
 
+        self.assertTrue(modulestore()._value_matches('gotcha', {'$in': ['a', 'bunch', 'of', 'gotcha']}))
+        self.assertFalse(modulestore()._value_matches('gotcha', {'$in': ['a', 'bunch', 'of', 'gotchas']}))
+        self.assertFalse(modulestore()._value_matches('gotcha', {'$nin': ['a', 'bunch', 'of', 'gotcha']}))
+        self.assertTrue(modulestore()._value_matches('gotcha', {'$nin': ['a', 'bunch', 'of', 'gotchas']}))
+
         self.assertTrue(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 1}))
         self.assertFalse(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 2}))
         self.assertFalse(modulestore()._block_matches({'a': 1, 'b': 2}, {'c': 1}))
