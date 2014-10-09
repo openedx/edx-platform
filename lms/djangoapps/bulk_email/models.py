@@ -197,7 +197,7 @@ class CourseEmailTemplate(models.Model):
         result = result.replace(message_body_tag, message_body, 1)
 
         # finally, return the result, after wrapping long lines and without converting to an encoded byte array.
-        return wrap_message(result)
+        return wrap_message(result, 450)
 
     def render_plaintext(self, plaintext, context):
         """
