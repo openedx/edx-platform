@@ -13,7 +13,7 @@ DEFAULT_PORT = {"lms": 8000, "studio": 8001}
 DEFAULT_SETTINGS = 'devstack'
 
 
-def run_server(system, settings=None, port=None, skip_assets=False):
+def run_server(system, settings=None, port=None, skip_assets=False, contracts=False):
     """
     Start the server for the specified `system` (lms or studio).
     `settings` is the Django settings module to use; if not provided, use the default.
@@ -36,9 +36,12 @@ def run_server(system, settings=None, port=None, skip_assets=False):
     if port is None:
         port = DEFAULT_PORT[system]
 
-    run_process(django_cmd(
-        system, settings, 'runserver', '--traceback',
-        '--pythonpath=.', '0.0.0.0:{}'.format(port)))
+    args = [settings, 'runserver', '--traceback', '--pythonpath=.', '0.0.0.0:{}'.format(port)]
+
+    if contracts:
+        args.append("--contracts")
+
+    run_process(django_cmd(system, *args))
 
 
 @task
@@ -86,8 +89,14 @@ def devstack(args):
     parser = argparse.ArgumentParser(prog='paver devstack')
     parser.add_argument('system', type=str, nargs=1, help="lms or studio")
     parser.add_argument('--fast', action='store_true', default=False, help="Skip updating assets")
+    parser.add_argument(
+        '--no-contracts',
+        action='store_true',
+        default=False,
+        help="Disable contracts. By default, they're enabled in devstack."
+    )
     args = parser.parse_args(args)
-    run_server(args.system[0], settings='devstack', skip_assets=args.fast)
+    run_server(args.system[0], settings='devstack', skip_assets=args.fast, contracts=(not args.no_contracts))
 
 
 @task
