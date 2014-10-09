@@ -793,15 +793,15 @@ class CourseTabList(List):
             settings,
             is_user_authenticated=True,
             is_user_staff=True,
+            is_user_enrolled=False,
             is_user_sneakpeek=False,
-            is_user_enrolled=False
     ):
         """
         Generator method for iterating through all tabs that can be displayed for the given course and
         the given user with the provided access settings.
         """
         for tab in course.tabs:
-            if (tab.can_display(course, settings, is_user_authenticated, is_user_staff) and
+            if (tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled) and
                     (not is_user_sneakpeek or
                      any([isinstance(tab, t) for t in CourseTabList.SNEAKPEEK_TAB_TYPES]))):
                 if tab.is_collection:
