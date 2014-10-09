@@ -1,3 +1,4 @@
+import json
 import pytz
 from collections import defaultdict
 import logging
@@ -8,19 +9,19 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
+from django.utils.timezone import UTC
+
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 
 from edxmako import lookup_template
 import pystache_custom as pystache
 
-from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted
+from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
 from course_groups.models import CourseUserGroup
-from xmodule.modulestore.django import modulestore
-from django.utils.timezone import UTC
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
-import json
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 
@@ -425,7 +426,7 @@ def prepare_content(content, course_key, is_staff=False):
         # Only reveal endorser if requester can see author or if endorser is staff
         if (
             endorser and
-            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_id))
+            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_key))
         ):
             endorsement["username"] = endorser.username
         else:
@@ -438,9 +439,13 @@ def prepare_content(content, course_key, is_staff=False):
             ]
             content[child_content_key] = children
 
-    # Augment the specified thread info to include the group name if a group id is present.
-    if content.get('group_id') is not None:
-        content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
+    if is_course_cohorted(course_key):
+        # Augment the specified thread info to include the group name if a group id is present.
+        if content.get('group_id') is not None:
+            content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
+    else:
+        # Remove any cohort information that might remain if the course had previously been cohorted.
+        content.pop('group_id', None)
 
     return content
 
