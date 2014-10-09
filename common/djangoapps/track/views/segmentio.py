@@ -93,14 +93,19 @@ def track_segmentio_event(request):
     # The POST body will contain the JSON encoded event
     full_segment_event = request.json
 
+    # We mostly care about the properties
+    segment_event = full_segment_event.get('properties', {})
+
     def logged_failure_response(*args, **kwargs):
         """Indicate a failure and log information about the event that will aide debugging efforts"""
         failed_response = failure_response(*args, **kwargs)
         log.warning('Unable to process event received from segment.io: %s', json.dumps(full_segment_event))
         return failed_response
 
-    # Selectively listen to particular channels
-    channel = full_segment_event.get('channel')
+    # Selectively listen to particular channels, note that the client can set the "event_source" field in the
+    # "properties" dict to override the channel provided by segment.io. This is necessary because there is a bug in some
+    # segment.io client libraries that prevented them from sending correct channel fields.
+    channel = segment_event.get('event_source')
     allowed_channels = [c.lower() for c in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_CHANNELS', [])]
     if not channel or channel.lower() not in allowed_channels:
         return response(WARNING_IGNORED_CHANNEL, committed=False)
@@ -111,15 +116,15 @@ def track_segmentio_event(request):
     if not action or action.lower() not in allowed_actions:
         return response(WARNING_IGNORED_ACTION, committed=False)
 
-    # We mostly care about the properties
-    segment_event = full_segment_event.get('properties', {})
-
     context = {}
 
     # Start with the context provided by segment.io in the "client" field if it exists
     segment_context = full_segment_event.get('context')
     if segment_context:
         context['client'] = segment_context
+        user_agent = segment_context.get('userAgent', '')
+    else:
+        user_agent = ''
 
     # Overlay any context provided in the properties
     context.update(segment_event.get('context', {}))
@@ -136,7 +141,7 @@ def track_segmentio_event(request):
     except ValueError:
         return logged_failure_response(ERROR_INVALID_USER_ID)
     else:
-        context['user_id'] = user_id
+        context['user_id'] = user.id
 
     # course_id is expected to be provided in the context when applicable
     course_id = context.get('course_id')
@@ -173,6 +178,7 @@ def track_segmentio_event(request):
         event = {
             "username": user.username,
             "event_type": event_type,
+            "name": segment_event.get('name', ''),
             # Will be either "mobile", "browser" or "server". These names happen to be identical to the names we already
             # use so no mapping is necessary.
             "event_source": channel,
@@ -181,7 +187,7 @@ def track_segmentio_event(request):
             "context": complete_context,
             "page": segment_event.get('page'),
             "host": complete_context.get('host', ''),
-            "agent": '',
+            "agent": user_agent,
             "ip": segment_event.get('ip', ''),
             "event": segment_event.get('event', {}),
         }
