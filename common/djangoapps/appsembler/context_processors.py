@@ -6,7 +6,7 @@ import os
 def intercom(request):
     email = os.environ.get("INTERCOM_USER_EMAIL")
     user_hash = hmac.new(
-        os.environ.get("INTERCOM_API_SECRET"),
+        os.environ.get("INTERCOM_APP_SECRET"),
         email,
         digestmod=hashlib.sha256).hexdigest()
     data = {
