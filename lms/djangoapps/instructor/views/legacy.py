@@ -11,6 +11,7 @@ import logging
 import os
 import re
 import requests
+import urllib
 
 from collections import defaultdict, OrderedDict
 from markupsafe import escape
@@ -910,7 +911,7 @@ def instructor_dashboard(request, course_id):
         """
         url = settings.ANALYTICS_SERVER_URL + \
             u"get?aname={}&course_id={}&apikey={}".format(
-                analytics_name, course_key.to_deprecated_string(), settings.ANALYTICS_API_KEY
+                analytics_name, urllib.quote(unicode(course_key)), settings.ANALYTICS_API_KEY
             )
         try:
             res = requests.get(url)
