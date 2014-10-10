@@ -357,7 +357,13 @@
             % endif
       
             ##<li><div class="icon length"></div><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
-      
+            
+            <li>
+                <i class="icon icon-money"></i>
+                <p>${_("Price")}</p>
+                <span>${course_display_price}</span>
+            </li>
+            
             % if get_course_about_section(course, "prerequisites"):
               <li class="prerequisites"><div class="icon prereq"></div><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
             % endif

@@ -648,6 +648,22 @@ def registered_for_course(course, user):
         return False
 
 
+def get_course_display_price(course, registration_price):
+    """
+    Return Course Price as a string preceded by correct currency, or 'Free'
+    """
+    currency_symbol = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
+    
+    price = course.display_price
+    if registration_price > 0:
+        price = registration_price
+    
+    if price:
+        return "{}{}".format(currency_symbol, price)
+    else:
+        return  _('Free')
+
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
@@ -694,6 +710,8 @@ def course_about(request, course_id):
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
 
+    course_display_price = get_course_display_price(course, registration_price)
+
     # only allow course sneak peek if
     # 1) within enrollment period
     # 2) course specifies it's okay
@@ -724,6 +742,7 @@ def course_about(request, course_id):
         'sneakpeek_allowed': sneakpeek_allowed,
         'course_target': course_target,
         'registration_price': registration_price,
+        'course_display_price': course_display_price,
         'in_cart': in_cart,
         'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
         'show_courseware_link': show_courseware_link,
