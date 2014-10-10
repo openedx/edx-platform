@@ -278,7 +278,11 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
           <div class="data-input">
             <h3>${_("Registration for")}:
               <span class="pull-right">
-                % if course.start_date_text or course.end_date_text:
+                <%
+                    course_start_time = course.start_datetime_text()
+                    course_end_time = course.end_datetime_text()
+                %>
+                % if course_start_time or course_end_time:
                   ${_("Course Dates")}:
                 %endif
               </span>
@@ -286,12 +290,12 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
 
             <h1>${_(" {course_name} ").format(course_name=course.display_name)}
               <span class="pull-right">
-                % if course.start_date_text:
-                  ${course.start_date_text}
+                % if course_start_time:
+                  ${course_start_time}
                 %endif
                 -
-                % if course.end_date_text:
-                  ${course.end_date_text}
+                % if course_end_time:
+                  ${course_end_time}
                 %endif
               </span>
             </h1>
