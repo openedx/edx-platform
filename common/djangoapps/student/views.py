@@ -29,6 +29,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
 from django.db.models.signals import post_save
@@ -1829,7 +1830,7 @@ def activate_account(request, key):
     return HttpResponse(_("Unknown error. Please e-mail us to let us know how it happened."))
 
 
-@ensure_csrf_cookie
+@csrf_exempt
 def password_reset(request):
     """ Attempts to send a password reset e-mail. """
     if request.method != "POST":
