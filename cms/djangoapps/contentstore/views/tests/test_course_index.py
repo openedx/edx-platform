@@ -331,12 +331,9 @@ class OutlinePerfTest(TestCourseOutline):
                     course = modulestore().get_course(self.course.id, depth=0)
                     return _course_outline_json(None, course)
 
-        if mongo_uses_error_check(modulestore()):
-            per_thread = 5
-        else:
-            per_thread = 4
+        per_thread = 4
         with check_mongo_calls(per_thread * num_threads, 0):
-            outline_threads = [threading.Thread(target=test_client) for __ in range(num_threads)]
+            outline_threads = [threading.Thread(target=test_client) for __ in xrange(num_threads)]
             [thread.start() for thread in outline_threads]
             # now wait until they all finish
             [thread.join() for thread in outline_threads]
