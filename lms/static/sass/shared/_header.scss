@@ -334,8 +334,7 @@ header.global-new {
 
   nav {
     @include clearfix();
-    max-width: grid-width(12);
-    min-width: 760px;
+    width: grid-width(12);
     height: ($baseline*2);
     margin: 0 auto;
     padding: 18px ($baseline/2) 0;
