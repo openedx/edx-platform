@@ -759,7 +759,7 @@ body.discussion, .discussion-course, div.discussion-body {
       display: inline-block;
       position: relative;
       top: 5px;
-      margin-right: 6px;
+      @include margin-right(6px);
       width: 21px;
       height: 19px;
       background: url(../images/show-hide-discussion-icon.png) no-repeat;
@@ -769,7 +769,7 @@ body.discussion, .discussion-course, div.discussion-body {
 
   .new-post-btn {
     display: inline-block;
-    float: right;
+    @include float(right);
   }
 
   section.discussion {

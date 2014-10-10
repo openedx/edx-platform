@@ -8,7 +8,7 @@
   }
 
   .content-primary {
-    @extend %ui-col-wide;
+    @extend .ui-col-wide;
 
     .no-textbook-content {
       @extend %no-content;
@@ -305,7 +305,7 @@
             border-bottom: none;
             margin: flip(0 ($baseline*0.75) 0 0, 0 0 0 ($baseline*0.75));
             padding: ($baseline/4) 0 0 0;
-            float: $left;
+            @include float(left);
             position: relative;
 
             input, textarea {
@@ -352,6 +352,6 @@
   }
 }
   .content-supplementary {
-    @extend %ui-col-narrow;
+    @extend .ui-col-narrow;
   }
 }

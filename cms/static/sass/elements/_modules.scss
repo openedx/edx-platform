@@ -300,7 +300,7 @@ $outline-indent-width: $baseline;
 
   .icon {
     @extend %t-icon5;
-    margin-right: ($baseline/4);
+    @include margin-right($baseline/4);
   }
 }
 

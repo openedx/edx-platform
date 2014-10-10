@@ -12,7 +12,6 @@
 
 // base - utilities
 @import 'base/reset';
-@import 'base/config';
 @import 'base/variables';
 @import 'base/mixins';
 

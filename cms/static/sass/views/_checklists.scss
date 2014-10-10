@@ -8,7 +8,7 @@
   }
 
   .content-primary {
-    @extend %ui-col-wide;
+    @extend .ui-col-wide;
   }
 
   // checklists - general
@@ -336,6 +336,6 @@
   }
 
   .content-supplementary {
-    @extend %ui-col-narrow;
+    @extend .ui-col-narrow;
   }
 }

@@ -276,6 +276,7 @@ nav.sequence-nav {
           height: 100%;
           width: 40px;
           text-indent: -9999px;
+          overflow: hidden;
           @include transition(all .2s $ease-in-out-quad 0s);
 
 /*          &:focus {
@@ -356,6 +357,7 @@ nav.sequence-bottom {
           display: block;
           padding: lh(.5) 4px;
           text-indent: -9999px;
+          overflow: hidden;
           @include transition(all .2s $ease-in-out-quad 0s);
 
           &:hover, &:focus {
@@ -386,12 +388,20 @@ nav.sequence-bottom {
       }
 
       &.next {
-        border-radius: flip(0 35px 35px 0, 35px 0 0 35px);
-        #{$border-left}: none;
+        @include border-radius(0 35px 35px 0);
+        @include border-left(none);
 
         a {
           background-image: flip($next-icon, $prev-icon);
           background-position: center 15px;
+
+          @include ltr {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
+
+          @include rtl {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
         }
       }
     }
