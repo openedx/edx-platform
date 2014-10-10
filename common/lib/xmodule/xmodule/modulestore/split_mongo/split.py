@@ -196,6 +196,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 course_key.replace(org=None, course=None, run=None, branch=None)
             ]
 
+        # handle ignore case and general use
         return super(SplitBulkWriteMixin, self)._get_bulk_ops_record(
             course_key.replace(branch=None, version_guid=None), ignore_case
         )
@@ -607,6 +608,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Closes any open connections to the underlying databases
         """
         self.db.connection.close()
+
+    def mongo_wire_version(self):
+        """
+        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
+        """
+        return self.db.connection.max_wire_version
 
     def _drop_database(self):
         """
