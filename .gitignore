@@ -55,6 +55,7 @@ cover_html/
 reports/
 jscover.log
 jscover.log.*
+.tddium*
 
 ### Installation artifacts
 *.egg-info
