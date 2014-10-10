@@ -74,6 +74,23 @@ describe "NewPostView", ->
         # It should be visible and enabled once more.
         checkVisibility(@view, true, false, false)
 
+      checkVisibility = (view, expectedVisible) =>
+        view.render()
+        expect(view.$(".js-group-select").is(":visible")).toEqual(expectedVisible)
+        if expectedVisible
+          expect(view.$(".js-group-select").prop("disabled")).toEqual(false)
+
+      it "is not visible to students", ->
+        checkVisibility(@view, false)
+
+      it "allows TAs to see the cohort selector", ->
+        DiscussionSpecHelper.makeTA()
+        checkVisibility(@view, true)
+
+      it "allows moderators to see the cohort selector", ->
+        DiscussionSpecHelper.makeModerator()
+        checkVisibility(@view, true)
+
       it "allows the user to make a cohort selection", ->
         DiscussionSpecHelper.makeModerator()
         @view.render()
