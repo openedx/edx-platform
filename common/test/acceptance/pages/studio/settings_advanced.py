@@ -155,6 +155,7 @@ class AdvancedSettingsPage(CoursePage):
             'certificates_display_behavior',
             'cohort_config',
             'course_image',
+            'cosmetic_display_price',
             'advertised_start',
             'announcement',
             'display_name',

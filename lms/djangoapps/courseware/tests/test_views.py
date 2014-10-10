@@ -199,6 +199,24 @@ class ViewsTestCase(TestCase):
         mock_course.id = self.course_key
         self.assertTrue(views.registered_for_course(mock_course, self.user))
 
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=["USD", "$"])
+    def test_get_cosmetic_display_price(self):
+        """
+        Check that get_cosmetic_display_price() returns the correct price given its inputs.
+        """
+        registration_price = 99
+        self.course.cosmetic_display_price = 10
+        # Since registration_price is set, it overrides the cosmetic_display_price and should be returned
+        self.assertEqual(views.get_cosmetic_display_price(self.course, registration_price), "$99")
+
+        registration_price = 0
+        # Since registration_price is not set, cosmetic_display_price should be returned
+        self.assertEqual(views.get_cosmetic_display_price(self.course, registration_price), "$10")
+
+        self.course.cosmetic_display_price = 0
+        # Since both prices are not set, there is no price, thus "Free"
+        self.assertEqual(views.get_cosmetic_display_price(self.course, registration_price), "Free")
+
     def test_jump_to_invalid(self):
         # TODO add a test for invalid location
         # TODO add a test for no data *
