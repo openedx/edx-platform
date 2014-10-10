@@ -28,11 +28,9 @@
                 this.template = _.template($('#thread-edit-template').html());
                 this.$el.html(this.template(this.model.toJSON())).appendTo(this.container);
                 this.submitBtn = this.$('.post-update');
-                if (this.isTabMode()) {
-                    threadTypeTemplate = _.template($("#thread-type-template").html());
-                    this.addField(threadTypeTemplate({form_id: formId}));
-                    this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
-                }
+                threadTypeTemplate = _.template($("#thread-type-template").html());
+                this.addField(threadTypeTemplate({form_id: formId}));
+                this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
                 this.topicView = new DiscussionTopicMenuView({
                     topicId: this.topicId,
                     course_settings: this.course_settings
@@ -55,7 +53,13 @@
                 var title = this.$('.edit-post-title').val(),
                     threadType = this.$(".post-type-input:checked").val(),
                     body = this.$('.edit-post-body textarea').val(),
-                    commentableId = this.topicView.getCurrentTopicId();
+                    commentableId = this.topicView.getCurrentTopicId(),
+                    postData = {
+                        title: title,
+                        thread_type: threadType,
+                        body: body,
+                        commentable_id: commentableId
+                    };
 
                 return DiscussionUtil.safeAjax({
                     $elem: this.submitBtn,
@@ -64,28 +68,18 @@
                     type: 'POST',
                     dataType: 'json',
                     async: false, // @TODO when the rest of the stuff below is made to work properly..
-                    data: {
-                        title: title,
-                        thread_type: threadType,
-                        body: body,
-                        commentable_id: commentableId
-                    },
+                    data: postData,
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function() {
-                        var newAttrs = {
-                            title: title,
-                            body: body,
-                            thread_type: threadType,
-                            commentable_id: commentableId,
-                            courseware_title: this.topicView.getFullTopicName()
-                        };
                         // @TODO: Move this out of the callback, this makes it feel sluggish
                         this.$('.edit-post-title').val('').attr('prev-text', '');
                         this.$('.edit-post-body textarea').val('').attr('prev-text', '');
                         this.$('.wmd-preview p').html('');
-                        this.model.set(newAttrs).unset('abbreviatedBody');
+                        postData.courseware_title = this.topicView.getFullTopicName();
+                        this.model.set(postData).unset('abbreviatedBody');
                         this.trigger('thread:updated');
                         if (this.threadType !== threadType) {
+                            this.model.set("thread_type", threadType)
                             this.model.trigger('thread:thread_type_updated');
                             this.trigger('comment:endorse');
                         }

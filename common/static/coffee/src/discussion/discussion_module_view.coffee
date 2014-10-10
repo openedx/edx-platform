@@ -99,13 +99,17 @@ if Backbone?
 
       @newPostForm = $('.new-post-article')
       @threadviews = @discussion.map (thread) =>
-        new DiscussionThreadView(
+        view = new DiscussionThreadView(
           el: @$("article#thread_#{thread.id}"),
           model: thread,
           mode: "inline",
           course_settings: @course_settings,
           topicId: discussionId
         )
+        thread.on "thread:thread_type_updated", ->
+          view.rerender()
+          view.expand()
+        return view
       _.each @threadviews, (dtv) -> dtv.render()
       DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
       @newPostView = new NewPostView(
