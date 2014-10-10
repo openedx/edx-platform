@@ -13,7 +13,7 @@ from django.db.models import Avg, Count, Max, Min
 from django.http import Http404
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
+from django.db.models import Q, F
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -36,7 +36,7 @@ from api_manager.models import CourseGroupRelationship, CourseContentGroupRelati
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
-from api_manager.utils import generate_base_uri, str2bool
+from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
 from projects.models import Project, Workgroup
 from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from .serializers import CourseModuleCompletionSerializer, CourseSerializer
@@ -1537,6 +1537,80 @@ class CoursesMetrics(SecureAPIView):
             }
             return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         data.update(thread_stats)
+        return Response(data, status=status.HTTP_200_OK)
+
+class CoursesTimeSeriesMetrics(SecureAPIView):
+    """
+    ### The CoursesTimeSeriesMetrics view allows clients to retrieve a list of Metrics for the specified Course
+    in time series format.
+    - URI: ```/api/courses/{course_id}/time-series-metrics/?start_date={date}&end_date={date}&interval={interval}&organization={organization_id}```
+    - interval can be `days`, `weeks` or `months`
+    - GET: Returns a JSON representation with three metrics
+    {
+        "users_not_started": [[datetime-1, count-1], [datetime-2, count-2], ........ [datetime-n, count-n]],
+        "users_started": [[datetime-1, count-1], [datetime-2, count-2], ........ [datetime-n, count-n]],
+        "users_completed": [[datetime-1, count-1], [datetime-2, count-2], ........ [datetime-n, count-n]]
+    }
+    - metrics can be filtered by organization by adding organization parameter to GET request
+    ### Use Cases/Notes:
+    * Example: Display number of users completed, started or not started in a given course for a given time period
+    """
+
+    def get(self, request, course_id):  # pylint: disable=W0613
+        """
+        GET /api/courses/{course_id}/time-series-metrics/
+        """
+        if not course_exists(request, request.user, course_id):
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        start = request.QUERY_PARAMS.get('start_date', None)
+        end = request.QUERY_PARAMS.get('end_date', None)
+        interval = request.QUERY_PARAMS.get('interval', 'days')
+        if not start or not end:
+            return Response({"message": _("Both start_date and end_date parameters are required")}
+                            , status=status.HTTP_400_BAD_REQUEST)
+        if interval not in ['days', 'weeks', 'months']:
+            return Response({"message": _("Interval parameter is not valid. It should be one of these "
+                                          "'days', 'weeks', 'months'")}, status=status.HTTP_400_BAD_REQUEST)
+        start_dt = parse_datetime(start)
+        end_dt = parse_datetime(end)
+        course_key = get_course_key(course_id)
+        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
+        grades_qs = StudentGradebook.objects.filter(course_id__exact=course_key, user__is_active=True).\
+            exclude(user_id__in=exclude_users)
+        grades_complete_qs = grades_qs.filter(proforma_grade__lte=F('grade') + grade_complete_match_range,
+                                              proforma_grade__gt=0)
+        enrolled_qs = CourseEnrollment.objects.filter(course_id__exact=course_key, user__is_active=True)\
+            .exclude(id__in=exclude_users)
+        users_started_qs = StudentProgress.objects.filter(course_id__exact=course_key, user__is_active=True)\
+            .exclude(user_id__in=exclude_users)
+        organization = request.QUERY_PARAMS.get('organization', None)
+        if organization:
+            enrolled_qs = enrolled_qs.filter(user__organizations=organization)
+            grades_complete_qs = grades_complete_qs.filter(user__organizations=organization)
+            users_started_qs = users_started_qs.filter(user__organizations=organization)
+
+        total_enrolled = enrolled_qs.filter(created__lt=start_dt).count()
+        total_started = users_started_qs.filter(created__lt=start_dt).count()
+        enrolled_series = get_time_series_data(enrolled_qs, start_dt, end_dt, interval=interval,
+                                               date_field='created', aggregate=Count('id'))
+
+        started_series = get_time_series_data(users_started_qs, start_dt, end_dt, interval=interval,
+                                              date_field='created', aggregate=Count('id'))
+        completed_series = get_time_series_data(grades_complete_qs, start_dt, end_dt, interval=interval,
+                                                date_field='modified', aggregate=Count('id'))
+        not_started_series = []
+        for enrolled, started in zip(enrolled_series, started_series):
+            not_started_series.append((started[0], (total_enrolled + enrolled[1]) - (total_started + started[1])))
+            total_started += started[1]
+            total_enrolled += enrolled[1]
+
+        data = {
+            'users_not_started': not_started_series,
+            'users_started': started_series,
+            'users_completed': completed_series
+        }
         return Response(data, status=status.HTTP_200_OK)
 
 

@@ -3,12 +3,14 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/courses/tests.py]
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import uuid
 import mock
 from random import randint
 from urllib import urlencode
+from freezegun import freeze_time
+from dateutil.relativedelta import relativedelta
 
 from django.contrib.auth.models import Group
 from django.core.cache import cache
@@ -1967,6 +1969,144 @@ class CoursesApiTests(ModuleStoreTestCase):
         course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_bogus_course_id)
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 404)
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'MARK_PROGRESS_ON_GRADING_EVENT': True,
+                                                       'SIGNAL_ON_SCORE_CHANGED': True,
+                                                       'STUDENT_GRADEBOOK': True,
+                                                       'STUDENT_PROGRESS': True})
+    def test_courses_data_time_series_metrics(self):
+        course = CourseFactory.create(
+            number='3033',
+            name='metrics_in_timeseries',
+            start=datetime(2014, 9, 16, 14, 30),
+            end=datetime(2015, 1, 16)
+        )
+
+        chapter = ItemFactory.create(
+            category="chapter",
+            parent_location=course.location,
+            data=self.test_data,
+            due=datetime(2015, 5, 16, 14, 30),
+            display_name="Overview"
+        )
+
+        sub_section = ItemFactory.create(
+            parent_location=chapter.location,
+            category="sequential",
+            display_name=u"test subsection",
+        )
+        unit = ItemFactory.create(
+            parent_location=sub_section.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"test unit",
+        )
+
+        item = ItemFactory.create(
+            parent_location=unit.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name='Problem to test timeseries',
+            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
+        )
+
+        # create 10 users
+        USER_COUNT = 25
+        users = [UserFactory.create(username="testuser_tstest" + str(__), profile='test') for __ in xrange(USER_COUNT)]
+
+        # enroll users with time set to 28 days ago
+        enrolled_time = timezone.now() + relativedelta(days=-28)
+        with freeze_time(enrolled_time):
+            for user in users:
+                CourseEnrollmentFactory.create(user=user, course_id=course.id)
+
+        # Mark users as those who have started course
+        for j, user in enumerate(users):
+            complete_time = timezone.now() + relativedelta(days=-(USER_COUNT - j))
+            with freeze_time(complete_time):
+                points_scored = .25
+                points_possible = 1
+                module = self.get_module_for_user(user, course, item)
+                grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+                module.system.publish(module, 'grade', grade_dict)
+
+                # Last 2 users as those who have completed
+                if j >= USER_COUNT - 2:
+                    try:
+                        sg_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
+                        sg_entry.grade = 0.9
+                        sg_entry.proforma_grade = 0.91
+                        sg_entry.save()
+                    except StudentGradebook.DoesNotExist:
+                        StudentGradebook.objects.create(user=user, course_id=course.id, grade=0.9,
+                                                        proforma_grade=0.91)
+
+        test_course_id = unicode(course.id)
+        # get course metrics in time series format
+        end_date = datetime.now().date()
+        start_date = end_date + relativedelta(days=-4)
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}'.format(self.base_courses_uri,
+                                                                                           test_course_id,
+                                                                                           start_date,
+                                                                                           end_date)
+
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 5)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 6)
+        self.assertEqual(len(response.data['users_started']), 5)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 4)
+        self.assertEqual(len(response.data['users_completed']), 5)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 2)
+
+        # metrics with weeks as interval
+        start_date = end_date + relativedelta(days=-10)
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&' \
+                             'interval=weeks'.format(self.base_courses_uri,
+                                                     test_course_id,
+                                                     start_date,
+                                                     end_date)
+
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 2)
+        self.assertEqual(len(response.data['users_started']), 2)
+        self.assertEqual(len(response.data['users_completed']), 2)
+
+        # metrics with months as interval
+        start_date = end_date + relativedelta(months=-3)
+        end_date = datetime.now().date() + relativedelta(months=1)
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&' \
+                             'interval=months'.format(self.base_courses_uri,
+                                                      test_course_id,
+                                                      start_date,
+                                                      end_date)
+
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 5)
+        self.assertEqual(len(response.data['users_started']), 5)
+        self.assertEqual(len(response.data['users_completed']), 5)
+
+        # test without end_date
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}'.format(self.base_courses_uri,
+                                                                                           test_course_id,
+                                                                                           start_date)
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 400)
+
+        # test with unsupported interval
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&interval=hours'\
+            .format(self.base_courses_uri,
+                    test_course_id,
+                    start_date,
+                    end_date)
+
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 400)
 
     def test_course_workgroups_list(self):
         projects_uri = self.base_projects_uri
