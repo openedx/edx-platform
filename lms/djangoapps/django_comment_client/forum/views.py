@@ -265,7 +265,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_key)
-    course_settings = make_course_settings(course, include_category_map=True)
+    course_settings = make_course_settings(course)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
     is_moderator = cached_has_permission(request.user, "see_all_cohorts", course_key)
