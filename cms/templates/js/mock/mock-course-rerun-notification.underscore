@@ -1,7 +1,7 @@
 <div id="page-alert">
     <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
         <div class="alert announcement has-actions">
-            <i class="alert-symbol icon-bullhorn"></i>
+            <i class="feedback-symbol icon-bullhorn"></i>
 
             <div class="copy">
                 <h2 class="title title-3">This course was created as a re-run. Some manual configuration is needed.</h2>
