@@ -24,6 +24,7 @@ urlpatterns = patterns(
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:-]+)/completions/*$', courses_views.CourseModuleCompletionList.as_view(), name='completion-list'),
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:-]+)/projects/*$', courses_views.CoursesProjectList.as_view(), name='courseproject-list'),
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:-]+)/metrics/*$', courses_views.CoursesMetrics.as_view(), name='course-metrics'),
+    url(r'^(?P<course_id>[a-zA-Z0-9_+\/:-]+)/time-series-metrics/*$', courses_views.CoursesTimeSeriesMetrics.as_view(), name='course-time-series-metrics'),
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:-]+)/metrics/cities/$', courses_views.CoursesMetricsCities.as_view(), name='courses-cities-metrics'),
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:-]+)/metrics/completions/leaders/*$', courses_views.CoursesMetricsCompletionsLeadersList.as_view(), name='course-metrics-completions-leaders'),
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:-]+)/metrics/grades/*$', courses_views.CoursesMetricsGradesList.as_view()),
