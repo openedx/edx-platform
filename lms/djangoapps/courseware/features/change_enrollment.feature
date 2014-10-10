@@ -19,5 +19,5 @@ Then I should be on the dashboard page
 Then 2 "edx.course.enrollment.mode_changed" server event is emitted
 
 # don't emit another mode_changed event upon unenrollment
-When I unregister for the course numbered "6.002x"
+When I unenroll from the course numbered "6.002x"
 Then 2 "edx.course.enrollment.mode_changed" server events is emitted
