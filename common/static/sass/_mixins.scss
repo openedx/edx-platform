@@ -88,13 +88,13 @@
 }
 
 // layout placeholders
-%ui-col-wide  {
+.ui-col-wide  {
   width: flex-grid(9, 12);
   @include margin-right(flex-gutter());
   @include float(left);
 }
 
-%ui-col-narrow  {
+.ui-col-narrow  {
   width: flex-grid(3, 12);
   @include float(left);
 }

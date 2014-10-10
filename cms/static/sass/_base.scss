@@ -279,17 +279,17 @@ p, ul, ol, dl {
       @include clearfix();
 
       .page-header {
-        width: flex-grid(6,12);
         @include float(left);
         @include margin-right(flex-gutter());
+        width: flex-grid(6,12);
       }
 
       .nav-actions {
+        @include float(left);
+        @include text-align(right);
         position: relative;
         bottom: -($baseline*0.75);
         width: flex-grid(6,12);
-        @include float(left);
-        @include text-align(right);
 
         .nav-item {
           display: inline-block;

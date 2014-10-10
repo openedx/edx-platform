@@ -164,7 +164,7 @@
 	width: 30%;
 	padding: 20px 30px;
 	margin: 0;
-	@include border-radius(0 3px 3px 0);
+	@include border-radius(0, 3px, 3px, 0);
 	@include border-left(none);
 	background: $lightGrey;
 
@@ -184,7 +184,7 @@
 
     .edit-icon,
     .delete-icon {
-      @include margin-right(4px);
+      @include margin-right($baseline/5);
     }
   }
 

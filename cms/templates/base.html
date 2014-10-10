@@ -9,7 +9,7 @@
 <!--[if IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
 <%
-    # This should be done someplace more central.
+    # set doc language direction
     from django.utils.translation import get_language_bidi
     dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 %>

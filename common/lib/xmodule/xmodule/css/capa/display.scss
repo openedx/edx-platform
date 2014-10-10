@@ -97,7 +97,7 @@ div.problem {
     input[type="radio"],
     input[type="checkbox"] {
       @include float(left);
-      @include margin(4px 8px 0 0);
+      @include margin(4px, 8px, 0, 0);
     }
 
     text {

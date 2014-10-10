@@ -41,7 +41,7 @@
       display: inline-block;
       width: 49%;
       vertical-align: middle;
-      text-align: right;
+      @include text-align(right);
     }
   }
 

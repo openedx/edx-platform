@@ -8,11 +8,11 @@
   }
 
   .content-primary {
-    @extend %ui-col-wide;
+    @extend .ui-col-wide;
   }
 
   .content-supplementary {
-    @extend %ui-col-narrow;
+    @extend .ui-col-narrow;
   }
 
   .nav-actions {

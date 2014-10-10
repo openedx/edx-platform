@@ -2,7 +2,7 @@
   @extend .sidebar;
   @extend .tran;
   @include border-right(1px solid $border-color-2);
-  @include border-radius(3px 0 0 3px);
+  @include border-radius(3px, 0, 0, 3px);
 
   #open_close_accordion {
     display: none;
@@ -66,11 +66,14 @@
           background-image: url("/static/images/ui-icons_222222_256x240.png");  // jQuery UI sprite
 
           &.ui-icon-triangle-1-e {
+
+            // CASE: left to right layout
             @include ltr {
               background-position: -32px -16px; // jQuery UI east arrow position
             }
 
-            @include rtl {
+           // CASE: right to left layout
+           @include rtl {
               background-position: -96px -16px; // jQuery UI west arrow position
             }
           }

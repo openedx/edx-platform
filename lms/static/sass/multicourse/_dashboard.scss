@@ -452,7 +452,7 @@
           @include box-sizing(border-box);
           border-radius: 3px;
           display: block;
-          float: left;
+          @include float(left);
           font: normal 15px/1.6rem $sans-serif;
           letter-spacing: 0;
           padding: 6px 32px 7px;

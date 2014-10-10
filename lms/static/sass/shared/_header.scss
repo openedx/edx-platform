@@ -146,6 +146,7 @@ header.global {
         @include background-image(url('../images/small-header-home-icon.png'));
         background-repeat: no-repeat;
 
+        // CASE: right to left layout
         @include rtl {
           background-position: top right;
         }
@@ -420,7 +421,7 @@ header.global-new {
       vertical-align: middle;
 
       &:last-child {
-        @include margin-right(0px);
+        @include margin-right(0);
       }
 
       &:hover, &:focus, &:active {
@@ -436,12 +437,12 @@ header.global-new {
     > .primary {
       display: block;
       @include float(left);
-      margin: 0px;
+      margin: 0;
       position: relative;
 
       > a {
         margin: 0px;
-        @include border-right-radius(0px);
+        @include border-right-radius(0);
       }
 
       &:last-child {
@@ -497,7 +498,7 @@ header.global-new {
       display: none;
       padding: 5px 10px;
       position: absolute;
-      @include right(0px);
+      @include right(0);
       top: 34px;
       width: 170px;
       z-index: 3;

@@ -53,7 +53,7 @@
   }
 
   .content-primary {
-    @extend %ui-col-wide;
+    @extend .ui-col-wide;
 
     form {
       @include box-sizing(border-box);
@@ -209,7 +209,7 @@
   }
 
   .content-supplementary {
-    @extend %ui-col-narrow;
+    @extend .ui-col-narrow;
 
     .bit {
       @extend %t-copy-sub1;

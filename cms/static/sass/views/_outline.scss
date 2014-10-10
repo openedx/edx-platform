@@ -73,7 +73,7 @@
   }
 
   .content-primary {
-    @extend %ui-col-wide;
+    @extend .ui-col-wide;
 
     .no-content {
       @extend %no-content;
@@ -81,7 +81,7 @@
   }
 
   .content-supplementary {
-    @extend %ui-col-narrow;
+    @extend .ui-col-narrow;
   }
 
 
@@ -295,7 +295,7 @@
       }
 
       .section-header-details {
-        float: left;
+        @include float(left);
         width: flex-grid(6, 9);
 
         .icon, .wrapper-section-title {
@@ -304,7 +304,7 @@
         }
 
         .icon {
-          margin-right: ($baseline/4);
+          @include margin-right($baseline/4);
         }
 
         .wrapper-section-title {
@@ -314,10 +314,10 @@
       }
 
       .section-header-actions {
-        float: right;
+        @include float(right);
         width: flex-grid(3, 9);
         margin-top: -($baseline/4);
-        text-align: right;
+        @include text-align(right);
 
         .actions-list {
           @extend %actions-list;
@@ -383,7 +383,7 @@
       }
 
       .subsection-header-details {
-        float: left;
+        @include float(left);
         width: flex-grid(6, 9);
 
         .icon, .wrapper-subsection-title {
@@ -392,7 +392,7 @@
         }
 
         .icon {
-          margin-right: ($baseline/4);
+          @include margin-right($baseline/4);
         }
 
         .wrapper-subsection-title {
@@ -403,10 +403,10 @@
       }
 
       .subsection-header-actions {
-        float: right;
+        @include float(right);
         width: flex-grid(3, 9);
         margin-top: -($baseline/4);
-        text-align: right;
+        @include text-align(right);
 
         .actions-list {
           @extend %actions-list;
@@ -422,7 +422,7 @@
 
       // status
       .subsection-status {
-        margin: 0 0 0 $outline-indent-width;
+        @include margin(0, 0, 0, $outline-indent-width);
       }
 
       // content
@@ -465,16 +465,16 @@
       }
 
       .unit-header-details {
-        float: left;
+        @include float(left);
         width: flex-grid(6, 9);
         margin-top: ($baseline/4);
       }
 
       .unit-header-actions {
-        float: right;
+        @include float(right);
         width: flex-grid(3, 9);
         margin-top: -($baseline/10);
-        text-align: right;
+        @include text-align(right);
 
         .actions-list {
           @extend %actions-list;
@@ -495,7 +495,7 @@
         .icon {
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/2);
+          @include margin-right($baseline/2);
         }
       }
     }

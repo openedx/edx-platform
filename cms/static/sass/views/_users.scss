@@ -9,11 +9,11 @@
   }
 
   .content-primary {
-    @extend %ui-col-wide;
+    @extend .ui-col-wide;
   }
 
   .content-supplementary {
-    @extend %ui-col-narrow;
+    @extend .ui-col-narrow;
   }
 
   // ELEM: content
@@ -132,7 +132,7 @@
           @include transition(color $tmg-f2 ease-in-out 0s);
           @extend %t-title4;
           @extend %t-strong;
-          @include margin(0 ($baseline/2) ($baseline/10) 0);
+          @include margin(0, ($baseline/2), ($baseline/10), 0);
           color: $gray-d4;
         }
 

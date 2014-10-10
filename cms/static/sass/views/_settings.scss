@@ -9,7 +9,7 @@
 
   .content-primary {
     @extend %ui-window;
-    @extend %ui-col-wide;
+    @extend .ui-col-wide;
     padding: $baseline ($baseline*1.5);
   }
 
@@ -897,7 +897,7 @@
   }
 
   .content-supplementary {
-    @extend %ui-col-narrow;
+    @extend .ui-col-narrow;
   }
 
   .wrapper-modal-window {

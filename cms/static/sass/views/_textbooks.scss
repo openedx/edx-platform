@@ -8,7 +8,7 @@
   }
 
   .content-primary {
-    @extend %ui-col-wide;
+    @extend .ui-col-wide;
 
     .no-textbook-content {
       @extend %no-content;
@@ -303,7 +303,7 @@
             display: block;
             width: 46%;
             border-bottom: none;
-            @include margin(0 ($baseline*0.75) 0 0);
+            @include margin(0, ($baseline*0.75), 0, 0);
             padding: ($baseline/4) 0 0 0;
             @include float(left);
             position: relative;
@@ -352,6 +352,6 @@
   }
 }
   .content-supplementary {
-    @extend %ui-col-narrow;
+    @extend .ui-col-narrow;
   }
 }
