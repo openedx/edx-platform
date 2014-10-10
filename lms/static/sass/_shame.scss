@@ -199,6 +199,22 @@ footer .references {
   list-style: none;
 }
 
+// ====================
+
+// poor definition/scope on ul elements inside .vert-mod element in courseware - override needed for inline discussion editing
+.course-content .discussion-post.edit-post-form .topic-menu {
+  padding-left: 0;
+  list-style: none;
+
+  .topic-menu-item {
+    margin-bottom: 0;
+  }
+}
+
+.course-content .discussion-post.edit-post-form .topic-submenu {
+  list-style: none;
+}
+
 
 // LMS system feedback button overrides
 .is-in-course .wrapper-prompt .nav-actions {
