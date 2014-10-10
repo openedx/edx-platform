@@ -19,7 +19,7 @@ from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 
 from open_ended_grading.utils import does_location_exist
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 log = logging.getLogger(__name__)
 

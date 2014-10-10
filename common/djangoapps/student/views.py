@@ -78,7 +78,7 @@ from lang_pref import LANGUAGE_KEY
 
 import track.views
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse

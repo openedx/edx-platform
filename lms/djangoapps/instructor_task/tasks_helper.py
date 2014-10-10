@@ -13,7 +13,7 @@ from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.db import transaction, reset_queries
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 
 from xmodule.modulestore.django import modulestore
@@ -198,7 +198,7 @@ def run_main_task(entry_id, task_fcn, action_name):
         raise ValueError(message)
 
     # Now do the work:
-    with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
+    with dog_stats_api.timer('instructor_tasks.time.overall', tags=[u'action:{name}'.format(name=action_name)]):
         task_progress = task_fcn(entry_id, course_id, task_input, action_name)
 
     # Release any queries that the connection has been hanging onto:

@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 import logging
 import requests
 from django.conf import settings
