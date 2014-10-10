@@ -28,9 +28,9 @@
                 this.template = _.template($('#thread-edit-template').html());
                 this.$el.html(this.template(this.model.toJSON())).appendTo(this.container);
                 this.submitBtn = this.$('.post-update');
+                threadTypeTemplate = _.template($("#thread-type-template").html());
+                this.addField(threadTypeTemplate({form_id: formId}));
                 if (this.isTabMode()) {
-                    threadTypeTemplate = _.template($("#thread-type-template").html());
-                    this.addField(threadTypeTemplate({form_id: formId}));
                     this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
                     this.topicView = new DiscussionTopicMenuView({
                         topicId: this.topicId,
@@ -57,6 +57,16 @@
                     body = this.$('.edit-post-body textarea').val(),
                     commentableId = this.isTabMode() ? this.topicView.getCurrentTopicId() : null;
 
+                var post_data = {
+                    title: title,
+                    thread_type: threadType,
+                    body: body
+                };
+
+                if (this.isTabMode()){
+                    post_data.commentable_id = commentableId;
+                }
+
                 return DiscussionUtil.safeAjax({
                     $elem: this.submitBtn,
                     $loading: this.submitBtn,
@@ -64,12 +74,7 @@
                     type: 'POST',
                     dataType: 'json',
                     async: false, // @TODO when the rest of the stuff below is made to work properly..
-                    data: {
-                        title: title,
-                        thread_type: threadType,
-                        body: body,
-                        commentable_id: commentableId
-                    },
+                    data: post_data,
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function() {
                         var newAttrs = {
