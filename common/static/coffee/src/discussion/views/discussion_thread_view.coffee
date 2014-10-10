@@ -272,7 +272,6 @@ if Backbone?
         model: @model
         mode: @mode
         course_settings: @options.course_settings
-        topicId: @model.get('commentable_id')
       )
       @editView.bind "thread:updated thread:cancel_edit", @closeEditView
       @editView.bind "comment:endorse", @endorseThread
