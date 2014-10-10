@@ -17,7 +17,8 @@ from instructor_task.tasks import (rescore_problem,
                                    reset_problem_attempts,
                                    delete_problem_state,
                                    send_bulk_course_email,
-                                   calculate_grades_csv)
+                                   calculate_grades_csv,
+                                   get_student_submissions)
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,
@@ -214,6 +215,17 @@ def submit_calculate_grades_csv(request, course_key):
     """
     task_type = 'grade_course'
     task_class = calculate_grades_csv
+    task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+def submit_get_student_submissions(request, course_key):
+    """
+    AlreadyRunningError is raised if the student submissions report is already being generated.
+    """
+    task_type = 'student_submissions'
+    task_class = get_student_submissions
     task_input = {}
     task_key = ""
 

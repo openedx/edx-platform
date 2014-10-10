@@ -1,0 +1,15 @@
+{
+    "course/2012_Fall": {
+        "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
+        "start": "2010-07-17T12:00",
+        "display_name": "Üñîçø∂é ßraded Course",
+        "graded": "true"
+    },
+	
+    "videosequence/Homework1": {
+        "display_name": "πoméwork 1", 
+        "graded": true, 
+        "format": "Homework"
+    },
+	
+}
