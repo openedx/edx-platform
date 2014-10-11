@@ -18,9 +18,9 @@ class CourseUpdateTest(CourseTestCase):
         kwargs = {'provided_id': str(provided_id)} if provided_id else None
         return reverse_course_url('course_info_update_handler', course_key, kwargs=kwargs)
 
-    '''The do all and end all of unit test cases.'''
+    # The do all and end all of unit test cases.
     def test_course_update(self):
-        '''Go through each interface and ensure it works.'''
+        """Go through each interface and ensure it works."""
         def get_response(content, date):
             """
             Helper method for making call to server and returning response.
