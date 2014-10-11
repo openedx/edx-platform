@@ -4,7 +4,6 @@ Tests for the recently enrolled messaging within the Dashboard.
 import datetime
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import Client
 from opaque_keys.edx import locator
 from pytz import UTC
 import unittest

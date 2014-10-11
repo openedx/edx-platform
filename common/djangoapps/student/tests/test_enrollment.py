@@ -1,8 +1,6 @@
 """
 Tests for student enrollment.
 """
-from datetime import datetime, timedelta
-import pytz
 import ddt
 import unittest
 

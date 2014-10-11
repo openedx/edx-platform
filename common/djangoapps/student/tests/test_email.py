@@ -15,7 +15,6 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
-from textwrap import dedent
 
 
 class TestException(Exception):

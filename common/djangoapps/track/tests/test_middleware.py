@@ -1,5 +1,3 @@
-import re
-
 from mock import patch
 from mock import sentinel
 
