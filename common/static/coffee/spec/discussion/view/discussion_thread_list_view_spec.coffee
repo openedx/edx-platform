@@ -16,6 +16,7 @@ describe "DiscussionThreadListView", ->
                     <label>
                         <span class="sr">Search</span>
                         <input class="forum-nav-search-input" type="text" placeholder="Search all posts">
+                        <i class="icon icon-search"></i>
                     </label>
                 </form>
             </div>
@@ -330,6 +331,20 @@ describe "DiscussionThreadListView", ->
             spyOn(@view, "renderThread")
             @view.collection.trigger("change", new Thread({id: 1}))
             expect(@view.clearSearchAlerts).toHaveBeenCalled()
+
+    describe "Search events", ->
+
+      it "perform search when enter pressed inside search textfield", ->
+        setupAjax()
+        spyOn(@view, "searchFor")
+        @view.$el.find(".forum-nav-search-input").trigger($.Event("keydown", {which: 13}))
+        expect(@view.searchFor).toHaveBeenCalled()
+
+      it "perform search when search icon is clicked", ->
+        setupAjax()
+        spyOn(@view, "searchFor")
+        @view.$el.find(".icon-search").click()
+        expect(@view.searchFor).toHaveBeenCalled()
 
     describe "username search", ->
 
