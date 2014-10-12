@@ -2166,7 +2166,7 @@ the child module that was shown to the student.
    * - Field
      - Type
      - Details
-   * - ``child-id``
+   * - ``child_id``
      - string
      - ID of the module that displays to the student. 
 
