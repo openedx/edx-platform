@@ -394,3 +394,14 @@
     </form>
   </div>
 </section>
+<script>
+    $(function() {
+        $("#unregister_block_course").click( function(event) {
+            $("#unenroll_course_id").val( $(event.target).data("course-id") );
+            $("#unenroll_course_number").text( $(event.target).data("course-number") );
+        });
+    });
+</script>
+
+## Available in Edraak theme
+<%include file="bayt/_dashboard_popups.html" />
