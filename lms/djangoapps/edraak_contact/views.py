@@ -10,11 +10,12 @@ from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
+
 @ensure_csrf_cookie
 def contact(request):
     if request.method == 'POST':
         if not (request.POST['firstname'] or request.POST['lastname'] or request.POST['email'] or request.POST['message']):
-            return render_to_response("theme-contact.html", {'error': True})
+            return render_to_response("static_templates/theme-contact.html", {'error': True})
 
 
         ##################################### We will need this #####################################
@@ -43,10 +44,10 @@ def contact(request):
         #             result = True                                                                 #
         #         else:                                                                             #
         #             params = {'error': True, 'captcha': True}                                     #
-        #             return render_to_response("theme-contact.html", params)                       #
+        #             return render_to_response("static_templates/theme-contact.html", params)      #
         # except:                                                                                   #
         #     # should return a google error                                                        #
-        #     return render_to_response("theme-contact.html", {'error': True})                      #
+        #     return render_to_response("static_templates/theme-contact.html", {'error': True})     #
         ###################################### Do NOT Delete ########################################
 
 
@@ -98,5 +99,5 @@ def contact(request):
             # Seems like the core part of the request was successful.
             return JsonResponse(js, status=500)
 
-        return render_to_response("contact/contact.html", {'success': True})
-    return render_to_response("contact/contact.html", {})
+        return render_to_response("static_templates/theme-contact.html", {'success': True})
+    return render_to_response("static_templates/theme-contact.html", {})
