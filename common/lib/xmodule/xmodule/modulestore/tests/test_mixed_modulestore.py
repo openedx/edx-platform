@@ -290,11 +290,9 @@ class TestMixedModuleStore(unittest.TestCase):
                 self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
 
     # Draft:
-    #    - One lookup to locate an item that exists
-    #    - Two lookups to determine an item doesn't exist (one to check mongo, one to check split)
+    #    problem: One lookup to locate an item that exists
+    #    fake: one w/ wildcard version
     # split has one lookup for the course and then one for the course items
-    # TODO: LMS-11220: Document why draft find count is [1, 1]
-    # TODO: LMS-11220: Document why split find count is [2, 2]
     @ddt.data(('draft', [1, 1], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_has_item(self, default_ms, max_find, max_send):
@@ -317,10 +315,12 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(UnsupportedRevisionError):
             self.store.has_item(self.fake_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred)
 
-    # draft is 2 to compute inheritance
-    # split is 2 (would be 3 on course b/c it looks up the wiki_slug in definitions)
-    # TODO: LMS-11220: Document why draft find count is [2, 2]
-    # TODO: LMS-11220: Document why split find count is [3, 3]
+    # draft queries:
+    #   problem: find draft item, find all items pertinent to inheritance computation
+    #   non-existent problem: find draft, find published
+    # split:
+    #   problem: active_versions, structure, then active_versions again?
+    #   non-existent problem: ditto
     @ddt.data(('draft', [2, 2], 0), ('split', [3, 3], 0))
     @ddt.unpack
     def test_get_item(self, default_ms, max_find, max_send):
@@ -345,8 +345,10 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(UnsupportedRevisionError):
             self.store.get_item(self.fake_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred)
 
-    # compared to get_item for the course, draft asks for both draft and published
-    # TODO: LMS-11220: Document why split find count is 3
+    # Draft:
+    #    wildcard query, 6! load pertinent items for inheritance calls, course root fetch (why)
+    # Split:
+    #    active_versions (with regex), structure, and spurious active_versions refetch
     @ddt.data(('draft', 8, 0), ('split', 3, 0))
     @ddt.unpack
     def test_get_items(self, default_ms, max_find, max_send):
@@ -372,10 +374,11 @@ class TestMixedModuleStore(unittest.TestCase):
                 revision=ModuleStoreEnum.RevisionOption.draft_preferred
             )
 
-    # draft: 2 to look in draft and then published and then 5 for updating ancestors.
-    # split: 3 to get the course structure & the course definition (show_calculator is scope content)
-    #  before the change. 1 during change to refetch the definition. 3 afterward (b/c it calls get_item to return the "new" object).
-    #  2 sends to update index & structure (calculator is a setting field)
+    # draft: get draft, count parents, get parents, count & get grandparents, count & get greatgrand,
+    #        count & get next ancestor (chapter's parent), count non-existent next ancestor, get inheritance
+    #    sends: update problem and then each ancestor up to course (edit info)
+    # split: active_versions, definitions (calculator field), structures
+    #  2 sends to update index & structure (note, it would also be definition if a content field changed)
     @ddt.data(('draft', 11, 5), ('split', 3, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
@@ -638,8 +641,14 @@ class TestMixedModuleStore(unittest.TestCase):
         # Check the parent for changes should return True and not throw an exception
         self.assertTrue(self.store.has_changes(parent))
 
-    # TODO: LMS-11220: Document why split find count is 4
-    # TODO: LMS-11220: Document why split send count is 3
+    # Draft
+    #   Find: find parents (definition.children query), get parent, get course (fill in run?),
+    #         find parents of the parent (course), get inheritance items,
+    #         get errors, get item (to delete subtree), get inheritance again.
+    #   Sends: delete item, update parent
+    # Split
+    #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
+    #   Sends: updated draft and published structures and active_versions
     @ddt.data(('draft', 8, 2), ('split', 4, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, max_find, max_send):
@@ -652,15 +661,24 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.store.delete_item(self.xml_chapter_location, self.user_id)
 
-        with check_mongo_calls(max_find, max_send):
-            self.store.delete_item(self.writable_chapter_location, self.user_id)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.writable_chapter_location.course_key):
+            with check_mongo_calls(max_find, max_send):
+                self.store.delete_item(self.writable_chapter_location, self.user_id)
 
-        # verify it's gone
+            # verify it's gone
+            with self.assertRaises(ItemNotFoundError):
+                self.store.get_item(self.writable_chapter_location)
+        # verify it's gone from published too
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(self.writable_chapter_location)
+            self.store.get_item(self.writable_chapter_location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
-    # TODO: LMS-11220: Document why split find count is 4
-    # TODO: LMS-11220: Document why split send count is 3
+    # Draft:
+    #    queries: find parent (definition.children), count versions of item, get parent, count grandparents,
+    #             inheritance items, draft item, draft child, get errors, inheritance
+    #    sends: delete draft vertical and update parent
+    # Split:
+    #    queries: active_versions, draft and published structures, definition (unnecessary)
+    #    sends: update published (why?), draft, and active_versions
     @ddt.data(('draft', 9, 2), ('split', 4, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
@@ -706,7 +724,12 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertFalse(self.store.has_item(leaf_loc))
         self.assertNotIn(vert_loc, course.children)
 
-    # TODO: LMS-11220: Document why split find count is 2
+    # Draft:
+    #   find: find parent (definition.children) 2x, find draft item, check error state, get inheritance items
+    #   send: one delete query for specific item
+    # Split:
+    #   find: active_version & structure
+    #   send: update structure and active_versions
     @ddt.data(('draft', 5, 1), ('split', 2, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, max_find, max_send):
@@ -740,9 +763,15 @@ class TestMixedModuleStore(unittest.TestCase):
         with check_mongo_calls(max_find, max_send):
             self.store.delete_item(private_leaf.location, self.user_id)
 
-    # TODO: LMS-11220: Document why split find count is 5
-    # TODO: LMS-11220: Document why draft find count is 4
-    @ddt.data(('draft', 4, 0), ('split', 5, 0))
+    # Draft:
+    #   1) find all courses (wildcard),
+    #   2) get each course 1 at a time (1 course),
+    #   3) wildcard split if it has any (1) but it doesn't
+    # Split:
+    #   1) wildcard split search,
+    #   2-4) active_versions, structure, definition (s/b lazy; so, unnecessary)
+    #   5) wildcard draft mongo which has none
+    @ddt.data(('draft', 3, 0), ('split', 5, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -785,9 +814,8 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(AttributeError):
             xml_store.create_course("org", "course", "run", self.user_id)
 
-    # draft is 2 to compute inheritance
-    # split is 3 (one for the index, one for the definition to check if the wiki is set, and one for the course structure
-    # TODO: LMS-11220: Document why split find count is 4
+    # draft is 2: find out which ms owns course, get item
+    # split: find out which ms owns course, active_versions, structure, definition (definition s/b unnecessary unless lazy is false)
     @ddt.data(('draft', 2, 0), ('split', 4, 0))
     @ddt.unpack
     def test_get_course(self, default_ms, max_find, max_send):
@@ -805,7 +833,8 @@ class TestMixedModuleStore(unittest.TestCase):
 
     # notice this doesn't test getting a public item via draft_preferred which draft would have 2 hits (split
     # still only 2)
-    # TODO: LMS-11220: Document why draft find count is 2
+    # Draft: count via definition.children query, then fetch via that query
+    # Split: active_versions, structure
     @ddt.data(('draft', 2, 0), ('split', 2, 0))
     @ddt.unpack
     def test_get_parent_locations(self, default_ms, max_find, max_send):
@@ -902,21 +931,23 @@ class TestMixedModuleStore(unittest.TestCase):
             (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
-    # Mongo reads:
-    #    First location:
-    #        - count problem (1)
-    #        - For each level of ancestors: (5)
-    #          - Count ancestor
-    #          - retrieve ancestor
-    #        - compute inheritable data
-    #    Second location:
-    #        - load vertical
-    #        - load inheritance data
-
-    # TODO: LMS-11220: Document why draft send count is 5
-    # TODO: LMS-11220: Document why draft find count is [19, 6]
-    # TODO: LMS-11220: Document why split find count is [2, 2]
-    @ddt.data(('draft', [20, 5], 0), ('split', [17, 6], 0))  # FIXME, replace w/ above when bulk reenabled
+    # Draft:
+    #   Problem path:
+    #    1. Get problem
+    #    2-3. count matches definition.children called 2x?
+    #    4. get parent via definition.children query
+    #    5-7. 2 counts and 1 get grandparent via definition.children
+    #    8-10. ditto for great-grandparent
+    #    11-13. ditto for next ancestor
+    #    14. fail count query looking for parent of course (unnecessary)
+    #    15. get course record direct query (not via definition.children) (already fetched in 13)
+    #    16. get items for inheritance computation
+    #    17. get vertical (parent of problem)
+    #    18. get items for inheritance computation (why? caching should handle)
+    #    19-20. get vertical_x1b (? why? this is the only ref in trace) & items for inheritance computation
+    #   Chapter path: get chapter, count parents 2x, get parents, count non-existent grandparents
+    # Split: active_versions & structure
+    @ddt.data(('draft', [20, 5], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
         """
@@ -936,6 +967,7 @@ class TestMixedModuleStore(unittest.TestCase):
             )
 
             for location, expected in should_work:
+                # each iteration has different find count, pop this iter's find count
                 with check_mongo_calls(num_finds.pop(0), num_sends):
                     self.assertEqual(path_to_location(self.store, location), expected)
 
@@ -1074,6 +1106,8 @@ class TestMixedModuleStore(unittest.TestCase):
         # It does not discard the child vertical, even though that child is a draft (with no published version)
         self.assertEqual(num_children, len(reverted_parent.children))
 
+    # Draft: get all items which can be or should have parents
+    # Split: active_versions, structure
     @ddt.data(('draft', 1, 0), ('split', 2, 0))
     @ddt.unpack
     def test_get_orphans(self, default_ms, max_find, max_send):
@@ -1212,8 +1246,8 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(self.user_id, block.subtree_edited_by)
         self.assertGreater(datetime.datetime.now(UTC), block.subtree_edited_on)
 
-    # TODO: LMS-11220: Document why split find count is 2
-    # TODO: LMS-11220: Document why draft find count is 2
+    # Draft: wildcard search of draft and split
+    # Split: wildcard search of draft and split
     @ddt.data(('draft', 2, 0), ('split', 2, 0))
     @ddt.unpack
     def test_get_courses_for_wiki(self, default_ms, max_find, max_send):
@@ -1242,15 +1276,16 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
 
-    # Mongo reads:
-    #    - load vertical
-    #    - load vertical children
-    #    - get last error
-    # Split takes 1 query to read the course structure, deletes all of the entries in memory, and loads the module from an in-memory cache
+    # Draft:
+    #    Find: find vertical, find children, get last error
+    #    Sends:
+    #      1. delete all of the published nodes in subtree
+    #      2. insert vertical as published (deleted in step 1) w/ the deleted problems as children
+    #      3-6. insert the 3 problems and 1 html as published
+    # Split: active_versions, 2 structures (pre & post published?)
     # Sends:
     #    - insert structure
     #    - write index entry
-    # TODO: LMS-11220: Document why split find count is 3
     @ddt.data(('draft', 3, 6), ('split', 3, 2))
     @ddt.unpack
     def test_unpublish(self, default_ms, max_find, max_send):
@@ -1285,6 +1320,8 @@ class TestMixedModuleStore(unittest.TestCase):
         )
         self.assertIsNotNone(draft_xblock)
 
+    # Draft: specific query for revision None
+    # Split: active_versions, structure
     @ddt.data(('draft', 1, 0), ('split', 2, 0))
     @ddt.unpack
     def test_has_published_version(self, default_ms, max_find, max_send):
@@ -1482,13 +1519,23 @@ class TestMixedModuleStore(unittest.TestCase):
         test_course_key = test_course.id
 
         # test create_item of direct-only category to make sure we are autopublishing
-        chapter = self.store.create_item(self.user_id, test_course_key, 'chapter', 'Overview')
+        chapter = self.store.create_child(self.user_id, test_course.location, 'chapter', 'Overview')
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            self.assertIn(
+                chapter.location,
+                self.store.get_item(test_course.location).children,
+            )
         self.assertTrue(self.store.has_published_version(chapter))
 
         chapter_location = chapter.location
 
         # test create_child of direct-only category to make sure we are autopublishing
         sequential = self.store.create_child(self.user_id, chapter_location, 'sequential', 'Sequence')
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            self.assertIn(
+                sequential.location,
+                self.store.get_item(chapter_location).children,
+            )
         self.assertTrue(self.store.has_published_version(sequential))
 
         # test update_item of direct-only category to make sure we are autopublishing
@@ -1498,6 +1545,11 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # test delete_item of direct-only category to make sure we are autopublishing
         self.store.delete_item(sequential.location, self.user_id, revision=ModuleStoreEnum.RevisionOption.all)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            self.assertNotIn(
+                sequential.location,
+                self.store.get_item(chapter_location).children,
+            )
         chapter = self.store.get_item(chapter.location.for_branch(None))
         self.assertTrue(self.store.has_published_version(chapter))
 
@@ -1712,9 +1764,9 @@ class TestMixedModuleStore(unittest.TestCase):
             with self.store.default_store(fake_store):
                 pass  # pragma: no cover
 
-#=============================================================================================================
+# ============================================================================================================
 # General utils for not using django settings
-#=============================================================================================================
+# ============================================================================================================
 
 
 def load_function(path):

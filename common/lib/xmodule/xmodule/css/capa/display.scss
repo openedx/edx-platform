@@ -158,7 +158,9 @@ div.problem {
       }
       &.status {
         margin: 8px 0 0 $baseline/2;
-        text-indent: -9999px;
+        text-indent: 100%;
+        white-space: nowrap;
+        overflow: hidden;
       }
     }
 
@@ -203,7 +205,6 @@ div.problem {
         width: 20px;
         height: 20px;
         background: url('../images/incorrect-icon.png') center center no-repeat;
-        text-indent: -9999px;
       }
 
       input {

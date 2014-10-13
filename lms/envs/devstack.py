@@ -48,7 +48,7 @@ ANALYTICS_DASHBOARD_URL = None
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ('debug_toolbar',)
+INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
 MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
                        'debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
@@ -62,12 +62,13 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.sql.SQLDebugPanel',
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
+    'debug_toolbar_mongo.panel.MongoDebugPanel',
 
     #  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
     #  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
     #  hit twice). So you can uncomment when you need to diagnose performance
     #  problems, but you shouldn't leave it on.
-    #  'debug_toolbar.panels.profiling.ProfilingPanel',
+    #'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -93,6 +94,10 @@ CC_PROCESSOR = {
         "PROFILE_ID": 'edx',
     }
 }
+
+########################### External REST APIs #################################
+FEATURES['ENABLE_MOBILE_REST_API'] = True
+FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
 #####################################################################
 # See if the developer has any local overrides.

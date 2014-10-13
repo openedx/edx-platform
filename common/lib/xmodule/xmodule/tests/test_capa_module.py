@@ -83,6 +83,7 @@ class CapaFactory(object):
                problem_state=None,
                correct=False,
                xml=None,
+               override_get_score=True,
                **kwargs
                ):
         """
@@ -130,11 +131,12 @@ class CapaFactory(object):
             ScopeIds(None, None, location, location),
         )
 
-        if correct:
-            # TODO: probably better to actually set the internal state properly, but...
-            module.get_score = lambda: {'score': 1, 'total': 1}
-        else:
-            module.get_score = lambda: {'score': 0, 'total': 1}
+        if override_get_score:
+            if correct:
+                # TODO: probably better to actually set the internal state properly, but...
+                module.get_score = lambda: {'score': 1, 'total': 1}
+            else:
+                module.get_score = lambda: {'score': 0, 'total': 1}
 
         return module
 
@@ -210,6 +212,28 @@ class CapaModuleTest(unittest.TestCase):
 
         other_module = CapaFactory.create(correct=True)
         self.assertEqual(other_module.get_score()['score'], 1)
+
+    def test_get_score(self):
+        """
+        Do 1 test where the internals of get_score are properly set
+
+        @jbau Note: this obviously depends on a particular implementation of get_score, but I think this is actually
+        useful as unit-code coverage for this current implementation.  I don't see a layer where LoncapaProblem
+        is tested directly
+        """
+        from capa.correctmap import CorrectMap
+        student_answers = {'1_2_1': 'abcd'}
+        correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=0.9)
+        module = CapaFactory.create(correct=True, override_get_score=False)
+        module.lcp.correct_map = correct_map
+        module.lcp.student_answers = student_answers
+        self.assertEqual(module.get_score()['score'], 0.9)
+
+        other_correct_map = CorrectMap(answer_id='1_2_1', correctness="incorrect", npoints=0.1)
+        other_module = CapaFactory.create(correct=False, override_get_score=False)
+        other_module.lcp.correct_map = other_correct_map
+        other_module.lcp.student_answers = student_answers
+        self.assertEqual(other_module.get_score()['score'], 0.1)
 
     def test_showanswer_default(self):
         """

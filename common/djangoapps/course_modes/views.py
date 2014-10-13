@@ -21,18 +21,19 @@ from xmodule.modulestore.django import modulestore
 
 
 class ChooseModeView(View):
-    """
-    View used when the user is asked to pick a mode
+    """View used when the user is asked to pick a mode.
 
     When a get request is used, shows the selection page.
-    When a post request is used, assumes that it is a form submission
-        from the selection page, parses the response, and then sends user
-        to the next step in the flow
+
+    When a post request is used, assumes that it is a form submission 
+    from the selection page, parses the response, and then sends user
+    to the next step in the flow.
+    
     """
 
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
-        """ Displays the course mode choice page
+        """Displays the course mode choice page.
 
         Args:
             request (`Request`): The Django Request object.
@@ -121,7 +122,19 @@ class ChooseModeView(View):
 
     @method_decorator(login_required)
     def post(self, request, course_id):
-        """ Takes the form submission from the page and parses it """
+        """Takes the form submission from the page and parses it.
+
+        Args:
+            request (`Request`): The Django Request object.
+            course_id (unicode): The slash-separated course key.
+
+        Returns:
+            Status code 400 when the requested mode is unsupported. When the honor mode
+            is selected, redirects to the dashboard. When the verified mode is selected,
+            returns error messages if the indicated contribution amount is invalid or
+            below the minimum, otherwise redirects to the verification flow.
+
+        """
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         user = request.user
 
@@ -134,26 +147,26 @@ class ChooseModeView(View):
 
         upgrade = request.GET.get('upgrade', False)
 
-        requested_mode = self.get_requested_mode(request.POST)
+        requested_mode = self._get_requested_mode(request.POST)
 
         allowed_modes = CourseMode.modes_for_course_dict(course_key)
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
-        if requested_mode in ("audit", "honor"):
-            # TODO (ECOM-16): Skip enrollment if we're in the experimental branch
-            if not request.session.get('auto_register', False):
-                CourseEnrollment.enroll(user, course_key, requested_mode)
+        # TODO (ECOM-16): Remove if the experimental variant wins. Functionally, 
+        #  it doesn't matter, but it will avoid hitting the database.
+        if requested_mode == 'honor':
+            CourseEnrollment.enroll(user, course_key, requested_mode)
             return redirect('dashboard')
 
         mode_info = allowed_modes[requested_mode]
 
-        if requested_mode == "verified":
+        if requested_mode == 'verified':
             amount = request.POST.get("contribution") or \
                 request.POST.get("contribution-other-amt") or 0
 
             try:
-                # validate the amount passed in and force it into two digits
+                # Validate the amount passed in and force it into two digits
                 amount_value = decimal.Decimal(amount).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
             except decimal.InvalidOperation:
                 error_msg = _("Invalid amount selected.")
@@ -172,14 +185,20 @@ class ChooseModeView(View):
                 reverse('verify_student_show_requirements',
                         kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade))
 
-    def get_requested_mode(self, request_dict):
+    def _get_requested_mode(self, request_dict):
+        """Get the user's requested mode
+
+        Args:
+            request_dict (`QueryDict`): A dictionary-like object containing all given HTTP POST parameters.
+
+        Returns:
+            The course mode slug corresponding to the choice in the POST parameters,
+            None if the choice in the POST parameters is missing or is an unsupported mode.
+
         """
-        Given the request object of `user_choice`, return the
-        corresponding course mode slug
-        """
-        if 'audit_mode' in request_dict:
-            return 'audit'
-        if 'certificate_mode' and request_dict.get("honor-code"):
-            return 'honor'
-        if 'certificate_mode' in request_dict:
+        if 'verified_mode' in request_dict:
             return 'verified'
+        if 'honor_mode' in request_dict:
+            return 'honor'
+        else:
+            return None

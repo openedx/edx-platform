@@ -1,0 +1,369 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Instructor Dashboard</%block>
+<%block name="nav_skip">#instructor-dashboard-content</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-vendor-tinymce-content'/>
+<%static:css group='style-vendor-tinymce-skin'/>
+<%static:css group='style-course'/>
+<script type="text/javascript">
+    // This is a hack to get tinymce to work correctly in Firefox until the annotator tool is refactored to not include
+    // tinymce globally.
+    if(typeof window.Range.prototype === "undefined") {
+        window.Range.prototype = { };
+    }
+</script>
+<script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
+<script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/jquery.event.drag-2.2.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/jquery.event.drop-2.2.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/slick.core.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/slick.grid.js')}"></script>
+<link rel="stylesheet" href="${static.url('css/vendor/slickgrid/smoothness/jquery-ui-1.8.16.custom.css')}">
+<link rel="stylesheet" href="${static.url('css/vendor/slickgrid/slick.grid.css')}">
+<script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
+<%static:js group='module-descriptor-js'/>
+<%static:js group='instructor_dash'/>
+</%block>
+
+<section class="container">
+    <div class="instructor-dashboard-wrapper-2">
+        <section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
+            <h1>Instructor Dashboard</h1>
+
+            <div class="batch-enrollment membership-section">
+                <h2> Batch Enrollment </h2>
+                <p>
+                    <label for="student-ids">
+                        Enter email addresses and/or usernames separated by new lines or commas.
+                        You will not get notification for emails that bounce, so please double-check spelling. </label>
+                    <textarea rows="6" name="student-ids" placeholder="Email Addresses/Usernames" spellcheck="false"></textarea>
+                </p>
+
+                <div class="enroll-option">
+                    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
+                    <label for="auto-enroll">Auto Enroll</label>
+                    <div class="hint auto-enroll-hint">
+                        <span class="hint-caret"></span>
+                        <p>
+                            If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
+                            If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+                            <br /><br />
+                            Checking this box has no effect if 'Unenroll' is selected.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="enroll-option">
+                    <input type="checkbox" name="email-students" value="Notify-students-by-email" checked="yes">
+                    <label for="email-students">Notify users by email</label>
+                    <div class="hint email-students-hint">
+                        <span class="hint-caret"></span>
+                        <p>
+                            If this option is <em>checked</em>, users will receive an email notification.
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <input type="button" name="enrollment-button" class="enrollment-button" value="Enroll" data-action="enroll" >
+                    <input type="button" name="enrollment-button" class="enrollment-button" value="Unenroll" data-action="unenroll" >
+                </div>
+                <div class="request-response"></div>
+                <div class="request-response-error"></div>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="batch-beta-testers membership-section">
+                <h2> Batch Beta Tester Addition </h2>
+                <p>
+                    <label for="student-ids-for-beta">
+                        Enter email addresses and/or usernames separated by new lines or commas.<br/>
+                        Note: Users must have an activated {platform_name} account before they can be enrolled as a beta tester.").format(platform_name=settings.PLATFORM_NAME)}
+                    </label>
+
+                    <textarea rows="6" cols="50" name="student-ids-for-beta" placeholder="Email Addresses/Usernames" spellcheck="false"></textarea>
+                </p>
+
+                <div class="enroll-option">
+                    <input type="checkbox" name="auto-enroll" value="Auto-Enroll" checked="yes">
+                    <label for="auto-enroll-beta">Auto Enroll</label>
+                    <div class="hint auto-enroll-beta-hint">
+                        <span class="hint-caret"></span>
+                        <p>
+                            If this option is <em>checked</em>, users who have not enrolled in your course will be automatically enrolled.
+                            <br /><br />
+                            Checking this box has no effect if 'Remove beta testers' is selected.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="enroll-option">
+                    <input type="checkbox" name="email-students-beta" value="Notify-students-by-email" checked="yes">
+                    <label for="email-students-beta">Notify users by email</label>
+                    <div class="hint email-students-beta-hint">
+                        <span class="hint-caret"></span>
+                        <p> If this option is <em>checked</em>, users will receive an email notification.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <input type="button" name="beta-testers" class="enrollment-button" value="Add beta testers" data-action="add" >
+                    <input type="button" name="beta-testers" class="enrollment-button" value="Remove beta testers" data-action="remove" >
+                </div>
+
+                <div class="request-response"></div>
+                <div class="request-response-error"></div>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="member-lists-management membership-section">
+                ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
+                <h2> Administration List Management </h2>
+
+                <div class="request-response-error"></div>
+
+                <div class="wrapper-member-select">
+                    ## Translators: an "Administrator Group" is a group, such as Course Staff, that users can be added to.
+                    <label for="member-lists-selector">Select an Administrator Group:</label>
+                    <select id="member-lists-selector" class="member-lists-selector">
+                        <option> Getting available lists... </option>
+                    </select>
+
+                </div>
+
+
+                <p>
+                    Staff cannot modify staff or beta tester lists. To modify these lists, "
+                    "contact your instructor and ask them to add you as an instructor for staff "
+                    "and beta lists, or a discussion admin for discussion management.
+                </p>
+
+                <div class="auth-list-container"
+                     data-rolename="staff"
+                     data-display-name="Course Staff"
+                data-info-text="
+                Course staff can help you manage limited aspects of your course. Staff "
+                "can enroll and unenroll students, as well as modify their grades and "
+                "see all course data. Course staff are not automatically given access "
+                "to Studio and will not be able to edit your course."
+                data-list-endpoint=""
+                data-modify-endpoint=""
+                data-add-button-label="Add Staff"
+                ></div>
+
+            <div class="auth-list-container"
+                 data-rolename="instructor"
+                 data-display-name="Instructors"
+            data-info-text="
+            Instructors are the core administration of your course. Instructors can "
+            "add and remove course staff, as well as administer discussion access."
+            data-list-endpoint=""
+            data-modify-endpoint=""
+            data-add-button-label="Add Instructor"
+            ></div>
+
+    <div class="auth-list-container"
+         data-rolename="beta"
+         data-display-name="Beta Testers"
+    data-info-text="
+    Beta testers can see course content before the rest of the students. "
+    "They can make sure that the content works, but have no additional "
+    "privileges."
+    data-list-endpoint=""
+    data-modify-endpoint=""
+    data-add-button-label="Add Beta Tester"
+    ></div>
+
+    <div class="auth-list-container"
+         data-rolename="Administrator"
+         data-display-name="Discussion Admins"
+    data-info-text="
+    Discussion admins can edit or delete any post, clear misuse flags, close "
+     "and re-open threads, endorse responses, and see posts from all cohorts. "
+     "They CAN add/delete other moderators and their posts are marked as 'staff'."
+    data-list-endpoint=""
+    data-modify-endpoint=""
+    data-add-button-label="Add Discussion Admin"
+    ></div>
+
+    <div class="auth-list-container"
+         data-rolename="Moderator"
+         data-display-name="Discussion Moderators"
+    data-info-text="
+    Discussion moderators can edit or delete any post, clear misuse flags, close "
+     "and re-open threads, endorse responses, and see posts from all cohorts. "
+     "They CANNOT add/delete other moderators and their posts are marked as 'staff'."
+    data-list-endpoint=""
+    data-modify-endpoint=""
+    data-add-button-label="Add Moderator"
+    ></div>
+
+    <div class="auth-list-container"
+         data-rolename="Community TA"
+         data-display-name="Discussion Community TAs"
+    data-info-text="
+    Community TA's are members of the community whom you deem particularly "
+    "helpful on the discussion boards. They can edit or delete any post, clear misuse flags, "
+    "close and re-open threads, endorse responses, and see posts from all cohorts. "
+    "Their posts are marked 'Community TA'."
+    data-list-endpoint=""
+    data-modify-endpoint=""
+    data-add-button-label="Add Community TA"
+    ></div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="cohort-management membership-section">
+        <h2 class="section-title">
+            <span class="value">Cohort Management</span>
+            <span class="description">Cohorts are such and such and are used for this and that to do all the things</span>
+        </h2>
+
+        <!-- nav -->
+        <div class="cohort-management-nav">
+            <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
+
+                <div class="cohort-management-nav-form-select field field-select">
+                    <label for="cohort-select" class="label sr">Select a cohort to manage</label>
+
+                    <select class="input cohort-select" name="cohort-select" id="cohort-select">
+                        <option value="cohort-name-1">Cohort Name is Placed Here and Should Accommodate Almost Everything (12,546)</option>
+                        <option value="cohort-name-2" selected>Cras mattis consectetur purus sit amet fermentum (8,546)</option>
+                        <option value="cohort-name-3">Donec id elit non mi porta gravida at eget metus. (4)
+                        </option>
+                        <option value="cohort-name-4">Donec id elit non mi porta gravida at eget metus. (4)
+                        </option>
+                    </select>
+                </div>
+
+                <button class="form-submit button action-primary action-view sr">View cohort group</button>
+            </form>
+        </div>
+
+        <!-- message - error - no groups -->
+        <div class="message message-warning is-shown">
+            <h3 class="message-title">You currently have no cohort groups configured</h3>
+
+            <div class="message-copy">
+                <p>Please complete your cohort group configuration by creating groups within Studio</p>
+            </div>
+
+            <div class="message-actions">
+                <a href="" class="action-primary action-review">Revise Configuration in Studio</a>
+            </div>
+        </div>
+
+        <!-- message - error - bad configuration -->
+        <div class="message message-error is-shown">
+            <h3 class="message-title">There's currently an error with your cohorts configuration within this course.</h3>
+
+            <div class="message-copy">
+                <p>Error output (if any and near-human legible/comprehendable can be displayed here)</p>
+            </div>
+
+            <div class="message-actions">
+                <a href="" class="action-primary action-review">Review Configuration in Studio</a>
+            </div>
+        </div>
+
+        <!-- individual group -->
+        <div class="cohort-management-group">
+            <header class="cohort-management-group-header">
+                <h3 class="group-header-title">
+                    <span class="title-value">Cohort Name Can be Placed Here and Should Accommodate Almost Everything</span>
+                    <span class="group-count">(contains 12,546 Students)</span>
+                </h3>
+
+                <div class="cohort-management-group-setup">
+                    <h4 class="sr">This cohort group's current management set up:</h4>
+                    <div class="setup-value">
+                        Students are added to this group automatically
+                        <a href="" class="incontext-help action-secondary action-help">What does this mean?</a>
+                    </div>
+
+                    <div class="setup-actions">
+                        <a href="" class="action-secondary action-edit">Edit settings in Studio</a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- individual group - form -->
+            <div class="cohort-management-group-add">
+                <form action="" method="post" name="" id="cohort-management-group-add-form" class="cohort-management-group-add-form">
+
+                    <h4 class="form-title">Add students to this cohort group</h4>
+
+                    <div class="form-introduction">
+                        <p>Please Note: Adding a student to this group will remove them from any groups they are currently  a part of.</p>
+                    </div>
+
+                    <!-- individual group - form message - confirmation -->
+                    <div class="message message-confirmation is-shown">
+                        <h3 class="message-title">2,546 students have been added to this cohort group</h3>
+
+                        <div class="message-copy">
+                            <ul class="list-summary summary-items">
+                                <li class="summary-item">1,245 were removed from Cohort Name is Placed Here and Should Accommodate Almost Everything</li>
+                                <li class="summary-item">1,245 were removed from Cohort Name is Placed Here and Should Accommodate Almost Everything</li>
+                                <li class="summary-item">1,245 were removed from Cohort Name is Placed Here and Should Accommodate Almost Everything</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- individual group - form message - error (collapsed) -->
+                    <div class="message message-error is-shown">
+                        <h3 class="message-title">There were 25 errors when trying to add students:</h3>
+
+                        <div class="message-copy">
+                            <ul class="list-summary summary-items">
+                                <li class="summary-item">Unknown user: ahgaeubgoq</li>
+                                <li class="summary-item">Unknown user: hagaihga</li>
+                                <li class="summary-item">Unknown user: ahgaeubgoq</li>
+                                <li class="summary-item">Unknown user: ahgaeubgoq</li>
+                                <li class="summary-item">Unknown user: hagaihga</li>
+                            </ul>
+                        </div>
+
+                        <div class="message-actions">
+                            <a href="" class="action-primary action-expand">View all errors</a>
+                        </div>
+                    </div>
+
+                    <div class="form-fields">
+                        <div class="field field-textarea is-required">
+                            <label for="cohort-management-group-add-students" class="label">Student ID or Email Address of Students to be added (one per line or comma-separated)</label>
+
+                            <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students" class="input cohort-management-group-add-students" placeholder="e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"></textarea>
+                        </div>
+                    </div>
+
+                    <button class="form-submit button action-primary action-view">
+                        <i class="button-icon icon icon-plus"></i> Add Students
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- cta - view download -->
+        <div class="cohort-management-supplemental">
+            <p class=""><i class="icon icon-info-sign"></i> You may view individual student information for each cohort via your entire course profile data download on <a href="" class="link-cross-reference">the data download view</a></p>
+        </div>
+    </div>
+</section>

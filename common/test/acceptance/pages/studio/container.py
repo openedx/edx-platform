@@ -247,6 +247,9 @@ class ContainerPage(PageObject):
         Note that this does an ajax call.
         """
         self.q(css='.add-missing-groups-button').first.click()
+        self.wait_for_ajax()
+
+        # Wait until all xblocks rendered.
         self.wait_for_page()
 
     def missing_groups_button_present(self):

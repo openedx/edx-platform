@@ -287,3 +287,10 @@ class ContentStore(object):
                 logging.exception(u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
 
         return thumbnail_content, thumbnail_file_location
+
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+        """
+        pass

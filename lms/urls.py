@@ -28,6 +28,7 @@ urlpatterns = ('',  # nopep8
     url(r'^reject_name_change$', 'student.views.reject_name_change'),
     url(r'^pending_name_changes$', 'student.views.pending_name_changes'),
     url(r'^event$', 'track.views.user_track'),
+    url(r'^segmentio/event$', 'track.views.segmentio.track_segmentio_event'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),   # TODO: Is this used anymore? What is STATIC_GRAB?
 
     url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
@@ -63,15 +64,20 @@ urlpatterns = ('',  # nopep8
 
     url(r'^lang_pref/', include('lang_pref.urls')),
 
-    url(r'^', include('waffle.urls')),
-
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
 
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
+
 )
+
+if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
+    urlpatterns += (
+        url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
+        url(r'^api/val/v0/', include('edxval.urls')),
+    )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
@@ -189,7 +195,7 @@ if settings.WIKI_ENABLED:
         # never be returned by a reverse() so they come after the other url patterns
         url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
             'course_wiki.views.course_wiki_redirect', name="course_wiki"),
-        url(r'^courses/{}/wiki/'.format(settings.COURSE_ID_PATTERN), include(wiki_pattern())),
+        url(r'^courses/{}/wiki/'.format(settings.COURSE_KEY_REGEX), include(wiki_pattern())),
     )
 
 if settings.COURSEWARE_ENABLED:
@@ -476,6 +482,12 @@ if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
         url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
     )
 
+if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
+    urlpatterns += (
+        url(r'^oauth2/', include('oauth2_provider.urls', namespace='oauth2')),
+    )
+
+
 if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
         url(r'^migrate/modules$', 'lms_migration.migrate.manage_modulestores'),
@@ -545,6 +557,9 @@ urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+    # in debug mode, allow any template to be rendered (most useful for UX reference templates)
+    urlpatterns += url(r'^template/(?P<template>.+)$', 'debug.views.show_reference_template'),
 
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'

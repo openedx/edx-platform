@@ -25,7 +25,7 @@ Feature: CMS.Course Outline
     Scenario: Collapse link is removed after last section of a course is deleted
         Given I have a course with 1 section
         And I navigate to the course outline page
-        And I press the "section" delete icon
+        And I press the section delete icon
         When I will confirm all alerts
         Then I do not see the "Collapse All Sections" link
 
