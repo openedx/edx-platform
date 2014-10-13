@@ -917,6 +917,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'splash.middleware.SplashMiddleware',
 
+    # Make Arabic language the default one
+    'edraak_misc.middleware.ForceLangMiddleware',
+    'edraak_misc.middleware.SessionBasedLocaleMiddleware',
+
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
     'geoinfo.middleware.CountryMiddleware',
