@@ -4,7 +4,7 @@ or with filename which starts with "._")
 """
 from django.core.management import call_command
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
@@ -37,7 +37,7 @@ class ExportAllCourses(ModuleStoreTestCase):
             verbose=True
         )
 
-        course = self.module_store.get_course(SlashSeparatedCourseKey('edX', 'dot-underscore', '2014_Fall'))
+        course = self.module_store.get_course(CourseKey.from_string('edX/dot-underscore/2014_Fall'))
         self.assertIsNotNone(course)
 
         # check that there are two assets ['example.txt', '.example.txt'] in contentstore for imported course

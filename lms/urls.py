@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 
 import django.contrib.auth.views
 from microsite_configuration import microsite
+from django.views.generic.base import RedirectView
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -119,8 +120,7 @@ urlpatterns += (
 favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
 urlpatterns += ((
     r'^favicon\.ico$',
-    'django.views.generic.simple.redirect_to',
-    {'url':  settings.STATIC_URL + favicon_path}
+    RedirectView.as_view(url=settings.STATIC_URL + favicon_path)
 ),)
 
 # Semi-static views only used by edX, not by themes

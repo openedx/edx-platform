@@ -9,8 +9,8 @@ from datetime import datetime
 import factory
 from factory.django import DjangoModelFactory
 from uuid import uuid4
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232, C0111
@@ -110,14 +110,14 @@ class CourseEnrollmentFactory(DjangoModelFactory):
     FACTORY_FOR = CourseEnrollment
 
     user = factory.SubFactory(UserFactory)
-    course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+    course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
 
 class CourseEnrollmentAllowedFactory(DjangoModelFactory):
     FACTORY_FOR = CourseEnrollmentAllowed
 
     email = 'test@edx.org'
-    course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+    course_id = CourseKey.from_string('edX/toy/2012_Fall')
 
 
 class PendingEmailChangeFactory(DjangoModelFactory):

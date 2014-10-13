@@ -1,6 +1,6 @@
 from course_modes.models import CourseMode
 from factory.django import DjangoModelFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 # Factories don't have __init__ methods, and are self documenting
@@ -8,7 +8,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 class CourseModeFactory(DjangoModelFactory):
     FACTORY_FOR = CourseMode
 
-    course_id = SlashSeparatedCourseKey('MITx', '999', 'Robot_Super_Course')
+    course_id = CourseKey.from_string('MITx/999/Robot_Super_Course')
     mode_slug = 'audit'
     mode_display_name = 'audit course'
     min_price = 0

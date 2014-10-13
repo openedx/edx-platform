@@ -9,7 +9,6 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 from xmodule.contentstore.django import contentstore
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class Command(BaseCommand):
@@ -23,10 +22,7 @@ class Command(BaseCommand):
         if len(args) != 2:
             raise CommandError("export requires two arguments: <course id> <output path>")
 
-        try:
-            course_key = CourseKey.from_string(args[0])
-        except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+        course_key = CourseKey.from_string(args[0])
 
         output_path = args[1]
 
