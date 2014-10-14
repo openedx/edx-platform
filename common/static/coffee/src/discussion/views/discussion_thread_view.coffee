@@ -295,6 +295,7 @@ if Backbone?
     closeEditView: (event) =>
       @createShowView()
       @renderShowView()
+      @$el.find(".post-extended-content").show()
 
     # If you use "delete" here, it will compile down into JS that includes the
     # use of DiscussionThreadView.prototype.delete, and that will break IE8
