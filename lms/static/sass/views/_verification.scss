@@ -355,12 +355,13 @@
   // UI: page header
   .page-header {
     width: flex-grid(12,12);
-    margin: 0 0 ($baseline/2) 0;
-    border-bottom: ($baseline/4) solid $m-gray-l4;
+    margin-bottom: 0;
+    border-bottom: none;
 
     .title {
       @include clearfix();
       width: flex-grid(12,12);
+      margin: 0;
 
       .sts-course, .sts-track {
         display: inline-block;
@@ -393,96 +394,51 @@
         }
       }
 
-      .sts-label {
-        @extend %t-title7;
+      .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
+        @extend %t-title5;
         @extend %t-weight4;
-        display: block;
-        margin-bottom: ($baseline/2);
-        border-bottom: ($baseline/10) solid $m-gray-l4;
-        padding-bottom: ($baseline/2);
-        color: $m-gray-d1;
-      }
-
-      .sts-course {
-        @extend %t-title;
-        width: flex-grid(9,12);
+        @include font-size(14);
+        @include line-height(14);
+        display: inline-block;
+        color: $gray;
         text-transform: none;
       }
 
-      .sts-course-org, .sts-course-number {
-        @extend %t-title5;
-        @extend %t-weight4;
-        display: inline-block;
+      .sts-label {
+        margin: 0;
+        border: none;
+        padding: 0;
+      }
+
+      .sts-course {
+        width: initial;
       }
 
       .sts-course-org {
-        margin-right: ($baseline/4);
+        margin-right: 0;
       }
 
-      .sts-course-name {
-        @include font-size(28);
-        @include line-height(28);
-        @extend %t-weight4;
-        display: block;
-      }
-    }
-  }
-
-  // CASE: page header - experiment variant A overrides
-  .page-header.exp-variant-A {
-    margin-bottom: 0;
-    border-bottom: none;
-
-    .title {
-      margin: 0;
-    }
-
-
-    .sts-label {
-      display: inline-block;
-      margin: 0;
-      border: none;
-      padding: 0;
-      text-transform: none;
-    }
-
-    .sts-course-org {
-      margin-right: 0;
-    }
-
-    .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
-      @extend %t-title5;
-      @extend %t-weight4;
-      @include font-size(14);
-      @include line-height(14);
-      display: inline-block;
-      color: $gray;
-      text-transform: none;
-    }
-
-    .wrapper-sts {
-      display: inline-block;
-      width: flex-grid(9,12);
-      margin-bottom: ($baseline/4);
-    }
-
-    .sts-course {
-      width: initial;
-    }
-
-    .title .sts-track {
-      display: inline-block;
-
-      .sts-track-value {
-        background: $verified-color-lvl3;
+      .wrapper-sts {
+        display: inline-block;
+        width: flex-grid(9,12);
+        margin-bottom: ($baseline/4);
       }
 
-      &.professional-ed {
+      .title .sts-track {
+        display: inline-block;
 
         .sts-track-value {
-          background-color: $professional-color-lvl1;
+          background: $verified-color-lvl3;
+        }
+
+        &.professional-ed {
+
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
+          }
         }
       }
+
     }
   }
 
@@ -1150,10 +1106,6 @@
   // ====================
 
   // UI: main content
-  .wrapper-content-main {
-
-  }
-
   .content-main {
     width: flex-grid(12,12);
 
@@ -1188,17 +1140,13 @@
         margin-right: flex-gutter();
 
         &:last-child {
-          margin-right: 0
+          margin-right: 0;
+        }
+
+        &.help-item-technical {
+          width: flex-grid(8,12);
         }
       }
-    }
-  }
-
-  // CASE: supplemental content - experiment variant A overrides
-  .wrapper-content-supplementary.exp-variant-A {
-
-    .help-item-technical {
-      width: flex-grid(8,12);
     }
   }
 
@@ -1217,7 +1165,7 @@
       margin: ($baseline*2) 0;
 
       .deco-divider {
-        width: flex-grid(8,12);
+        width: flex-grid(12,12);
         float: left;
       }
     }
@@ -1227,7 +1175,7 @@
     }
 
     .register-choice {
-      width: flex-grid(8,12);
+      width: flex-grid(12,12);
       margin: 0 flex-gutter() $baseline 0;
       border-top: ($baseline/4) solid $m-gray-d4;
       padding: $baseline ($baseline*1.5);
@@ -1287,7 +1235,7 @@
 
       .list-actions {
         width: flex-grid(8,8);
-        margin: ($baseline/3) 0;
+        margin: ($baseline) 0;
       }
 
       .action-select input {
@@ -1310,7 +1258,10 @@
       }
 
       .list-actions {
-        margin: ($baseline/3) 0;
+        margin: ($baseline/4) 0;
+        border-top: none;
+        width: flex-grid(4,12);
+        float: right;
       }
 
       .action-intro, .action-select {
@@ -1325,7 +1276,7 @@
       }
 
       .action-select {
-        width: flex-grid(5,8);
+        width: initial;
       }
 
       .action-select input {
@@ -1382,7 +1333,13 @@
 
     .contribution-options {
       @include clearfix();
-      margin: $baseline 0;
+      margin: 0;
+      width: flex-grid(8,12);
+
+      &:after{
+        clear: none;
+        display: none;
+      }
 
       .field {
         float: left;
@@ -1421,39 +1378,6 @@
         .contribution-option-other1 label, .contribution-option-other2 label {
           @extend %text-sr;
         }
-      }
-    }
-  }
-
-  // CASE: select a track - experiment variant A overrides
-  .wrapper-register-choose.exp-variant-A {
-
-    .register-choice {
-      width: flex-grid(12,12);
-    }
-
-    .deco-divider{
-      width: flex-grid(12,12);
-    }
-
-    .contribution-options {
-      width: flex-grid(8,12);
-      margin: 0;
-
-      &:after{
-        clear: none;
-        display: none;
-      }
-    }
-
-    .register-choice-certificate .list-actions {
-      border-top: none;
-      width: flex-grid(4,12);
-      float: right;
-      margin: ($baseline/4) 0;
-
-      .action-select {
-        width: initial;
       }
     }
   }
