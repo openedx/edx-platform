@@ -13,6 +13,9 @@ October, 2014
 
    * - Date
      - Change
+   * - 10/14/14
+     - Removed the chapter on the Vital Source E-Reader tool, as it is no
+       longer supported in the edX Platform.
    * - 10/7/14
      - Added the :ref:`Including Student Cohorts` chapter.
        
@@ -207,7 +210,7 @@ May, 2014
      - Updated :ref:`Assigning_discussion_roles` with a note about course staff
        requiring explicit granting of discussion administration roles.
    * - 
-     - Added :ref:`VitalSource` topic.
+     - Added VitalSource topic.
    * - 05/08/14
      - Added warnings to :ref:`Add a File` about file size.
    * - 05/07/14
