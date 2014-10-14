@@ -97,6 +97,11 @@ define(['js/student_account/account'],
                 view.submit(fakeEvent);
             };
 
+            var requestPasswordChange = function() {
+                var fakeEvent = {preventDefault: function() {}};
+                view.click(fakeEvent);
+            };
+
             var assertAjax = function(url, method, data) {
                 expect($.ajax).toHaveBeenCalled();
                 var ajaxArgs = $.ajax.mostRecentCall.args[0];
@@ -106,31 +111,13 @@ define(['js/student_account/account'],
                 expect(ajaxArgs.headers.hasOwnProperty("X-CSRFToken")).toBe(true);
             };
 
-            var assertEmailStatus = function(success, expectedStatus) {
+            var assertStatus = function(selection, success, errorClass, expectedStatus) {
                 if (!success) {
-                    expect(view.$emailStatus).toHaveClass("validation-error");
+                    expect(selection).toHaveClass(errorClass);
                 } else {
-                    expect(view.$emailStatus).not.toHaveClass("validation-error");
+                    expect(selection).not.toHaveClass(errorClass);
                 }
-                expect(view.$emailStatus.text()).toEqual(expectedStatus);
-            };
-
-            var assertPasswordStatus = function(success, expectedStatus) {
-                if (!success) {
-                    expect(view.$passwordStatus).toHaveClass("validation-error");
-                } else {
-                    expect(view.$passwordStatus).not.toHaveClass("validation-error");
-                }
-                expect(view.$passwordStatus.text()).toEqual(expectedStatus);
-            };
-
-            var assertRequestStatus = function(success, expectedStatus) {
-                if (!success) {
-                    expect(view.$requestStatus).toHaveClass("error");
-                } else {
-                    expect(view.$requestStatus).not.toHaveClass("error");
-                }
-                expect(view.$requestStatus.text()).toEqual(expectedStatus);
+                expect(selection.text()).toEqual(expectedStatus);
             };
 
             beforeEach(function() {
@@ -139,7 +126,7 @@ define(['js/student_account/account'],
 
                 view = new edx.student.account.AccountView().render();
 
-                // Stub Ajax cals to return success/failure
+                // Stub Ajax calls to return success/failure
                 spyOn($, "ajax").andCallFake(function() {
                     return $.Deferred(function(defer) {
                         if (ajaxSuccess) {
@@ -157,39 +144,57 @@ define(['js/student_account/account'],
                     email: "bob@example.com",
                     password: "password"
                 });
-                assertRequestStatus(true, "Please check your email to confirm the change");
+                assertStatus(view.$requestStatus, true, "error", "Please check your email to confirm the change");
             });
 
             it("displays email validation errors", function() {
                 // Invalid email should display an error
                 requestEmailChange("invalid", "password");
-                assertEmailStatus(false, "Please enter a valid email address");
+                assertStatus(view.$emailStatus, false, "validation-error", "Please enter a valid email address");
 
                 // Once the error is fixed, the status should return to normal
                 requestEmailChange("bob@example.com", "password");
-                assertEmailStatus(true, "");
+                assertStatus(view.$emailStatus, true, "validation-error", "");
             });
 
             it("displays an invalid password error", function() {
                 // Password cannot be empty
                 requestEmailChange("bob@example.com", "");
-                assertPasswordStatus(false, "Please enter a valid password");
+                assertStatus(view.$passwordStatus, false, "validation-error", "Please enter a valid password");
 
                 // Once the error is fixed, the status should return to normal
                 requestEmailChange("bob@example.com", "password");
-                assertPasswordStatus(true, "");
+                assertStatus(view.$passwordStatus, true, "validation-error", "");
             });
 
             it("displays server errors", function() {
                 // Simulate an error from the server
                 ajaxSuccess = false;
                 requestEmailChange("bob@example.com", "password");
-                assertRequestStatus(false, "The data could not be saved.");
+                assertStatus(view.$requestStatus, false, "error", "The data could not be saved.");
 
                 // On retry, it should succeed
                 ajaxSuccess = true;
                 requestEmailChange("bob@example.com", "password");
-                assertRequestStatus(true, "Please check your email to confirm the change");
+                assertStatus(view.$requestStatus, true, "error", "Please check your email to confirm the change");
+            });
+
+            it("requests a password reset", function() {
+                requestPasswordChange();
+                assertAjax("password", "POST", {});
+                assertStatus(view.$passwordResetStatus, true, "error", "Password reset email sent. Follow the link in the email to change your password.");
+            });
+
+            it("displays an error message if a password reset email could not be sent", function() {
+                // Simulate an error from the server
+                ajaxSuccess = false;
+                requestPasswordChange();
+                assertStatus(view.$passwordResetStatus, false, "error", "We weren't able to send you a password reset email.");
+
+                // Retry, this time simulating success
+                ajaxSuccess = true;
+                requestPasswordChange();
+                assertStatus(view.$passwordResetStatus, true, "error", "Password reset email sent. Follow the link in the email to change your password.");
             });
         });
     }
