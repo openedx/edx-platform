@@ -20,34 +20,37 @@ import re
 from uuid import uuid4
 
 from bson.son import SON
-from fs.osfs import OSFS
-from path import path
+from contracts import contract, new_contract
 from datetime import datetime
+from fs.osfs import OSFS
+from mongodb_proxy import MongoProxy, autoretry_read
+from path import path
 from pytz import UTC
 from contracts import contract, new_contract
 from operator import itemgetter
 from sortedcontainers import SortedListWithKey
 
 from importlib import import_module
-from xmodule.errortracker import null_error_tracker, exc_info_to_str
-from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.error_module import ErrorDescriptor
-from xblock.runtime import KvsFieldData
-from xblock.exceptions import InvalidScopeError
-from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
-
-from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
-from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
+from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
-from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
-from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
-from xmodule.exceptions import HeartbeatFailure
-from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
+
+from xblock.core import XBlock
+from xblock.exceptions import InvalidScopeError
+from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
+from xblock.runtime import KvsFieldData
+
 from xmodule.assetstore import AssetMetadata
+from xmodule.error_module import ErrorDescriptor
+from xmodule.errortracker import null_error_tracker, exc_info_to_str
+from xmodule.exceptions import HeartbeatFailure
+from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
+from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 
 log = logging.getLogger(__name__)
 
@@ -442,6 +445,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  error_tracker=null_error_tracker,
                  i18n_service=None,
                  fs_service=None,
+                 retry_wait_time=0.1,
                  **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -455,15 +459,18 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
-            self.database = pymongo.database.Database(
-                pymongo.MongoClient(
-                    host=host,
-                    port=port,
-                    tz_aware=tz_aware,
-                    document_class=dict,
-                    **kwargs
+            self.database = MongoProxy(
+                pymongo.database.Database(
+                    pymongo.MongoClient(
+                        host=host,
+                        port=port,
+                        tz_aware=tz_aware,
+                        document_class=dict,
+                        **kwargs
+                    ),
+                    db
                 ),
-                db
+                wait_time=retry_wait_time
             )
             self.collection = self.database[collection]
 
@@ -516,7 +523,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         super(MongoModuleStore, self)._drop_database()
 
         connection = self.collection.database.connection
-        connection.drop_database(self.collection.database)
+        connection.drop_database(self.collection.database.proxied_object)
         connection.close()
 
     def fill_in_run(self, course_key):
