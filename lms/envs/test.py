@@ -203,6 +203,17 @@ simplefilter('ignore')  # Change to "default" to see the first instance of each 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
+THIRD_PARTY_AUTH = {
+    "Google": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
+    },
+    "Facebook": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
+    },
+}
+
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
 FEATURES['AUTH_USE_OPENID_PROVIDER'] = True

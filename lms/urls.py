@@ -375,6 +375,10 @@ if settings.COURSEWARE_ENABLED:
         # LTI endpoints listing
         url(r'^courses/{}/lti_rest_endpoints/'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.get_course_lti_endpoints', name='lti_rest_endpoints'),
+
+        # Student account and profile
+        url(r'^account/', include('student_account.urls')),
+        url(r'^profile/', include('student_profile.urls')),
     )
 
     # allow course staff to change to student view of courseware
@@ -537,12 +541,6 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         url(r'', include('third_party_auth.urls')),
     )
 
-# If enabled, expose the URLs for the new dashboard, account, and profile pages
-if settings.FEATURES.get('ENABLE_NEW_DASHBOARD'):
-    urlpatterns += (
-        url(r'^profile/', include('student_profile.urls')),
-        url(r'^account/', include('student_account.urls')),
-    )
 
 urlpatterns = patterns(*urlpatterns)
 

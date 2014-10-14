@@ -65,9 +65,15 @@ def profile_info(username):
         return None
 
     profile_dict = {
-        u'username': profile.user.username,
-        u'email': profile.user.email,
-        u'full_name': profile.name,
+        "username": profile.user.username,
+        "email": profile.user.email,
+        "full_name": profile.name,
+        "level_of_education": profile.level_of_education,
+        "mailing_address": profile.mailing_address,
+        "year_of_birth": profile.year_of_birth,
+        "goals": profile.goals,
+        "city": profile.city,
+        "country": profile.country,
     }
 
     return profile_dict
