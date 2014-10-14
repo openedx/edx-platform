@@ -806,7 +806,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=W0613
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_codes(user, course_id, generated_codes_list, invoice=None, order=None):
+def save_registration_code(user, course_id, invoice=None, order=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -816,16 +816,16 @@ def save_registration_codes(user, course_id, generated_codes_list, invoice=None,
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_codes(user, course_id, generated_codes_list, invoice, order)
+        return save_registration_code(user, course_id, invoice, order)
 
     course_registration = CourseRegistrationCode(
         code=code, course_id=course_id.to_deprecated_string(), created_by=user, invoice=invoice, order=order
     )
     try:
         course_registration.save()
-        generated_codes_list.append(course_registration)
+        return course_registration
     except IntegrityError:
-        return save_registration_codes(user, course_id, generated_codes_list, invoice, order)
+        return save_registration_code(user, course_id, invoice, order)
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -891,7 +891,6 @@ def generate_registration_codes(request, course_id):
     Respond with csv which contains a summary of all Generated Codes.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course_registration_codes = []
     invoice_copy = False
 
     # covert the course registration code number into integer
@@ -928,8 +927,10 @@ def generate_registration_codes(request, course_id):
         address_line_3=address_line_3, city=city, state=state, zip=zip_code, country=country,
         internal_reference=internal_reference, customer_reference_number=customer_reference_number
     )
+    registration_codes = []
     for _ in range(course_code_number):  # pylint: disable=W0621
-        save_registration_codes(request.user, course_id, course_registration_codes, sale_invoice, order=None)
+        generated_registration_code = save_registration_code(request.user, course_id, sale_invoice, order=None)
+        registration_codes.append(generated_registration_code)
 
     site_name = microsite.get_value('SITE_NAME', 'localhost')
     course = get_course_by_id(course_id, depth=None)
@@ -956,7 +957,7 @@ def generate_registration_codes(request, course_id):
         'discount': discount,
         'sale_price': sale_price,
         'quantity': quantity,
-        'registration_codes': course_registration_codes,
+        'registration_codes': registration_codes,
         'course_url': course_url,
         'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         'dashboard_url': dashboard_url,
@@ -974,7 +975,7 @@ def generate_registration_codes(request, course_id):
     #send_mail(subject, message, from_address, recipient_list, fail_silently=False)
     csv_file = StringIO.StringIO()
     csv_writer = csv.writer(csv_file)
-    for registration_code in course_registration_codes:
+    for registration_code in registration_codes:
         csv_writer.writerow([registration_code.code])
 
     # send a unique email for each recipient, don't put all email addresses in a single email
@@ -988,7 +989,7 @@ def generate_registration_codes(request, course_id):
         email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
         email.send()
 
-    return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
+    return registration_codes_csv("Registration_Codes.csv", registration_codes)
 
 
 @ensure_csrf_cookie

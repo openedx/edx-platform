@@ -22,13 +22,14 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from shoppingcart.models import (
     Order, OrderItem, CertificateItem,
-    InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration,
+    InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration, CourseRegCodeItem,
     Donation, OrderItemSubclassPK
 )
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from shoppingcart.exceptions import PurchasedCallbackException, CourseDoesNotExistException
+from shoppingcart.exceptions import (PurchasedCallbackException, CourseDoesNotExistException,
+                                     ItemAlreadyInCartException, AlreadyEnrolledInCourseException)
 
 from opaque_keys.edx.locator import CourseLocator
 
@@ -330,7 +331,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
     def test_cart_type_business(self):
         self.cart.order_type = 'business'
         self.cart.save()
-        item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
         self.cart.purchase()
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
         # check that the registration codes are generated against the order
@@ -350,6 +351,31 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(reg1.status, "cart")
         self.assertEqual(self.cart.total_cost, 0)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
+
+        course_reg_code_item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2, mode_slug="DNE")
+
+        self.assertEqual(course_reg_code_item.unit_cost, 0)
+        self.assertEqual(course_reg_code_item.line_cost, 0)
+        self.assertEqual(course_reg_code_item.mode, "honor")
+        self.assertEqual(course_reg_code_item.user, self.user)
+        self.assertEqual(course_reg_code_item.status, "cart")
+        self.assertEqual(self.cart.total_cost, 0)
+        self.assertTrue(CourseRegCodeItem.contained_in_order(self.cart, self.course_key))
+
+    def test_add_course_reg_item_with_no_course_item(self):
+        fake_course_id = CourseLocator(org="edx", course="fake", run="course")
+        with self.assertRaises(CourseDoesNotExistException):
+            CourseRegCodeItem.add_to_order(self.cart, fake_course_id, 2)
+
+    def test_course_reg_item_already_in_cart(self):
+        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        with self.assertRaises(ItemAlreadyInCartException):
+            CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+
+    def test_course_reg_item_already_enrolled_in_course(self):
+        CourseEnrollment.enroll(self.user, self.course_key)
+        with self.assertRaises(AlreadyEnrolledInCourseException):
+            CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
 
     def test_purchased_callback(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -391,6 +417,12 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         with self.assertRaises(PurchasedCallbackException):
             reg1.purchased_callback()
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
+
+        course_reg_code_item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        course_reg_code_item.course_id = CourseLocator(org="changed1", course="forsome1", run="reason1")
+        course_reg_code_item.save()
+        with self.assertRaises(PurchasedCallbackException):
+            course_reg_code_item.purchased_callback()
 
     def test_user_cart_has_both_items(self):
         """

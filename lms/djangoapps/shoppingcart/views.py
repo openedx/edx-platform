@@ -33,7 +33,7 @@ from .exceptions import (
 )
 from .models import (
     Order, OrderTypes,
-    PaidCourseRegistration, OrderItem, Coupon,
+    PaidCourseRegistration, OrderItem, Coupon, CourseRegCodeItem,
     CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption,
     Donation, DonationConfiguration
 )
@@ -119,7 +119,7 @@ def update_user_cart(request):
 
         item.qty = qty
         item.save()
-        update_order_type(request.user)
+        item.order.update_order_type()
         total_cost = item.order.total_cost
         return JsonResponse({"total_cost": total_cost}, 200)
 
@@ -133,15 +133,10 @@ def show_cart(request):
     """
     cart = Order.get_cart_for_user(request.user)
     total_cost = cart.total_cost
-    cart_items = cart.orderitem_set.all()
+    cart_items = cart.orderitem_set.all().select_subclasses()
     shoppingcart_items = []
     for cart_item in cart_items:
-        course_key = None
-        if hasattr(cart_item, 'paidcourseregistration'):
-            course_key = cart_item.paidcourseregistration.course_id
-        elif hasattr(cart_item, 'certificateitem'):
-            course_key = cart_item.certificateitem.course_id
-
+        course_key = cart_item.course_id
         if course_key:
             course = get_course_by_id(course_key, depth=0)
             shoppingcart_items.append((cart_item, course))
@@ -199,24 +194,9 @@ def remove_item(request):
             item.delete()
             log.info('order item {0} removed for user {1}'.format(item_id, request.user))
             remove_code_redemption(order_item_course_id, item_id, item, request.user)
-            update_order_type(request.user)
+            item.order.update_order_type()
 
     return HttpResponse('OK')
-
-
-def update_order_type(user):
-    """
-    updating order type
-    """
-    cart = Order.get_cart_for_user(user)
-    cart_items = cart.orderitem_set.all()
-    order_type = OrderTypes.PERSONAL
-    for cart_item in cart_items:
-        if cart_item.qty > 1:
-            order_type = OrderTypes.BUSINESS
-
-    cart.order_type = order_type
-    cart.save()
 
 def remove_code_redemption(order_item_course_id, item_id, item, user):
     """
@@ -602,41 +582,17 @@ def show_receipt(request, ordernum):
     shoppingcart_items = []
     course_names_list = []
     for order_item in order_items:
-        course_key = None
-        if hasattr(order_item, 'paidcourseregistration'):
-            course_key = order_item.paidcourseregistration.course_id
-        elif hasattr(order_item, 'certificateitem'):
-            course_key = order_item.certificateitem.course_id
-        elif hasattr(order_item, 'donation'):
-            if hasattr(order_item, 'course_id'):
-                course_key = order_item.donation.course_id
+        course_key = order_item.course_id
         if course_key:
             course = get_course_by_id(course_key, depth=0)
             shoppingcart_items.append((order_item, course))
             course_names_list.append(course.display_name)
 
-    course_names = ", ".join(course_names_list)
+    appended_course_names = ", ".join(course_names_list)
     any_refunds = any(i.status == "refunded" for i in order_items)
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
     order_type = getattr(order, 'order_type')
-    # we want to have the ability to override the default receipt page when
-    # there is only one item in the order
-    context = {
-        'order': order,
-        'shoppingcart_items': shoppingcart_items,
-        'order_items': order_items,
-        'any_refunds': any_refunds,
-        'instructions': instructions,
-        'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
-        'order_type': order_type,
-        'course_names': course_names,
-        'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
-    }
-
-    if order_items.count() == 1:
-        receipt_template = order_items[0].single_item_receipt_template
-        context.update(order_items[0].single_item_receipt_context)
 
     # Only orders where order_items.count() == 1 might be attempting to upgrade
     attempting_upgrade = request.session.get('attempting_upgrade', False)
@@ -645,21 +601,39 @@ def show_receipt(request, ordernum):
         course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
         request.session['attempting_upgrade'] = False
 
-    recipient_list = list()
+    recipient_list = []
+    registration_codes = None
+    total_registration_codes = None
     recipient_list.append(getattr(order.user, 'email'))
     if order_type == OrderTypes.BUSINESS:
         registration_codes = CourseRegistrationCode.objects.filter(order=order)
         total_registration_codes = registration_codes.count()
-        context.update({'registration_codes': registration_codes})
-        context.update({'total_registration_codes': total_registration_codes})
         if order.company_contact_email:
             recipient_list.append(order.company_contact_email)
         if order.recipient_email:
             recipient_list.append(order.recipient_email)
 
-    emails = ", ".join(recipient_list)
-    context.update({'emails': emails})
-    # return render_to_response('shoppingcart/reciet.html', context)
+    appended_recipient_emails = ", ".join(recipient_list)
+
+    context = {
+        'order': order,
+        'shoppingcart_items': shoppingcart_items,
+        'any_refunds': any_refunds,
+        'instructions': instructions,
+        'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        'order_type': order_type,
+        'appended_course_names': appended_course_names,
+        'appended_recipient_emails': appended_recipient_emails,
+        'total_registration_codes': total_registration_codes,
+        'registration_codes': registration_codes,
+        'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
+    }
+    # we want to have the ability to override the default receipt page when
+    # there is only one item in the order
+    if order_items.count() == 1:
+        receipt_template = order_items[0].single_item_receipt_template
+        context.update(order_items[0].single_item_receipt_context)
+
     return render_to_response(receipt_template, context)
 
 

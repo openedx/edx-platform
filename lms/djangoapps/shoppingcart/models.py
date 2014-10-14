@@ -65,7 +65,7 @@ ORDER_STATUSES = (
 OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=C0103
 
 
-class OrderTypes:
+class OrderTypes(object):
     """
     This class specify purchase OrderTypes.
     """
@@ -193,6 +193,113 @@ class Order(models.Model):
             for item in OrderItem.objects.filter(order=self).select_subclasses():
                 item.start_purchase()
 
+    def update_order_type(self):
+        """
+        updating order type
+        """
+        cart_items = self.orderitem_set.all()  # pylint: disable=E1101
+        is_order_type_business = False
+        for cart_item in cart_items:
+            if cart_item.qty > 1:
+                is_order_type_business = True
+
+        if is_order_type_business:
+            items_to_delete = []
+            for cart_item in cart_items:
+                if hasattr(cart_item, 'paidcourseregistration'):
+                    CourseRegCodeItem.add_to_order(self, cart_item.paidcourseregistration.course_id, cart_item.qty)
+                    items_to_delete.append(cart_item)
+
+            for item in items_to_delete:
+                item.delete()
+        else:
+            items_to_delete = []
+            for cart_item in cart_items:
+                if hasattr(cart_item, 'courseregcodeitem'):
+                    PaidCourseRegistration.add_to_order(self, cart_item.courseregcodeitem.course_id)
+                    items_to_delete.append(cart_item)
+                    # CourseRegCodeItem.add_to_order
+
+            for item in items_to_delete:
+                item.delete()
+
+        self.order_type = OrderTypes.BUSINESS if is_order_type_business else OrderTypes.PERSONAL
+        self.save()
+
+    def generate_registration_codes_csv(self, orderitems, site_name):
+        """
+        this function generates the csv file
+        """
+        course_info = []
+        csv_file = StringIO.StringIO()
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(['Course Name', 'Registration Code', 'URL'])
+        for item in orderitems:
+            course_id = item.course_id
+            course = get_course_by_id(getattr(item, 'course_id'), depth=0)
+            registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id, order=self)
+            course_info.append((course.display_name, ' (' + course.start_date_text + '-' + course.end_date_text + ')'))
+            for registration_code in registration_codes:
+                redemption_url = reverse('register_code_redemption', args=[registration_code.code])
+                url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url)
+                csv_writer.writerow([course.display_name, registration_code.code, url])
+
+        return csv_file, course_info
+
+    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, site_name, courses_info):
+        """
+        send confirmation e-mail
+        """
+        recipient_list = [(self.user.username, getattr(self.user, 'email'), 'user')]  # pylint: disable=E1101
+        if self.company_contact_email:
+            recipient_list.append((self.company_contact_name, self.company_contact_email, 'company_contact'))
+        joined_course_names = ""
+        if self.recipient_email:
+            recipient_list.append((self.recipient_name, self.recipient_email, 'email_recipient'))
+            courses_names_with_dates = [course_info[0] + course_info[1] for course_info in courses_info]
+            joined_course_names = " " + ", ".join(courses_names_with_dates)
+        subject = _('Confirmation and Registration Codes for' + joined_course_names) if is_order_type_business else _("Order Payment Confirmation")
+
+        dashboard_url = '{base_url}{dashboard}'.format(
+            base_url=site_name,
+            dashboard=reverse('dashboard')
+        )
+        try:
+            from_address = microsite.get_value(
+                'email_from_address',
+                settings.DEFAULT_FROM_EMAIL
+            )
+            # send a unique email for each recipient, don't put all email addresses in a single email
+            for recipient in recipient_list:
+                message = render_to_string(
+                    'emails/business_order_confirmation_email.txt' if is_order_type_business else 'emails/order_confirmation_email.txt',
+                    {
+                        'order': self,
+                        'recipient_name': recipient[0],
+                        'recipient_type': recipient[2],
+                        'site_name': site_name,
+                        'order_items': orderitems,
+                        'course_names': ", ".join([course_info[0] for course_info in courses_info]),
+                        'dashboard_url': dashboard_url,
+                        'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=E1101
+                        'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
+                        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                        'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
+                        'payment_email_signature': microsite.get_value('payment_email_signature'),
+                    }
+                )
+                email = EmailMessage()
+                email.subject = subject
+                email.body = message
+                email.from_email = from_address
+                email.to = [recipient[1]]
+                if csv_file:
+                    email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
+                email.content_subtype = "html"  # Main content is now text/html
+                email.send()
+        except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
+            log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
+
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
         """
@@ -235,84 +342,20 @@ class Order(models.Model):
         # this should return all of the objects with the correct types of the
         # subclasses
         orderitems = OrderItem.objects.filter(order=self).select_subclasses()
-        csv_file = None
-        course_names = []
-        course_names_with_dates = []
         site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
-        if getattr(self, 'order_type') == OrderTypes.BUSINESS:
-            for item in orderitems:
-                from instructor.views.api import save_registration_codes
-                if hasattr(item, 'paidcourseregistration'):
-                    course_id = item.paidcourseregistration.course_id
-                    registration_codes = []
-                    total_registration_codes = int(item.qty)
-                    for i in range(total_registration_codes):  # pylint: disable=W0612
-                        save_registration_codes(self.user, course_id, registration_codes, invoice=None, order=self)
-                    item.status = 'purchased'
-                    item.fulfilled_time = datetime.now(pytz.utc)
-                    item.save()
-                    course = get_course_by_id(getattr(item, 'course_id'), depth=0)
-                    course_names.append(course.display_name)
-                    course_names_with_dates.append(course.display_name + ' (' + course.start_date_text + '-' + course.end_date_text + ')')
-                    csv_file = StringIO.StringIO()
-                    csv_writer = csv.writer(csv_file)
-                    csv_writer.writerow(['Course Name', 'Registration Code', 'URL'])
-                    for registration_code in registration_codes:
-                        redemption_url = reverse('register_code_redemption', args=[registration_code.code])
-                        url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url)
-                        csv_writer.writerow([course.display_name, registration_code.code, url])
-        else:
-            for item in orderitems:
-                item.purchase_item()
 
-        # send confirmation e-mail
-        recipient_list = []
-        recipient_list.append((self.user.username, getattr(self.user, 'email'), 'user'))  # pylint: disable=E1101
-        if self.company_contact_email:
-            recipient_list.append((self.company_contact_name, self.company_contact_email, 'company_contact'))
-        if self.recipient_email:
-            recipient_list.append((self.recipient_name, self.recipient_email, 'email_recipient'))
-        subject = _("Order Payment Confirmation") if self.order_type == OrderTypes.PERSONAL else _('Confirmation and Registration Codes for' + ", ".join(course_names_with_dates) + '')
+        if self.order_type == OrderTypes.BUSINESS:
+            self.update_order_type()
 
-        dashboard_url = '{base_url}{dashboard}'.format(
-            base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
-            dashboard=reverse('dashboard')
-        )
-        try:
-            from_address = microsite.get_value(
-                'email_from_address',
-                settings.DEFAULT_FROM_EMAIL
-            )
-            # send a unique email for each recipient, don't put all email addresses in a single email
-            for recipient in recipient_list:
-                message = render_to_string(
-                    'emails/order_confirmation_email.txt' if self.order_type == OrderTypes.PERSONAL else 'emails/business_order_confirmation_email.txt',
-                    {
-                        'order': self,
-                        'recipient_name': recipient[0],
-                        'recipient_type': recipient[2],
-                        'site_name': site_name,
-                        'order_items': orderitems,
-                        'course_names': ", ".join(course_names),
-                        'dashboard_url': dashboard_url,
-                        'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=E1101
-                        'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
-                        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
-                        'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
-                        'payment_email_signature': microsite.get_value('payment_email_signature'),
-                    }
-                )
-                email = EmailMessage()
-                email.subject = subject
-                email.body = message
-                email.from_email = from_address
-                email.to = [recipient[1]]
-                if csv_file:
-                    email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
-                email.content_subtype = "html"  # Main content is now text/html
-                email.send()
-        except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
-            log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
+        for item in orderitems:
+            item.purchase_item()
+
+        csv_file = None
+        courses_info = []
+        if self.order_type == OrderTypes.BUSINESS:
+            csv_file, courses_info = self.generate_registration_codes_csv(orderitems, site_name)
+
+        self.send_confirmation_emails(orderitems, self.order_type == OrderTypes.BUSINESS, csv_file, site_name, courses_info)
 
     def add_billing_details(self, company_name='', company_contact_name='', company_contact_email='', recipient_name='',
                             recipient_email='', customer_reference_number=''):
@@ -799,6 +842,139 @@ class PaidCourseRegistration(OrderItem):
             return u""
 
 
+class CourseRegCodeItem(OrderItem):
+    """
+    This is an inventory item for paying for
+    generating course registration codes
+    """
+    course_id = CourseKeyField(max_length=128, db_index=True)
+    mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
+
+    @classmethod
+    def contained_in_order(cls, order, course_id):
+        """
+        Is the course defined by course_id contained in the order?
+        """
+        return course_id in [
+            item.course_id
+            for item in order.orderitem_set.all().select_subclasses("courseregcodeitem")
+            if isinstance(item, cls)
+        ]
+
+    @classmethod
+    def get_total_amount_of_purchased_item(cls, course_key):
+        """
+        This will return the total amount of money that a purchased course generated
+        """
+        total_cost = 0
+        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=E1101
+
+        if result['total'] is not None:
+            total_cost = result['total']
+
+        return total_cost
+
+    @classmethod
+    @transaction.commit_on_success
+    def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=W0221
+        """
+        A standardized way to create these objects, with sensible defaults filled in.
+        Will update the cost if called on an order that already carries the course.
+
+        Returns the order item
+        """
+        # First a bunch of sanity checks
+        course = modulestore().get_course(course_id)  # actually fetch the course to make sure it exists, use this to
+                                                # throw errors if it doesn't
+        if not course:
+            log.error("User {} tried to add non-existent course {} to cart id {}"
+                      .format(order.user.email, course_id, order.id))
+            raise CourseDoesNotExistException
+
+        if cls.contained_in_order(order, course_id):
+            log.warning("User {} tried to add PaidCourseRegistration for course {}, already in cart id {}"
+                        .format(order.user.email, course_id, order.id))
+            raise ItemAlreadyInCartException
+
+        if CourseEnrollment.is_enrolled(user=order.user, course_key=course_id):
+            log.warning("User {} trying to add course {} to cart id {}, already registered"
+                        .format(order.user.email, course_id, order.id))
+            raise AlreadyEnrolledInCourseException
+
+        ### Validations done, now proceed
+        ### handle default arguments for mode_slug, cost, currency
+        course_mode = CourseMode.mode_for_course(course_id, mode_slug)
+        if not course_mode:
+            # user could have specified a mode that's not set, in that case return the DEFAULT_MODE
+            course_mode = CourseMode.DEFAULT_MODE
+        if not cost:
+            cost = course_mode.min_price
+        if not currency:
+            currency = course_mode.currency
+
+        super(CourseRegCodeItem, cls).add_to_order(order, course_id, cost, currency=currency)
+
+        item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)  # pylint: disable=W0612
+        item.status = order.status
+        item.mode = course_mode.slug
+        item.unit_cost = cost
+        item.qty = qty
+        item.line_desc = _(u'Enrollment codes for Course: {course_name}').format(
+            course_name=course.display_name_with_default)
+        item.currency = currency
+        order.currency = currency
+        item.report_comments = item.csv_report_comments
+        order.save()
+        item.save()
+        log.info("User {} added course registration {} to cart: order {}"
+                 .format(order.user.email, course_id, order.id))
+        return item
+
+    def purchased_callback(self):
+        """
+        When purchased, this should enroll the user in the course.  We are assuming that
+        course settings for enrollment date are configured such that only if the (user.email, course_id) pair is found
+        in CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
+        would in fact be quite silly since there's a clear back door.
+        """
+        if not modulestore().has_course(self.course_id):
+            raise PurchasedCallbackException(
+                "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
+        from instructor.views.api import save_registration_code
+        total_registration_codes = int(self.qty)
+        for i in range(total_registration_codes):  # pylint: disable=W0612
+            save_registration_code(self.user, self.course_id, invoice=None, order=self.order)
+
+        log.info("Enrolled {0} in paid course {1}, paid ${2}"
+                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=E1101
+
+    @property
+    def csv_report_comments(self):
+        """
+        Tries to fetch an annotation associated with the course_id from the database.  If not found, returns u"".
+        Otherwise returns the annotation
+        """
+        try:
+            return CourseRegCodeItemAnnotation.objects.get(course_id=self.course_id).annotation
+        except CourseRegCodeItemAnnotation.DoesNotExist:
+            return u""
+
+
+class CourseRegCodeItemAnnotation(models.Model):
+    """
+    A model that maps course_id to an additional annotation.  This is specifically needed because when Stanford
+    generates report for the paid courses, each report item must contain the payment account associated with a course.
+    And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
+    so this is to retrofit it.
+    """
+    course_id = CourseKeyField(unique=True, max_length=128, db_index=True)
+    annotation = models.TextField(null=True)
+
+    def __unicode__(self):
+        # pylint: disable=no-member
+        return u"{} : {}".format(self.course_id.to_deprecated_string(), self.annotation)
+
+
 class PaidCourseRegistrationAnnotation(models.Model):
     """
     A model that maps course_id to an additional annotation.  This is specifically needed because when Stanford
@@ -1145,3 +1321,9 @@ class Donation(OrderItem):
         # The donation is for the organization as a whole, not a specific course
         else:
             return _(u"Donation for {platform_name}").format(platform_name=settings.PLATFORM_NAME)
+
+    @property
+    def single_item_receipt_context(self):
+        return {
+            'receipt_has_donation_item': True,
+        }

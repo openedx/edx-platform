@@ -8,6 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'CourseRegCodeItem'
+        db.create_table('shoppingcart_courseregcodeitem', (
+            ('orderitem_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['shoppingcart.OrderItem'], unique=True, primary_key=True)),
+            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=128, db_index=True)),
+            ('mode', self.gf('django.db.models.fields.SlugField')(default='honor', max_length=50)),
+        ))
+        db.send_create_signal('shoppingcart', ['CourseRegCodeItem'])
+
+        # Adding model 'CourseRegCodeItemAnnotation'
+        db.create_table('shoppingcart_courseregcodeitemannotation', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(unique=True, max_length=128, db_index=True)),
+            ('annotation', self.gf('django.db.models.fields.TextField')(null=True)),
+        ))
+        db.send_create_signal('shoppingcart', ['CourseRegCodeItemAnnotation'])
+
         # Adding field 'Order.company_name'
         db.add_column('shoppingcart_order', 'company_name',
                       self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
@@ -33,36 +49,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
                       keep_default=False)
 
-        # Adding field 'Order.company_address_line_1'
-        db.add_column('shoppingcart_order', 'company_address_line_1',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
-                      keep_default=False)
-
-        # Adding field 'Order.company_address_line_2'
-        db.add_column('shoppingcart_order', 'company_address_line_2',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
-                      keep_default=False)
-
-        # Adding field 'Order.company_city'
-        db.add_column('shoppingcart_order', 'company_city',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
-                      keep_default=False)
-
-        # Adding field 'Order.company_state'
-        db.add_column('shoppingcart_order', 'company_state',
-                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
-                      keep_default=False)
-
-        # Adding field 'Order.company_zip'
-        db.add_column('shoppingcart_order', 'company_zip',
-                      self.gf('django.db.models.fields.CharField')(max_length=15, null=True, blank=True),
-                      keep_default=False)
-
-        # Adding field 'Order.company_country'
-        db.add_column('shoppingcart_order', 'company_country',
-                      self.gf('django.db.models.fields.CharField')(max_length=64, null=True, blank=True),
-                      keep_default=False)
-
         # Adding field 'Order.customer_reference_number'
         db.add_column('shoppingcart_order', 'customer_reference_number',
                       self.gf('django.db.models.fields.CharField')(max_length=63, null=True, blank=True),
@@ -75,6 +61,12 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
+        # Deleting model 'CourseRegCodeItem'
+        db.delete_table('shoppingcart_courseregcodeitem')
+
+        # Deleting model 'CourseRegCodeItemAnnotation'
+        db.delete_table('shoppingcart_courseregcodeitemannotation')
+
         # Deleting field 'Order.company_name'
         db.delete_column('shoppingcart_order', 'company_name')
 
@@ -89,24 +81,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Order.recipient_email'
         db.delete_column('shoppingcart_order', 'recipient_email')
-
-        # Deleting field 'Order.company_address_line_1'
-        db.delete_column('shoppingcart_order', 'company_address_line_1')
-
-        # Deleting field 'Order.company_address_line_2'
-        db.delete_column('shoppingcart_order', 'company_address_line_2')
-
-        # Deleting field 'Order.company_city'
-        db.delete_column('shoppingcart_order', 'company_city')
-
-        # Deleting field 'Order.company_state'
-        db.delete_column('shoppingcart_order', 'company_state')
-
-        # Deleting field 'Order.company_zip'
-        db.delete_column('shoppingcart_order', 'company_zip')
-
-        # Deleting field 'Order.company_country'
-        db.delete_column('shoppingcart_order', 'company_country')
 
         # Deleting field 'Order.customer_reference_number'
         db.delete_column('shoppingcart_order', 'customer_reference_number')
@@ -163,7 +137,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Coupon'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '32', 'db_index': 'True'}),
             'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 9, 16, 0, 0)'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 10, 16, 0, 0)'}),
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -177,15 +151,40 @@ class Migration(SchemaMigration):
             'order': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Order']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
+        'shoppingcart.courseregcodeitem': {
+            'Meta': {'object_name': 'CourseRegCodeItem', '_ormbases': ['shoppingcart.OrderItem']},
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '128', 'db_index': 'True'}),
+            'mode': ('django.db.models.fields.SlugField', [], {'default': "'honor'", 'max_length': '50'}),
+            'orderitem_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.OrderItem']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'shoppingcart.courseregcodeitemannotation': {
+            'Meta': {'object_name': 'CourseRegCodeItemAnnotation'},
+            'annotation': ('django.db.models.fields.TextField', [], {'null': 'True'}),
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'unique': 'True', 'max_length': '128', 'db_index': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
         'shoppingcart.courseregistrationcode': {
             'Meta': {'object_name': 'CourseRegistrationCode'},
             'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
             'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 9, 16, 0, 0)'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 10, 16, 0, 0)'}),
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_by_user'", 'to': "orm['auth.User']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invoice': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Invoice']", 'null': 'True'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'purchase_order'", 'null': 'True', 'to': "orm['shoppingcart.Order']"})
+        },
+        'shoppingcart.donation': {
+            'Meta': {'object_name': 'Donation', '_ormbases': ['shoppingcart.OrderItem']},
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
+            'donation_type': ('django.db.models.fields.CharField', [], {'default': "'general'", 'max_length': '32'}),
+            'orderitem_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.OrderItem']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'shoppingcart.donationconfiguration': {
+            'Meta': {'object_name': 'DonationConfiguration'},
+            'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
+            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'shoppingcart.invoice': {
             'Meta': {'object_name': 'Invoice'},
@@ -220,15 +219,9 @@ class Migration(SchemaMigration):
             'bill_to_state': ('django.db.models.fields.CharField', [], {'max_length': '8', 'blank': 'True'}),
             'bill_to_street1': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'bill_to_street2': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
-            'company_address_line_1': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'company_address_line_2': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'company_city': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'company_contact_email': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'company_contact_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'company_country': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
             'company_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'company_state': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'company_zip': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True', 'blank': 'True'}),
             'currency': ('django.db.models.fields.CharField', [], {'default': "'usd'", 'max_length': '8'}),
             'customer_reference_number': ('django.db.models.fields.CharField', [], {'max_length': '63', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -273,7 +266,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'RegistrationCodeRedemption'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Order']", 'null': 'True'}),
-            'redeemed_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 9, 16, 0, 0)', 'null': 'True'}),
+            'redeemed_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 10, 16, 0, 0)', 'null': 'True'}),
             'redeemed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'registration_code': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.CourseRegistrationCode']"})
         },

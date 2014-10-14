@@ -13,7 +13,8 @@ from django.test.utils import override_settings
 
 from course_modes.models import CourseMode
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation)
+from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation,
+                                 CourseRegCodeItemAnnotation)
 from shoppingcart.views import initialize_report
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -203,6 +204,8 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         course_mode2.save()
         self.annotation = PaidCourseRegistrationAnnotation(course_id=self.course_key, annotation=self.TEST_ANNOTATION)
         self.annotation.save()
+        self.course_reg_code_annotation = CourseRegCodeItemAnnotation(course_id=self.course_key, annotation=self.TEST_ANNOTATION)
+        self.course_reg_code_annotation.save()
         self.cart = Order.get_cart_for_user(self.user)
         self.reg = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         self.cert_item = CertificateItem.add_to_order(self.cart, self.course_key, self.cost, 'verified')
@@ -269,3 +272,9 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         Fill in gap in test coverage.  __unicode__ method of PaidCourseRegistrationAnnotation
         """
         self.assertEqual(unicode(self.annotation), u'{} : {}'.format(self.course_key.to_deprecated_string(), self.TEST_ANNOTATION))
+
+    def test_courseregcodeitemannotationannotation_unicode(self):
+        """
+        Fill in gap in test coverage.  __unicode__ method of CourseRegCodeItemAnnotation
+        """
+        self.assertEqual(unicode(self.course_reg_code_annotation), u'{} : {}'.format(self.course_key.to_deprecated_string(), self.TEST_ANNOTATION))

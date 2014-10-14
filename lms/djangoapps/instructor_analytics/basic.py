@@ -4,7 +4,7 @@ Student and course analytics.
 Serve miscellaneous course and student data
 """
 from shoppingcart.models import (
-    PaidCourseRegistration, CouponRedemption, Invoice,
+    PaidCourseRegistration, CouponRedemption, Invoice, CourseRegCodeItem,
     OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode
 )
 from django.contrib.auth.models import User
@@ -43,6 +43,7 @@ def sale_order_record_features(course_id, features):
     ]
     """
     purchased_courses = PaidCourseRegistration.objects.filter(course_id=course_id, status='purchased').order_by('order')
+    purchased_course_reg_codes = CourseRegCodeItem.objects.filter(course_id=course_id, status='purchased').order_by('order')
 
     def sale_order_info(purchased_course, features):
         """
@@ -86,7 +87,9 @@ def sale_order_record_features(course_id, features):
 
         return sale_order_dict
 
-    return [sale_order_info(purchased_course, features) for purchased_course in purchased_courses]
+    csv_data = [sale_order_info(purchased_course, features) for purchased_course in purchased_courses]
+    csv_data.extend([sale_order_info(purchased_course_reg_code, features) for purchased_course_reg_code in purchased_course_reg_codes])
+    return csv_data
 
 
 def sale_record_features(course_id, features):
