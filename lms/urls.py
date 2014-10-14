@@ -71,6 +71,7 @@ urlpatterns = ('',  # nopep8
     url(r'', include('edraak_misc.urls')),
     url(r'', include('edraak_contact.urls')),
     url(r'', include('edraak_bayt.urls')),
+    url(r'^certificate/', include('edraak_certificates.urls')),
 
     url(r'^embargo$', 'student.views.embargo', name="embargo"),
 

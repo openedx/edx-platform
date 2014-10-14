@@ -42,6 +42,30 @@
         verifyToggleBannerFailedOff: "${reverse('verify_student_toggle_failed_banner_off')}",
       });
     });
+  })(this);
+
+  $(function(){
+    accessible_modal(".edit-name", "#apply_name_change .close-modal", "#apply_name_change", "#dashboard-main");
+
+    accessible_modal(".edit-email", "#change_email .close-modal", "#change_email", "#dashboard-main");
+
+    accessible_modal("#pwd_reset_button", "#password_reset_complete .close-modal", "#password_reset_complete", "#dashboard-main");
+
+
+    $(".email-settings").each(function(index){
+      $(this).attr("id", "unenroll-" + index);
+      // a bit of a hack, but gets the unique selector for the modal trigger
+      var trigger = "#" + $(this).attr("id");
+      accessible_modal(trigger, "#email-settings-modal .close-modal", "#email-settings-modal", "#dashboard-main");
+    });
+
+    $(".unenroll").each(function(index){
+      $(this).attr("id", "email-settings-" + index);
+      // a bit of a hack, but gets the unique selector for the modal trigger
+      var trigger = "#" + $(this).attr("id");
+      accessible_modal(trigger, "#unenroll-modal .close-modal", "#unenroll-modal", "#dashboard-main");
+    });
+  });
   </script>
 </%block>
 
@@ -405,3 +429,4 @@
 
 ## Available in Edraak theme
 <%include file="bayt/_dashboard_popups.html" />
+<%include file="edraak_certificates/_dashboard_popups.html" />

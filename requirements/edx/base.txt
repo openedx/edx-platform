@@ -143,3 +143,6 @@ git+https://github.com/mitocw/django-cas.git
 
 # edX packages
 edx-submissions==0.0.8
+
+# Edraak packages
+-r edraak/certificates.txt
