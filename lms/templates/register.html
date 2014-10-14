@@ -8,7 +8,7 @@
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils import html %>
-<%! from django_countries.countries import COUNTRIES %>
+<%! from django_countries import countries %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
@@ -254,7 +254,7 @@
               <label for="country">${_("Country")}</label>
               <select id="country" name="country" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['country'] == 'required' else ''}>
                 <option value="">--</option>
-                %for code, country_name in COUNTRIES:
+                %for code, country_name in sorted(countries.countries, key=lambda (__, name): unicode(name)):
                 <option value="${code}">${ unicode(country_name) }</option>
                 %endfor
               </select>
