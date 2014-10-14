@@ -13,6 +13,8 @@ October, 2014
 
    * - Date
      - Change
+   * - 10/14/14
+     - Added the :ref:`Rerun a Course` chapter.
    * - 10/7/14
      - Added the :ref:`Including Student Cohorts` chapter.
        

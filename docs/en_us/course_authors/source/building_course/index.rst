@@ -13,10 +13,11 @@ page, see :ref:`Developing Your Course Index`.
    :maxdepth: 2
 
    creating_new_course
-   export_import_course
+   setting_up_student_view
    course_files
    handouts_updates
    pages
    textbooks
    establish_grading_policy
-   setting_up_student_view
+   course_rerun
+   export_import_course
