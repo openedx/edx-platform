@@ -231,7 +231,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 var span = document.createElement('span');
                 var rectPosition = an.rangePosition;
                 span.className = "annotator-hl";
-                span.style.border = '2px solid rgba(0,0,0,0.5)';
+                
+                // outline and border below create a double line one black and one white
+                // so to be able to differentiate when selecting dark or light images
+                span.style.border = '2px solid rgb(255, 255, 255)';
+                span.style.outline = '2px solid rgb(0, 0, 0)';
                 span.style.background = 'rgba(0,0,0,0)';
                 
                 // Adds listening items for the viewer and editor
@@ -305,7 +309,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 viewer.innerTracker.setTracking(false);
                 this.rect = document.createElement('div');
                 this.rect.style.background = 'rgba(0,0,0,0)';
-                this.rect.style.border = '2px solid rgba(0,0,0,0.5)';
+                
+                // outline and border below create a double line one black and one white
+                // so to be able to differentiate when selecting dark or light images
+                this.rect.style.border = '2px solid rgb(255, 255, 255)';
+                this.rect.style.outline = '2px solid rgb(0, 0, 0)';
+                
                 this.rect.style.position = 'absolute';
                 this.rect.className = 'DrawingRect';
                 // set the initial position
