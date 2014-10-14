@@ -41,6 +41,22 @@ def index(request):
     )
 
 
+@require_http_methods(['GET'])
+def login_and_registration_form(request, initial_mode="login"):
+    """Render the combined login/registration form, defaulting to login
+
+    This relies on the JS to asynchronously load the actual form from
+    the user_api.
+
+    Keyword Args:
+        mode (string): Either "login" or "registration".
+
+    TODO
+
+    """
+    pass
+
+
 @login_required
 @require_http_methods(['POST'])
 @ensure_csrf_cookie
