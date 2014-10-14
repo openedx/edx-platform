@@ -1,10 +1,10 @@
 """
-Test the user service
+Test the user course tag API.
 """
 from django.test import TestCase
 
 from student.tests.factories import UserFactory
-from user_api import user_service
+from user_api.api import course_tag as course_tag_api
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -19,17 +19,17 @@ class TestUserService(TestCase):
 
     def test_get_set_course_tag(self):
         # get a tag that doesn't exist
-        tag = user_service.get_course_tag(self.user, self.course_id, self.test_key)
+        tag = course_tag_api.get_course_tag(self.user, self.course_id, self.test_key)
         self.assertIsNone(tag)
 
         # test setting a new key
         test_value = 'value'
-        user_service.set_course_tag(self.user, self.course_id, self.test_key, test_value)
-        tag = user_service.get_course_tag(self.user, self.course_id, self.test_key)
+        course_tag_api.set_course_tag(self.user, self.course_id, self.test_key, test_value)
+        tag = course_tag_api.get_course_tag(self.user, self.course_id, self.test_key)
         self.assertEqual(tag, test_value)
 
         #test overwriting an existing key
         test_value = 'value2'
-        user_service.set_course_tag(self.user, self.course_id, self.test_key, test_value)
-        tag = user_service.get_course_tag(self.user, self.course_id, self.test_key)
+        course_tag_api.set_course_tag(self.user, self.course_id, self.test_key, test_value)
+        tag = course_tag_api.get_course_tag(self.user, self.course_id, self.test_key)
         self.assertEqual(tag, test_value)
