@@ -8,9 +8,9 @@ ${_("Thank you for your purchase of ")} <b> ${course_names} </b>
 %if recipient_type == 'user':
 <p>${_("Your payment was successful.")}</p>
 % if marketing_link('FAQ'):
-<p>${_("If you have billing questions, please read the FAQ ({faq_url}) or contact {billing_email}.").format(billing_email=settings.PAYMENT_SUPPORT_EMAIL, faq_url=marketing_link('FAQ'))}</p>
+<p>${_("If you have billing questions, please read the FAQ ({faq_url}) or contact {billing_email}.").format(billing_email=payment_support_email, faq_url=marketing_link('FAQ'))}</p>
 % else:
-<p>${_("If you have billing questions, please contact {billing_email}.").format(billing_email=settings.PAYMENT_SUPPORT_EMAIL)}</p>
+<p>${_("If you have billing questions, please contact {billing_email}.").format(billing_email=payment_support_email)}</p>
 % endif
 
 %elif recipient_type == 'company_contact':
@@ -63,28 +63,29 @@ ${order.bill_to_country.upper()}
 </p>
 <p>${_("Order Number: {order_number}").format(order_number=order.id)}</p>
 
-<p><b>${_("A CSV file of your registration URLs is attached. please distribute registration URLs to each student planning to enroll using the email template below.")}</b></p>
+<p><b>${_("A CSV file of your registration URLs is attached. Please distribute registration URLs to each student planning to enroll using the email template below.")}</b></p>
 
 <p>${_("Warm regards,")}<br>
-MIT Professional Education<br>
-The Online X Programs Team<br>
-onlinex-registration@mit.edu<br>
-238 Main Street, Bldg E48-401<br>
-Cambridge, Massachusetts 02142</p>
+% if payment_email_signature:
+${payment_email_signature}
+% else:
+${_("The {platform_name} Team").format(platform_name=platform_name)}
+%endif
+</p>
 
 
 ———————————————————————————————————————————
 
 
-<p>Dear [[Name]]:</p>
+<p>Dear [[Name]]</p>
 
-<p>We have provided an enrollment URL for you. Please follow the instructions below to claim your access.</p>
+<p>To enroll in ${course_names} we have provided a registration URL for you.  Please follow the instructions below to claim your access.</p>
 
 <p>Your redeem url is: [[Enter Redeem URL here from the attached CSV]]</p>
 
 <p>${_("(1) Register for an account at <a href='https://{site_name}' >https://{site_name}</a>.").format(site_name=site_name)}<br>
 ${_("(2) Once registered, copy the redeem URL and paste it in your web browser.")}<br>
-${_("(3) On the enrollment confirmation page, Click the 'Activate Enrolment Code' button. This will show the enrollment confirmation.")}<br>
+${_("(3) On the enrollment confirmation page, Click the 'Activate Enrollment Code' button. This will show the enrollment confirmation.")}<br>
 ${_("(4) You should be able to click on 'view course' button or see your course on your student dashboard at <a href='https://{dashboard_url}'>https://{dashboard_url}</a>").format(dashboard_url=dashboard_url)}<br>
 ${_("(5) Course materials will not be available until the course start date.")}</p>
 
