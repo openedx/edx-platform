@@ -49,12 +49,12 @@ def login_and_registration_form(request, initial_mode="login"):
     the user_api.
 
     Keyword Args:
-        mode (string): Either "login" or "registration".
+        initial_mode (string): Either "login" or "registration".
 
     TODO
 
     """
-    pass
+    return HttpResponse()
 
 
 @login_required

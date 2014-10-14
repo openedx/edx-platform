@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
@@ -36,11 +37,9 @@ class LoginSessionView(APIView):
     def get(self, request):
         """Render a form for allowing a user to log in.
 
-        GET param: ?next
-
         TODO
         """
-        pass
+        return HttpResponse()
 
     def post(self, request):
         """Authenticate a user and log them in.
@@ -50,14 +49,14 @@ class LoginSessionView(APIView):
         # Initially, this should be a shim to student views,
         # since it will be too much work to re-implement everything there.
         # Eventually, we'll want to pull out that functionality into this Django app.
-        pass
+        return HttpResponse()
 
     def delete(self, request):
         """ Log the user out.
 
         TODO
         """
-        pass
+        return HttpResponse()
 
 
 class RegistrationView(APIView):
@@ -70,7 +69,7 @@ class RegistrationView(APIView):
 
         TODO
         """
-        pass
+        return HttpResponse()
 
     def post(self, request):
         """Create the user's account.
@@ -79,7 +78,7 @@ class RegistrationView(APIView):
         """
         # Initially, this should be a shim to student views.
         # Eventually, we'll want to pull that functionality into this API.
-        pass
+        return HttpResponse()
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
