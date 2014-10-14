@@ -1697,7 +1697,7 @@ def send_email(request, course_id):
         course_id,
         request.user,
         send_to,
-        subject,message,
+        subject, message,
         template_name=template_name,
         from_addr=from_addr
     )
@@ -1800,7 +1800,7 @@ def proxy_legacy_analytics(request, course_id):
     url = "{}get?aname={}&course_id={}&apikey={}".format(
         settings.ANALYTICS_SERVER_URL,
         analytics_name,
-        urllib.quote(course_id.to_deprecated_string()),
+        urllib.quote(unicode(course_id)),
         settings.ANALYTICS_API_KEY,
     )
 
