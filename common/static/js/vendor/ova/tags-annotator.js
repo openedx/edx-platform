@@ -293,6 +293,8 @@ $.TokenList = function (input, url_or_data, settings) {
                 case KEY.COMMA:
                   if(selected_dropdown_item) {
                     add_token($(selected_dropdown_item).data("tokeninput"));
+                    // this allows for tags to be color-coded based on instructor set-up
+                    annotator.publish("colorEditorTags")
                     hidden_input.change();
                     return false;
                   } else{
@@ -903,6 +905,7 @@ Annotator.Plugin.HighlightTags = (function(_super) {
         this.colorize = __bind(this.colorize, this);
         this.updateField = __bind(this.updateField, this);
         this.externalCall = __bind(this.externalCall, this);
+        this.colorizeEditorTags = __bind(this.colorizeEditorTags, this);
 
         this.options = options;
         _ref = HighlightTags.__super__.constructor.apply(this, arguments);
@@ -954,7 +957,7 @@ Annotator.Plugin.HighlightTags = (function(_super) {
         this.annotator.subscribe('flaggedAnnotation', this.updateViewer);
         this.annotator.subscribe('annotationCreated', function(){setTimeout(function(){self.colorize()}, 1000)});
         this.annotator.subscribe('externalCallToHighlightTags', function(){setTimeout(function(){self.externalCall()}, 1000)});
-
+        this.annotator.subscribe('colorEditorTags', this.colorizeEditorTags);
     };
     
     HighlightTags.prototype.getHighlightTags = function(){

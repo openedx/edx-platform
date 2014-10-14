@@ -1053,6 +1053,14 @@ OpenSeadragonAnnotation = function (element, options) {
     document.addEventListener("msfullscreenchange", function () {
         reloadEditor();
     }, false);
+
+    // for some reason the above doesn't work when person hits ESC to exit full screen...
+    $(document).keyup(function(e) {
+        // esc key reloads editor as well
+        if (e.keyCode == 27) { 
+            reloadEditor();
+        }   
+    });
     
     this.options = options;
 
