@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-01 13:57+0000\n"
-"PO-Revision-Date: 2014-10-01 13:57:56.490708\n"
+"POT-Creation-Date: 2014-10-14 12:44-0400\n"
+"PO-Revision-Date: 2014-10-14 16:45:52.446317\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -66,6 +66,7 @@ msgstr "ÖK Ⱡ'#"
 #: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕ#"
 
@@ -111,6 +112,7 @@ msgstr "Nämé Ⱡ'σяєм#"
 #: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
 msgid "Save"
 msgstr "Sävé Ⱡ'σяєм#"
 
@@ -2401,6 +2403,39 @@ msgstr "Çlösé Çälçülätör Ⱡ'σ#"
 msgid "Post body"
 msgstr "Pöst ßödý #"
 
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "Error fetching distribution."
+msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating student profile information. Please try again."
+msgstr ""
+"Érrör générätïng stüdént pröfïlé ïnförmätïön. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
+
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
@@ -2430,22 +2465,6 @@ msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
-
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
 msgstr "Ûsérnämé #"
@@ -2464,6 +2483,7 @@ msgid "Enter username or email"
 msgstr "Éntér üsérnämé ör émäïl Ⱡ'σяє#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/views/cohort_editor.js
 msgid "Please enter a username or email."
 msgstr "Pléäsé éntér ä üsérnämé ör émäïl. Ⱡ'σяєм ι#"
 
@@ -3139,6 +3159,14 @@ msgstr "Süççéssfüllý résçöréd prößlém för üsér {user} Ⱡ'σяє
 msgid "Failed to rescore problem."
 msgstr "Fäïléd tö résçöré prößlém. Ⱡ'σяєм#"
 
+#: lms/static/js/dashboard/donation.js
+msgid "Please enter a valid donation amount."
+msgstr "Pléäsé éntér ä välïd dönätïön ämöünt. Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/js/dashboard/donation.js
+msgid "Your donation could not be submitted."
+msgstr "Ýöür dönätïön çöüld nöt ßé süßmïttéd. Ⱡ'σяєм ιρѕ#"
+
 #: lms/static/js/student_account/account.js
 #: lms/static/js/student_profile/profile.js
 msgid "The data could not be saved."
@@ -3161,8 +3189,85 @@ msgid "Full name cannot be blank"
 msgstr "Füll nämé çännöt ßé ßlänk Ⱡ'σяєм#"
 
 #: lms/static/js/student_profile/profile.js
+msgid "Language cannot be blank"
+msgstr "Längüägé çännöt ßé ßlänk Ⱡ'σяє#"
+
+#: lms/static/js/student_profile/profile.js
+msgid "We couldn't populate the list of language choices."
+msgstr "Wé çöüldn't pöpüläté thé lïst öf längüägé çhöïçés. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/static/js/student_profile/profile.js
 msgid "Saved"
 msgstr "Sävéd Ⱡ'σяєм ι#"
+
+#: lms/static/js/views/cohort_editor.js
+msgid "Error adding students."
+msgstr "Érrör äddïng stüdénts. Ⱡ'σяє#"
+
+#: lms/static/js/views/cohort_editor.js
+msgid "{numUsersAdded} student has been added to this cohort group"
+msgid_plural "{numUsersAdded} students have been added to this cohort group"
+msgstr[0] ""
+"{numUsersAdded} stüdént häs ßéén äddéd tö thïs çöhört gröüp Ⱡ'σяєм ιρѕυм #"
+msgstr[1] ""
+"{numUsersAdded} stüdénts hävé ßéén äddéd tö thïs çöhört gröüp Ⱡ'σяєм ιρѕυм "
+"∂#"
+
+#: lms/static/js/views/cohort_editor.js
+msgid "{numMoved} student was removed from {oldCohort}"
+msgid_plural "{numMoved} students were removed from {oldCohort}"
+msgstr[0] "{numMoved} stüdént wäs rémövéd fröm {oldCohort} Ⱡ'σяєм ι#"
+msgstr[1] "{numMoved} stüdénts wéré rémövéd fröm {oldCohort} Ⱡ'σяєм ιρ#"
+
+#: lms/static/js/views/cohort_editor.js
+msgid "{numPresent} student was already in the cohort group"
+msgid_plural "{numPresent} students were already in the cohort group"
+msgstr[0] "{numPresent} stüdént wäs älréädý ïn thé çöhört gröüp Ⱡ'σяєм ιρѕυм#"
+msgstr[1] ""
+"{numPresent} stüdénts wéré älréädý ïn thé çöhört gröüp Ⱡ'σяєм ιρѕυм#"
+
+#: lms/static/js/views/cohort_editor.js
+msgid "Unknown user: {user}"
+msgstr "Ûnknöwn üsér: {user} Ⱡ'σ#"
+
+#: lms/static/js/views/cohort_editor.js
+msgid "There was an error when trying to add students:"
+msgid_plural "There were {numErrors} errors when trying to add students:"
+msgstr[0] "Théré wäs än érrör whén trýïng tö ädd stüdénts: Ⱡ'σяєм ιρѕυм #"
+msgstr[1] ""
+"Théré wéré {numErrors} érrörs whén trýïng tö ädd stüdénts: Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/static/js/views/cohort_editor.js
+msgid "View all errors"
+msgstr "Vïéw äll érrörs Ⱡ'#"
+
+#: lms/static/js/views/cohorts.js
+msgid "You currently have no cohort groups configured"
+msgstr "Ýöü çürréntlý hävé nö çöhört gröüps çönfïgüréd Ⱡ'σяєм ιρѕυм #"
+
+#: lms/static/js/views/cohorts.js
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Add Cohort Group"
+msgstr "Àdd Çöhört Gröüp Ⱡ'σ#"
+
+#: lms/static/js/views/cohorts.js
+msgid ""
+"The {cohortGroupName} cohort group has been created. You can manually add "
+"students to this group below."
+msgstr ""
+"Thé {cohortGroupName} çöhört gröüp häs ßéén çréätéd. Ýöü çän mänüällý ädd "
+"stüdénts tö thïs gröüp ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/static/js/views/cohorts.js
+msgid ""
+"We've encountered an error. Please refresh your browser and then try again."
+msgstr ""
+"Wé'vé énçöüntéréd än érrör. Pléäsé réfrésh ýöür ßröwsér änd thén trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/static/js/views/cohorts.js
+msgid "Please enter a name for your new cohort group."
+msgstr "Pléäsé éntér ä nämé för ýöür néw çöhört gröüp. Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
@@ -3552,14 +3657,6 @@ msgstr ""
 msgid "%(total_items)s total"
 msgstr "%(total_items)s tötäl #"
 
-#: cms/static/js/views/section_edit.js
-msgid "Your change could not be saved"
-msgstr "Ýöür çhängé çöüld nöt ßé sävéd Ⱡ'σяєм #"
-
-#: cms/static/js/views/section_edit.js
-msgid "Return and resolve this issue"
-msgstr "Rétürn änd résölvé thïs ïssüé Ⱡ'σяєм #"
-
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
 msgstr "Délété “<%= name %>”? Ⱡ'#"
@@ -3760,6 +3857,10 @@ msgstr ""
 "pölïçý päïrs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
 
 #: cms/static/js/views/settings/main.js
+msgid "%(hours)s:%(minutes)s (current UTC time)"
+msgstr "%(hours)s:%(minutes)s (çürrént ÛTÇ tïmé) Ⱡ'σяєм#"
+
+#: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
 msgstr "Ûplöäd ýöür çöürsé ïmägé. Ⱡ'σяєм#"
 
@@ -3871,6 +3972,139 @@ msgstr "Çlöséd Ⱡ'σяєм ιρѕ#"
 #: common/templates/js/discussion/thread-show.underscore
 msgid "(this post is about %(courseware_title_linked)s)"
 msgstr "(thïs pöst ïs äßöüt %(courseware_title_linked)s) Ⱡ'σяє#"
+
+#: lms/templates/dashboard/donation.underscore
+msgid "Donate"
+msgstr "Dönäté Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
+msgid "Add a New Cohort Group"
+msgstr "Àdd ä Néw Çöhört Gröüp Ⱡ'σяє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
+msgid "New Cohort Name"
+msgstr "Néw Çöhört Nämé Ⱡ'#"
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "(Required Field)"
+msgstr "(Réqüïréd Fïéld) Ⱡ'σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
+msgid "Enter Your New Cohort Group's Name"
+msgstr "Éntér Ýöür Néw Çöhört Gröüp's Nämé Ⱡ'σяєм ιρ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid ""
+"Students are added to this group only when you provide their email addresses"
+" or usernames on this page."
+msgstr ""
+"Stüdénts äré äddéd tö thïs gröüp önlý whén ýöü prövïdé théïr émäïl äddréssés"
+" ör üsérnämés ön thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "What does this mean?"
+msgstr "Whät döés thïs méän? Ⱡ'σя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Students are added to this group automatically."
+msgstr "Stüdénts äré äddéd tö thïs gröüp äütömätïçällý. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Edit settings in Studio"
+msgstr "Édït séttïngs ïn Stüdïö Ⱡ'σяє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Add students to this cohort group"
+msgstr "Àdd stüdénts tö thïs çöhört gröüp Ⱡ'σяєм ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid ""
+"Note: Students can only be in one cohort group. Adding students to this "
+"group overrides any previous group assignment."
+msgstr ""
+"Nöté: Stüdénts çän önlý ßé ïn öné çöhört gröüp. Àddïng stüdénts tö thïs "
+"gröüp övérrïdés äný prévïöüs gröüp ässïgnmént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas for "
+"students to add. *"
+msgstr ""
+"Éntér émäïl äddréssés änd/ör üsérnämés sépärätéd ßý néw lïnés ör çömmäs för "
+"stüdénts tö ädd. * Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
+msgstr ""
+"é.g. jöhndöé@éxämplé.çöm, JänéDöé, jöéýdöé@éxämplé.çöm Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid ""
+"You will not get notification for emails that bounce, so please double-check"
+" spelling."
+msgstr ""
+"Ýöü wïll nöt gét nötïfïçätïön för émäïls thät ßöünçé, sö pléäsé döüßlé-çhéçk"
+" spéllïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Add Students"
+msgstr "Àdd Stüdénts Ⱡ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
+msgid "Select a cohort group"
+msgstr "Séléçt ä çöhört gröüp Ⱡ'σя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
+msgid "%(cohort_name)s (%(user_count)s)"
+msgstr "%(cohort_name)s (%(user_count)s) #"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Cohort Management"
+msgstr "Çöhört Mänägémént Ⱡ'σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Select a cohort group to manage"
+msgstr "Séléçt ä çöhört gröüp tö mänägé Ⱡ'σяєм ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "View Cohort Group"
+msgstr "Vïéw Çöhört Gröüp Ⱡ'σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid ""
+"To review all student cohort group assignments, download course profile "
+"information on %(link_start)s the Data Download page. %(link_end)s"
+msgstr ""
+"Tö révïéw äll stüdént çöhört gröüp ässïgnménts, döwnlöäd çöürsé pröfïlé "
+"ïnförmätïön ön %(link_start)s thé Dätä Döwnlöäd pägé. %(link_end)s Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/student_account/account.underscore
+msgid "New Address"
+msgstr "Néw Àddréss Ⱡ#"
+
+#: lms/templates/student_account/account.underscore
+msgid "Password"
+msgstr "Pässwörd #"
+
+#: lms/templates/student_account/account.underscore
+msgid "Change My Email Address"
+msgstr "Çhängé Mý Émäïl Àddréss Ⱡ'σяє#"
+
+#: lms/templates/student_profile/profile.underscore
+msgid "Full Name"
+msgstr "Füll Nämé #"
+
+#: lms/templates/student_profile/profile.underscore
+msgid "Preferred Language"
+msgstr "Préférréd Längüägé Ⱡ'σ#"
+
+#: lms/templates/student_profile/profile.underscore
+msgid "Update Profile"
+msgstr "Ûpdäté Pröfïlé Ⱡ'#"
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
