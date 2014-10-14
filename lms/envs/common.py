@@ -27,14 +27,13 @@ Longer TODO:
 import sys
 import os
 import imp
-import json
 
 from path import path
 from warnings import simplefilter
+from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
-
 from lms.lib.xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -1838,3 +1837,9 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
+
+# Country code overrides
+# Used by django-countries
+COUNTRIES_OVERRIDE = {
+    "TW": _("Taiwan"),
+}
