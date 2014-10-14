@@ -1,7 +1,6 @@
 (function() {
     'use strict';
     describe('DiscussionThreadEditView', function() {
-
         var testUpdate, testCancel;
 
         beforeEach(function() {
