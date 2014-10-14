@@ -60,6 +60,16 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         response = self.client.get(reverse('account_index'))
         self.assertContains(response, "Student Account")
 
+    @ddt.data(
+        ("login", "login"),
+        ("register", "register"),
+    )
+    @ddt.unpack
+    def test_login_and_registration_form(self, url_name, initial_mode):
+        response = self.client.get(reverse(url_name))
+        expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
+        self.assertContains(response, expected_data)
+
     def test_change_email(self):
         response = self._change_email(self.NEW_EMAIL, self.PASSWORD)
         self.assertEquals(response.status_code, 200)

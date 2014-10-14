@@ -51,10 +51,13 @@ def login_and_registration_form(request, initial_mode="login"):
     Keyword Args:
         initial_mode (string): Either "login" or "registration".
 
-    TODO
-
     """
-    return HttpResponse()
+    return render_to_response(
+        'student_account/login_and_register.html', {
+            'disable_courseware_js': True,
+            'initial_mode': initial_mode,
+        }
+    )
 
 
 @login_required
