@@ -13,21 +13,18 @@ from urllib import urlencode
 from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.utils import override_settings
-from django.utils import timezone
 
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.tests.factories import StudentModuleFactory
 from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
-from gradebook.models import StudentGradebook
 from instructor.access import allow_access
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT, TEST_COURSE_UPDATES_CONTENT_LEGACY
@@ -61,13 +58,12 @@ def _fake_get_course_thread_stats(course_id):
 
 @mock.patch("api_manager.courses.views.get_course_social_stats", _fake_get_get_course_social_stats)
 @mock.patch("api_manager.courses.views.get_course_thread_stats", _fake_get_course_thread_stats)
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
                                                    'ADVANCED_SECURITY': False,
                                                    'PREVENT_CONCURRENT_LOGINS': False
                                                    })
-class CoursesApiTests(TestCase):
+class CoursesApiTests(ModuleStoreTestCase):
     """ Test suite for Courses API views """
 
     def get_module_for_user(self, user, course, problem):
