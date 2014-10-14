@@ -55,6 +55,7 @@ cover_html/
 reports/
 jscover.log
 jscover.log.*
+common/test/db_cache/*
 
 ### Installation artifacts
 *.egg-info

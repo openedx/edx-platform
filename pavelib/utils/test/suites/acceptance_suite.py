@@ -129,4 +129,5 @@ class AcceptanceTestSuite(TestSuite):
             sh("./manage.py lms --settings acceptance migrate --traceback --noinput")
 
             # Create the cache if it doesn't already exist
+            self.db_cache.parent.mkdir_p(mode=0755)
             sh("cp {db} {db_cache}".format(db_cache=self.db_cache, db=self.db))
