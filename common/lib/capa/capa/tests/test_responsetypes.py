@@ -226,7 +226,6 @@ class SymbolicResponseTest(ResponseTest):
         ]
 
         for (input_str, input_mathml, server_fixture) in correct_inputs:
-            print "Testing input: {0}".format(input_str)
             server_resp = load_fixture(server_fixture)
             self._assert_symbolic_grade(
                 problem, input_str, input_mathml,

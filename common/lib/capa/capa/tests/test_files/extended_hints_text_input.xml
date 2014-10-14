@@ -1,0 +1,40 @@
+<problem>
+    <p>In which country would you find the city of Paris?</p>
+
+    <stringresponse answer="France" type="ci" >
+        <textline label="In which country would you find the city of Paris?" size="20"/>
+        <correcthint>
+            Viva la France!
+        </correcthint>
+
+        <additional_answer answer="USA" type="ci" >
+             Less well known, but yes, there is a Paris, Texas.
+        </additional_answer>
+
+        <stringequalhint answer="Germany">
+            I do not think so.
+        </stringequalhint>
+
+        <regexphint answer=".*land">
+             The country name does not end in LAND
+        </regexphint>
+    </stringresponse>
+
+    <p>What color is the sky?</p>
+    <stringresponse answer="Blue">
+        <correcthint >The red light is scattered by water molecules leaving only blue light.
+        </correcthint>
+        <textline label="What color is the sky?" size="20"/>
+    </stringresponse>
+
+    <p>(This question will cause an illegal regular expression exception)</p>
+    <stringresponse answer="Bonk">
+        <correcthint >This hint should never appear.
+        </correcthint>
+        <textline label="Why not?" size="20"/>
+        <regexphint answer="[">
+             This hint should never appear either because the regex is illegal.
+        </regexphint>
+    </stringresponse>
+
+</problem>
