@@ -1,15 +1,16 @@
 """ Views for a student's account information. """
 
+import json
 from django.conf import settings
 from django.http import (
-    QueryDict, HttpResponse,
-    HttpResponseBadRequest, HttpResponseServerError
+    HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 )
 from django.core.mail import send_mail
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response, render_to_string
+import third_party_auth
 from microsite_configuration import microsite
 
 from user_api.api import account as account_api
@@ -39,6 +40,38 @@ def index(request):
             'disable_courseware_js': True,
         }
     )
+
+
+@require_http_methods(['GET'])
+def login_and_registration_form(request, initial_mode="login"):
+    """Render the combined login/registration form, defaulting to login
+
+    This relies on the JS to asynchronously load the actual form from
+    the user_api.
+
+    Keyword Args:
+        initial_mode (string): Either "login" or "registration".
+
+    """
+    context = {
+        'disable_courseware_js': True,
+        'initial_mode': initial_mode,
+        'third_party_auth_providers': json.dumps([])
+    }
+
+    if microsite.get_value("ENABLE_THIRD_PARTY_AUTH", settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH")):
+        context["third_party_auth_providers"] = json.dumps([
+            {
+                "name": enabled.NAME,
+                "icon_class": enabled.ICON_CLASS,
+                "login_url": third_party_auth.pipeline.get_login_url(
+                   enabled.NAME, third_party_auth.pipeline.AUTH_ENTRY_LOGIN
+                ),
+            }
+            for enabled in third_party_auth.provider.Registry.enabled()
+        ])
+
+    return render_to_response('student_account/login_and_register.html', context)
 
 
 @login_required

@@ -1,12 +1,22 @@
-import base64
+"""Tests for the user API at the HTTP request level. """
 
-from django.test import TestCase
-from django.test.utils import override_settings
+import datetime
+import base64
 import json
 import re
-from student.tests.factories import UserFactory
+
+from django.core.urlresolvers import reverse
+from django.core import mail
+from django.test import TestCase
+from django.test.utils import override_settings
 from unittest import SkipTest
-from user_api.models import UserPreference
+import ddt
+from pytz import UTC
+from django_countries.countries import COUNTRIES
+
+from user_api.api import account as account_api, profile as profile_api
+
+from student.tests.factories import UserFactory
 from user_api.tests.factories import UserPreferenceFactory
 from django_comment_common import models
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -532,3 +542,554 @@ class PreferenceUsersListViewTest(UserApiTestCase):
             self.assertUserIsValid(user)
         all_user_uris = [user["url"] for user in first_page_users + second_page_users]
         self.assertEqual(len(set(all_user_uris)), 2)
+
+
+class LoginSessionViewTest(ApiTestCase):
+    """Tests for the login end-points of the user API. """
+
+    USERNAME = "bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "password"
+
+    def setUp(self):
+        super(LoginSessionViewTest, self).setUp()
+        self.url = reverse("user_api_login_session")
+
+    def test_allowed_methods(self):
+        self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
+
+    def test_put_not_allowed(self):
+        response = self.client.put(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_delete_not_allowed(self):
+        response = self.client.delete(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_patch_not_allowed(self):
+        raise SkipTest("Django 1.4's test client does not support patch")
+
+    def test_login_form(self):
+        # Retrieve the login form
+        response = self.client.get(self.url, content_type="application/json")
+        self.assertHttpOK(response)
+
+        # Verify that the form description matches what we expect
+        form_desc = json.loads(response.content)
+        self.assertEqual(form_desc["method"], "post")
+        self.assertEqual(form_desc["submit_url"], self.url)
+        self.assertEqual(form_desc["fields"], [
+            {
+                u"name": u"email",
+                u"default": u"",
+                u"type": u"text",
+                u"required": True,
+                u"label": u"E-mail",
+                u"placeholder": u"example: username@domain.com",
+                u"instructions": u"This is the e-mail address you used to register with edX",
+                u"restrictions": {
+                    u"min_length": 3,
+                    u"max_length": 254
+                },
+            },
+            {
+                u"name": u"password",
+                u"default": u"",
+                u"type": u"text",
+                u"required": True,
+                u"label": u"Password",
+                u"placeholder": u"",
+                u"instructions": u"",
+                u"restrictions": {
+                    u"min_length": 2,
+                    u"max_length": 75
+                },
+            },
+        ])
+
+    def test_login(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Login
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "password": self.PASSWORD,
+        })
+        self.assertHttpOK(response)
+
+        # Verify that we logged in successfully by accessing
+        # a page that requires authentication.
+        response = self.client.get(reverse("dashboard"))
+        self.assertHttpOK(response)
+
+    def test_invalid_credentials(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Invalid password
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "password": "invalid"
+        })
+        self.assertHttpForbidden(response)
+
+        # Invalid email address
+        response = self.client.post(self.url, {
+            "email": "invalid@example.com",
+            "password": self.PASSWORD,
+        })
+        self.assertHttpForbidden(response)
+
+    def test_missing_login_params(self):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Missing password
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+        })
+        self.assertHttpBadRequest(response)
+
+        # Missing email
+        response = self.client.post(self.url, {
+            "password": self.PASSWORD,
+        })
+        self.assertHttpBadRequest(response)
+
+        # Missing both email and password
+        response = self.client.post(self.url, {})
+
+
+@ddt.ddt
+class RegistrationViewTest(ApiTestCase):
+    """Tests for the registration end-points of the User API. """
+
+    USERNAME = "bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "password"
+    NAME = "Bob Smith"
+    EDUCATION = "m"
+    YEAR_OF_BIRTH = "1998"
+    ADDRESS = "123 Fake Street"
+    CITY = "Springfield"
+    COUNTRY = "us"
+    GOALS = "Learn all the things!"
+
+    def setUp(self):
+        super(RegistrationViewTest, self).setUp()
+        self.url = reverse("user_api_registration")
+
+    def test_allowed_methods(self):
+        self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
+
+    def test_put_not_allowed(self):
+        response = self.client.put(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_delete_not_allowed(self):
+        response = self.client.delete(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_patch_not_allowed(self):
+        raise SkipTest("Django 1.4's test client does not support patch")
+
+    def test_register_form_default_fields(self):
+        no_extra_fields_setting = {}
+
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                u"name": u"email",
+                u"default": u"",
+                u"type": u"text",
+                u"required": True,
+                u"label": u"E-mail",
+                u"placeholder": u"example: username@domain.com",
+                u"instructions": u"This is the e-mail address you used to register with edX",
+                u"restrictions": {
+                    u"min_length": 3,
+                    u"max_length": 254
+                },
+            }
+        )
+
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                u"name": u"name",
+                u"default": u"",
+                u"type": u"text",
+                u"required": True,
+                u"label": u"Full Name",
+                u"placeholder": u"",
+                u"instructions": u"Needed for any certificates you may earn",
+                u"restrictions": {
+                    "max_length": 255,
+                }
+            }
+        )
+
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                u"name": u"username",
+                u"default": u"",
+                u"type": u"text",
+                u"required": True,
+                u"label": u"Public Username",
+                u"placeholder": u"",
+                u"instructions": u"Will be shown in any discussions or forums you participate in (cannot be changed)",
+                u"restrictions": {
+                    u"min_length": 2,
+                    u"max_length": 30,
+                }
+            }
+        )
+
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                u"name": u"password",
+                u"default": u"",
+                u"type": u"text",
+                u"required": True,
+                u"label": u"Password",
+                u"placeholder": u"",
+                u"instructions": u"",
+                u"restrictions": {
+                    u"min_length": 2,
+                    u"max_length": 75
+                },
+            }
+        )
+
+    def test_register_form_level_of_education(self):
+        self._assert_reg_field(
+            {"level_of_education": "optional"},
+            {
+                "name": "level_of_education",
+                "default": "",
+                "type": "select",
+                "required": False,
+                "label": "Highest Level of Education Completed",
+                "placeholder": "",
+                "instructions": "",
+                "options": [
+                    {"value": "", "name": "--"},
+                    {"value": "p", "name": "Doctorate"},
+                    {"value": "m", "name": "Master's or professional degree"},
+                    {"value": "b", "name": "Bachelor's degree"},
+                    {"value": "a", "name": "Associate's degree"},
+                    {"value": "hs", "name": "Secondary/high school"},
+                    {"value": "jhs", "name": "Junior secondary/junior high/middle school"},
+                    {"value": "el", "name": "Elementary/primary school"},
+                    {"value": "none", "name": "None"},
+                    {"value": "other", "name": "Other"},
+                ],
+                "restrictions": {},
+            }
+        )
+
+    def test_register_form_gender(self):
+        self._assert_reg_field(
+            {"gender": "optional"},
+            {
+                "name": "gender",
+                "default": "",
+                "type": "select",
+                "required": False,
+                "label": "Gender",
+                "placeholder": "",
+                "instructions": "",
+                "options": [
+                    {"value": "", "name": "--"},
+                    {"value": "m", "name": "Male"},
+                    {"value": "f", "name": "Female"},
+                    {"value": "o", "name": "Other"},
+                ],
+                "restrictions": {},
+            }
+        )
+
+    def test_register_form_year_of_birth(self):
+        this_year = datetime.datetime.now(UTC).year
+        year_options = (
+            [{"value": "", "name": "--"}] + [
+                {"value": unicode(year), "name": unicode(year)}
+                for year in range(this_year, this_year - 120, -1)
+            ]
+        )
+        self._assert_reg_field(
+            {"year_of_birth": "optional"},
+            {
+                "name": "year_of_birth",
+                "default": "",
+                "type": "select",
+                "required": False,
+                "label": "Year of Birth",
+                "placeholder": "",
+                "instructions": "",
+                "options": year_options,
+                "restrictions": {},
+            }
+        )
+
+    def test_registration_form_mailing_address(self):
+        self._assert_reg_field(
+            {"mailing_address": "optional"},
+            {
+                "name": "mailing_address",
+                "default": "",
+                "type": "textarea",
+                "required": False,
+                "label": "Mailing Address",
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
+    def test_registration_form_goals(self):
+        self._assert_reg_field(
+            {"goals": "optional"},
+            {
+                "name": "goals",
+                "default": "",
+                "type": "textarea",
+                "required": False,
+                "label": "Please share with us your reasons for registering with edX",
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
+    def test_registration_form_city(self):
+        self._assert_reg_field(
+            {"city": "optional"},
+            {
+                "name": "city",
+                "default": "",
+                "type": "text",
+                "required": False,
+                "label": "City",
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
+    def test_registration_form_country(self):
+        country_options = (
+            [{"name": "--", "value": ""}] +
+            [
+                {"value": country_code, "name": unicode(country_name)}
+                for country_code, country_name in COUNTRIES
+            ]
+        )
+        self._assert_reg_field(
+            {"country": "required"},
+            {
+                "label": "Country",
+                "name": "country",
+                "default": "",
+                "type": "select",
+                "required": True,
+                "placeholder": "",
+                "instructions": "",
+                "options": country_options,
+                "restrictions": {},
+            }
+        )
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={
+        "level_of_education": "optional",
+        "gender": "optional",
+        "year_of_birth": "optional",
+        "mailing_address": "optional",
+        "goals": "optional",
+        "city": "optional",
+        "country": "required",
+    })
+    def test_field_order(self):
+        response = self.client.get(self.url)
+        self.assertHttpOK(response)
+
+        # Verify that all fields render in the correct order
+        form_desc = json.loads(response.content)
+        field_names = [field["name"] for field in form_desc["fields"]]
+        self.assertEqual(field_names, [
+            "email",
+            "name",
+            "username",
+            "password",
+            "city",
+            "country",
+            "level_of_education",
+            "gender",
+            "year_of_birth",
+            "mailing_address",
+            "goals",
+        ])
+
+    def test_register(self):
+        # Create a new registration
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        })
+        self.assertHttpOK(response)
+
+        # Verify that the user exists
+        self.assertEqual(
+            account_api.account_info(self.USERNAME),
+            {
+                "username": self.USERNAME,
+                "email": self.EMAIL,
+                "is_active": False
+            }
+        )
+
+        # Verify that the user's full name is set
+        profile_info = profile_api.profile_info(self.USERNAME)
+        self.assertEqual(profile_info["full_name"], self.NAME)
+
+        # Verify that we've been logged in
+        # by trying to access a page that requires authentication
+        response = self.client.get(reverse("dashboard"))
+        self.assertHttpOK(response)
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={
+        "level_of_education": "optional",
+        "gender": "optional",
+        "year_of_birth": "optional",
+        "mailing_address": "optional",
+        "goals": "optional",
+        "city": "optional",
+        "country": "required",
+    })
+    def test_register_with_profile_info(self):
+        # Register, providing lots of demographic info
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "level_of_education": self.EDUCATION,
+            "mailing_address": self.ADDRESS,
+            "year_of_birth": self.YEAR_OF_BIRTH,
+            "goals": self.GOALS,
+            "city": self.CITY,
+            "country": self.COUNTRY
+        })
+        self.assertHttpOK(response)
+
+        # Verify the profile information
+        profile_info = profile_api.profile_info(self.USERNAME)
+        self.assertEqual(profile_info["level_of_education"], self.EDUCATION)
+        self.assertEqual(profile_info["mailing_address"], self.ADDRESS)
+        self.assertEqual(profile_info["year_of_birth"], int(self.YEAR_OF_BIRTH))
+        self.assertEqual(profile_info["goals"], self.GOALS)
+        self.assertEqual(profile_info["city"], self.CITY)
+        self.assertEqual(profile_info["country"], self.COUNTRY)
+
+    def test_activation_email(self):
+        # Register, which should trigger an activation email
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        })
+        self.assertHttpOK(response)
+
+        # Verify that the activation email was sent
+        self.assertEqual(len(mail.outbox), 1)
+        sent_email = mail.outbox[0]
+        self.assertEqual(sent_email.to, [self.EMAIL])
+        self.assertEqual(sent_email.subject, "Activate Your edX Account")
+        self.assertIn("activate your account", sent_email.body)
+
+    @ddt.data(
+        {"email": ""},
+        {"email": "invalid"},
+        {"name": ""},
+        {"username": ""},
+        {"username": "a"},
+        {"password": ""},
+    )
+    def test_register_invalid_input(self, invalid_fields):
+        # Initially, the field values are all valid
+        data = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        }
+
+        # Override the valid fields, making the input invalid
+        data.update(invalid_fields)
+
+        # Attempt to create the account, expecting an error response
+        response = self.client.post(self.url, data)
+        self.assertHttpBadRequest(response)
+
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
+    @ddt.data("email", "name", "username", "password", "country")
+    def test_register_missing_required_field(self, missing_field):
+        data = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "country": self.COUNTRY,
+        }
+
+        del data[missing_field]
+
+        # Send a request missing a field
+        response = self.client.post(self.url, data)
+        self.assertHttpBadRequest(response)
+
+    def test_register_already_authenticated(self):
+        data = {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        }
+
+        # Register once, which will also log us in
+        response = self.client.post(self.url, data)
+        self.assertHttpOK(response)
+
+        # Try to register again
+        response = self.client.post(self.url, data)
+        self.assertHttpBadRequest(response)
+
+    def _assert_reg_field(self, extra_fields_setting, expected_field):
+        """Retrieve the registration form description from the server and
+        verify that it contains the expected field.
+
+        Args:
+            extra_fields_setting (dict): Override the Django setting controlling
+                which extra fields are displayed in the form.
+
+            expected_field (dict): The field definition we expect to find in the form.
+
+        Raises:
+            AssertionError
+
+        """
+        # Retrieve the registration form description
+        with override_settings(REGISTRATION_EXTRA_FIELDS=extra_fields_setting):
+            response = self.client.get(self.url)
+            self.assertHttpOK(response)
+
+        # Verify that the form description matches what we'd expect
+        form_desc = json.loads(response.content)
+        self.assertIn(expected_field, form_desc["fields"])

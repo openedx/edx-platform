@@ -1,0 +1,52 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Login and Register")}</%block>
+
+<%block name="js_extra">
+    <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <%static:js group='student_account'/>
+</%block>
+
+<%block name="header_extras">
+% for template_name in ["account"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="student_account/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<h1>Login and Registration!</h1>
+
+<p>This is a placeholder for the combined login and registration form</p>
+
+## TODO: Use JavaScript to populate this div with
+## the actual registration/login forms (loaded asynchronously from the user API)
+## The URLS for the forms are:
+## - GET /user_api/v1/registration/
+## - GET /user_api/v1/login_session/
+##
+## You can post back to those URLs with JSON-serialized
+## data from the form fields in order to complete the registration
+## or login.
+##
+## Also TODO: we need to figure out how to enroll students in
+## a course if they got here from a course about page.
+##
+## third_party_auth_providers is a JSON-serialized list of
+## dictionaries of the form:
+## {
+##      "name": "Facebook",
+##      "icon_class": "facebook-icon",
+##      "login_url": "http://api.facebook.com/auth"
+## }
+##
+## Note that this list may be empty.
+##
+<div id="login-and-registration-container"
+    data-initial-mode="${initial_mode}"
+    data-third-party-auth-providers="${third_party_auth_providers}"
+/>

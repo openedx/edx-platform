@@ -3,6 +3,7 @@
 
 import re
 from urllib import urlencode
+import json
 from mock import patch
 import ddt
 from django.test import TestCase
@@ -59,6 +60,37 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
     def test_index(self):
         response = self.client.get(reverse('account_index'))
         self.assertContains(response, "Student Account")
+
+    @ddt.data(
+        ("login", "login"),
+        ("register", "register"),
+    )
+    @ddt.unpack
+    def test_login_and_registration_form(self, url_name, initial_mode):
+        response = self.client.get(reverse(url_name))
+        expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
+        self.assertContains(response, expected_data)
+
+    @ddt.data("login", "register")
+    def test_login_and_registration_third_party_auth_urls(self, url_name):
+        response = self.client.get(reverse(url_name))
+
+        # This relies on the THIRD_PARTY_AUTH configuration in the test settings
+        expected_data = u"data-third-party-auth-providers=\"{providers}\"".format(
+            providers=json.dumps([
+                {
+                    u'icon_class': u'icon-facebook',
+                    u'login_url': u'/auth/login/facebook/?auth_entry=login',
+                    u'name': u'Facebook'
+                },
+                {
+                    u'icon_class': u'icon-google-plus',
+                    u'login_url': u'/auth/login/google-oauth2/?auth_entry=login',
+                    u'name': u'Google'
+                }
+            ])
+        )
+        self.assertContains(response, expected_data)
 
     def test_change_email(self):
         response = self._change_email(self.NEW_EMAIL, self.PASSWORD)
