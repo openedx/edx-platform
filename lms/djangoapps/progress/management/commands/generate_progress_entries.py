@@ -29,7 +29,7 @@ class Command(BaseCommand):
                 "--course_ids",
                 dest="course_ids",
                 help="List of courses for which to generate progress",
-                metavar="slashes:first+course+id,slashes:second+course+id"
+                metavar="first/course/id,second/course/id"
             ),
             make_option(
                 "-u",

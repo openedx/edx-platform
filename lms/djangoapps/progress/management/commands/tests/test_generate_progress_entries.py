@@ -106,7 +106,7 @@ class GenerateProgressEntriesTests(ModuleStoreTestCase):
         Test the progress entry generator
         """
         # Set up the command context
-        course_ids = '{},slashes:bogus+course+id'.format(self.course.id)
+        course_ids = '{},bogus/course/id'.format(self.course.id)
         user_ids = '{}'.format(self.users[0].id)
         current_entries = StudentProgress.objects.all()
         self.assertEqual(len(current_entries), 0)
