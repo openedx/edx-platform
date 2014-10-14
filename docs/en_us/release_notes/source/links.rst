@@ -5,13 +5,24 @@
 
 .. _edX Open Learning XML Guide: http://edx-open-learning-xml.readthedocs.org/en/latest/index.html
 
+.. OLX Guide Links
+
+.. _Graphical Slider Tool: http://edx-open-learning-xml.readthedocs.org/en/latest/problem-xml/graphical_slider_tool.html#graphical-slider-tool
+
+.. _Symbolic Response: http://edx-open-learning-xml.readthedocs.org/en/latest/problem-xml/symbolic_response.html#symbolic-response
+
 .. _molecule viewer tool: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/molecule_viewer.html
+
+.. _Problems and Tools:  http://edx-open-learning-xml.readthedocs.org/en/latest/problem-xml/index.html
+
+
 
 .. _EdX Guide for Students: http://edx-guide-for-students.readthedocs.org/en/latest/
 
 .. _Cohorts: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/cohorts/index.html
 
 .. _Creating Exercises and Tools: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/index.html
+
 
 .. _edX Product and Engineering Newsletter: http://us5.campaign-archive2.com/?u=1822a33c054dc20e223ca40e2&id=090cb3ea4c&e=4a41f5542a
 
@@ -111,7 +122,6 @@
 
 .. _Building a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/index.html
 
-.. _Creating Exercises and Tools: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/index.html
 
 .. _Running Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/index.html
 
@@ -211,6 +221,8 @@
 .. _New Course Run Announcement: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/course_launching.html#new-course-run-announcement
 
 .. _Add Content Experiments to Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/content_experiments/content_experiments_add.html
+
+
 
 .. Peer Assessments
 
