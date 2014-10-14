@@ -828,8 +828,9 @@ def course_about(request, course_id):
         )
         course = get_course_with_access(request.user, permission_name, course_key)
 
-        # if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
-        #     return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
+        # Redirect to IONISx course description page
+        if settings.IONISX_AUTH and settings.IONISX_AUTH.get('ROOT_URL'):
+            return redirect(settings.IONISX_AUTH.get('ROOT_URL') + '/return/' + course.id.to_deprecated_string())
 
         registered = registered_for_course(course, request.user)
 
