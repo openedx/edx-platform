@@ -1,13 +1,11 @@
 # pylint: disable=E1101
 
 """ Database ORM models managed by this Django app """
-
 from django.contrib.auth.models import Group, User
 from django.db import models
 
 from model_utils.models import TimeStampedModel
 from .utils import is_int
-
 from projects.models import Workgroup
 
 
