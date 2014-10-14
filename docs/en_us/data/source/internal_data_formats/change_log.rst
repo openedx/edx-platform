@@ -4,9 +4,24 @@
 Change Log
 ###########
 
-.. **********************
-.. October-December 2014
-.. **********************
+**********************
+October-December 2014
+**********************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 10/07/14
+     - Added new student and instructor events relating to cohort use to the
+       :ref:`Tracking Logs` chapter.
+   * - 
+     - Removed information about XML course formats. See the `edX Open
+       Learning XML Guide <http://edx-open-learning-
+       xml.readthedocs.org/en/latest/index.html>`_ for information about
+       building XML courses.
 
 
 **********************

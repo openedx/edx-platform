@@ -22,7 +22,7 @@ class Thread(models.Model):
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned'
+        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type'
     ]
 
     metric_tag_fields = [
@@ -93,9 +93,9 @@ class Thread(models.Model):
     @classmethod
     def url_for_threads(cls, params={}):
         if params.get('commentable_id'):
-            return "{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
+            return u"{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
         else:
-            return "{prefix}/threads".format(prefix=settings.PREFIX)
+            return u"{prefix}/threads".format(prefix=settings.PREFIX)
 
     @classmethod
     def url_for_search_threads(cls, params={}):

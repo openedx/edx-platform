@@ -2,10 +2,9 @@
 # pylint: disable=W0621
 
 from lettuce import world, step
-from common import course_id, course_location
+from common import course_location
 from problems_setup import PROBLEM_DICT
 from nose.tools import assert_in
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 @step(u'I am viewing a course with multiple sections')
@@ -149,9 +148,9 @@ def create_course():
 
 
 def create_user_and_visit_course():
-    world.register_by_course_key(SlashSeparatedCourseKey('edx', '999', 'Test_Course'))
+    world.register_by_course_key(world.scenario_dict['COURSE'].id)
     world.log_in()
-    world.visit('/courses/edx/999/Test_Course/courseware/')
+    world.visit(u'/courses/{}/courseware/'.format(world.scenario_dict['COURSE'].id))
 
 
 def add_problem_to_course_section(parent_location, display_name):

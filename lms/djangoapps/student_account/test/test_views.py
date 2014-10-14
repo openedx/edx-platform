@@ -62,7 +62,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
     def test_change_email(self):
         response = self._change_email(self.NEW_EMAIL, self.PASSWORD)
-        self.assertEquals(response.status_code, 204)
+        self.assertEquals(response.status_code, 200)
 
         # Verify that the email associated with the account remains unchanged
         profile_info = profile_api.profile_info(self.USERNAME)
@@ -79,7 +79,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
         # Retrieve the activation key from the email
         email_body = mail.outbox[0].body
-        result = re.search('/email_change_confirm/([^ \n]+)', email_body)
+        result = re.search('/email/confirmation/([^ \n]+)', email_body)
         self.assertIsNot(result, None)
         activation_key = result.group(1)
 
@@ -127,7 +127,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
         # Request to change the original user's email to the email used by the inactive user
         response = self._change_email(self.NEW_EMAIL, self.PASSWORD)
-        self.assertEquals(response.status_code, 204)
+        self.assertEquals(response.status_code, 200)
 
     @ddt.data(*INVALID_EMAILS)
     def test_email_change_request_email_invalid(self, invalid_email):
@@ -192,14 +192,15 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         self.assertEqual(response.status_code, 400)
 
     @ddt.data(
-        ('get', 'account_index'),
-        ('put', 'email_change_request')
+        ('get', 'account_index', []),
+        ('post', 'email_change_request', []),
+        ('get', 'email_change_confirm', [123])
     )
     @ddt.unpack
-    def test_require_login(self, method, url_name):
+    def test_require_login(self, method, url_name, args):
         # Access the page while logged out
         self.client.logout()
-        url = reverse(url_name)
+        url = reverse(url_name, args=args)
         response = getattr(self.client, method)(url, follow=True)
 
         # Should have been redirected to the login page
@@ -207,13 +208,14 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         self.assertIn('accounts/login?next=', response.redirect_chain[0][0])
 
     @ddt.data(
-        ('get', 'account_index'),
-        ('put', 'email_change_request')
+        ('get', 'account_index', []),
+        ('post', 'email_change_request', []),
+        ('get', 'email_change_confirm', [123])
     )
     @ddt.unpack
-    def test_require_http_method(self, correct_method, url_name):
+    def test_require_http_method(self, correct_method, url_name, args):
         wrong_methods = {'get', 'put', 'post', 'head', 'options', 'delete'} - {correct_method}
-        url = reverse(url_name)
+        url = reverse(url_name, args=args)
 
         for method in wrong_methods:
             response = getattr(self.client, method)(url)
@@ -230,15 +232,9 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         data = {}
 
         if new_email is not None:
-            data['new_email'] = new_email
+            data['email'] = new_email
         if password is not None:
             # We can't pass a Unicode object to urlencode, so we encode the Unicode object
             data['password'] = password.encode('utf-8')
 
-        response = self.client.put(
-            path=reverse('email_change_request'),
-            data=urlencode(data),
-            content_type='application/x-www-form-urlencoded'
-        )
-
-        return response
+        return self.client.post(path=reverse('email_change_request'), data=data)

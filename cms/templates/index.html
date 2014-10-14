@@ -259,11 +259,6 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             </ul>
           </li>
           %endfor
-          % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
-          <script type="text/javascript">
-              $('.course-item').addClass('can-rerun');
-          </script>
-          % endif
         </ul>
       </div>
 

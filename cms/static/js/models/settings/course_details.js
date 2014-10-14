@@ -1,4 +1,4 @@
-define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
+define(["backbone", "underscore", "gettext", "date"], function(Backbone, _, gettext, date) {
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
@@ -21,16 +21,16 @@ var CourseDetails = Backbone.Model.extend({
     // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
     parse: function(attributes) {
         if (attributes['start_date']) {
-            attributes.start_date = new Date(attributes.start_date);
+            attributes.start_date = date.parse(attributes.start_date);
         }
         if (attributes['end_date']) {
-            attributes.end_date = new Date(attributes.end_date);
+            attributes.end_date = date.parse(attributes.end_date);
         }
         if (attributes['enrollment_start']) {
-            attributes.enrollment_start = new Date(attributes.enrollment_start);
+            attributes.enrollment_start = date.parse(attributes.enrollment_start);
         }
         if (attributes['enrollment_end']) {
-            attributes.enrollment_end = new Date(attributes.enrollment_end);
+            attributes.enrollment_end = date.parse(attributes.enrollment_end);
         }
         return attributes;
     },

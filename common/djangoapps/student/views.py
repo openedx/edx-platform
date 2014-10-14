@@ -46,8 +46,8 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory, UserSignupSource
-)
+    create_comments_service_user, PasswordHistory, UserSignupSource,
+    DashboardConfiguration)
 from student.forms import PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
@@ -57,6 +57,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
@@ -71,6 +72,7 @@ import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
+from shoppingcart.models import DonationConfiguration
 from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
@@ -78,6 +80,7 @@ import track.views
 
 from dogapi import dog_stats_api
 
+from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
@@ -244,23 +247,25 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     a student's dashboard.
     """
     for enrollment in CourseEnrollment.enrollments_for_user(user):
-        course = modulestore().get_course(enrollment.course_id)
-        if course and not isinstance(course, ErrorDescriptor):
+        store = modulestore()
+        with store.bulk_operations(enrollment.course_id):
+            course = store.get_course(enrollment.course_id)
+            if course and not isinstance(course, ErrorDescriptor):
 
-            # if we are in a Microsite, then filter out anything that is not
-            # attributed (by ORG) to that Microsite
-            if course_org_filter and course_org_filter != course.location.org:
-                continue
-            # Conversely, if we are not in a Microsite, then let's filter out any enrollments
-            # with courses attributed (by ORG) to Microsites
-            elif course.location.org in org_filter_out_set:
-                continue
+                # if we are in a Microsite, then filter out anything that is not
+                # attributed (by ORG) to that Microsite
+                if course_org_filter and course_org_filter != course.location.org:
+                    continue
+                # Conversely, if we are not in a Microsite, then let's filter out any enrollments
+                # with courses attributed (by ORG) to Microsites
+                elif course.location.org in org_filter_out_set:
+                    continue
 
-            yield (course, enrollment)
-        else:
-            log.error("User {0} enrolled in {2} course {1}".format(
-                user.username, enrollment.course_id, "broken" if course else "non-existent"
-            ))
+                yield (course, enrollment)
+            else:
+                log.error("User {0} enrolled in {2} course {1}".format(
+                    user.username, enrollment.course_id, "broken" if course else "non-existent"
+                ))
 
 
 def _cert_info(user, course, cert_status):
@@ -411,7 +416,7 @@ def register_user(request, extra_context=None):
     return render_to_response('register.html', context)
 
 
-def complete_course_mode_info(course_id, enrollment):
+def complete_course_mode_info(course_id, enrollment, modes=None):
     """
     We would like to compute some more information from the given course modes
     and the user's current enrollment
@@ -420,7 +425,9 @@ def complete_course_mode_info(course_id, enrollment):
         - whether to show the course upsell information
         - numbers of days until they can't upsell anymore
     """
-    modes = CourseMode.modes_for_course_dict(course_id)
+    if modes is None:
+        modes = CourseMode.modes_for_course_dict(course_id)
+
     mode_info = {'show_upsell': False, 'days_for_upsell': None}
     # we want to know if the user is already verified and if verified is an
     # option
@@ -471,11 +478,29 @@ def dashboard(request):
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = list(get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set))
 
+    # sort the enrollment pairs by the enrollment date
+    course_enrollment_pairs.sort(key=lambda x: x[1].created, reverse=True)
+
+    # Retrieve the course modes for each course
+    course_modes_by_course = {
+        course.id: CourseMode.modes_for_course_dict(course.id)
+        for course, __ in course_enrollment_pairs
+    }
+
+    # Check to see if the student has recently enrolled in a course.
+    # If so, display a notification message confirming the enrollment.
+    enrollment_message = _create_recent_enrollment_message(
+        course_enrollment_pairs, course_modes_by_course
+    )
+
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
     if not user.is_active:
-        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
+        message = render_to_string(
+            'registration/activate_account_notice.html',
+            {'email': user.email, 'platform_name': settings.PLATFORM_NAME}
+        )
 
     # Global staff can see what courses errored on their dashboard
     staff_access = False
@@ -488,8 +513,21 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                           if has_access(request.user, 'load', course))
 
-    course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
-    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
+    # Construct a dictionary of course mode information
+    # used to render the course list.  We re-use the course modes dict
+    # we loaded earlier to avoid hitting the database.
+    course_mode_info = {
+        course.id: complete_course_mode_info(
+            course.id, enrollment,
+            modes=course_modes_by_course[course.id]
+        )
+        for course, enrollment in course_enrollment_pairs
+    }
+
+    cert_statuses = {
+        course.id: cert_info(request.user, course)
+        for course, _enrollment in course_enrollment_pairs
+    }
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
@@ -551,6 +589,7 @@ def dashboard(request):
         current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
 
     context = {
+        'enrollment_message': enrollment_message,
         'course_enrollment_pairs': course_enrollment_pairs,
         'course_optouts': course_optouts,
         'message': message,
@@ -558,7 +597,7 @@ def dashboard(request):
         'staff_access': staff_access,
         'errored_courses': errored_courses,
         'show_courseware_links_for': show_courseware_links_for,
-        'all_course_modes': course_modes,
+        'all_course_modes': course_mode_info,
         'cert_statuses': cert_statuses,
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
@@ -584,6 +623,76 @@ def dashboard(request):
         context['provider_user_states'] = pipeline.get_provider_user_states(user)
 
     return render_to_response('dashboard.html', context)
+
+
+def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
+    """Builds a recent course enrollment message
+
+    Constructs a new message template based on any recent course enrollments for the student.
+
+    Args:
+        course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
+        course_modes (dict): Mapping of course ID's to course mode dictionaries.
+
+    Returns:
+        A string representing the HTML message output from the message template.
+        None if there are no recently enrolled courses.
+
+    """
+    recently_enrolled_courses = _get_recently_enrolled_courses(course_enrollment_pairs)
+
+    if recently_enrolled_courses:
+        messages = [
+            {
+                "course_id": course.id,
+                "course_name": course.display_name,
+                "allow_donation": _allow_donation(course_modes, course.id)
+            }
+            for course in recently_enrolled_courses
+        ]
+
+        return render_to_string(
+            'enrollment/course_enrollment_message.html',
+            {'course_enrollment_messages': messages, 'platform_name': settings.PLATFORM_NAME}
+        )
+
+
+def _get_recently_enrolled_courses(course_enrollment_pairs):
+    """Checks to see if the student has recently enrolled in courses.
+
+    Checks to see if any of the enrollments in the course_enrollment_pairs have been recently created and activated.
+
+    Args:
+        course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
+
+    Returns:
+        A list of courses
+
+    """
+    seconds = DashboardConfiguration.current().recent_enrollment_time_delta
+    time_delta = (datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds))
+    return [
+        course for course, enrollment in course_enrollment_pairs
+        # If the enrollment has no created date, we are explicitly excluding the course
+        # from the list of recent enrollments.
+        if enrollment.is_active and enrollment.created > time_delta
+    ]
+
+
+def _allow_donation(course_modes, course_id):
+    """Determines if the dashboard will request donations for the given course.
+
+    Check if donations are configured for the platform, and if the current course is accepting donations.
+
+    Args:
+        course_modes (dict): Mapping of course ID's to course mode dictionaries.
+        course_id (str): The unique identifier for the course.
+
+    Returns:
+        True if the course is allowing donations.
+
+    """
+    return DonationConfiguration.current().enabled and not CourseMode.has_verified_mode(course_modes[course_id])
 
 
 def try_change_enrollment(request):
@@ -615,6 +724,7 @@ def try_change_enrollment(request):
 
 
 @require_POST
+@commit_on_success_with_read_committed
 def change_enrollment(request, auto_register=False, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
@@ -1624,7 +1734,7 @@ def auto_auth(request):
     course_id = request.GET.get('course_id', None)
     course_key = None
     if course_id:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object

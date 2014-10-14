@@ -19,6 +19,23 @@ class @DiscussionSpecHelper
                 {always: ->}
         )
 
+    @makeEventSpy = () ->
+        jasmine.createSpyObj('event', ['preventDefault', 'target'])
+
+    @makeCourseSettings = (is_cohorted=true) ->
+        new DiscussionCourseSettings(
+            category_map:
+                children: ['Test Topic', 'Other Topic']
+                entries:
+                    'Test Topic':
+                        is_cohorted: is_cohorted
+                        id: 'test_topic'
+                    'Other Topic':
+                        is_cohorted: is_cohorted
+                        id: 'other_topic'
+            is_cohorted: is_cohorted
+        )
+
     @setUnderscoreFixtures = ->
         for templateName in ['thread-show']
             templateFixture = readFixtures('templates/discussion/' + templateName + '.underscore')
@@ -298,26 +315,6 @@ browser and pasting the output.  When that file changes, this one should be rege
 <script aria-hidden="true" type="text/template" id="new-post-template">
     <form class="forum-new-post-form">
         <ul class="post-errors" style="display: none"></ul>
-        <div class="post-field">
-            <div class="field-label">
-                <span class="field-label-text">
-                    Post type:
-                </span><fieldset class="field-input">
-                    <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-question" value="question" checked>
-                    <label for="<%= form_id %>-post-type-question" class="post-type-label">
-                        <i class="icon icon-question"></i>
-                        Question
-                    </label>
-                    <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-discussion" value="discussion">
-                    <label for="<%= form_id %>-post-type-discussion" class="post-type-label">
-                        <i class="icon icon-comments"></i>
-                        Discussion
-                    </label>
-                </fieldset>
-            </div><span class="field-help">
-                Questions raise issues that need answers. Discussions share ideas and start conversations.
-            </span>
-        </div>
         <div class="forum-new-post-form-wrapper"></div>
         <% if (cohort_options) { %>
         <div class="post-field">
@@ -367,6 +364,29 @@ browser and pasting the output.  When that file changes, this one should be rege
             <a href="#" class="cancel">Cancel</a>
         </div>
     </form>
+</script>
+
+<script aria-hidden="true" type="text/template" id="thread-type-template">
+    <div class="post-field">
+        <div class="field-label">
+            <span class="field-label-text">
+                "Post type:"
+            </span><fieldset class="field-input">
+                <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-question" value="question" checked>
+                <label for="<%= form_id %>-post-type-question" class="post-type-label">
+                    <i class="icon icon-question"></i>
+                    "Question"
+                </label>
+                <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-discussion" value="discussion">
+                <label for="<%= form_id %>-post-type-discussion" class="post-type-label">
+                    <i class="icon icon-comments"></i>
+                    "Discussion"
+                </label>
+            </fieldset>
+        </div><span class="field-help">
+            "Questions raise issues that need answers. Discussions share ideas and start conversations."
+        </span>
+    </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">

@@ -69,13 +69,15 @@ def preferred_language(preferred_language_code):
     if preferred_language_code in settings.LANGUAGE_DICT:
         # If the user has indicated a preference for a valid
         # language, record their preferred language
-        preferred_language = settings.LANGUAGE_DICT[preferred_language_code]
+        pass
     elif active_language_code in settings.LANGUAGE_DICT:
         # Otherwise, set the language used in the current thread
         # as the preferred language
-        preferred_language = settings.LANGUAGE_DICT[active_language_code]
+        preferred_language_code = active_language_code
     else:
         # Otherwise, use the default language
-        preferred_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
+        preferred_language_code = settings.LANGUAGE_CODE
 
-    return preferred_language
+    preferred_language = settings.LANGUAGE_DICT[preferred_language_code]
+
+    return Language(preferred_language_code, preferred_language)

@@ -81,6 +81,8 @@ def click_the_link_with_the_text_group1(step, linktext):
 
 @step('I should see that the path is "([^"]*)"$')
 def i_should_see_that_the_path_is(step, path):
+    if 'COURSE' in world.scenario_dict:
+        path = path.format(world.scenario_dict['COURSE'].id)
     assert world.url_equals(path), (
         "path should be {!r} but is {!r}".format(path, world.browser.url)
     )
@@ -185,6 +187,8 @@ def dialogs_are_closed(step):
 
 @step(u'visit the url "([^"]*)"')
 def visit_url(step, url):
+    if 'COURSE' in world.scenario_dict:
+        url = url.format(world.scenario_dict['COURSE'].id)
     world.browser.visit(lettuce.django.django_url(url))
 
 

@@ -644,6 +644,7 @@ COURSES_WITH_UNSAFE_CODE = []
 DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
+SESSION_COOKIE_SECURE = False
 
 # CMS base
 CMS_BASE = 'localhost:8001'
@@ -1024,6 +1025,7 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/URI.min.js',
 ]
 
+dashboard_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
@@ -1173,6 +1175,10 @@ PIPELINE_JS = {
         'source_filenames': instructor_dash_js,
         'output_filename': 'js/instructor_dash.js',
     },
+    'dashboard': {
+        'source_filenames': dashboard_js,
+        'output_filename': 'js/dashboard.js'
+    },
     'student_account': {
         'source_filenames': student_account_js,
         'output_filename': 'js/student_account.js'
@@ -1206,7 +1212,7 @@ if os.path.isdir(DATA_DIR):
 
 
 PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
 
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
@@ -1217,7 +1223,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "common_static",
 )
 
-PIPELINE_YUI_BINARY = 'yui-compressor'
+PIPELINE_UGLIFYJS_BINARY='node_modules/.bin/uglifyjs'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True

@@ -1,6 +1,20 @@
 ############
 Change Log
 ############
+
+       
+*****************
+October, 2014
+*****************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 10/7/14
+     - Added the :ref:`Including Student Cohorts` chapter.
        
 *****************
 September, 2014

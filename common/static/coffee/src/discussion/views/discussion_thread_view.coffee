@@ -272,9 +272,9 @@ if Backbone?
         model: @model
         mode: @mode
         course_settings: @options.course_settings
-        topicId: @model.get('commentable_id')
       )
       @editView.bind "thread:updated thread:cancel_edit", @closeEditView
+      @editView.bind "comment:endorse", @endorseThread
 
     renderSubView: (view) ->
       view.setElement(@$('.thread-content-wrapper'))
@@ -295,6 +295,7 @@ if Backbone?
     closeEditView: (event) =>
       @createShowView()
       @renderShowView()
+      @$el.find(".post-extended-content").show()
 
     # If you use "delete" here, it will compile down into JS that includes the
     # use of DiscussionThreadView.prototype.delete, and that will break IE8

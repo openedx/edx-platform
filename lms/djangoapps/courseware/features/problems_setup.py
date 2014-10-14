@@ -1,7 +1,7 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
 
-#EVERY PROBLEM TYPE MUST HAVE THE FOLLOWING:
+# EVERY PROBLEM TYPE MUST HAVE THE FOLLOWING:
 # -Section in Dictionary containing:
 #   -factory
 #   -kwargs
@@ -187,7 +187,9 @@ def answer_problem(course, problem_type, correctness):
     section_loc = section_location(course)
 
     if problem_type == "drop down":
-        select_name = "input_i4x-{0.org}-{0.course}-problem-drop_down_2_1".format(section_loc)
+        select_name = "input_{}_2_1".format(
+            section_loc.course_key.make_usage_key('problem', 'drop_down').html_id()
+        )
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
         world.select_option(select_name, option_text)
 
@@ -263,8 +265,9 @@ def answer_problem(course, problem_type, correctness):
         offset = 25 if correctness == "correct" else -25
 
         def try_click():
-            image_selector = "#imageinput_i4x-{0.org}-{0.course}-problem-image_2_1".format(section_loc)
-            input_selector = "#input_i4x-{0.org}-{0.course}-problem-image_2_1".format(section_loc)
+            problem_html_loc = section_loc.course_key.make_usage_key('problem', 'image').html_id()
+            image_selector = "#imageinput_{}_2_1".format(problem_html_loc)
+            input_selector = "#input_{}_2_1".format(problem_html_loc)
 
             world.browser.execute_script('$("body").on("click", function(event) {console.log(event);})')
 
@@ -385,16 +388,15 @@ def inputfield(course, problem_type, choice=None, input_num=1):
 
     section_loc = section_location(course)
 
+    ptype = problem_type.replace(" ", "_")
     # this is necessary due to naming requirement for this problem type
     if problem_type in ("radio_text", "checkbox_text"):
-        selector_template = "input#i4x-{org}-{course}-problem-{ptype}_2_{input}"
+        selector_template = "input#{}_2_{input}"
     else:
-        selector_template = "input#input_i4x-{org}-{course}-problem-{ptype}_2_{input}"
+        selector_template = "input#input_{}_2_{input}"
 
     sel = selector_template.format(
-        org=section_loc.org,
-        course=section_loc.course,
-        ptype=problem_type.replace(" ", "_"),
+        section_loc.course_key.make_usage_key('problem', ptype).html_id(),
         input=input_num,
     )
 

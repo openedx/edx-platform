@@ -13,7 +13,6 @@ from functools import wraps
 from pymongo.errors import AutoReconnect
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo import BlockKey
-from datetime import tzinfo
 import datetime
 import pytz
 

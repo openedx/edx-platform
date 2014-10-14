@@ -32,6 +32,7 @@ from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries import CountryField
+from config_models.models import ConfigurationModel
 from track import contexts
 from eventtracking import tracker
 from importlib import import_module
@@ -1388,3 +1389,20 @@ def enforce_single_login(sender, request, user, signal, **kwargs):    # pylint: 
         else:
             key = None
         user.profile.set_login_session(key)
+
+
+class DashboardConfiguration(ConfigurationModel):
+    """Dashboard Configuration settings.
+
+    Includes configuration options for the dashboard, which impact behavior and rendering for the application.
+
+    """
+    recent_enrollment_time_delta = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of seconds in which a new enrollment is considered 'recent'. "
+                  "Used to display notifications."
+    )
+
+    @property
+    def recent_enrollment_seconds(self):
+        return self.recent_enrollment_time_delta
