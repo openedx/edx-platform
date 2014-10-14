@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Add configurable reset button to units
+
 LMS: Support adding cohorts from the instructor dashboard. TNL-162
 
 LMS: Support adding students to a cohort via the instructor dashboard. TNL-163

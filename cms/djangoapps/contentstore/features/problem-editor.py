@@ -13,6 +13,7 @@ MAXIMUM_ATTEMPTS = "Maximum Attempts"
 PROBLEM_WEIGHT = "Problem Weight"
 RANDOMIZATION = 'Randomization'
 SHOW_ANSWER = "Show Answer"
+SHOW_RESET_BUTTON = "Show Reset Button"
 TIMER_BETWEEN_ATTEMPTS = "Timer Between Attempts"
 MATLAB_API_KEY = "Matlab API key"
 
@@ -102,6 +103,7 @@ def i_see_advanced_settings_with_values(step):
             [PROBLEM_WEIGHT, "", False],
             [RANDOMIZATION, "Never", False],
             [SHOW_ANSWER, "Finished", False],
+            [SHOW_RESET_BUTTON, "False", False],
             [TIMER_BETWEEN_ATTEMPTS, "0", False],
         ])
 
