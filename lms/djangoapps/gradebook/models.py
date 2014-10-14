@@ -129,10 +129,23 @@ class StudentGradebookHistory(TimeStampedModel):
         """
         Event hook for creating gradebook entry copies
         """
-        history_entry = StudentGradebookHistory(
-            user=instance.user,
-            course_id=instance.course_id,
-            grade=instance.grade,
-            proforma_grade=instance.proforma_grade
-        )
-        history_entry.save()
+        history_entries = StudentGradebookHistory.objects.filter(user=instance.user, course_id=instance.course_id)
+        latest_history_entry = None
+        if len(history_entries):
+            latest_history_entry = history_entries[0]
+
+        create_history_entry = False
+        if latest_history_entry is not None:
+            if (latest_history_entry.grade != instance.grade) or (latest_history_entry.proforma_grade != instance.proforma_grade):
+                create_history_entry = True
+        else:
+            create_history_entry = True
+
+        if create_history_entry:
+            new_history_entry = StudentGradebookHistory(
+                user=instance.user,
+                course_id=instance.course_id,
+                grade=instance.grade,
+                proforma_grade=instance.proforma_grade
+            )
+            new_history_entry.save()

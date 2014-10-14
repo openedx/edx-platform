@@ -316,11 +316,11 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             user = User.objects.get(pk=user_id)
             users.append(user_id)
             if i < 2:
-                StudentGradebook.objects.create(user=user, grade=0.75, proforma_grade=0.85)
+                StudentGradebook.objects.create(user=user, course_id=self.course.id, grade=0.75, proforma_grade=0.85)
             elif i < 4:
-                StudentGradebook.objects.create(user=user, grade=0.82, proforma_grade=0.82)
+                StudentGradebook.objects.create(user=user, course_id=self.course.id, grade=0.82, proforma_grade=0.82)
             else:
-                StudentGradebook.objects.create(user=user, grade=0.90, proforma_grade=0.91)
+                StudentGradebook.objects.create(user=user, course_id=self.course.id, grade=0.90, proforma_grade=0.91)
 
         data = {
             'name': self.test_organization_name,
