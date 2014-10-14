@@ -80,7 +80,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         """
         split_db = self.split_mongo.db
         # old_mongo doesn't give a db attr, but all of the dbs are the same
-        split_db.drop_collection(self.draft_mongo.collection)
+        split_db.drop_collection(self.draft_mongo.collection.proxied_object)
 
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, draft=True, split=True):
         """
