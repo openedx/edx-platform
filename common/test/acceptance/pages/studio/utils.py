@@ -7,6 +7,12 @@ from bok_choy.promise import EmptyPromise
 
 from ...tests.helpers import disable_animations
 
+# Publish title text for container page.
+PUBLISHED_STATUS = "Publishing Status\nPublished (not yet released)"
+PUBLISHED_LIVE_STATUS = "Publishing Status\nPublished and Live"
+DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
+LOCKED_STATUS = "Publishing Status\nVisible to Staff Only"
+
 
 def click_css(page, css, source_index=0, require_notification=True):
     """
@@ -193,3 +199,13 @@ def verify_ordering(test_class, page, expected_orderings):
                     blocks_checked.add(expected)
                 break
     test_class.assertEqual(len(blocks_checked), len(xblocks))
+
+
+def verify_unit_publish_title(unit, expected_title):
+    """
+    Waits for the publish title to change to the expected value.
+    """
+    def wait_for_title_change():
+        return unit.publish_title == expected_title
+
+    EmptyPromise(wait_for_title_change, "Publish title incorrect. Found '" + unit.publish_title + "'").fulfill()

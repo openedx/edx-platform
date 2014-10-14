@@ -77,7 +77,7 @@ define(["jquery", "underscore", "js/common_helpers/ajax_helpers", "js/spec_helpe
                     expect(refreshed).toBeTruthy();
                 });
 
-                it('hides itself and does not refresh after cancel notification', function() {
+                it('hides itself and refreshes after cancel notification', function() {
                     var requests = AjaxHelpers.requests(this),
                         refreshed = false,
                         refresh = function() {
@@ -86,7 +86,8 @@ define(["jquery", "underscore", "js/common_helpers/ajax_helpers", "js/spec_helpe
                     modal = showModal(requests, mockXBlockEditorHtml, { refresh: refresh });
                     modal.editorView.notifyRuntime('cancel');
                     expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
-                    expect(refreshed).toBeFalsy();
+                    // Some xblocks may change state that needs to be saved simply by showing their editor.
+                    expect(refreshed).toBeTruthy();
                 });
 
                 describe("Custom Buttons", function() {

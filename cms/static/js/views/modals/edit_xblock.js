@@ -96,6 +96,13 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
 
                 // Resize the modal to fit the window
                 this.resize();
+
+                // Some xblocks change their state (creating a draft) when rendered. Allow the xblock
+                // to update its state.
+                var refresh = this.editOptions.refresh;
+                if (refresh) {
+                    refresh(this.xblockInfo);
+                }
             },
 
             disableSave: function() {

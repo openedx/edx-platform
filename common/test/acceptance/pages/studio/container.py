@@ -282,6 +282,7 @@ class XBlockWrapper(PageObject):
         'basic_tab': '.editor-tabs li.inner_tab_wrap:nth-child(1) > a',
         'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
         'save_settings': '.action-save',
+        'cancel': '.action-cancel'
     }
 
     def __init__(self, browser, locator):
@@ -366,6 +367,12 @@ class XBlockWrapper(PageObject):
         Click on settings Save button.
         """
         self._click_button('save_settings')
+
+    def cancel(self):
+        """
+        Cancel the edit dialog.
+        """
+        self._click_button('cancel')
 
     @property
     def editor_selector(self):
