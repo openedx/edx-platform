@@ -49,32 +49,17 @@ class ChooseModeView(View):
 
         """
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
+        
         upgrade = request.GET.get('upgrade', False)
         request.session['attempting_upgrade'] = upgrade
 
-        # TODO (ECOM-16): Remove once the AB-test of auto-registration completes
-        auto_register = request.session.get('auto_register', False)
-
-        # Inactive users always need to re-register
-        # Verified and professional users do not need to register or upgrade
-        # Registered users who are not trying to upgrade do not need to re-register
-        if not auto_register:
-            go_to_dashboard = (
-                is_active and
-                (not upgrade or enrollment_mode in ['verified', 'professional'])
-            )
-
-        # If auto-registration is enabled, then students might already be registered,
+        # Students will already have an active course enrollment at this stage,
         # but we should still show them the "choose your track" page so they have
         # the option to enter the verification/payment flow.
-        # TODO (ECOM-16): Based on the results of the AB-test, set the default behavior to
-        # either enable or disable auto-registration.
-        else:
-            go_to_dashboard = (
-                not upgrade and enrollment_mode in ['verified', 'professional']
-            )
+        go_to_dashboard = (
+            not upgrade and enrollment_mode in ['verified', 'professional']
+        )
 
         if go_to_dashboard:
             return redirect(reverse('dashboard'))
@@ -92,6 +77,16 @@ class ChooseModeView(View):
                 )
             )
 
+        # If a user's course enrollment is inactive at this stage, the track
+        # selection page may have been visited directly, so we should redirect
+        # the user to their dashboard. By the time the user gets here during the
+        # normal registration process, they will already have an activated enrollment;
+        # the button appearing on the track selection page only redirects the user to
+        # the dashboard, and we don't want the user to be confused when they click the
+        # honor button and are taken to their dashboard without being enrolled.
+        if not is_active:
+            return redirect(reverse('dashboard'))
+
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
 
@@ -106,7 +101,6 @@ class ChooseModeView(View):
             "error": error,
             "upgrade": upgrade,
             "can_audit": "audit" in modes,
-            "autoreg": auto_register
         }
         if "verified" in modes:
             context["suggested_prices"] = [
@@ -155,10 +149,10 @@ class ChooseModeView(View):
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
-        # TODO (ECOM-16): Remove if the experimental variant wins. Functionally, 
-        #  it doesn't matter, but it will avoid hitting the database.
         if requested_mode == 'honor':
-            CourseEnrollment.enroll(user, course_key, requested_mode)
+            # The user will have already been enrolled in the honor mode at this
+            # point, so we just redirect them to the dashboard, thereby avoiding
+            # hitting the database a second time attempting to enroll them.
             return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]

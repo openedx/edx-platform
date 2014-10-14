@@ -31,7 +31,8 @@ from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, Mo
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls
+from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
+    mongo_uses_error_check
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR, CourseComparisonTest
 
@@ -660,18 +661,20 @@ class TestMixedModuleStore(CourseComparisonTest):
     # Draft
     #   Find: find parents (definition.children query), get parent, get course (fill in run?),
     #         find parents of the parent (course), get inheritance items,
-    #         get errors, get item (to delete subtree), get inheritance again.
+    #         get item (to delete subtree), get inheritance again.
     #   Sends: delete item, update parent
     # Split
     #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
     #   Sends: updated draft and published structures and active_versions
-    @ddt.data(('draft', 8, 2), ('split', 4, 3))
+    @ddt.data(('draft', 7, 2), ('split', 4, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, max_find, max_send):
         """
         Delete should reject on r/o db and work on r/w one
         """
         self.initdb(default_ms)
+        if default_ms == 'draft' and mongo_uses_error_check(self.store):
+            max_find += 1
 
         # r/o try deleting the chapter (is here to ensure it can't be deleted)
         with self.assertRaises(NotImplementedError):
@@ -690,12 +693,12 @@ class TestMixedModuleStore(CourseComparisonTest):
 
     # Draft:
     #    queries: find parent (definition.children), count versions of item, get parent, count grandparents,
-    #             inheritance items, draft item, draft child, get errors, inheritance
+    #             inheritance items, draft item, draft child, inheritance
     #    sends: delete draft vertical and update parent
     # Split:
     #    queries: active_versions, draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data(('draft', 9, 2), ('split', 4, 3))
+    @ddt.data(('draft', 8, 2), ('split', 4, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
@@ -703,6 +706,8 @@ class TestMixedModuleStore(CourseComparisonTest):
         behavioral properties which this deletion test gets at.
         """
         self.initdb(default_ms)
+        if default_ms == 'draft' and mongo_uses_error_check(self.store):
+            max_find += 1
         # create and delete a private vertical with private children
         private_vert = self.store.create_child(
             # don't use course_location as it may not be the repr
@@ -741,12 +746,12 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.assertNotIn(vert_loc, course.children)
 
     # Draft:
-    #   find: find parent (definition.children) 2x, find draft item, check error state, get inheritance items
+    #   find: find parent (definition.children) 2x, find draft item, get inheritance items
     #   send: one delete query for specific item
     # Split:
     #   find: active_version & structure
     #   send: update structure and active_versions
-    @ddt.data(('draft', 5, 1), ('split', 2, 2))
+    @ddt.data(('draft', 4, 1), ('split', 2, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, max_find, max_send):
         """
@@ -776,6 +781,8 @@ class TestMixedModuleStore(CourseComparisonTest):
         private_leaf.display_name = 'change me'
         private_leaf = self.store.update_item(private_leaf, self.user_id)
         # test succeeds if delete succeeds w/o error
+        if default_ms == 'draft' and mongo_uses_error_check(self.store):
+            max_find += 1
         with check_mongo_calls(max_find, max_send):
             self.store.delete_item(private_leaf.location, self.user_id)
 
@@ -1294,7 +1301,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
 
     # Draft:
-    #    Find: find vertical, find children, get last error
+    #    Find: find vertical, find children
     #    Sends:
     #      1. delete all of the published nodes in subtree
     #      2. insert vertical as published (deleted in step 1) w/ the deleted problems as children
@@ -1303,13 +1310,15 @@ class TestMixedModuleStore(CourseComparisonTest):
     # Sends:
     #    - insert structure
     #    - write index entry
-    @ddt.data(('draft', 3, 6), ('split', 3, 2))
+    @ddt.data(('draft', 2, 6), ('split', 3, 2))
     @ddt.unpack
     def test_unpublish(self, default_ms, max_find, max_send):
         """
         Test calling unpublish
         """
         self.initdb(default_ms)
+        if default_ms == 'draft' and mongo_uses_error_check(self.store):
+            max_find += 1
         self._create_block_hierarchy()
 
         # publish

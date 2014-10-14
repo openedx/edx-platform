@@ -217,6 +217,7 @@ class ImportTestCase(CourseTestCase):
         """
 
         def try_tar(tarpath):
+            """ Attempt to tar an unacceptable file """
             with open(tarpath) as tar:
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
@@ -307,10 +308,10 @@ class ExportTestCase(CourseTestCase):
 
         self._verify_export_failure(u'/container/{}'.format(vertical.location))
 
-    def _verify_export_failure(self, expectedText):
+    def _verify_export_failure(self, expected_text):
         """ Export failure helper method. """
         resp = self.client.get(self.url, HTTP_ACCEPT='application/x-tgz')
         self.assertEquals(resp.status_code, 200)
         self.assertIsNone(resp.get('Content-Disposition'))
         self.assertContains(resp, 'Unable to create xml for module')
-        self.assertContains(resp, expectedText)
+        self.assertContains(resp, expected_text)

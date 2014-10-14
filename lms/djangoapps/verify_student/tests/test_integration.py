@@ -99,12 +99,7 @@ class TestProfEdVerification(ModuleStoreTestCase):
         # On the verified page, expect that there's a link to payment page
         self.assertContains(resp, '/shoppingcart/payment_fake')
 
-    def test_do_not_auto_register(self):
-        # TODO (ECOM-16): Remove once we complete the AB-test of auto-registration.
-        session = self.client.session
-        session['auto_register'] = True
-        session.save()
-
+    def test_do_not_auto_enroll(self):
         # Go to the course mode page, expecting a redirect
         # to the show requirements page.
         resp = self.client.get(self.urls['course_modes_choose'], follow=True)

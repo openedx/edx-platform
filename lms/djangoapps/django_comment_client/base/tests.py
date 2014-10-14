@@ -173,8 +173,11 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
         super(ViewsTestCase, self).setUp(create_user=False)
 
         # create a course
-        self.course = CourseFactory.create(org='MITx', course='999',
-                                           display_name='Robot Super Course')
+        self.course = CourseFactory.create(
+            org='MITx', course='999',
+            discussion_topics={"Some Topic": {"id": "some_topic"}},
+            display_name='Robot Super Course',
+        )
         self.course_id = self.course.id
         # seed the forums permissions and roles
         call_command('seed_permissions_roles', self.course_id.to_deprecated_string())
@@ -368,7 +371,15 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             mock_request
         )
 
-    @patch('django_comment_client.base.views.get_discussion_id_map', return_value={"test_commentable": {}})
+    def test_update_thread_course_topic(self, mock_request):
+        self._setup_mock_request(mock_request)
+        response = self.client.post(
+            reverse("update_thread", kwargs={"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()}),
+            data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
+        )
+        self.assertEqual(response.status_code, 200)
+
+    @patch('django_comment_client.base.views.get_discussion_categories_ids', return_value=["test_commentable"])
     def test_update_thread_wrong_commentable_id(self, mock_get_discussion_id_map, mock_request):
         self._test_request_error(
             "update_thread",
@@ -861,14 +872,14 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-    @patch('django_comment_client.base.views.get_discussion_id_map', return_value={"test_commentable": {}})
+    @patch('django_comment_client.base.views.get_discussion_categories_ids', return_value=["test_commentable"])
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request, mock_get_discussion_id_map):
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
         })
-        request = RequestFactory().post("dummy_url", {"body": text, "title": text, "commentable_id": "test_commentable"})
+        request = RequestFactory().post("dummy_url", {"body": text, "title": text, "thread_type": "question", "commentable_id": "test_commentable"})
         request.user = self.student
         request.view_name = "update_thread"
         response = views.update_thread(request, course_id=self.course.id.to_deprecated_string(), thread_id="dummy_thread_id")
@@ -877,6 +888,7 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertTrue(mock_request.called)
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
+        self.assertEqual(mock_request.call_args[1]["data"]["thread_type"], "question")
         self.assertEqual(mock_request.call_args[1]["data"]["commentable_id"], "test_commentable")
 
 

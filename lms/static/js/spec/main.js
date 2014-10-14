@@ -212,12 +212,24 @@
             },
 
             // LMS class loaded explicitly until they are converted to use RequireJS
+            'js/student_account/account': {
+                exports: 'js/student_account/account',
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+            },
+            'js/student_profile/profile': {
+                exports: 'js/student_profile/profile',
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+            },
             'js/verify_student/photocapture': {
                 exports: 'js/verify_student/photocapture'
             },
             'js/staff_debug_actions': {
                 exports: 'js/staff_debug_actions',
                 deps: ['gettext']
+            },
+            'js/dashboard/donation.js': {
+                exports: 'js/dashboard/donation',
+                deps: ['jquery', 'underscore', 'gettext']
             },
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/cohort': {
@@ -255,7 +267,10 @@
         'lms/include/js/spec/views/cohorts_spec.js',
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
-        'lms/include/js/spec/views/notification_spec.js'
+        'lms/include/js/spec/views/notification_spec.js',
+        'lms/include/js/spec/dashboard/donation.js',
+        'lms/include/js/spec/student_account/account.js',
+        'lms/include/js/spec/student_profile/profile.js'
     ]);
 
 }).call(this, requirejs, define);

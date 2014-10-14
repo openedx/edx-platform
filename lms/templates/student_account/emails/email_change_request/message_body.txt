@@ -18,9 +18,9 @@ ${_("There was recently a request to change the email address associated "
 
 ## Confirmation link
 % if is_secure:
-https://${site}/account/email_change_confirm/${key}
+https://${site}/account/email/confirmation/${key}
 % else:
-http://${site}/account/email_change_confirm/${key}
+http://${site}/account/email/confirmation/${key}
 % endif
 
 ## Closing

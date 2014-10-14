@@ -1,5 +1,5 @@
 import logging
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 from .grading_service_module import GradingService
 from opaque_keys.edx.keys import UsageKey

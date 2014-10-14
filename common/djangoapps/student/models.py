@@ -17,7 +17,7 @@ import logging
 from pytz import UTC
 import uuid
 from collections import defaultdict
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from django.db.models import Q
 import pytz
 

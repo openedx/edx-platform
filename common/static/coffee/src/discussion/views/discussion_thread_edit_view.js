@@ -16,16 +16,22 @@
                 this.container = options.container || $('.thread-content-wrapper');
                 this.mode = options.mode || 'inline';
                 this.course_settings = options.course_settings;
+                this.threadType = this.model.get('thread_type');
                 this.topicId = options.topicId;
                 _.bindAll(this);
                 return this;
             },
 
             render: function() {
+                var threadTypeTemplate,
+                    formId = _.uniqueId("form-");
                 this.template = _.template($('#thread-edit-template').html());
                 this.$el.html(this.template(this.model.toJSON())).appendTo(this.container);
                 this.submitBtn = this.$('.post-update');
                 if (this.isTabMode()) {
+                    threadTypeTemplate = _.template($("#thread-type-template").html());
+                    this.addField(threadTypeTemplate({form_id: formId}));
+                    this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
                     this.topicView = new DiscussionTopicMenuView({
                         topicId: this.topicId,
                         course_settings: this.course_settings
@@ -47,6 +53,7 @@
 
             save: function() {
                 var title = this.$('.edit-post-title').val(),
+                    threadType = this.$(".post-type-input:checked").val(),
                     body = this.$('.edit-post-body textarea').val(),
                     commentableId = this.isTabMode() ? this.topicView.getCurrentTopicId() : null;
 
@@ -59,6 +66,7 @@
                     async: false, // @TODO when the rest of the stuff below is made to work properly..
                     data: {
                         title: title,
+                        thread_type: threadType,
                         body: body,
                         commentable_id: commentableId
                     },
@@ -74,12 +82,17 @@
                         this.$('.wmd-preview p').html('');
                         if (this.isTabMode()) {
                             _.extend(newAttrs, {
+                                thread_type: threadType,
                                 commentable_id: commentableId,
                                 courseware_title: this.topicView.getFullTopicName()
                             });
                         }
                         this.model.set(newAttrs).unset('abbreviatedBody');
                         this.trigger('thread:updated');
+                        if (this.threadType !== threadType) {
+                            this.model.trigger('thread:thread_type_updated');
+                            this.trigger('comment:endorse');
+                        }
                     }.bind(this)
                 });
             },

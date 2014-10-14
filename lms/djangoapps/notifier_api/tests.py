@@ -10,6 +10,7 @@ from django_comment_common.models import Role, Permission
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
 from notifier_api.views import NotifierUsersViewSet
+from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from user_api.models import UserPreference
@@ -117,6 +118,14 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertNotIn(unicode(course_id), result["course_info"])
 
     def test_course_info_no_enrollments(self):
+        result = self._get_detail()
+        self.assertEqual(result["course_info"], {})
+
+    def test_course_info_non_existent_course_enrollment(self):
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=CourseLocator(org="dummy", course="dummy", run="non_existent")
+        )
         result = self._get_detail()
         self.assertEqual(result["course_info"], {})
 

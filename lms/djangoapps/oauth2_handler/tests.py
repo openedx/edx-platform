@@ -1,5 +1,4 @@
 # pylint: disable=missing-docstring
-from django.conf import settings
 from django.test.utils import override_settings
 from django.test import TestCase
 

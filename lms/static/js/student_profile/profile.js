@@ -1,97 +1,205 @@
 var edx = edx || {};
 
-(function($) {
+(function($, _, Backbone, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
+    edx.student.profile = {};
 
-    edx.student.profile = (function() {
+    var syncErrorMessage = gettext("The data could not be saved.");
 
-        var _fn = {
-            init: function() {
-                _fn.ajax.init();
-                _fn.eventHandlers.init();
-            },
+    edx.student.profile.reloadPage = function() {
+        location.reload();
+    };
 
-            eventHandlers: {
-                init: function() {
-                    _fn.eventHandlers.submit();
-                    _fn.eventHandlers.click();
-                },
+    edx.student.profile.ProfileModel = Backbone.Model.extend({
+        defaults: {
+            fullName: ''
+        },
 
-                submit: function() {
-                    $('#name-change-form').on( 'submit', _fn.update.name );
-                },
+        urlRoot: '',
 
-                click: function() {
-                    $('#language-change-form .submit-button').on( 'click', _fn.update.language );
-                }
-            },
+        sync: function(method, model) {
+            var headers = {
+                'X-CSRFToken': $.cookie('csrftoken')
+            };
 
-            update: {
-                name: function( event ) {
-                    _fn.form.submit( event, '#new-name', 'new_name', 'name_change' );
-                },
+            $.ajax({
+                url: model.urlRoot,
+                type: 'PUT',
+                data: model.attributes,
+                headers: headers
+            })
+            .done(function() {
+                model.trigger('sync');
+            })
+            .fail(function() {
+                model.trigger('error', syncErrorMessage);
+            });
+        },
 
-                language: function( event ) {
-                    /** 
-                     * The onSuccess argument here means: take `window.location.reload`
-                     * and return a function that will use `window.location` as the 
-                     * `this` reference inside `reload()`.
-                     */
-                    _fn.form.submit( event, '#new-language', 'new_language', 'language_change', window.location.reload.bind(window.location) );
-                }
-            },
+        validate: function(attrs) {
+            var errors = {};
+            if (attrs.fullName.length < 1) {
+                errors.fullName = gettext("Full name cannot be blank");
+            }
 
-            form: {
-                submit: function( event, idSelector, key, url, onSuccess ) {
-                    var $selection = $(idSelector),
-                        data = {};
+            if (!$.isEmptyObject(errors)) {
+                return errors;
+            }
+        }
+    });
 
-                    data[key] = $selection.val();
+    edx.student.profile.PreferencesModel = Backbone.Model.extend({
+        defaults: {
+            language: 'en'
+        },
 
-                    event.preventDefault();
-                    _fn.ajax.put( url, data, onSuccess );
-                }
-            },
+        urlRoot: 'preferences',
 
-            ajax: {
-                init: function() {
-                    var csrftoken = _fn.cookie.get( 'csrftoken' );
+        sync: function(method, model) {
+            var headers = {
+                'X-CSRFToken': $.cookie('csrftoken')
+            };
 
-                    $.ajaxSetup({
-                        beforeSend: function( xhr, settings ) {
-                            if ( settings.type === 'PUT' ) {
-                                xhr.setRequestHeader( 'X-CSRFToken', csrftoken );
-                            }
-                        }
-                    });
-                },
+            $.ajax({
+                url: model.urlRoot,
+                type: 'PUT',
+                data: model.attributes,
+                headers: headers
+            })
+            .done(function() {
+                model.trigger('sync');
+                edx.student.profile.reloadPage();
+            })
+            .fail(function() {
+                model.trigger('error', syncErrorMessage);
+            });
+        },
 
-                put: function( url, data, onSuccess ) {
-                    $.ajax({
-                        url: url,
-                        type: 'PUT',
-                        data: data,
-                        success: onSuccess ? onSuccess : ''
-                    });
-                }
-            },
+        validate: function(attrs) {
+            var errors = {};
+            if (attrs.language.length < 1) {
+                errors.language = gettext("Language cannot be blank");
+            }
 
-            cookie: {
-                get: function( name ) {
-                    return $.cookie(name);
-                }
-            },
+            if (!$.isEmptyObject(errors)) {
+                return errors;
+            }
+        }
+    });
 
-        };
+    edx.student.profile.ProfileView = Backbone.View.extend({
 
-        return {
-            init: _fn.init
-        };
+        events: {
+            'submit': 'submit',
+            'change': 'change'
+        },
 
-    })();
+        initialize: function() {
+            _.bindAll(this, 'render', 'change', 'submit', 'invalidProfile', 'invalidPreference', 'error', 'sync', 'clearStatus');
+            
+            this.profileModel = new edx.student.profile.ProfileModel();
+            this.profileModel.on('invalid', this.invalidProfile);
+            this.profileModel.on('error', this.error);
+            this.profileModel.on('sync', this.sync);
 
-    edx.student.profile.init();
+            this.preferencesModel = new edx.student.profile.PreferencesModel();
+            this.preferencesModel.on('invalid', this.invalidPreference);
+            this.preferencesModel.on('error', this.error);
+            this.preferencesModel.on('sync', this.sync);
+        },
 
-})(jQuery);
+        render: function() {
+            this.$el.html(_.template($('#profile-tpl').html()));
+
+            this.$nameField = $('#profile-name', this.$el);
+            this.$nameStatus = $('#profile-name-status', this.$el);
+            
+            this.$languageChoices = $('#preference-language', this.$el);
+            this.$languageStatus = $('#preference-language-status', this.$el);
+
+            this.$submitStatus = $('#submit-status', this.$el);
+
+            var self = this;
+            $.getJSON('preferences/languages')
+                .done(function(json) {
+                    /** Asynchronously populate the language choices. */
+                    self.$languageChoices.html(_.template($('#languages-tpl').html(), {languageInfo: json}));
+                })
+                .fail(function() {
+                    self.$languageStatus
+                        .addClass('language-list-error')
+                        .text(gettext("We couldn't populate the list of language choices."));
+                });
+
+            return this;
+        },
+
+        change: function() {
+            this.profileModel.set({
+                fullName: this.$nameField.val()
+            });
+
+            this.preferencesModel.set({
+                language: this.$languageChoices.val()
+            });
+        },
+
+        submit: function(event) {
+            event.preventDefault();
+            this.clearStatus();
+            this.profileModel.save();
+            this.preferencesModel.save();
+        },
+
+        invalidProfile: function(model) {
+            var errors = model.validationError;
+            if (errors.hasOwnProperty('fullName')) {
+                this.$nameStatus
+                    .addClass('validation-error')
+                    .text(errors.fullName);
+            }
+        },
+
+        invalidPreference: function(model) {
+            var errors = model.validationError;
+            if (errors.hasOwnProperty('language')) {
+                this.$languageStatus
+                    .addClass('validation-error')
+                    .text(errors.language);
+            }
+        },
+
+        error: function(error) {
+            this.$submitStatus
+                .addClass('error')
+                .text(error);
+        },
+
+        sync: function() {
+            this.$submitStatus
+                .addClass('success')
+                .text(gettext("Saved"));
+        },
+
+        clearStatus: function() {
+            this.$nameStatus
+                .removeClass('validation-error')
+                .text("");
+
+            this.$languageStatus
+                .removeClass('validation-error')
+                .text("");
+
+            this.$submitStatus
+                .removeClass('error')
+                .text("");
+        }
+    });
+
+    return new edx.student.profile.ProfileView({
+        el: $('#profile-container')
+    }).render();
+
+})(jQuery, _, Backbone, gettext);
