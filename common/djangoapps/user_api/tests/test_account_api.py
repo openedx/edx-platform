@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 """ Tests for the account API. """
 
-import unittest
+import re
+from unittest import skipUnless
+
 from nose.tools import raises
+from mock import patch
 import ddt
 from dateutil.parser import parse as parse_datetime
-from django.conf import settings
+from django.core import mail
 from django.test import TestCase
+from django.conf import settings
+
 from user_api.api import account as account_api
 from user_api.models import UserProfile
 
@@ -14,43 +19,46 @@ from user_api.models import UserProfile
 @ddt.ddt
 class AccountApiTest(TestCase):
 
-    USERNAME = u"frank-underwood"
-    PASSWORD = u"ṕáśśẃőŕd"
-    EMAIL = u"frank+underwood@example.com"
+    USERNAME = u'frank-underwood'
+    PASSWORD = u'ṕáśśẃőŕd'
+    EMAIL = u'frank+underwood@example.com'
+
+    ORIG_HOST = 'example.com'
+    IS_SECURE = False
 
     INVALID_USERNAMES = [
         None,
-        u"",
-        u"a",
-        u"a" * (account_api.USERNAME_MAX_LENGTH + 1),
-        u"invalid_symbol_@",
-        u"invalid-unicode_fŕáńḱ",
+        u'',
+        u'a',
+        u'a' * (account_api.USERNAME_MAX_LENGTH + 1),
+        u'invalid_symbol_@',
+        u'invalid-unicode_fŕáńḱ',
     ]
 
     INVALID_EMAILS = [
         None,
-        u"",
-        u"a",
-        "no_domain",
-        "no+domain",
-        "@",
-        "@domain.com",
-        "test@no_extension",
-        u"fŕáńḱ@example.com",
-        u"frank@éxáḿṕĺé.ćőḿ",
+        u'',
+        u'a',
+        'no_domain',
+        'no+domain',
+        '@',
+        '@domain.com',
+        'test@no_extension',
+        u'fŕáńḱ@example.com',
+        u'frank@éxáḿṕĺé.ćőḿ',
 
         # Long email -- subtract the length of the @domain
         # except for one character (so we exceed the max length limit)
-        u"{user}@example.com".format(
+        u'{user}@example.com'.format(
             user=(u'e' * (account_api.EMAIL_MAX_LENGTH - 11))
         )
     ]
 
     INVALID_PASSWORDS = [
         None,
-        u"",
-        u"a",
-        u"a" * (account_api.PASSWORD_MAX_LENGTH + 1)
+        u'',
+        u'a',
+        u'a' * (account_api.PASSWORD_MAX_LENGTH + 1)
     ]
 
     def test_activate_account(self):
@@ -72,7 +80,7 @@ class AccountApiTest(TestCase):
         # Request an email change
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         activation_key = account_api.request_email_change(
-            self.USERNAME, u"new+email@example.com", self.PASSWORD
+            self.USERNAME, u'new+email@example.com', self.PASSWORD
         )
 
         # Verify that the email has not yet changed
@@ -82,24 +90,23 @@ class AccountApiTest(TestCase):
         # Confirm the change, using the activation code
         old_email, new_email = account_api.confirm_email_change(activation_key)
         self.assertEqual(old_email, self.EMAIL)
-        self.assertEqual(new_email, u"new+email@example.com")
+        self.assertEqual(new_email, u'new+email@example.com')
 
         # Verify that the email is changed
         account = account_api.account_info(self.USERNAME)
-        self.assertEqual(account['email'], u"new+email@example.com")
+        self.assertEqual(account['email'], u'new+email@example.com')
 
     def test_confirm_email_change_repeat(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         activation_key = account_api.request_email_change(
-            self.USERNAME, u"new+email@example.com", self.PASSWORD
+            self.USERNAME, u'new+email@example.com', self.PASSWORD
         )
 
         # Confirm the change once
         account_api.confirm_email_change(activation_key)
 
-        # Confirm the change again
-        # The activation code should be single-use
-        # so this should raise an error.
+        # Confirm the change again. The activation code should be
+        # single-use, so this should raise an error.
         with self.assertRaises(account_api.AccountNotAuthorized):
             account_api.confirm_email_change(activation_key)
 
@@ -110,11 +117,11 @@ class AccountApiTest(TestCase):
 
     # Email uniqueness constraints were introduced in a database migration,
     # which we disable in the unit tests to improve the speed of the test suite.
-    @unittest.skipUnless(settings.SOUTH_TESTS_MIGRATE, "South migrations required")
+    @skipUnless(settings.SOUTH_TESTS_MIGRATE, "South migrations required")
     def test_create_account_duplicate_email(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         with self.assertRaises(account_api.AccountUserAlreadyExists):
-            account_api.create_account("different_user", self.PASSWORD, self.EMAIL)
+            account_api.create_account('different_user', self.PASSWORD, self.EMAIL)
 
     def test_username_too_long(self):
         long_username = 'e' * (account_api.USERNAME_MAX_LENGTH + 1)
@@ -122,7 +129,7 @@ class AccountApiTest(TestCase):
             account_api.create_account(long_username, self.PASSWORD, self.EMAIL)
 
     def test_account_info_no_user(self):
-        self.assertIs(account_api.account_info("does_not_exist"), None)
+        self.assertIs(account_api.account_info('does_not_exist'), None)
 
     @raises(account_api.AccountEmailInvalid)
     @ddt.data(*INVALID_EMAILS)
@@ -146,11 +153,11 @@ class AccountApiTest(TestCase):
 
     @raises(account_api.AccountNotAuthorized)
     def test_activate_account_invalid_key(self):
-        account_api.activate_account(u"invalid")
+        account_api.activate_account(u'invalid')
 
     @raises(account_api.AccountUserNotFound)
     def test_request_email_change_no_user(self):
-        account_api.request_email_change(u"no_such_user", self.EMAIL, self.PASSWORD)
+        account_api.request_email_change(u'no_such_user', self.EMAIL, self.PASSWORD)
 
     @ddt.data(*INVALID_EMAILS)
     def test_request_email_change_invalid_email(self, invalid_email):
@@ -165,22 +172,22 @@ class AccountApiTest(TestCase):
         # Create two accounts, both activated
         activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         account_api.activate_account(activation_key)
-        activation_key = account_api.create_account(u"another_user", u"password", u"another+user@example.com")
+        activation_key = account_api.create_account(u'another_user', u'password', u'another+user@example.com')
         account_api.activate_account(activation_key)
 
         # Try to change the first user's email to the same as the second user's
         with self.assertRaises(account_api.AccountEmailAlreadyExists):
-            account_api.request_email_change(self.USERNAME, u"another+user@example.com", self.PASSWORD)
+            account_api.request_email_change(self.USERNAME, u'another+user@example.com', self.PASSWORD)
 
     def test_request_email_change_duplicates_unactivated_account(self):
         # Create two accounts, but the second account is inactive
         activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         account_api.activate_account(activation_key)
-        account_api.create_account(u"another_user", u"password", u"another+user@example.com")
+        account_api.create_account(u'another_user', u'password', u'another+user@example.com')
 
         # Try to change the first user's email to the same as the second user's
         # Since the second user has not yet activated, this should succeed.
-        account_api.request_email_change(self.USERNAME, u"another+user@example.com", self.PASSWORD)
+        account_api.request_email_change(self.USERNAME, u'another+user@example.com', self.PASSWORD)
 
     def test_request_email_change_same_address(self):
         # Create and activate the account
@@ -196,14 +203,14 @@ class AccountApiTest(TestCase):
 
         # Use the wrong password
         with self.assertRaises(account_api.AccountNotAuthorized):
-            account_api.request_email_change(self.USERNAME, u"new+email@example.com", u"wrong password")
+            account_api.request_email_change(self.USERNAME, u'new+email@example.com', u'wrong password')
 
     def test_confirm_email_change_invalid_activation_key(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        account_api.request_email_change(self.USERNAME, u"new+email@example.com", self.PASSWORD)
+        account_api.request_email_change(self.USERNAME, u'new+email@example.com', self.PASSWORD)
 
         with self.assertRaises(account_api.AccountNotAuthorized):
-            account_api.confirm_email_change(u"invalid")
+            account_api.confirm_email_change(u'invalid')
 
     def test_confirm_email_change_no_request_pending(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -213,11 +220,11 @@ class AccountApiTest(TestCase):
 
         # Request a change
         activation_key = account_api.request_email_change(
-            self.USERNAME, u"new+email@example.com", self.PASSWORD
+            self.USERNAME, u'new+email@example.com', self.PASSWORD
         )
 
         # Another use takes the email before we confirm the change
-        account_api.create_account(u"other_user", u"password", u"new+email@example.com")
+        account_api.create_account(u'other_user', u'password', u'new+email@example.com')
 
         # When we try to confirm our change, we get an error because the email is taken
         with self.assertRaises(account_api.AccountEmailAlreadyExists):
@@ -229,7 +236,7 @@ class AccountApiTest(TestCase):
     def test_confirm_email_no_user_profile(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         activation_key = account_api.request_email_change(
-            self.USERNAME, u"new+email@example.com", self.PASSWORD
+            self.USERNAME, u'new+email@example.com', self.PASSWORD
         )
 
         # This should never happen, but just in case...
@@ -243,7 +250,7 @@ class AccountApiTest(TestCase):
 
         # Change the email once
         activation_key = account_api.request_email_change(
-            self.USERNAME, u"new+email@example.com", self.PASSWORD
+            self.USERNAME, u'new+email@example.com', self.PASSWORD
         )
         account_api.confirm_email_change(activation_key)
 
@@ -256,7 +263,7 @@ class AccountApiTest(TestCase):
 
         # Change the email again
         activation_key = account_api.request_email_change(
-            self.USERNAME, u"another_new+email@example.com", self.PASSWORD
+            self.USERNAME, u'another_new+email@example.com', self.PASSWORD
         )
         account_api.confirm_email_change(activation_key)
 
@@ -264,8 +271,38 @@ class AccountApiTest(TestCase):
         meta = UserProfile.objects.get(user__username=self.USERNAME).get_meta()
         self.assertEqual(len(meta['old_emails']), 2)
         email, timestamp = meta['old_emails'][1]
-        self.assertEqual(email, "new+email@example.com")
+        self.assertEqual(email, 'new+email@example.com')
         self._assert_is_datetime(timestamp)
+
+    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    def test_request_password_change(self):
+        # Create and activate an account
+        activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        account_api.activate_account(activation_key)
+
+        # Request a password change
+        account_api.request_password_change(self.EMAIL, self.ORIG_HOST, self.IS_SECURE)
+
+        # Verify that one email message has been sent
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verify that the body of the message contains something that looks
+        # like an activation link
+        email_body = mail.outbox[0].body
+        result = re.search('(?P<url>https?://[^\s]+)', email_body)
+        self.assertIsNot(result, None)
+
+    @raises(account_api.AccountUserNotFound)
+    @ddt.data(True, False)
+    def test_request_password_change_invalid_user(self, create_inactive_account):
+        if create_inactive_account:
+            # Create an account, but do not activate it
+            account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        
+        account_api.request_password_change(self.EMAIL, self.ORIG_HOST, self.IS_SECURE)
+
+        # Verify that no email messages have been sent
+        self.assertEqual(len(mail.outbox), 0)
 
     def _assert_is_datetime(self, timestamp):
         if not timestamp:
