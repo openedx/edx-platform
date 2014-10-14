@@ -755,7 +755,7 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
-        data = {'course_id': 'slashes:234asdfapsdf+2sdfs+sdf'}
+        data = {'course_id': '234asdfapsdf/2sdfs/sdf'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
         data = {'course_id': 'really-invalid-course-id-oh-boy-watch-out'}
@@ -1071,7 +1071,7 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_user_course_grades_course_not_found(self):
-        test_uri = '{}/{}/courses/slashes:some+unknown+course/grades'.format(self.users_base_uri, self.user.id)
+        test_uri = '{}/{}/courses/some/unknown/course/grades'.format(self.users_base_uri, self.user.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 

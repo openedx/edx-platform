@@ -895,9 +895,6 @@ class GroupsApiTests(ModuleStoreTestCase):
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = response.data['uri'] + '/courses'
-        data = {'course_id': "slashes:invalid+course+id"}
-        response = self.do_post(test_uri, data)
-        self.assertEqual(response.status_code, 404)
         data = {'course_id': "invalid/course/id"}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
