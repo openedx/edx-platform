@@ -1012,7 +1012,6 @@ CatchAnnotation.prototype = {
             // Set vertical editor
             this.annotator.editor.resetOrientation();
             this.annotator.editor.invertY();
-            this.annotator.editor.element.find('.annotator-widget').css('min-width', replyElem.css('width'));
 
             // set parent 
             var parentValue = $(this.annotator.editor.element).find(".reply-item span.parent-annotation");
