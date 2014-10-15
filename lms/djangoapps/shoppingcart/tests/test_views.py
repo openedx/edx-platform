@@ -860,7 +860,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('40.00', resp.content)
         # check for the enrollment codes content
-        self.assertIn('Next, send each student one of these unique enrollment codes for this course.', resp.content)
+        self.assertIn('Please send each professional one of these unique registration codes to enroll into the course.', resp.content)
 
         ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
         self.assertEqual(template, 'shoppingcart/receipt.html')

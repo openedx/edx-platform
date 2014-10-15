@@ -296,7 +296,10 @@ class Order(models.Model):
                         'course_names': ", ".join(course_names),
                         'dashboard_url': dashboard_url,
                         'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=E1101
-                        'has_billing_info': settings.FEATURES['STORE_BILLING_INFO']
+                        'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
+                        'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+                        'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
+                        'payment_email_signature': microsite.get_value('payment_email_signature'),
                     }
                 )
                 email = EmailMessage()
