@@ -34,6 +34,7 @@
 
     block.element = element
     block.name = $element.data("name")
+    block.type = $element.data("block-type")
 
     $element.trigger("xblock-initialized")
     $element.data("initialized", true)
