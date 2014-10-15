@@ -49,8 +49,8 @@ many contributor pull request reviews they want to commit to.
 Once a pull request from a contributor passes all required code reviews, a core
 committer will need to merge the pull request into the project. The core
 committer who merges the pull request will be responsible for verifying those
-changes on the staging server prior to release, using the test plan provided by
-the author of the pull request.
+changes on the staging server prior to release, using the manual test plan provided
+by the author of the pull request.
 
 In addition to reviewing contributor requests as part of sprint work, core
 committers should expect to spend about one hour per week doing other tasks
