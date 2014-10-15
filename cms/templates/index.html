@@ -134,7 +134,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       <!-- STATE: processing courses -->
       %if allow_course_reruns and rerun_creator_status and len(in_process_course_actions) > 0:
       <div class="courses courses-processing">
-          <h3 class="title">Courses Being Processed</h3>
+          <h3 class="title">${_("Courses Being Processed")}</h3>
 
           <ul class="list-courses">
             %for course_info in sorted(in_process_course_actions, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
@@ -160,16 +160,20 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 </div>
 
                 <dl class="course-status">
-                  <dt class="label sr">This re-run processing status:</dt>
+                  <dt class="label sr">${_("This course run is currently being created.")}</dt>
                   <dd class="value">
                     <i class="icon icon-refresh icon-spin"></i>
-                    <span class="copy">Configuring as re-run</span>
+                    ## Translators: This is a status message, used to inform the user of what the system is doing. This status means that the user has requested to re-run an existing course, and the system is currently in the process of duplicating and configuring the existing course so that it can be re-run.
+                    <span class="copy">${_("Configuring as re-run")}</span>
                   </dd>
                 </dl>
               </div>
 
               <div class="status-message">
-                <p class="copy">${_('The new course will be added to your course list in 5-10 minutes. Return to this page or <a href="#" class="action-reload">refresh it</a> to update the course list. The new course will need some manual configuration.')}</p>
+                <p class="copy">${_('The new course will be added to your course list in 5-10 minutes. Return to this page or {link_start}refresh it{link_end} to update the course list. The new course will need some manual configuration.').format(
+                    link_start='<a href="#" class="action-reload">',
+                    link_end='</a>',
+                  )}</p>
               </div>
             </li>
             %endif
@@ -385,28 +389,36 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Getting Started with edX Studio")}</a>
           </li>
           <li class="action-item">
-            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to request help">${_('Request help with edX Studio')}</a>
+            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">${_("Request help with edX Studio")}</a>
           </li>
         </ol>
       </div>
 
       % if course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
       <div class="bit">
-        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
-        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
+        <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3>
+        <p>${_("In order to create courses in Studio, you must {link_start}contact edX staff to help you create a course{link_end}.").format(
+            link_start='<a href="mailto:{email}">'.format(email=settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')),
+            link_end="</a>",
+          )}</p>
       </div>
       % endif
 
       % if course_creator_status == "unrequested":
       <div class="bit">
-        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
+        <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3>
         <p>${_('In order to create courses in Studio, you must have course creator privileges to create your own course.')}</p>
       </div>
 
       % elif course_creator_status == "denied":
       <div class="bit">
-        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
-        <p>${_('Your request to author courses in studio has been denied. Please')} <a href="http://help.edge.edx.org/discussion/new" class="show-tender">${_('contact edX Staff with further questions')}</a></p>
+        <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3>
+        <p>${_("Your request to author courses in Studio has been denied. Please {link_start}contact edX Staff with further questions{link_end}.").format(
+            link_start='<a href="{url}" class="show-tender">'.format(
+              url="http://help.edge.edx.org/discussion/new",
+            ),
+            link_end="</a>",
+          )}</p>
       </div>
 
       % endif
@@ -423,7 +435,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
       <div class="notice notice-incontext notice-instruction notice-instruction-verification">
         <div class="msg">
-          <h3 class="title">${_('We need to verify your email address')}</h3>
+          <h3 class="title">${_("We need to verify your email address")}</h3>
           <div class="copy">
             <p>${_('Almost there! In order to complete your sign up we need you to verify your email address (%(email)s). An activation message and next steps should be waiting for you there.') % dict(email=user.email)}</p>
           </div>
@@ -438,7 +450,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
         <ol class='list-actions'>
           <li class="action-item">
-            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to request help">Request help with your Studio account</a>
+            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">${_("Request help with your Studio account")}</a>
           </li>
         </ol>
       </div>
