@@ -32,8 +32,8 @@ from django.db.models import Count
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
-from django_countries import CountryField
 from cities.models import City
+from django_countries.fields import CountryField
 from config_models.models import ConfigurationModel
 from track import contexts
 from eventtracking import tracker
