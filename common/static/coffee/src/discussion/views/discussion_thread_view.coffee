@@ -34,6 +34,20 @@ if Backbone?
       if @isQuestion()
         @markedAnswers = new Comments()
 
+    rerender: () ->
+      if @showView?
+        @showView.undelegateEvents()
+      @undelegateEvents()
+      @$el.empty()
+      @initialize(
+        mode: @mode
+        model: @model
+        el: @el
+        course_settings: @course_settings
+        topicId: @topicId
+      )
+      @render()
+
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
       @template(@model.toJSON())

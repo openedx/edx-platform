@@ -29,10 +29,7 @@
         testUpdate = function(view, thread) {
             spyOn($, 'ajax').andCallFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));
-                if (view.isTabMode()) {
-                    // TODO remove the tabMode condition, depends on #5554 / TNL-606
-                    expect(params.data.thread_type).toBe('discussion');
-                }
+                expect(params.data.thread_type).toBe('discussion');
                 expect(params.data.commentable_id).toBe('other_topic');
                 expect(params.data.title).toBe('changed thread title');
                 params.success();
@@ -45,15 +42,12 @@
             expect($.ajax).toHaveBeenCalled();
 
             expect(thread.get('title')).toBe('changed thread title');
-            if (view.isTabMode()) {
-                // TODO remove the tabMode condition, depends on #5554 / TNL-606
-                expect(thread.get('thread_type')).toBe('discussion');
-            }
+            expect(thread.get('thread_type')).toBe('discussion');
             expect(thread.get('commentable_id')).toBe('other_topic');
             expect(thread.get('courseware_title')).toBe('Other Topic');
             expect(view.$('.edit-post-title')).toHaveValue('');
             expect(view.$('.wmd-preview p')).toHaveText('');
-        }
+        };
 
         it('can save new data correctly in tab mode', function() {
             this.createEditView();
