@@ -1,0 +1,34 @@
+<%!
+from django.utils.translation import ugettext as _
+from xmodule.util.date_utils import get_time_display
+from django.conf import settings
+%>
+
+<%namespace name='static' file='static_content.html'/>
+<h2 class="problem-header">
+  ${ problem['name'] }
+</h2>
+
+<div class="problem-progress"></div>
+
+% if problem_is_timed and not problem_has_finished:
+  <div class="time_limit">
+    <p>
+      ${_("You are about to start a timed problem. The allotted time for this problem is {minutes_allowed} minutes.").format(
+          minutes_allowed=minutes_allowed)}
+      <br />
+      <b>
+      ${_("At {end_time}, you must manually click the '{check_button}' button below.").format(
+          end_time=get_time_display(end_time_to_display, coerce_tz=settings.TIME_ZONE),
+          check_button=check_button)}
+      </b>
+    </p>
+  </div>
+% endif
+
+<div class="problem" role="application">
+  <div class="action">
+    <input type="hidden" name="problem_id" value="${ problem['name'] }" />
+    <input class="start" type="button" value="${_('Start Timer')}" />
+  </div>
+</div>
