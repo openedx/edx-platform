@@ -226,6 +226,21 @@
             <span class="tip tip-input" id="city-tip">Debe <strong>seleccionar</strong>su ciudad de la lista que se desplega<strong>cuando digite un texto.</strong></span>
             <input type="hidden" name="city_id" value="" id="city_id"/>
           </li>
+
+          <li class="field required text" id="field-publicentity">
+            <label for="publicentity">Institución Pública</label>
+	    <input value="NINGUNO" onclick="this.select();" id="publicentity" name="publicentity" type="text" list="entities" required aria-describedby="publicentity-tip"/>
+            <span class="tip tip-input" id="publicentity-tip"><strong>Si es servidor público, seleccione una institución de la lista.</strong></span>
+	    <datalist name="publicentity" id="entities">
+	      % for pe in public_entities:
+	          % if pe.name.upper() == "NINGUNO":
+	          <option id="${pe.id}" value="${pe.name.upper()}" selected="selected">${pe.name}</option>
+		  % else:
+		  <option id="${pe.id}" value="${pe.name.upper()}">${pe.name}</option>
+		  % endif
+	      % endfor
+            </select>
+          </li>
         </ol>
 
         % else:

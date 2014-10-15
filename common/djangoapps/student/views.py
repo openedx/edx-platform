@@ -102,6 +102,8 @@ from shoppingcart.models import CourseRegistrationCode
 import analytics
 from eventtracking import tracker
 
+from cities.models import PublicEntity
+
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -417,6 +419,9 @@ def register_user(request, extra_context=None):
         overrides['running_pipeline'] = running_pipeline
         overrides['selected_provider'] = current_provider.NAME
         context.update(overrides)
+
+    public_entities = PublicEntity.objects.all()
+    context.update({'public_entities': public_entities})
 
     return render_to_response('register.html', context)
 
@@ -1314,8 +1319,8 @@ def _do_create_account(post_vars, extended_profile=None):
     profile.cedula = post_vars.get('cedula')
     profile.city = city
 
-    city = City.objects.get(id=post_vars['city_id'])
-    profile.city = city
+#    city = City.objects.get(id=post_vars['city_id'])
+#    profile.city = city
 
     type_id = post_vars['type_id']
     if type_id == 'cedula':
