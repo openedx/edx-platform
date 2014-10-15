@@ -7,6 +7,7 @@ import json
 import logging
 import static_replace
 import uuid
+import markupsafe
 
 from django.conf import settings
 from django.utils.timezone import UTC
@@ -71,7 +72,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
 
     data = {}
     data.update(extra_data)
-    css_classes = ['xblock', 'xblock-{}'.format(view)]
+    css_classes = ['xblock', 'xblock-{}'.format(markupsafe.escape(view))]
 
     if isinstance(block, (XModule, XModuleDescriptor)):
         if view in PREVIEW_VIEWS:
@@ -81,7 +82,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
             # The block is acting as an XModuleDescriptor
             css_classes.append('xmodule_edit')
 
-        css_classes.append('xmodule_' + class_name)
+        css_classes.append('xmodule_' + markupsafe.escape(class_name))
         data['type'] = block.js_module_name
         shim_xmodule_js(frag)
 
@@ -100,7 +101,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
         'display_name': block.display_name_with_default,
-        'data_attributes': u' '.join(u'data-{}="{}"'.format(key, value)
+        'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
                                      for key, value in data.iteritems()),
     }
 
