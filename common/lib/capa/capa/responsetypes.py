@@ -33,7 +33,7 @@ from sys import float_info
 from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 # specific library imports
 from calc import evaluator, UndefinedVariable

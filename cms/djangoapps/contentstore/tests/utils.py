@@ -72,10 +72,10 @@ class CourseTestCase(ModuleStoreTestCase):
         will be cleared out before each test case execution and deleted
         afterwards.
         """
-        user_password = super(CourseTestCase, self).setUp()
+        self.user_password = super(CourseTestCase, self).setUp()
 
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password=user_password)
+        self.client.login(username=self.user.username, password=self.user_password)
 
         self.course = CourseFactory.create()
 

@@ -196,7 +196,7 @@ def sign(params):
     return params
 
 
-def render_purchase_form_html(cart, callback_url=None):
+def render_purchase_form_html(cart, callback_url=None, extra_data=None):
     """
     Renders the HTML of the hidden POST form that must be used to initiate a purchase with CyberSource
 
@@ -209,17 +209,21 @@ def render_purchase_form_html(cart, callback_url=None):
             the URL provided by the administrator of the account
             (CyberSource config, not LMS config).
 
+        extra_data (list): Additional data to include as merchant-defined data fields.
+
     Returns:
         unicode: The rendered HTML form.
 
     """
     return render_to_string('shoppingcart/cybersource_form.html', {
         'action': get_purchase_endpoint(),
-        'params': get_signed_purchase_params(cart, callback_url=callback_url),
+        'params': get_signed_purchase_params(
+            cart, callback_url=callback_url, extra_data=extra_data
+        ),
     })
 
 
-def get_signed_purchase_params(cart, callback_url=None):
+def get_signed_purchase_params(cart, callback_url=None, extra_data=None):
     """
     This method will return a digitally signed set of CyberSource parameters
 
@@ -232,14 +236,16 @@ def get_signed_purchase_params(cart, callback_url=None):
             the URL provided by the administrator of the account
             (CyberSource config, not LMS config).
 
+        extra_data (list): Additional data to include as merchant-defined data fields.
+
     Returns:
         dict
 
     """
-    return sign(get_purchase_params(cart, callback_url=callback_url))
+    return sign(get_purchase_params(cart, callback_url=callback_url, extra_data=extra_data))
 
 
-def get_purchase_params(cart, callback_url=None):
+def get_purchase_params(cart, callback_url=None, extra_data=None):
     """
     This method will build out a dictionary of parameters needed by CyberSource to complete the transaction
 
@@ -251,6 +257,8 @@ def get_purchase_params(cart, callback_url=None):
             completes a purchase.  If not provided, then CyberSource will use
             the URL provided by the administrator of the account
             (CyberSource config, not LMS config).
+
+        extra_data (list): Additional data to include as merchant-defined data fields.
 
     Returns:
         dict
@@ -279,6 +287,12 @@ def get_purchase_params(cart, callback_url=None):
     if callback_url is not None:
         params['override_custom_receipt_page'] = callback_url
         params['override_custom_cancel_page'] = callback_url
+
+    if extra_data is not None:
+        # CyberSource allows us to send additional data in "merchant defined data" fields
+        for num, item in enumerate(extra_data, start=1):
+            key = u"merchant_defined_data{num}".format(num=num)
+            params[key] = item
 
     return params
 

@@ -573,6 +573,7 @@ class TestMongoModuleStore(unittest.TestCase):
                     'published_by': published_by,
                 },
             },
+            allow_not_found=True,
         )
 
         # Retrieve the block and verify its fields

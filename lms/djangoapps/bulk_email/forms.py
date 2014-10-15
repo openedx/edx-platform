@@ -20,8 +20,10 @@ log = logging.getLogger(__name__)
 class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
     """Form providing validation of CourseEmail templates."""
 
+    name = forms.CharField(required=False)
     class Meta:  # pylint: disable=C0111
         model = CourseEmailTemplate
+        fields = ('html_template', 'plain_template', 'name')
 
     def _validate_template(self, template):
         """Check the template for required tags."""
@@ -49,6 +51,21 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
         template = self.cleaned_data["plain_template"]
         self._validate_template(template)
         return template
+
+    def clean_name(self):
+        """Validate the name field. Enforce uniqueness constraint on 'name' field"""
+        name = self.cleaned_data.get("name")
+        # if we are creating a new CourseEmailTemplate, then we need to
+        # enforce the uniquess constraint as part of the Form validation
+        if not self.instance.pk:
+            try:
+                CourseEmailTemplate.get_template(name)
+                # already exists, this is no good
+                raise ValidationError('Name of "{}" already exists, this must be unique.'.format(name))
+            except CourseEmailTemplate.DoesNotExist:
+                # this is actually the successful validation
+                pass
+        return name
 
 
 class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924

@@ -9,7 +9,7 @@ from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
 from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
                          HttpResponseServerError)
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from edxmako.shortcuts import render_to_response
 import zendesk
 from microsite_configuration import microsite

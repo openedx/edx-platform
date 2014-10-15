@@ -16,7 +16,7 @@ defusedxml==0.4.1
 distribute>=0.6.28, <0.7
 django-babel-underscore==0.1.0
 django-celery==3.0.17
-django-countries==1.5
+django-countries==2.1.2
 django-extensions==1.2.5
 django-filter==0.6.0
 django-followit==0.0.3
@@ -61,7 +61,7 @@ polib==1.0.3
 pycrypto>=2.6
 pygments==1.6
 pygraphviz==1.1
-pymongo==2.4.1
+pymongo==2.7.2
 pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5

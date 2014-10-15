@@ -17,7 +17,7 @@ import logging
 from pytz import UTC
 import uuid
 from collections import defaultdict
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from django.db.models import Q
 import pytz
 
@@ -32,8 +32,8 @@ from django.db.models import Count
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
-from django_countries import CountryField
 from cities.models import City
+from django_countries.fields import CountryField
 from config_models.models import ConfigurationModel
 from track import contexts
 from eventtracking import tracker

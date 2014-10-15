@@ -313,13 +313,14 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                             create_new_course_if_not_present=True,
                         )
 
-                        export_to_xml(
-                            dest_store,
-                            dest_content,
-                            dest_course_key,
-                            self.export_dir,
-                            'exported_dest_course',
-                        )
+# NOT CURRENTLY USED
+#                         export_to_xml(
+#                             dest_store,
+#                             dest_content,
+#                             dest_course_key,
+#                             self.export_dir,
+#                             'exported_dest_course',
+#                         )
 
                         self.exclude_field(None, 'wiki_slug')
                         self.exclude_field(None, 'xml_attributes')

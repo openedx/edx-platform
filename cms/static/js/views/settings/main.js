@@ -35,21 +35,19 @@ var DetailsView = ValidatingView.extend({
             $(this).show();
         });
 
-
         // Editor tinymce
         this.editor = new tinymce.Editor('course-overview', {
-            language: "es",
-            plugins: ["table"],
+            plugins: ["table", "codemirror"],
             menu: {
                 file: {title: 'File', items: 'save'},
-                edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
-                insert: {title: 'Insert', items: '|'}, 
-                view: {title: 'View', items: 'visualaid'}, 
-                format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
-                table: {title: 'Table'}, 
-                tools: {title: 'Tools', items: 'inserttable'} 
+                edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'},
+                insert: {title: 'Insert', items: '|'},
+                view: {title: 'View', items: 'visualaid'},
+                format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'},
+                table: {title: 'Table'},
+                tools: {title: 'Tools', items: 'inserttable'}
             },
-            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table",
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table | code",
         }, tinymce.EditorManager);
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
@@ -62,7 +60,7 @@ var DetailsView = ValidatingView.extend({
                     console.log("eventchange fired", e);
                 });
             },
-            plugins: ["table"],
+            plugins: ["table", "codemirror"],
             menu: {
                 file: {title: 'File', items: 'save'},
                 edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
@@ -72,7 +70,7 @@ var DetailsView = ValidatingView.extend({
                 table: {title: 'Table'}, 
                 tools: {title: 'Tools', items: 'inserttable'} 
             },
-            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table",
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table | code",
         });
     },
 
@@ -329,3 +327,4 @@ var DetailsView = ValidatingView.extend({
 return DetailsView;
 
 }); // end define()
+

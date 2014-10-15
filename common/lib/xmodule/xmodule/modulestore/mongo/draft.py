@@ -677,7 +677,11 @@ class DraftModuleStore(MongoModuleStore):
                                 # So, do not delete the child.  It will be published when the new parent is published.
                                 pass
 
-            super(DraftModuleStore, self).update_item(item, user_id, isPublish=True, is_publish_root=is_root)
+            # update the published (not draft) item (ignoring that item is "draft"). The published
+            # may not exist; (if original_published is None); so, allow_not_found
+            super(DraftModuleStore, self).update_item(
+                item, user_id, isPublish=True, is_publish_root=is_root, allow_not_found=True
+            )
             to_be_deleted.append(as_draft(item_location).to_deprecated_son())
 
         # verify input conditions

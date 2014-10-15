@@ -59,6 +59,30 @@ class TestTrackViews(TestCase):
         self.mock_tracker.send.assert_called_once_with(expected_event)
 
     @freeze_time(expected_time)
+    def test_user_track_with_missing_values(self):
+        request = self.request_factory.get('/event')
+        with tracker.get_tracker().context('edx.request', {'session': sentinel.session}):
+            views.user_track(request)
+
+        expected_event = {
+            'username': 'anonymous',
+            'session': sentinel.session,
+            'ip': '127.0.0.1',
+            'event_source': 'browser',
+            'event_type': '',
+            'event': '',
+            'agent': '',
+            'page': '',
+            'time': expected_time,
+            'host': 'testserver',
+            'context': {
+                'course_id': '',
+                'org_id': '',
+            },
+        }
+        self.mock_tracker.send.assert_called_once_with(expected_event)
+
+    @freeze_time(expected_time)
     def test_user_track_with_middleware(self):
         middleware = TrackMiddleware()
         request = self.request_factory.get('/event', {

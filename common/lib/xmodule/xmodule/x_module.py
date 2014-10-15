@@ -25,7 +25,7 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import UsageKey
 from xmodule.exceptions import UndefinedContext
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 
 log = logging.getLogger(__name__)

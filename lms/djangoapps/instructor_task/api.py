@@ -17,7 +17,8 @@ from instructor_task.tasks import (rescore_problem,
                                    reset_problem_attempts,
                                    delete_problem_state,
                                    send_bulk_course_email,
-                                   calculate_grades_csv)
+                                   calculate_grades_csv,
+                                   calculate_students_features_csv)
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,
@@ -215,6 +216,20 @@ def submit_calculate_grades_csv(request, course_key):
     task_type = 'grade_course'
     task_class = calculate_grades_csv
     task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_calculate_students_features_csv(request, course_key, features):
+    """
+    Submits a task to generate a CSV containing student profile info.
+
+    Raises AlreadyRunningError if said CSV is already being updated.
+    """
+    task_type = 'profile_info_csv'
+    task_class = calculate_students_features_csv
+    task_input = {'features': features}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

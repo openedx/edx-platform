@@ -12,7 +12,7 @@ import sys
 
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
-    from dogapi import dog_stats_api
+    import dogstats_wrapper as dog_stats_api
 except ImportError:
     # pylint: disable=invalid-name
     dog_stats_api = None

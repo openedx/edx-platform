@@ -30,6 +30,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 
 from django.db.models.signals import post_save
@@ -58,6 +59,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
@@ -74,12 +76,13 @@ import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
+from shoppingcart.models import DonationConfiguration
 from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
 import track.views
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
@@ -248,23 +251,25 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     a student's dashboard.
     """
     for enrollment in CourseEnrollment.enrollments_for_user(user):
-        course = modulestore().get_course(enrollment.course_id)
-        if course and not isinstance(course, ErrorDescriptor):
+        store = modulestore()
+        with store.bulk_operations(enrollment.course_id):
+            course = store.get_course(enrollment.course_id)
+            if course and not isinstance(course, ErrorDescriptor):
 
-            # if we are in a Microsite, then filter out anything that is not
-            # attributed (by ORG) to that Microsite
-            if course_org_filter and course_org_filter != course.location.org:
-                continue
-            # Conversely, if we are not in a Microsite, then let's filter out any enrollments
-            # with courses attributed (by ORG) to Microsites
-            elif course.location.org in org_filter_out_set:
-                continue
+                # if we are in a Microsite, then filter out anything that is not
+                # attributed (by ORG) to that Microsite
+                if course_org_filter and course_org_filter != course.location.org:
+                    continue
+                # Conversely, if we are not in a Microsite, then let's filter out any enrollments
+                # with courses attributed (by ORG) to Microsites
+                elif course.location.org in org_filter_out_set:
+                    continue
 
-            yield (course, enrollment)
-        else:
-            log.error("User {0} enrolled in {2} course {1}".format(
-                user.username, enrollment.course_id, "broken" if course else "non-existent"
-            ))
+                yield (course, enrollment)
+            else:
+                log.error("User {0} enrolled in {2} course {1}".format(
+                    user.username, enrollment.course_id, "broken" if course else "non-existent"
+                ))
 
 
 def _cert_info(user, course, cert_status):
@@ -416,7 +421,7 @@ def register_user(request, extra_context=None):
     return render_to_response('register.html', context)
 
 
-def complete_course_mode_info(course_id, enrollment):
+def complete_course_mode_info(course_id, enrollment, modes=None):
     """
     We would like to compute some more information from the given course modes
     and the user's current enrollment
@@ -425,7 +430,9 @@ def complete_course_mode_info(course_id, enrollment):
         - whether to show the course upsell information
         - numbers of days until they can't upsell anymore
     """
-    modes = CourseMode.modes_for_course_dict(course_id)
+    if modes is None:
+        modes = CourseMode.modes_for_course_dict(course_id)
+
     mode_info = {'show_upsell': False, 'days_for_upsell': None}
     # we want to know if the user is already verified and if verified is an
     # option
@@ -476,15 +483,29 @@ def dashboard(request):
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = list(get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set))
 
-    # Check to see if the student has recently enrolled in a course. If so, display a notification message confirming
-    # the enrollment.
-    enrollment_message = _create_recent_enrollment_message(course_enrollment_pairs)
+    # sort the enrollment pairs by the enrollment date
+    course_enrollment_pairs.sort(key=lambda x: x[1].created, reverse=True)
+
+    # Retrieve the course modes for each course
+    course_modes_by_course = {
+        course.id: CourseMode.modes_for_course_dict(course.id)
+        for course, __ in course_enrollment_pairs
+    }
+
+    # Check to see if the student has recently enrolled in a course.
+    # If so, display a notification message confirming the enrollment.
+    enrollment_message = _create_recent_enrollment_message(
+        course_enrollment_pairs, course_modes_by_course
+    )
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
     if not user.is_active:
-        message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
+        message = render_to_string(
+            'registration/activate_account_notice.html',
+            {'email': user.email, 'platform_name': settings.PLATFORM_NAME}
+        )
 
     # Global staff can see what courses errored on their dashboard
     staff_access = False
@@ -497,8 +518,21 @@ def dashboard(request):
     show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                           if has_access(request.user, 'load', course))
 
-    course_modes = {course.id: complete_course_mode_info(course.id, enrollment) for course, enrollment in course_enrollment_pairs}
-    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in course_enrollment_pairs}
+    # Construct a dictionary of course mode information
+    # used to render the course list.  We re-use the course modes dict
+    # we loaded earlier to avoid hitting the database.
+    course_mode_info = {
+        course.id: complete_course_mode_info(
+            course.id, enrollment,
+            modes=course_modes_by_course[course.id]
+        )
+        for course, enrollment in course_enrollment_pairs
+    }
+
+    cert_statuses = {
+        course.id: cert_info(request.user, course)
+        for course, _enrollment in course_enrollment_pairs
+    }
 
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
@@ -568,7 +602,7 @@ def dashboard(request):
         'staff_access': staff_access,
         'errored_courses': errored_courses,
         'show_courseware_links_for': show_courseware_links_for,
-        'all_course_modes': course_modes,
+        'all_course_modes': course_mode_info,
         'cert_statuses': cert_statuses,
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
@@ -596,23 +630,35 @@ def dashboard(request):
     return render_to_response('dashboard.html', context)
 
 
-def _create_recent_enrollment_message(course_enrollment_pairs):
+def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
     """Builds a recent course enrollment message
 
     Constructs a new message template based on any recent course enrollments for the student.
 
     Args:
         course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
+        course_modes (dict): Mapping of course ID's to course mode dictionaries.
 
     Returns:
         A string representing the HTML message output from the message template.
+        None if there are no recently enrolled courses.
 
     """
-    recent_course_enrollment_pairs = _get_recently_enrolled_courses(course_enrollment_pairs)
-    if recent_course_enrollment_pairs:
+    recently_enrolled_courses = _get_recently_enrolled_courses(course_enrollment_pairs)
+
+    if recently_enrolled_courses:
+        messages = [
+            {
+                "course_id": course.id,
+                "course_name": course.display_name,
+                "allow_donation": _allow_donation(course_modes, course.id)
+            }
+            for course in recently_enrolled_courses
+        ]
+
         return render_to_string(
             'enrollment/course_enrollment_message.html',
-            {'recent_course_enrollment_pairs': recent_course_enrollment_pairs,}
+            {'course_enrollment_messages': messages, 'platform_name': settings.PLATFORM_NAME}
         )
 
 
@@ -625,18 +671,33 @@ def _get_recently_enrolled_courses(course_enrollment_pairs):
         course_enrollment_pairs (list): A list of tuples containing courses, and the associated enrollment information.
 
     Returns:
-        A list of tuples for the course and enrollment.
+        A list of courses
 
     """
     seconds = DashboardConfiguration.current().recent_enrollment_time_delta
-    sorted_list = sorted(course_enrollment_pairs, key=lambda created: created[1].created, reverse=True)
     time_delta = (datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds))
     return [
-        (course, enrollment) for course, enrollment in sorted_list
+        course for course, enrollment in course_enrollment_pairs
         # If the enrollment has no created date, we are explicitly excluding the course
         # from the list of recent enrollments.
         if enrollment.is_active and enrollment.created > time_delta
     ]
+
+
+def _allow_donation(course_modes, course_id):
+    """Determines if the dashboard will request donations for the given course.
+
+    Check if donations are configured for the platform, and if the current course is accepting donations.
+
+    Args:
+        course_modes (dict): Mapping of course ID's to course mode dictionaries.
+        course_id (str): The unique identifier for the course.
+
+    Returns:
+        True if the course is allowing donations.
+
+    """
+    return DonationConfiguration.current().enabled and not CourseMode.has_verified_mode(course_modes[course_id])
 
 
 def try_change_enrollment(request):
@@ -669,7 +730,7 @@ def try_change_enrollment(request):
 
 @require_POST
 @commit_on_success_with_read_committed
-def change_enrollment(request, auto_register=False, check_access=True):
+def change_enrollment(request, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
 
@@ -685,37 +746,21 @@ def change_enrollment(request, auto_register=False, check_access=True):
     happens. This function should only be called from an AJAX request or
     as a post-login/registration helper, so the error messages in the responses
     should never actually be user-visible.
-    The original version of the change enrollment handler,
-    which does NOT perform auto-registration.
-
-    TODO (ECOM-16): We created a second variation of this handler that performs
-    auto-registration for an AB-test.  Depending on the results of that test,
-    we should make the winning implementation the default.
 
     Args:
         request (`Request`): The Django request object
 
     Keyword Args:
-        auto_register (boolean): If True, auto-register the user
-            for a default course mode when they first enroll
-            before sending them to the "choose your track" page
+        check_access (boolean): If True, we check that an accessible course actually
+            exists for the given course_key before we enroll the student.
+            The default is set to False to avoid breaking legacy code or
+            code with non-standard flows (ex. beta tester invitations), but
+            for any standard enrollment flow you probably want this to be True.
 
     Returns:
         Response
 
     """
-    # Sets the auto_register flag, if that's desired
-    # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
-    # If a user is in the experimental condition (auto-registration enabled),
-    # immediately set a session flag so they stay in the experimental condition.
-    # We keep them in the experimental condition even if later on the user
-    # tries to register using the control URL (e.g. because of a redirect from the login page,
-    # which is hard-coded to use the control URL).
-    if auto_register:
-        request.session['auto_register'] = True
-    if request.session.get('auto_register') and not auto_register:
-        auto_register = True
-
     # Get the user
     user = request.user
 
@@ -740,15 +785,6 @@ def change_enrollment(request, auto_register=False, check_access=True):
         )
         return HttpResponseBadRequest(_("Invalid course id"))
 
-    # Don't execute auto-register for the set of courses excluded from auto-registration
-    # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
-    # We've agreed to exclude certain courses from the A/B test.  If we find ourselves
-    # registering for one of these courses, immediately switch to the control.
-    if unicode(course_id) in getattr(settings, 'AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES', []):
-        auto_register = False
-        if 'auto_register' in request.session:
-            del request.session['auto_register']
-
     if action == "enroll":
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
@@ -757,73 +793,38 @@ def change_enrollment(request, auto_register=False, check_access=True):
                         .format(user.username, course_id))
             return HttpResponseBadRequest(_("Course id is invalid"))
 
-        # We use this flag to determine which condition of an AB-test
-        # for auto-registration we're currently in.
-        # (We have two URLs that both point to this view, but vary the
-        # value of `auto_register`)
-        # In the auto-registration case, we automatically register the student
-        # as "honor" before allowing them to choose a track.
-        # TODO (ECOM-16): Once the auto-registration AB-test is complete, delete
-        # one of these two conditions and remove the `auto_register` flag.
-        if auto_register:
-            available_modes = CourseMode.modes_for_course_dict(course_id)
+        available_modes = CourseMode.modes_for_course_dict(course_id)
 
-            # Handle professional ed as a special case.
-            # If professional ed is included in the list of available modes,
-            # then do NOT automatically enroll the student (we want them to pay first!)
-            # By convention, professional ed should be the *only* available course mode,
-            # if it's included at all -- anything else is a misconfiguration.  But if someone
-            # messes up and adds an additional course mode, we err on the side of NOT
-            # accidentally giving away free courses.
-            if "professional" not in available_modes:
-                # Enroll the user using the default mode (honor)
-                # We're assuming that users of the course enrollment table
-                # will NOT try to look up the course enrollment model
-                # by its slug.  If they do, it's possible (based on the state of the database)
-                # for no such model to exist, even though we've set the enrollment type
-                # to "honor".
-                try:
-                    CourseEnrollment.enroll(user, course_id, check_access=check_access)
-                except Exception:
-                    return HttpResponseBadRequest(_("Could not enroll"))
-
-            # If we have more than one course mode or professional ed is enabled,
-            # then send the user to the choose your track page.
-            # (In the case of professional ed, this will redirect to a page that
-            # funnels users directly into the verification / payment flow)
-            if len(available_modes) > 1 or "professional" in available_modes:
-                return HttpResponse(
-                    reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
-                )
-
-            # Otherwise, there is only one mode available (the default)
-            return HttpResponse()
-
-        # If auto-registration is disabled, do NOT register the student
-        # before sending them to the "choose your track" page.
-        # This is the control for the auto-registration AB-test.
-        else:
-            # If this course is available in multiple modes, redirect them to a page
-            # where they can choose which mode they want.
-            available_modes = CourseMode.modes_for_course(course_id)
-            if len(available_modes) > 1:
-                return HttpResponse(
-                    reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
-                )
-
-            current_mode = available_modes[0]
-            # only automatically enroll people if the only mode is 'honor'
-            if current_mode.slug != 'honor':
-                return HttpResponse(
-                    reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
-                )
-
+        # Handle professional ed as a special case.
+        # If professional ed is included in the list of available modes,
+        # then do NOT automatically enroll the student (we want them to pay first!)
+        # By convention, professional ed should be the *only* available course mode,
+        # if it's included at all -- anything else is a misconfiguration.  But if someone
+        # messes up and adds an additional course mode, we err on the side of NOT
+        # accidentally giving away free courses.
+        if "professional" not in available_modes:
+            # Enroll the user using the default mode (honor)
+            # We're assuming that users of the course enrollment table
+            # will NOT try to look up the course enrollment model
+            # by its slug.  If they do, it's possible (based on the state of the database)
+            # for no such model to exist, even though we've set the enrollment type
+            # to "honor".
             try:
-                CourseEnrollment.enroll(user, course_id, mode=current_mode.slug, check_access=check_access)
+                CourseEnrollment.enroll(user, course_id, check_access=check_access)
             except Exception:
                 return HttpResponseBadRequest(_("Could not enroll"))
 
-            return HttpResponse()
+        # If we have more than one course mode or professional ed is enabled,
+        # then send the user to the choose your track page.
+        # (In the case of professional ed, this will redirect to a page that
+        # funnels users directly into the verification / payment flow)
+        if len(available_modes) > 1 or "professional" in available_modes:
+            return HttpResponse(
+                reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
+            )
+
+        # Otherwise, there is only one mode available (the default)
+        return HttpResponse()
 
     elif action == "add_to_cart":
         # Pass the request handling to shoppingcart.views
@@ -1706,7 +1707,7 @@ def auto_auth(request):
     course_id = request.GET.get('course_id', None)
     course_key = None
     if course_id:
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
 
     # Get or create the user object
@@ -1801,7 +1802,7 @@ def activate_account(request, key):
     return HttpResponse(_("Unknown error. Please e-mail us to let us know how it happened."))
 
 
-@ensure_csrf_cookie
+@csrf_exempt
 def password_reset(request):
     """ Attempts to send a password reset e-mail. """
     if request.method != "POST":

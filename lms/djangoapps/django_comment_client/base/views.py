@@ -27,7 +27,7 @@ from django_comment_client.utils import (
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_id_map,
+    get_discussion_categories_ids
 )
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
@@ -143,11 +143,14 @@ def update_thread(request, course_id, thread_id):
     thread = cc.Thread.find(thread_id)
     thread.body = request.POST["body"]
     thread.title = request.POST["title"]
-
+    # The following checks should avoid issues we've seen during deploys, where end users are hitting an updated server
+    # while their browser still has the old client code. This will avoid erasing present values in those cases.
+    if "thread_type" in request.POST:
+        thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         course = get_course_with_access(request.user, 'load', course_key)
-        id_map = get_discussion_id_map(course)
-        if request.POST.get("commentable_id") in id_map:
+        commentable_ids = get_discussion_categories_ids(course)
+        if request.POST.get("commentable_id") in commentable_ids:
             thread.commentable_id = request.POST["commentable_id"]
         else:
             return JsonError(_("Topic doesn't exist"))

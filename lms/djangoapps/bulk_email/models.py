@@ -67,12 +67,14 @@ class CourseEmail(Email):
     )
     course_id = CourseKeyField(max_length=255, db_index=True)
     to_option = models.CharField(max_length=64, choices=TO_OPTION_CHOICES, default=SEND_TO_MYSELF)
+    template_name = models.CharField(null=True, max_length=255)
+    from_addr = models.CharField(null=True, max_length=255)
 
     def __unicode__(self):
         return self.subject
 
     @classmethod
-    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None):
+    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None, template_name=None, from_addr=None):
         """
         Create an instance of CourseEmail.
 
@@ -101,6 +103,8 @@ class CourseEmail(Email):
             subject=subject,
             html_message=html_message,
             text_message=text_message,
+            template_name=template_name,
+            from_addr=from_addr,
         )
         course_email.save_now()
 
@@ -120,6 +124,11 @@ class CourseEmail(Email):
         """
         self.save()
 
+    def get_template(self):
+        """
+        Returns the corresponding CourseEmailTemplate for this CourseEmail.
+        """
+        return CourseEmailTemplate.get_template(name=self.template_name)
 
 class Optout(models.Model):
     """
@@ -151,16 +160,17 @@ class CourseEmailTemplate(models.Model):
     """
     html_template = models.TextField(null=True, blank=True)
     plain_template = models.TextField(null=True, blank=True)
+    name = models.CharField(null=True, max_length=255, unique=True, blank=True)
 
     @staticmethod
-    def get_template():
+    def get_template(name=None):
         """
         Fetch the current template
 
         If one isn't stored, an exception is thrown.
         """
         try:
-            return CourseEmailTemplate.objects.get()
+            return CourseEmailTemplate.objects.get(name=name)
         except CourseEmailTemplate.DoesNotExist:
             log.exception("Attempting to fetch a non-existent course email template")
             raise

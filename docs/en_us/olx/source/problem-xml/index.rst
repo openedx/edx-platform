@@ -20,6 +20,7 @@ Use the chapters in this section to create course problems and tools.
    full_screen_image
    gene_explorer
    google_hangout
+   graphical_slider_tool
    iframe
    image_mapped_input
    math_expression_input
@@ -33,6 +34,7 @@ Use the chapters in this section to create course problems and tools.
    problem_in_latex
    problem_with_hint
    protein_builder
+   symbolic_response
    text_input
    vitalsource
    zooming_image

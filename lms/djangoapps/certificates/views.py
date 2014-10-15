@@ -1,5 +1,5 @@
 """URL handlers related to certificate handling by LMS"""
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 import json
 import logging
 

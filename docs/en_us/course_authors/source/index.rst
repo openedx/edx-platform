@@ -20,6 +20,7 @@ Building and Running an edX Course
    creating_content/index
    exercises_tools/index
    content_experiments/index
+   cohorts/index
    releasing_course/index
    running_course/index
    students/index
