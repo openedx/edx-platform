@@ -1296,19 +1296,17 @@ input[name="subject"] {
     width: 650px;
     margin-left: -325px;
     border-radius: 2px;
-    input[type="submit"]#update_coupon_button{
+    input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
+    input[type="button"]#set_course_button {
       @include button(simple, $blue);
       @extend .button-reset;
-    }
-    input[type="submit"]#add_coupon_button{
-      @include button(simple, $blue);
-      @extend .button-reset;
+      display: block;
+      height: auto;
+      margin: 0 auto;
+      width: 100%;
+      white-space: normal;
     }
     input[name="generate-registration-codes-csv"]{
-      @include button(simple, $blue);
-      @extend .button-reset;
-    }
-    input[type="submit"]#set_course_button{
       @include button(simple, $blue);
       @extend .button-reset;
     }
