@@ -9,6 +9,8 @@ October 7, 2014. See previous pages in this document for a history of changes.
 edX Release Announcements Mailing List
 ****************************************
 
+THIS IS A DEMO COMMENT
+
 These edX Course Staff Release Notes are always available and are updated with
 each release of the edX Platform on `edx.org`_ and `edX Edge`_.
 
