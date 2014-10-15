@@ -12,7 +12,7 @@ from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture
 from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage
+from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 
 import uuid
@@ -242,3 +242,16 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
+
+    def test_link_to_data_download(self):
+        """
+        Scenario: a link is present from the cohort configuration in
+        the instructor dashboard to the Data Download section.
+
+        Given I have a course with a cohort defined
+        When I view the cohort in the LMS instructor dashboard
+        There is a link to take me to the Data Download section of the Instructor Dashboard.
+        """
+        self.membership_page.select_data_download()
+        data_download_page = DataDownloadPage(self.browser)
+        data_download_page.wait_for_page()
