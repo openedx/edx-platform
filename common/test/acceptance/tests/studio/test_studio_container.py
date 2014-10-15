@@ -605,6 +605,27 @@ class UnitPublishingTest(ContainerBase):
         self._view_published_version(unit)
         self.assertTrue(modified_content in self.courseware.xblock_component_html_content(0))
 
+    def test_cancel_does_not_create_draft(self):
+        """
+        Scenario: Editing a component and then canceling does not create a draft version (TNL-399)
+            Given I have a published unit with no unpublished changes
+            When I go to the unit page in Studio
+            And edit the content of an HTML component and then press cancel
+            Then the content does not change
+            And the title in the Publish information box is "Published and Live"
+            And when I reload the page
+            Then the title in the Publish information box is "Published and Live"
+        """
+        unit = self.go_to_unit_page()
+        component = unit.xblocks[1]
+        component.edit()
+        HtmlComponentEditorView(self.browser, component.locator).set_content_and_cancel("modified content")
+        self.assertEqual(component.student_content, "Body of HTML Unit.")
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        self.browser.refresh()
+        unit.wait_for_page()
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+
     def test_delete_child_in_published_unit(self):
         """
         Scenario: A published unit can be published again after deleting a child
