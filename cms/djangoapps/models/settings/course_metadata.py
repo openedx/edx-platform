@@ -1,6 +1,7 @@
 from xblock.fields import Scope
 from xmodule.modulestore.django import modulestore
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 
 class CourseMetadata(object):
@@ -11,6 +12,8 @@ class CourseMetadata(object):
     editable metadata.
     '''
     # The list of fields that wouldn't be shown in Advanced Settings.
+    # Should not be used directly. Instead the filtered_list method should be used if the field needs to be filtered
+    # depending on the feature flag.
     FILTERED_LIST = ['xml_attributes',
                      'start',
                      'end',
@@ -31,6 +34,20 @@ class CourseMetadata(object):
     ]
 
     @classmethod
+    def filtered_list(cls):
+        """
+        Filter fields based on feature flag, i.e. enabled, disabled.
+        """
+        # Copy the filtered list to avoid permanently changing the class attribute.
+        filtered_list = list(cls.FILTERED_LIST)
+
+        # Do not show giturl if feature is not enabled.
+        if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
+            filtered_list.append('giturl')
+
+        return filtered_list
+
+    @classmethod
     def fetch(cls, descriptor):
         """
         Fetch the key:value editable course details for the given course from
@@ -42,7 +59,7 @@ class CourseMetadata(object):
             if field.scope != Scope.settings:
                 continue
 
-            if field.name in cls.FILTERED_LIST:
+            if field.name in cls.filtered_list():
                 continue
 
             result[field.name] = {
@@ -61,8 +78,7 @@ class CourseMetadata(object):
 
         Ensures none of the fields are in the blacklist.
         """
-        # Copy the filtered list to avoid permanently changing the class attribute.
-        filtered_list = list(cls.FILTERED_LIST)
+        filtered_list = cls.filtered_list()
         # Don't filter on the tab attribute if filter_tabs is False.
         if not filter_tabs:
             filtered_list.remove("tabs")
@@ -97,10 +113,10 @@ class CourseMetadata(object):
             errors: list of error objects
             result: the updated course metadata or None if error
         """
-
-        filtered_list = list(cls.FILTERED_LIST)
+        filtered_list = cls.filtered_list()
         if not filter_tabs:
             filtered_list.remove("tabs")
+
         filtered_dict = dict((k, v) for k, v in jsondict.iteritems() if k not in filtered_list)
         did_validate = True
         errors = []
