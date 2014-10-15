@@ -33,8 +33,9 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         Provide statistical information for the specified Organization
         """
         response_data = {}
+        grade_avg = 0
         grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
-        org_user_grades = StudentGradebook.objects.filter(user__organizations=pk)
+        org_user_grades = StudentGradebook.objects.filter(user__organizations=pk, user__is_active=True)
         courses_filter = request.QUERY_PARAMS.get('courses', None)
         if courses_filter:
             upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
@@ -45,7 +46,9 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             org_user_grades = org_user_grades.filter(course_id__in=courses)
 
         users_grade_average = org_user_grades.aggregate(Avg('grade'))
-        response_data['users_grade_average'] = float('{0:.3f}'.format(float(users_grade_average['grade__avg'])))
+        if users_grade_average['grade__avg']:
+            grade_avg = float('{0:.3f}'.format(float(users_grade_average['grade__avg'])))
+        response_data['users_grade_average'] = grade_avg
 
         users_grade_complete_count = org_user_grades\
             .filter(proforma_grade__lte=F('grade') + grade_complete_match_range, proforma_grade__gt=0).count()
