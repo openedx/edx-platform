@@ -207,7 +207,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             # VAL will always give us the keys for the profiles we asked for, but 
             # if it doesn't have an encoded video entry for that Video + Profile, the
             # value will map to `None`
-            if val_video_urls["desktop_mp4"]:
+            if val_video_urls["desktop_mp4"] and self.download_video:
                 download_video_link = val_video_urls["desktop_mp4"]
             if val_video_urls["youtube"]:
                 youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
