@@ -409,3 +409,10 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         response = self.do_get(filtered_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_complete_count'], 6)
+
+        courses = {'courses': '{}'.format(self.course.id)}
+        filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
+        response = self.do_get(filtered_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_grade_complete_count'], 0)
+        self.assertEqual(response.data['users_grade_average'], 0)
