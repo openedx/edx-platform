@@ -6,7 +6,8 @@ from django.conf import settings
 from mock import patch
 from pytz import UTC
 from splinter.exceptions import ElementDoesNotExist
-from nose.tools import assert_true, assert_equal, assert_in
+from selenium.common.exceptions import NoAlertPresentException
+from nose.tools import assert_true, assert_equal, assert_in, assert_is_none
 from lettuce import world, step
 
 from courseware.tests.factories import InstructorFactory, BetaTesterFactory
@@ -72,13 +73,39 @@ def view_lti_permission_alert(_step):
     assert len(world.browser.windows) == 1
 
 
+def check_no_alert():
+    """
+    Make sure the alert has gone away.
+
+    Note that the splinter documentation indicates that
+    get_alert should return None if no alert is present,
+    however that is not the case. Instead a
+    NoAlertPresentException is raised.
+    """
+    try:
+        assert_is_none(world.browser.get_alert())
+    except NoAlertPresentException:
+        pass
+
+
 @step('I accept the permission alert and view the LTI$')
 def accept_lti_permission_alert(_step):
     parent_window = world.browser.current_window  # Save the parent window
+
+    # To start with you should only have one window/tab
     assert len(world.browser.windows) == 1
     alert = world.browser.get_alert()
     alert.accept()
-    assert len(world.browser.windows) != 1
+    check_no_alert()
+
+    # Give it a few seconds for the LTI window to appear
+    world.wait_for(
+        lambda _: len(world.browser.windows) == 2,
+        timeout=5,
+        timeout_msg="Timed out waiting for the LTI window to appear."
+    )
+
+    # Verify the LTI window
     check_lti_popup(parent_window)
 
 
@@ -86,6 +113,7 @@ def accept_lti_permission_alert(_step):
 def reject_lti_permission_alert(_step):
     alert = world.browser.get_alert()
     alert.dismiss()
+    check_no_alert()
     assert len(world.browser.windows) == 1
 
 
@@ -234,20 +262,29 @@ def i_am_registered_for_the_course(coursenum, metadata, user='Instructor'):
 
 
 def check_lti_popup(parent_window):
-    assert len(world.browser.windows) != 1
+    # You should now have 2 browser windows open, the original courseware and the LTI
+    windows = world.browser.windows
+    assert_equal(len(windows), 2)
 
-    for window in world.browser.windows:
-        world.browser.switch_to_window(window)  # Switch to a different window (the pop-up)
-        # Check if this is the one we want by comparing the url
-        url = world.browser.url
-        basename = os.path.basename(url)
-        pathname = os.path.splitext(basename)[0]
-        if pathname == u'correct_lti_endpoint':
-            break
+    # For verification, iterate through the window titles and make sure that
+    # both are there.
+    tabs = []
+    for window in windows:
+        world.browser.switch_to_window(window)
+        tabs.append(world.browser.title)
+    assert_equal(tabs, [u'LTI | Test Section | test_course Courseware | edX', u'TEST TITLE'])
+
+    # Now verify the contents of the LTI window (which is the 2nd window/tab)
+    # Note: The LTI opens in a new browser window, but Selenium sticks with the
+    # current window until you explicitly switch to the context of the new one.
+    world.browser.switch_to_window(windows[1])
+    url = world.browser.url
+    basename = os.path.basename(url)
+    pathname = os.path.splitext(basename)[0]
+    assert_equal(pathname, u'correct_lti_endpoint')
 
     result = world.css_find('.result').first.text
-
-    assert result == u'This is LTI tool. Success.'
+    assert_equal(result, u'This is LTI tool. Success.')
 
     world.browser.driver.close()  # Close the pop-up window
     world.browser.switch_to_window(parent_window)  # Switch to the main window again
