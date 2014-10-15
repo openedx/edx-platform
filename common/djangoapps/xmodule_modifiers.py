@@ -93,6 +93,9 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
         data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
         data['request-token'] = request_token
 
+    if block.name:
+        data['name'] = block.name
+
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
