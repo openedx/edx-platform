@@ -23,7 +23,7 @@ class Command(BaseCommand):
         for gbe in gradebook_entries:
             current_course_id = unicode(gbe.course_id)
             oldstyle_course_id = current_course_id.replace("slashes:", "")
-            oldstyle_course_id = current_course_id.replace("+", "/")
+            oldstyle_course_id = oldstyle_course_id.replace("+", "/")
             gbe.course_id = CourseKey.from_string(oldstyle_course_id)
             gbe.save()
         log.warning('Complete!')
@@ -33,7 +33,7 @@ class Command(BaseCommand):
         for he in history_entries:
             current_course_id = unicode(he.course_id)
             oldstyle_course_id = current_course_id.replace("slashes:", "")
-            oldstyle_course_id = current_course_id.replace("+", "/")
+            oldstyle_course_id = oldstyle_course_id.replace("+", "/")
             he.course_id = oldstyle_course_id
             he.save()
         log.warning('Complete!')
