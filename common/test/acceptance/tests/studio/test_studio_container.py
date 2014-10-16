@@ -8,12 +8,15 @@ from nose.plugins.attrib import attr
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.html_component_editor import HtmlComponentEditorView
-from ...pages.studio.utils import add_discussion, drag
+from ...pages.studio.utils import (
+    add_discussion, drag, verify_unit_publish_title,
+    PUBLISHED_LIVE_STATUS, PUBLISHED_STATUS, DRAFT_STATUS, LOCKED_STATUS
+)
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.staff_view import StaffPage
 
 import datetime
-from bok_choy.promise import Promise, EmptyPromise
+from bok_choy.promise import EmptyPromise
 from base_studio_test import ContainerBase
 
 
@@ -295,10 +298,6 @@ class UnitPublishingTest(ContainerBase):
     Tests of the publishing control and related widgets on the Unit page.
     """
 
-    PUBLISHED_STATUS = "Publishing Status\nPublished (not yet released)"
-    PUBLISHED_LIVE_STATUS = "Publishing Status\nPublished and Live"
-    DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
-    LOCKED_STATUS = "Publishing Status\nVisible to Staff Only"
     RELEASE_TITLE_RELEASED = "RELEASED:"
     RELEASE_TITLE_RELEASE = "RELEASE:"
 
@@ -368,7 +367,7 @@ class UnitPublishingTest(ContainerBase):
             And the last saved text contains "Last published"
         """
         unit = self.go_to_unit_page()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
         # Start date set in course fixture to 1970.
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC\nwith Section "Test Section"'
@@ -379,11 +378,11 @@ class UnitPublishingTest(ContainerBase):
 
         # Add a component to the page so it will have unpublished changes.
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        self._verify_publish_title(unit, DRAFT_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_SAVED)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
 
     def test_discard_changes(self):
@@ -400,9 +399,9 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        self._verify_publish_title(unit, DRAFT_STATUS)
         unit.discard_changes()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
 
     def test_view_live_no_changes(self):
         """
@@ -461,7 +460,7 @@ class UnitPublishingTest(ContainerBase):
             Then I see the content in the unit
         """
         unit = self.go_to_unit_page("Unlocked Section", "Unlocked Subsection", "Unlocked Unit")
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, self.past_start_date_text + '\n' + 'with Section "Unlocked Section"'
@@ -487,7 +486,7 @@ class UnitPublishingTest(ContainerBase):
         self.assertTrue(checked)
         self.assertFalse(unit.currently_visible_to_students)
         self.assertFalse(unit.shows_inherited_staff_lock())
-        self._verify_publish_title(unit, self.LOCKED_STATUS)
+        self._verify_publish_title(unit, LOCKED_STATUS)
         self._view_published_version(unit)
         # Will initially be in staff view, locked component should be visible.
         self._verify_components_visible(['problem'])
@@ -506,7 +505,7 @@ class UnitPublishingTest(ContainerBase):
             Then I do not see any content in the unit
         """
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
-        self._verify_publish_title(unit, self.LOCKED_STATUS)
+        self._verify_publish_title(unit, LOCKED_STATUS)
         self.assertFalse(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASE,
@@ -530,7 +529,7 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
         checked = unit.toggle_staff_lock()
         self.assertFalse(checked)
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._view_published_version(unit)
         # Will initially be in staff view, components always visible.
@@ -598,12 +597,33 @@ class UnitPublishingTest(ContainerBase):
         component.edit()
         HtmlComponentEditorView(self.browser, component.locator).set_content_and_save(modified_content)
         self.assertEqual(component.student_content, modified_content)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        self._verify_publish_title(unit, DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertTrue(modified_content in self.courseware.xblock_component_html_content(0))
+
+    def test_cancel_does_not_create_draft(self):
+        """
+        Scenario: Editing a component and then canceling does not create a draft version (TNL-399)
+            Given I have a published unit with no unpublished changes
+            When I go to the unit page in Studio
+            And edit the content of an HTML component and then press cancel
+            Then the content does not change
+            And the title in the Publish information box is "Published and Live"
+            And when I reload the page
+            Then the title in the Publish information box is "Published and Live"
+        """
+        unit = self.go_to_unit_page()
+        component = unit.xblocks[1]
+        component.edit()
+        HtmlComponentEditorView(self.browser, component.locator).set_content_and_cancel("modified content")
+        self.assertEqual(component.student_content, "Body of HTML Unit.")
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
+        self.browser.refresh()
+        unit.wait_for_page()
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
 
     def test_delete_child_in_published_unit(self):
         """
@@ -619,10 +639,10 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         unit.delete(0)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        self._verify_publish_title(unit, DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertEqual(0, self.courseware.num_xblock_components)
 
@@ -638,12 +658,12 @@ class UnitPublishingTest(ContainerBase):
             Then the title in the Publish information box is "Published (not yet released)"
         """
         unit = self.go_to_unit_page('Unreleased Section', 'Unreleased Subsection', 'Unreleased Unit')
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_STATUS)
         add_discussion(unit)
-        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        self._verify_publish_title(unit, DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, PUBLISHED_STATUS)
 
     def _view_published_version(self, unit):
         """
@@ -694,10 +714,7 @@ class UnitPublishingTest(ContainerBase):
         """
         Waits for the publish title to change to the expected value.
         """
-        def wait_for_title_change():
-            return (unit.publish_title == expected_title, unit.publish_title)
-
-        Promise(wait_for_title_change, "Publish title incorrect. Found '" + unit.publish_title + "'").fulfill()
+        verify_unit_publish_title(unit, expected_title)
 
     def _verify_last_published_and_saved(self, unit, expected_published_prefix, expected_saved_prefix):
         """

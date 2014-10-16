@@ -4,6 +4,7 @@ Acceptance tests for Studio related to the acid xblock.
 from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 
+from ...pages.studio.utils import verify_unit_publish_title, PUBLISHED_LIVE_STATUS, DRAFT_STATUS
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.xblock.acid import AcidView
@@ -83,11 +84,17 @@ class XBlockAcidBase(WebAppTest):
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
 
-        acid_block = AcidView(self.browser, unit.xblocks[0].edit().editor_selector)
+        verify_unit_publish_title(unit, PUBLISHED_LIVE_STATUS)
+        acid_block_editor = unit.xblocks[0].edit()
+        acid_block = AcidView(self.browser, acid_block_editor.editor_selector)
         self.assertTrue(acid_block.init_fn_passed)
         self.assertTrue(acid_block.resource_url_passed)
         self.assertTrue(acid_block.scope_passed('content'))
         self.assertTrue(acid_block.scope_passed('settings'))
+
+        # Verify that Studio shows that a draft version was created of the xblock, just by showing the editor.
+        acid_block_editor.cancel()
+        verify_unit_publish_title(unit, DRAFT_STATUS)
 
 
 class XBlockAcidNoChildTest(XBlockAcidBase):
