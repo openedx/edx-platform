@@ -202,10 +202,8 @@ class XBlockAcidChildTest(XBlockAcidParentBase):
 
         self.user = course_fix.user
 
-    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_preview(self):
         super(XBlockAcidChildTest, self).test_acid_block_preview()
 
-    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_editor(self):
         super(XBlockAcidChildTest, self).test_acid_block_editor()

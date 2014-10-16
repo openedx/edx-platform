@@ -80,7 +80,6 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
             )
         ).install()
 
-    @skip('Flakey test, TE-401')
     def test_acid_block(self):
         super(XBlockAcidNoChildTest, self).test_acid_block()
 
@@ -113,10 +112,20 @@ class XBlockAcidChildTest(XBlockAcidBase):
             )
         ).install()
 
-    def validate_acid_block_view(self, acid_block):
-        super(XBlockAcidChildTest, self).validate_acid_block_view()
-        self.assertTrue(acid_block.child_tests_passed)
+    def validate_acid_parent_block_view(self, acid_parent_block):
+        super(XBlockAcidChildTest, self).validate_acid_block_view(acid_parent_block)
+        self.assertTrue(acid_parent_block.child_tests_passed)
 
-    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block(self):
-        super(XBlockAcidChildTest, self).test_acid_block()
+        """
+        Verify that all expected acid block tests pass in the lms.
+        """
+
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Courseware')
+
+        acid_parent_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid_parent]')
+        self.validate_acid_parent_block_view(acid_parent_block)
+
+        acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
+        self.validate_acid_block_view(acid_block)
