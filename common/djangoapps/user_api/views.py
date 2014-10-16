@@ -1,9 +1,10 @@
-"""TODO"""
+"""HTTP end-points for the User API. """
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -21,7 +22,7 @@ from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from user_api.api import account as account_api, profile as profile_api
-from user_api.helpers import FormDescription, shim_student_view
+from user_api.helpers import FormDescription, shim_student_view, require_post_params
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
@@ -42,12 +43,24 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
 
 
 class LoginSessionView(APIView):
-    """TODO"""
+    """HTTP end-points for logging in users. """
 
     def get(self, request):
-        """Render a form for allowing a user to log in.
+        """Return a description of the login form.
 
-        TODO
+        This decouples clients from the API definition:
+        if the API decides to modify the form, clients won't need
+        to be updated.
+
+        See `user_api.helpers.FormDescription` for examples
+        of the JSON-encoded form description.
+
+        Arguments:
+            request (HttpRequest)
+
+        Returns:
+            HttpResponse
+
         """
         form_desc = FormDescription("post", reverse("user_api_login_session"))
 
@@ -76,32 +89,38 @@ class LoginSessionView(APIView):
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
     @method_decorator(ensure_csrf_cookie)
+    @method_decorator(require_post_params(["email", "password"]))
     def post(self, request):
-        """Authenticate a user and log them in.
+        """Log in a user.
 
-        TODO
+        Arguments:
+            request (HttpRequest)
+
+        Returns:
+            HttpResponse: 200 on success
+            HttpResponse: 400 if the request is not valid.
+            HttpResponse: 403 if authentication failed.
+            HttpResponse: 302 if redirecting to another page.
+
+        Example Usage:
+
+            POST /user_api/v1/login_session
+            with POST params `email` and `password`
+
+            200 OK
+
         """
-        # Validate the parameters
-        # If either param is missing, it's a malformed request
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        if email is None or password is None:
-            return HttpResponseBadRequest()
-
-        return self._login_shim(request)
-
-    def _login_shim(self, request):
-        # Initially, this should be a shim to student views,
-        # since it will be too much work to re-implement everything there.
-        # Eventually, we'll want to pull out that functionality into this Django app.
+        # For the initial implementation, shim the existing login view
+        # from the student Django app.
         from student.views import login_user
         return shim_student_view(login_user, check_logged_in=True)(request)
 
 
 class RegistrationView(APIView):
-    """TODO"""
+    """HTTP end-points for creating a new user. """
 
     DEFAULT_FIELDS = ["email", "name", "username", "password"]
+
     EXTRA_FIELDS = [
         "city", "country", "level_of_education", "gender",
         "year_of_birth", "mailing_address", "goals",
@@ -110,15 +129,32 @@ class RegistrationView(APIView):
     def __init__(self, *args, **kwargs):
         super(RegistrationView, self).__init__(*args, **kwargs)
 
+        # Map field names to the instance method used to add the field to the form
         self.field_handlers = {}
         for field_name in (self.DEFAULT_FIELDS + self.EXTRA_FIELDS):
             handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
             self.field_handlers[field_name] = handler
 
     def get(self, request):
-        """Render a form for allowing the user to register.
+        """Return a description of the registration form.
 
-        TODO
+        This decouples clients from the API definition:
+        if the API decides to modify the form, clients won't need
+        to be updated.
+
+        This is especially important for the registration form,
+        since different edx-platform installations might
+        collect different demographic information.
+
+        See `user_api.helpers.FormDescription` for examples
+        of the JSON-encoded form description.
+
+        Arguments:
+            request (HttpRequest)
+
+        Returns:
+            HttpResponse
+
         """
         form_desc = FormDescription("post", reverse("user_api_registration"))
 
@@ -126,37 +162,48 @@ class RegistrationView(APIView):
         for field_name in self.DEFAULT_FIELDS:
             self.field_handlers[field_name](form_desc, required=True)
 
-        # Extra fields from configuration may be required, optional, or hidden
-        # TODO -- explain error handling here
+        # Extra fields configured in Django settings
+        # may be required, optional, or hidden
         for field_name in self.EXTRA_FIELDS:
-            field_setting = settings.REGISTRATION_EXTRA_FIELDS.get(field_name)
+            field_setting = settings.REGISTRATION_EXTRA_FIELDS.get(field_name, "hidden")
             handler = self.field_handlers[field_name]
 
             if field_setting in ["required", "optional"]:
                 handler(form_desc, required=(field_setting == "required"))
             elif field_setting != "hidden":
-                # TODO -- warning here
-                pass
+                msg = u"Setting REGISTRATION_EXTRA_FIELDS values must be either required, optional, or hidden."
+                raise ImproperlyConfigured(msg)
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
+    @method_decorator(ensure_csrf_cookie)
     def post(self, request):
         """Create the user's account.
 
-        TODO
+        Arguments:
+            request (HTTPRequest)
+
+        Returns:
+            HttpResponse: 200 on success
+            HttpResponse: 400 if the request is not valid.
+            HttpResponse: 302 if redirecting to another page.
+
         """
-        # Backwards compat:
-        # TODO -- explain this
+        # Backwards compatability
+        # We used to validate that the users had checked
+        # "honor code" and "terms of service"
+        # on the registration form.  Now we rely on the client
+        # to display this to users and validate that they
+        # agree before making the request to this service.
         request.POST["honor_code"] = "true"
         request.POST["terms_of_service"] = "true"
 
-        # Initially, this should be a shim to student views.
-        # Eventually, we'll want to pull that functionality into this API.
+        # For the initial implementation, shim the existing login view
+        # from the student Django app.
         from student.views import create_account
         return shim_student_view(create_account)(request)
 
     def _add_email_field(self, form_desc, required=True):
-        """TODO """
         form_desc.add_field(
             "email",
             label=_(u"E-mail"),
@@ -172,7 +219,6 @@ class RegistrationView(APIView):
         )
 
     def _add_name_field(self, form_desc, required=True):
-        """TODO"""
         form_desc.add_field(
             "name",
             label=_(u"Full Name"),
@@ -184,7 +230,6 @@ class RegistrationView(APIView):
         )
 
     def _add_username_field(self, form_desc, required=True):
-        """TODO"""
         form_desc.add_field(
             "username",
             label=_(u"Public Username"),
@@ -197,7 +242,6 @@ class RegistrationView(APIView):
         )
 
     def _add_password_field(self, form_desc, required=True):
-        """TODO"""
         form_desc.add_field(
             "password",
             label=_(u"Password"),
@@ -209,7 +253,6 @@ class RegistrationView(APIView):
         )
 
     def _add_level_of_education_field(self, form_desc, required=True):
-        """ TODO """
         form_desc.add_field(
             "level_of_education",
             label=_("Highest Level of Education Completed"),
@@ -219,7 +262,6 @@ class RegistrationView(APIView):
         )
 
     def _add_gender_field(self, form_desc, required=True):
-        """TODO """
         form_desc.add_field(
             "gender",
             label=_("Gender"),
@@ -229,7 +271,6 @@ class RegistrationView(APIView):
         )
 
     def _add_year_of_birth_field(self, form_desc, required=True):
-        """TODO """
         options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
         form_desc.add_field(
             "year_of_birth",
@@ -240,7 +281,6 @@ class RegistrationView(APIView):
         )
 
     def _add_mailing_address_field(self, form_desc, required=True):
-        """TODO """
         form_desc.add_field(
             "mailing_address",
             label=_("Mailing Address"),
@@ -249,7 +289,6 @@ class RegistrationView(APIView):
         )
 
     def _add_goals_field(self, form_desc, required=True):
-        """TODO """
         form_desc.add_field(
             "goals",
             label=_("Please share with us your reasons for registering with edX"),
@@ -258,7 +297,6 @@ class RegistrationView(APIView):
         )
 
     def _add_city_field(self, form_desc, required=True):
-        """TODO """
         form_desc.add_field(
             "city",
             label=_("City"),
@@ -266,7 +304,6 @@ class RegistrationView(APIView):
         )
 
     def _add_country_field(self, form_desc, required=True):
-        """TODO """
         options = [
             (country_code, unicode(country_name))
             for country_code, country_name in COUNTRIES
@@ -280,7 +317,7 @@ class RegistrationView(APIView):
         )
 
     def _options_with_default(self, options):
-        """TODO """
+        """Include a default option as the first option. """
         return (
             [("", "--")] + list(options)
         )
