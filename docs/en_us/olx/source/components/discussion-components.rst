@@ -1,3 +1,5 @@
+.. _Discussion Components:
+
 #################################
 Discussion Components
 #################################
