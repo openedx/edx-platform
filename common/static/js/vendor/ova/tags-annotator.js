@@ -1028,22 +1028,24 @@ Annotator.Plugin.HighlightTags = (function(_super) {
         return getColorValues(item)
     }
     
-    HighlightTags.prototype.colorize = function(){
+    HighlightTags.prototype.colorize = function() {
         
         var annotations = Array.prototype.slice.call($(".annotator-hl"));
-        for (annNum = 0; annNum < annotations.length; ++annNum){
+        for (annNum = 0; annNum < annotations.length; ++annNum) {
             var anns = $.data(annotations[annNum],"annotation");
-            if (typeof anns.tags != "undefined" && anns.tags.length == 0) {
+            if (typeof anns.tags !== "undefined" && anns.tags.length == 0) {
+                
                 // image annotations should not change the background of the highlight
                 // only the border so as not to block the image behind it.
                 if (anns.media !== "image") {
-                    $(annotations[annNum]).css("background-color","");
+                    $(annotations[annNum]).css("background-color", "");
                 } else {
                     $(annotations[annNum]).css("border", "2px solid rgb(255, 255, 255)");
                     $(annotations[annNum]).css("outline", "2px solid rgb(0, 0, 0)");
                 }
             }
-            if (typeof anns.tags != "undefined" && this.colors !== {}) {
+
+            if (typeof anns.tags !== "undefined" && this.colors !== {}) {
                 
                 for (var index = 0; index < anns.tags.length; ++index) {
                     if (anns.tags[index].indexOf("flagged-") == -1) {
@@ -1079,7 +1081,7 @@ Annotator.Plugin.HighlightTags = (function(_super) {
                 
             } else {
                 // if there are no tags or predefined colors, keep the background at default
-                if (anns.media !== "image"){
+                if (anns.media !== "image") {
                    $(annotations[annNum]).css("background","");
                 }
             }
@@ -1088,34 +1090,41 @@ Annotator.Plugin.HighlightTags = (function(_super) {
         this.annotator.publish('colorizeCompleted');
     }
     
-    HighlightTags.prototype.updateField = function(field, annotation){
-            
-    
-            if(this.isFirstTime){
-                var tags = this.options.tag.split(",");
-        var tokensavailable = [];
-                tags.forEach (function(tagnames){
-            lonename = tagnames.split(":");
-            
-            tokensavailable.push({'id': lonename[0], 'name':lonename[0]});
-        });
-                $("#tag-input").tokenInput(tokensavailable);
-                this.isFirstTime = false;
-            }
-            $('#token-input-tag-input').attr('placeholder','Add tags...');
-            $('#tag-input').tokenInput('clear');            
-            if (typeof annotation.tags != "undefined") {
-                for (tagnum = 0; tagnum < annotation.tags.length; tagnum++){
-                    var n = annotation.tags[tagnum];
-                        if (typeof this.annotator.plugins["HighlightTags"] != 'undefined') {
-                            if (annotation.tags[tagnum].indexOf("flagged-")==-1){
-                                $('#tag-input').tokenInput('add',{'id':n,'name':n});
-                            }
-                        } else{
-                            $('#tag-input').tokenInput('add',{'id':n,'name':n});
-                        }
+    HighlightTags.prototype.updateField = function(field, annotation) {
+        // the first time that this plug in runs, the predetermined instructor tags are
+        // added and stored for the dropdown list
+        if(this.isFirstTime) {
+            var tags = this.options.tag.split(",");
+            var tokensavailable = [];
+
+            // tags are given the structure that the dropdown/token function requires
+            tags.forEach (function(tagnames) {
+                lonename = tagnames.split(":");
+                tokensavailable.push({'id': lonename[0], 'name': lonename[0]});
+            });
+
+            // they are then added to the appropriate input for tags in annotator
+            $("#tag-input").tokenInput(tokensavailable);
+            this.isFirstTime = false;
+        }
+
+        $('#token-input-tag-input').attr('placeholder', 'Add tags...');
+        $('#tag-input').tokenInput('clear');            
+        
+        // loops through the tags already in the annotation and "add" them to this annotation
+        if (typeof annotation.tags !== "undefined") {
+            for (tagnum = 0; tagnum < annotation.tags.length; tagnum++) {
+                var n = annotation.tags[tagnum];
+                if (typeof this.annotator.plugins["HighlightTags"] !== 'undefined') {
+                    // if there are flags, we must ignore them
+                    if (annotation.tags[tagnum].indexOf("flagged-") == -1) {
+                        $('#tag-input').tokenInput('add',{'id':n,'name':n});
+                    }
+                } else {
+                    $('#tag-input').tokenInput('add', {'id': n, 'name': n});
                 }
             }
+        }
         this.colorizeEditorTags();
     }
 
@@ -1142,7 +1151,7 @@ Annotator.Plugin.HighlightTags = (function(_super) {
         });    
     }
     
-    //The following function is run when a person hits submit.
+    // The following function is run when a person hits submit.
     HighlightTags.prototype.pluginSubmit = function(field, annotation) {
         var tokens = Array.prototype.slice.call($(".token-input-input-token").parent().find('.token-input-token'));
         var arr = [];
@@ -1153,16 +1162,21 @@ Annotator.Plugin.HighlightTags = (function(_super) {
         annotation.tags = arr;
     }
 
-    //The following allows you to edit the annotation popup when the viewer has already
-    //hit submit and is just viewing the annotation.
+    // The following allows you to edit the annotation popup when the viewer has already
+    // hit submit and is just viewing the annotation.
     HighlightTags.prototype.updateViewer = function(field, annotation) {
         if (typeof annotation.tags != "undefined") {
+            
+            // if there are no tags, the space for tags in the pop up is removed and function ends
             if (annotation.tags.length == 0) {
                 $(field).remove();
                 return;
             }
+
+            // otherwise we prepare to loop through them
             var nonFlagTags = true;
             var tokenList = "<ul class=\"token-input-list\">";
+
             for (tagnum = 0; tagnum < annotation.tags.length; ++tagnum){
                 if (typeof this.annotator.plugins["Flagging"] !== 'undefined') {
                     // once again we ingore flags
@@ -1190,18 +1204,20 @@ Annotator.Plugin.HighlightTags = (function(_super) {
             }
             tokenList += "</ul>";
             $(field).append(tokenList);
+
+            // the field for tags is removed also if all the tags ended up being flags
             if (nonFlagTags) {
                 $(field).remove();
             }
             
-        } else{
+        } else {
             $(field).remove();
         }
         this.annotator.publish("finishedDrawingTags");
     }
     
-    //The following will call the colorize function during an external call and then return
-    //an event signaling completion.
+    // The following will call the colorize function during an external call and then return
+    // an event signaling completion.
     HighlightTags.prototype.externalCall = function() {
         this.colorize();
         this.annotator.publish('finishedExternalCallToHighlightTags');
