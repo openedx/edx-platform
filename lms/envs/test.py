@@ -394,3 +394,15 @@ MONGODB_LOG = {
     'password': '',
     'db': 'xlog',
 }
+
+
+############# Performance Profiler #################
+# Note: We've added profiler support to this configuration in order
+# to enable analysis when running unit tests.  (outputs to console)
+FEATURES['PROFILER'] = False
+if FEATURES.get('PROFILER'):
+    INSTALLED_APPS += ('profiler',)
+    MIDDLEWARE_CLASSES += (
+        'profiler.middleware.HotshotProfilerMiddleware',
+        'profiler.middleware.CProfileProfilerMiddleware',
+    )
