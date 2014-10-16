@@ -1,4 +1,4 @@
-.. _ODL Directory Structure with edX Studio:
+.. _ODL Directory Structure:
 
 ###############################################
 OLX Course Structure
@@ -135,6 +135,6 @@ See :ref:`Course Assets` for more information.
 The ``tabs`` directory contains an HTML file for each page you add to your
 course.
 
-See :ref:`Course Pages` for more information.
+See :ref:`Course Tabs` for more information.
 
  .. include:: links.rst
