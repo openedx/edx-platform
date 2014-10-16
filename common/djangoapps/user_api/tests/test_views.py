@@ -1037,7 +1037,6 @@ class RegistrationViewTest(ApiTestCase):
         response = self.client.post(self.url, data)
         self.assertHttpBadRequest(response)
 
-
     @override_settings(REGISTRATION_EXTRA_FIELDS={"country": "required"})
     @ddt.data("email", "name", "username", "password", "country")
     def test_register_missing_required_field(self, missing_field):
@@ -1055,21 +1054,65 @@ class RegistrationViewTest(ApiTestCase):
         response = self.client.post(self.url, data)
         self.assertHttpBadRequest(response)
 
-    def test_register_already_authenticated(self):
-        data = {
+    def test_register_duplicate_email(self):
+        # Register the first user
+        response = self.client.post(self.url, {
             "email": self.EMAIL,
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
-        }
-
-        # Register once, which will also log us in
-        response = self.client.post(self.url, data)
+        })
         self.assertHttpOK(response)
 
-        # Try to register again
-        response = self.client.post(self.url, data)
-        self.assertHttpBadRequest(response)
+        # Try to create a second user with the same email address
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": "someone_else",
+            "password": self.PASSWORD,
+        })
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.content, json.dumps(["email"]))
+
+    def test_register_duplicate_username(self):
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        })
+        self.assertHttpOK(response)
+
+        # Try to create a second user with the same username
+        response = self.client.post(self.url, {
+            "email": "someone+else@example.com",
+            "name": "Someone Else",
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        })
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.content, json.dumps(["username"]))
+
+    def test_register_duplicate_username_and_email(self):
+        # Register the first user
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        })
+        self.assertHttpOK(response)
+
+        # Try to create a second user with the same username
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": "Someone Else",
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+        })
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.content, json.dumps(["email", "username"]))
 
     def _assert_reg_field(self, extra_fields_setting, expected_field):
         """Retrieve the registration form description from the server and

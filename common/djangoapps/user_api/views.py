@@ -1,4 +1,5 @@
 """HTTP end-points for the User API. """
+import json
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -177,6 +178,7 @@ class RegistrationView(APIView):
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
     @method_decorator(ensure_csrf_cookie)
+    @method_decorator(require_post_params(DEFAULT_FIELDS))
     def post(self, request):
         """Create the user's account.
 
@@ -197,6 +199,18 @@ class RegistrationView(APIView):
         # agree before making the request to this service.
         request.POST["honor_code"] = "true"
         request.POST["terms_of_service"] = "true"
+
+        # Handle duplicate username/email
+        conflicts = account_api.check_account_exists(
+            username=request.POST.get('username'),
+            email=request.POST.get('email')
+        )
+        if conflicts:
+            return HttpResponse(
+                status=409,
+                content=json.dumps(conflicts),
+                content_type="application/json"
+            )
 
         # For the initial implementation, shim the existing login view
         # from the student Django app.
