@@ -107,7 +107,7 @@ Group assignments are:
 Set up Group Configurations in edX Studio 
 ************************************************
 
-..note:: 
+.. note:: 
   You must :ref:`enable content experiments<Enable Content Experiments>` before
   you can set up group configurations.
 
