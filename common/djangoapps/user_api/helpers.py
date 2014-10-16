@@ -5,6 +5,7 @@ This is NOT part of the public API.
 from functools import wraps
 import logging
 import json
+from django.http import HttpResponseBadRequest
 
 
 LOGGER = logging.getLogger(__name__)
@@ -54,6 +55,34 @@ def intercept_errors(api_error, ignore_errors=[]):
                 )
                 LOGGER.exception(msg)
                 raise api_error(msg)
+        return _wrapped
+    return _decorator
+
+
+def require_post_params(required_params):
+    """
+    View decorator that ensures the required POST params are
+    present.  If not, returns an HTTP response with status 400.
+
+    Args:
+        required_params (list): The required parameter keys.
+
+    Returns:
+        HttpResponse
+
+    """
+    def _decorator(func):
+        @wraps(func)
+        def _wrapped(*args, **kwargs):
+            request = args[0]
+            missing_params = set(required_params) - set(request.POST.keys())
+            if len(missing_params) > 0:
+                msg = u"Missing POST parameters: {missing}".format(
+                    missing=", ".join(missing_params)
+                )
+                return HttpResponseBadRequest(msg)
+            else:
+                return func(request)
         return _wrapped
     return _decorator
 
@@ -244,22 +273,30 @@ def shim_student_view(view_func, check_logged_in=False):
         function
 
     """
-
     @wraps(view_func)
     def _inner(request):
 
-        # Strip out enrollment action stuff, since we're handling that elsewhere
+        # The login and registration handlers in student view try to change
+        # the user's enrollment status if these parameters are present.
+        # Since we want the JavaScript client to communicate directly with
+        # the enrollment API, we want to prevent the student views from
+        # updating enrollments.
         if "enrollment_action" in request.POST:
             del request.POST["enrollment_action"]
         if "course_id" in request.POST:
             del request.POST["course_id"]
 
-        # Actually call the function!
-        # TODO ^^
+        # Call the original view to generate a response.
+        # We can safely modify the status code or content
+        # of the response, but to be safe we won't mess
+        # with the headers.
         response = view_func(request)
 
-        # Most responses from this view are a JSON dict
-        # TODO -- explain this more
+        # Most responses from this view are JSON-encoded
+        # dictionaries with keys "success", "value", and
+        # (sometimes) "redirect_url".
+        # We want to communicate some of this information
+        # using HTTP status codes instead.
         try:
             response_dict = json.loads(response.content)
             msg = response_dict.get("value", u"")
@@ -268,30 +305,35 @@ def shim_student_view(view_func, check_logged_in=False):
             msg = response.content
             redirect_url = None
 
-        # If the user could not be authenticated
+        # If the user is not authenticated, and we expect them to be
+        # send a status 403.
         if check_logged_in and not request.user.is_authenticated():
             response.status_code = 403
             response.content = msg
 
-        # Handle redirects
-        # TODO -- explain why this is safe
+        # If the view wants to redirect us, send a status 302
         elif redirect_url is not None:
             response.status_code = 302
             response.content = redirect_url
 
-        # Handle errors
+        # If an error condition occurs, send a status 400
         elif response.status_code != 200 or not response_dict.get("success", False):
-            # TODO -- explain this
+            # The student views tend to send status 200 even when an error occurs
+            # If the JSON-serialized content has a value "success" set to False,
+            # then we know an error occurred.
             if response.status_code == 200:
                 response.status_code = 400
             response.content = msg
 
-        # Otherwise, return the response
+        # If the response is successful, then return the content
+        # of the response directly rather than including it
+        # in a JSON-serialized dictionary.
         else:
             response.content = msg
 
-        # Return the response.
-        # IMPORTANT: this NEEDS to preserve session variables / cookies!
+        # Return the response, preserving the original headers.
+        # This is really important, since the student views set cookies
+        # that are used elsewhere in the system (such as the marketing site).
         return response
 
     return _inner
