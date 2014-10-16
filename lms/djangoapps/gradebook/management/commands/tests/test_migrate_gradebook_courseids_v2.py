@@ -8,8 +8,8 @@ import uuid
 from django.contrib.auth.models import User
 
 from gradebook import models as gradebook_models
-from gradebook.management.commands import migrate_courseids_v2
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from gradebook.management.commands import migrate_gradebook_courseids_v2
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
@@ -71,7 +71,7 @@ class MigrateCourseIdsTests(ModuleStoreTestCase):
 
 
         # Run the data migration
-        migrate_courseids_v2.Command().handle()
+        migrate_gradebook_courseids_v2.Command().handle()
 
 
         # Confirm that the data has been properly migrated

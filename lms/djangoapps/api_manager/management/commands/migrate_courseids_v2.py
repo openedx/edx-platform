@@ -22,7 +22,7 @@ class Command(BaseCommand):
         for cg in course_groups:
             current_course_id = cg.course_id
             oldstyle_course_id = current_course_id.replace("slashes:", "")
-            oldstyle_course_id = current_course_id.replace("+", "/")
+            oldstyle_course_id = oldstyle_course_id.replace("+", "/")
             cg.course_id = oldstyle_course_id
             cg.save()
         log.warning('Complete!')
@@ -32,12 +32,12 @@ class Command(BaseCommand):
         for ccg in course_content_groups:
             current_course_id = ccg.course_id
             oldstyle_course_id = current_course_id.replace("slashes:", "")
-            oldstyle_course_id = current_course_id.replace("+", "/")
+            oldstyle_course_id = oldstyle_course_id.replace("+", "/")
             ccg.course_id = oldstyle_course_id
 
             current_content_id = ccg.content_id
             oldstyle_content_id = current_content_id.replace("slashes:", "")
-            oldstyle_content_id = current_content_id.replace("+", "/")
+            oldstyle_content_id = oldstyle_content_id.replace("+", "/")
             ccg.content_id = oldstyle_content_id
             ccg.save()
         log.warning('Complete!')
@@ -47,18 +47,18 @@ class Command(BaseCommand):
         for cmc in course_module_completions:
             current_course_id = cmc.course_id
             oldstyle_course_id = current_course_id.replace("slashes:", "")
-            oldstyle_course_id = current_course_id.replace("+", "/")
+            oldstyle_course_id = oldstyle_course_id.replace("+", "/")
             cmc.course_id = oldstyle_course_id
 
             current_content_id = cmc.content_id
             oldstyle_content_id = current_content_id.replace("slashes:", "")
-            oldstyle_content_id = current_content_id.replace("+", "/")
+            oldstyle_content_id = oldstyle_content_id.replace("+", "/")
             cmc.content_id = oldstyle_content_id
 
             if cmc.stage is not None:
                 current_stage = cmc.stage
                 oldstyle_stage = current_stage.replace("slashes:", "")
-                oldstyle_stage = current_stage.replace("+", "/")
+                oldstyle_stage = oldstyle_stage.replace("+", "/")
                 cmc.stage = oldstyle_stage
                 cmc.save()
         log.warning('Complete!')
