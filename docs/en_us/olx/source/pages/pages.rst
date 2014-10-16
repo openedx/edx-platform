@@ -1,17 +1,17 @@
-.. _Course Pages:
+.. _Course Tabs:
 
 #################################
-Course Pages
+Course Tabs
 #################################
 
-You can add tabs to your course. Each tab appears in your course’s navigation
-bar.
+You can add tabs, or pages, to your course. Each tab appears in your course’s
+navigation bar.
 
 *********************************************
-Create the Page File
+Create the Tab File
 *********************************************
 
-You create an HTML file for each page you want to add to the course in the
+You create an HTML file for each tab you want to add to the course in the
 ``tabs`` directory.
 
 You can add any text and HTML markup to the page. Tabs can also be

@@ -4,25 +4,32 @@
 HTML Components
 #################################
 
-To add an HTML component to your course, you can either in-line it in
-the parent XML file, or split it up into either 1 or 2 additional
-files. HTML configuration can be broken out into a .xml file in the
-html directory. In addition, HTML content can be broken out into an
-additional .html file in the same directory. Breaking out HTML content
-is especially useful if you are embedding HTML which is not valid XML. 
-
 See:
 
-* `Create the XML File for an HTML Component`_
+* `Create the HTML Component`_
+* `Example of an HTML Component Embedded in a Vertical`_
+* `Example of Separate HTML Files`_
 * `HTML Component XML File Elements`_
 * `html Element Attributes`_
 * `Example HTML Component XML File`_
-* `Create the HTML File for an HTML Component`_
 * `Example HTML Component Content`_
 
-*************************************
-In-line HTML Example
-*************************************
+
+*********************************************
+Create the HTML Component
+*********************************************
+
+To add an HTML component to your course, you can embed the XML for it in the
+parent XML file, or split it up into either 1 or 2 additional files. You can
+break up the HTML configuration into an .xml file in the html directory and an
+additional .html file in the same directory. 
+
+.. caution:: If you are including HTML that is not valid HTML, you must break out HTML content in a separate file.
+
+
+*****************************************************
+Example of an HTML Component Embedded in a Vertical
+*****************************************************
 
 .. code-block:: xml
   
@@ -33,12 +40,14 @@ In-line HTML Example
 
 
 *********************************************
-Fully split HTML file example and explanation
+Example of Separate HTML Files
 *********************************************
 
-You create an XML file in the ``html`` directory for each HTML component in your course.
+You create an XML file in the ``html`` directory for each HTML component in
+your course.
 
-The name of the XML file must match the value of the @url_name attribute of the ``html`` element in the vertical XML file.
+The name of the XML file must match the value of the @url_name attribute of the
+``html`` element in the vertical XML file.
 
 For example, if the vertical XML file contains:
 
@@ -86,22 +95,6 @@ The following example shows an XML file for an HTML component:
   
   <html filename="Introduction" display_name="Unit Introduction"/>  
 
-
-*********************************************
-Create the HTML File for an HTML Component
-*********************************************
-
-You create an HTML file in the ``html`` directory for each HTML component in your course.
-
-The name of the HTML file must match the value of the @file_name attribute of the ``html`` element in the component's XML file.
-
-For example, if the component's XML file contains:
-
-.. code-block:: xml
-  
-  <html filename="Introduction" display_name="Unit Introduction"/> 
-
-You create the file ``html/Introduction.html`` to define the HTML component content.
 
 *************************************
 Example HTML Component Content

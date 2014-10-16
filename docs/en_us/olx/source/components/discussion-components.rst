@@ -36,7 +36,9 @@ In-line, you can create, if the vertical XML file contains:
        /> 
   </vertical>
 
-If you prefer to split this up, you can also create: 
+If you prefer to create the discussion in its own file, you can create: 
+
+.. code-block:: xml
 
    <vertical display_name="Lesson_1_Unit_1">
       <discussion 

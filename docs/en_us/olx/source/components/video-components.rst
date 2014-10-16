@@ -19,7 +19,9 @@ See:
 Create the XML File for a Video Component
 **********************************************
 
-If you wish to place a video in your course, add it to the course XML tree as: 
+To add a video component to your course, add it to the course XML tree as: 
+
+.. code-block:: xml
 
   <video 
     youtube="1.00:o2pLltkrhGM" 

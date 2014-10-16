@@ -13,15 +13,16 @@ building blocks of an edX course. See:
 Courseware
 **************
 
-Courseware is the main content of your course, namely lessons and assessments.
-The following list describes how courseware is organized in OLX:
+Courseware is the main content of your course and consists mainly of lessons
+and assessments. The following list describes how courseware is organized in
+OLX:
 
 * Course chapters are at the top level of your course and typically
-  represent a time period. In Studio, chapters are called 'sections.'
+  represent a time period. In Studio, chapters are called *sections*.
 
 * A section contains one or more children which correspond to
-  top-level pages in the course. Studio calls these 'subsections' and
-  is currently restricted to ``sequential`` elements at this
+  top-level pages in the course. In Studio, these are called 'subsections' and
+  are currently restricted to ``sequential`` elements at this
   level. OLX supports any XBlock at this level. 
 
 * Courses are composed of structural elements, such as ``sequential``
