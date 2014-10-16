@@ -80,7 +80,13 @@ For example:
 Course Chapters
 *******************************
 
-You create a course chapter with the ``chapter`` element, as a child of the root ``course`` element. Chapter elements are top-level pages in the course. The edX platform renders navigation chrome around them (tab-set on top and accordion on the left). It is possible to disable chrome for specific chapters using the ``chrome`` option. It is possible to associate chapters with different elements of the tabset with the ``default_tab`` option. It is possible to hide them from the navigation using the ``hide_from_toc`` option. 
+You create a course chapter with the ``chapter`` element, as a child of the
+root ``course`` element. Chapter elements are top-level pages in the course.
+The edX platform renders navigation chrome around them (tab-set on top and
+accordion on the left). It is possible to disable chrome for specific chapters
+using the ``chrome`` option. It is possible to associate chapters with
+different elements of the tabset with the ``default_tab`` option. It is
+possible to hide them from the navigation using the ``hide_from_toc`` option.
 
 For example, if the course outline file contains:
 

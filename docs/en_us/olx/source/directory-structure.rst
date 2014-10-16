@@ -8,14 +8,8 @@ See:
 
 * `OLX and Directory File Structures`_
 * `Top-level Directory`_
-* `about Directory`_
-* `html Directory`_
-* `info Directory`_
-* `policies Directory`_
-* `problem Directory`_
-* `static Directory`_
-* `tabs Directory`_
-* `video Directory`_
+* `XBlock directories`_
+* `edX Platform Directories`_
 
 ****************************************
 OLX and Directory File Structures
@@ -32,15 +26,15 @@ Top-level Directory
 ************************
 
 Starting out, it is easiest to create your courseware structure in a
-single file, the ``course.xml file``. This file may contain your
-entire course, but in most cases, it is convenient to split out large
-chunks of content into individual files. This is typically done either
-at the level of large components, such as either problems or homework
-assignments. 
+single file, the ``course.xml file``. 
 
-Currently, Studio, on export, places each component in its own
-file. MIT ODL and edX have scripts which rechunk the file structure in
-different ways.
+This file can contain your entire course, but in most cases, it is convenient
+to split out large chunks of content into individual files. This is typically
+done either at the level of large components, such as problems or homework
+assignments.
+
+Currently, when Studio exports a course, it places each component in its own
+file. 
 
 For example, the edX Platform contains a directory called
 `manual-testing-complete`_ that contains a course with all component
@@ -54,19 +48,19 @@ content.
  If you are using custom XBlocks, you can have
  additional directories that store the XML for XBlocks of that type.
 
-********************
-XBlock directories (``html``, ``problem``, etc.)
-********************
+*******************
+XBlock directories
+*******************
 
-edX course components may be broken out of the main course.xml file
+edX course components can be broken out of the main ``course.xml`` file
 into individual files. Those files go into directories of the name of
 the component type (XML tag). For example, components of type ``html``
-may be placed as individual files in the ``html`` directory. If your
-course does not contain html files, or if they are all in-lined in
+can be placed as individual files in the ``html`` directory. If your
+course does not contain html files, or if they are all embedded in
 their top-level components, you do not need to create an ``html``
 directory.
 
-For information about several examplars of these directories, see: 
+For information about several examples of these directories, see: 
 
 See :ref:`HTML Components` for more information.
 See :ref:`Problems and Tools` for more information.
@@ -75,15 +69,13 @@ See :ref:`Video Components` for more information.
 As the set of XBlocks grows, so does the set of associated XML tags
 and directories.
 
-********************
+*************************
 edX Platform Directories
-********************
+*************************
 
 In addition to the course hierarchy, which is designed to be generic
-and cross-platform, XML course exports contain a set of JSON and HTML
-files providing edX-specific course metadata (such as course
-information pages specific to a MOOC setting), as well as things which
-have not yet been folded into the above framework.
+and cross-platform, OLX courses contain a set of JSON and HTML
+files that specify course policies and non-courseare content.
 
 ====================
 ``about`` Directory
@@ -112,9 +104,9 @@ The ``info`` directory contains:
 * ``updates.html``, which contains the course updates students see when opening
   a course.
 
-====================
+=======================
 ``policies`` Directory
-====================
+=======================
 
 The ``policies`` directory contains:
 
