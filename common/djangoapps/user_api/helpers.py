@@ -300,9 +300,11 @@ def shim_student_view(view_func, check_logged_in=False):
         try:
             response_dict = json.loads(response.content)
             msg = response_dict.get("value", u"")
-            redirect_url = response_dict.get("redirect_url")
+            redirect_url = response_dict.get("redirect_url") or response_dict.get("redirect")
+            success = response_dict.get("success")
         except (ValueError, TypeError):
             msg = response.content
+            success = True
             redirect_url = None
 
         # If the user is not authenticated, and we expect them to be
@@ -317,7 +319,7 @@ def shim_student_view(view_func, check_logged_in=False):
             response.content = redirect_url
 
         # If an error condition occurs, send a status 400
-        elif response.status_code != 200 or not response_dict.get("success", False):
+        elif response.status_code != 200 or not success:
             # The student views tend to send status 200 even when an error occurs
             # If the JSON-serialized content has a value "success" set to False,
             # then we know an error occurred.
