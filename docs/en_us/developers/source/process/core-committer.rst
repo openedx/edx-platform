@@ -64,25 +64,30 @@ In order to expedite the review process and to have a clear and mutual understan
 between reviewers and contributors, the following terminology is strongly suggested
 when submitting comments on a PR:
 
-* **Must** - A comment tagged with "Must" indicates the reviewer feels strongly about
+* **Must** - A comment of type "Must" indicates the reviewer feels strongly about
   their requested change to the code and feels the PR should not be merged unless
   their concern is satisfactorily addressed.
 
-* **Opt(ional)** - A comment tagged with "Optional" indicates the reviewer strongly
+* **Opt(ional)** - A comment of type "Optional" indicates the reviewer strongly
   favors their suggestion, but may be agreeable to the current behavior, especially
   with a persuasive response.
 
-* **Nit(pick)** - A comment tagged with "Nitpick" indicates the reviewer has a minor
+* **Nit(pick)** - A comment of type "Nitpick" indicates the reviewer has a minor
   criticism that *may* not be critical to address, but considers important to share
   in the given context. Contributors should still seriously consider and weigh these
   nits and address them in the spirit of maintaining high quality code.
 
-* **FYI** - A comment tagged with "FYI" is a related side comment that is
+* **FYI** - A comment of type "FYI" is a related side comment that is
   informative, but with the intention of having no required immediate action.
 
-**Note:** Unless stated or implied otherwise, all comments are assumed to be tagged
-with "Must".
+As an example, the following PR comment is clearly categorized as Optional:
+
+``"Optional: Consider reducing the high degree of connascense in this code by using
+keyword arguments."``
+
+**Note:** Unless stated or implied otherwise, all comments are assumed to be of type
+"Must".
 
 **Note 2:** It is possible that after further discussion and review, the reviewer
-chooses to amend the labelling of their comment, thereby changing its severity to be
-higher or lower than what was originally set.
+chooses to amend their comment, thereby changing its severity to be higher or
+lower than what was originally set.
