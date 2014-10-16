@@ -63,7 +63,6 @@ def get_enrollments(student_id):
     return data.get_course_enrollments(student_id)
 
 
-
 def get_enrollment(student_id, course_id):
     """ Retrieves all enrollment information for the student in respect to a specific course.
 
@@ -93,7 +92,7 @@ def get_enrollment(student_id, course_id):
         }
 
     """
-    pass
+    return data.get_course_enrollment(student_id, course_id)
 
 
 def add_enrollment(student_id, course_id, mode='honor', is_active=True):
@@ -128,7 +127,7 @@ def add_enrollment(student_id, course_id, mode='honor', is_active=True):
             invite_only: False
         }
     """
-    pass
+    data.update_course_enrollment(student_id, course_id, mode=mode, is_active=is_active)
 
 
 def deactivate_enrollment(student_id, course_id):
@@ -160,7 +159,7 @@ def deactivate_enrollment(student_id, course_id):
             invite_only: False
         }
     """
-    pass
+    return data.update_course_enrollment(student_id, course_id, is_active=False)
 
 
 def update_enrollment(student_id, course_id, mode):
@@ -193,7 +192,7 @@ def update_enrollment(student_id, course_id, mode):
         }
 
     """
-    pass
+    data.update_course_enrollment(student_id, course_id, mode)
 
 
 def get_course_enrollment_details(course_id):

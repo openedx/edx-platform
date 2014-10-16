@@ -16,7 +16,7 @@ class CourseField(serializers.RelatedField):
             "course_id": course_id,
             "enrollment_start": course.enrollment_start,
             "enrollment_end": course.enrollment_end,
-            "invite_only": course.invite_only
+            "invite_only": course.invitation_only
         }
 
 
