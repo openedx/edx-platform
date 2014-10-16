@@ -7,7 +7,7 @@ from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
 from student.tests.factories import UserFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon, PaidCourseRegistration
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon, CourseRegCodeItem
 
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
@@ -172,7 +172,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         order.add_billing_details(company_name='Test Company', company_contact_name='Test',
                                   company_contact_email='test@123', recipient_name='R1',
                                   recipient_email='', customer_reference_number='PO#23')
-        PaidCourseRegistration.add_to_order(order, self.course.id)
+        CourseRegCodeItem.add_to_order(order, self.course.id, 4)
         order.purchase()
 
         db_columns = [x[0] for x in query_features]

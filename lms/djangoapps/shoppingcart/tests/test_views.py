@@ -27,13 +27,12 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory
 from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import (
-    Order, CertificateItem, PaidCourseRegistration,
+    Order, CertificateItem, PaidCourseRegistration, CourseRegCodeItem,
     Coupon, CourseRegistrationCode, RegistrationCodeRedemption,
     DonationConfiguration
 )
 from student.tests.factories import UserFactory, AdminFactory
 from courseware.tests.factories import InstructorFactory
-from courseware.courses import get_course_by_id
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
@@ -232,9 +231,16 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         item2 = self.add_course_to_user_cart(self.testing_course.id)
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                {'id': item2.id})
-        self.assertEqual(resp.status_code, 200)
+        cart = Order.get_cart_for_user(self.user)
+        cart_items = cart.orderitem_set.all()
+        test_flag = False
+        for cartitem in cart_items:
+            if cartitem.qty == 5:
+                test_flag = True
+                resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]), {'id': cartitem.id})
+                self.assertEqual(resp.status_code, 200)
+        self.assertTrue(test_flag)
+
         cart = Order.get_cart_for_user(self.user)
         self.assertEqual(cart.order_type, 'personal')
 
@@ -247,23 +253,22 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn("Billing Details", resp.content)
 
     def test_purchase_type_should_be_personal_when_remove_all_items_from_cart(self):
-        qty = 2
         item1 = self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item1.id, 'qty': 2})
+        self.assertEqual(resp.status_code, 200)
+
         item2 = self.add_course_to_user_cart(self.testing_course.id)
-
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item1.id, 'qty': qty})
-        self.assertEqual(resp.status_code, 200)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': qty})
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item2.id, 'qty': 5})
         self.assertEqual(resp.status_code, 200)
 
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                {'id': item1.id})
-        self.assertEqual(resp.status_code, 200)
         cart = Order.get_cart_for_user(self.user)
-        self.assertEqual(cart.order_type, 'business')
-
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                {'id': item2.id})
+        cart_items = cart.orderitem_set.all()
+        test_flag = False
+        for cartitem in cart_items:
+            test_flag = True
+            resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]), {'id': cartitem.id})
+            self.assertEqual(resp.status_code, 200)
+        self.assertTrue(test_flag)
 
         cart = Order.get_cart_for_user(self.user)
         self.assertEqual(cart.order_type, 'personal')
@@ -832,21 +837,27 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
-        self.assertIn(reg_item, context['order_items'])
-        self.assertIn(cert_item, context['order_items'])
+        self.assertIn(reg_item, context['shoppingcart_items'][0])
+        self.assertIn(cert_item, context['shoppingcart_items'][1])
         self.assertFalse(context['any_refunds'])
+
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    def test_courseregcode_item_total_price(self):
+        self.cart.order_type = 'business'
+        self.cart.save()
+        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+        self.assertEquals(CourseRegCodeItem.get_total_amount_of_purchased_item(self.course_key), 80)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_order_type_business(self):
         self.cart.order_type = 'business'
         self.cart.save()
-        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        reg_item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
         self.cart.add_billing_details(company_name='T1Omega', company_contact_name='C1',
                                       company_contact_email='test@t1.com', recipient_email='test@t2.com')
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
-        course_key = reg_item.paidcourseregistration.course_id
-        course = get_course_by_id(course_key, depth=0)
         # mail is sent to these emails recipient_email, company_contact_email, order.user.email
         self.assertEquals(len(mail.outbox), 3)
 
@@ -858,17 +869,15 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # course but presented with the enrollment links
         self.assertFalse(CourseEnrollment.is_enrolled(self.cart.user, self.course_key))
         self.assertIn('FirstNameTesting123', resp.content)
-        self.assertIn('40.00', resp.content)
+        self.assertIn('80.00', resp.content)
         # check for the enrollment codes content
         self.assertIn('Please send each professional one of these unique registration codes to enroll into the course.', resp.content)
 
         ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
-        self.assertIn(reg_item, context['order_items'])
+        self.assertIn(reg_item, context['shoppingcart_items'][0])
         self.assertIn(self.cart.purchase_time.strftime("%B %d, %Y"), resp.content)
-        self.assertIn(course.start_date_text, resp.content)
-        self.assertIn(course.end_date_text, resp.content)
         self.assertIn(self.cart.company_name, resp.content)
         self.assertIn(self.cart.company_contact_name, resp.content)
         self.assertIn(self.cart.company_contact_email, resp.content)
@@ -910,8 +919,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
-        self.assertIn(reg_item, context['order_items'])
-        self.assertIn(cert_item, context['order_items'])
+        self.assertIn(reg_item, context['shoppingcart_items'][0])
+        self.assertIn(cert_item, context['shoppingcart_items'][1])
         self.assertFalse(context['any_refunds'])
 
         course_enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_key)
@@ -941,8 +950,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         ((template, context), _tmp) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
-        self.assertIn(reg_item, context['order_items'])
-        self.assertIn(cert_item, context['order_items'])
+        self.assertIn(reg_item, context['shoppingcart_items'][0])
+        self.assertIn(cert_item, context['shoppingcart_items'][1])
         self.assertTrue(context['any_refunds'])
 
     @patch('shoppingcart.views.render_to_response', render_mock)
