@@ -13,13 +13,12 @@ Use the chapters in this section to create course components.
    discussion-components
    video-components
    annotation
-   lti_component
-   open_response_assessment
-   word_cloud
    conditional_module
    full_screen_image
    google_hangout
+   lti_component
+   open_response_assessment
    periodic_table
    poll
-   vitalsource
+   word_cloud 
    zooming_image
