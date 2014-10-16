@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError
-from rest_framework.response import Response
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
 from user_api.models import UserPreference
 from django_comment_common.models import Role
@@ -29,6 +29,56 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
             (settings.DEBUG and api_key is None) or
             (api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key)
         )
+
+
+class LoginSessionView(APIView):
+    """TODO"""
+
+    def get(self, request):
+        """Render a form for allowing a user to log in.
+
+        TODO
+        """
+        return HttpResponse()
+
+    def post(self, request):
+        """Authenticate a user and log them in.
+
+        TODO
+        """
+        # Initially, this should be a shim to student views,
+        # since it will be too much work to re-implement everything there.
+        # Eventually, we'll want to pull out that functionality into this Django app.
+        return HttpResponse()
+
+    def delete(self, request):
+        """ Log the user out.
+
+        TODO
+        """
+        return HttpResponse()
+
+
+class RegistrationView(APIView):
+    """TODO"""
+
+    def get(self, request):
+        """Render a form for allowing the user to register.
+
+        This must use preferences to
+
+        TODO
+        """
+        return HttpResponse()
+
+    def post(self, request):
+        """Create the user's account.
+
+        TODO
+        """
+        # Initially, this should be a shim to student views.
+        # Eventually, we'll want to pull that functionality into this API.
+        return HttpResponse()
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -84,3 +134,4 @@ class PreferenceUsersListView(generics.ListAPIView):
 
     def get_queryset(self):
         return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences")
+

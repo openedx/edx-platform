@@ -41,6 +41,25 @@ def index(request):
     )
 
 
+@require_http_methods(['GET'])
+def login_and_registration_form(request, initial_mode="login"):
+    """Render the combined login/registration form, defaulting to login
+
+    This relies on the JS to asynchronously load the actual form from
+    the user_api.
+
+    Keyword Args:
+        initial_mode (string): Either "login" or "registration".
+
+    """
+    return render_to_response(
+        'student_account/login_and_register.html', {
+            'disable_courseware_js': True,
+            'initial_mode': initial_mode,
+        }
+    )
+
+
 @login_required
 @require_http_methods(['POST'])
 @ensure_csrf_cookie
