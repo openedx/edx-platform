@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="carnegie_theme_enabled"/>
 <%! from datetime import datetime %>
 <%! import pytz %>
 <%! from django.conf import settings %>
@@ -12,7 +13,11 @@
 % if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
-  <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
+  % if carnegie_theme_enabled():
+    <a href="mailto:claslite_techsupport@carnegiescience.edu" role="button">${_("Help")}</a>
+  % else :
+    <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
+  %endif
 </div>
 
 <section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=platform_name)}">
@@ -37,41 +42,51 @@
 
 <%
   discussion_tab = CourseTabList.get_discussion(course) if course else None
-  discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.can_display(course, settings, True, True)) else None
+  discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.can_display(course, settings, True, True, True)) else None
 %>
 
 % if discussion_link:
-    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
-      link_start='<a href="{url}" target="_blank">'.format(url=discussion_link),
-      link_end='</a>',
-      )}
-    </p>
+    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the course discussion forum.')}</p>
+	<ul class="help-buttons">
+	  <li><a class="help-modal-button"  href="${discussion_link}">
+		${_('Post in the Forum')}
+	  </a></li>
+	</ul>
 % endif
 
     <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} Help Center.').format(platform_name=platform_name)}</p>
 	
-	<div class="help-buttons">
-	  <a id="help-center-button" href="http://stanfordonline.zendesk.com/hc" target="_blank">
+	<ul class="help-buttons">
+	  <li><a class="help-modal-button" href="https://stanfordonline.zendesk.com/hc" target="_blank">
 		${_('Access the Help Center')}
-	  </a>
-	</div>
+	  </a></li>
+	</ul>
 
 	<hr>
-
-    <p>${_("Can't find an answer to your question? You can contact the {platform_name} general support team directly:").format(
-        platform_name=platform_name
+% if course:
+    <p>${_("Can't find an answer to your question? You can contact the {platform_name} general support team directly {link_start}by clicking here{link_end}.").format(
+        platform_name=platform_name,
+        link_start='<a href="#" id="feedback_link_question">',
+        link_end='</a>',
       )}</p>
-
-    <div class="help-buttons">
-      <a href="#" id="feedback_link_problem">${_('Report a problem')}</a>
-      <a href="#" id="feedback_link_suggestion">${_('Make a suggestion')}</a>
-      <a href="#" id="feedback_link_question">${_('Ask a question')}</a>
-    </div>
 
     <p class="note">${_('Please note: The {platform_name} support team is English speaking. While we will do our best to address your inquiry in any language, our responses will be in English.').format(
         platform_name=platform_name
       )}</p>
-
+% else:
+	<p>${_('Here are some of the most popular articles from the Help Center:')}</p>
+	<ul class="help-buttons">
+	  <li><a href="https://stanfordonline.zendesk.com/hc/en-us/articles/202275024-How-do-I-create-an-account-" target="_blank">
+		${_('How to register an account')}
+	  </a></li>
+	  <li><a href="https://stanfordonline.zendesk.com/hc/en-us/articles/201864484-How-do-I-reset-my-password-" target="_blank">
+		${_('How to reset a password')}
+	  </a></li>
+	  <li><a href="https://stanfordonline.zendesk.com/hc/en-us/articles/203009244-How-do-I-enroll-in-a-course-" target="_blank">
+		${_('How to enroll in a course')}
+	  </a></li>
+	</ul>
+% endif
   </div>
 
   <div class="inner-wrapper" id="feedback_form_wrapper">

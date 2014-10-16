@@ -1,22 +1,22 @@
 """
 General utilities
 """
-import urllib
+
+from collections import namedtuple
+from contracts import contract, check
+from opaque_keys.edx.locator import BlockUsageLocator
 
 
-def encode_key_for_mongo(fieldname):
-    """
-    Fieldnames in mongo cannot have periods nor dollar signs. So encode them.
-    :param fieldname: an atomic field name. Note, don't pass structured paths as it will flatten them
-    """
-    for char in [".", "$"]:
-        fieldname = fieldname.replace(char, '%{:02x}'.format(ord(char)))
-    return fieldname
+class BlockKey(namedtuple('BlockKey', 'type id')):
+    __slots__ = ()
+
+    @contract(type="string[>0]")
+    def __new__(cls, type, id):
+        return super(BlockKey, cls).__new__(cls, type, id)
 
 
-def decode_key_from_mongo(fieldname):
-    """
-    The inverse of encode_key_for_mongo
-    :param fieldname: with period and dollar escaped
-    """
-    return urllib.unquote(fieldname)
+    @classmethod
+    @contract(usage_key=BlockUsageLocator)
+    def from_usage_key(cls, usage_key):
+        return cls(usage_key.block_type, usage_key.block_id)
+

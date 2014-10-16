@@ -4,7 +4,10 @@ describe "NewPostView", ->
         DiscussionSpecHelper.setUpGlobals()
         DiscussionSpecHelper.setUnderscoreFixtures()
         window.$$course_id = "edX/999/test"
-        spyOn(DiscussionUtil, "makeWmdEditor")
+        spyOn(DiscussionUtil, "makeWmdEditor").andCallFake(
+          ($content, $local, cls_identifier) ->
+            $local("." + cls_identifier).html("<textarea></textarea>")
+        )
         @discussion = new Discussion([], {pages: 1})
 
     describe "Drop down works correct", ->
@@ -138,19 +141,26 @@ describe "NewPostView", ->
           mode: "tab"
         )
 
-      expectCohortSelectorVisible = (view, visible) ->
-        expect(view.$(".js-group-select").is(":visible")).toEqual(visible)
+      checkVisibility = (view, expectedVisible) =>
+        view.render()
+        expect(view.$(".js-group-select").is(":visible")).toEqual(expectedVisible)
+        if expectedVisible
+          expect(view.$(".js-group-select").prop("disabled")).toEqual(false)
 
       it "is not visible to students", ->
-        @view.render()
-        expectCohortSelectorVisible(@view, false)
+        checkVisibility(@view, false)
 
-      it "allows moderators to select visibility", ->
+      it "allows TAs to see the cohort selector", ->
+        DiscussionSpecHelper.makeTA()
+        checkVisibility(@view, true)
+
+      it "allows moderators to see the cohort selector", ->
+        DiscussionSpecHelper.makeModerator()
+        checkVisibility(@view, true)
+
+      it "allows the user to make a cohort selection", ->
         DiscussionSpecHelper.makeModerator()
         @view.render()
-        expectCohortSelectorVisible(@view, true)
-        expect(@view.$(".js-group-select").prop("disabled")).toEqual(false)
-
         expectedGroupId = null
         DiscussionSpecHelper.makeAjaxSpy(
           (params) -> expect(params.data.group_id).toEqual(expectedGroupId)
@@ -167,6 +177,79 @@ describe "NewPostView", ->
             expect($.ajax).toHaveBeenCalled()
             $.ajax.reset()
         )
+
+    describe "cancel post resets form ", ->
+      beforeEach ->
+        @course_settings = new DiscussionCourseSettings({
+          "allow_anonymous_to_peers":true,
+          "allow_anonymous":true,
+          "category_map": {
+            "subcategories": {
+              "Week 1": {
+                "subcategories": {},
+                "children": [
+                  "Topic-Level Student-Visible Label"
+                ],
+                "entries": {
+                  "Topic-Level Student-Visible Label": {
+                    "sort_key": null,
+                    "is_cohorted": false,
+                    "id": "2b3a858d0c884eb4b272dbbe3f2ffddd"
+                  }
+                }
+              }
+            },
+            "children": [
+              "General",
+              "Week 1"
+            ],
+            "entries": {
+              "General": {
+                "sort_key": "General",
+                "is_cohorted": false,
+                "id": "i4x-waqastest-waqastest-course-waqastest"
+              }
+            }
+          }
+        })
+
+      checkPostCancelReset = (mode, discussion, course_settings) ->
+        view = new NewPostView(
+          el: $("#fixture-element"),
+          collection: discussion,
+          course_settings: course_settings,
+          mode: mode
+        )
+        view.render()
+        eventSpy = jasmine.createSpy('eventSpy')
+        view.listenTo(view, "newPost:cancel", eventSpy)
+        view.$(".post-errors").html("<li class='post-error'>Title can't be empty</li>")
+        view.$("#tab-post-type-discussion").click()
+        view.$(".js-post-title").val("Test Title")
+        view.$(".js-post-body textarea").val("Test body")
+        view.$(".wmd-preview p").html("Test body")
+        view.$(".js-follow").prop("checked", false)
+        view.$(".js-anon").prop("checked", true)
+        view.$(".js-anon-peers").prop("checked", true)
+        if mode == "tab"
+          view.$("a[data-discussion-id='2b3a858d0c884eb4b272dbbe3f2ffddd']").click()
+        view.$(".cancel").click()
+        expect(eventSpy).toHaveBeenCalled()
+        expect(view.$(".post-errors").html()).toEqual("");
+        expect($("##{mode}-post-type-question").prop("checked")).toBe(true)
+        expect($("##{mode}-post-type-discussion").prop("checked")).toBe(false)
+        expect(view.$(".js-post-title").val()).toEqual("");
+        expect(view.$(".js-post-body textarea").val()).toEqual("");
+        expect(view.$(".js-follow").prop("checked")).toBe(true)
+        expect(view.$(".js-anon").prop("checked")).toBe(false)
+        expect(view.$(".js-anon-peers").prop("checked")).toBe(false)
+        if mode == "tab"
+          expect(view.$(".js-selected-topic").text()).toEqual("General")
+
+      _.each(["tab", "inline"], (mode) =>
+        it "resets the form in #{mode} mode", ->
+          checkPostCancelReset(mode, @discussion, @course_settings)
+      )
 
     it "posts to the correct URL", ->
       topicId = "test_topic"

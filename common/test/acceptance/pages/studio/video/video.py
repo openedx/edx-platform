@@ -9,6 +9,7 @@ from bok_choy.javascript import wait_for_js, js_defined
 from ....tests.helpers import YouTubeStubConfig
 from ...lms.video.video import VideoPage
 from selenium.webdriver.common.keys import Keys
+from ..utils import wait_for_notification
 
 
 CLASS_SELECTORS = {
@@ -59,6 +60,7 @@ DEFAULT_SETTINGS = [
     ['Default Timed Transcript', '', False],
     ['Download Transcript Allowed', 'False', False],
     ['Downloadable Transcript URL', '', False],
+    ['EdX Video ID', '', False],
     ['Show Transcript', 'True', False],
     ['Transcript Languages', '', False],
     ['Upload Handout', '', False],
@@ -118,9 +120,21 @@ class VideoComponentPage(VideoPage):
             self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_init']).present, 'Video Player Initialized')
             self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['video_spinner']).visible,
                            'Video Buffering Completed')
-            self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_controls']).visible, 'Player Controls are Visible')
+            self._wait_for(self.is_controls_visible, 'Player Controls are Visible')
 
-    def click_button(self, button_name, index=0):
+    @wait_for_js
+    def is_controls_visible(self):
+        """
+        Get current visibility sate of all video controls.
+
+        Returns:
+            bool: True means video controls are visible for all videos, False means video controls are not visible
+            for one or more videos
+
+        """
+        return self.q(css=CLASS_SELECTORS['video_controls']).visible
+
+    def click_button(self, button_name, index=0, require_notification=False):
         """
         Click on a button as specified by `button_name`
 
@@ -130,6 +144,8 @@ class VideoComponentPage(VideoPage):
 
         """
         self.q(css=BUTTON_SELECTORS[button_name]).nth(index).click()
+        if require_notification:
+            wait_for_notification(self)
         self.wait_for_ajax()
 
     @staticmethod
@@ -225,7 +241,7 @@ class VideoComponentPage(VideoPage):
         Create a Video Component by clicking on Video button and wait for rendering completion.
         """
         # Create video
-        self.click_button('create_video')
+        self.click_button('create_video', require_notification=True)
         self.wait_for_video_component_render()
 
     def xblocks(self):

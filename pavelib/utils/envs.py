@@ -109,6 +109,7 @@ class Env(object):
     for item in (REPO_ROOT / "common/lib").listdir():
         if (REPO_ROOT / 'common/lib' / item).isdir():
             LIB_TEST_DIRS.append(path("common/lib") / item.basename())
+    LIB_TEST_DIRS.append(path("pavelib/paver_tests"))
 
     # Directory for i18n test reports
     I18N_REPORT_DIR = REPORT_DIR / 'i18n'

@@ -96,6 +96,7 @@ class MongoModulestoreBuilder(object):
             branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
             metadata_inheritance_cache_subsystem=MemoryCache(),
         )
+        modulestore.ensure_indexes()
 
         try:
             yield modulestore
@@ -139,6 +140,7 @@ class VersioningModulestoreBuilder(object):
             fs_root,
             render_template=repr,
         )
+        modulestore.ensure_indexes()
 
         try:
             yield modulestore
@@ -210,6 +212,7 @@ class MongoContentstoreBuilder(object):
             collection='content',
             **COMMON_DOCSTORE_CONFIG
         )
+        contentstore.ensure_indexes()
 
         try:
             yield contentstore

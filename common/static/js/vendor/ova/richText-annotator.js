@@ -130,10 +130,11 @@ Annotator.Plugin.RichText = (function(_super) {
             });
         };
 
-        // makes sure that tinymce is not initiated by checking if editors exist
-        if(tinymce.editors.length === 0) {
-            tinymce.init(this.options.tinymce);
+        // makes sure that if tinymce exists already that this removes/destroys previous version
+        if (tinymce.editors.length > 0) {
+            tinymce.remove("li.annotator-item textarea");  
         }
+        tinymce.init(this.options.tinymce);
     };
     
     /**

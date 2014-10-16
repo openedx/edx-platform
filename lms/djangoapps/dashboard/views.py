@@ -1,3 +1,4 @@
+"""View functions for the LMS Student dashboard"""
 from django.http import Http404
 from edxmako.shortcuts import render_to_response
 from django.db import connection
@@ -15,14 +16,17 @@ def dictfetchall(cursor):
 
     # ensure response from db is a list, not a tuple (which is returned
     # by MySQL backed django instances)
-    rows_from_cursor=cursor.fetchall()
+    rows_from_cursor = cursor.fetchall()
     table = table + [list(row) for row in rows_from_cursor]
     return table
 
-def SQL_query_to_list(cursor, query_string):
+
+def SQL_query_to_list(cursor, query_string):  # pylint: disable=invalid-name
+    """Returns the raw result of the query"""
     cursor.execute(query_string)
-    raw_result=dictfetchall(cursor)
+    raw_result = dictfetchall(cursor)
     return raw_result
+
 
 def dashboard(request):
     """
@@ -40,11 +44,11 @@ def dashboard(request):
     # two types of results: scalars and tables.  Scalars should be represented
     # as "Visible Title": Value and tables should be lists of lists where each
     # inner list represents a single row of the table
-    results = {"scalars":{},"tables":{}}
+    results = {"scalars": {}, "tables": {}}
 
     # count how many users we have
-    results["scalars"]["Unique Usernames"]=User.objects.filter().count()
-    results["scalars"]["Activated Usernames"]=User.objects.filter(is_active=1).count()
+    results["scalars"]["Unique Usernames"] = User.objects.filter().count()
+    results["scalars"]["Activated Usernames"] = User.objects.filter(is_active=1).count()
 
     # count how many enrollments we have
     results["scalars"]["Total Enrollments Across All Courses"] = CourseEnrollment.objects.filter(is_active=1).count()
@@ -78,6 +82,6 @@ def dashboard(request):
         cursor.execute(table_queries[query])
         results["tables"][query] = SQL_query_to_list(cursor, table_queries[query])
 
-    context={"results":results}
+    context = {"results": results}
 
-    return render_to_response("admin_dashboard.html",context)
+    return render_to_response("admin_dashboard.html", context)

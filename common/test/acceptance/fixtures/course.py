@@ -11,6 +11,7 @@ from textwrap import dedent
 from collections import namedtuple
 from path import path
 from lazy import lazy
+from opaque_keys.edx.keys import CourseKey
 
 from . import STUDIO_BASE_URL
 
@@ -204,6 +205,7 @@ class CourseFixture(StudioApiFixture):
         self.children = []
         self._assets = []
         self._advanced_settings = {}
+        self._course_key = None
 
     def __str__(self):
         """
@@ -264,18 +266,16 @@ class CourseFixture(StudioApiFixture):
         return self
 
     @property
-    def _course_key(self):
-        """
-        Return the locator string for the course.
-        """
-        return "{org}/{number}/{run}".format(**self._course_dict)
-
-    @property
     def _course_location(self):
         """
         Return the locator string for the course.
         """
-        return "i4x://{org}/{number}/course/{run}".format(**self._course_dict)
+        course_key = CourseKey.from_string(self._course_key)
+        if getattr(course_key, 'deprecated', False):
+            block_id = self._course_dict['run']
+        else:
+            block_id = 'course'
+        return unicode(course_key.make_usage_key('course', block_id))
 
     @property
     def _assets_url(self):
@@ -289,7 +289,8 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course handouts
         """
-        return "i4x://{org}/{number}/course_info/handouts".format(**self._course_dict)
+        course_key = CourseKey.from_string(self._course_key)
+        return unicode(course_key.make_usage_key('course_info', 'handouts'))
 
     def _create_course(self):
         """
@@ -315,7 +316,9 @@ class CourseFixture(StudioApiFixture):
         if err is not None:
             raise CourseFixtureError("Could not create course {0}.  Error message: '{1}'".format(self, err))
 
-        if not response.ok:
+        if response.ok:
+            self._course_key = response.json()['course_key']
+        else:
             raise CourseFixtureError(
                 "Could not create course {0}.  Status was {1}".format(
                     self._course_dict, response.status_code))

@@ -125,7 +125,7 @@
           location.href = xhr.responseText;
         }
       } else if (xhr.status == 403) {
-        location.href = "${reverse('register_user')}?course_id=${course.id.to_deprecated_string()}&enrollment_action=enroll";
+          location.href = "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
@@ -236,19 +236,17 @@
   </header>
 
   <section class="container">
+      % if self.carnegie_theme_enabled():
+        <section class="details" style="float: none; width: 100%; margin: 0 auto;">
+      % else:
+        <section class="details">
+      % endif
+      % if staff_access and studio_url is not None:
+        <div class="wrap-instructor-info studio-view">
+          <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
+        </div>
+      % endif
 
-    % if self.carnegie_theme_enabled():
-      <section class="details" style="float: none; width: 100%; margin: 0 auto;">
-    % else:
-      <section class="details">
-    % endif
-
-    % if staff_access and studio_url is not None:
-      <div class="wrap-instructor-info studio-view">
-        <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
-      </div>
-    % endif
-  
       <nav>
         <a href="#" class="active">${_("Overview")}</a>
       ##  <a href="#">${_("FAQ")}</a>

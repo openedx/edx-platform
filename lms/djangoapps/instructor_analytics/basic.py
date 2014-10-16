@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
-                    'level_of_education', 'mailing_address', 'goals')
+                    'level_of_education', 'mailing_address', 'goals', 'meta')
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
 ORDER_FEATURES = ('purchase_time',)
 
@@ -81,7 +81,7 @@ def purchase_transactions(course_id, features):
     ]
     """
 
-    purchased_courses = PaidCourseRegistration.objects.filter(course_id=course_id, status='purchased')
+    purchased_courses = PaidCourseRegistration.objects.filter(course_id=course_id, status='purchased').order_by('user')
 
     def purchase_transactions_info(purchased_course, features):
         """ convert purchase transactions to dictionary """
@@ -103,12 +103,17 @@ def purchase_transactions(course_id, features):
                                for feature in order_item_features)
         order_item_dict.update({"orderitem_id": getattr(purchased_course, 'id')})
 
-        try:
-            coupon_redemption = CouponRedemption.objects.select_related('coupon').get(order_id=purchased_course.order_id)
-        except CouponRedemption.DoesNotExist:
-            coupon_code_dict = {'coupon_code': 'None'}
+        coupon_redemption = CouponRedemption.objects.select_related('coupon').filter(order_id=purchased_course.order_id)
+        if coupon_redemption:
+            # we format the coupon codes in comma separated way if there are more then one coupon against a order id.
+            coupon_codes = list()
+            for redemption in coupon_redemption:
+                coupon_codes.append(redemption.coupon.code)
+
+            coupon_code_dict = {'coupon_code': ", ".join(coupon_codes)}
+
         else:
-            coupon_code_dict = {'coupon_code': coupon_redemption.coupon.code}
+            coupon_code_dict = {'coupon_code': 'None'}
 
         student_dict.update(dict(order_dict.items() + order_item_dict.items() + coupon_code_dict.items()))
         student_dict.update({'course_id': course_id.to_deprecated_string()})
@@ -145,6 +150,7 @@ def enrolled_students_features(course_id, features):
             profile_dict = dict((feature, getattr(profile, feature))
                                 for feature in profile_features)
             student_dict.update(profile_dict)
+
         return student_dict
 
     return [extract_student(student, features) for student in students]

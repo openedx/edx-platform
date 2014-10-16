@@ -13,14 +13,15 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 """
 
+from copy import deepcopy
 from datetime import datetime
 import logging
 import os.path
 import re
 
 from lxml import etree
+from pytz import UTC
 from xml.sax.saxutils import unescape
-from copy import deepcopy
 
 from capa.correctmap import CorrectMap
 import capa.inputtypes as inputtypes
@@ -28,10 +29,8 @@ import capa.customrender as customrender
 import capa.responsetypes as responsetypes
 from capa.util import contextualize_text, convert_files_to_filenames
 import capa.xqueue_interface as xqueue_interface
-
 from capa.safe_exec import safe_exec
 
-from pytz import UTC
 
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
@@ -84,6 +83,7 @@ class LoncapaSystem(object):
         anonymous_student_id,
         cache,
         can_execute_unsafe_code,
+        get_python_lib_zip,
         DEBUG,                                          # pylint: disable=invalid-name
         filestore,
         i18n,
@@ -98,6 +98,7 @@ class LoncapaSystem(object):
         self.anonymous_student_id = anonymous_student_id
         self.cache = cache
         self.can_execute_unsafe_code = can_execute_unsafe_code
+        self.get_python_lib_zip = get_python_lib_zip
         self.DEBUG = DEBUG                              # pylint: disable=invalid-name
         self.filestore = filestore
         self.i18n = i18n
@@ -645,6 +646,13 @@ class LoncapaProblem(object):
             code = unescape(script.text, XMLESC)
             all_code += code
 
+        # An asset named python_lib.zip can be imported by Python code.
+        extra_files = []
+        zip_lib = self.capa_system.get_python_lib_zip()
+        if zip_lib is not None:
+            extra_files.append(("python_lib.zip", zip_lib))
+            python_path.append("python_lib.zip")
+
         if all_code:
             try:
                 safe_exec(
@@ -652,6 +660,7 @@ class LoncapaProblem(object):
                     context,
                     random_seed=self.seed,
                     python_path=python_path,
+                    extra_files=extra_files,
                     cache=self.capa_system.cache,
                     slug=self.problem_id,
                     unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -664,6 +673,7 @@ class LoncapaProblem(object):
         # Store code source in context, along with the Python path needed to run it correctly.
         context['script_code'] = all_code
         context['python_path'] = python_path
+        context['extra_files'] = extra_files or None
         return context
 
     def _extract_html(self, problemtree):  # private

@@ -85,7 +85,7 @@ class CorrectMapTest(unittest.TestCase):
         self.cmap.set(
             answer_id='1_2_1',
             correctness='correct',
-            npoints=5
+            npoints=5.3
         )
 
         self.cmap.set(
@@ -116,7 +116,7 @@ class CorrectMapTest(unittest.TestCase):
         # If points assigned --> npoints
         # If no points assigned and correct --> 1 point
         # If no points assigned and incorrect --> 0 points
-        self.assertEqual(self.cmap.get_npoints('1_2_1'), 5)
+        self.assertEqual(self.cmap.get_npoints('1_2_1'), 5.3)
         self.assertEqual(self.cmap.get_npoints('2_2_1'), 1)
         self.assertEqual(self.cmap.get_npoints('3_2_1'), 5)
         self.assertEqual(self.cmap.get_npoints('4_2_1'), 0)

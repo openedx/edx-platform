@@ -41,56 +41,6 @@ window.rewriteStaticLinks = function(content, from, to) {
     return content.replace(regex, replacer);
 };
 
-// Appends a parameter to a path; useful for indicating initial or return signin, for example
-window.appendParameter = function(path, key, value) {
-    // Check if the given path already contains a query string by looking for the ampersand separator
-    if (path.indexOf("?") > -1) {
-        var splitPath = path.split("?");
-        var parameters = window.parseQueryString(splitPath[1]);
-        // Check if the provided key already exists in the query string
-        if (key in parameters) {
-            // Overwrite the existing key's value with the provided value
-            parameters[key] = value;
-
-            // Reconstruct the path, including the overwritten key/value pair
-            var reconstructedPath = splitPath[0] + "?";
-            for (var k in parameters) {
-                reconstructedPath = reconstructedPath + k + "=" + parameters[k] + "&";
-            }
-            // Strip the trailing ampersand
-            return reconstructedPath.slice(0, -1);
-        } else {
-            // Check for a trailing ampersand
-            if (path[path.length - 1] != "&") {
-                // Append signin parameter to the existing query string
-                return path + "&" + key + "=" + value;
-            } else {
-                // Append signin parameter to the existing query string, excluding the ampersand
-                return path + key + "=" + value;
-            }
-        }
-    } else {
-        // Append new query string containing the provided parameter
-        return path + "?" + key + "=" + value;
-    }
-};
-
-// Convert a query string to a key/value object
-window.parseQueryString = function(queryString) {
-    var parameters = {}, queries, pair, i, l;
-
-    // Split the query string into key/value pairs
-    queries = queryString.split("&");
-
-    // Break the array of strings into an object
-    for (i = 0, l = queries.length; i < l; i++) {
-        pair = queries[i].split('=');
-        parameters[pair[0]] = pair[1];
-    }
-
-    return parameters
-};
-
 window.identifyUser = function(userID, email, username) {
     analytics.identify(userID, {
         email: email,

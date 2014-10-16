@@ -7,8 +7,8 @@ The data type and use of it for declaratively creating test courses.
 # fields is a dictionary of keys and values. sub_tree is a collection of BlockInfo
 from collections import namedtuple
 import datetime
-BlockInfo = namedtuple('BlockInfo', 'block_id, category, fields, sub_tree')
-default_block_info_tree = [
+BlockInfo = namedtuple('BlockInfo', 'block_id, category, fields, sub_tree')  # pylint: disable=invalid-name
+default_block_info_tree = [  # pylint: disable=invalid-name
     BlockInfo(
         'chapter_x', 'chapter', {}, [
             BlockInfo(
@@ -44,7 +44,7 @@ default_block_info_tree = [
 # equivalent to toy course in xml
 TOY_BLOCK_INFO_TREE = [
     BlockInfo(
-        'Overview', "chapter", {"display_name" : "Overview"}, [
+        'Overview', "chapter", {"display_name": "Overview"}, [
             BlockInfo(
                 "Toy_Videos", "videosequence", {
                     "xml_attributes": {"filename": ["", None]}, "display_name": "Toy Videos", "format": "Lecture Sequence"
@@ -52,24 +52,24 @@ TOY_BLOCK_INFO_TREE = [
                     BlockInfo(
                         "secret:toylab", "html", {
                             "data": "<b>Lab 2A: Superposition Experiment</b>\n\n<<<<<<< Updated upstream\n<p>Isn't the toy course great?</p>\n\n<p>Let's add some markup that uses non-ascii characters.\nFor example, we should be able to write words like encyclop&aelig;dia, or foreign words like fran&ccedil;ais.\nLooking beyond latin-1, we should handle math symbols:  &pi;r&sup2 &le; &#8734.\nAnd it shouldn't matter if we use entities or numeric codes &mdash; &Omega; &ne; &pi; &equiv; &#937; &#8800; &#960;.\n</p>\n=======\n<p>Isn't the toy course great? — &le;</p>\n>>>>>>> Stashed changes\n",
-                            "xml_attributes": { "filename" : [  "html/secret/toylab.xml", "html/secret/toylab.xml" ] },
-                            "display_name" : "Toy lab"
+                            "xml_attributes": {"filename": ["html/secret/toylab.xml", "html/secret/toylab.xml"]},
+                            "display_name": "Toy lab"
                         }, []
                     ),
                     BlockInfo(
                         "toyjumpto", "html", {
-                            "data" : "<a href=\"/jump_to_id/vertical_test\">This is a link to another page and some Chinese 四節比分和七年前</a> <p>Some more Chinese 四節比分和七年前</p>\n",
-                            "xml_attributes": { "filename" : [  "html/toyjumpto.xml", "html/toyjumpto.xml" ] }
+                            "data": "<a href=\"/jump_to_id/vertical_test\">This is a link to another page and some Chinese 四節比分和七年前</a> <p>Some more Chinese 四節比分和七年前</p>\n",
+                            "xml_attributes": {"filename": ["html/toyjumpto.xml", "html/toyjumpto.xml"]}
                         }, []),
                     BlockInfo(
                         "toyhtml", "html", {
-                            "data" : "<a href='/static/handouts/sample_handout.txt'>Sample</a>",
-                            "xml_attributes" : { "filename" : [  "html/toyhtml.xml", "html/toyhtml.xml" ] }
+                            "data": "<a href='/static/handouts/sample_handout.txt'>Sample</a>",
+                            "xml_attributes": {"filename": ["html/toyhtml.xml", "html/toyhtml.xml"]}
                         }, []),
                     BlockInfo(
                         "nonportable", "html", {
                             "data": "<a href=\"/static/foo.jpg\">link</a>\n",
-                            "xml_attributes" : { "filename" : [  "html/nonportable.xml", "html/nonportable.xml" ] }
+                            "xml_attributes": {"filename": ["html/nonportable.xml", "html/nonportable.xml"]}
                         }, []),
                     BlockInfo(
                         "nonportable_link", "html", {
@@ -79,7 +79,7 @@ TOY_BLOCK_INFO_TREE = [
                     BlockInfo(
                         "badlink", "html", {
                             "data": "<img src=\"/static//file.jpg\" />\n",
-                            "xml_attributes" : { "filename" : [  "html/badlink.xml", "html/badlink.xml" ] }
+                            "xml_attributes": {"filename": ["html/badlink.xml", "html/badlink.xml"]}
                         }, []),
                     BlockInfo(
                         "with_styling", "html", {
@@ -89,11 +89,11 @@ TOY_BLOCK_INFO_TREE = [
                     BlockInfo(
                         "just_img", "html", {
                             "data": "<img src=\"/static/foo_bar.jpg\" />",
-                            "xml_attributes": {"filename": [  "html/just_img.xml", "html/just_img.xml" ] }
+                            "xml_attributes": {"filename": ["html/just_img.xml", "html/just_img.xml"]}
                         }, []),
                     BlockInfo(
                         "Video_Resources", "video", {
-                            "youtube_id_1_0" : "1bK-WdDi6Qw", "display_name" : "Video Resources"
+                            "youtube_id_1_0": "1bK-WdDi6Qw", "display_name": "Video Resources"
                         }, []),
                 ]),
             BlockInfo(
@@ -109,7 +109,7 @@ TOY_BLOCK_INFO_TREE = [
     ),
     BlockInfo(
         "secret:magic", "chapter", {
-            "xml_attributes": {"filename": [ "chapter/secret/magic.xml", "chapter/secret/magic.xml"]}
+            "xml_attributes": {"filename": ["chapter/secret/magic.xml", "chapter/secret/magic.xml"]}
         }, [
             BlockInfo(
                 "toyvideo", "video", {"youtube_id_1_0": "OEoXaMPEzfMA", "display_name": "toyvideo"}, []
@@ -117,18 +117,18 @@ TOY_BLOCK_INFO_TREE = [
         ]
     ),
     BlockInfo(
-       "poll_test", "chapter", {}, [
+        "poll_test", "chapter", {}, [
             BlockInfo(
                 "T1_changemind_poll_foo", "poll_question", {
                     "question": "<p>Have you changed your mind? ’</p>",
                     "answers": [{"text": "Yes", "id": "yes"}, {"text": "No", "id": "no"}],
                     "xml_attributes": {"reset": "false", "filename": ["", None]},
                     "display_name": "Change your answer"
-                }, []) ]
+                }, [])]
     ),
     BlockInfo(
-       "vertical_container", "chapter", {
-           "xml_attributes": {"filename": ["chapter/vertical_container.xml", "chapter/vertical_container.xml"]}
+        "vertical_container", "chapter", {
+            "xml_attributes": {"filename": ["chapter/vertical_container.xml", "chapter/vertical_container.xml"]}
         }, [
             BlockInfo("vertical_sequential", "sequential", {}, [
                 BlockInfo("vertical_test", "vertical", {
@@ -163,7 +163,7 @@ TOY_BLOCK_INFO_TREE = [
                         "T1_changemind_poll_foo_2", "poll_question", {
                             "question": "<p>Have you changed your mind?</p>",
                             "answers": [{"text": "Yes", "id": "yes"}, {"text": "No", "id": "no"}],
-                            "xml_attributes": {"reset": "false", "filename": [  "", None]},
+                            "xml_attributes": {"reset": "false", "filename": ["", None]},
                             "display_name": "Change your answer"
                         }, []),
                 ]),
@@ -174,8 +174,8 @@ TOY_BLOCK_INFO_TREE = [
         ]
     ),
     BlockInfo(
-       "handout_container", "chapter", {
-            "xml_attributes" : {"filename" : ["chapter/handout_container.xml", "chapter/handout_container.xml"]}
+        "handout_container", "chapter", {
+            "xml_attributes": {"filename": ["chapter/handout_container.xml", "chapter/handout_container.xml"]}
         }, [
             BlockInfo(
                 "html_7e5578f25f79", "html", {

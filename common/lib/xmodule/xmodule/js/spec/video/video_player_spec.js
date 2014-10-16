@@ -382,7 +382,9 @@ function (VideoPlayer) {
                     }, 'video didn\'t start playing', WAIT_TIMEOUT);
                 });
 
-                it('slider event causes log update', function () {
+                // as per TNL-439 this test is deemed flaky and needs to be fixed.
+                // disabled 09/18/2014
+                xit('slider event causes log update', function () {
                     runs(function () {
                         spyOn(state.videoPlayer, 'log');
                         state.videoProgressSlider.onSlide(
@@ -395,16 +397,30 @@ function (VideoPlayer) {
                     }, 'currentTime is less than 2 seconds', WAIT_TIMEOUT);
 
                     runs(function () {
-                        var args = state.videoPlayer.log.calls[0].args;
+                        // Depending on the browser, the object of arrays may list the
+                        // arrays in a different order. Find the array that is relevent
+                        // to onSeek. Fail if that is not found.
+                        var seekVideoArgIndex
+                        for(var i = 0; i < state.videoPlayer.log.calls.length; i++){
+                            if (state.videoPlayer.log.calls[i].args[0] == 'seek_video') {
+                                seekVideoArgIndex = i
+                                break;
+                            }
+                        }
 
-                        expect(args[0]).toBe('seek_video');
+                        expect(seekVideoArgIndex).toBeDefined;
+
+                        var args = state.videoPlayer.log.calls[seekVideoArgIndex].args;
+
                         expect(args[1].old_time).toBeLessThan(2);
                         expect(args[1].new_time).toBe(2);
                         expect(args[1].type).toBe('onSlideSeek');
                     });
                 });
 
-                it('seek the player', function () {
+                // as per TNL-439 this test is deemed flaky and needs to be fixed.
+                // disabled 09/18/2014
+                xit('seek the player', function () {
                     runs(function () {
                         spyOn(state.videoPlayer.player, 'seekTo')
                             .andCallThrough();
@@ -423,7 +439,9 @@ function (VideoPlayer) {
                     });
                 });
 
-                it('call updatePlayTime on player', function () {
+                // as per TNL-439 this test is deemed flaky and needs to be fixed.
+                // disabled 09/18/2014
+                xit('call updatePlayTime on player', function () {
                     runs(function () {
                         spyOn(state.videoPlayer, 'updatePlayTime')
                             .andCallThrough();
@@ -463,7 +481,9 @@ function (VideoPlayer) {
                 });
             });
 
-            describe('when the video is not playing', function () {
+            // as per TNL-439 these tests are deemed flaky and needs to be fixed.
+            // disabled 09/18/2014
+            xdescribe('when the video is not playing', function () {
                 beforeEach(function () {
                     spyOn(state.videoPlayer, 'setPlaybackRate')
                         .andCallThrough();
@@ -496,7 +516,7 @@ function (VideoPlayer) {
                     state.speed = '2.0';
                     state.videoPlayer.onPlay();
                     expect(state.videoPlayer.setPlaybackRate)
-                        .toHaveBeenCalledWith('2.0');
+                        .toHaveBeenCalledWith('2.0', true);
                     state.videoPlayer.onPlay();
                     expect(state.videoPlayer.setPlaybackRate.calls.length)
                         .toEqual(1);

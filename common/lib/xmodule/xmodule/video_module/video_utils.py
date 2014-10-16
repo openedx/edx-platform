@@ -1,5 +1,5 @@
 """
-Module containts utils specific for video_module but not for transcripts.
+Module contains utils specific for video_module but not for transcripts.
 """
 import json
 import logging
