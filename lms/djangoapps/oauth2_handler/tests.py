@@ -2,7 +2,7 @@
 from django.test.utils import override_settings
 from django.test import TestCase
 
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.tests import TEST_DATA_DIR
 from lang_pref import LANGUAGE_KEY
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import anonymous_id_for_user
@@ -14,6 +14,10 @@ from user_api.models import UserPreference
 # Will also run default tests for IDTokens and UserInfo
 from oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
 
+from xmodule.modulestore.tests.django_utils import mixed_store_config
+TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class BaseTestMixin(TestCase):
@@ -21,7 +25,7 @@ class BaseTestMixin(TestCase):
 
     def setUp(self):
         super(BaseTestMixin, self).setUp()
-
+        
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.course_id = unicode(self.course_key)
 

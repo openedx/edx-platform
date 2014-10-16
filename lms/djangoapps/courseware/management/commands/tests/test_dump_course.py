@@ -14,8 +14,7 @@ from django.core.management import call_command
 from django.test.utils import override_settings
 from django.test.testcases import TestCase
 
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_DIR
 from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from xmodule.modulestore import ModuleStoreEnum
@@ -24,6 +23,10 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_from_xml
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from xmodule.modulestore.tests.django_utils import xml_store_config, mixed_store_config
+TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, ['simple'])
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, {'edX/simple/2012_Fall': 'xml'})
 
 DATA_DIR = 'common/test/data/'
 
@@ -38,7 +41,6 @@ class CommandsTestBase(TestCase):
     to be tested.
 
     """
-
     def setUp(self):
         self.loaded_courses = self.load_courses()
 
