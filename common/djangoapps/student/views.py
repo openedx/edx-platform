@@ -1319,9 +1319,8 @@ def _do_create_account(post_vars, extended_profile=None):
     profile.cedula = post_vars.get('cedula')
     profile.city = city
 
-#    city = City.objects.get(id=post_vars['city_id'])
-#    profile.city = city
-
+    city = City.objects.get(id=post_vars['city_id'])
+    profile.city = city
     type_id = post_vars['type_id']
     if type_id == 'cedula':
         try:
@@ -1473,9 +1472,9 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         try:
             validate_cedula(post_vars['cedula'])
         except ValidationError:
-            js['value'] = _("A valid ID is required.").format(field=a)
+            js['value'] = _("A valid ID is required.")
             js['field'] = 'cedula'
-            return HttpResponse(json.dumps(js))        
+            return HttpResponse(json.dumps(js))
 
         max_length = 75
         if field_name == 'username':

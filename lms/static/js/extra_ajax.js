@@ -56,3 +56,32 @@ $(function(){
         });
     })
   });
+
+$(function(){
+    $("#publicentity").autocomplete({
+        source: function(request, response){
+            $.ajax({
+                url: "/entity_lookup/",
+                dataType: "json",
+                data: {
+                    query: request.term,
+                },
+                success: function(data){
+                    response( $.map(data, function(item){
+                      $("#entity_id").val(item[0]); 
+                      return {
+                          label: item[1],
+                          value: item[1]
+                      }
+                    }));
+                }
+            });
+        },
+        open: function(){
+            $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+        },
+        close: function(){
+            $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+        }
+    })
+});
