@@ -16,6 +16,8 @@ Use the chapters in this section to create course components.
    conditional_module
    full_screen_image
    google_hangout
+   graphical_slider_tool
+   iframe
    lti_component
    open_response_assessment
    periodic_table
