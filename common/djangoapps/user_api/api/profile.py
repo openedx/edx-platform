@@ -73,7 +73,7 @@ def profile_info(username):
         "year_of_birth": profile.year_of_birth,
         "goals": profile.goals,
         "city": profile.city,
-        "country": profile.country,
+        "country": unicode(profile.country),
     }
 
     return profile_dict

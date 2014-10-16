@@ -28,6 +28,12 @@ class ProfileApiTest(TestCase):
             'username': self.USERNAME,
             'email': self.EMAIL,
             'full_name': u'',
+            'goals': None,
+            'level_of_education': None,
+            'mailing_address': None,
+            'year_of_birth': None,
+            'country': '',
+            'city': None,
         })
 
     def test_update_full_name(self):
