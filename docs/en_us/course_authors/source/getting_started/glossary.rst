@@ -10,6 +10,12 @@ Glossary
 A
 ****
 
+.. _AB Test:
+
+**A/B Test**
+
+  See `Content Experiment`_.
+
 .. _About Page:
 
 **About Page**
@@ -88,6 +94,15 @@ C
   contain one or more components. For more information, see :ref:`Developing
   Course Components`.
 
+.. _Content Experiment:
+
+**Content Experiment**
+
+  You can define alternative course content to be delivered to different,
+  randomly assigned groups of students. Also known as A/B or split testing, you
+  use content experiments to compare the performance of students who have been
+  exposed to different versions of of the content. For more information, see
+  :ref:`Creating Content Experiments`.
 
 .. _Course Accordion:
  
@@ -514,6 +529,11 @@ S
 
   The graphical user interface in a Problem component that contains formatting buttons and is available for some problem types. For more information, see :ref:`Problem Studio View`.
 
+.. _Split_Test:
+
+**Split Test**
+
+  See `Content Experiment`_.
 
 
 .. _Subsection:

@@ -9,3 +9,4 @@ networkx==1.7
 sympy==0.7.1
 pyparsing==2.0.1
 nltk==2.0.4
+matplotlib==1.3.1

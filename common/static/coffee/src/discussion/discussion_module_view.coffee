@@ -7,7 +7,6 @@ if Backbone?
       "click .new-post-btn": "toggleNewPost"
       "keydown .new-post-btn":
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
-      "click .cancel": "hideNewPost"
       "click .discussion-paginator a": "navigateToPage"
 
     paginationTemplate: -> DiscussionUtil.getTemplate("_pagination")
@@ -36,9 +35,8 @@ if Backbone?
       @$("section.discussion").slideDown()
       @showed = true
 
-    hideNewPost: (event) ->
-      event.preventDefault()
-      @newPostForm.slideUp(300)
+    hideNewPost: =>
+     @newPostForm.slideUp(300)
 
     hideDiscussion: =>
       @$("section.discussion").slideUp()
@@ -111,6 +109,7 @@ if Backbone?
         topicId: discussionId
       )
       @newPostView.render()
+      @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )
       @discussion.on "add", @addThread
 
       @retrieved = true

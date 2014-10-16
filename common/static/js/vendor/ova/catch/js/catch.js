@@ -546,9 +546,11 @@ CatchAnnotation.prototype = {
             // public or is equal to the person with update access, then we leave it alone,
             // otherwise we need to clean them up (i.e. disable them).
             if (self.options.userId !== '' && self.options.userId !== value.permissions.update[0]) {
-                $.each(value.highlights, function(key1, value1){
-                    $(value1).removeClass('annotator-hl');
-                });
+                if (value.highlights !== undefined) {
+                    $.each(value.highlights, function(key1, value1){
+                        $(value1).removeClass('annotator-hl');
+                    });
+                }
             }
         });
     },
@@ -1123,11 +1125,10 @@ CatchAnnotation.prototype = {
         
         // checks to make sure that Grouping is redone when switching tags in text annotations
         if (this.options.media === 'text') {
-            if (this.current_tab ==='public') {
-                this.annotator.plugins.Grouping.useGrouping = 0;
-            } else {
-                this.annotator.plugins.Grouping.useGrouping = 1;
-            }
+            if (typeof this.annotator.plugins.Grouping !== 'undefined') {
+                // this is to check if user is is MyNotes instead of the annotation component
+                this.annotator.plugins.Grouping.useGrouping = this.current_tab === 'public' ? 0 : 1;
+            } 
             this.annotator.publish("changedTabsInCatch");
         }
         // Change userid and refresh
@@ -1156,7 +1157,11 @@ CatchAnnotation.prototype = {
         var searchtype = searchtype || "";
         var searchInput = searchInput || ""; 
         this.clean = true;
-        this._clearAnnotator();
+
+        // the following cannot run in notes for there are no highlights
+        if ($("#notesHolder").length === 0) {
+            this._clearAnnotator();
+        }
         
         var annotator = this.annotator;
         var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
@@ -1196,11 +1201,11 @@ CatchAnnotation.prototype = {
         
         annotations.forEach(function(ann){
             var child, h, _i, _len, _ref;
-            if (ann.highlights !== null) {
+            if (ann.highlights !== undefined) {
                 _ref = ann.highlights;
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     h = _ref[_i];
-                    if (!(h.parentNode !== null)) {
+                    if (!(h.parentNode !== undefined)) {
                         continue;
                     }
                     child = h.childNodes[0];

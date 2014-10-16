@@ -103,8 +103,14 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
         self.user_email = ""
+        self.is_course_staff = False
+        if self.runtime.get_user_role() in ['instructor', 'staff']:
+            self.is_course_staff = True
         if self.runtime.get_real_user is not None:
-            self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
+            try:
+                self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
+            except:  # pylint: disable=broad-except
+                self.user_email = _("No email address found.")
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -131,10 +137,15 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'default_tab': self.default_tab,
             'instructor_email': self.instructor_email,
             'annotation_mode': self.annotation_mode,
+            'is_course_staff': self.is_course_staff,
         }
         fragment = Fragment(self.system.render_template('videoannotation.html', context))
-        fragment.add_javascript_url(self.runtime.STATIC_URL + "js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
-        fragment.add_javascript_url(self.runtime.STATIC_URL + "js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+
+        # TinyMCE already exists in Studio so we should not load the files again
+        # get_real_user always returns "None" in Studio since its runtimes contains no anonymous ids
+        if self.runtime.get_real_user is not None:
+            fragment.add_javascript_url(self.runtime.STATIC_URL + "js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+            fragment.add_javascript_url(self.runtime.STATIC_URL + "js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
         return fragment
 
 

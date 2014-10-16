@@ -2,10 +2,16 @@
 Tests for testing the modulestore settings migration code.
 """
 import copy
+import ddt
 from unittest import TestCase
-from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
+from xmodule.modulestore.modulestore_settings import (
+    convert_module_store_setting_if_needed,
+    update_module_store_settings,
+    get_mixed_stores,
+)
 
 
+@ddt.ddt
 class ModuleStoreSettingsMigration(TestCase):
     """
     Tests for the migration code for the module store settings
@@ -108,12 +114,6 @@ class ModuleStoreSettingsMigration(TestCase):
     }
 
 
-    def _get_mixed_stores(self, mixed_setting):
-        """
-        Helper for accessing stores in a configuration setting for the Mixed modulestore.
-        """
-        return mixed_setting["default"]["OPTIONS"]["stores"]
-
     def assertStoreValuesEqual(self, store_setting1, store_setting2):
         """
         Tests whether the fields in the given store_settings are equal.
@@ -134,7 +134,7 @@ class ModuleStoreSettingsMigration(TestCase):
         self.assertEqual(new_mixed_setting["default"]["ENGINE"], "xmodule.modulestore.mixed.MixedModuleStore")
 
         # check whether the stores are in an ordered list
-        new_stores = self._get_mixed_stores(new_mixed_setting)
+        new_stores = get_mixed_stores(new_mixed_setting)
         self.assertIsInstance(new_stores, list)
 
         return new_mixed_setting, new_stores[0]
@@ -143,7 +143,7 @@ class ModuleStoreSettingsMigration(TestCase):
         """
         Tests whether the split module store is configured in the given setting.
         """
-        stores = self._get_mixed_stores(mixed_setting)
+        stores = get_mixed_stores(mixed_setting)
         split_settings = [store for store in stores if store['ENGINE'].endswith('.DraftVersioningModuleStore')]
         if len(split_settings):
             # there should only be one setting for split
@@ -178,8 +178,8 @@ class ModuleStoreSettingsMigration(TestCase):
         self.assertTrue(self.is_split_configured(new_mixed_setting))
 
         # exclude split when comparing old and new, since split was added as part of the migration
-        new_stores = [store for store in self._get_mixed_stores(new_mixed_setting) if store['NAME'] != 'split']
-        old_stores = self._get_mixed_stores(self.OLD_MIXED_CONFIG_WITH_DICT)
+        new_stores = [store for store in get_mixed_stores(new_mixed_setting) if store['NAME'] != 'split']
+        old_stores = get_mixed_stores(self.OLD_MIXED_CONFIG_WITH_DICT)
 
         # compare each store configured in mixed
         self.assertEqual(len(new_stores), len(old_stores))
@@ -192,3 +192,14 @@ class ModuleStoreSettingsMigration(TestCase):
         new_mixed_setting, new_default_store_setting = self.assertMigrated(old_mixed_setting)
         self.assertTrue(self.is_split_configured(new_mixed_setting))
         self.assertEquals(old_mixed_setting, new_mixed_setting)
+
+    @ddt.data('draft', 'split')
+    def test_update_settings(self, default_store):
+        mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG
+        update_module_store_settings(mixed_setting, default_store=default_store)
+        self.assertTrue(get_mixed_stores(mixed_setting)[0]['NAME'] == default_store)
+
+    def test_update_settings_error(self):
+        mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG
+        with self.assertRaises(Exception):
+            update_module_store_settings(mixed_setting, default_store='non-existent store')

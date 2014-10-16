@@ -11,6 +11,9 @@ Change Log
 
    * - Date
      - Change
+   * - 09/18/14
+     - Added descriptions of two columns added to the :ref:`auth_userprofile
+       table<auth_userprofile>`.
    * - 09/08/14
      - Added cautions to the :ref:`Getting_Credentials_Data_Czar` chapter.
    * - 09/04/14

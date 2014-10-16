@@ -20,7 +20,6 @@ from instructor_analytics.basic import (
     sale_record_features, enrolled_students_features, course_registration_features, coupon_codes_features, student_submissions,
     AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 )
-
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 
@@ -59,7 +58,7 @@ class TestAnalyticsBasic(TestCase):
         self.assertEqual(set(AVAILABLE_FEATURES), set(STUDENT_FEATURES + PROFILE_FEATURES))
 
 
-class TestCourseSaleRecordsAnalyticsBasic(TestCase):
+class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic course sale records analytics functions. """
     def setUp(self):
         """
@@ -107,7 +106,7 @@ class TestCourseSaleRecordsAnalyticsBasic(TestCase):
             self.assertEqual(sale_record['total_codes'], 5)
 
 
-class TestCourseRegistrationCodeAnalyticsBasic(TestCase):
+class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic course registration codes analytics functions. """
     def setUp(self):
         """

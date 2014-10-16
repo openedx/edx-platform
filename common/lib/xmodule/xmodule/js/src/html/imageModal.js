@@ -1,4 +1,7 @@
-function setupFullScreenImage() {
+var setupFullScreenModal = function() {
+  
+  // Setup full screen image modal.
+  // Executed from HTMLModule in display.js.
   $("a.modal-content").each(function() {
     var smallImageObject = $(this).children();
     var largeImageSRC = $(this).attr('href');
@@ -104,4 +107,4 @@ function setupFullScreenImage() {
       $(".wrapper-modal-image .image-content .image-controls .modal-ui-icon").toggleClass('is-disabled');
     }
   });
-}
+};

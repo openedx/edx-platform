@@ -12,7 +12,7 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
+from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
 from smtplib import SMTPException
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
@@ -211,28 +211,31 @@ def course_handler(request, course_key_string=None):
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
-    response_format = request.REQUEST.get('format', 'html')
-    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
-        if request.method == 'GET':
-            course_module = _get_course_module(CourseKey.from_string(course_key_string), request.user, depth=None)
-            return JsonResponse(_course_outline_json(request, course_module))
-        elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
-            return _create_or_rerun_course(request)
-        elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
-            raise PermissionDenied()
-        elif request.method == 'PUT':
-            raise NotImplementedError()
-        elif request.method == 'DELETE':
-            raise NotImplementedError()
+    try:
+        response_format = request.REQUEST.get('format', 'html')
+        if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+            if request.method == 'GET':
+                course_module = _get_course_module(CourseKey.from_string(course_key_string), request.user, depth=None)
+                return JsonResponse(_course_outline_json(request, course_module))
+            elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
+                return _create_or_rerun_course(request)
+            elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
+                raise PermissionDenied()
+            elif request.method == 'PUT':
+                raise NotImplementedError()
+            elif request.method == 'DELETE':
+                raise NotImplementedError()
+            else:
+                return HttpResponseBadRequest()
+        elif request.method == 'GET':  # assume html
+            if course_key_string is None:
+                return course_listing(request)
+            else:
+                return course_index(request, CourseKey.from_string(course_key_string))
         else:
-            return HttpResponseBadRequest()
-    elif request.method == 'GET':  # assume html
-        if course_key_string is None:
-            return course_listing(request)
-        else:
-            return course_index(request, CourseKey.from_string(course_key_string))
-    else:
-        return HttpResponseNotFound()
+            return HttpResponseNotFound()
+    except InvalidKeyError:
+        raise Http404
 
 
 @login_required
@@ -426,7 +429,7 @@ def course_index(request, course_key):
     """
     # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
     # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
-    with modulestore().bulk_temp_noop_operations(course_key):  # FIXME
+    with modulestore().bulk_operations(course_key):
         course_module = _get_course_module(course_key, request.user, depth=None)
         lms_link = get_lms_link_for_item(course_module.location)
         sections = course_module.get_children()
@@ -570,7 +573,11 @@ def _create_new_course(request, org, number, run, fields):
     fields.update(definition_data)
 
     store = modulestore()
-    with store.default_store(settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE', 'mongo')):
+    store_for_new_course = (
+        settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE') or
+        store.default_modulestore.get_modulestore_type()
+    )
+    with store.default_store(store_for_new_course):
         # Creating the course raises DuplicateCourseError if an existing course with this org/name is found
         new_course = store.create_course(
             org,
@@ -587,7 +594,8 @@ def _create_new_course(request, org, number, run, fields):
     initialize_permissions(new_course.id, request.user)
 
     return JsonResponse({
-        'url': reverse_course_url('course_handler', new_course.id)
+        'url': reverse_course_url('course_handler', new_course.id),
+        'course_key': unicode(new_course.id),
     })
 
 

@@ -26,8 +26,9 @@ class CapaHtmlRenderTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str)
 
         # Render the HTML
-        rendered_html = etree.XML(problem.get_html())
+        etree.XML(problem.get_html())
         # expect that we made it here without blowing up
+        self.assertTrue(True)
 
     def test_include_html(self):
         # Create a test file to include
@@ -123,17 +124,17 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Render the HTML
         rendered_html = etree.XML(problem.get_html())
 
-
         # expect the javascript is still present in the rendered html
         self.assertTrue("<script type=\"text/javascript\">function(){}</script>" in etree.tostring(rendered_html))
 
-
     def test_render_response_xml(self):
         # Generate some XML for a string response
-        kwargs = {'question_text': "Test question",
-                    'explanation_text': "Test explanation",
-                    'answer': 'Test answer',
-                    'hints': [('test prompt', 'test_hint', 'test hint text')]}
+        kwargs = {
+            'question_text': "Test question",
+            'explanation_text': "Test explanation",
+            'answer': 'Test answer',
+            'hints': [('test prompt', 'test_hint', 'test hint text')]
+        }
         xml_str = StringResponseXMLFactory().build_xml(**kwargs)
 
         # Mock out the template renderer
@@ -186,18 +187,21 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         expected_solution_context = {'id': '1_solution_1'}
 
-        expected_calls = [mock.call('textline.html', expected_textline_context),
-                mock.call('solutionspan.html', expected_solution_context),
-                mock.call('textline.html', expected_textline_context),
-                mock.call('solutionspan.html', expected_solution_context)]
+        expected_calls = [
+            mock.call('textline.html', expected_textline_context),
+            mock.call('solutionspan.html', expected_solution_context),
+            mock.call('textline.html', expected_textline_context),
+            mock.call('solutionspan.html', expected_solution_context)
+        ]
 
-        self.assertEqual(the_system.render_template.call_args_list,
-                            expected_calls)
-
+        self.assertEqual(
+            the_system.render_template.call_args_list,
+            expected_calls
+        )
 
     def test_render_response_with_overall_msg(self):
         # CustomResponse script that sets an overall_message
-        script=textwrap.dedent("""
+        script = textwrap.dedent("""
             def check_func(*args):
                 msg = '<p>Test message 1<br /></p><p>Test message 2</p>'
                 return {'overall_message': msg,
@@ -205,18 +209,17 @@ class CapaHtmlRenderTest(unittest.TestCase):
         """)
 
         # Generate some XML for a CustomResponse
-        kwargs = {'script':script, 'cfn': 'check_func'}
+        kwargs = {'script': script, 'cfn': 'check_func'}
         xml_str = CustomResponseXMLFactory().build_xml(**kwargs)
 
         # Create the problem and render the html
         problem = new_loncapa_problem(xml_str)
 
         # Grade the problem
-        correctmap = problem.grade_answers({'1_2_1': 'test'})
+        problem.grade_answers({'1_2_1': 'test'})
 
         # Render the html
         rendered_html = etree.XML(problem.get_html())
-
 
         # Expect that there is a <div> within the response <div>
         # with css class response_message
@@ -231,7 +234,6 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         self.assertEqual(msg_p_elements[1].tag, "p")
         self.assertEqual(msg_p_elements[1].text, "Test message 2")
-
 
     def test_substitute_python_vars(self):
         # Generate some XML with Python variables defined in a script

@@ -1,0 +1,92 @@
+###################################
+September 18, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of
+September 18, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we update the edX Course Staff Release Notes.
+
+
+*******************************
+edX Learning Management System
+*******************************
+
+* On the **Discussions** tab, an error message sometimes appeared when you clicked through the thread list quickly. This bug has been fixed. 
+
+* A "Page Not Found" error that could occur in some circumstances has been fixed. Previously, if a student closed the browser window after viewing a course section, and the course team later made that section unavailable, the error could occur when the student returned to the course section. (LMS-6492) 
+
+* If a student changed the playback speed of a video in Firefox, the video did not play. This bug has been fixed. (BLD-1221)
+
+* To help course teams protect video assets, the edX video player now hides video URLs from students by default. This functionality is now in effect for all video files, including those that are not hosted on YouTube. Students can still download videos if you have selected the **Video Download Allowed** option for your Video components. (TNL-302)
+
+
+*******************************
+edX Studio
+*******************************
+
+* The **Adding Files for Your Course** page now includes a recommendation to limit the size of individual files to 10 MB.
+
+* After you added a private YouTube video to your course, the video controls for later videos did not appear in Studio or in the LMS. This bug has been fixed. (TNL-184)
+
+**************************
+Coming Soon
+**************************
+
+We're pleased to announce the following upcoming changes:
+
+* Course teams will soon be able to access data about their courses on a
+  dedicated dashboard for course-specific data. By providing insights into who
+  your students are, and what they do while interacting with your course, the
+  data available on this dashboard can validate choices you’ve made, reveal
+  unexpected patterns, and inform plans for changes to the course.
+
+* EdX will soon release a fully supported cohorts feature that allows course teams and TAs to assign students to different cohorts in class discussions. Students in different cohorts will be able to see the discussions for their individual cohorts, but cannot see discussions for other cohorts. Course teams can also open some course discussions to all students.
+
+
+**************************
+edX Documentation
+**************************
+
+All guides now include a section that lists browsers supported for use with the
+edX platform.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+
+* `Creating Peer Assessments`_
+
+* `edX Research Guide`_
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst

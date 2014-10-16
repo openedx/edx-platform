@@ -79,7 +79,7 @@ def test_system(options):
 ])
 def test_lib(options):
     """
-    Run tests for common/lib/
+    Run tests for common/lib/ and pavelib/ (paver-tests)
     """
     lib = getattr(options, 'lib', None)
     test_id = getattr(options, 'test_id', lib)
