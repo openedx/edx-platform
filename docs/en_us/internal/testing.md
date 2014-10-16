@@ -398,11 +398,11 @@ More specific options are below.
 
 * Running a report, and setting it to fail if it exceeds a given number of violations:
 
-		paver run_pep8 -l 800
+		paver run_pep8 --limit=800
 
 * The `run_quality` uses the underlying diff-quality tool (which is packaged with [diff-cover](https://github.com/edx/diff-cover)). With that, the command can be set to fail if a certain diff threshold is not met. For example, to cause the process to fail if  quality expectations are less than 100% when compared to master (or in other words, if style quality is worse than what's already on master):
 
-		paver run_quality -p 100
+		paver run_quality --percentage=100
 
 
 
