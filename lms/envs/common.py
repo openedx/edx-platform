@@ -287,6 +287,11 @@ FEATURES = {
 
     # Enable the new dashboard, account, and profile pages
     'ENABLE_NEW_DASHBOARD': False,
+
+    # Show a section in the membership tab of the instructor dashboard
+    # to allow an upload of a CSV file that contains a list of new accounts to create
+    # and register for course.
+    'ALLOW_AUTOMATED_SIGNUPS': False,
 }
 
 # Ignore static asset files on import which match this pattern
