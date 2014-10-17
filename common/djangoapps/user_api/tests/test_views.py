@@ -544,6 +544,7 @@ class PreferenceUsersListViewTest(UserApiTestCase):
         self.assertEqual(len(set(all_user_uris)), 2)
 
 
+@ddt.ddt
 class LoginSessionViewTest(ApiTestCase):
     """Tests for the login end-points of the user API. """
 
@@ -580,31 +581,41 @@ class LoginSessionViewTest(ApiTestCase):
         self.assertEqual(form_desc["submit_url"], self.url)
         self.assertEqual(form_desc["fields"], [
             {
-                u"name": u"email",
-                u"default": u"",
-                u"type": u"text",
-                u"required": True,
-                u"label": u"E-mail",
-                u"placeholder": u"example: username@domain.com",
-                u"instructions": u"This is the e-mail address you used to register with edX",
-                u"restrictions": {
-                    u"min_length": 3,
-                    u"max_length": 254
+                "name": "email",
+                "default": "",
+                "type": "text",
+                "required": True,
+                "label": "E-mail",
+                "placeholder": "example: username@domain.com",
+                "instructions": "This is the e-mail address you used to register with edX",
+                "restrictions": {
+                    "min_length": 3,
+                    "max_length": 254
                 },
             },
             {
-                u"name": u"password",
-                u"default": u"",
-                u"type": u"text",
-                u"required": True,
-                u"label": u"Password",
-                u"placeholder": u"",
-                u"instructions": u"",
-                u"restrictions": {
-                    u"min_length": 2,
-                    u"max_length": 75
+                "name": "password",
+                "default": "",
+                "type": "text",
+                "required": True,
+                "label": "Password",
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {
+                    "min_length": 2,
+                    "max_length": 75
                 },
             },
+            {
+                "name": "remember",
+                "default": False,
+                "type": "checkbox",
+                "required": False,
+                "label": "Remember me",
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
         ])
 
     def test_login(self):
@@ -622,6 +633,34 @@ class LoginSessionViewTest(ApiTestCase):
         # a page that requires authentication.
         response = self.client.get(reverse("dashboard"))
         self.assertHttpOK(response)
+
+    @ddt.data(
+        (json.dumps(True), False),
+        (json.dumps(False), True),
+        (None, True),
+    )
+    @ddt.unpack
+    def test_login_remember_me(self, remember_value, expire_at_browser_close):
+        # Create a test user
+        UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+
+        # Login and remember me
+        data = {
+            "email": self.EMAIL,
+            "password": self.PASSWORD,
+        }
+
+        if remember_value is not None:
+            data["remember"] = remember_value
+
+        response = self.client.post(self.url, data)
+        self.assertHttpOK(response)
+
+        # Verify that the session expiration was set correctly
+        self.assertEqual(
+            self.client.session.get_expire_at_browser_close(),
+            expire_at_browser_close
+        )
 
     def test_invalid_credentials(self):
         # Create a test user

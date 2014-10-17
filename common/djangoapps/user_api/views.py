@@ -87,6 +87,14 @@ class LoginSessionView(APIView):
             }
         )
 
+        form_desc.add_field(
+            "remember",
+            field_type="checkbox",
+            label=_("Remember me"),
+            default=False,
+            required=False,
+        )
+
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
     @method_decorator(ensure_csrf_cookie)
