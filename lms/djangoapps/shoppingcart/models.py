@@ -127,7 +127,7 @@ class Order(models.Model):
         return cart_order
 
     @classmethod
-    def user_cart_has_items(cls, user, item_type=None):
+    def user_cart_has_items(cls, user, item_types=None):
         """
         Returns true if the user (anonymous user ok) has
         a cart with items in it.  (Which means it should be displayed.
@@ -137,7 +137,17 @@ class Order(models.Model):
         if not user.is_authenticated():
             return False
         cart = cls.get_cart_for_user(user)
-        return cart.has_items(item_type)
+
+        if not item_types:
+            # check to see if the cart has at least some item in it
+            return cart.has_items()
+        else:
+            # if the caller is explicitly asking to check for particular types
+            for item_type in item_types:
+                if cart.has_items(item_type):
+                    return True
+
+        return False
 
     @property
     def total_cost(self):

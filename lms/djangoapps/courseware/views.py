@@ -707,7 +707,8 @@ def course_about(request, course_id):
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
             cart = shoppingcart.models.Order.get_cart_for_user(request.user)
-            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key)
+            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
+                shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
 
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
