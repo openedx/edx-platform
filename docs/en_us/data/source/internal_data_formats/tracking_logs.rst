@@ -2687,6 +2687,9 @@ the child module that was shown to the student.
    * - ``child_id``
      - string
      - ID of the module that displays to the student. 
+       
+       **History**: Renamed on 16 Oct 2014 from ``child-id`` to ``child_id``.
+       
 
 .. _student_cohort_events:
 
