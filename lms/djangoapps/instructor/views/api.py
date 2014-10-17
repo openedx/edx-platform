@@ -238,8 +238,11 @@ def register_and_enroll_list_of_students(request, course_id):
 
     -If the username already exists (but not the email), assume it is a different user and fail to create the new account.
      The failure will be messaged in a response in the browser.
-
     """
+
+    if not microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+        return HttpResponseForbidden()
+
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     results = []
     if 'students_list' in request.FILES:

@@ -71,7 +71,7 @@
 
 <hr class="divider" />
 
-%if microsite.get_value('ALLOW_AUTOMATED_SIGNEDUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNEDUPS', False)):
+%if microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
   <div class="auto-enroll-via-csv">
     <h2> ${_("Register/Enroll Students")} </h2>
     <p>
