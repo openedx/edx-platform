@@ -206,6 +206,7 @@ class RegistrationView(APIView):
         # on the registration form.  Now we rely on the client
         # to display this to users and validate that they
         # agree before making the request to this service.
+        request.POST = request.POST.copy()
         request.POST["honor_code"] = "true"
         request.POST["terms_of_service"] = "true"
 
