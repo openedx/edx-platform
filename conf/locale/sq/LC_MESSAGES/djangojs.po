@@ -31,9 +31,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-24 13:34-0400\n"
-"PO-Revision-Date: 2014-09-04 21:13+0000\n"
-"Last-Translator: Faton Nuha <faton11@live.com>\n"
+"POT-Creation-Date: 2014-10-14 11:52-0400\n"
+"PO-Revision-Date: 2014-10-08 18:08+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/edx-platform/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -52,7 +52,6 @@ msgstr ""
 msgid "OK"
 msgstr "Në rregull"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js cms/static/js/views/asset.js
@@ -64,13 +63,6 @@ msgstr "Në rregull"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: cms/templates/js/add-xblock-component-menu-problem.underscore
-#: cms/templates/js/add-xblock-component-menu.underscore
-#: cms/templates/js/course_info_handouts.underscore
-#: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-edit.underscore
-#: cms/templates/js/section-name-edit.underscore
-#: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Cancel"
 msgstr "Anulo"
 
@@ -106,16 +98,10 @@ msgstr "Fshije"
 msgid "Name"
 msgstr "Emri"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/base_modal.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/course_info_handouts.underscore
-#: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-edit.underscore
-#: cms/templates/js/section-name-edit.underscore
-#: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Save"
 msgstr "Ruaj"
 
@@ -253,9 +239,9 @@ msgid ""
 "You are trying to upload a file that is too large for our system.  Please "
 "choose a file under 2MB or paste a link to it into the answer box."
 msgstr ""
-"Ju jeni duke provuar të ngarkoni një fajll i cili është i madh për sistemin "
-"tonë.Ju lutem zgjidhni një fajll nën 2MB ose shtoni një link te kutia e "
-"përgjigjjeve."
+"Ju jeni duke provuar të ngarkoni një dokument i cili është i madh për "
+"sistemin tonë.Ju lutem zgjidhni një dokument nën 2MB ose shtoni një link te "
+"kutia e përgjigjjeve."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
@@ -683,7 +669,7 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "File"
-msgstr "Fajll"
+msgstr "Dokument"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1518,6 +1504,27 @@ msgid ""
 "Ctrl+X/C/V keyboard shortcuts instead."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your username sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/lti/lti.js
+msgid ""
+"Click OK to have your e-mail address sent to a 3rd party application.\n"
+"\n"
+"Click Cancel to return to this page without sending your information."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to tab %(tab_name)s in the current "
@@ -1602,7 +1609,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
-msgstr "Ky shfletues nuk mund të i lexoj fajllat .mp4, .ogg ose .webm."
+msgstr "Ky shfletues nuk mund të i lexoj dokumentet .mp4, .ogg ose .webm."
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "Try using a different browser, such as Google Chrome."
@@ -1712,9 +1719,7 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/coffee/src/discussion/views/new_post_view.js
-#: common/static/coffee/src/discussion/views/new_post_view.js
-#: common/static/coffee/src/discussion/views/new_post_view.js
+#: common/static/coffee/src/discussion/views/discussion_topic_menu_view.js
 msgid "…"
 msgstr "..."
 
@@ -1727,8 +1732,8 @@ msgstr[1] ""
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
 msgid_plural "%(numVotes)s Votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(numVotes)s Vota"
+msgstr[1] "%(numVotes)s Vota"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble subscribing you to this thread. Please try again."
@@ -2308,6 +2313,10 @@ msgid "<%= num_students %> students scored."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+msgid "Error generating student profile information. Please try again."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
 msgstr ""
@@ -2326,7 +2335,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
-msgstr "Emri fajllit"
+msgstr "Emri dokumentit"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
@@ -2352,6 +2361,7 @@ msgid "Enter username or email"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/views/cohort_editor.js
 msgid "Please enter a username or email."
 msgstr ""
 
@@ -2943,6 +2953,107 @@ msgstr ""
 msgid "Failed to rescore problem."
 msgstr ""
 
+#: lms/static/js/dashboard/donation.js
+msgid "Please enter a valid donation amount."
+msgstr ""
+
+#: lms/static/js/dashboard/donation.js
+msgid "Your donation could not be submitted."
+msgstr ""
+
+#: lms/static/js/student_account/account.js
+#: lms/static/js/student_profile/profile.js
+msgid "The data could not be saved."
+msgstr ""
+
+#: lms/static/js/student_account/account.js
+msgid "Please enter a valid email address"
+msgstr ""
+
+#: lms/static/js/student_account/account.js
+msgid "Please enter a valid password"
+msgstr ""
+
+#: lms/static/js/student_account/account.js
+msgid "Please check your email to confirm the change"
+msgstr ""
+
+#: lms/static/js/student_profile/profile.js
+msgid "Full name cannot be blank"
+msgstr ""
+
+#: lms/static/js/student_profile/profile.js
+msgid "Language cannot be blank"
+msgstr ""
+
+#: lms/static/js/student_profile/profile.js
+msgid "We couldn't populate the list of language choices."
+msgstr ""
+
+#: lms/static/js/student_profile/profile.js
+msgid "Saved"
+msgstr ""
+
+#: lms/static/js/views/cohort_editor.js
+msgid "Error adding students."
+msgstr ""
+
+#: lms/static/js/views/cohort_editor.js
+msgid "{numUsersAdded} student has been added to this cohort group"
+msgid_plural "{numUsersAdded} students have been added to this cohort group"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/static/js/views/cohort_editor.js
+msgid "{numMoved} student was removed from {oldCohort}"
+msgid_plural "{numMoved} students were removed from {oldCohort}"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/static/js/views/cohort_editor.js
+msgid "{numPresent} student was already in the cohort group"
+msgid_plural "{numPresent} students were already in the cohort group"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/static/js/views/cohort_editor.js
+msgid "Unknown user: {user}"
+msgstr ""
+
+#: lms/static/js/views/cohort_editor.js
+msgid "There was an error when trying to add students:"
+msgid_plural "There were {numErrors} errors when trying to add students:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/static/js/views/cohort_editor.js
+msgid "View all errors"
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+msgid "You currently have no cohort groups configured"
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Add Cohort Group"
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+msgid ""
+"The {cohortGroupName} cohort group has been created. You can manually add "
+"students to this group below."
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+msgid ""
+"We've encountered an error. Please refresh your browser and then try again."
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+msgid "Please enter a name for your new cohort group."
+msgstr ""
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -3069,7 +3180,7 @@ msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
-"Vetëm fajllat <%= fileTypes %> mund të ngarkohen. Ju lutem zgjedhni një "
+"Vetëm dokumentet <%= fileTypes %> mund të ngarkohen. Ju lutem zgjedhni një "
 "fajllë i cili ka prapashtesën <%= fileExtensions %> të e ngarkoni."
 
 #: cms/static/js/models/uploads.js
@@ -3145,7 +3256,7 @@ msgstr ""
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
-msgstr "Fajlli juaj është fshirë."
+msgstr "Dokumenti juaj është fshirë."
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 msgid "Date Added"
@@ -3158,7 +3269,7 @@ msgstr ""
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Choose File"
-msgstr "Zgjidh fajllin"
+msgstr "Zgjidh dokumentin"
 
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
@@ -3264,7 +3375,7 @@ msgstr ""
 
 #: cms/static/js/views/metadata.js
 msgid "Upload File"
-msgstr "Ngarko fajllin"
+msgstr "Ngarko dokumentin"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
@@ -3313,14 +3424,6 @@ msgstr ""
 msgid "%(total_items)s total"
 msgstr ""
 
-#: cms/static/js/views/section_edit.js
-msgid "Your change could not be saved"
-msgstr ""
-
-#: cms/static/js/views/section_edit.js
-msgid "Return and resolve this issue"
-msgstr ""
-
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
 msgstr ""
@@ -3343,7 +3446,7 @@ msgstr "Na vjen keq, këtu është një problem"
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes"
-msgstr ""
+msgstr "Ju keni bërë disa ndryshime"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes will not take effect until you save your progress."
@@ -3500,12 +3603,16 @@ msgid ""
 msgstr ""
 
 #: cms/static/js/views/settings/main.js
+msgid "%(hours)s:%(minutes)s (current UTC time)"
+msgstr ""
+
+#: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
 msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
-msgstr "Fajllat mund të jenë në formatin JPEG ose PNG."
+msgstr "Dokumentet mund të jenë në formatin JPEG ose PNG."
 
 #: cms/static/js/views/utils/create_course_utils.js
 msgid "Required field."
@@ -3578,7 +3685,7 @@ msgstr ""
 
 #: common/templates/js/discussion/thread-show.underscore
 msgid "This post is visible only to %(group_name)s."
-msgstr ""
+msgstr "Ky postim shihet vetëm nga %(group_name)s."
 
 #: common/templates/js/discussion/thread-show.underscore
 msgid "This post is visible to everyone."
@@ -3604,6 +3711,126 @@ msgstr ""
 msgid "(this post is about %(courseware_title_linked)s)"
 msgstr ""
 
+#: lms/templates/dashboard/donation.underscore
+msgid "Donate"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
+msgid "Add a New Cohort Group"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
+msgid "New Cohort Name"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "(Required Field)"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore
+msgid "Enter Your New Cohort Group's Name"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid ""
+"Students are added to this group only when you provide their email addresses"
+" or usernames on this page."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "What does this mean?"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Students are added to this group automatically."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Edit settings in Studio"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Add students to this cohort group"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid ""
+"Note: Students can only be in one cohort group. Adding students to this "
+"group overrides any previous group assignment."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas for "
+"students to add. *"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid ""
+"You will not get notification for emails that bounce, so please double-check"
+" spelling."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "Add Students"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
+msgid "Select a cohort group"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
+msgid "%(cohort_name)s (%(user_count)s)"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Cohort Management"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Select a cohort group to manage"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "View Cohort Group"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid ""
+"To review all student cohort group assignments, download course profile "
+"information on %(link_start)s the Data Download page. %(link_end)s"
+msgstr ""
+
+#: lms/templates/student_account/account.underscore
+msgid "New Address"
+msgstr ""
+
+#: lms/templates/student_account/account.underscore
+msgid "Password"
+msgstr ""
+
+#: lms/templates/student_account/account.underscore
+msgid "Change My Email Address"
+msgstr ""
+
+#: lms/templates/student_profile/profile.underscore
+msgid "Full Name"
+msgstr ""
+
+#: lms/templates/student_profile/profile.underscore
+msgid "Preferred Language"
+msgstr ""
+
+#: lms/templates/student_profile/profile.underscore
+msgid "Update Profile"
+msgstr ""
+
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr ""
@@ -3618,7 +3845,7 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "List of uploaded files and assets in this course"
-msgstr "Lista e fajllave dhe aseteve të ngarkuara në këtë kurs"
+msgstr "Lista e dokumenteve dhe aseteve të ngarkuara në këtë kurs"
 
 #: cms/templates/js/asset-library.underscore
 msgid "Embed URL"
@@ -3647,7 +3874,7 @@ msgstr "mbylle"
 
 #: cms/templates/js/asset.underscore
 msgid "Open/download this file"
-msgstr "Hape/shkarko këtë fajll"
+msgstr "Hape/shkarko këtë dokument"
 
 #: cms/templates/js/asset.underscore
 msgid "Delete this asset"
@@ -4101,7 +4328,7 @@ msgstr ""
 
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
-msgstr "Shiko Drejtpërdrejtë"
+msgstr "Shiko Drejtpërdrejt"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Student Visibility"
@@ -4163,7 +4390,7 @@ msgstr ""
 
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "View Live Version"
-msgstr ""
+msgstr "Shio verzionin drejtëpërdrejt"
 
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Preview Changes"

@@ -19,6 +19,23 @@ class @DiscussionSpecHelper
                 {always: ->}
         )
 
+    @makeEventSpy = () ->
+        jasmine.createSpyObj('event', ['preventDefault', 'target'])
+
+    @makeCourseSettings = (is_cohorted=true) ->
+        new DiscussionCourseSettings(
+            category_map:
+                children: ['Test Topic', 'Other Topic']
+                entries:
+                    'Test Topic':
+                        is_cohorted: is_cohorted
+                        id: 'test_topic'
+                    'Other Topic':
+                        is_cohorted: is_cohorted
+                        id: 'other_topic'
+            is_cohorted: is_cohorted
+        )
+
     @setUnderscoreFixtures = ->
         for templateName in ['thread-show']
             templateFixture = readFixtures('templates/discussion/' + templateName + '.underscore')
