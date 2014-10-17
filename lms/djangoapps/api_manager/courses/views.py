@@ -359,6 +359,8 @@ def _get_course_data(request, course_key, course_descriptor, depth=0):
             course_descriptor
         )
     base_uri_without_qs = generate_base_uri(request, True)
+    if unicode(course_key) not in base_uri_without_qs:
+        base_uri_without_qs = '{}/{}'.format(base_uri_without_qs, unicode(course_key))
     data['course_image_url'] = course_image_url(course_descriptor)
     data['resources'] = []
     resource_uri = '{}/content/'.format(base_uri_without_qs)
