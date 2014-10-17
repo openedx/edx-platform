@@ -12,7 +12,7 @@
 </%block>
 
 <%block name="header_extras">
-% for template_name in ["account"]:
+% for template_name in ["account", "access", "form_field", "login"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="student_account/${template_name}.underscore" />
 </script>
@@ -21,7 +21,7 @@
 
 <h1>Login and Registration!</h1>
 
-<p>This is a placeholder for the combined login and registration form</p>
+<p>This is a placeholder for the combined login and registration form.</p>
 
 ## TODO: Use JavaScript to populate this div with
 ## the actual registration/login forms (loaded asynchronously from the user API)
