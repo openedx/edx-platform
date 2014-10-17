@@ -238,13 +238,21 @@ def register_and_enroll_list_of_students(request, course_id):
 
     -If the username already exists (but not the email), assume it is a different user and fail to create the new account.
      The failure will be messaged in a response in the browser.
-
     """
+
+    if not microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+        return HttpResponseForbidden()
+
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     results = []
     if 'students_list' in request.FILES:
-        file = request.FILES.get('students_list')
-        students = csv.reader(file)
+        upload_file = request.FILES.get('students_list')
+
+        def read_csv_file(upload_file):
+            data = [row for row in csv.reader(upload_file.read().splitlines())]
+            return data
+
+        students = read_csv_file(upload_file)
         generated_passwords = []
         for student in students:
             """
@@ -301,8 +309,8 @@ def register_and_enroll_list_of_students(request, course_id):
                     else:
                         # Email address already exists. assume it is the correct user
                         # and just register the user in the course and send an enrollment email.
-                        warning_message = 'An account with email {email} exists but the provided username {username}' \
-                                          ' is different. Enrolling anyway.'.format(email=email, username=username)
+                        warning_message = _('An account with email {email} exists but the provided username {username}' \
+                                          ' is different. Enrolling anyway.').format(email=email, username=username)
                         results.append({
                             'username': username, 'email': email, 'response_type': 'warning',
                             'response': warning_message})
