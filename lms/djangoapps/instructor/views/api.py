@@ -224,7 +224,7 @@ EMAIL_INDEX = 0; USERNAME_INDEX = 1; NAME_INDEX = 2; COUNTRY_INDEX = 3
 @require_level('staff')
 def register_and_enroll_list_of_students(request, course_id):
     """
-    Register and Enroll students in this course.
+    Create new account and Enroll students in this course.
     Passing a csv file that contains a list of students.
     Order in csv should be the following email = 0; username = 1; name = 2; country = 3.
     Requires staff access.
@@ -233,8 +233,9 @@ def register_and_enroll_list_of_students(request, course_id):
     do nothing (including no email gets sent out)
 
     -If the email address already exists, but the username is different,
-    assume it is the correct user and just register the user in the course.
-    Note the change of username as a warning message (but not a failure).
+    match on te email address only and continue to enroll the user in the course.
+    Note the change of username as a warning message (but not a failure). Send a standard enrollment email
+    which is the same as the existing manual enrollment
 
     -If the username already exists (but not the email), assume it is a different user and fail to create the new account.
      The failure will be messaged in a response in the browser.
@@ -255,9 +256,7 @@ def register_and_enroll_list_of_students(request, course_id):
         students = read_csv_file(upload_file)
         generated_passwords = []
         for student in students:
-            """
-            Iterate each student in the uploaded csv file.
-            """
+            # Iterate each student in the uploaded csv file.
             email = student[EMAIL_INDEX]
             username = student[USERNAME_INDEX]
             name = student[NAME_INDEX]
@@ -270,7 +269,7 @@ def register_and_enroll_list_of_students(request, course_id):
             except ValidationError:
                 results.append({
                     'username': username, 'email': email, 'response_type': 'error',
-                    'response': 'Invalid email {0} '.format(email)})
+                    'response': _('Invalid email {email_address} ').format(email_address=email)})
             else:
                 try:
                     # If a username and email already exist than we do not need to do anything.
@@ -329,7 +328,8 @@ def register_and_enroll_list_of_students(request, course_id):
     else:
         results.append({
             'username': '', 'email': '', 'response_type': 'error',
-            'response': 'File is not attached.'})
+            'response': 'File is not attached.'
+        })
 
     return JsonResponse(results)
 
@@ -338,15 +338,17 @@ def generate_unique_password(generated_passwords, password_length=12):
     """
     generate a unique password for each student.
     """
-    chars = ''
-    for char in string.ascii_uppercase + string.digits + string.ascii_lowercase:
-        # removing vowel words and specific characters
-        chars += char.strip('aAeEiIoOuU1l')
+    chars = [
+        char for char in string.ascii_uppercase + string.digits + string.ascii_lowercase
+        if char not in 'aAeEiIoOuU1l'
+    ]
 
-    password = string.join((random.choice(chars) for _ in range(password_length)), '')
+    def _generate_new_password():
+        return string.join((random.choice(chars) for __ in range(password_length)), '')
 
+    password = _generate_new_password()
     while password in generated_passwords:
-        password = string.join((random.choice(chars) for _ in range(password_length)), '')
+        password = _generate_new_password()
 
     return password
 

@@ -69,9 +69,9 @@
   <div class="request-response-error"></div>
 </div>
 
-<hr class="divider" />
-
 %if microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+  <hr class="divider" />
+
   <div class="auto-enroll-via-csv">
     <h2> ${_("Register/Enroll Students")} </h2>
     <p>

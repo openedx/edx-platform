@@ -287,11 +287,11 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
 
-@ddt.ddt
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
 class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    Test Bulk account creation and enrollment from csv file,
+    Test Bulk account creation and enrollment from csv file
     """
     def setUp(self):
         self.request = RequestFactory().request()
@@ -299,8 +299,11 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
-        self.not_enrolled_student = UserFactory(username='NotEnrolledStudent', email='nonenrolled@test.com', first_name='NotEnrolled',
-                                                last_name='Student')
+        self.not_enrolled_student = UserFactory(username='NotEnrolledStudent',
+            email='nonenrolled@test.com',
+            first_name='NotEnrolled',
+            last_name='Student'
+        )
 
 
     @patch('instructor.views.api.log.info')
@@ -315,7 +318,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         data = json.loads(response.content)
         self.assertEquals(len(data), 0)
 
-        # test the lof for email that's send to new created user.
+        # test the log for email that's send to new created user.
         info_log.assert_called_with('email send to new created user at test_student@example.com')
 
     @patch('instructor.views.api.log.info')
@@ -334,7 +337,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         data = json.loads(response.content)
         self.assertEquals(len(data), 0)
 
-        # test the lof for email that's send to new created user.
+        # test the log for email that's send to new created user.
         info_log.assert_called_with("user already exist with username '{username}' and email '{email}'".format(username='test_student_1', email='test_student@example.com'))
 
     def test_invalid_email_in_csv(self):
