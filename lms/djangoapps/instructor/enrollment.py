@@ -331,6 +331,10 @@ def send_mail_to_student(student, param_dict):
             'emails/remove_beta_tester_email_subject.txt',
             'emails/remove_beta_tester_email_message.txt'
         ),
+        'account_creation_and_enrollment': (
+            'emails/enroll_email_enrolledsubject.txt',
+            'emails/account_creation_and_enroll_emailMessage.txt'
+        ),
     }
 
     subject_template, message_template = email_template_dict.get(message_type, (None, None))
