@@ -779,8 +779,8 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         response = self.client.post(url)
         self.assertEquals(response.status_code, 403)
 
-        # now reset the time to 5 mins from now in future in order to unblock
-        reset_time = datetime.now(UTC) + timedelta(seconds=350)
+        # now reset the time to 10 mins from now in future in order to unblock
+        reset_time = datetime.now(UTC) + timedelta(seconds=600)
         with freeze_time(reset_time):
             response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
             print(response)
@@ -804,8 +804,8 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, 403)
 
-        # now reset the time to 5 mins from now in future in order to unblock
-        reset_time = datetime.now(UTC) + timedelta(seconds=350)
+        # now reset the time to 10 mins from now in future in order to unblock
+        reset_time = datetime.now(UTC) + timedelta(seconds=600)
         with freeze_time(reset_time):
             response = self.client.get(url, **{'HTTP_HOST': 'localhost'})
             self.assertEquals(response.status_code, 404)
