@@ -6,6 +6,7 @@ import unittest
 
 from student.tests.factories import UserFactory, UserStandingFactory
 from student.models import UserStanding
+from django.core.cache import cache
 from django.conf import settings
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
@@ -103,3 +104,29 @@ class UserStandingTest(TestCase):
         self.assertEqual(
             UserStanding.objects.filter(user=self.good_user).count(), 0
         )
+
+    def test_user_standing_cache_reenable_account(self):
+        """Tests that saving renabling a student's account updates the cache"""
+        old_cache = cache.get('disabled_account_ids')
+        self.assertEqual(len(old_cache), 1)
+        self.assertIn(self.bad_user.id, old_cache)
+        user_standing = UserStanding.objects.get(user=self.bad_user)
+        self.assertEqual(user_standing.account_status, UserStanding.ACCOUNT_DISABLED)
+        user_standing.account_status = UserStanding.ACCOUNT_ENABLED
+        user_standing.save()
+        new_cache = cache.get('disabled_account_ids')
+        self.assertEqual(len(new_cache), 0)
+
+    def test_user_standing_cache_new_row(self):
+        """Tests that adding a new UserStanding row updates the cache"""
+        old_cache = cache.get('disabled_account_ids')
+        self.assertEqual(len(old_cache), 1)
+        self.assertNotIn(self.good_user.id, old_cache)
+        new_userstanding = UserStandingFactory.create(
+            user=self.good_user,
+            account_status=UserStanding.ACCOUNT_DISABLED,
+            changed_by=self.admin
+        )
+        new_cache = cache.get('disabled_account_ids')
+        self.assertIn(self.good_user.id, new_cache)
+        self.assertEqual(len(new_cache), 2)

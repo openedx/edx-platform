@@ -21,6 +21,7 @@ import dogstats_wrapper as dog_stats_api
 from django.db.models import Q
 import pytz
 
+from django.core.cache import cache
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -176,6 +177,20 @@ class UserStanding(models.Model):
     )
     changed_by = models.ForeignKey(User, blank=True)
     standing_last_changed_at = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def generate_cache(cls):
+        """
+        Since this table is likely to be very small, we can cache disabled
+        accounts to limit database hits
+        """
+        disabled_accounts = cls.objects.filter(account_status=cls.ACCOUNT_DISABLED)
+        cache.set('disabled_account_ids', [account.user.id for account in disabled_accounts])
+
+    def save(self, *args, **kwargs):
+        """Regenerate cache after every save."""
+        super(UserStanding, self).save(*args, **kwargs)
+        UserStanding.generate_cache()
 
 
 class UserProfile(models.Model):
