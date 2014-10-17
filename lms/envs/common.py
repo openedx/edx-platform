@@ -1025,7 +1025,12 @@ instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/ins
 # JavaScript used by the student account and profile pages
 # These are not courseware, so they do not need many of the courseware-specific
 # JavaScript modules.
-student_account_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_account/**/*.js'))
+student_account_js = [
+    'js/student_account/models/LoginModel.js',
+    'js/student_account/views/LoginView.js',
+    'js/student_account/views/AccessView.js',
+    'js/student_account/accessApp.js',
+]
 student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
 
 PIPELINE_CSS = {

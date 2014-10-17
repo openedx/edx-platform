@@ -1,0 +1,6 @@
+<form id="login">
+    <%= fields %>
+    <button class="action action-primary action-update js-login">Log in</button>
+    <button type="submit" class="button button-primary button-facebook"><span class="icon icon-facebook"></span>Sign in with Facebook</button>
+    <button type="submit" class="button button-primary button-google"><span class="icon icon-google-plus"></span>Sign in with Google</button>
+</form>
