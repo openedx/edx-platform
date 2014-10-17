@@ -3,6 +3,8 @@
 """ Database ORM models managed by this Django app """
 from django.contrib.auth.models import Group, User
 from django.db import models
+from django.db.models import Q
+from django.conf import settings
 
 from model_utils.models import TimeStampedModel
 from .utils import is_int
@@ -158,6 +160,16 @@ class CourseModuleCompletion(TimeStampedModel):
     course_id = models.CharField(max_length=255, db_index=True)
     content_id = models.CharField(max_length=255, db_index=True)
     stage = models.CharField(max_length=255, null=True, blank=True)
+
+    @classmethod
+    def get_actual_completions(cls):
+        """
+        This would skip those modules with ignorable categories
+        """
+        detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
+        cat_list = [Q(content_id__contains=item.strip()) for item in detached_categories]
+        cat_list = reduce(lambda a, b: a | b, cat_list)
+        return cls.objects.all().exclude(cat_list)
 
 
 class APIUserQuerySet(models.query.QuerySet):  # pylint: disable=R0924
