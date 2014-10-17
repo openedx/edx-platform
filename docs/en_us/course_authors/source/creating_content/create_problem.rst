@@ -68,7 +68,7 @@ All problems on the edX platform have several component parts.
    the **Show Answer** button is visible.
 
 #. **Attempts.** The instructor may set a specific number of attempts or
-   allow unlimited attempts.
+   allow unlimited attempts for a problem. By default, the course-wide **Maximum Attempts** setting in Advanced Settings is null, meaning that the maximum number of attempts for problems is unlimited. If the course-wide **Maximum Attempts** setting is changed to a specific number, the **Maximum Attempts** setting for individual problems defaults to that number, and cannot be set to unlimited.
 
    .. image:: ../Images//AnatomyOfExercise2.png
     :alt: Image of a problem from a student's point of view, with callouts for 
@@ -274,8 +274,7 @@ ribbon at the top of the page.
 Maximum Attempts
 ==============================
 
-This setting specifies the number of times a student can try to answer
-the problem. By default, a student has an unlimited number of attempts.
+This setting specifies the number of times a student is allowed to attempt answering the problem. By default, the course-wide **Maximum Attempts** setting in Advanced Settings is null, meaning that the maximum number of attempts for problems is unlimited. If the course-wide **Maximum Attempts** setting is changed to a specific number, the **Maximum Attempts** setting for individual problems defaults to that number, and cannot be set to unlimited.
 
 .. note:: Only questions that have a **Maximum Attempts** setting of 1 or 
  higher are included on the Student Answer Distribution report that you can
