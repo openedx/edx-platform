@@ -8,7 +8,12 @@
 <!--[if IE 8]><html class="ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-  <head>
+<%
+    # set doc language direction
+    from django.utils.translation import get_language_bidi
+    dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
+%>
+  <head dir="${dir_rtl}">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>
@@ -35,7 +40,7 @@
     <%block name="header_extras"></%block>
   </head>
 
-  <body class="<%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE}">
+  <body class="${dir_rtl} <%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE}">
   <%block name="view_notes"></%block>
 
     <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
@@ -341,7 +346,7 @@
     % endif
 
     <!-- view -->
-    <div class="wrapper wrapper-view">
+    <div class="wrapper wrapper-view" dir="${dir_rtl}">
         <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
         <%include file="widgets/header.html" args="online_help_token=online_help_token" />
 
