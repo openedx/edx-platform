@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-20 10:51-0400\n"
-"PO-Revision-Date: 2014-10-20 14:51:41.189304\n"
+"POT-Creation-Date: 2014-10-17 14:16+0000\n"
+"PO-Revision-Date: 2014-10-17 14:16:50.815957\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -7750,19 +7750,13 @@ msgstr "Rését Pässwörd Ⱡ'#"
 msgid "Current Courses"
 msgstr "Çürrént Çöürsés Ⱡ'#"
 
-#: lms/templates/dashboard.html
-msgid "Looks like you haven't registered for any courses yet."
-msgstr ""
-"Lööks lïké ýöü hävén't régïstéréd för äný çöürsés ýét. Ⱡ'σяєм ιρѕυм ∂σ#"
+#: lms/templates/dashboard.html lms/templates/dashboard.html
+msgid "Looks like you haven't enrolled in any courses yet."
+msgstr "Lööks lïké ýöü hävén't énrölléd ïn äný çöürsés ýét. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
 msgstr "Fïnd çöürsés nöw! Ⱡ'σ#"
-
-#: lms/templates/dashboard.html
-msgid "Looks like you haven't been enrolled in any courses yet."
-msgstr ""
-"Lööks lïké ýöü hävén't ßéén énrölléd ïn äný çöürsés ýét. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -7866,8 +7860,9 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Unregister"
-msgstr "Ûnrégïstér Ⱡ#"
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Unenroll"
+msgstr "Ûnénröll #"
 
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
@@ -10414,16 +10409,16 @@ msgid "Access Courseware"
 msgstr "Àççéss Çöürséwäré Ⱡ'σ#"
 
 #: lms/templates/courseware/mktg_course_about.html
-msgid "You Are Registered"
-msgstr "Ýöü Àré Régïstéréd Ⱡ'σ#"
+msgid "You Are Enrolled"
+msgstr "Ýöü Àré Énrölléd Ⱡ'σ#"
 
 #: lms/templates/courseware/mktg_course_about.html
-msgid "Register for"
-msgstr "Régïstér för Ⱡ#"
+msgid "Enroll in"
+msgstr "Énröll ïn #"
 
 #. Translators: This is the second line on a button users can click.  The
 #. first
-#. line is "Register for COURSE_NAME"
+#. line is "Enroll in COURSE_NAME"
 #. The "choose your student track" means users can select between taking the
 #. course as an auditor, as a verified student, etc
 #: lms/templates/courseware/mktg_course_about.html
@@ -10432,7 +10427,7 @@ msgstr "änd çhöösé ýöür stüdént träçk Ⱡ'σяєм #"
 
 #. Translators: This is the second line on a button users can click.  The
 #. first
-#. line is "Register for COURSE_NAME"
+#. line is "Enroll in COURSE_NAME"
 #. 'Verification' here refers to verifying one's identity in order to receive
 #. a
 #. verified certificate.
@@ -10441,8 +10436,8 @@ msgid "and proceed to verification"
 msgstr "änd pröçééd tö vérïfïçätïön Ⱡ'σяєм#"
 
 #: lms/templates/courseware/mktg_course_about.html
-msgid "Registration Is Closed"
-msgstr "Régïsträtïön Ìs Çlöséd Ⱡ'σяє#"
+msgid "Enrollment Is Closed"
+msgstr "Énröllmént Ìs Çlöséd Ⱡ'σя#"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -10693,8 +10688,8 @@ msgstr ""
 "päýmént, ör ýöü çän Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "unregister"
-msgstr "ünrégïstér Ⱡ#"
+msgid "unenroll"
+msgstr "ünénröll #"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for this course."
@@ -10715,26 +10710,26 @@ msgstr "Vïéw Çöürsé Ⱡ#"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unregister from the purchased course"
+msgid "Are you sure you want to unenroll from the purchased course"
 msgstr ""
-"Àré ýöü süré ýöü wänt tö ünrégïstér fröm thé pürçhäséd çöürsé Ⱡ'σяєм ιρѕυм "
-"∂σłσя#"
+"Àré ýöü süré ýöü wänt tö ünénröll fröm thé pürçhäséd çöürsé Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unregister from"
-msgstr "Àré ýöü süré ýöü wänt tö ünrégïstér fröm Ⱡ'σяєм ιρѕυ#"
+msgid "Are you sure you want to unenroll from"
+msgstr "Àré ýöü süré ýöü wänt tö ünénröll fröm Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Are you sure you want to unregister from the verified {cert_name_long} track"
-" of"
+"Are you sure you want to unenroll from the verified {cert_name_long} track "
+"of"
 msgstr ""
-"Àré ýöü süré ýöü wänt tö ünrégïstér fröm thé vérïfïéd {cert_name_long} träçk"
-" öf Ⱡ'σяєм ιρѕυм ∂σłσя #"
+"Àré ýöü süré ýöü wänt tö ünénröll fröm thé vérïfïéd {cert_name_long} träçk "
+"öf Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -12744,10 +12739,6 @@ msgid "Enroll"
 msgstr "Énröll Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Unenroll"
-msgstr "Ûnénröll #"
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Beta Tester Addition"
 msgstr "Bätçh Bétä Téstér Àddïtïön Ⱡ'σяєм#"
 
@@ -13989,6 +13980,7 @@ msgstr ""
 msgid "Student Account"
 msgstr "Stüdént Àççöünt Ⱡ'#"
 
+#: lms/templates/student_profile/index.html
 #: lms/templates/student_profile/index.html
 msgid "Student Profile"
 msgstr "Stüdént Pröfïlé Ⱡ'#"
