@@ -685,6 +685,28 @@ section.instructor-dashboard-content-2 {
     }
   }
 
+  .auto-enroll-via-csv {
+    div.request-response {
+      margin: 0;
+      padding-bottom: 40px;
+      .title {
+        margin: 20px 0 10px 0;
+      }
+    }
+    input {
+      margin-right: 5px;
+    }
+    input[type='file'] {
+      margin: 10px 10px 10px 0px;
+      width: 240px;
+      height: 29px;
+      cursor: pointer;
+    }
+    h3 {
+      color: #646464;
+    }
+  }
+
   .enroll-option {
     margin: ($baseline/2) 0;
     position: relative;

@@ -50,6 +50,7 @@ from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
     enroll_email,
+    send_mail_to_student,
     get_email_params,
     send_beta_role_email,
     unenroll_email
@@ -83,6 +84,7 @@ from .tools import (
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
+from student.models import UserProfile, Registration
 
 log = logging.getLogger(__name__)
 
@@ -214,6 +216,147 @@ def require_level(level):
                 return HttpResponseForbidden()
         return wrapped
     return decorator
+
+
+EMAIL_INDEX = 0; USERNAME_INDEX = 1; NAME_INDEX = 2; COUNTRY_INDEX = 3
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def register_and_enroll_list_of_students(request, course_id):
+    """
+    Register and Enroll students in this course.
+    Passing a csv file that contains a list of students.
+    Order in csv should be the following email = 0; username = 1; name = 2; country = 3.
+    Requires staff access.
+
+    -If the email address and username already exists and the user is enrolled in the course,
+    do nothing (including no email gets sent out)
+
+    -If the email address already exists, but the username is different,
+    assume it is the correct user and just register the user in the course.
+    Note the change of username as a warning message (but not a failure).
+
+    -If the username already exists (but not the email), assume it is a different user and fail to create the new account.
+     The failure will be messaged in a response in the browser.
+
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    results = []
+    if 'students_list' in request.FILES:
+        file = request.FILES.get('students_list')
+        students = csv.reader(file)
+        generated_passwords = []
+        for student in students:
+            """
+            Iterate each student in the uploaded csv file.
+            """
+            email = student[EMAIL_INDEX]
+            username = student[USERNAME_INDEX]
+            name = student[NAME_INDEX]
+            country = student[COUNTRY_INDEX][:2]
+
+            course = get_course_by_id(course_id)
+            email_params = get_email_params(course, True, secure=request.is_secure())
+            try:
+                validate_email(email)  # Raises ValidationError if invalid
+            except ValidationError:
+                results.append({
+                    'username': username, 'email': email, 'response_type': 'error',
+                    'response': 'Invalid email {0} '.format(email)})
+            else:
+                try:
+                    # If a username and email already exist than we do not need to do anything.
+                    # Iterate the next student record.
+                    user = User.objects.get(email=email, username=username)
+
+                except User.DoesNotExist:
+                    try:
+                        User.objects.get(email=email)
+                    except User.DoesNotExist:
+                        # Now try to create a user if username already exist
+                        # then create_and_enroll_user will raise an IntegrityError exception.
+                        password = generate_unique_password(generated_passwords)
+                        generated_passwords.append(password)
+
+                        try:
+                            create_and_enroll_user(email, username, name, country, password, course_id)
+                        except IntegrityError:
+                            results.append({
+                                'username': username, 'email': email, 'response_type': 'error',
+                                'response': _('Oops, username {user} already exists.').format(user=username)})
+                        except Exception as e:
+                            log.exception(type(e).__name__)
+                            results.append({
+                                'username': username, 'email': email, 'response_type': 'error',
+                                'response': _(type(e).__name__)})
+                        else:
+                            # It's a new user, an email will be sent to each newly created user.
+                            email_params['message'] = 'account_creation_and_enrollment'
+                            email_params['email_address'] = email
+                            email_params['password'] = password
+                            email_params['platform_name']= microsite.get_value('platform_name', settings.PLATFORM_NAME)
+                            send_mail_to_student(email, email_params)
+                            log.info('email send to new created user at {email}'.format(email=email))
+
+                    else:
+                        # Email address already exists. assume it is the correct user
+                        # and just register the user in the course and send an enrollment email.
+                        warning_message = 'An account with email {email} exists but the provided username {username}' \
+                                          ' is different. Enrolling anyway.'.format(email=email, username=username)
+                        results.append({
+                            'username': username, 'email': email, 'response_type': 'warning',
+                            'response': warning_message})
+                        log.warning('email {email} already exist'.format(email=email))
+                        enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
+
+                else:
+                    # username and email exist,
+                    # enroll the user if he/she is not already enrolled.
+                    # Iterate another student,
+                    log.info("user already exist with username '{username}' and email '{email}'".format(username=username, email=email))
+                    if not CourseEnrollment.is_enrolled(user, course_id):
+                        CourseEnrollment.enroll(user, course_id)
+                        log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
+
+    else:
+        results.append({
+            'username': '', 'email': '', 'response_type': 'error',
+            'response': 'File is not attached.'})
+
+    return JsonResponse(results)
+
+
+def generate_unique_password(generated_passwords, password_length=12):
+    """
+    generate a unique password for each student.
+    """
+    chars = ''
+    for char in string.ascii_uppercase + string.digits + string.ascii_lowercase:
+        # removing vowel words and specific characters
+        chars += char.strip('aAeEiIoOuU1l')
+
+    password = string.join((random.choice(chars) for _ in range(password_length)), '')
+
+    while password in generated_passwords:
+        password = string.join((random.choice(chars) for _ in range(password_length)), '')
+
+    return password
+
+
+def create_and_enroll_user(email, uname, name, country, password, course_id):
+    """ Creates a user and enroll him/her in the course"""
+
+    user = User.objects.create_user(uname, email, password)
+    reg = Registration()
+    reg.register(user)
+
+    profile = UserProfile(user=user)
+    profile.name = name
+    profile.country = country
+    profile.save()
+
+    # try to enroll the user in this course
+    CourseEnrollment.enroll(user, course_id)
 
 
 @ensure_csrf_cookie

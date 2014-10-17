@@ -40,6 +40,7 @@ from analyticsclient.exceptions import ClientError
 
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from microsite_configuration import microsite
 
 log = logging.getLogger(__name__)
 
@@ -244,6 +245,7 @@ def _section_membership(course, access):
         'access': access,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'upload_student_csv_button_url': reverse('register_and_enroll_list_of_students', kwargs={'course_id': course_key.to_deprecated_string()}),
         'modify_beta_testers_button_url': reverse('bulk_beta_modify_access', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_key.to_deprecated_string()}),
         'modify_access_url': reverse('modify_access', kwargs={'course_id': course_key.to_deprecated_string()}),

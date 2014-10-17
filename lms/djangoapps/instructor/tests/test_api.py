@@ -48,6 +48,8 @@ from shoppingcart.models import (
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode
 )
 from course_modes.models import CourseMode
+from django.core.files.uploadedfile import SimpleUploadedFile
+from student.models import NonExistentCourseError
 
 from .test_tools import msk_from_problem_urlname
 from ..views.tools import get_extended_due
@@ -283,6 +285,160 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 200,
                 "Instructor should be allowed to access endpoint " + endpoint
             )
+
+
+@ddt.ddt
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test Bulk account creation and enrollment from csv file,
+    """
+    def setUp(self):
+        self.request = RequestFactory().request()
+        self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+        self.not_enrolled_student = UserFactory(username='NotEnrolledStudent', email='nonenrolled@test.com', first_name='NotEnrolled',
+                                                last_name='Student')
+
+
+    @patch('instructor.views.api.log.info')
+    def test_account_creation_and_enrollment_with_csv(self, info_log):
+
+        url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        csv_content = "test_student@example.com,test_student_1,tester1,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data), 0)
+
+        # test the lof for email that's send to new created user.
+        info_log.assert_called_with('email send to new created user at test_student@example.com')
+
+    @patch('instructor.views.api.log.info')
+    def test_email_and_username_already_exist(self, info_log):
+        """
+        If the email address and username already exists
+        and the user is enrolled in the course, do nothing (including no email gets sent out)
+        """
+        url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        csv_content = "test_student@example.com,test_student_1,tester1,USA\n" \
+                      "test_student@example.com,test_student_1,tester2,US"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data), 0)
+
+        # test the lof for email that's send to new created user.
+        info_log.assert_called_with("user already exist with username '{username}' and email '{email}'".format(username='test_student_1', email='test_student@example.com'))
+
+    def test_invalid_email_in_csv(self):
+
+        url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        csv_content = "test_student.example.com,test_student_1,tester1,USA"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(url, {'students_list': uploaded_file})
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data), 0)
+        self.assertEquals(data[0]['response_type'], 'error')
+        self.assertEquals(data[0]['response'], 'Invalid email {0} '.format('test_student.example.com'))
+
+    @patch('instructor.views.api.log.info')
+    def test_csv_user_exist_and_not_enrolled(self, info_log):
+        """
+        If the email address and username already exists
+        and the user is not enrolled in the course, enrolled him/her and iterate to next one.
+        """
+        url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        csv_content = "nonenrolled@test.com,NotEnrolledStudent,tester1,USA"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        info_log.assert_called_with('user {username} enrolled in the course {course}'.format(username='NotEnrolledStudent', course=self.course.id))
+
+    def test_user_with_already_existing_email_in_csv(self):
+        """
+        If the email address already exists, but the username is different,
+        assume it is the correct user and just register the user in the course.
+        """
+        url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        csv_content = "test_student@example.com,test_student_1,tester1,USA\n" \
+                      "test_student@example.com,test_student_2,tester2,US"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(url, {'students_list': uploaded_file})
+        data = json.loads(response.content)
+        warning_message = 'An account with email {email} exists but the provided username {username} ' \
+                          'is different. Enrolling anyway.'.format(email='test_student@example.com', username='test_student_2')
+        self.assertNotEquals(len(data), 0)
+        self.assertEquals(data[0]['response_type'], 'warning')
+        self.assertEquals(data[0]['response'], warning_message)
+        user = User.objects.get(email='test_student@example.com')
+        self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
+
+    def test_user_with_already_existing_username_in_csv(self):
+        """
+        If the username already exists (but not the email),
+        assume it is a different user and fail to create the new account.
+        """
+        url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
+                      "test_student2@example.com,test_student_1,tester2,US"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+
+        response = self.client.post(url, {'students_list': uploaded_file})
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data), 0)
+        self.assertEquals(data[0]['response_type'], 'error')
+        self.assertEquals(data[0]['response'], 'Oops, username {user} already exists.'.format(user='test_student_1'))
+
+    def test_csv_file_not_attached(self):
+        """
+        If the username already exists (but not the email),
+        assume it is a different user and fail to create the new account.
+        """
+        url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
+                      "test_student2@example.com,test_student_1,tester2,US"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+
+        response = self.client.post(url, {'file_not_found': uploaded_file})
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data), 0)
+        self.assertEquals(data[0]['response_type'], 'error')
+        self.assertEquals(data[0]['response'], 'File is not attached.')
+
+
+    def test_raising_exception_in_auto_registration_and_enrollment_case(self):
+
+        url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
+                      "test_student2@example.com,test_student_1,tester2,US"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        with patch('instructor.views.api.create_and_enroll_user') as mock:
+            mock.side_effect = NonExistentCourseError()
+            response = self.client.post(url, {'students_list': uploaded_file})
+
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data), 0)
+        self.assertEquals(data[0]['response_type'], 'error')
+        self.assertEquals(data[0]['response'], 'NonExistentCourseError')
 
 
 @ddt.ddt

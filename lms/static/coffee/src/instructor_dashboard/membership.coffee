@@ -174,6 +174,86 @@ class AuthListWidget extends MemberListWidget
     else
       @reload_list()
 
+class AutoEnrollmentViaCsv
+  constructor: (@$container) ->
+    # Wrapper for the AutoEnrollmentViaCsv subsection.
+    # This object handles buttons, success and failure reporting,
+    # and server communication.
+    @$student_enrollment_form       = @$container.find("form#student-auto-enroll-form")
+    @$enrollment_signup_button      = @$container.find("input[name='enrollment-signup-button']")
+    @$students_list_file      = @$container.find("input[name='students_list']")
+    @$csrf_token      = @$container.find("input[name='csrfmiddlewaretoken']")
+    @$task_response          = @$container.find(".request-response")
+    @$request_response_error = @$container.find(".request-response-error")
+
+    # attach click handler for enrollment buttons
+    @$enrollment_signup_button.click =>
+      @$student_enrollment_form.submit (event) =>
+        event.preventDefault()
+        data = new FormData(event.currentTarget)
+        $.ajax
+            dataType: 'json'
+            type: 'POST'
+            url: event.currentTarget.action
+            data: data
+            processData: false
+            contentType: false
+            success: (data) => @display_response data
+
+        return false;
+
+  # clear the input text field
+  clear_input: ->
+    @$task_response.empty()
+
+  display_response: (data_from_server) ->
+    @clear_input()
+    @$task_response.empty()
+    errors = []
+    warnings = []
+    for student_results in data_from_server
+      if student_results.response_type is 'error'
+        errors.push student_results
+
+      else if student_results.response_type is 'warning'
+        warnings.push student_results
+
+    render_title = (title) =>
+      task_res_section = $ '<h3/>', class: 'title', text: title
+      @$task_response.append task_res_section
+
+    # render populated result arrays
+    render_list = (student_results) =>
+      task_res_section = $ '<div/>', class: 'request-res-section'
+      messages_list = $ '<p/>'
+      task_res_section.append messages_list
+
+      response_message = student_results.username +
+      '  ('+ student_results.email + '):  '+
+      student_results.response_type.toUpperCase()+
+      '   (' + student_results.response + ' )'
+      messages_list.append $ '<span/>', text: response_message
+
+      @$task_response.append task_res_section
+
+    if errors.length
+      if warnings.length
+        render_title ('The Following errors and warnings were generated')
+      else
+        render_title ('The Following errors were generated')
+    else
+      if warnings.length
+        render_title ('The Following warnings were generated')
+      else
+        render_title ('All accounts created successfully')
+
+    if errors.length
+      for student_results in errors
+        render_list (student_results)
+
+    if warnings.length
+      for student_results in warnings
+        render_list (student_results)
 
 class BetaTesterBulkAddition
   constructor: (@$container) ->
@@ -263,6 +343,10 @@ class BetaTesterBulkAddition
       no_users.push $ gettext("Users must create and activate their account before they can be promoted to beta tester.")
       `// Translators: A list of identifiers (which are email addresses and/or usernames) appears after this sentence`
       render_list gettext("Could not find users associated with the following identifiers:"), (sr.identifier for sr in no_users)
+
+
+
+
 
 # Wrapper for the batch enrollment subsection.
 # This object handles buttons, success and failure reporting,
@@ -580,7 +664,10 @@ class Membership
 
     # isolate # initialize BatchEnrollment subsection
     plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
-    
+
+    # isolate # initialize BatchEnrollment subsection
+    plantTimeout 0, => new AutoEnrollmentViaCsv @$section.find '.auto-enroll-via-csv'
+
     # initialize BetaTesterBulkAddition subsection
     plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
 
