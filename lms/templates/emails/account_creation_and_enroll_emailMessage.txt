@@ -2,7 +2,7 @@
 
 ${_("Welcome to {course_name} ").format(course_name=course.display_name_with_default)}
 
-${_("An new account was created for you in order to enter into your course. Please go to {site_name} and login in with the following information:").format(site_name=site_name)}
+${_("An new account was created for you in order to enter into your course. To get started, please visit {site_name}. The login information for your account follows.").format(site_name=site_name)}
 
 ${_("email: {email}").format(email=email_address)}
 ${_("password: {password}").format(password=password)}

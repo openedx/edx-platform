@@ -141,7 +141,7 @@ class AuthListWidget extends MemberListWidget
       url: @list_endpoint
       data: rolename: @rolename
       success: (data) => cb? null, data[@rolename]
-      error: std_ajax_err => 
+      error: std_ajax_err =>
         `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
         cb? gettext("Error fetching list for role") + " '#{@rolename}'"
 
@@ -238,12 +238,12 @@ class AutoEnrollmentViaCsv
 
     if errors.length
       if warnings.length
-        render_title ('The Following errors and warnings were generated')
+        render_title ('The following errors and warnings were generated')
       else
-        render_title ('The Following errors were generated')
+        render_title ('The following errors were generated')
     else
       if warnings.length
-        render_title ('The Following warnings were generated')
+        render_title ('The following warnings were generated')
       else
         render_title ('All accounts created successfully')
 
@@ -269,7 +269,7 @@ class BetaTesterBulkAddition
     @$btn_beta_testers.click (event) =>
       emailStudents = @$checkbox_emailstudents.is(':checked')
       autoEnroll = @$checkbox_autoenroll.is(':checked')
-      send_data = 
+      send_data =
         action: $(event.target).data('action')  # 'add' or 'remove'
         identifiers: @$identifier_input.val()
         email_students: emailStudents
@@ -343,10 +343,6 @@ class BetaTesterBulkAddition
       no_users.push $ gettext("Users must create and activate their account before they can be promoted to beta tester.")
       `// Translators: A list of identifiers (which are email addresses and/or usernames) appears after this sentence`
       render_list gettext("Could not find users associated with the following identifiers:"), (sr.identifier for sr in no_users)
-
-
-
-
 
 # Wrapper for the batch enrollment subsection.
 # This object handles buttons, success and failure reporting,
