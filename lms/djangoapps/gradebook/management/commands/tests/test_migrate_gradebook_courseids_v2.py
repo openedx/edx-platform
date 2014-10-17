@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from gradebook import models as gradebook_models
-from gradebook.management.commands import migrate_courseids_v2
+from gradebook.management.commands import migrate_gradebook_courseids_v2
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -75,7 +75,7 @@ class MigrateCourseIdsTests(TestCase):
 
 
         # Run the data migration
-        migrate_courseids_v2.Command().handle()
+        migrate_gradebook_courseids_v2.Command().handle()
 
 
         # Confirm that the data has been properly migrated
