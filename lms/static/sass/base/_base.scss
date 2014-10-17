@@ -107,7 +107,7 @@ a:focus {
 
 .container {
   @include clearfix;
-  box-sizing: border-box;
+  @include box-sizing(border-box);
   margin: 0 auto 0;
   padding: 0px 30px;
   max-width: grid-width(12);
