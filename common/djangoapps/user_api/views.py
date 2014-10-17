@@ -81,6 +81,7 @@ class LoginSessionView(APIView):
         form_desc.add_field(
             "password",
             label=_(u"Password"),
+            field_type="password",
             restrictions={
                 "min_length": account_api.PASSWORD_MIN_LENGTH,
                 "max_length": account_api.PASSWORD_MAX_LENGTH,
