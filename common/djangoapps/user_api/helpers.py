@@ -94,10 +94,11 @@ class InvalidFieldError(Exception):
 class FormDescription(object):
     """Generate a JSON representation of a form. """
 
-    ALLOWED_TYPES = ["text", "select", "textarea", "checkbox"]
+    ALLOWED_TYPES = ["text", "select", "textarea", "checkbox", "password"]
 
     ALLOWED_RESTRICTIONS = {
         "text": ["min_length", "max_length"],
+        "password": ["min_length", "max_length"],
     }
 
     def __init__(self, method, submit_url):

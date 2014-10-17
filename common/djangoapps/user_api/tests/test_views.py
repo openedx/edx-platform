@@ -596,7 +596,7 @@ class LoginSessionViewTest(ApiTestCase):
             {
                 "name": "password",
                 "default": "",
-                "type": "text",
+                "type": "password",
                 "required": True,
                 "label": "Password",
                 "placeholder": "",
