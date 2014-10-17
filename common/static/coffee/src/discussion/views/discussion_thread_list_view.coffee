@@ -7,6 +7,7 @@ if Backbone?
       "click .forum-nav-browse-menu-wrapper": "ignoreClick"
       "click .forum-nav-browse-title": "selectTopicHandler"
       "keydown .forum-nav-search-input": "performSearch"
+      "click .icon-search": "performSearch"
       "change .forum-nav-sort-control": "sortThreads"
       "click .forum-nav-thread-link": "threadSelected"
       "click .forum-nav-load-more-link": "loadMorePages"
@@ -425,7 +426,8 @@ if Backbone?
       @retrieveFirstPage(event)
 
     performSearch: (event) ->
-      if event.which == 13
+      #event.which 13 represent the Enter button 
+      if event.which == 13 or event.type == 'click'
         event.preventDefault()
         @hideBrowseMenu()
         @setCurrentTopicDisplay(gettext("Search Results"))
