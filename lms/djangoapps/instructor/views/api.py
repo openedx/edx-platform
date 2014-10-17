@@ -324,6 +324,8 @@ def register_and_enroll_list_of_students(request, course_id):
                     if not CourseEnrollment.is_enrolled(user, course_id):
                         CourseEnrollment.enroll(user, course_id)
                         log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
+                        enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
+
 
     else:
         results.append({
