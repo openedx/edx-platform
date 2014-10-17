@@ -75,7 +75,7 @@
   <div class="auto-enroll-via-csv">
     <h2> ${_("Register/Enroll Students")} </h2>
     <p>
-    ${_("Choose a CSV file that must contain the following columns: email, username, name and country in order to register and enroll a list of users in this course.")}
+    ${_("Choose a CSV file that must contain the following columns in this exact order: email, username, name and country in order to register and enroll a list of users in this course. Please use one student per row and do not use any headers, footers or blank lines")}
     </p>
     <form id="student-auto-enroll-form" method="post" action="${ section_data['upload_student_csv_button_url'] }" enctype="multipart/form-data">
       <input type="file" name="students_list" class="custom-file-input" accept=".csv">
