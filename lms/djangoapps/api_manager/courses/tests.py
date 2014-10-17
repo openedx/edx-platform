@@ -2010,9 +2010,28 @@ class CoursesApiTests(ModuleStoreTestCase):
             metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
         )
 
+        item2 = ItemFactory.create(
+            parent_location=unit.location,
+            category='problem 2',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name='Problem 2 for test timeseries',
+            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
+        )
+
         # create 10 users
         USER_COUNT = 25
         users = [UserFactory.create(username="testuser_tstest" + str(__), profile='test') for __ in xrange(USER_COUNT)]
+        user_ids = [user.id for user in users]
+
+        #create an organization
+        data = {
+            'name': 'Test Organization',
+            'display_name': 'Test Org Display Name',
+            'users': user_ids
+        }
+        response = self.do_post(self.base_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        org_id = response.data['id']
 
         # enroll users with time set to 28 days ago
         enrolled_time = timezone.now() + relativedelta(days=-28)
@@ -2020,14 +2039,16 @@ class CoursesApiTests(ModuleStoreTestCase):
             for user in users:
                 CourseEnrollmentFactory.create(user=user, course_id=course.id)
 
+        points_scored = .25
+        points_possible = 1
+        grade_dict = {'value': points_scored, 'max_value': points_possible}
+
         # Mark users as those who have started course
         for j, user in enumerate(users):
             complete_time = timezone.now() + relativedelta(days=-(USER_COUNT - j))
             with freeze_time(complete_time):
-                points_scored = .25
-                points_possible = 1
                 module = self.get_module_for_user(user, course, item)
-                grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+                grade_dict['user_id'] = user.id
                 module.system.publish(module, 'grade', grade_dict)
 
                 # Last 2 users as those who have completed
@@ -2041,14 +2062,24 @@ class CoursesApiTests(ModuleStoreTestCase):
                         StudentGradebook.objects.create(user=user, course_id=course.id, grade=0.9,
                                                         proforma_grade=0.91)
 
+        # make more completions
+        for j, user in enumerate(users[:5]):
+            complete_time = timezone.now() + relativedelta(days=-(USER_COUNT - j))
+            with freeze_time(complete_time):
+                module = self.get_module_for_user(user, course, item2)
+                grade_dict['user_id'] = user.id
+                module.system.publish(module, 'grade', grade_dict)
+
         test_course_id = unicode(course.id)
         # get course metrics in time series format
         end_date = datetime.now().date()
         start_date = end_date + relativedelta(days=-4)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}'.format(self.base_courses_uri,
-                                                                                           test_course_id,
-                                                                                           start_date,
-                                                                                           end_date)
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&organization={}'\
+            .format(self.base_courses_uri,
+                    test_course_id,
+                    start_date,
+                    end_date,
+                    org_id)
 
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 200)
@@ -2061,8 +2092,26 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(len(response.data['users_completed']), 5)
         total_completed = sum([completed[1] for completed in response.data['users_completed']])
         self.assertEqual(total_completed, 2)
+        self.assertEqual(len(response.data['modules_completed']), 5)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 4)
+
+        # get modules completed for first 5 days
+        start_date = datetime.now().date() + relativedelta(days=-USER_COUNT)
+        end_date = datetime.now().date() + relativedelta(days=-(USER_COUNT - 4))
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}'.format(self.base_courses_uri,
+                                                                                           test_course_id,
+                                                                                           start_date,
+                                                                                           end_date)
+
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['modules_completed']), 5)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 10)
 
         # metrics with weeks as interval
+        end_date = datetime.now().date()
         start_date = end_date + relativedelta(days=-10)
         course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&' \
                              'interval=weeks'.format(self.base_courses_uri,
