@@ -8,6 +8,7 @@
 
   footer {
     @include clearfix();
+    @include box-sizing(border-box);
     max-width: grid-width(12);
     min-width: 760px;
     width: flex-grid(12);
