@@ -47,7 +47,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
     @patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
     def setUp(self):
-        super(StudentAccountViewTest, self).setUp()
+        super(StudentAccountViewTest, self).setUp("student_account.urls")
 
         # Create/activate a new account
         activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.OLD_EMAIL)
@@ -62,8 +62,8 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         self.assertContains(response, "Student Account")
 
     @ddt.data(
-        ("login", "login"),
-        ("register", "register"),
+        ("account_login", "login"),
+        ("account_register", "register"),
     )
     @ddt.unpack
     def test_login_and_registration_form(self, url_name, initial_mode):
@@ -71,7 +71,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
         self.assertContains(response, expected_data)
 
-    @ddt.data("login", "register")
+    @ddt.data("account_login", "account_register")
     def test_login_and_registration_third_party_auth_urls(self, url_name):
         response = self.client.get(reverse(url_name))
 

@@ -4,8 +4,8 @@ from django.conf import settings
 
 urlpatterns = patterns(
     'student_account.views',
-    url(r'^login/$', 'login_and_registration_form', {'initial_mode': 'login'}, name='login'),
-    url(r'^register/$', 'login_and_registration_form', {'initial_mode': 'register'}, name='register'),
+    url(r'^login/$', 'login_and_registration_form', {'initial_mode': 'login'}, name='account_login'),
+    url(r'^register/$', 'login_and_registration_form', {'initial_mode': 'register'}, name='account_register'),
 )
 
 if settings.FEATURES.get('ENABLE_NEW_DASHBOARD'):

@@ -35,7 +35,7 @@ class StudentProfileViewTest(UrlResetMixin, TestCase):
 
     @patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
     def setUp(self):
-        super(StudentProfileViewTest, self).setUp()
+        super(StudentProfileViewTest, self).setUp("student_profile.urls")
 
         # Create/activate a new account
         activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
