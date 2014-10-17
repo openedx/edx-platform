@@ -153,8 +153,8 @@ def get_time_series_data(queryset, start, end, interval='days', date_field='crea
     sql = {
         'mysql': {
             'days': "DATE_FORMAT(`{}`, '%%Y-%%m-%%d')".format(date_field),
-            'weeks': "DATE_FORMAT(DATE_SUB(`{}`, INTERVAL(WEEKDAY(`{}`)) DAY), '%%Y-%%m-%%d')".\
-                format(date_field, date_field),
+            'weeks': "DATE_FORMAT(DATE_SUB(`{}`, INTERVAL(WEEKDAY(`{}`)) DAY), '%%Y-%%m-%%d')".format(date_field,
+                                                                                                      date_field),
             'months': "DATE_FORMAT(`{}`, '%%Y-%%m-01')".format(date_field)
         },
         'sqlite': {
