@@ -5,11 +5,12 @@ import base64
 import json
 import re
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
-from unittest import SkipTest
+from unittest import SkipTest, skipUnless
 import ddt
 from pytz import UTC
 from django_countries.countries import COUNTRIES
@@ -545,6 +546,7 @@ class PreferenceUsersListViewTest(UserApiTestCase):
 
 
 @ddt.ddt
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class LoginSessionViewTest(ApiTestCase):
     """Tests for the login end-points of the user API. """
 
@@ -701,6 +703,7 @@ class LoginSessionViewTest(ApiTestCase):
 
 
 @ddt.ddt
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class RegistrationViewTest(ApiTestCase):
     """Tests for the registration end-points of the User API. """
 
