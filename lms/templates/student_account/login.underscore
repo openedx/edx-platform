@@ -1,4 +1,10 @@
 <form id="login">
+    <div class="error-msg hidden">
+        <h4>We couldn't log you in.</h4>
+        <div class="errors">
+            <p>Email or password is incorrent. <a href="#">Forgot password?</a></p>
+        </div>
+    </div>
     <%= fields %>
     <button class="action action-primary action-update js-login">Log in</button>
     <button type="submit" class="button button-primary button-facebook"><span class="icon icon-facebook"></span>Sign in with Facebook</button>

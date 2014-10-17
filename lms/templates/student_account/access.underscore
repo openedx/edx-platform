@@ -3,7 +3,7 @@
         <input type="radio" name="form" id="register-option" value="register" class="form-toggle" <% if ( mode === 'register' ) { %>checked<% } %> >
         <label for"register-option">I am a new user</label>
     </h2>
-    <div id="register-form" class="form-wrapper <% if ( mode === 'register' ) { %>hidden<% } %>"></div>
+    <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden<% } %>"></div>
 </section>
 
 <section class="form-type">

@@ -1,0 +1,15 @@
+<form id="register">
+    <div class="error-msg hidden">
+        <h4>An error occured in your registration.</h4>
+        <div class="errors">
+            <p>Please enter a valid password</p>
+        </div>
+    </div>
+
+    <button type="submit" class="button button-primary button-facebook"><span class="icon icon-facebook"></span>Sign up with Facebook</button>
+    <button type="submit" class="button button-primary button-google"><span class="icon icon-google-plus"></span>Sign up with Google</button>
+    <%= fields %>
+    <input id="register-termsofservice" type="checkbox" name="termsofservice">
+    <label for="register-termsofservice">I agree to the <a href="#">Terms of Service and Honor Code</a> *</label>
+    <button class="action action-primary action-update js-register">Create My edX Account</button>
+</form>

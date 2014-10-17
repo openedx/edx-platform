@@ -44,6 +44,9 @@ var edx = edx || {};
             if ( type === 'login' ) {
                 console.log('load login');
                 return new edx.student.account.LoginView();
+            } else if ( type === 'register' ) {
+                console.log('load register');
+                return new edx.student.account.RegisterView();
             }
 
             // return new app.LoginView({

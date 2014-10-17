@@ -6,18 +6,17 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
-    edx.student.account.LoginView = Backbone.View.extend({
+    edx.student.account.RegisterView = Backbone.View.extend({
         tagName: 'form',
 
-        el: '#login-form',
+        el: '#register-form',
 
-        tpl: $('#login-tpl').html(),
+        tpl: $('#register-tpl').html(),
 
         fieldTpl: $('#form_field-tpl').html(),
 
         events: {
-            'click .js-login': 'submitForm',
-            'click .forgot-password': 'forgotPassword'
+            'click .js-register': 'submitForm'
         },
 
         errors: [],
@@ -54,7 +53,7 @@ var edx = edx || {};
             $.ajax({
                 type: 'GET',
                 dataType: 'json',
-                url: '/user_api/v1/account/login_session/',
+                url: '/user_api/v1/account/registration/',
                 success: function( data ) {
                     console.log(data);
                     that.buildForm( data.fields );
@@ -67,7 +66,7 @@ var edx = edx || {};
         },
 
         initModel: function( url, method ) {
-            this.model = new edx.student.account.LoginModel({
+            this.model = new edx.student.account.RegisterModel({
                 url: url
             });
 
@@ -84,7 +83,7 @@ var edx = edx || {};
 
             for ( i=0; i<len; i++ ) {
                 html.push( _.template( fieldTpl, $.extend( data[i], {
-                    form: 'login'
+                    form: 'register'
                 }) ) );
             }
 
@@ -123,21 +122,17 @@ var edx = edx || {};
             return obj;
         },
 
-        forgotPassword: function( event ) {
-            event.preventDefault();
-            console.log('forgotPassword');
-        },
-
         submitForm: function( event ) {
             var data = this.getFormData();
 
             event.preventDefault();
-
+console.log(data);
             // console.log(this.model);
 
             if ( !this.errors.length ) {
                 console.log('save me');
                 this.model.set( data );
+console.log(this.model);
                 this.model.save();
                 this.toggleErrorMsg( false );
             } else {
