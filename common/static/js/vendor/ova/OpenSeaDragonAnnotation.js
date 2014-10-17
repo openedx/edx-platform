@@ -1035,6 +1035,10 @@ OpenSeadragonAnnotation = function (element, options) {
     function reloadEditor(){
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, "annotator-field-0");
         tinymce.EditorManager.execCommand('mceAddEditor',true, "annotator-field-0");
+        
+        // if person hits into/out of fullscreen before closing the editor should close itself
+        // ideally we would want to keep it open and reposition, this would make a great TODO in the future
+        annotator.editor.hide();
     }
 
     var self = this;

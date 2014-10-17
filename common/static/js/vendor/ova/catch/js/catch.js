@@ -1001,6 +1001,9 @@ CatchAnnotation.prototype = {
             var positionAnnotator = videojs.findPosition(wrapper[0]);
             var positionAdder = {};
 
+            // the following addition to display makes sure the editor shows up
+            // after opening TinyMCE/editor within the image source
+            positionAdder.display = "block";
             positionAdder.left = positionLeft.left - positionAnnotator.left;
             positionAdder.top = positionLeft.top + 20 - positionAnnotator.top;
 
@@ -1010,6 +1013,7 @@ CatchAnnotation.prototype = {
             this.annotator.onAdderClick();
             
             // Set vertical editor
+            $(this.annotator.editor.element).css(positionAdder);
             this.annotator.editor.resetOrientation();
             this.annotator.editor.invertY();
 
