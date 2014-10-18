@@ -255,6 +255,7 @@ def register_and_enroll_list_of_students(request, course_id):
 
         students = read_csv_file(upload_file)
         generated_passwords = []
+        course = get_course_by_id(course_id)
         for student in students:
             # Iterate each student in the uploaded csv file.
             email = student[EMAIL_INDEX]
@@ -262,7 +263,6 @@ def register_and_enroll_list_of_students(request, course_id):
             name = student[NAME_INDEX]
             country = student[COUNTRY_INDEX][:2]
 
-            course = get_course_by_id(course_id)
             email_params = get_email_params(course, True, secure=request.is_secure())
             try:
                 validate_email(email)  # Raises ValidationError if invalid
@@ -271,61 +271,52 @@ def register_and_enroll_list_of_students(request, course_id):
                     'username': username, 'email': email, 'response_type': 'error',
                     'response': _('Invalid email {email_address} ').format(email_address=email)})
             else:
-                try:
-                    # If a username and email already exist than we do not need to do anything.
-                    # Iterate the next student record.
-                    user = User.objects.get(email=email, username=username)
+                if User.objects.filter(email=email).exists():
+                    # Email address already exists. assume it is the correct user
+                    # and just register the user in the course and send an enrollment email.
+                    user = User.objects.get(email=email)
 
-                except User.DoesNotExist:
-                    try:
-                        User.objects.get(email=email)
-                    except User.DoesNotExist:
-                        # Now try to create a user if username already exist
-                        # then create_and_enroll_user will raise an IntegrityError exception.
-                        password = generate_unique_password(generated_passwords)
-                        generated_passwords.append(password)
-
-                        try:
-                            create_and_enroll_user(email, username, name, country, password, course_id)
-                        except IntegrityError:
-                            results.append({
-                                'username': username, 'email': email, 'response_type': 'error',
-                                'response': _('Oops, username {user} already exists.').format(user=username)})
-                        except Exception as e:
-                            log.exception(type(e).__name__)
-                            results.append({
-                                'username': username, 'email': email, 'response_type': 'error',
-                                'response': _(type(e).__name__)})
-                        else:
-                            # It's a new user, an email will be sent to each newly created user.
-                            email_params['message'] = 'account_creation_and_enrollment'
-                            email_params['email_address'] = email
-                            email_params['password'] = password
-                            email_params['platform_name']= microsite.get_value('platform_name', settings.PLATFORM_NAME)
-                            send_mail_to_student(email, email_params)
-                            log.info('email send to new created user at {email}'.format(email=email))
-
-                    else:
-                        # Email address already exists. assume it is the correct user
-                        # and just register the user in the course and send an enrollment email.
+                    # see if it is an exact match with email and username
+                    # if it's not an exact match then just display a warning message, but continue onwards
+                    if not User.objects.filter(email=email, username=username).exists():
                         warning_message = _('An account with email {email} exists but the provided username {username}' \
                                           ' is different. Enrolling anyway.').format(email=email, username=username)
                         results.append({
                             'username': username, 'email': email, 'response_type': 'warning',
                             'response': warning_message})
                         log.warning('email {email} already exist'.format(email=email))
-                        enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
+                    else:
+                        log.info("user already exist with username '{username}' and email '{email}'".format(email=email, username=username))
 
-                else:
-                    # username and email exist,
-                    # enroll the user if he/she is not already enrolled.
-                    # Iterate another student,
-                    log.info("user already exist with username '{username}' and email '{email}'".format(username=username, email=email))
+                    # make sure user is enrolled in course
                     if not CourseEnrollment.is_enrolled(user, course_id):
                         CourseEnrollment.enroll(user, course_id)
                         log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
                         enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
+                else:
+                    # This email does not yet exist, so we need to create a new account
+                    # then create_and_enroll_user will raise an IntegrityError exception.
+                    password = generate_unique_password(generated_passwords)
 
+                    try:
+                        create_and_enroll_user(email, username, name, country, password, course_id)
+                    except IntegrityError:
+                        results.append({
+                            'username': username, 'email': email, 'response_type': 'error',
+                            'response': _('Username {user} already exists.').format(user=username)})
+                    except Exception as e:
+                        log.exception(type(e).__name__)
+                        results.append({
+                            'username': username, 'email': email, 'response_type': 'error',
+                            'response': _(type(e).__name__)})
+                    else:
+                        # It's a new user, an email will be sent to each newly created user.
+                        email_params['message'] = 'account_creation_and_enrollment'
+                        email_params['email_address'] = email
+                        email_params['password'] = password
+                        email_params['platform_name']= microsite.get_value('platform_name', settings.PLATFORM_NAME)
+                        send_mail_to_student(email, email_params)
+                        log.info('email send to new created user at {email}'.format(email=email))
 
     else:
         results.append({
@@ -336,21 +327,28 @@ def register_and_enroll_list_of_students(request, course_id):
     return JsonResponse(results)
 
 
-def generate_unique_password(generated_passwords, password_length=12):
+def generate_random_string(length):
     """
-    generate a unique password for each student.
+    Create a string of random characters of specified length
     """
     chars = [
         char for char in string.ascii_uppercase + string.digits + string.ascii_lowercase
         if char not in 'aAeEiIoOuU1l'
     ]
 
-    def _generate_new_password():
-        return string.join((random.choice(chars) for __ in range(password_length)), '')
+    return string.join((random.choice(chars) for __ in range(length)), '')
 
-    password = _generate_new_password()
+
+def generate_unique_password(generated_passwords, password_length=12):
+    """
+    generate a unique password for each student.
+    """
+
+    password = generate_random_string(password_length)
     while password in generated_passwords:
-        password = _generate_new_password()
+        password = generate_random_string(password_length)
+
+    generated_passwords.append(password)
 
     return password
 
@@ -967,13 +965,8 @@ def random_code_generator():
     generate a random alphanumeric code of length defined in
     REGISTRATION_CODE_LENGTH settings
     """
-    chars = ''
-    for char in string.ascii_uppercase + string.digits + string.ascii_lowercase:
-        # removing vowel words and specific characters
-        chars += char.strip('aAeEiIoOuU1l')
-
     code_length = getattr(settings, 'REGISTRATION_CODE_LENGTH', 8)
-    return string.join((random.choice(chars) for _ in range(code_length)), '')
+    return generate_random_string(code_length)
 
 
 @ensure_csrf_cookie
