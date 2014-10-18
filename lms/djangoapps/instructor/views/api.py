@@ -285,7 +285,7 @@ def register_and_enroll_list_of_students(request, course_id):
                     # if it's not an exact match then just display a warning message, but continue onwards
                     if not User.objects.filter(email=email, username=username).exists():
                         warning_message = _(
-                            'An account with email {email} exists but the provided username {username} ' \
+                            'An account with email {email} exists but the provided username {username} '
                             'is different. Enrolling anyway.'
                         ).format(email=email, username=username)
 
