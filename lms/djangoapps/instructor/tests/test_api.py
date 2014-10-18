@@ -300,7 +300,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         self.client.login(username=self.instructor.username, password='test')
         self.url = reverse('register_and_enroll_list_of_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
 
-        self.not_enrolled_student = UserFactory(username='NotEnrolledStudent',
+        self.not_enrolled_student = UserFactory(
+            username='NotEnrolledStudent',
             email='nonenrolled@test.com',
             first_name='NotEnrolled',
             last_name='Student'
