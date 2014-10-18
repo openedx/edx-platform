@@ -218,7 +218,12 @@ def require_level(level):
     return decorator
 
 
-EMAIL_INDEX = 0; USERNAME_INDEX = 1; NAME_INDEX = 2; COUNTRY_INDEX = 3
+EMAIL_INDEX = 0
+USERNAME_INDEX = 1
+NAME_INDEX = 2
+COUNTRY_INDEX = 3
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -279,8 +284,11 @@ def register_and_enroll_list_of_students(request, course_id):
                     # see if it is an exact match with email and username
                     # if it's not an exact match then just display a warning message, but continue onwards
                     if not User.objects.filter(email=email, username=username).exists():
-                        warning_message = _('An account with email {email} exists but the provided username {username}' \
-                                          ' is different. Enrolling anyway.').format(email=email, username=username)
+                        warning_message = _(
+                            'An account with email {email} exists but the provided username {username} ' \
+                            'is different. Enrolling anyway.'
+                        ).format(email=email, username=username)
+
                         results.append({
                             'username': username, 'email': email, 'response_type': 'warning',
                             'response': warning_message})
@@ -314,7 +322,7 @@ def register_and_enroll_list_of_students(request, course_id):
                         email_params['message'] = 'account_creation_and_enrollment'
                         email_params['email_address'] = email
                         email_params['password'] = password
-                        email_params['platform_name']= microsite.get_value('platform_name', settings.PLATFORM_NAME)
+                        email_params['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
                         send_mail_to_student(email, email_params)
                         log.info('email send to new created user at {email}'.format(email=email))
 
