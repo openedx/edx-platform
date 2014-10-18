@@ -179,16 +179,22 @@ class AutoEnrollmentViaCsv
     # Wrapper for the AutoEnrollmentViaCsv subsection.
     # This object handles buttons, success and failure reporting,
     # and server communication.
-    @$student_enrollment_form       = @$container.find("form#student-auto-enroll-form")
-    @$enrollment_signup_button      = @$container.find("input[name='enrollment-signup-button']")
-    @$students_list_file      = @$container.find("input[name='students_list']")
-    @$csrf_token      = @$container.find("input[name='csrfmiddlewaretoken']")
-    @$task_response          = @$container.find(".request-response")
+    @$student_enrollment_form = @$container.find("form#student-auto-enroll-form")
+    @$enrollment_signup_button = @$container.find("input[name='enrollment-signup-button']")
+    @$students_list_file = @$container.find("input[name='students_list']")
+    @$csrf_token = @$container.find("input[name='csrfmiddlewaretoken']")
+    @$task_response = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
+    @processing = false
 
     # attach click handler for enrollment buttons
     @$enrollment_signup_button.click =>
       @$student_enrollment_form.submit (event) =>
+        if @processing
+          return false
+
+        @processing = true
+
         event.preventDefault()
         data = new FormData(event.currentTarget)
         $.ajax
@@ -198,7 +204,9 @@ class AutoEnrollmentViaCsv
             data: data
             processData: false
             contentType: false
-            success: (data) => @display_response data
+            success: (data) =>
+              @processing = false
+              @display_response data
 
         return false;
 
