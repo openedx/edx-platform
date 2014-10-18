@@ -227,7 +227,7 @@ COUNTRY_INDEX = 3
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def register_and_enroll_list_of_students(request, course_id):
+def register_and_enroll_students(request, course_id):
     """
     Create new account and Enroll students in this course.
     Passing a csv file that contains a list of students.
@@ -255,6 +255,9 @@ def register_and_enroll_list_of_students(request, course_id):
         upload_file = request.FILES.get('students_list')
 
         def read_csv_file(upload_file):
+            """
+            Helper method to read through the CSV file that was uploaded
+            """
             data = [row for row in csv.reader(upload_file.read().splitlines())]
             return data
 
@@ -312,11 +315,11 @@ def register_and_enroll_list_of_students(request, course_id):
                         results.append({
                             'username': username, 'email': email, 'response_type': 'error',
                             'response': _('Username {user} already exists.').format(user=username)})
-                    except Exception as e:
-                        log.exception(type(e).__name__)
+                    except Exception as ex:
+                        log.exception(type(ex).__name__)
                         results.append({
                             'username': username, 'email': email, 'response_type': 'error',
-                            'response': _(type(e).__name__)})
+                            'response': _(type(ex).__name__)})
                     else:
                         # It's a new user, an email will be sent to each newly created user.
                         email_params['message'] = 'account_creation_and_enrollment'
