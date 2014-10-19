@@ -639,10 +639,20 @@ member fields.
 
    * - ``id``
      - string
-     - For events with an ``event_source`` of 'browser', the edX ID of the
-       video being watched. 
+     - For events with an ``event_source`` of 'browser', the optional name
+       value that the course creators supply or the system-generated hash code
+       for the video being watched. 
 
-       For example, i4x-HarvardX-PH207x-video-Simple_Random_Sample.
+       For example, ``0b9e39477cf34507a7a48f74be381fdd``.
+       
+       This value is part of the ``courseware_studentmodule.module_id``. See
+       :ref:`courseware_studentmodule`.
+
+       **History**: In October 2014, identifiers for some new courses began to
+       use the format shown above. Other new courses, and all courses created
+       prior to October 2014, use an html-escaped version of the
+       ``courseware_studentmodule.module_id``. For example, 
+       ``i4x-HarvardX-PH207x-video-Simple_Random_Sample``.
 
    * - ``module_id``
      - string
@@ -650,9 +660,13 @@ member fields.
        the video component.
 
        For example,
-       i4x://MITx/4.605x_2/video/8b375e7e9c6d419c92a5cdc32f47d4f2.
 
-       **History**: Added 16 Oct 2014.
+       ``block-v1:edX+DemoX+Demo_2014+type@problem+block@303034da25524878a2e66fb57c91cf85``
+
+       **History**: Added 16 Oct 2014. In October 2014, identifiers for some
+       new courses began to use the format shown above. Other new courses, and
+       all courses created prior to October 2014, use the format
+       ``i4x://MITx/4.605x_2/video/8b375e7e9c6d419c92a5cdc32f47d4f2``.
 
    * - ``name``
      - string
@@ -2057,10 +2071,21 @@ The browser emits ``problem_show`` events when a problem is shown.
      - Details
    * - ``problem``
      - string
-     - ID of the problem being shown. 
-       
-       For example, i4x://MITx/6.00x/problem/L15:L15_Problem_2.
+     - The optional name value that the course creators supply or the 
+       system-generated hash code for the problem being shown.
 
+       For example, ``input_303034da25524878a2e66fb57c91cf85_2_1`` or
+       ``303034da25524878a2e66fb57c91cf85_2_1``.
+       
+       This value is based on part of the
+       ``courseware_studentmodule.module_id``. See
+       :ref:`courseware_studentmodule`.
+
+       **History**: In October 2014, identifiers for some new courses began to
+       use the format shown above. Other new courses, and all courses created
+       prior to October 2014, use an html-escaped version of the
+       ``courseware_studentmodule.module_id``. For example,
+       i4x://MITx/6.00x/problem/L15:L15_Problem_2.
 
 ``reset_problem``
 ------------------------------------------------
