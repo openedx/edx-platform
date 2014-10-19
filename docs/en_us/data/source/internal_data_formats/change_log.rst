@@ -14,6 +14,12 @@ October-December 2014
 
    * - Date
      - Change
+   * - 10/23/14
+     - Added examples of the format used to identify course components to the
+       :ref:`Student_Info` and :ref:`Tracking Logs` chapters.
+   * - 
+     - Updated the ``child_render`` event to reflect the name change for the
+       ``child_id`` member field. See :ref:`Tracking Logs`.
    * - 10/20/14
      - Updated the :ref:`Package` chapter to remove instructions for
        downloading weekly event files.
