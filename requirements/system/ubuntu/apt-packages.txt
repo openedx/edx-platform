@@ -32,6 +32,7 @@ libreadline6-dev
 mongodb
 nodejs
 coffeescript
+addlibmagickwand
 mysql-client
 virtualenvwrapper
 libgeos-ruby1.8
