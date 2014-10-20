@@ -15,6 +15,12 @@ var edx = edx || {};
             'change .form-toggle': 'toggleForm'
         },
 
+        subview: {
+            login: {},
+            register: {},
+            passwordHelp: {}
+        },
+
         // The form currently loaded
         activeForm: '',
 
@@ -38,22 +44,38 @@ var edx = edx || {};
         postRender: function() {
             // Load the default form
             this.loadForm( this.activeForm );
+            this.$header = $(this.el).find('.js-login-register-header');
         },
 
         loadForm: function( type ) {
             if ( type === 'login' ) {
-                console.log('load login');
-                return new edx.student.account.LoginView();
-            } else if ( type === 'register' ) {
-                console.log('load register');
-                return new edx.student.account.RegisterView();
-            }
+                this.subview.login =  new edx.student.account.LoginView();
 
-            // return new app.LoginView({
-            //     el: $('#' + type + '-form'),
-            //     model: this.getModel( type ),
-            //     tpl: $('#' + type + '-form-tpl').html()
-            // });
+                // Listen for 'password-help' event to toggle sub-views
+                this.listenTo( this.subview.login, 'password-help', this.resetPassword );
+            } else if ( type === 'register' ) {
+                this.subview.register = new edx.student.account.RegisterView();
+            } else if ( type === 'reset' ) {
+                this.subview.passwordHelp = new edx.student.account.PasswordResetView();
+
+                // Listen for 'password-reset' event to toggle sub-views
+                this.listenTo( this.subview.passwordHelp, 'password-reset', this.removePasswordView);
+            }
+        },
+
+        removePasswordView: function() {
+            this.$header.removeClass('hidden');
+            $(this.el).find('.form-type').removeClass('hidden');
+
+            // User should only have to submit reset once so remove view
+            this.subview.passwordHelp.remove();
+        },
+
+        resetPassword: function() {
+            console.log( this.$header );
+            this.$header.addClass('hidden');
+            $(this.el).find('.form-type').addClass('hidden');
+            this.loadForm('reset');
         },
 
         toggleForm: function( e ) {

@@ -12,16 +12,13 @@
 </%block>
 
 <%block name="header_extras">
-% for template_name in ["account", "access", "form_field", "login", "register"]:
+% for template_name in ["account", "access", "form_field", "login", "register", "password_reset"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="student_account/${template_name}.underscore" />
 </script>
 % endfor
 </%block>
 
-<h1>Welcome!</h1>
-
-<p>Please log in to continue</p>
 
 ## TODO: Use JavaScript to populate this div with
 ## the actual registration/login forms (loaded asynchronously from the user API)
@@ -47,6 +44,7 @@
 ## Note that this list may be empty.
 ##
 <div id="login-and-registration-container"
+    class="login-register"
     data-initial-mode="${initial_mode}"
     data-third-party-auth-providers="${third_party_auth_providers}"
 />

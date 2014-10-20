@@ -6,25 +6,37 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
-    edx.student.account.RegisterView = Backbone.View.extend({
+    edx.student.account.PasswordResetView = Backbone.View.extend({
         tagName: 'form',
 
-        el: '#register-form',
+        el: '#password-reset-wrapper',
 
-        tpl: $('#register-tpl').html(),
+        tpl: $('#password_reset-tpl').html(),
 
         fieldTpl: $('#form_field-tpl').html(),
 
         events: {
-            'click .js-register': 'submitForm'
+            'click .js-reset': 'submitForm'
         },
 
         errors: [],
 
+        mode: {},
+
         $form: {},
 
         initialize: function( obj ) {
-            this.getInitialData();
+            var fields = this.buildForm([{
+                label: 'E-mail',
+                instructions: 'This is the e-mail address you used to register with edX',
+                name: 'email',
+                required: true,
+                type: 'email',
+                restrictions: []
+            }]);
+console.log('PasswordResetView INIT');
+            this.initModel();
+            this.render( fields );
         },
 
         // Renders the form.
@@ -45,34 +57,17 @@ var edx = edx || {};
 
             this.$form = $container.find('form');
             this.$errors = $container.find('.error-msg');
-        },
 
-        getInitialData: function() {
-            var that = this;
-
-            $.ajax({
-                type: 'GET',
-                dataType: 'json',
-                url: '/user_api/v1/account/registration/',
-                success: function( data ) {
-                    console.log(data);
-                    that.buildForm( data.fields );
-                    that.initModel( data.submit_url, data.method );
-                },
-                error: function( jqXHR, textStatus, errorThrown ) {
-                    console.log('fail ', errorThrown);
-                }
-            });
+            this.listenTo( this.model, 'success', this.resetComplete) ;
         },
 
         initModel: function( url, method ) {
-            this.model = new edx.student.account.RegisterModel({
-                url: url
-            });
+            console.log('init the password reset model');
+            /*this.model = new edx.student.account.PasswordResetModel();
 
             this.listenTo( this.model, 'error', function( error ) {
                 console.log(error.status, ' error: ', error.responseText);
-            });
+            });*/
         },
 
         buildForm: function( data ) {
@@ -83,7 +78,7 @@ var edx = edx || {};
 console.log('buildForm ', data);
             for ( i=0; i<len; i++ ) {
                 html.push( _.template( fieldTpl, $.extend( data[i], {
-                    form: 'register'
+                    form: 'reset-password'
                 }) ) );
             }
 
@@ -122,17 +117,20 @@ console.log('buildForm ', data);
             return obj;
         },
 
+        resetComplete: function() {
+            this.trigger('password-reset');
+        },
+
         submitForm: function( event ) {
             var data = this.getFormData();
 
             event.preventDefault();
-console.log(data);
+
             // console.log(this.model);
 
             if ( !this.errors.length ) {
                 console.log('save me');
                 this.model.set( data );
-console.log(this.model);
                 this.model.save();
                 this.toggleErrorMsg( false );
             } else {

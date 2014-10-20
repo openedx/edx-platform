@@ -1029,8 +1029,10 @@ student_account_js = [
     'js/common_helpers/edx.utils.validate.js',
     'js/student_account/models/LoginModel.js',
     'js/student_account/models/RegisterModel.js',
+    'js/student_account/models/PasswordResetModel.js',
     'js/student_account/views/LoginView.js',
     'js/student_account/views/RegisterView.js',
+    'js/student_account/views/PasswordResetView.js',
     'js/student_account/views/AccessView.js',
     'js/student_account/accessApp.js',
 ]
