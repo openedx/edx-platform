@@ -11,6 +11,7 @@ import logging
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locator import CourseLocator
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -46,6 +47,8 @@ class SplitMigrator(object):
 
         # create the course: set fields to explicitly_set for each scope, id_root = new_course_locator, master_branch = 'production'
         original_course = self.source_modulestore.get_course(source_course_key, **kwargs)
+        if original_course is None:
+            raise ItemNotFoundError(unicode(source_course_key))
 
         if new_org is None:
             new_org = source_course_key.org
