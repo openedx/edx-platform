@@ -105,7 +105,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-14 11:53-0400\n"
+"POT-Creation-Date: 2014-10-20 10:16-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: LIU,SHU-HAO <jeremy55662004@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
@@ -278,7 +278,7 @@ msgstr "無效課程編號"
 msgid "Course id is invalid"
 msgstr "課程編號無效"
 
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py
 msgid "Could not enroll"
 msgstr ""
 
@@ -1110,7 +1110,6 @@ msgstr ""
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html lms/templates/login.html
 #: lms/templates/register.html
 msgid "or"
@@ -5459,6 +5458,10 @@ msgstr "這個課程並不支援認證書。"
 msgid "No selected price or selected price is below minimum."
 msgstr "沒有選擇價格或是選擇價格低於最小值。"
 
+#: lms/envs/common.py
+msgid "Taiwan"
+msgstr ""
+
 #: lms/lib/xblock/mixin.py
 msgid "Courseware Chrome"
 msgstr ""
@@ -6517,16 +6520,15 @@ msgid "Terms of Service"
 msgstr "服務條款"
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "隱私權保護政策"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
-#: lms/templates/help_modal.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/static_templates/help.html
+#: lms/templates/help_modal.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "幫助"
@@ -6542,87 +6544,6 @@ msgstr "註冊 for {} | 選擇您的追蹤"
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to register you"
 msgstr "很抱歉，當要為您註冊時發生錯誤。"
-
-#: common/templates/course_modes/choose.html
-msgid "Select your track:"
-msgstr "選擇您的追蹤："
-
-#: common/templates/course_modes/choose.html
-msgid "Certificate of Achievement (ID Verified)"
-msgstr "成績證明書 (ID 已驗證)"
-
-#: common/templates/course_modes/choose.html
-msgid "Upgrade and work toward a verified Certificate of Achievement."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Sign up and work toward a verified Certificate of Achievement."
-msgstr "註冊，並且努力朝向取得證書的成就。"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Select your contribution for this course (min. $"
-msgstr "選擇您對這門課程的貢獻金額 (min. $)"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "):"
-msgstr "):"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration"
-msgstr "更新您的註冊"
-
-#: common/templates/course_modes/choose.html
-msgid "Select Certificate"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Verified Registration Requirements"
-msgstr "已驗證註冊要求。"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To upgrade your registration and work towards a Verified Certificate of "
-"Achievement, you will need a webcam, a credit or debit card, and an ID."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To register for a Verified Certificate of Achievement option, you will need "
-"a webcam, a credit or debit card, and an ID."
-msgstr "為了註冊一個證書成就選項，您會需要一個視訊鏡頭、一張信用卡或金融簽帳卡(debit card)以及一個識別碼。"
-
-#: common/templates/course_modes/choose.html
-msgid "What is an ID Verified Certificate?"
-msgstr "ID認證證書是甚麼？"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"An ID Verified Certificate requires proof of your identity through your "
-"photo and ID and is checked throughout the course to verify that it is you "
-"who earned the passing grade."
-msgstr "一個ID證書需要透過您的照片和ID以及檢查整個課程，證明您的身分以確認是您獲得了及格。"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course"
-msgstr "旁聽這門課程"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums. If your work is satisfactory and "
-"you abide by the Honor Code, you'll receive a personalized Honor Code "
-"Certificate to showcase your achievement."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Select Audit"
-msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Now choose your course track:"
@@ -6646,6 +6567,31 @@ msgid ""
 "Plan to use your completed coursework for job applications, career "
 "advancement, or school applications? Then work toward a Verified Certificate"
 " of Achievement to document your accomplishment. A minimum fee applies."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "Select your contribution for this course (min. $"
+msgstr "選擇您對這門課程的貢獻金額 (min. $)"
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/verify_student/photo_verification.html
+msgid "):"
+msgstr "):"
+
+#: common/templates/course_modes/choose.html
+msgid "Upgrade Your Registration"
+msgstr "更新您的註冊"
+
+#: common/templates/course_modes/choose.html
+msgid "Audit This Course"
+msgstr "旁聽這門課程"
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -6688,12 +6634,12 @@ msgstr "願景"
 msgid "Faq"
 msgstr "常見問題"
 
-#: lms/templates/contact.html lms/templates/footer-edx.html
+#: lms/templates/contact.html lms/templates/footer-legacy.html
 msgid "Press"
 msgstr "新聞報導"
 
 #: lms/templates/contact.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
@@ -6768,22 +6714,6 @@ msgstr "新的"
 #: lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "控制面板"
-
-#: lms/templates/dashboard.html lms/templates/courseware/course_about.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "發生錯誤。請稍後再試一次。"
-
-#: lms/templates/dashboard.html
-msgid "Please verify your new email address"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid ""
-"You'll receive a confirmation in your inbox. Please follow the link in the "
-"email to confirm your email address change."
-msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -7055,11 +6985,11 @@ msgid ""
 "online initiative created by founding partners {Harvard} and {MIT}."
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 msgid "&copy; 2014 edX, some rights reserved."
 msgstr "&copy; 2014 edX, 部分權利保留。"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
 msgstr "服務條款和榮譽守則"
@@ -7072,7 +7002,7 @@ msgstr ""
 msgid "About & Company Info"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "About"
 msgstr "關於"
@@ -7081,7 +7011,7 @@ msgstr "關於"
 msgid "News"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
@@ -7123,17 +7053,17 @@ msgstr ""
 msgid "Google+"
 msgstr ""
 
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "工作"
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid "edX Logo"
 msgstr ""
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid ""
 "{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
 " mission is to bring the best of higher education to students of all ages "
@@ -7567,76 +7497,74 @@ msgstr "確認"
 msgid "Reject"
 msgstr ""
 
-#: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Find Courses"
 msgstr "尋找課程"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
 msgstr "控制面板："
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "More options dropdown"
 msgstr "更多選擇下拉清單"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Log Out"
 msgstr "登出"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
 msgstr ""
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
 msgstr "運行機制"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation-edx.html
 msgid "Schools & Partners"
 msgstr ""
 
-#: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/register.html
 msgid "Register"
 msgstr "註冊"
 
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html lms/templates/register-sidebar.html
+#: lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "登入"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
 msgstr ""
 
-#: lms/templates/notes.html lms/templates/textannotation.html
-#: lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "您沒有任何筆記。"
-
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Global Navigation"
 msgstr "全球導航"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/navigation.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 msgid "Courses"
 msgstr "課程"
 
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Schools"
 msgstr "學校"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Register Now"
 msgstr "立刻註冊"
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "您沒有任何筆記。"
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -8191,6 +8119,11 @@ msgstr "日期"
 msgid "Git Action"
 msgstr "Git動作"
 
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "No git import logs have been recorded for this course."
+msgstr ""
+
 #: lms/templates/textannotation.html
 msgid "Source:"
 msgstr ""
@@ -8304,7 +8237,7 @@ msgstr "填滿瀏覽器"
 msgid "HD off"
 msgstr "關閉 HD"
 
-#: lms/templates/video.html lms/templates/video.html
+#: lms/templates/video.html
 msgid "Turn off captions"
 msgstr "關閉字幕"
 
@@ -8536,6 +8469,12 @@ msgstr "{chapter}，目前章節"
 #: lms/templates/courseware/progress.html
 msgid "due {date}"
 msgstr "到期日 {date}"
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/mktg_course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "發生錯誤。請稍後再試一次。"
 
 #: lms/templates/courseware/course_about.html
 msgid ""
@@ -8987,7 +8926,7 @@ msgid ""
 "and re-open threads, endorse responses, and see posts from all cohorts (if "
 "the course is cohorted). Moderators' posts are marked as 'staff'."
 msgstr ""
-"論壇版主：可以編輯或刪除任何討論串、移除誤用標誌、關閉或重新打開討論串、贊同回應、看到所有世代的討論串(如果課程是同一世代)。版主的討論串被標記為 "
+"論壇版主：可以編輯或刪除任何討論串、移除誤用標誌、關閉或重新打開討論串、贊同回應、看到所有同伴的討論串(如果課程是有同伴的)。版主的討論串被標記為 "
 "'工作人員'。"
 
 #: lms/templates/courseware/instructor_dashboard.html
@@ -9295,7 +9234,7 @@ msgstr "新聞 - MITx 6.002x"
 
 #: lms/templates/courseware/news.html
 msgid "Updates to Discussion Posts You Follow"
-msgstr "更新您參與討論的發表"
+msgstr "更新您參與討論的文章"
 
 #: lms/templates/courseware/progress.html
 msgid "{course_number} Progress"
@@ -9430,9 +9369,6 @@ msgstr "登記為："
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -9669,7 +9605,7 @@ msgstr "抱歉，沒有找不到您的查詢內容。請嘗試其他查詢。"
 
 #: lms/templates/discussion/_blank_slate.html
 msgid "There are no posts here yet. Be the first one to post!"
-msgstr "目前還沒有任何發表。成為第一位發表的人吧！"
+msgstr "目前還沒有任何文章。成為第一位發文章的人吧！"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
@@ -9699,7 +9635,7 @@ msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
-msgstr "我參與的發表"
+msgstr "我追蹤的文章"
 
 #: lms/templates/discussion/_recent_active_posts.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -9708,7 +9644,7 @@ msgstr "參與"
 
 #: lms/templates/discussion/_search_bar.html
 msgid "Search posts"
-msgstr "搜尋發表"
+msgstr "搜尋文章"
 
 #: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
@@ -9721,7 +9657,7 @@ msgstr "討論主題； 目前選擇是："
 
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Search all posts"
-msgstr "搜索所有討論"
+msgstr "搜尋所有討論"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -9921,7 +9857,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Search for specific posts "
-msgstr "搜索特定的討論"
+msgstr "搜尋特定的討論"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Sort by date, vote, or comments"
@@ -12414,12 +12350,10 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
 msgstr "有問題嗎?"
 
 #: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
@@ -12429,68 +12363,41 @@ msgstr ""
 "certificates{a_end}."
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your registration for"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "您正在註冊為"
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Professional Education"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Upgrading to:"
-msgstr "升級成："
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Re-verifying for:"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Registering as: "
-msgstr "註冊："
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Congrats! You are now registered to audit"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
-msgid "Change your mind?"
-msgstr "改變您的決定?"
-
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "You can always continue to audit the course without verifying."
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"You can always {a_start} audit the course for free {a_end} without "
-"verifying."
-msgstr "您可以總是 {a_start} 審核課程for free {a_end} 無須驗證。"
+#: lms/templates/verify_student/_verification_header.html
+msgid "Upgrading to:"
+msgstr "升級成："
 
-#: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "Re-verifying for:"
+msgstr ""
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Registering as: "
+msgstr "註冊："
+
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
@@ -13084,6 +12991,16 @@ msgstr "拍攝您的照片"
 #: lms/templates/verify_student/photo_verification.html
 msgid "What if my camera isn't working?"
 msgstr "如果我的攝像頭不正常？"
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "You can always continue to audit the course without verifying."
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"You can always {a_start} audit the course for free {a_end} without "
+"verifying."
+msgstr "您可以總是 {a_start} 審核課程for free {a_end} 無須驗證。"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Go to Step 2: Take ID Photo"
@@ -14676,15 +14593,31 @@ msgstr "您的課程開始的學期。"
 msgid "Create"
 msgstr "創建"
 
+#: cms/templates/index.html
+msgid "Courses Being Processed"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Course Run:"
 msgstr "開課時程："
 
 #: cms/templates/index.html
+msgid "This course run is currently being created."
+msgstr ""
+
+#. Translators: This is a status message, used to inform the user of what the
+#. system is doing. This status means that the user has requested to re-run an
+#. existing course, and the system is currently in the process of duplicating
+#. and configuring the existing course so that it can be re-run.
+#: cms/templates/index.html
+msgid "Configuring as re-run"
+msgstr ""
+
+#: cms/templates/index.html
 msgid ""
 "The new course will be added to your course list in 5-10 minutes. Return to "
-"this page or <a href=\"#\" class=\"action-reload\">refresh it</a> to update "
-"the course list. The new course will need some manual configuration."
+"this page or {link_start}refresh it{link_end} to update the course list. The"
+" new course will need some manual configuration."
 msgstr ""
 
 #: cms/templates/index.html
@@ -14797,6 +14730,10 @@ msgstr ""
 msgid "Getting Started with edX Studio"
 msgstr ""
 
+#: cms/templates/index.html cms/templates/index.html
+msgid "Use our feedback tool, Tender, to request help"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/widgets/sock.html
 msgid "Request help with edX Studio"
 msgstr ""
@@ -14806,12 +14743,10 @@ msgid "Can I create courses in Studio?"
 msgstr "我可以在Studio中創建課程嗎？"
 
 #: cms/templates/index.html
-msgid "In order to create courses in Studio, you must"
-msgstr "為了在Studio中創建課程，您必須"
-
-#: cms/templates/index.html
-msgid "contact edX staff to help you create a course"
-msgstr "聯繫edX工作人員來幫助您創建一個課程"
+msgid ""
+"In order to create courses in Studio, you must {link_start}contact edX staff"
+" to help you create a course{link_end}."
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
@@ -14820,12 +14755,10 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Your request to author courses in studio has been denied. Please"
-msgstr "您在Studio中開設課程的請求已經被拒絕。請"
-
-#: cms/templates/index.html
-msgid "contact edX Staff with further questions"
-msgstr "進一步的問題請聯繫edX工作人員"
+msgid ""
+"Your request to author courses in Studio has been denied. Please "
+"{link_start}contact edX Staff with further questions{link_end}."
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Thanks for signing up, %(name)s!"
@@ -14852,6 +14785,10 @@ msgid ""
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
 msgstr "請檢查您的垃圾郵件，以防我們的郵件不在您的收件箱中。依然找不到確認郵件？透過下面的連結請求協助。"
+
+#: cms/templates/index.html
+msgid "Request help with your Studio account"
+msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"

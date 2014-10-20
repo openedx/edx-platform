@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-14 11:53-0400\n"
+"POT-Creation-Date: 2014-10-20 10:16-0400\n"
 "PO-Revision-Date: 2014-09-02 00:40+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -295,7 +295,7 @@ msgstr "الرمز التعريفي للمساق غير صحيح"
 msgid "Course id is invalid"
 msgstr "الرمز التعريفي غير صحيح "
 
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py
 msgid "Could not enroll"
 msgstr "لقد تعذّر التسجيل"
 
@@ -1204,7 +1204,6 @@ msgstr "حدث خطأ"
 #. in
 #. to the site.
 #: common/lib/capa/capa/responsetypes.py
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html lms/templates/login.html
 #: lms/templates/register.html
 msgid "or"
@@ -6185,6 +6184,10 @@ msgstr "لا يدعم هذا المساق الشهادات الموثّقة"
 msgid "No selected price or selected price is below minimum."
 msgstr "لم يتم اختيار سعر أو أن السعر الذي تم اختياره قليل جداً.  "
 
+#: lms/envs/common.py
+msgid "Taiwan"
+msgstr ""
+
 #: lms/lib/xblock/mixin.py
 msgid "Courseware Chrome"
 msgstr "منهاج المساق في متصفّح كروم"
@@ -7302,16 +7305,15 @@ msgid "Terms of Service"
 msgstr "شروط الخدمة"
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "سياسة الخصوصية"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
-#: lms/templates/help_modal.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/static_templates/help.html
+#: lms/templates/help_modal.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "المساعدة"
@@ -7327,98 +7329,6 @@ msgstr "قم بالتسجيل في {} | قم باختيار المسار الخ�
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to register you"
 msgstr "للأسف، لقد حدث خطأ أثناء محاولة تسجيلك. "
-
-#: common/templates/course_modes/choose.html
-msgid "Select your track:"
-msgstr "اختر المسار الخاص بك: "
-
-#: common/templates/course_modes/choose.html
-msgid "Certificate of Achievement (ID Verified)"
-msgstr "شهادة الإتمام (موثّقة بالهوية)"
-
-#: common/templates/course_modes/choose.html
-msgid "Upgrade and work toward a verified Certificate of Achievement."
-msgstr "إجراء ترقية والعمل على الحصول على شهادة إتمام مصدّقة."
-
-#: common/templates/course_modes/choose.html
-msgid "Sign up and work toward a verified Certificate of Achievement."
-msgstr "قم بالتسجيل وابدأ العمل في سبيل الحصول على شهادة إتمام  معتمدة. "
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Select your contribution for this course (min. $"
-msgstr "اختر مساهمتك في هذا المساق (الحد الأدنى $ "
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "):"
-msgstr "): "
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration"
-msgstr "إجراء عملية ترقية للتسجيل الخاص بك"
-
-#: common/templates/course_modes/choose.html
-msgid "Select Certificate"
-msgstr "اختيار الشهادة"
-
-#: common/templates/course_modes/choose.html
-msgid "Verified Registration Requirements"
-msgstr "متطلبات التسجيل المعتمدة "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To upgrade your registration and work towards a Verified Certificate of "
-"Achievement, you will need a webcam, a credit or debit card, and an ID."
-msgstr ""
-"لإجراء ترقية لتسجيلك والعمل على الحصول على شهادة إتمام موثّقة، يلزمك كاميرا "
-"ويب، وبطاقة ائتمان أو بطاقة الخصم الفوري، وهوية شخصية غير منتهية."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To register for a Verified Certificate of Achievement option, you will need "
-"a webcam, a credit or debit card, and an ID."
-msgstr ""
-"للتسجيل لخيار شهادة إتمام موثّقة، ستكون بحاجة لكاميرا الويب، وبطاقة ائتمان "
-"أو بطاقة خصم فوري، وهوية شخصية. "
-
-#: common/templates/course_modes/choose.html
-msgid "What is an ID Verified Certificate?"
-msgstr "ما هي الشهادة الموثقة بالهوية؟ "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"An ID Verified Certificate requires proof of your identity through your "
-"photo and ID and is checked throughout the course to verify that it is you "
-"who earned the passing grade."
-msgstr ""
-"الشهادة الموثقة بالهوية تتطلب إثباتاً لهويتك عن طريق صورتك وبطاقتك الشخصية، "
-"ويتم التحقق منها طوال فترة المساق للتأكد من كونك أنت من تمكن من نيل درجة "
-"النجاح.  "
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course"
-msgstr "سجل في هذا المساق كمستمع "
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums. If your work is satisfactory and "
-"you abide by the Honor Code, you'll receive a personalized Honor Code "
-"Certificate to showcase your achievement."
-msgstr ""
-"استمع لدروس هذا المساق كمستمع مجانًا واحصل على وصول كامل لجميع المواد "
-"المتعلقة بالمساق وأنشطته واختباراته ومنتدياته. إذا جاءت نتيجة عملك مرضية "
-"والتزمت لميثاق الشرق الأكاديمي فسوف تحصل على شهادة ميثاق الشرف الأكاديمي "
-"خاصة بك بيانًا للإنجاز الذي حققته."
-
-#: common/templates/course_modes/choose.html
-msgid "Select Audit"
-msgstr "اختيار المستمع"
 
 #: common/templates/course_modes/choose.html
 msgid "Now choose your course track:"
@@ -7449,6 +7359,35 @@ msgstr ""
 "هل تخطط لاستخدام عمل المساق الذي تنجزه في التقدم للوظائف أو التطور الوظيفي "
 "أو التقدم للتسجيل في المدارس؟ حدّث لتدرس للحصول على شهادة إتمام موثقة كي "
 "توثّق إنجازك. يترتب عليك دفع رسوم إضافية بسيطة."
+
+#: common/templates/course_modes/choose.html
+msgid "Select your contribution for this course (min. $"
+msgstr "اختر مساهمتك في هذا المساق (الحد الأدنى $ "
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/verify_student/photo_verification.html
+msgid "):"
+msgstr "): "
+
+#: common/templates/course_modes/choose.html
+msgid "Upgrade Your Registration"
+msgstr "إجراء عملية ترقية للتسجيل الخاص بك"
+
+#: common/templates/course_modes/choose.html
+msgid "Audit This Course"
+msgstr "سجل في هذا المساق كمستمع "
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
+msgstr ""
+"استمع لدروس هذا المساق كمستمع مجانًا واحصل على وصول كامل لجميع المواد "
+"المتعلقة بالمساق وأنشطته واختباراته ومنتدياته. إذا جاءت نتيجة عملك مرضية "
+"والتزمت لميثاق الشرق الأكاديمي فسوف تحصل على شهادة ميثاق الشرف الأكاديمي "
+"خاصة بك بيانًا للإنجاز الذي حققته."
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue an Honor Code Certificate"
@@ -7490,12 +7429,12 @@ msgstr "الرؤية"
 msgid "Faq"
 msgstr "الأسئلة الأكثر تكراراً"
 
-#: lms/templates/contact.html lms/templates/footer-edx.html
+#: lms/templates/contact.html lms/templates/footer-legacy.html
 msgid "Press"
 msgstr "الصحافة"
 
 #: lms/templates/contact.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
@@ -7592,24 +7531,6 @@ msgstr "جديد"
 #: lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "لوحة المعلومات"
-
-#: lms/templates/dashboard.html lms/templates/courseware/course_about.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "حدث خطأ. الرجاء إعادة المحاولة في وقتٍ لاحق. "
-
-#: lms/templates/dashboard.html
-msgid "Please verify your new email address"
-msgstr "الرجاء تأكيد عنوان بريدك الإلكتروني الجديد"
-
-#: lms/templates/dashboard.html
-msgid ""
-"You'll receive a confirmation in your inbox. Please follow the link in the "
-"email to confirm your email address change."
-msgstr ""
-"ستصلك رسالة تأكيد على البريد الوارد الخاص بك. الرجاء الضغط على الرابط في "
-"الرسالة لتأكيد تغيير البريد الالكتروني."
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -7893,18 +7814,18 @@ msgid ""
 "online initiative created by founding partners {Harvard} and {MIT}."
 msgstr ""
 "تقدّم {EdX} دروسًا تفاعليةً ومقررات جامعية متاحة عبر الإنترنت من أفضل "
-"الجامعات في العالم، إضافة إلى دورات عبر الإنترنت من {MITx} و{HarvardX} "
-"و{BerkeleyX} و{UTx} والكثير غيرها من الجامعات في مجالات تتنوع بين علوم "
-"الأحياء والأعمال والكيمياء وعلوم الكومبيوتر والاقتصاد والمالية والإلكترونيات"
-" والهندسة والغذاء والتغذية والتاريخ والعلوم الإنسانية والحقوق والآداب "
+"الجامعات في العالم، إضافة إلى دورات عبر الإنترنت من {MITx} و {HarvardX} و "
+"{BerkeleyX} و {UTx} والكثير غيرها من الجامعات في مجالات تتنوع بين علوم "
+"الأحياء والأعمال والكيمياء وعلوم الكومبيوتر والاقتصاد والتمويل والإلكترونيات"
+" والهندسة وعلوم التغذية والتاريخ والعلوم الإنسانية والحقوق والآداب "
 "والرياضيات والطب والموسيقى والفلسفة والفيزياء والعلوم والإحصاء وغيرها. {EdX}"
-" هي مبادرة إلكترونية لا ربحية أسسها الشركاء {HarvardX} و{MITx}."
+" هي مبادرة إلكترونية لاربحية أسسها الشركاء {HarvardX} و {MITx}."
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 msgid "&copy; 2014 edX, some rights reserved."
 msgstr "&copy؛ 2014 edX، بعض الحقوق محفوظة."
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
 msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
@@ -7917,7 +7838,7 @@ msgstr "(روجعت في 16/4/2014)"
 msgid "About & Company Info"
 msgstr "نبذة ومعلومات عن الشركة"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "About"
 msgstr "نبذة عن"
@@ -7926,7 +7847,7 @@ msgstr "نبذة عن"
 msgid "News"
 msgstr "أحدث الأخبار"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
@@ -7968,17 +7889,17 @@ msgstr "لينكد إن"
 msgid "Google+"
 msgstr "جوجل +"
 
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "الوظائف"
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid "edX Logo"
 msgstr "شعار edX"
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid ""
 "{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
 " mission is to bring the best of higher education to students of all ages "
@@ -7986,11 +7907,12 @@ msgid ""
 "online MOOCs are interactive and subjects include computer science, public "
 "health, and artificial intelligence."
 msgstr ""
-"{platform_name} غير ربحية أنشأت من قبل الشركاء {Harvard} و  {MIT} والذين "
-"جعلوا مهمتهم وضع أفضل الدراسات العليا في متناول الطلاب من جميع الأعمار في أي"
-" مكان في العالم يتواجد به الانترنت. إنّ المقررات الجامعية المتاحة عبر "
-"الإنترنت المجانية التابعة لـ {EdX} هي مقررات تفاعلية تتضمّن عدة مواضيع منها "
-"علوم الكومبيوتر والصحة العامة والذكاء الاصطناعي."
+"{EdX} هي منصّة غير ربحية تم إنشاؤها من قبل الشركاء المؤسّسين  {Harvard} و  "
+"{MIT} لتأدية رسالةٍ تتمثّل في وضع أفضل مستويات التعليم العالي المتاحة في في "
+"متناول الطلاب من جميع الأعمار وفي أي مكان في العالم تتوفّر به إمكانيّة "
+"الاتصال بالإنترنت. إنّ المقررات الجامعية المجانية المتاحة عبر الإنترنت "
+"والتابعة لـ {EdX} هي مقررات تفاعلية، تتضمّن مواضيع عدة من بينها علوم "
+"الكومبيوتر والصحة العامة والذكاء الاصطناعي."
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
@@ -8446,47 +8368,47 @@ msgstr "تأكيد"
 msgid "Reject"
 msgstr "رفض"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Find Courses"
 msgstr "إيجاد المساقات"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
 msgstr "لوحة المعلومات لـ:"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "More options dropdown"
 msgstr "قائمة منسدلة لخيارات إضافية"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Log Out"
 msgstr "تسجيل الخروج"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
 msgstr "سلة االتسوق"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
 msgstr "كيفية العمل"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation-edx.html
 msgid "Schools & Partners"
 msgstr "المدارس والشركاء"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/register.html
 msgid "Register"
 msgstr "تسجيل"
 
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html lms/templates/register-sidebar.html
+#: lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "تسجيل الدخول"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -8494,30 +8416,28 @@ msgstr ""
 "<strong>تحذير:</strong> إنّ المتصفح الذي تستخدمه غير مدعوم بشكل كامل، نوصي "
 "بشدة باستخدام  {chrome_link} أو {ff_link}."
 
-#: lms/templates/notes.html lms/templates/textannotation.html
-#: lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "لا يوجد لديك أية ملاحظات."
-
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Global Navigation"
 msgstr "روابط تصفح متطابقة في كافة صفحات الموقع"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/navigation.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 msgid "Courses"
 msgstr "المساقات"
 
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Schools"
 msgstr "المدارس"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Register Now"
 msgstr "قم بالتسجيل الآن"
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "لا يوجد لديك أية ملاحظات."
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -9093,6 +9013,11 @@ msgstr "التاريخ "
 msgid "Git Action"
 msgstr "عملية Git"
 
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "No git import logs have been recorded for this course."
+msgstr ""
+
 #: lms/templates/textannotation.html
 msgid "Source:"
 msgstr "المصدر:"
@@ -9217,7 +9142,7 @@ msgstr "إدخال اسم المتصفح "
 msgid "HD off"
 msgstr "الدقة العالية غير مفعّلة"
 
-#: lms/templates/video.html lms/templates/video.html
+#: lms/templates/video.html
 msgid "Turn off captions"
 msgstr "إيقاف العناوين الفرعية"
 
@@ -9468,6 +9393,12 @@ msgstr "{chapter}، الفصل الحالي "
 #: lms/templates/courseware/progress.html
 msgid "due {date}"
 msgstr "تاريخ الاستحقاق {date}"
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/mktg_course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "حدث خطأ. الرجاء إعادة المحاولة في وقتٍ لاحق. "
 
 #: lms/templates/courseware/course_about.html
 msgid ""
@@ -10438,9 +10369,6 @@ msgstr "مسجل كـ: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -13745,12 +13673,10 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
 msgstr "هل لديك أسئلة؟ "
 
 #: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
@@ -13760,69 +13686,41 @@ msgstr ""
 "الأسئلة الشائعة لما يتعلق بشهاداتنا{a_end}."
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your registration for"
 msgstr "أنت حالياً تقوم بترقية تسجيلك بغرض"
 
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for"
 msgstr "أنت تقوم بعملية إعادة التحقّق بالنسبة لـ"
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "تقوم بالتسجيل لـ "
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Professional Education"
-msgstr "التعليم المهني"
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Upgrading to:"
-msgstr "الترقية لـ:"
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Re-verifying for:"
-msgstr "إجراء عملية إعادة التحقّق بالنسبة لـ:"
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Registering as: "
-msgstr "تقوم بالتسجيل كـ: "
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Congrats! You are now registered to audit"
 msgstr "تهانينا! أنت الآن مسجل لتقوم بالتدقيق"
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
-msgid "Change your mind?"
-msgstr "هل غيرت رأيك؟ "
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
+msgstr "التعليم المهني"
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "You can always continue to audit the course without verifying."
-msgstr "يمكنك دائماً مواصلة حضور المساق بصفة مستمع دون القيام بعملية التحقّق."
+#: lms/templates/verify_student/_verification_header.html
+msgid "Upgrading to:"
+msgstr "الترقية لـ:"
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"You can always {a_start} audit the course for free {a_end} without "
-"verifying."
-msgstr ""
-"بإمكانك دائماً  {a_start}حضور المساق بصفة مستمع بالمجان{a_end} دون التحقق."
+#: lms/templates/verify_student/_verification_header.html
+msgid "Re-verifying for:"
+msgstr "إجراء عملية إعادة التحقّق بالنسبة لـ:"
 
-#: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "Registering as: "
+msgstr "تقوم بالتسجيل كـ: "
+
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
 msgstr "المتطلّبات التقنيّة"
 
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
@@ -14477,6 +14375,17 @@ msgstr "قم بأخذ صورة  "
 #: lms/templates/verify_student/photo_verification.html
 msgid "What if my camera isn't working?"
 msgstr "ماذا إذا لم تعمل الكاميرا الخاصة بي؟ "
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "You can always continue to audit the course without verifying."
+msgstr "يمكنك دائماً مواصلة حضور المساق بصفة مستمع دون القيام بعملية التحقّق."
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"You can always {a_start} audit the course for free {a_end} without "
+"verifying."
+msgstr ""
+"بإمكانك دائماً  {a_start}حضور المساق بصفة مستمع بالمجان{a_end} دون التحقق."
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Go to Step 2: Take ID Photo"
@@ -16256,19 +16165,32 @@ msgstr "الفترة التي سيتمّ تشغيل مساقك فيها."
 msgid "Create"
 msgstr "إنشاء "
 
+#: cms/templates/index.html
+msgid "Courses Being Processed"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Course Run:"
 msgstr "تشغيل المساق:"
 
 #: cms/templates/index.html
+msgid "This course run is currently being created."
+msgstr ""
+
+#. Translators: This is a status message, used to inform the user of what the
+#. system is doing. This status means that the user has requested to re-run an
+#. existing course, and the system is currently in the process of duplicating
+#. and configuring the existing course so that it can be re-run.
+#: cms/templates/index.html
+msgid "Configuring as re-run"
+msgstr ""
+
+#: cms/templates/index.html
 msgid ""
 "The new course will be added to your course list in 5-10 minutes. Return to "
-"this page or <a href=\"#\" class=\"action-reload\">refresh it</a> to update "
-"the course list. The new course will need some manual configuration."
+"this page or {link_start}refresh it{link_end} to update the course list. The"
+" new course will need some manual configuration."
 msgstr ""
-"سوف يضاف المساق الجديد إلى لائحة مساقاتك خلال 5-10 دقائق. عُد إلى هذه الصفحة"
-" أو <a href=\"#\" class=\"action-reload\">حدّثها</a> لتحديث لائحة المساقات. "
-"سوف يحتاج المساق الجديد بعض الإعدادات اليدوية."
 
 #: cms/templates/index.html
 msgid ""
@@ -16400,6 +16322,10 @@ msgstr ""
 msgid "Getting Started with edX Studio"
 msgstr "البدء باستخدام برنامج استوديو edX"
 
+#: cms/templates/index.html cms/templates/index.html
+msgid "Use our feedback tool, Tender, to request help"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/widgets/sock.html
 msgid "Request help with edX Studio"
 msgstr "طلب المساعدة لبرنامج استوديو edX"
@@ -16409,12 +16335,10 @@ msgid "Can I create courses in Studio?"
 msgstr "هل أستطيع إنشاء مساقات باستخدام برنامج استوديو؟"
 
 #: cms/templates/index.html
-msgid "In order to create courses in Studio, you must"
-msgstr "حتى تتمكن من إنشاء مساقات في برنامج استوديو، عليك أن"
-
-#: cms/templates/index.html
-msgid "contact edX staff to help you create a course"
-msgstr "اتصل بطاقم مساق edX لمساعدتك في إنشاء مساق"
+msgid ""
+"In order to create courses in Studio, you must {link_start}contact edX staff"
+" to help you create a course{link_end}."
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
@@ -16425,12 +16349,10 @@ msgstr ""
 "المساق لإنشاء مساقك."
 
 #: cms/templates/index.html
-msgid "Your request to author courses in studio has been denied. Please"
-msgstr "الطلب الذي تقدمت به لتأليف المساقات في الاستوديو قد رفض. الرجاء"
-
-#: cms/templates/index.html
-msgid "contact edX Staff with further questions"
-msgstr "اتصل بطاقم المساق edX في حال كانت لديك أية أسئلة إضافية"
+msgid ""
+"Your request to author courses in Studio has been denied. Please "
+"{link_start}contact edX Staff with further questions{link_end}."
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Thanks for signing up, %(name)s!"
@@ -16463,6 +16385,10 @@ msgstr ""
 "الرجاء التحقق من ملف الرسائل غير المرغوب بها في حال عدم وجود الرسالة في ملف "
 "البريد الوارد. وإذا لم تتمكن من إيجاد رسالة التأكيد؟ اطلب المساعدة عن طريق "
 "الرابط في الأسفل."
+
+#: cms/templates/index.html
+msgid "Request help with your Studio account"
+msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"

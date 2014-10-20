@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-14 11:53-0400\n"
+"POT-Creation-Date: 2014-10-20 10:16-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: emma_saroyan <Emma_Saroyan@aybschool.am>\n"
 "Language-Team: Armenian (Armenia) (http://www.transifex.com/projects/p/edx-platform/language/hy_AM/)\n"
@@ -239,7 +239,7 @@ msgstr "Դասընթացի սխալ id"
 msgid "Course id is invalid"
 msgstr "Դասընթացի նույնականացման համարը սխալ է "
 
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py
 msgid "Could not enroll"
 msgstr ""
 
@@ -1089,7 +1089,6 @@ msgstr ""
 #. in
 #. to the site.
 #: common/lib/capa/capa/responsetypes.py
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html lms/templates/login.html
 #: lms/templates/register.html
 msgid "or"
@@ -5622,6 +5621,10 @@ msgstr "Այս դասընթացը չի ընդունում հաստատված հ�
 msgid "No selected price or selected price is below minimum."
 msgstr "Արժեքն ընտրված չէ, կամ ընտրված արժեքը ցածր է նվազագույնից:"
 
+#: lms/envs/common.py
+msgid "Taiwan"
+msgstr ""
+
 #: lms/lib/xblock/mixin.py
 msgid "Courseware Chrome"
 msgstr ""
@@ -6749,16 +6752,15 @@ msgid "Terms of Service"
 msgstr "Օգտագործման պայմանները"
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Գաղտնիության քաղաքականությունը"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
-#: lms/templates/help_modal.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/static_templates/help.html
+#: lms/templates/help_modal.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html
 msgid "Help"
 msgstr "Օգնություն"
@@ -6774,95 +6776,6 @@ msgstr "Գրանցվե՛ք {}-ի համար | Ընտրեք Ձեր ուղին"
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to register you"
 msgstr "Ներողություն ենք խնդրում, Ձեր գրանցման ընթացքում սխալ է տեղի ունեցել"
-
-#: common/templates/course_modes/choose.html
-msgid "Select your track:"
-msgstr "Ընտրե՛ք Ձեր ուղին`"
-
-#: common/templates/course_modes/choose.html
-msgid "Certificate of Achievement (ID Verified)"
-msgstr "Հաջողության հավաստագիր ( ID Verified)"
-
-#: common/templates/course_modes/choose.html
-msgid "Upgrade and work toward a verified Certificate of Achievement."
-msgstr "Թարմացրե՛ք և աշխատե՛ք վավերացված Հաջողության հավաստագրի ուղղությամբ:"
-
-#: common/templates/course_modes/choose.html
-msgid "Sign up and work toward a verified Certificate of Achievement."
-msgstr "Գրանցվե՛ք և աշխատե՛ք վավերացված հավաստագիր ձեռք բերելու ուղղությամբ:"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Select your contribution for this course (min. $"
-msgstr "Ընտրեք այս դասընթացի համար Ձեր նվիրաբերության չափը (min. $"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "):"
-msgstr "):"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration"
-msgstr "Թարմացնել Ձեր գրանցումը"
-
-#: common/templates/course_modes/choose.html
-msgid "Select Certificate"
-msgstr "Ընտրել վկայականը"
-
-#: common/templates/course_modes/choose.html
-msgid "Verified Registration Requirements"
-msgstr "Վավերացված գրանցման պահանջները"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To upgrade your registration and work towards a Verified Certificate of "
-"Achievement, you will need a webcam, a credit or debit card, and an ID."
-msgstr ""
-"Ձեր գրանցումը թարմացնելու և վավերացված Հաջողության հավաստագրի ուղղությամբ "
-"աշխատելու համար Ձեզ հարկավոր է տեսախցիկ, վարկային կամ դեբետային քարտ եւ "
-"նույնականացման համար/ ID/."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To register for a Verified Certificate of Achievement option, you will need "
-"a webcam, a credit or debit card, and an ID."
-msgstr ""
-"Վավերացված Հաջողության հավաստագրի տարբերակը գրանցելու համար Ձեզ հարկավոր է "
-"տեսախցիկ, վարկային կամ դեբետային քարտ եւ նույնականացման համար/ ID/."
-
-#: common/templates/course_modes/choose.html
-msgid "What is an ID Verified Certificate?"
-msgstr "Ինչ է ID Վավերացված Հավաստագիրը?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"An ID Verified Certificate requires proof of your identity through your "
-"photo and ID and is checked throughout the course to verify that it is you "
-"who earned the passing grade."
-msgstr ""
-"ID Վավերացված Հավաստագիրը պահանջում է Ձեր լուսանկարն ու ID-ն որպես Ձեր "
-"ինքնության ապացույց, և դասընթացի ընթացքում այն անընդհատ ստուգվում է` վստահ "
-"լինելու համար, որ Դուք եք ստացել անցողիկ միավորը:"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course"
-msgstr "Աուդիտ անել այս դասընթացը"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums. If your work is satisfactory and "
-"you abide by the Honor Code, you'll receive a personalized Honor Code "
-"Certificate to showcase your achievement."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Select Audit"
-msgstr "Ընտրել աուդիտ"
 
 #: common/templates/course_modes/choose.html
 msgid "Now choose your course track:"
@@ -6886,6 +6799,31 @@ msgid ""
 "Plan to use your completed coursework for job applications, career "
 "advancement, or school applications? Then work toward a Verified Certificate"
 " of Achievement to document your accomplishment. A minimum fee applies."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "Select your contribution for this course (min. $"
+msgstr "Ընտրեք այս դասընթացի համար Ձեր նվիրաբերության չափը (min. $"
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/verify_student/photo_verification.html
+msgid "):"
+msgstr "):"
+
+#: common/templates/course_modes/choose.html
+msgid "Upgrade Your Registration"
+msgstr "Թարմացնել Ձեր գրանցումը"
+
+#: common/templates/course_modes/choose.html
+msgid "Audit This Course"
+msgstr "Աուդիտ անել այս դասընթացը"
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -6928,12 +6866,12 @@ msgstr "Տեսլական"
 msgid "Faq"
 msgstr "Հաճախակի տրվող հարցեր"
 
-#: lms/templates/contact.html lms/templates/footer-edx.html
+#: lms/templates/contact.html lms/templates/footer-legacy.html
 msgid "Press"
 msgstr "մամուլ"
 
 #: lms/templates/contact.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
@@ -7029,22 +6967,6 @@ msgstr "Նոր"
 #: lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Ղեկավարման վահանակ"
-
-#: lms/templates/dashboard.html lms/templates/courseware/course_about.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "Սխալ է տեղի ունեցել: Խնդրում ենք կրկին փորձել ավելի ուշ:"
-
-#: lms/templates/dashboard.html
-msgid "Please verify your new email address"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid ""
-"You'll receive a confirmation in your inbox. Please follow the link in the "
-"email to confirm your email address change."
-msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -7321,11 +7243,11 @@ msgid ""
 "online initiative created by founding partners {Harvard} and {MIT}."
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 msgid "&copy; 2014 edX, some rights reserved."
 msgstr "&copy; 2014 edX, որոշ իրավունքներ պաշտպանված են"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
 msgstr "Օգտագործման պայմանները և պատվո կոդը"
@@ -7338,7 +7260,7 @@ msgstr ""
 msgid "About & Company Info"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "About"
 msgstr "Մասին"
@@ -7347,7 +7269,7 @@ msgstr "Մասին"
 msgid "News"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
@@ -7389,17 +7311,17 @@ msgstr "LinkedIn"
 msgid "Google+"
 msgstr "Google+"
 
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "Աշխատանքներ"
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid "edX Logo"
 msgstr "edX լոգո"
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid ""
 "{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
 " mission is to bring the best of higher education to students of all ages "
@@ -7871,47 +7793,47 @@ msgstr "հաստատել"
 msgid "Reject"
 msgstr "Մերժել"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Find Courses"
 msgstr "Փնտրել դասընթացներ"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
 msgstr "Ղեկավարման վահանակ`"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "More options dropdown"
 msgstr "Ավելի շատ տարբերակների ցուցակ"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Log Out"
 msgstr "Դուրս գալ"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
 msgstr "Գնումների զամբյուղը"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
 msgstr "Ինչպես է սա աշխատում "
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation-edx.html
 msgid "Schools & Partners"
 msgstr ""
 
-#: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/register.html
 msgid "Register"
 msgstr "Գրանցվել"
 
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html lms/templates/register-sidebar.html
+#: lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "մուտք"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -7919,30 +7841,28 @@ msgstr ""
 "<strong>Զգուշացում`</strong> Ձեր բրաուզերը ամբողջապես չի աջակցվում։ Մենք "
 "խորհուրդ ենք տալիս օգտագործել {chrome_link} կամ {ff_link}։"
 
-#: lms/templates/notes.html lms/templates/textannotation.html
-#: lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "Դուք նոթեր չունեք"
-
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Global Navigation"
 msgstr "Գլոբալ նավիգացիա"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/navigation.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 msgid "Courses"
 msgstr "Դասընթացներ"
 
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Schools"
 msgstr "Համալսարաններ"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Register Now"
 msgstr "Գրանցվեք հիմա"
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "Դուք նոթեր չունեք"
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -8518,6 +8438,11 @@ msgstr "Ամսաթիվ"
 msgid "Git Action"
 msgstr ""
 
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "No git import logs have been recorded for this course."
+msgstr ""
+
 #: lms/templates/textannotation.html
 msgid "Source:"
 msgstr "Աղբյուր՝"
@@ -8634,7 +8559,7 @@ msgstr "Լցնել բրաուզերը"
 msgid "HD off"
 msgstr "HD-ն անջատված է"
 
-#: lms/templates/video.html lms/templates/video.html
+#: lms/templates/video.html
 msgid "Turn off captions"
 msgstr "Անջատել լեգենդը"
 
@@ -8868,6 +8793,12 @@ msgstr "{chapter}, ընթացիկ բաժին"
 #: lms/templates/courseware/progress.html
 msgid "due {date}"
 msgstr "մինչ {date}"
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/mktg_course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "Սխալ է տեղի ունեցել: Խնդրում ենք կրկին փորձել ավելի ուշ:"
 
 #: lms/templates/courseware/course_about.html
 msgid ""
@@ -9782,9 +9713,6 @@ msgstr "Ընդգրկված է որպես`"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -12800,12 +12728,10 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
 msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
@@ -12815,68 +12741,41 @@ msgstr ""
 "տրվող հարցերը տեսնելու համար{a_end}:"
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your registration for"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "Դուք գրանցվում եք .. համար"
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Professional Education"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Upgrading to:"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Re-verifying for:"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Registering as: "
-msgstr "Գրանցվել որպես`"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Congrats! You are now registered to audit"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
-msgid "Change your mind?"
-msgstr "Փոխեցի՞ք Ձեր միտքը"
-
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "You can always continue to audit the course without verifying."
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"You can always {a_start} audit the course for free {a_end} without "
-"verifying."
+#: lms/templates/verify_student/_verification_header.html
+msgid "Upgrading to:"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "Re-verifying for:"
+msgstr ""
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Registering as: "
+msgstr "Գրանցվել որպես`"
+
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
 msgstr "Տեխնիկական պահանջներ"
 
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
@@ -13468,6 +13367,16 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 msgid "What if my camera isn't working?"
 msgstr "Ի՞նչ անել, եթե իմ տեսախցիկը չի աշխատում:"
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "You can always continue to audit the course without verifying."
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"You can always {a_start} audit the course for free {a_end} without "
+"verifying."
+msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Go to Step 2: Take ID Photo"
@@ -15040,15 +14949,31 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
+#: cms/templates/index.html
+msgid "Courses Being Processed"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Course Run:"
 msgstr ""
 
 #: cms/templates/index.html
+msgid "This course run is currently being created."
+msgstr ""
+
+#. Translators: This is a status message, used to inform the user of what the
+#. system is doing. This status means that the user has requested to re-run an
+#. existing course, and the system is currently in the process of duplicating
+#. and configuring the existing course so that it can be re-run.
+#: cms/templates/index.html
+msgid "Configuring as re-run"
+msgstr ""
+
+#: cms/templates/index.html
 msgid ""
 "The new course will be added to your course list in 5-10 minutes. Return to "
-"this page or <a href=\"#\" class=\"action-reload\">refresh it</a> to update "
-"the course list. The new course will need some manual configuration."
+"this page or {link_start}refresh it{link_end} to update the course list. The"
+" new course will need some manual configuration."
 msgstr ""
 
 #: cms/templates/index.html
@@ -15157,6 +15082,10 @@ msgstr ""
 msgid "Getting Started with edX Studio"
 msgstr ""
 
+#: cms/templates/index.html cms/templates/index.html
+msgid "Use our feedback tool, Tender, to request help"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/widgets/sock.html
 msgid "Request help with edX Studio"
 msgstr ""
@@ -15166,11 +15095,9 @@ msgid "Can I create courses in Studio?"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "In order to create courses in Studio, you must"
-msgstr ""
-
-#: cms/templates/index.html
-msgid "contact edX staff to help you create a course"
+msgid ""
+"In order to create courses in Studio, you must {link_start}contact edX staff"
+" to help you create a course{link_end}."
 msgstr ""
 
 #: cms/templates/index.html
@@ -15180,11 +15107,9 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Your request to author courses in studio has been denied. Please"
-msgstr ""
-
-#: cms/templates/index.html
-msgid "contact edX Staff with further questions"
+msgid ""
+"Your request to author courses in Studio has been denied. Please "
+"{link_start}contact edX Staff with further questions{link_end}."
 msgstr ""
 
 #: cms/templates/index.html
@@ -15211,6 +15136,10 @@ msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Request help with your Studio account"
 msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html
