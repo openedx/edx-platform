@@ -14,12 +14,14 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             },
 
             options: {
-                collapsedClass: 'is-collapsed'
+                collapsedClass: 'is-collapsed',
+                maxLabelLength: 50
             },
 
             initialize: function() {
                 var self = this;
                 this.initialState = this.options.initialState;
+                this.maxLabelLength = this.options.maxLabelLength;
                 BasePage.prototype.initialize.call(this);
                 this.$('.button-new').click(function(event) {
                     self.outlineView.handleAddEvent(event);
@@ -65,6 +67,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     el: this.$('.outline'),
                     model: this.model,
                     isRoot: true,
+                    maxLabelLength: this.maxLabelLength,
                     initialState: this.initialState,
                     expandedLocators: this.expandedLocators
                 });
