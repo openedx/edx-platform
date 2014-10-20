@@ -112,10 +112,10 @@ class Migration(DataMigration):
         if self.mongostore is not None:
             course_son = bson.son.SON([
                 ('_id.tag', 'i4x'),
-                ('_id.org', re.compile(r'^{}$'.format(downcased_ssck.org), re.IGNORECASE)),
-                ('_id.course', re.compile(r'^{}$'.format(downcased_ssck.course), re.IGNORECASE)),
+                ('_id.org', re.compile(ur'^{}$'.format(downcased_ssck.org), re.IGNORECASE | re.UNICODE)),
+                ('_id.course', re.compile(ur'^{}$'.format(downcased_ssck.course), re.IGNORECASE | re.UNICODE)),
                 ('_id.category', 'course'),
-                ('_id.name', re.compile(r'^{}$'.format(downcased_ssck.run), re.IGNORECASE)),
+                ('_id.name', re.compile(ur'^{}$'.format(downcased_ssck.run), re.IGNORECASE | re.UNICODE)),
             ])
             entry = self.mongostore.collection.find_one(course_son)
             if entry:
