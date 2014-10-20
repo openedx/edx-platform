@@ -125,7 +125,8 @@ var edx = edx || {};
 
         forgotPassword: function( event ) {
             event.preventDefault();
-            console.log('forgotPassword');
+
+            this.trigger('password-help');
         },
 
         submitForm: function( event ) {
