@@ -276,6 +276,8 @@ def shim_student_view(view_func, check_logged_in=False):
     """
     @wraps(view_func)
     def _inner(request):
+        # Ensure that the POST querydict is mutable
+        request.POST = request.POST.copy()
 
         # The login and registration handlers in student view try to change
         # the user's enrollment status if these parameters are present.
@@ -286,6 +288,16 @@ def shim_student_view(view_func, check_logged_in=False):
             del request.POST["enrollment_action"]
         if "course_id" in request.POST:
             del request.POST["course_id"]
+
+        # Backwards compatibility: the student view expects both
+        # terms of service and honor code values.  Since we're combining
+        # these into a single checkbox, the only value we may get
+        # from the new view is "honor_code".
+        # Longer term, we will need to make this more flexible to support
+        # open source installations that may have separate checkboxes
+        # for TOS, privacy policy, etc.
+        if request.POST.get("honor_code") is not None and request.POST.get("terms_of_service") is None:
+            request.POST["terms_of_service"] = request.POST.get("honor_code")
 
         # Call the original view to generate a response.
         # We can safely modify the status code or content
