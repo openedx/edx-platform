@@ -209,7 +209,13 @@ def run_quality(options):
     if diff_quality_failure:
         raise BuildFailure("Diff-quality failure(s).")
 
+
 def _is_known_diff_quality_failure(error_message):
+    """
+    When diff-quality is run with a threshold percentage, it ends with an exit code of 1. This bubbles up to
+    paver with a subprocess return code error. If the subprocess exits with anything other than 1, raise
+    a paver exception.
+    """
     if "Subprocess return code: 1" not in error_message:
         raise BuildFailure(error_message)
     else:
