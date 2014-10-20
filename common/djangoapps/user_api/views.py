@@ -1,4 +1,5 @@
 """HTTP end-points for the User API. """
+import copy
 import json
 
 from django.conf import settings
@@ -21,6 +22,7 @@ from user_api.serializers import UserSerializer, UserPreferenceSerializer
 from user_api.models import UserPreference, UserProfile
 from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from edxmako.shortcuts import marketing_link
 
 from user_api.api import account as account_api, profile as profile_api
 from user_api.helpers import FormDescription, shim_student_view, require_post_params
@@ -134,6 +136,7 @@ class RegistrationView(APIView):
     EXTRA_FIELDS = [
         "city", "country", "level_of_education", "gender",
         "year_of_birth", "mailing_address", "goals",
+        "honor_code",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -172,10 +175,15 @@ class RegistrationView(APIView):
         for field_name in self.DEFAULT_FIELDS:
             self.field_handlers[field_name](form_desc, required=True)
 
+        # Backwards compatibility: Honor code is required by default, unless
+        # explicitly set to "optional" in Django settings.
+        extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
+        extra_fields_setting["honor_code"] = extra_fields_setting.get("honor_code", "required")
+
         # Extra fields configured in Django settings
         # may be required, optional, or hidden
         for field_name in self.EXTRA_FIELDS:
-            field_setting = settings.REGISTRATION_EXTRA_FIELDS.get(field_name, "hidden")
+            field_setting = extra_fields_setting.get(field_name, "hidden")
             handler = self.field_handlers[field_name]
 
             if field_setting in ["required", "optional"]:
@@ -200,16 +208,6 @@ class RegistrationView(APIView):
             HttpResponse: 302 if redirecting to another page.
 
         """
-        # Backwards compatability
-        # We used to validate that the users had checked
-        # "honor code" and "terms of service"
-        # on the registration form.  Now we rely on the client
-        # to display this to users and validate that they
-        # agree before making the request to this service.
-        request.POST = request.POST.copy()
-        request.POST["honor_code"] = "true"
-        request.POST["terms_of_service"] = "true"
-
         # Handle duplicate username/email
         conflicts = account_api.check_account_exists(
             username=request.POST.get('username'),
@@ -341,6 +339,32 @@ class RegistrationView(APIView):
             field_type="select",
             options=self._options_with_default(options),
             required=required
+        )
+
+    def _add_honor_code_field(self, form_desc, required=True):
+        # Translators: This is a legal document users must agree to in order to register a new account.
+        terms_text = _(u"Terms of Service and Honor Code")
+
+        # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
+        label = _(
+            u"I agree to the {terms_of_service}"
+        ).format(
+            terms_of_service=u"<a href=\"{url}\">{terms_text}</a>".format(
+                url=marketing_link("HONOR"),
+                terms_text=terms_text
+            )
+        )
+
+        # TODO: Open source installations may need
+        # separate checkboxes for terms or service or privacy
+        # policies.  Instead of hard-coding this, we should create a more flexible
+        # mechanism for configuring which fields appear on the registration form.
+        form_desc.add_field(
+            "honor_code",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=required,
         )
 
     def _options_with_default(self, options):
