@@ -180,14 +180,20 @@ class AutoEnrollmentViaCsv
     # This object handles buttons, success and failure reporting,
     # and server communication.
     @$student_enrollment_form = @$container.find("form#student-auto-enroll-form")
-    @$enrollment_signup_button = @$container.find("input[name='enrollment-signup-button']")
+    @$enrollment_signup_button = @$container.find("[name='enrollment_signup_button']")
     @$students_list_file = @$container.find("input[name='students_list']")
     @$csrf_token = @$container.find("input[name='csrfmiddlewaretoken']")
-    @$task_response = @$container.find(".request-response")
-    @$request_response_error = @$container.find(".request-response-error")
+    @$results = @$container.find("div.results")
+    @$browse_button = @$container.find("#browseBtn")
+    @$browse_file = @$container.find("#browseFile")
+
     @processing = false
 
-    # attach click handler for enrollment buttons
+    @$browse_button.on "change", (event) =>
+      if event.currentTarget.files.length == 1
+        @$browse_file.val(event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf("\\") + 1))
+
+    # attach click handler for @$enrollment_signup_button
     @$enrollment_signup_button.click =>
       @$student_enrollment_form.submit (event) =>
         if @processing
@@ -210,58 +216,71 @@ class AutoEnrollmentViaCsv
 
         return false;
 
-  # clear the input text field
+  # clear the results area
   clear_input: ->
-    @$task_response.empty()
+    @$results.empty()
 
   display_response: (data_from_server) ->
     @clear_input()
-    @$task_response.empty()
+    @$results.empty()
     errors = []
     warnings = []
-    for student_results in data_from_server
-      if student_results.response_type is 'error'
-        errors.push student_results
+    general_errors = []
 
-      else if student_results.response_type is 'warning'
-        warnings.push student_results
+    resulf_from_server_is_success = true
+    if data_from_server.row_errors.length
+      resulf_from_server_is_success = false
+      for error in data_from_server.row_errors
+        errors.push error
 
-    render_title = (title) =>
-      task_res_section = $ '<h3/>', class: 'title', text: title
-      @$task_response.append task_res_section
+    else if data_from_server.general_errors.length
+      resulf_from_server_is_success = false
+      for general_error in data_from_server.general_errors
+        general_errors.push general_error
 
-    # render populated result arrays
-    render_list = (student_results) =>
-      task_res_section = $ '<div/>', class: 'request-res-section'
-      messages_list = $ '<p/>'
-      task_res_section.append messages_list
+    if data_from_server.warnings.lenght
+      resulf_from_server_is_success = false
+      for warning in data_from_server.warnings
+        warnings.push warning
 
-      response_message = student_results.username +
-      '  ('+ student_results.email + '):  '+
-      student_results.response_type.toUpperCase()+
-      '   (' + student_results.response + ' )'
-      messages_list.append $ '<span/>', text: response_message
+    render_response = (label, type, student_results) =>
+      if type is 'success'
+        task_res_section = $ '<div/>', class: 'message message-confirmation'
+        message_title = $ '<h3/>', class: 'message-title', text: label
+        task_res_section.append message_title
+        @$results.append task_res_section
+        return
 
-      @$task_response.append task_res_section
+      if type is 'error' or 'general-error'
+        task_res_section = $ '<div/>', class: 'message message-error'
+      if type is 'warning'
+        task_res_section = $ '<div/>', class: 'message message-warning'
+
+      message_title = $ '<h3/>', class: 'message-title', text: label
+      task_res_section. append message_title
+      messages_copy = $ '<div/>', class: 'message-copy'
+      task_res_section. append messages_copy
+      messages_summary = $ '<ul/>', class: 'list-summary summary-items'
+      messages_copy.append messages_summary
+
+      for student_result in student_results
+        if type is 'general-error'
+          response_message =  student_result.response
+
+        else
+          response_message = student_result.username + '  ('+ student_result.email + '):  ' + '   (' + student_result.response + ' )'
+        messages_summary.append $ '<li/>', class: 'summary-item', text: response_message
+
+      @$results.append task_res_section
 
     if errors.length
-      if warnings.length
-        render_title ('The following errors and warnings were generated')
-      else
-        render_title ('The following errors were generated')
-    else
-      if warnings.length
-        render_title ('The following warnings were generated')
-      else
-        render_title ('All accounts created successfully')
-
-    if errors.length
-      for student_results in errors
-        render_list (student_results)
-
+      render_response gettext("The following errors were generated"), 'error', errors
+    else if general_errors.length
+      render_response gettext("The following errors were generated"), 'general-error', general_errors
     if warnings.length
-      for student_results in warnings
-        render_list (student_results)
+      render_response gettext("The following warnings were generated"), 'warning', warnings
+    else if resulf_from_server_is_success
+      render_response gettext("All accounts were created successfully"), 'success', []
 
 class BetaTesterBulkAddition
   constructor: (@$container) ->
@@ -669,8 +688,8 @@ class Membership
     # isolate # initialize BatchEnrollment subsection
     plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
 
-    # isolate # initialize BatchEnrollment subsection
-    plantTimeout 0, => new AutoEnrollmentViaCsv @$section.find '.auto-enroll-via-csv'
+    # isolate # initialize AutoEnrollmentViaCsv subsection
+    plantTimeout 0, => new AutoEnrollmentViaCsv @$section.find '.auto_enroll_csv'
 
     # initialize BetaTesterBulkAddition subsection
     plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
