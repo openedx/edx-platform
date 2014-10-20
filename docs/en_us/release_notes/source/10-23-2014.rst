@@ -1,0 +1,122 @@
+###################################
+October 23, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of
+October 23, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we update the edX Course Staff Release Notes.
+
+*******************************
+edX Website
+*******************************
+
+Visitors to the `edx.org`_ website can now search for courses by name, school,
+or subject. Search results can be further refined by selecting course
+availability (for example, Current, Starting Soon, Archived) and type (for
+example, Verified, High School, Professional Education).
+
+*******************************
+edX Course Discussion
+*******************************
+
+* When you enter a search term on the **Discussion** page, the search starts
+  either when you click the magnifying glass icon or press the Enter key.
+  Previously, only use of the Enter key started the search. (TNL-526)
+
+* After you mark a response to a question post as the correct answer, a message
+  that describes this action is added to the response. The hyperlinked username
+  in this message now correctly opens a new page showing your contributions to
+  the course discussion. (TNL-188)
+
+*************
+edX Studio
+*************
+
+* The protein builder tool now correctly uses font sizing set by user browser
+  preferences. (TNL-256)
+  
+**************************
+edX Data & Analytics
+**************************
+
+* For compatibility with database import tools, a field in the ``child_render``
+  event was renamed. The ``event`` member field is now named ``child_id``
+  instead of ``child-id``.
+
+**************************
+edX Documentation
+**************************
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  Recent changes include:
+
+  Course authors can set both a course-wide **Maximum Attempts** value for
+  all problem components and a **Maximum Attempts** value for each problem
+  component added to the course. The interaction between these settings has
+  been clarified.
+
+* `Using edX Insights`_
+
+* `EdX Guide for Students`_
+
+* `Creating Peer Assessments`_
+
+* `edX Research Guide`_
+  
+  Recent changes include:
+
+  Instructions for downloading the weekly tracking event log file have been
+  removed. These log files are now available only daily.
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+* `edX Open Learning XML Guide`_
+  
+  Recent changes include:
+
+  * Additional explanation in the `Problems and Tools`_ section.
+  * Reorganization of the `Problems and Tools`_ and `Course Components
+    (XBlocks)`_ sections.
+  * Clarifications to how an OLX course is organized in the `OLX Course
+    Structure`_ section.
+  * Updates to the descriptions for embedding content in container objects for
+    HTML, video, and discussion components in the `Course Components
+    (XBlocks)`_ section.
+.. comment for spacing only 
+
+* `edX Platform API Version 0.5`_
+
+  Alpha documentation for the edX platform API is now available.
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst
