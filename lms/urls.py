@@ -73,6 +73,9 @@ urlpatterns = ('',  # nopep8
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
+    # Enrollment API RESTful endpoints
+    url(r'^enrollment/v0/', include('enrollment.urls')),
+
 )
 
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
