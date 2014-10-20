@@ -286,7 +286,7 @@ FEATURES = {
     'ENABLE_VIDEO_ABSTRACTION_LAYER_API': False,
 
     # Enable the new dashboard, account, and profile pages
-    'ENABLE_NEW_DASHBOARD': False,
+    'ENABLE_NEW_DASHBOARD': True,
 }
 
 # Ignore static asset files on import which match this pattern

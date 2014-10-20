@@ -1,4 +1,4 @@
-<form id="register">
+<form id="register" autocomplete="off">
     <div class="error-msg hidden">
         <h4>An error occured in your registration.</h4>
         <div class="errors">

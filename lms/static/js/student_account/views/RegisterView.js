@@ -23,7 +23,7 @@ var edx = edx || {};
 
         $form: {},
 
-        initialize: function( obj ) {
+        initialize: function() {
             this.getInitialData();
         },
 
@@ -65,7 +65,7 @@ var edx = edx || {};
             });
         },
 
-        initModel: function( url, method ) {
+        initModel: function( url ) {
             this.model = new edx.student.account.RegisterModel({
                 url: url
             });
