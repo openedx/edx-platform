@@ -112,6 +112,98 @@ class BaseProfilerMiddleware(object):
             THREAD_LOCAL.profiler = self.profiler_start()
             return THREAD_LOCAL.profiler.runcall(callback, request, *callback_args, **callback_kwargs)
 
+    def _generate_console_response(self, stats_str, stats_summary):
+        """
+        Output directly to the console -- helpful during unit testing or
+        for viewing code executions in devstack
+        """
+        print stats_str
+        print stats_summary
+
+    def _generate_text_response(self, stats_str, stats_summary, response):
+        """
+        Output the call stats to the browser as plain text
+        """
+        response['Content-Type'] = 'text/plain'
+        response.content = stats_str
+        response.content = "\n".join(response.content.split("\n")[:40])
+        response.content += "\n\n"
+        response.content += stats_summary
+
+    def _generate_html_response(self, stats_str, stats_summary, response):
+        """
+        Output the call stats to the browser wrapped in HTML tags
+        Feel free to improve the HTML structure!!!
+        """
+        response['Content-Type'] = 'text/html'
+        response.content = '<pre>{}{}</pre>'.format(stats_str, stats_summary)
+
+    def _generate_pdf_response(self, response):
+        """
+        Output a pretty picture of the call tree (boxes and arrows)
+        """
+        if not which('dot'):
+            raise Exception('Could not find "dot" from Graphviz; please install Graphviz to enable call graph generation')
+        if not which('gprof2dot'):
+            raise Exception('Could not find gprof2dot; have you updated your dependencies recently?')
+        command = ('gprof2dot -f pstats {} | dot -Tpdf'.format(THREAD_LOCAL.data_file.name))
+        process = subprocess.Popen(
+            command,
+            shell=True,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE)
+        output = process.communicate()[0]
+        return_code = process.poll()
+        if return_code:
+            raise Exception('gprof2dot/dot exited with {}'.format(return_code))
+        response['Content-Type'] = 'application/pdf'
+        response.content = output
+
+    def _generate_svg_response(self, response):
+        """
+        Output a pretty picture of the call tree (boxes and arrows)
+        """
+        # Set up the data file
+        profile_name = '{}_{}'.format(self.profiler_type(), time.time())
+        profile_data = '/tmp/{}.dat'.format(profile_name)
+        shutil.copy(THREAD_LOCAL.data_file.name, profile_data)
+        os.chmod(profile_data, 0666)
+        # Create the output file
+        profile_svg = '/tmp/{}.svg'.format(profile_name)
+        old = os.path.abspath('.')
+        os.chdir('/tmp')
+        command = 'gprof2dot -f pstats {} | dot -Tsvg -o {}'.format(profile_data, profile_svg)
+        try:
+            output = subprocess.call(command, shell=True)
+        except Exception:  # pylint: disable=W0703
+            output = 'Error during call to gprof2dot/dot'
+        os.chdir(old)
+        if os.path.exists(profile_svg):
+            response['Content-Type'] = 'image/svg+xml'
+            f = open(profile_svg)
+            response.content = f.read()
+            f.close()
+        else:
+            response['Content-Type'] = 'text/plain'
+            response.content = output
+
+    def _generate_raw_response(self, response):
+        """
+        Output the raw stats data to the browser -- the caller can then
+        save the information to a local file and do something else with it
+        Could be used as an integration point in the future for real-time
+        diagrams, charts, reports, etc.
+        """
+        # Set up the data faile (this is all we do in this particular case)
+        profile_name = '{}_{}'.format(self.profiler_type(), time.time())
+        profile_data = '/tmp/{}.dat'.format(profile_name)
+        shutil.copy(THREAD_LOCAL.data_file.name, profile_data)
+        os.chmod(profile_data, 0666)
+        # Return the raw data directly to the caller/browser (useful for API scenarios)
+        f = open(profile_data)
+        response.content = f.read()
+        f.close()
+
     def process_response(self, request, response):
         """
         Most of the heavy lifting takes place in this base process_response operation
@@ -177,71 +269,21 @@ class BaseProfilerMiddleware(object):
             if response and response.content and stats_str:
                 stats_summary = self.summary_for_files(stats_str)
                 response_format = request.GET.get('profiler_format', 'console')
+                # Console format sends the profiler result to stdout, preserving current response content
+                # All other formats replace response content with the profiler result
                 if response_format == 'console':
-                    # Send the profiler result to stdout, preserving current response content
-                    # All other formats replace response content with the profiler result
-                    print stats_str
-                    print stats_summary
+                    self._generate_console_response(stats_str, stats_summary)
                 elif response_format == 'text':
-                    response['Content-Type'] = 'text/plain'
-                    response.content = stats_str
-                    response.content = "\n".join(response.content.split("\n")[:40])
-                    response.content += "\n\n"
-                    response.content += stats_summary
+                    self._generate_text_response(stats_str, stats_summary, response)
                 elif response_format == 'html':
-                    response['Content-Type'] = 'text/html'
-                    response.content = '<pre>{}{}</pre>'.format(stats_str, stats_summary)
+                    self._generate_html_response(stats_str, stats_summary, response)
                 elif response_format == 'pdf':
-                    if not which('dot'):
-                        raise Exception('Could not find "dot" from Graphviz; please install Graphviz to enable call graph generation')
-                    if not which('gprof2dot'):
-                        raise Exception('Could not find gprof2dot; have you updated your dependencies recently?')
-                    command = ('gprof2dot -f pstats {} | dot -Tpdf'.format(THREAD_LOCAL.data_file.name))
-                    process = subprocess.Popen(
-                        command,
-                        shell=True,
-                        stdin=subprocess.PIPE,
-                        stdout=subprocess.PIPE)
-                    output = process.communicate()[0]
-                    return_code = process.poll()
-                    if return_code:
-                        raise Exception('gprof2dot/dot exited with {}'.format(return_code))
-                    response['Content-Type'] = 'application/pdf'
-                    response.content = output
+                    self._generate_pdf_response(response)
                 elif response_format == 'svg':
-                    # Set up the data file
-                    profile_name = '{}_{}'.format(self.profiler_type(), time.time())
-                    profile_data = '/tmp/{}.dat'.format(profile_name)
-                    shutil.copy(THREAD_LOCAL.data_file.name, profile_data)
-                    os.chmod(profile_data, 0666)
-                    # Create the output file
-                    profile_svg = '/tmp/{}.svg'.format(profile_name)
-                    old = os.path.abspath('.')
-                    os.chdir('/tmp')
-                    command = 'gprof2dot -f pstats {} | dot -Tsvg -o {}'.format(profile_data, profile_svg)
-                    try:
-                        output = subprocess.call(command, shell=True)
-                    except Exception:
-                        output = 'Error during call to gprof2dot/dot'
-                    os.chdir(old)
-                    if os.path.exists(profile_svg):
-                        response['Content-Type'] = 'image/svg+xml'
-                        f = open(profile_svg)
-                        response.content = f.read()
-                        f.close()
-                    else:
-                        response['Content-Type'] = 'text/plain'
-                        response.content = output
+                    self._generate_svg_response(response)
                 elif response_format == 'raw':
-                    # Set up the data faile (this is all we do in this particular case)
-                    profile_name = '{}_{}'.format(self.profiler_type(), time.time())
-                    profile_data = '/tmp/{}.dat'.format(profile_name)
-                    shutil.copy(THREAD_LOCAL.data_file.name, profile_data)
-                    os.chmod(profile_data, 0666)
-                    # Return the raw data directly to the caller/browser (useful for API scenarios)
-                    f = open(profile_data)
-                    response.content = f.read()
-                    f.close()
+                    self._generate_raw_response(response)
+
         # Clean up the stuff we stuffed into thread_local and then return the response to the caller
         THREAD_LOCAL.profiler_type = None
         THREAD_LOCAL.profiler_requested = None
@@ -265,7 +307,7 @@ class BaseProfilerMiddleware(object):
         """
         return MiddlewareNotUsed()
 
-    def profiler_stop(self):
+    def profiler_stop(self, stream):  # pylint: disable=W0613
         """
         Parent method -- should be overridden by child
         """
@@ -331,16 +373,15 @@ class BaseProfilerMiddleware(object):
         """
         Provide some useful operational info to the caller
         """
-        return  "########## PROFILER HELP ##########\n\n\n" + \
-                "Profiler Options (query string params):\n\n" + \
-                "profiler_type: hotshot (default), cprofile \n" + \
-                "profiler_mode: normal (default), help \n" + \
-                "profiler_sort: time (default) calls, cumulative, file, module, ncalls \n" + \
-                "profiler_format: console (default), text, html, pdf, svg, raw \n\n\n" + \
-                "More info: \n\n" + \
-                "https://docs.python.org/2/library/hotshot.html \n" + \
-                "https://docs.python.org/2/library/profile.html#module-cProfile \n"
-
+        return "########## PROFILER HELP ##########\n\n\n" + \
+            "Profiler Options (query string params):\n\n" + \
+            "profiler_type: hotshot (default), cprofile \n" + \
+            "profiler_mode: normal (default), help \n" + \
+            "profiler_sort: time (default) calls, cumulative, file, module, ncalls \n" + \
+            "profiler_format: console (default), text, html, pdf, svg, raw \n\n\n" + \
+            "More info: \n\n" + \
+            "https://docs.python.org/2/library/hotshot.html \n" + \
+            "https://docs.python.org/2/library/profile.html#module-cProfile \n"
 
 
 class HotshotProfilerMiddleware(BaseProfilerMiddleware):
@@ -370,7 +411,7 @@ class HotshotProfilerMiddleware(BaseProfilerMiddleware):
         """
         return hotshot.Profile(THREAD_LOCAL.data_file.name)
 
-    def profiler_stop(self, stream):
+    def profiler_stop(self, stream):  # pylint: disable=W0221
         """
         Store profiler data in file and return statistics to caller
         """
