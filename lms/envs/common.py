@@ -286,7 +286,7 @@ FEATURES = {
     'ENABLE_VIDEO_ABSTRACTION_LAYER_API': False,
 
     # Enable the new dashboard, account, and profile pages
-    'ENABLE_NEW_DASHBOARD': True,
+    'ENABLE_NEW_DASHBOARD': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1036,6 +1036,7 @@ student_account_js = [
     'js/student_account/views/AccessView.js',
     'js/student_account/accessApp.js',
 ]
+
 student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
 
 PIPELINE_CSS = {
