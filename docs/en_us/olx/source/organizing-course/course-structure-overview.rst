@@ -1,9 +1,11 @@
+.. _OLX Course Building Blocks:
+
 ###############################
 OLX Course Building Blocks
 ###############################
 
-Before you begin building OLX, you should understand the
-building blocks of an edX course. See:
+Before you begin building OLX, you should understand the building blocks of an
+edX course. See:
 
 * `Courseware`_
 * `Supplemental Course Content`_
@@ -20,7 +22,7 @@ OLX:
 * Course chapters are at the top level of your course and typically
   represent a time period. In Studio, chapters are called *sections*.
 
-* A section contains one or more children which correspond to
+* A chapter contains one or more children which correspond to
   top-level pages in the course. In Studio, these are called 'subsections' and
   are currently restricted to ``sequential`` elements at this
   level. OLX supports any XBlock at this level. 
@@ -32,8 +34,7 @@ OLX:
   and children of ``vertical`` elements are leaf elements (called modules). 
 
   * :ref:`Course Components`
-  * :ref:`Problems and Tools`
-  * :ref:`Advanced Components`
+  * :ref:`Problems`
     
 For more information, see :ref:`The Courseware Structure`.
 
@@ -54,7 +55,7 @@ following list describes the types of supported content:
   more information, see :ref:`Course Assets`.
 
 * Course pages are custom pages that you can have appear in the top navigation
-  menu of your course.  For more information, see :ref:`Course Pages`.
+  menu of your course.  For more information, see :ref:`Course Tabs`.
 
 ****************************
 Course Policies

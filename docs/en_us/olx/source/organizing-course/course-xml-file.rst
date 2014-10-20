@@ -14,6 +14,8 @@ See:
 * `Course Sequentials`_
 * `Course Verticals`_
 
+For an example of an ``course.xml`` file, see :ref:`The edX-Insider course.xml File`.
+
 *************************************
 The ``course.xml`` File
 *************************************
