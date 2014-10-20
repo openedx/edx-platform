@@ -6,9 +6,12 @@ address, but does NOT include user profile information (i.e., demographic
 information and preferences).
 
 """
+from django.conf import settings
 from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.core.validators import validate_email, validate_slug, ValidationError
+from django.contrib.auth.forms import PasswordResetForm
+
 from user_api.models import User, UserProfile, Registration, PendingEmailChange
 from user_api.helpers import intercept_errors
 
@@ -328,6 +331,43 @@ def confirm_email_change(activation_key):
         # This allows the caller of the function to notify users at both
         # the new and old email, which is necessary for security reasons.
         return (old_email, new_email)
+
+
+@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
+def request_password_change(email, orig_host, is_secure):
+    """Email a single-use link for performing a password reset.
+
+    Users must confirm the password change before we update their information.
+
+    Args:
+        email (string): An email address
+        orig_host (string): An originating host, extracted from a request with get_host
+        is_secure (Boolean): Whether the request was made with HTTPS
+
+    Returns:
+        None
+
+    Raises:
+        AccountUserNotFound
+        AccountRequestError
+
+    """
+    # Binding data to a form requires that the data be passed as a dictionary
+    # to the Form class constructor.
+    form = PasswordResetForm({'email': email})
+
+    # Validate that an active user exists with the given email address.
+    if form.is_valid():
+        # Generate a single-use link for performing a password reset
+        # and email it to the user.
+        form.save(
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            domain_override=orig_host,
+            use_https=is_secure
+        )
+    else:
+        # No active user with the provided email address exists.
+        raise AccountUserNotFound
 
 
 def _validate_username(username):

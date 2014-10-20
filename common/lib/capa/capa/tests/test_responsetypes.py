@@ -1006,6 +1006,7 @@ class CodeResponseTest(ResponseTest):
 
         invalid_grader_msgs = [
             '<audio',  # invalid XML and HTML5
+            '<p>\b</p>',  # invalid special character
         ]
 
         answer_ids = sorted(self.problem.get_question_answers())

@@ -8,6 +8,7 @@
 
   footer {
     @include clearfix();
+    @include box-sizing(border-box);
     max-width: grid-width(12);
     min-width: 760px;
     width: flex-grid(12);
@@ -32,16 +33,16 @@
 
     // colophon
     .colophon {
-      margin-right: flex-gutter();
+      @include margin-right(flex-gutter());
       width: flex-grid(8,12);
-      float: left;
+      @include float(left);
 
       .nav-colophon {
         @include clearfix();
         margin: $footer_margin;
 
         li {
-          float: left;
+          @include float(left);
           margin-right: ($baseline*0.75);
 
           a {
@@ -102,12 +103,12 @@
       margin: -2px 0 8px 0;
       font-size: em(11);
       color: $gray-l2;
-      text-align: left;
+      @include text-align(left);
     }
 
     .nav-legal {
       @include clearfix();
-      text-align: left;
+      @include text-align(left);
 
       li {
         display: inline-block;
@@ -154,10 +155,11 @@
 
     // platform Open edX logo and link
     .powered-by {
+      @include float(right);
       width: flex-grid(3,12);
       display: inline-block;
       vertical-align: bottom;
-      text-align: right;
+      @include text-align(right);
 
       a {
         display: inline-block;

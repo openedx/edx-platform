@@ -14,4 +14,5 @@ if settings.FEATURES.get('ENABLE_NEW_DASHBOARD'):
         url(r'^$', 'index', name='account_index'),
         url(r'^email$', 'email_change_request_handler', name='email_change_request'),
         url(r'^email/confirmation/(?P<key>[^/]*)$', 'email_change_confirmation_handler', name='email_change_confirm'),
+        url(r'^password$', 'password_change_request_handler', name='password_change_request'),
     )

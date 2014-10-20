@@ -1,9 +1,10 @@
 """ Views for a student's account information. """
 
+import logging
 import json
 from django.conf import settings
 from django.http import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 )
 from django.core.mail import send_mail
 from django_future.csrf import ensure_csrf_cookie
@@ -15,6 +16,10 @@ from microsite_configuration import microsite
 
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
+from util.bad_request_rate_limiter import BadRequestRateLimiter
+
+
+AUDIT_LOG = logging.getLogger("audit")
 
 
 @login_required
@@ -80,18 +85,20 @@ def login_and_registration_form(request, initial_mode="login"):
 def email_change_request_handler(request):
     """Handle a request to change the user's email address.
 
+    Sends an email to the newly specified address containing a link
+    to a confirmation page.
+
     Args:
         request (HttpRequest)
 
     Returns:
         HttpResponse: 200 if the confirmation email was sent successfully
         HttpResponse: 302 if not logged in (redirect to login page)
-        HttpResponse: 400 if the format of the new email is incorrect
+        HttpResponse: 400 if the format of the new email is incorrect, or if
+            an email change is requested for a user which does not exist
         HttpResponse: 401 if the provided password (in the form) is incorrect
         HttpResponse: 405 if using an unsupported HTTP method
         HttpResponse: 409 if the provided email is already in use
-        HttpResponse: 500 if the user to which the email change will be applied
-                          does not exist
 
     Example usage:
 
@@ -111,12 +118,10 @@ def email_change_request_handler(request):
 
     try:
         key = account_api.request_email_change(username, new_email, password)
-    except account_api.AccountUserNotFound:
-        return HttpResponseServerError()
+    except (account_api.AccountEmailInvalid, account_api.AccountUserNotFound):
+        return HttpResponseBadRequest()
     except account_api.AccountEmailAlreadyExists:
         return HttpResponse(status=409)
-    except account_api.AccountEmailInvalid:
-        return HttpResponseBadRequest()
     except account_api.AccountNotAuthorized:
         return HttpResponse(status=401)
 
@@ -138,7 +143,6 @@ def email_change_request_handler(request):
     # Send a confirmation email to the new address containing the activation key
     send_mail(subject, message, from_address, [new_email])
 
-    # Send a 200 response code to the client to indicate that the email was sent successfully.
     return HttpResponse(status=200)
 
 
@@ -155,15 +159,15 @@ def email_change_confirmation_handler(request, key):
 
     Returns:
         HttpResponse: 200 if the email change is successful, the activation key
-                          is invalid, the new email is already in use, or the
-                          user to which the email change will be applied does
-                          not exist
+            is invalid, the new email is already in use, or the
+            user to which the email change will be applied does
+            not exist
         HttpResponse: 302 if not logged in (redirect to login page)
         HttpResponse: 405 if using an unsupported HTTP method
 
     Example usage:
 
-        GET /account/email_change_confirm/{key}
+        GET /account/email/confirmation/{key}
 
     """
     try:
@@ -212,3 +216,53 @@ def email_change_confirmation_handler(request, key):
             'disable_courseware_js': True,
         }
     )
+
+
+@require_http_methods(['POST'])
+def password_change_request_handler(request):
+    """Handle password change requests originating from the account page.
+
+    Uses the Account API to email the user a link to the password reset page.
+
+    Note:
+        The next step in the password reset process (confirmation) is currently handled
+        by student.views.password_reset_confirm_wrapper, a custom wrapper around Django's
+        password reset confirmation view.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the email was sent successfully
+        HttpResponse: 400 if there is no 'email' POST parameter, or if no user with
+            the provided email exists
+        HttpResponse: 403 if the client has been rate limited
+        HttpResponse: 405 if using an unsupported HTTP method
+
+    Example usage:
+
+        POST /account/password
+
+    """
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Password reset rate limit exceeded")
+        return HttpResponseForbidden()
+
+    user = request.user
+    # Prefer logged-in user's email
+    email = user.email if user.is_authenticated() else request.POST.get('email')
+
+    if email:
+        try:
+            account_api.request_password_change(email, request.get_host(), request.is_secure())
+        except account_api.AccountUserNotFound:
+            AUDIT_LOG.info("Invalid password reset attempt")
+            # Increment the rate limit counter
+            limiter.tick_bad_request_counter(request)
+
+            return HttpResponseBadRequest("No active user with the provided email address exists.")
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseBadRequest("No email address provided.")

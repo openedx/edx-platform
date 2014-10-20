@@ -1,4 +1,5 @@
 import unittest
+import ddt
 from xmodule.contentstore.content import StaticContent, StaticContentStream
 from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
@@ -73,6 +74,7 @@ class FakeGridFsItem:
         return chunk
 
 
+@ddt.ddt
 class ContentTest(unittest.TestCase):
     def test_thumbnail_none(self):
         # We had a bug where a thumbnail location of None was getting transformed into a Location tuple, with
@@ -88,12 +90,19 @@ class ContentTest(unittest.TestCase):
         url = StaticContent.convert_legacy_static_url_with_course_id('images_course_image.jpg', course_key)
         self.assertEqual(url, '/c4x/foo/bar/asset/images_course_image.jpg')
 
-    def test_generate_thumbnail_image(self):
+    @ddt.data(
+        (u"monsters__.jpg", u"monsters__.jpg"),
+        (u"monsters__.png", u"monsters__-png.jpg"),
+        (u"dots.in.name.jpg", u"dots.in.name.jpg"),
+        (u"dots.in.name.png", u"dots.in.name-png.jpg"),
+    )
+    @ddt.unpack
+    def test_generate_thumbnail_image(self, original_filename, thumbnail_filename):
         contentStore = ContentStore()
-        content = Content(AssetLocation(u'mitX', u'800', u'ignore_run', u'asset', u'monsters__.jpg'), None)
+        content = Content(AssetLocation(u'mitX', u'800', u'ignore_run', u'asset', original_filename), None)
         (thumbnail_content, thumbnail_file_location) = contentStore.generate_thumbnail(content)
         self.assertIsNone(thumbnail_content)
-        self.assertEqual(AssetLocation(u'mitX', u'800', u'ignore_run', u'thumbnail', u'monsters__.jpg'), thumbnail_file_location)
+        self.assertEqual(AssetLocation(u'mitX', u'800', u'ignore_run', u'thumbnail', thumbnail_filename), thumbnail_file_location)
 
     def test_compute_location(self):
         # We had a bug that __ got converted into a single _. Make sure that substitution of INVALID_CHARS (like space)

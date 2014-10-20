@@ -10,10 +10,11 @@ pull requests. For each pull request, a community manager should:
 #. Read the description of the pull request to understand the idea behind it
    and what parts of the code it impacts. If the description is absent or
    unclear, inform the author that the pull request cannot be reviewed until
-   the description is clearer.
+   the description is clearer. Guide them to the :doc:`pull request cover letter <cover-letter>`
+   guidelines.
 
-#. Evaluate the idea behind the pull request. Is this something that
-   Open edX wants? Discuss with product owners as necessary. If you and the
+#. Help the product team evaluate the idea behind the pull request.
+   Is this something that Open edX wants? If you and the
    product owner(s) all believe that Open edX does not want this pull request,
    add a comment to the pull request explaining the reasoning behind that
    decision. Be polite, and remind them that they are welcome to fork the code
@@ -24,8 +25,8 @@ pull requests. For each pull request, a community manager should:
 
 #. Check that the author of the pull requests has submitted a
    `contributor's agreement`_, added name to AUTHORS file, and any other
-   necessary administrivia. If not, inform author of problems
-   and wait for them to fix it.
+   necessary administrivia (our bot will make an automated comment if this is not
+   properly in place). If not, inform author of problems and wait for them to fix it.
 
 #. Once you’ve verified that the code change is not malicious,
    run a Jenkins job on the pull request and check the result.
@@ -77,25 +78,39 @@ meaningful way.
 If the pull request is small, it can be reviewed immediately. If the community
 manager that is handling this pull request feels comfortable doing the code
 review, then he or she should do so rather than handing it off to a core
-committer. If not, he or she should add a comment to the PR tagging a core
-committer to do the review, and informing the author that it might take a few
-days for the reviewer to get around to it.
+committer. If not, he or she should move the JIRA ticket for the PR review
+into the "Awaiting Prioritization" state and add enough detail on the ticket for
+the product team to understand the size and scope of the changes.
+Inform the author that it might take a few days for the engineering team to review the PR.
 
-If the pull request is not small, it will be handled by the core contributor
-Scrum process. The community manager should:
+If the pull request is not small, it will be handled by the full pull request process:
 
-* Determine which teams of core committers this pull request impacts.
-  At least one developer from each of these teams should review this pull request.
+.. image:: pr-process.png
+   :align: center
+   :alt: A visualization of the pull request process
 
-* For each team, create a story on the team’s JIRA board that links to the
-  pull request in question. In the story description, include any relevant
-  information about which contributor organization is behind the pull request,
-  any known political factors, etc. Tag the story as a contributor pull
-  request in whatever manner the team prefers: adding it to an epic, perhaps.
+The community manager should:
 
-* Inform the product owner of the team that there is a contributor pull request
-  that their team is responsible for reviewing, and send them a link to the
-  JIRA story that you’ve just created. Ask the product owner for an estimate
+* Make sure the pull request is ready for Product Review, if that has not yet happened.
+  That means getting enough detail out of the contributor for the product owner
+  to properly do a product review. Once this is done, move the JIRA ticket to the
+  "Product Review" state.
+
+* If questions arise from product owners during review, work with the contributor to
+  get those questions answered before the next round of review.
+
+* Once a PR has passed product review, do a first-round review of the PR with the
+  contributor. That is, make sure quality and test coverage is up to par, and that
+  the code generally meets our style guidelines. Once this has happened, move the
+  ticket to the "Awaiting Prioritization" state.
+
+* At each of these junctures, try to update the author with an estimate of how long
+  the next steps will take. The product team will meet biweekly to review new
+  proposals and prioritize PRs for team review. Direct the contributor to the JIRA ticket
+  as well; the state of the JIRA ticket reflect the above diagram and can give a good
+  sense of where in the process the pull request is.
+
+* Once a PR has been prioritized for team review, ask the product owner for an estimate
   of how many sprints it will take for the pull request to be reviewed:
   if its more than one, try to push back and advocate for the contributor.
   However, the estimate is ultimately up to the product owner, and if he/she
@@ -105,9 +120,8 @@ Scrum process. The community manager should:
   is queued to be reviewed. Give them an estimate of when the pull request
   will be reviewed: if you’re not sure what to say, tell them it will be in
   two weeks. If the product owner has estimated that it will take more than
-  one sprint before the pull request can be reviewed, tag the product owner
-  in the comment so that they will be notified of further comments on
-  the pull request.
+  one sprint before the pull request can be reviewed, direct the contributor to
+  JIRA to monitor progress.
 
 For determining which teams that the pull request impacts, use common sense --
 but in addition, there are a few guidelines:
@@ -124,7 +138,7 @@ but in addition, there are a few guidelines:
 * If any logging events are modified,
   include the analytics team.
 
-* Include the doc team on every contributor pull request.
+* Include the doc team on every contributor pull request that has a user-facing change.
 
 Once the code review process has started, the community managers are also
 responsible for keeping the pull request unblocked during the review process. If

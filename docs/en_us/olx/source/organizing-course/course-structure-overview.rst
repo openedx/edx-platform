@@ -13,22 +13,23 @@ building blocks of an edX course. See:
 Courseware
 **************
 
-Courseware is the main content of your course, namely lessons and assessments.
-The following list describes how courseware is organized in OLX:
+Courseware is the main content of your course and consists mainly of lessons
+and assessments. The following list describes how courseware is organized in
+OLX:
 
-* Course sections are at the top level of your course and typically represent a
-  time period. In OLX, sections are represented by ``chapter`` elements. 
+* Course chapters are at the top level of your course and typically
+  represent a time period. In Studio, chapters are called *sections*.
 
-* A section contains one or more subsections. Course subsections are parts of a
-  section, and usually represent a topic or other organizing principle. In
-  OLX, subsections are represented by ``sequential`` elements. 
+* A section contains one or more children which correspond to
+  top-level pages in the course. In Studio, these are called 'subsections' and
+  are currently restricted to ``sequential`` elements at this
+  level. OLX supports any XBlock at this level. 
 
-* A subsection contains one or more units. In OLX, units are represented by
-  ``vertical`` elements.  
-
-* Course units are lessons in a subsection that students view as single pages.
-  A unit contains one or more components. Course components are objects within
-  units that contain your actual course content. For more information, see:
+* Courses are composed of structural elements, such as ``sequential``
+  and ``vertical``, and leaf-nodes or content elements, such as
+  ``html`` or ``problem``. Studio has a fixed hierarchy where children
+  of ``sequential`` elements are ``vertical`` elements (called units),
+  and children of ``vertical`` elements are leaf elements (called modules). 
 
   * :ref:`Course Components`
   * :ref:`Problems and Tools`

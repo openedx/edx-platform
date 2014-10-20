@@ -127,9 +127,8 @@ describe "NewPostView", ->
         view.$(".cancel").click()
         expect(eventSpy).toHaveBeenCalled()
         expect(view.$(".post-errors").html()).toEqual("");
-        if mode == "tab"
-          expect($("input[id$='post-type-question']")).toBeChecked()
-          expect($("input[id$='post-type-discussion']")).not.toBeChecked()
+        expect($("input[id$='post-type-question']")).toBeChecked()
+        expect($("input[id$='post-type-discussion']")).not.toBeChecked()
         expect(view.$(".js-post-title").val()).toEqual("");
         expect(view.$(".js-post-body textarea").val()).toEqual("");
         expect(view.$(".js-follow")).toBeChecked()

@@ -16,7 +16,7 @@ from rest_framework import permissions
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError
-from django_countries.countries import COUNTRIES
+from django_countries import countries
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
 from user_api.models import UserPreference, UserProfile
 from django_comment_common.models import Role
@@ -328,9 +328,12 @@ class RegistrationView(APIView):
         )
 
     def _add_country_field(self, form_desc, required=True):
+        sorted_countries = sorted(
+            countries.countries, key=lambda(__, name): unicode(name)
+        )
         options = [
             (country_code, unicode(country_name))
-            for country_code, country_name in COUNTRIES
+            for country_code, country_name in sorted_countries
         ]
         form_desc.add_field(
             "country",

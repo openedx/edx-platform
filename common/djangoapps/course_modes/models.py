@@ -6,7 +6,7 @@ from datetime import datetime
 
 from django.db import models
 from collections import namedtuple
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
 from xmodule_django.models import CourseKeyField

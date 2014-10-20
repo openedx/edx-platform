@@ -20,15 +20,15 @@
 -e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@81a6d713c98d4914af96a0ca624ee7fa4903625e#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@246811773c67a84fdb17614a8e9f7ec7b1890574#egg=XBlock
 -e git+https://github.com/edx/codejail.git@66dd5a45e5072666ff9a70c768576e9ffd1daa4b#egg=codejail
--e git+https://github.com/edx/diff-cover.git@v0.5.0#egg=diff_cover
+-e git+https://github.com/edx/diff-cover.git@9a44ae21369662a7d06bfc5111875fc0d119e03b#egg=diff_cover
 -e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
 -e git+https://github.com/edx/edx-analytics-data-api-client.git@0.1.0#egg=edx-analytics-data-api-client
 -e git+https://github.com/edx/bok-choy.git@4a259e3548a19e41cc39433caf68ea58d10a27ba#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
--e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
+-e git+https://github.com/edx/acid-block.git@df1a7f0cae46567c251d507b8c72168aed8ec042#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@release-2014-09-18T16.00#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@295d93170b2f6e57e3a2b9ba0a52087a4e8712c5#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease

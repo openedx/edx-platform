@@ -202,8 +202,6 @@ native Coffeescript features that break the extraction from the .js files:
 Underscore template files
 =========================
 
-.. highlight:: underscore
-
 Underscore template files are used in conjunction with JavaScript, and so the
 same techniques are used for localization. Ensure that the i18n JavaScript
 library has already been loaded, and then use the regular i18n functions
@@ -211,19 +209,13 @@ such as ``gettext`` and ``interpolate`` from your template.
 
 For example::
 
-    <div class="group-visibility-label">
-        <% if (group.group_name) { %>
-            <%-
-            interpolate(
-                gettext('This post is visible only to %(group_name)s.'),
+    <%-
+        interpolate(
+            gettext('This post is visible only to %(group_name)s.'),
                 {group_name: group.group_name},
                 true
-            )
-            %>
-        <% } else { %>
-            <%- gettext('This post is visible to everyone.') %>
-        <% } %>
-    </div>
+        )
+    %>
 
 Note: it is recommended that you use ``<%-`` for all translated strings
 as this will HTML escape the string before including it in the page. This

@@ -146,3 +146,19 @@ class MembershipPage(PageObject):
         The first entry in the array is the title. Any further entries are the details.
         """
         return self._get_cohort_messages("errors")
+
+    def select_data_download(self):
+        """
+        Click on the link to the Data Download Page.
+        """
+        self.q(css="a.link-cross-reference[data-section=data_download]").first.click()
+
+
+class DataDownloadPage(PageObject):
+    """
+    Data Download section of the Instructor dashboard.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        return self.q(css='a[data-section=data_download].active-section').present

@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-01 13:57+0000\n"
-"PO-Revision-Date: 2014-10-01 13:57:56.152525\n"
+"POT-Creation-Date: 2014-10-14 12:45-0400\n"
+"PO-Revision-Date: 2014-10-14 16:45:52.411756\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -98,6 +98,10 @@ msgstr "Süßséçtïön Ⱡ#"
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unit"
 msgstr "Ûnït Ⱡ'σяєм#"
+
+#: common/djangoapps/course_groups/cohorts.py
+msgid "You cannot create two cohorts with the same name"
+msgstr "Ýöü çännöt çréäté twö çöhörts wïth thé sämé nämé Ⱡ'σяєм ιρѕυм #"
 
 #: common/djangoapps/course_groups/views.py
 msgid "Requested page must be numeric"
@@ -1847,15 +1851,22 @@ msgstr "Dïsçüssïön Bläçköüt Dätés Ⱡ'σяєм#"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter pairs of dates between which students cannot post to discussion "
-"forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as "
-"dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to"
-" include the \"T\" between the date and time)."
+"forums. Each pair should be formatted as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. "
+"To specify times as well as dates, format each pair as [\"YYYY-MM-"
+"DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (be sure to include the \"T\" between the "
+"date and time). An entry defining more than one blackout period might look "
+"like this: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", "
+"\"2014-10-08\"]]"
 msgstr ""
 "Éntér päïrs öf dätés ßétwéén whïçh stüdénts çännöt pöst tö dïsçüssïön "
-"förüms, förmättéd äs \"ÝÝÝÝ-MM-DD-ÝÝÝÝ-MM-DD\". Tö spéçïfý tïmés äs wéll äs "
-"dätés, förmät thé päïrs äs \"ÝÝÝÝ-MM-DDTHH:MM-ÝÝÝÝ-MM-DDTHH:MM\" (ßé süré tö"
-" ïnçlüdé thé \"T\" ßétwéén thé däté änd tïmé). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢#"
+"förüms. Éäçh päïr shöüld ßé förmättéd äs [\"ÝÝÝÝ-MM-DD\", \"ÝÝÝÝ-MM-DD\"]. "
+"Tö spéçïfý tïmés äs wéll äs dätés, förmät éäçh päïr äs [\"ÝÝÝÝ-MM-"
+"DDTHH:MM\", \"ÝÝÝÝ-MM-DDTHH:MM\"] (ßé süré tö ïnçlüdé thé \"T\" ßétwéén thé "
+"däté änd tïmé). Àn éntrý défïnïng möré thän öné ßläçköüt pérïöd mïght löök "
+"lïké thïs: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", "
+"\"2014-10-08\"]] Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ #"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Topic Mapping"
@@ -1900,8 +1911,15 @@ msgid "Cohort Configuration"
 msgstr "Çöhört Çönfïgürätïön Ⱡ'σя#"
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Cohorts are not currently supported by edX."
-msgstr "Çöhörts äré nöt çürréntlý süppörtéd ßý édX. Ⱡ'σяєм ιρѕυм#"
+msgid ""
+"Enter policy keys and values to enable the cohort feature, define automated "
+"student assignment to groups, or identify any course-wide discussion topics "
+"as private to cohort members."
+msgstr ""
+"Éntér pölïçý kéýs änd välüés tö énäßlé thé çöhört féätüré, défïné äütömätéd "
+"stüdént ässïgnmént tö gröüps, ör ïdéntïfý äný çöürsé-wïdé dïsçüssïön töpïçs "
+"äs prïväté tö çöhört mémßérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Is New"
@@ -4469,6 +4487,30 @@ msgid "Goals"
 msgstr "Göäls Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Cohort"
+msgstr "Çöhört Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Your enrolled student profile report is being generated! You can view the "
+"status of the generation task in the 'Pending Instructor Tasks' section."
+msgstr ""
+"Ýöür énrölléd stüdént pröfïlé répört ïs ßéïng générätéd! Ýöü çän vïéw thé "
+"stätüs öf thé générätïön täsk ïn thé 'Péndïng Ìnstrüçtör Täsks' séçtïön. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"An enrolled student profile report generation task is already in progress. "
+"Check the 'Pending Instructor Tasks' table for the status of the task. When "
+"completed, the report will be available for download in the table below."
+msgstr ""
+"Àn énrölléd stüdént pröfïlé répört générätïön täsk ïs älréädý ïn prögréss. "
+"Çhéçk thé 'Péndïng Ìnstrüçtör Täsks' täßlé för thé stätüs öf thé täsk. Whén "
+"çömplétéd, thé répört wïll ßé äväïläßlé för döwnlöäd ïn thé täßlé ßélöw. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕм#"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
 msgstr "Mödülé döés nöt éxïst. Ⱡ'σяє#"
 
@@ -4582,12 +4624,11 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid ""
 "To gain insights into student enrollment and participation {link_start}visit"
-" {analytics_dashboard_name}, our new dashboard for course "
-"analytics{link_end}."
+" {analytics_dashboard_name}, our new course analytics product{link_end}."
 msgstr ""
 "Tö gäïn ïnsïghts ïntö stüdént énröllmént änd pärtïçïpätïön {link_start}vïsït"
-" {analytics_dashboard_name}, öür néw däshßöärd för çöürsé "
-"änälýtïçs{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+" {analytics_dashboard_name}, öür néw çöürsé änälýtïçs prödüçt{link_end}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "E-Commerce"
@@ -5034,9 +5075,17 @@ msgstr "délétéd #"
 msgid "emailed"
 msgstr "émäïléd #"
 
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
 msgstr "grädéd Ⱡ'σяєм ιρѕ#"
+
+#. Translators: This is a past-tense verb that is inserted into task progress
+#. messages as {action}.
+#: lms/djangoapps/instructor_task/tasks.py
+msgid "generated"
+msgstr "générätéd #"
 
 #: lms/djangoapps/instructor_task/views.py
 #: lms/djangoapps/instructor_task/views.py
@@ -5364,6 +5413,31 @@ msgstr ""
 "çöntäçt {billing_email}. Pléäsé ïnçlüdé ýöür ördér nümßér ïn ýöür é-mäïl. "
 "Pléäsé dö NÖT ïnçlüdé ýöür çrédït çärd ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη#"
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid ""
+"We greatly appreciate this generous contribution and your support of the "
+"{platform_name} mission.  This receipt was prepared to support charitable "
+"contributions for tax purposes.  We confirm that neither goods nor services "
+"were provided in exchange for this gift."
+msgstr ""
+"Wé gréätlý äppréçïäté thïs généröüs çöntrïßütïön änd ýöür süppört öf thé "
+"{platform_name} mïssïön.  Thïs réçéïpt wäs prépäréd tö süppört çhärïtäßlé "
+"çöntrïßütïöns för täx pürpösés.  Wé çönfïrm thät néïthér gööds nör sérvïçés "
+"wéré prövïdéd ïn éxçhängé för thïs gïft. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя#"
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Could not find a course with the ID '{course_id}'"
+msgstr "Çöüld nöt fïnd ä çöürsé wïth thé ÌD '{course_id}' Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Donation for {course}"
+msgstr "Dönätïön för {course} Ⱡ'σ#"
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Donation for {platform_name}"
+msgstr "Dönätïön för {platform_name} Ⱡ'σ#"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order Number"
@@ -7714,21 +7788,6 @@ msgstr ""
 "Ýöü'll réçéïvé ä çönfïrmätïön ïn ýöür ïnßöx. Pléäsé föllöw thé lïnk ïn thé "
 "émäïl tö çönfïrm ýöür émäïl äddréss çhängé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢т#"
-
-#. Translators: this message is displayed when a user tries to link their
-#. account with a third-party authentication provider (for example, Google or
-#. LinkedIn) with a given edX account, but their third-party account is
-#. already
-#. associated with another edX account. provider_name is the name of the
-#. third-party authentication provider, and platform_name is the name of the
-#. edX deployment.
-#: lms/templates/dashboard.html
-msgid ""
-"The {provider_name} account you selected is already linked to another "
-"{platform_name} account."
-msgstr ""
-"Thé {provider_name} äççöünt ýöü séléçtéd ïs älréädý lïnkéd tö änöthér "
-"{platform_name} äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -10770,11 +10829,12 @@ msgstr "Ýöü nééd tö ré-vérïfý tö çöntïnüé Ⱡ'σяєм ι#"
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 msgid ""
-"To continue in the ID Verified track in the following courses, you need to "
-"re-verify your identity:"
+"People change, and each year we ask you to re-verify your identity for our "
+"verified certificates. Take a minute now to help us renew your identity."
 msgstr ""
-"Tö çöntïnüé ïn thé ÌD Vérïfïéd träçk ïn thé föllöwïng çöürsés, ýöü nééd tö "
-"ré-vérïfý ýöür ïdéntïtý: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+"Péöplé çhängé, änd éäçh ýéär wé äsk ýöü tö ré-vérïfý ýöür ïdéntïtý för öür "
+"vérïfïéd çértïfïçätés. Täké ä mïnüté nöw tö hélp üs rénéw ýöür ïdéntïtý. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 msgid "{course_name}: Re-verify by {date}"
@@ -10861,6 +10921,25 @@ msgid ""
 msgstr ""
 "Ìf ýöü fäïl tö päss ä vérïfïçätïön ättémpt ßéföré ýöür çöürsé énds, ýöü wïll"
 " nöt réçéïvé ä vérïfïéd çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/dashboard/_dashboard_third_party_error.html
+msgid "Could Not Link Accounts"
+msgstr "Çöüld Nöt Lïnk Àççöünts Ⱡ'σяє#"
+
+#. Translators: this message is displayed when a user tries to link their
+#. account with a third-party authentication provider (for example, Google or
+#. LinkedIn) with a given edX account, but their third-party account is
+#. already
+#. associated with another edX account. provider_name is the name of the
+#. third-party authentication provider, and platform_name is the name of the
+#. edX deployment.
+#: lms/templates/dashboard/_dashboard_third_party_error.html
+msgid ""
+"The {provider_name} account you selected is already linked to another "
+"{platform_name} account."
+msgstr ""
+"Thé {provider_name} äççöünt ýöü séléçtéd ïs älréädý lïnkéd tö änöthér "
+"{platform_name} äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
@@ -11172,25 +11251,6 @@ msgstr ""
 "néw, ünréäd äçtïvïtý fröm pösts ýöü äré föllöwïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєт#"
 
-#. Translators: This is the label for a control to
-#. select a forum post type
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Post type:"
-msgstr "Pöst týpé: Ⱡ#"
-
-#. Translators: This is a forum post type
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Question"
-msgstr "Qüéstïön #"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
-msgstr ""
-"Qüéstïöns räïsé ïssüés thät nééd änswérs. Dïsçüssïöns shäré ïdéäs änd stärt "
-"çönvérsätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
 #. Translators: This labels the selector for which group of students can view
 #. a
 #. post
@@ -11204,11 +11264,12 @@ msgstr "Àll Gröüps Ⱡ#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid ""
-"Instructors can set whether a post in a cohorted topic is visible to all "
-"cohorts or only to a specific cohort."
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single cohort group."
 msgstr ""
-"Ìnstrüçtörs çän sét whéthér ä pöst ïn ä çöhörtéd töpïç ïs vïsïßlé tö äll "
-"çöhörts ör önlý tö ä spéçïfïç çöhört. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+"Dïsçüssïön ädmïns, mödérätörs, änd TÀs çän mäké théïr pösts vïsïßlé tö äll "
+"stüdénts ör spéçïfý ä sïnglé çöhört gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Title:"
@@ -11239,6 +11300,25 @@ msgstr "pöst änönýmöüslý tö çlässmätés Ⱡ'σяєм #"
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add Post"
 msgstr "Àdd Pöst #"
+
+#. Translators: This is the label for a control to
+#. select a forum post type
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Post type:"
+msgstr "Pöst týpé: Ⱡ#"
+
+#. Translators: This is a forum post type
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Question"
+msgstr "Qüéstïön #"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations."
+msgstr ""
+"Qüéstïöns räïsé ïssüés thät nééd änswérs. Dïsçüssïöns shäré ïdéäs änd stärt "
+"çönvérsätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Topic Area:"
@@ -11913,6 +11993,32 @@ msgstr ""
 msgid "You have been un-enrolled from {course_name}"
 msgstr "Ýöü hävé ßéén ün-énrölléd fröm {course_name} Ⱡ'σяєм ιρ#"
 
+#: lms/templates/enrollment/course_enrollment_message.html
+msgid "Enrollment Successful"
+msgstr "Énröllmént Süççéssfül Ⱡ'σя#"
+
+#: lms/templates/enrollment/course_enrollment_message.html
+msgid ""
+"Thank you for enrolling in {enrolled_course}. We hope you enjoy the course."
+msgstr ""
+"Thänk ýöü för énröllïng ïn {enrolled_course}. Wé höpé ýöü énjöý thé çöürsé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя#"
+
+#: lms/templates/enrollment/course_enrollment_message.html
+msgid ""
+"{platform_name} is a nonprofit bringing high-quality education to everyone, "
+"everywhere. Your help allows us to continuously improve the learning "
+"experience for millions and make a better future one learner at a time."
+msgstr ""
+"{platform_name} ïs ä nönpröfït ßrïngïng hïgh-qüälïtý édüçätïön tö évérýöné, "
+"évérýwhéré. Ýöür hélp ällöws üs tö çöntïnüöüslý ïmprövé thé léärnïng "
+"éxpérïénçé för mïllïöns änd mäké ä ßéttér fütüré öné léärnér ät ä tïmé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ#"
+
+#: lms/templates/enrollment/course_enrollment_message.html
+msgid "Donation Actions"
+msgstr "Dönätïön Àçtïöns Ⱡ'σ#"
+
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
 msgstr "{course_number} Stäff Grädïng Ⱡ'σ#"
@@ -12080,31 +12186,6 @@ msgstr "Çöürsé Wärnïngs Ⱡ'#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Click to generate a CSV file of all students enrolled in this course, along "
-"with profile information such as email address and username:"
-msgstr ""
-"Çlïçk tö généräté ä ÇSV fïlé öf äll stüdénts énrölléd ïn thïs çöürsé, älöng "
-"wïth pröfïlé ïnförmätïön süçh äs émäïl äddréss änd üsérnämé: Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "Download profile information as a CSV"
-msgstr "Döwnlöäd pröfïlé ïnförmätïön äs ä ÇSV Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid ""
-"For smaller courses, click to list profile information for enrolled students"
-" directly on this page:"
-msgstr ""
-"För smällér çöürsés, çlïçk tö lïst pröfïlé ïnförmätïön för énrölléd stüdénts"
-" dïréçtlý ön thïs pägé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid "List enrolled students' profile information"
-msgstr "Lïst énrölléd stüdénts' pröfïlé ïnförmätïön Ⱡ'σяєм ιρѕυм#"
-
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html
-msgid ""
 "Click to display the grading configuration for the course. The grading "
 "configuration is the breakdown of graded subsections of the course (such as "
 "exams and problem sets), and can be changed on the 'Grading' page (under "
@@ -12134,33 +12215,59 @@ msgstr "Répörts #"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"Click to generate a CSV grade report for all currently enrolled students.  "
-"Links to generated reports appear in a table below when report generation is"
-" complete."
+"For large courses, generating some reports can take several hours. When "
+"report generation is complete, a link that includes the date and time of "
+"generation appears in the table below. These reports are generated in the "
+"background, meaning it is OK to navigate away from this page while your "
+"report is generating."
 msgstr ""
-"Çlïçk tö généräté ä ÇSV grädé répört för äll çürréntlý énrölléd stüdénts.  "
-"Lïnks tö générätéd répörts äppéär ïn ä täßlé ßélöw whén répört générätïön ïs"
-" çömplété. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιη#"
+"För lärgé çöürsés, générätïng sömé répörts çän täké sévéräl höürs. Whén "
+"répört générätïön ïs çömplété, ä lïnk thät ïnçlüdés thé däté änd tïmé öf "
+"générätïön äppéärs ïn thé täßlé ßélöw. Thésé répörts äré générätéd ïn thé "
+"ßäçkgröünd, méänïng ït ïs ÖK tö nävïgäté äwäý fröm thïs pägé whïlé ýöür "
+"répört ïs générätïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"For large courses, generating this report may take several hours. Please be "
-"patient and do not click the button multiple times. Clicking the button "
-"multiple times will significantly slow the grade generation process."
+"Please be patient and do not click these buttons multiple times. Clicking "
+"these buttons multiple times will significantly slow the generation process."
 msgstr ""
-"För lärgé çöürsés, générätïng thïs répört mäý täké sévéräl höürs. Pléäsé ßé "
-"pätïént änd dö nöt çlïçk thé ßüttön mültïplé tïmés. Çlïçkïng thé ßüttön "
-"mültïplé tïmés wïll sïgnïfïçäntlý slöw thé grädé générätïön pröçéss. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
+"Pléäsé ßé pätïént änd dö nöt çlïçk thésé ßüttöns mültïplé tïmés. Çlïçkïng "
+"thésé ßüttöns mültïplé tïmés wïll sïgnïfïçäntlý slöw thé générätïön pröçéss."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The report is generated in the background, meaning it is OK to navigate away"
-" from this page while your report is generating."
+"Click to generate a CSV file of all students enrolled in this course, along "
+"with profile information such as email address and username:"
 msgstr ""
-"Thé répört ïs générätéd ïn thé ßäçkgröünd, méänïng ït ïs ÖK tö nävïgäté äwäý"
-" fröm thïs pägé whïlé ýöür répört ïs générätïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєт#"
+"Çlïçk tö généräté ä ÇSV fïlé öf äll stüdénts énrölléd ïn thïs çöürsé, älöng "
+"wïth pröfïlé ïnförmätïön süçh äs émäïl äddréss änd üsérnämé: Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "Download profile information as a CSV"
+msgstr "Döwnlöäd pröfïlé ïnförmätïön äs ä ÇSV Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"For smaller courses, click to list profile information for enrolled students"
+" directly on this page:"
+msgstr ""
+"För smällér çöürsés, çlïçk tö lïst pröfïlé ïnförmätïön för énrölléd stüdénts"
+" dïréçtlý ön thïs pägé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid "List enrolled students' profile information"
+msgstr "Lïst énrölléd stüdénts' pröfïlé ïnförmätïön Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
+msgid ""
+"Click to generate a CSV grade report for all currently enrolled students."
+msgstr ""
+"Çlïçk tö généräté ä ÇSV grädé répört för äll çürréntlý énrölléd stüdénts. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Grade Report"
@@ -12172,18 +12279,16 @@ msgstr "Répörts Àväïläßlé för Döwnlöäd Ⱡ'σяєм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
-"The grade reports listed below are generated each time the <b>Generate Grade"
-" Report</b> button is clicked. A link to each grade report remains available"
-" on this page, identified by the UTC date and time of generation. Grade "
-"reports are not deleted, so you will always be able to access previously "
-"generated reports from this page."
+"The reports listed below are available for download. A link to every report "
+"remains available on this page, identified by the UTC date and time of "
+"generation. Reports are not deleted, so you will always be able to access "
+"previously generated reports from this page."
 msgstr ""
-"Thé grädé répörts lïstéd ßélöw äré générätéd éäçh tïmé thé <b>Généräté Grädé"
-" Répört</b> ßüttön ïs çlïçkéd. À lïnk tö éäçh grädé répört rémäïns äväïläßlé"
-" ön thïs pägé, ïdéntïfïéd ßý thé ÛTÇ däté änd tïmé öf générätïön. Grädé "
-"répörts äré nöt délétéd, sö ýöü wïll älwäýs ßé äßlé tö äççéss prévïöüslý "
-"générätéd répörts fröm thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂#"
+"Thé répörts lïstéd ßélöw äré äväïläßlé för döwnlöäd. À lïnk tö évérý répört "
+"rémäïns äväïläßlé ön thïs pägé, ïdéntïfïéd ßý thé ÛTÇ däté änd tïmé öf "
+"générätïön. Répörts äré nöt délétéd, sö ýöü wïll älwäýs ßé äßlé tö äççéss "
+"prévïöüslý générätéd répörts fröm thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -13140,12 +13245,10 @@ msgid "None Available"
 msgstr "Nöné Àväïläßlé Ⱡ'#"
 
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/student_profile/language.html
 msgid "Change Preferred Language"
 msgstr "Çhängé Préférréd Längüägé Ⱡ'σяєм#"
 
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/student_profile/language.html
 msgid "Please choose your preferred language"
 msgstr "Pléäsé çhöösé ýöür préférréd längüägé Ⱡ'σяєм ιρѕ#"
 
@@ -13154,7 +13257,6 @@ msgid "Save Language Settings"
 msgstr "Sävé Längüägé Séttïngs Ⱡ'σяє#"
 
 #: lms/templates/modal/_modal-settings-language.html
-#: lms/templates/student_profile/language.html
 msgid ""
 "Don't see your preferred language? {link_start}Volunteer to become a "
 "translator!{link_end}"
@@ -13407,17 +13509,19 @@ msgid "Go Back"
 msgstr "Gö Bäçk #"
 
 #: lms/templates/registration/activate_account_notice.html
-msgid "Thanks For Registering!"
-msgstr "Thänks För Régïstérïng! Ⱡ'σяє#"
+msgid "Thanks for Registering!"
+msgstr "Thänks för Régïstérïng! Ⱡ'σяє#"
 
 #: lms/templates/registration/activate_account_notice.html
 msgid ""
-"Your account is not active yet. An activation link has been sent to {email},"
-" along with instructions for activating your account."
+"You've successfully created an account on {platform_name}. We've sent an "
+"account activation message to {email}. To activate your account and start "
+"enrolling in courses, click the link in the message."
 msgstr ""
-"Ýöür äççöünt ïs nöt äçtïvé ýét. Àn äçtïvätïön lïnk häs ßéén sént tö {email},"
-" älöng wïth ïnstrüçtïöns för äçtïvätïng ýöür äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυ#"
+"Ýöü'vé süççéssfüllý çréätéd än äççöünt ön {platform_name}. Wé'vé sént än "
+"äççöünt äçtïvätïön méssägé tö {email}. Tö äçtïväté ýöür äççöünt änd stärt "
+"énröllïng ïn çöürsés, çlïçk thé lïnk ïn thé méssägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт,#"
 
 #: lms/templates/registration/activation_complete.html
 msgid "Activation Complete!"
@@ -13965,6 +14069,7 @@ msgstr ""
 msgid "Student Account"
 msgstr "Stüdént Àççöünt Ⱡ'#"
 
+#: lms/templates/student_profile/index.html
 #: lms/templates/student_profile/index.html
 msgid "Student Profile"
 msgstr "Stüdént Pröfïlé Ⱡ'#"
@@ -17228,6 +17333,11 @@ msgstr "Fïrst däý thé çöürsé ßégïns Ⱡ'σяєм#"
 #: cms/templates/settings.html
 msgid "Course Start Time"
 msgstr "Çöürsé Stärt Tïmé Ⱡ'σ#"
+
+#: cms/templates/settings.html cms/templates/settings.html
+#: cms/templates/settings.html cms/templates/settings.html
+msgid "(UTC)"
+msgstr "(ÛTÇ) Ⱡ'σяєм ι#"
 
 #: cms/templates/settings.html
 msgid "Course End Date"

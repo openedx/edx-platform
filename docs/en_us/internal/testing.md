@@ -385,9 +385,25 @@ generates HTML and XML (Cobertura format) reports.
 
 ## Code Style Quality
 
-To view code style quality (e.g. pep8 and pylint violations):
+To view code style quality (including pep8 and pylint violations):
 
     paver run_quality
+
+More specific options are below.
+
+* Running a particular quality report:
+
+		paver run_pep8
+		paver run_pylint
+
+* Running a report, and setting it to fail if it exceeds a given number of violations:
+
+		paver run_pep8 --limit=800
+
+* The `run_quality` uses the underlying diff-quality tool (which is packaged with [diff-cover](https://github.com/edx/diff-cover)). With that, the command can be set to fail if a certain diff threshold is not met. For example, to cause the process to fail if  quality expectations are less than 100% when compared to master (or in other words, if style quality is worse than what's already on master):
+
+		paver run_quality --percentage=100
+
 
 
 ## Testing using queue servers

@@ -109,7 +109,8 @@ case "$TEST_SUITE" in
     "quality")
         paver run_pep8 -l $PEP8_THRESHOLD > pep8.log || { cat pep8.log; EXIT=1; }
         paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
-        paver run_quality
+        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+        paver run_quality -p 100
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.

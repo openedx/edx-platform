@@ -13,7 +13,6 @@ from django.test.utils import override_settings
 from unittest import SkipTest, skipUnless
 import ddt
 from pytz import UTC
-from django_countries.countries import COUNTRIES
 
 from user_api.api import account as account_api, profile as profile_api
 
@@ -21,6 +20,8 @@ from student.tests.factories import UserFactory
 from user_api.tests.factories import UserPreferenceFactory
 from django_comment_common import models
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from user_api.tests.test_constants import SORTED_COUNTRIES
 
 
 TEST_API_KEY = "test_api_key"
@@ -927,7 +928,7 @@ class RegistrationViewTest(ApiTestCase):
             [{"name": "--", "value": ""}] +
             [
                 {"value": country_code, "name": unicode(country_name)}
-                for country_code, country_name in COUNTRIES
+                for country_code, country_name in SORTED_COUNTRIES
             ]
         )
         self._assert_reg_field(
