@@ -42,7 +42,7 @@ var edx = edx || {};
                 var query = window.location.search,
                     url = '/dashboard';
 
-                // model.trigger('sync');
+                model.trigger('sync');
 
                 // If query string in url go back to that page
                 if ( query.length > 1 ) {
