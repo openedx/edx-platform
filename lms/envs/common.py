@@ -1536,6 +1536,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'mailing_address': 'optional',
     'goals': 'optional',
     'honor_code': 'required',
+    'terms_of_service': 'hidden',
     'city': 'hidden',
     'country': 'hidden',
 }

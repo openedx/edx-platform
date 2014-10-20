@@ -983,6 +983,78 @@ class RegistrationViewTest(ApiTestCase):
             }
         )
 
+    @override_settings(MKTG_URLS={
+        "ROOT": "https://www.test.com/",
+        "HONOR": "honor",
+        "TOS": "tos",
+    })
+    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
+    def test_registration_separate_terms_of_service_mktg_site_enabled(self):
+        # Honor code field should say ONLY honor code,
+        # not "terms of service and honor code"
+        self._assert_reg_field(
+            {"honor_code": "required", "terms_of_service": "required"},
+            {
+                "label": "I agree to the <a href=\"https://www.test.com/honor\">Honor Code</a>",
+                "name": "honor_code",
+                "default": False,
+                "type": "checkbox",
+                "required": True,
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
+        # Terms of service field should also be present
+        self._assert_reg_field(
+            {"honor_code": "required", "terms_of_service": "required"},
+            {
+                "label": "I agree to the <a href=\"https://www.test.com/tos\">Terms of Service</a>",
+                "name": "terms_of_service",
+                "default": False,
+                "type": "checkbox",
+                "required": True,
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
+    @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor", "TOS": "tos"})
+    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
+    def test_registration_separate_terms_of_service_mktg_site_disabled(self):
+        # Honor code field should say ONLY honor code,
+        # not "terms of service and honor code"
+        self._assert_reg_field(
+            {"honor_code": "required", "terms_of_service": "required"},
+            {
+                "label": "I agree to the <a href=\"/honor\">Honor Code</a>",
+                "name": "honor_code",
+                "default": False,
+                "type": "checkbox",
+                "required": True,
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
+        # Terms of service field should also be present
+        self._assert_reg_field(
+            {"honor_code": "required", "terms_of_service": "required"},
+            {
+                "label": "I agree to the <a href=\"/tos\">Terms of Service</a>",
+                "name": "terms_of_service",
+                "default": False,
+                "type": "checkbox",
+                "required": True,
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
     @override_settings(REGISTRATION_EXTRA_FIELDS={
         "level_of_education": "optional",
         "gender": "optional",
