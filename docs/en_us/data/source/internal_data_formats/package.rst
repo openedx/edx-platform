@@ -52,17 +52,6 @@ For a partner organization named UniversityX, these daily files are identified
 by the organization name, the edX site name, and the date. For example,
 ``universityx-edge-2014-07-25.log.gz.gpg``.
 
-An alternative option for event data is available. The
-``{date}-{org}-tracking.tar`` file is available each week. It contains a
-cumulative log of events in all of an organization's courses. Data for courses
-running on both the edx.org and edge.edx.org sites is included in this file.
-
-.. remove this paragraph ^ when weekly file is removed.
-
-.. important:: The ``{org}-{site}-events-{date}.log.gz.gpg`` file is designed to replace the ``{date}-{org}-tracking.tar`` file. Both files will be produced for several weeks, and then production of the ``{date}-{org}-tracking.tar`` file will be discontinued.
-
-.. remove this paragraph ^ when weekly file is removed.
-
 For information about the contents of these files, see :ref:`Data Package
 Contents`.
 
@@ -94,10 +83,7 @@ Data package files are located in the following buckets on Amazon S3:
   ``{org}-{site}-events-{date}.log.gz.gpg`` files of course event data.
   
 * The **course-data** bucket contains the weekly ``{org}-{date}.zip`` database
-  snapshot. It also contains the weekly ``{date}-{org}-tracking.tar`` file of
-  cumulative course event data (until production of this file is discontinued).
-
-.. remove the last sentence ^ when weekly event file is removed.
+  snapshot. 
 
 For information about accessing Amazon S3, see :ref:`Access Amazon S3`.
 
@@ -137,24 +123,20 @@ Download Daily Event Files
 Download Weekly Files
 ============================
 
-.. note:: If you are using a third-party tool to connect to Amazon S3, you may not be able to navigate from one edX bucket to the other in a single session. You may need to disconnect from Amazon S3 and then reconnect to the other bucket.
+.. note:: If you are using a third-party tool to connect to Amazon S3, you may 
+ not be able to navigate from one edX bucket to the other in a single session.
+ You may need to disconnect from Amazon S3 and then reconnect to the other
+ bucket.
 
-#. To download a weekly database data file or cumulative event file, connect to
-   the edX **course-data** bucket on Amazon S3 using the AWS Command Line
-   Interface or a third-party tool.
-
-.. revise this sentence ^ when weekly event logs are no longer available
+#. To download a weekly database data file, connect to the edX **course-data**
+   bucket on Amazon S3 using the AWS Command Line Interface or a third-party
+   tool.
 
    For information about providing your credentials to connect to Amazon S3,
    see :ref:`Access Amazon S3`.
 
 2. Download the ``{org}-{date}.zip`` database data file from the **course-
    data** bucket.
-
-   The **course-data** bucket also contains the weekly, cumulative
-   ``{date}-{org}-tracking.tar`` files.
-
-.. remove this step ^ when weekly event logs are no longer available
 
 .. _AWS Command Line Interface: http://aws.amazon.com/cli/
 
@@ -181,53 +163,6 @@ courses on a single edX site for one 24-hour period. After you download a
    file named ``{org}-{site}-events-{date}.log``. (Alternatively, the data can
    be decompressed in stream using a tool such as gzip or, related libraries in
    your preferred programming language.)
-
-.. remove this section v through the next note when weekly file is removed
-
-============================================================
-Extracted Contents of ``{date}-{org}-tracking.tar``
-============================================================
-
-The ``{date}-{org}-tracking.tar`` file contains cumulative event data for all
-of an organization's courses, running on both edx.org and edge.edx.org.
-
-.. note:: Over time, these cumulative files could become large (25GB and larger) and difficult for many data czars to download without encountering session timeouts and other problems. As a result, this file will be superseded by daily ``{org}-{site}-events-{date}.log.gz.gpg`` files in the **edx-course-data** bucket.
-
-After you download the ``{date}-{org}-tracking.tar`` file for your
-institution, you:
-
-#. Extract the contents of the downloaded .tar file.
-
-   To balance the load of traffic to edX courses, every course is served by
-   multiple edX servers. A different set of servers handles traffic for the two
-   edX sites: edx.org ("prod") and edge.edx.org ("edge"). When you extract the
-   contents of this file, a separate subdirectory is created for events that
-   took place on each edX server.
-
-   For example, subdirectories with these names can be created:
-
-   ``prod-edx-001/``
-
-   ``prod-edx-002/``
-
-   ``prod-edx-003/``
-
-   ``prod-edge-001/``
-
-   ``prod-edge-002/``
-
-   The subdirectory names identify the site on which events took place.
-
-   Each of these subdirectories contains an encrypted log file of event data
-   for every day that events occurred on that server. These event tracking data
-   files are named ``{date}-{org}.log.gpg``.
-
-2. Use your private key to decrypt the extracted log files. See :ref:`Decrypt
-   an Encrypted File`.
-
-.. note:: During analysis, you must combine events from different servers to get a complete picture of the activity in each course. 
-
-.. remove this section ^ when weekly file is removed
 
 ============================================
 Extracted Contents of ``{org}-{date}.zip``
