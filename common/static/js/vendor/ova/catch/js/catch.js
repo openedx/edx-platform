@@ -504,6 +504,13 @@ CatchAnnotation.prototype = {
         
         // Search Button
         el.on("click", ".searchbox .search-icon", onSearchButtonClick);
+        // Search should also run when user hits ENTER
+        $('input[name=search]').keyup(function(e) {
+            // ENTER == 13
+            if(e.which == 13) {
+                onSearchButtonClick();
+            }
+        });
 
         // Clear Search Button
         el.on("click", ".searchbox .clear-search-icon", onClearSearchButtonClick);
