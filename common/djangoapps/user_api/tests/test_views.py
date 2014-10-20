@@ -13,6 +13,7 @@ from django.test.utils import override_settings
 from unittest import SkipTest, skipUnless
 import ddt
 from pytz import UTC
+from mock import patch
 
 from user_api.api import account as account_api, profile as profile_api
 
@@ -946,6 +947,42 @@ class RegistrationViewTest(ApiTestCase):
             }
         )
 
+    @override_settings(
+        MKTG_URLS={"ROOT": "https://www.test.com/", "HONOR": "honor"},
+    )
+    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
+    def test_registration_honor_code_mktg_site_enabled(self):
+        self._assert_reg_field(
+            {"honor_code": "required"},
+            {
+                "label": "I agree to the <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>",
+                "name": "honor_code",
+                "default": False,
+                "type": "checkbox",
+                "required": True,
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
+    @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
+    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
+    def test_registration_honor_code_mktg_site_disabled(self):
+        self._assert_reg_field(
+            {"honor_code": "required"},
+            {
+                "label": "I agree to the <a href=\"/honor\">Terms of Service and Honor Code</a>",
+                "name": "honor_code",
+                "default": False,
+                "type": "checkbox",
+                "required": True,
+                "placeholder": "",
+                "instructions": "",
+                "restrictions": {},
+            }
+        )
+
     @override_settings(REGISTRATION_EXTRA_FIELDS={
         "level_of_education": "optional",
         "gender": "optional",
@@ -954,6 +991,7 @@ class RegistrationViewTest(ApiTestCase):
         "goals": "optional",
         "city": "optional",
         "country": "required",
+        "honor_code": "required",
     })
     def test_field_order(self):
         response = self.client.get(self.url)
@@ -974,6 +1012,7 @@ class RegistrationViewTest(ApiTestCase):
             "year_of_birth",
             "mailing_address",
             "goals",
+            "honor_code",
         ])
 
     def test_register(self):
@@ -983,6 +1022,7 @@ class RegistrationViewTest(ApiTestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
+            "honor_code": "true",
         })
         self.assertHttpOK(response)
 
@@ -1026,7 +1066,8 @@ class RegistrationViewTest(ApiTestCase):
             "year_of_birth": self.YEAR_OF_BIRTH,
             "goals": self.GOALS,
             "city": self.CITY,
-            "country": self.COUNTRY
+            "country": self.COUNTRY,
+            "honor_code": "true",
         })
         self.assertHttpOK(response)
 
@@ -1046,6 +1087,7 @@ class RegistrationViewTest(ApiTestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
+            "honor_code": "true",
         })
         self.assertHttpOK(response)
 
@@ -1104,6 +1146,7 @@ class RegistrationViewTest(ApiTestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
+            "honor_code": "true",
         })
         self.assertHttpOK(response)
 
@@ -1113,6 +1156,7 @@ class RegistrationViewTest(ApiTestCase):
             "name": "Someone Else",
             "username": "someone_else",
             "password": self.PASSWORD,
+            "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
         self.assertEqual(response.content, json.dumps(["email"]))
@@ -1124,6 +1168,7 @@ class RegistrationViewTest(ApiTestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
+            "honor_code": "true",
         })
         self.assertHttpOK(response)
 
@@ -1133,6 +1178,7 @@ class RegistrationViewTest(ApiTestCase):
             "name": "Someone Else",
             "username": self.USERNAME,
             "password": self.PASSWORD,
+            "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
         self.assertEqual(response.content, json.dumps(["username"]))
@@ -1144,6 +1190,7 @@ class RegistrationViewTest(ApiTestCase):
             "name": self.NAME,
             "username": self.USERNAME,
             "password": self.PASSWORD,
+            "honor_code": "true",
         })
         self.assertHttpOK(response)
 
@@ -1153,6 +1200,7 @@ class RegistrationViewTest(ApiTestCase):
             "name": "Someone Else",
             "username": self.USERNAME,
             "password": self.PASSWORD,
+            "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
         self.assertEqual(response.content, json.dumps(["email", "username"]))
