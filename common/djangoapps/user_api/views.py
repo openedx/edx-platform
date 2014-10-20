@@ -136,11 +136,30 @@ class RegistrationView(APIView):
     EXTRA_FIELDS = [
         "city", "country", "level_of_education", "gender",
         "year_of_birth", "mailing_address", "goals",
-        "honor_code",
+        "honor_code", "terms_of_service",
     ]
+
+    def _is_field_visible(self, field_name):
+        """Check whether a field is visible based on Django settings. """
+        return self._extra_fields_setting.get(field_name) in ["required", "optional"]
+
+    def _is_field_required(self, field_name):
+        """Check whether a field is required based on Django settings. """
+        return self._extra_fields_setting.get(field_name) == "required"
 
     def __init__(self, *args, **kwargs):
         super(RegistrationView, self).__init__(*args, **kwargs)
+
+        # Backwards compatibility: Honor code is required by default, unless
+        # explicitly set to "optional" in Django settings.
+        self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
+        self._extra_fields_setting["honor_code"] = self._extra_fields_setting.get("honor_code", "required")
+
+        # Check that the setting is configured correctly
+        for field_name in self.EXTRA_FIELDS:
+            if self._extra_fields_setting.get(field_name, "hidden") not in ["required", "optional", "hidden"]:
+                msg = u"Setting REGISTRATION_EXTRA_FIELDS values must be either required, optional, or hidden."
+                raise ImproperlyConfigured(msg)
 
         # Map field names to the instance method used to add the field to the form
         self.field_handlers = {}
@@ -175,22 +194,14 @@ class RegistrationView(APIView):
         for field_name in self.DEFAULT_FIELDS:
             self.field_handlers[field_name](form_desc, required=True)
 
-        # Backwards compatibility: Honor code is required by default, unless
-        # explicitly set to "optional" in Django settings.
-        extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
-        extra_fields_setting["honor_code"] = extra_fields_setting.get("honor_code", "required")
-
         # Extra fields configured in Django settings
         # may be required, optional, or hidden
         for field_name in self.EXTRA_FIELDS:
-            field_setting = extra_fields_setting.get(field_name, "hidden")
-            handler = self.field_handlers[field_name]
-
-            if field_setting in ["required", "optional"]:
-                handler(form_desc, required=(field_setting == "required"))
-            elif field_setting != "hidden":
-                msg = u"Setting REGISTRATION_EXTRA_FIELDS values must be either required, optional, or hidden."
-                raise ImproperlyConfigured(msg)
+            if self._is_field_visible(field_name):
+                self.field_handlers[field_name](
+                    form_desc,
+                    required=self._is_field_required(field_name)
+                )
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
@@ -342,8 +353,14 @@ class RegistrationView(APIView):
         )
 
     def _add_honor_code_field(self, form_desc, required=True):
-        # Translators: This is a legal document users must agree to in order to register a new account.
-        terms_text = _(u"Terms of Service and Honor Code")
+        # Separate terms of service and honor code checkboxes
+        if self._is_field_visible("terms_of_service"):
+            terms_text = _(u"Honor Code")
+
+        # Combine terms of service and honor code checkboxes
+        else:
+            # Translators: This is a legal document users must agree to in order to register a new account.
+            terms_text = _(u"Terms of Service and Honor Code")
 
         # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
         label = _(
@@ -355,12 +372,30 @@ class RegistrationView(APIView):
             )
         )
 
-        # TODO: Open source installations may need
-        # separate checkboxes for terms or service or privacy
-        # policies.  Instead of hard-coding this, we should create a more flexible
-        # mechanism for configuring which fields appear on the registration form.
         form_desc.add_field(
             "honor_code",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=required,
+        )
+
+    def _add_terms_of_service_field(self, form_desc, required=True):
+        # Translators: This is a legal document users must agree to in order to register a new account.
+        terms_text = _(u"Terms of Service")
+
+        # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
+        label = _(
+            u"I agree to the {terms_of_service}"
+        ).format(
+            terms_of_service=u"<a href=\"{url}\">{terms_text}</a>".format(
+                url=marketing_link("TOS"),
+                terms_text=terms_text
+            )
+        )
+
+        form_desc.add_field(
+            "terms_of_service",
             label=label,
             field_type="checkbox",
             default=False,
