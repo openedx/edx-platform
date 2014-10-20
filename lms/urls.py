@@ -261,6 +261,10 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{}/syllabus$'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.syllabus', name="syllabus"),   # TODO arjun remove when custom tabs in place, see courseware/courses.py
 
+        #Survey associated with a course
+        url(r'^courses/{}/survey$'.format(settings.COURSE_ID_PATTERN),
+            'courseware.views.course_survey', name="course_survey"),
+
         url(r'^courses/{}/book/(?P<book_index>\d+)/$'.format(settings.COURSE_ID_PATTERN),
             'staticbook.views.index', name="book"),
         url(r'^courses/{}/book/(?P<book_index>\d+)/(?P<page>\d+)$'.format(settings.COURSE_ID_PATTERN),
@@ -448,6 +452,10 @@ urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
+# Survey Djangoapp
+urlpatterns += (
+    url(r'^survey/', include('survey.urls')),
+)
 
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (

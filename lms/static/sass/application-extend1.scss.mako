@@ -55,6 +55,7 @@
 @import 'multicourse/error-pages';
 @import 'multicourse/help';
 @import 'multicourse/edge';
+@import 'multicourse/survey-page';
 
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss
