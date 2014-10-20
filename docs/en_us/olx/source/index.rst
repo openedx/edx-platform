@@ -28,7 +28,7 @@ This document is intended for those developing edX courses through Open Learning
    problem-xml/index
    tools/index
    drafts/index
-   demo-course/index
+   example-course/index
 
 
  

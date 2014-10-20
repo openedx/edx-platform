@@ -4,12 +4,15 @@
 OLX Course Structure
 ###############################################
 
-See:
+This chapter describes the structure of a generic OLX course. See:
 
 * `OLX and Directory File Structures`_
 * `Top-level Directory`_
 * `XBlock directories`_
 * `edX Platform Directories`_
+
+See :ref:`The Structure of edX-Insider` for information on how a specific OLX course is structured.
+
 
 ****************************************
 OLX and Directory File Structures
@@ -49,7 +52,7 @@ content.
  additional directories that store the XML for XBlocks of that type.
 
 *******************
-XBlock directories
+XBlock Directories
 *******************
 
 edX course components can be broken out of the main ``course.xml`` file

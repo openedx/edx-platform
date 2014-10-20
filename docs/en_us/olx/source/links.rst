@@ -6,3 +6,7 @@
 .. _manual-testing-complete: https://github.com/edx/edx-platform/tree/master/common/test/data/manual-testing-complete
 
 .. _LONCAPA XML format: https://s1.lite.msu.edu/adm/help/Authoring_XML_Intro.hlp#Authoring_XML_Intro
+
+.. _edX-Insider: https://github.com/pmitros/edX-Insider
+
+.. _Ongoing: https://github.com/pmitros/edX-Insider/tree/master/Ongoing
