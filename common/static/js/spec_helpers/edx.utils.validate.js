@@ -18,6 +18,11 @@ var edx = edx || {};
                 },
 
                 charLength: function( $el ) {
+                    var type = $el.attr("type");
+                    if (type !== "text" && type !== "textarea" && type !== "password") {
+                        return true;
+                    }
+
                     // Cannot assume there will be both min and max
                     var min = $el.attr('minlength') || 0,
                         max = $el.attr('maxlength') || false,
@@ -35,7 +40,12 @@ var edx = edx || {};
                 },
 
                 required: function( $el ) {
-                    return $el.attr('required') ? $el.val() : true;
+                    if ($el.attr("type") === "checkbox") {
+                        return $el.attr('required') ? $el.prop("checked") : true;
+                    }
+                    else {
+                        return $el.attr('required') ? $el.val() : true;
+                    }
                 },
 
                 email: {
@@ -66,6 +76,6 @@ var edx = edx || {};
 
     })();
 
-    edx.utils.validate = utils.validate
+    edx.utils.validate = utils.validate;
 
 })( jQuery, _ );

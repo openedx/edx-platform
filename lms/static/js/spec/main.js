@@ -216,6 +216,7 @@
                 exports: 'js/student_account/account',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
             },
+
             'js/student_profile/profile': {
                 exports: 'js/student_profile/profile',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
@@ -231,6 +232,7 @@
                 exports: 'js/dashboard/donation',
                 deps: ['jquery', 'underscore', 'gettext']
             },
+
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/cohort': {
                 exports: 'CohortModel',
@@ -257,7 +259,42 @@
             'js/views/notification': {
                 exports: 'NotificationView',
                 deps: ['backbone', 'jquery', 'underscore']
-            }
+            },
+
+            // Student account registration/login
+            // Loaded explicitly until these are converted to RequireJS
+            'js/student_account/models/LoginModel': {
+                exports: 'js/student_account/models/LoginModel',
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+            },
+            'js/student_account/views/LoginView': {
+                exports: 'js/student_account/views/LoginView',
+                deps: ['js/student_account/models/LoginModel']
+            },
+            'js/student_account/models/PasswordResetModel': {
+                exports: 'js/student_account/models/PasswordResetModel',
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+            },
+            'js/student_account/views/PasswordResetView': {
+                exports: 'js/student_account/views/PasswordResetView',
+                deps: ['js/student_account/models/PasswordResetModel']
+            },
+            'js/student_account/models/RegisterModel': {
+                exports: 'js/student_account/models/RegisterModel',
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+            },
+            'js/student_account/views/RegisterView': {
+                exports: 'js/student_account/views/RegisterView',
+                deps: ['js/student_account/models/RegisterModel']
+            },
+            'js/student_account/views/AccessView': {
+                exports: 'js/student_account/views/AccessView',
+                deps: [
+                    'js/student_account/views/LoginView',
+                    'js/student_account/views/PasswordResetView',
+                    'js/student_account/views/RegisterView'
+                ]
+            },
         },
     });
 
@@ -270,7 +307,11 @@
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
         'lms/include/js/spec/student_account/account.js',
-        'lms/include/js/spec/student_profile/profile.js'
+        'lms/include/js/spec/student_account/access_spec.js',
+        'lms/include/js/spec/student_account/login_spec.js',
+        'lms/include/js/spec/student_account/register_spec.js',
+        'lms/include/js/spec/student_account/password_reset_spec.js',
+        'lms/include/js/spec/student_profile/profile.js',
     ]);
 
 }).call(this, requirejs, define);
