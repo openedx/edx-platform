@@ -14,6 +14,9 @@ October-December 2014
 
    * - Date
      - Change
+   * - 10/20/14
+     - Updated the :ref:`Package` chapter to remove instructions for
+       downloading weekly event files.
    * - 10/16/14
      - Updated video events with new fields relating to mobile device use in
        the :ref:`Tracking Logs` chapter.
