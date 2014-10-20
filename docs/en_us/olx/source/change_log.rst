@@ -13,16 +13,17 @@ October, 2014
 
    * - Date
      - Change
+   * - 10/28/14
+     - Added the section :ref:`Example of an OLX Course`.
    * - 10/23/14
      - Fixed the code sample in :ref:`Script Tag Format` in the :ref:`Write
        Your Own Grader` chapter.
    * - 
      - Fixed a bug in the :ref:`Text Input Problem XML`.
    * - 10/17/14
-     - Provided more explanation to the introduction to :ref:`Problems and
-       Tools`.
+     - Provided more explanation to the introduction to :ref:`Problems`.
    * - 
-     - Reorganized the :ref:`Problems and Tools` and :ref:`Course Components`
+     - Reorganized the :ref:`Problems` and :ref:`Course Components`
        sections to properly categorize these types of objects.
    * - 
      - Updated the :ref:`ODL Directory Structure` chapter to accurately reflect
@@ -33,7 +34,7 @@ October, 2014
        in container objects.
    * - 10/07/14
      - Added pages for the :ref:`Graphical Slider Tool` and 
-       :ref:`Symbolic Response` to the :ref:`Problems and Tools` section.
+       :ref:`Symbolic Response` to the :ref:`Problems` section.
        
 *****************
 September, 2014
