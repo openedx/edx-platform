@@ -9,21 +9,7 @@ from xmodule.modulestore.split_migrator import SplitMigrator
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore import ModuleStoreEnum
-
-
-def user_from_str(identifier):
-    """
-    Return a user identified by the given string. The string could be an email
-    address, or a stringified integer corresponding to the ID of the user in
-    the database. If no user could be found, a User.DoesNotExist exception
-    will be raised.
-    """
-    try:
-        user_id = int(identifier)
-    except ValueError:
-        return User.objects.get(email=identifier)
-
-    return User.objects.get(id=user_id)
+from contentstore.management.commands.utils import user_from_str
 
 
 class Command(BaseCommand):
