@@ -559,6 +559,16 @@ class CourseFields(object):
                               default=False,
                               scope=Scope.settings)
 
+    course_survey_name = String(display_name=_("Course Survey Name"),
+                              help="Whether to display a pre-course survey to the user.",
+                              default=None,
+                              scope=Scope.settings)
+
+    course_survey_required = Boolean(display_name=_("Course Survey Required"),
+                              help="Whether the user must first answer the Course Survey before allowed to view the content.",
+                              default=False,
+                              scope=Scope.settings)
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
 
