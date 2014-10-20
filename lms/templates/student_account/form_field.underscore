@@ -1,0 +1,41 @@
+<p class="form-field">
+    <% if ( type !== 'checkbox' ) { %>
+        <label for="<%= form %>-<%= name %>">
+            <%= label %>
+            <% if ( required ) { %> *</label><% } %>
+        </label>
+    <% } %>
+
+    <% if( form === 'login' && name === 'password' ) { %>
+        <a href="#" class="forgot-password">Forgot password?</a>
+    <% } %>
+
+    <% if ( type === 'select' ) { %>
+        <select id="<%= form %>-<%= name %>" name="<%= name %>" class="input-inline" aria-describedby="<%= form %>-<%= name %>-desc">
+        <% _.each(options, function(el) { %>
+            <option value="<%= el.value%>"><%= el.name %></option>
+        <% }); %>
+        </select>
+    <% } else if ( type === 'textarea' ) { %>
+        <textarea id="<%= form %>-<%= name %>" type="<%= type %>" name="<%= name %>" class="input-block" aria-describedby="<%= form %>-<%= name %>-desc"
+            <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
+            <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
+            <% if ( required ) { %> required<% } %> >
+        </textarea>
+    <% } else { %>
+        <input id="<%= form %>-<%= name %>" type="<%= type %>" name="<%= name %>" class="input-block" aria-describedby="<%= form %>-<%= name %>-desc"
+            <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
+            <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
+            <% if ( required ) { %> required<% } %>
+        />
+    <% } %>
+
+    <% if ( type === 'checkbox' ) { %>
+        <label for="<%= form %>-<%= name %>">
+            <%= label %>
+            <% if ( required ) { %> *</label><% } %>
+        </label>
+    <% } %>
+
+    <span id="<%= form %>-<%= name %>-desc" class="desc"><%= instructions %></span>
+</p>

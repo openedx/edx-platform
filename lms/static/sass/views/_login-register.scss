@@ -1,0 +1,31 @@
+// lms - views - login/register view
+// ====================
+.login-register{
+
+    @include span-columns(6);
+    @include shift(3);
+
+    input:-webkit-autofill {
+        -webkit-box-shadow:0 0 0 50px white inset;
+        -webkit-text-fill-color: #333;
+    }
+
+    input:-webkit-autofill:focus {
+        -webkit-box-shadow: white, 0 0 0 50px white inset;
+        -webkit-text-fill-color: #333;
+    }
+
+    .form-field {
+        width: 100%;
+    }
+
+    .input-block,
+    .desc {
+        display: block;
+    }
+
+    .input-inline {
+        display: inline;
+    }
+
+}
