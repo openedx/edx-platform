@@ -57,22 +57,10 @@ var edx = edx || {};
                 this.subview.register = new edx.student.account.RegisterView();
             } else if ( type === 'reset' ) {
                 this.subview.passwordHelp = new edx.student.account.PasswordResetView();
-
-                // Listen for 'password-reset' event to toggle sub-views
-                this.listenTo( this.subview.passwordHelp, 'password-reset', this.removePasswordView);
             }
         },
 
-        removePasswordView: function() {
-            this.$header.removeClass('hidden');
-            $(this.el).find('.form-type').removeClass('hidden');
-
-            // User should only have to submit reset once so remove view
-            this.subview.passwordHelp.remove();
-        },
-
         resetPassword: function() {
-            console.log( this.$header );
             this.$header.addClass('hidden');
             $(this.el).find('.form-type').addClass('hidden');
             this.loadForm('reset');
@@ -88,15 +76,6 @@ var edx = edx || {};
 
             $(this.el).find('.form-wrapper').addClass('hidden');
             $form.removeClass('hidden');
-        },
-
-        getModel: function( type ) {
-            var models = {
-                join: app.JoinModel,
-                login: app.JoinModel
-            };
-
-            return models[type] ? new models[type]() : false;
         },
 
         form: {

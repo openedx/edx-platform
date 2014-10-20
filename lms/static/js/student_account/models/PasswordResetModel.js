@@ -12,7 +12,7 @@ var edx = edx || {};
             email: ''
         },
 
-        urlRoot: '/resetMe',
+        urlRoot: '/account/password',
 
         sync: function(method, model) {
             var headers = {
@@ -27,9 +27,6 @@ var edx = edx || {};
                 headers: headers
             })
             .done(function() {
-                var query = window.location.search,
-                    url = '/dashboard';
-
                 model.trigger('success');
             })
             .fail( function( error ) {

@@ -25,7 +25,7 @@ var edx = edx || {};
 
         $form: {},
 
-        initialize: function( obj ) {
+        initialize: function() {
             var fields = this.buildForm([{
                 label: 'E-mail',
                 instructions: 'This is the e-mail address you used to register with edX',
@@ -34,7 +34,7 @@ var edx = edx || {};
                 type: 'email',
                 restrictions: []
             }]);
-console.log('PasswordResetView INIT');
+
             this.initModel();
             this.render( fields );
         },
@@ -61,13 +61,12 @@ console.log('PasswordResetView INIT');
             this.listenTo( this.model, 'success', this.resetComplete) ;
         },
 
-        initModel: function( url, method ) {
-            console.log('init the password reset model');
-            /*this.model = new edx.student.account.PasswordResetModel();
+        initModel: function() {
+            this.model = new edx.student.account.PasswordResetModel();
 
             this.listenTo( this.model, 'error', function( error ) {
                 console.log(error.status, ' error: ', error.responseText);
-            });*/
+            });
         },
 
         buildForm: function( data ) {
@@ -75,14 +74,14 @@ console.log('PasswordResetView INIT');
                 i,
                 len = data.length,
                 fieldTpl = this.fieldTpl;
-console.log('buildForm ', data);
+
             for ( i=0; i<len; i++ ) {
                 html.push( _.template( fieldTpl, $.extend( data[i], {
                     form: 'reset-password'
                 }) ) );
             }
 
-            this.render( html.join('') );
+            return html.join('');
         },
 
         getFormData: function() {
@@ -118,15 +117,16 @@ console.log('buildForm ', data);
         },
 
         resetComplete: function() {
-            this.trigger('password-reset');
+            var $el = $(this.el);
+
+            $el.find('#password-reset-form').addClass('hidden');
+            $el.find('.js-reset-success').removeClass('hidden');
         },
 
         submitForm: function( event ) {
             var data = this.getFormData();
 
             event.preventDefault();
-
-            // console.log(this.model);
 
             if ( !this.errors.length ) {
                 console.log('save me');
