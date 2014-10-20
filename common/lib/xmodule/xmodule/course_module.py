@@ -175,6 +175,12 @@ class CourseFields(object):
                  default=DEFAULT_START_DATE,
                  scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
+    display_price = Integer(
+        display_name=_("Course Display Price"),
+        help=_("The cost displayed to students for enrolling in the course. If a paid course registration price is set by platform staff in the database, that price will be displayed instead of this one."),
+        default=0,
+        scope=Scope.settings,
+    )
     advertised_start = String(
         display_name=_("Course Advertised Start Date"),
         help=_("Enter the date you want to advertise as the course start date, if this date is different from the set start date. To advertise the set start date, enter null."),
