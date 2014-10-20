@@ -1523,13 +1523,16 @@ INSTALLED_APPS = (
     'django_countries',
 
     # edX Mobile API
-    'mobile_api',    
+    'mobile_api',
 
+    # Surveys
+    'survey',
+    
     # EDX API application
     'api_manager',
 
     # Social Engagement
-    'social_engagement',
+    'social_engagement',    
 )
 
 ######################### MARKETING SITE ###############################

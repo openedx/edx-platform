@@ -44,6 +44,20 @@
 @import 'elements/typography';
 @import 'elements/controls';
 
+// shared - platform
+@import 'multicourse/home';
+@import 'multicourse/dashboard';
+@import 'multicourse/account';
+@import 'multicourse/courses';
+@import 'multicourse/course_about';
+@import 'multicourse/jobs';
+@import 'multicourse/media-kit';
+@import 'multicourse/about_pages';
+@import 'multicourse/press_release';
+@import 'multicourse/error-pages';
+@import 'multicourse/help';
+@import 'multicourse/edge';
+@import 'multicourse/survey-page';
 // shared - course
 @import 'shared/forms';
 @import 'shared/footer';
