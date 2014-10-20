@@ -68,9 +68,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-14 11:52-0400\n"
-"PO-Revision-Date: 2014-10-12 07:30+0000\n"
-"Last-Translator: Zhen-Rong Chen <zhenrcaaron@gmail.com>\n"
+"POT-Creation-Date: 2014-10-20 10:15-0400\n"
+"PO-Revision-Date: 2014-10-15 15:41+0000\n"
+"Last-Translator: Xaver Y.R. Chen <yrchen@atcity.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2941,6 +2941,20 @@ msgstr ""
 msgid "Your donation could not be submitted."
 msgstr ""
 
+#: lms/static/js/dashboard/legacy.js
+msgid "An error occurred. Please try again later."
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid "Please verify your new email address"
+msgstr ""
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"You'll receive a confirmation in your inbox. Please follow the link in the "
+"email to confirm your email address change."
+msgstr ""
+
 #: lms/static/js/student_account/account.js
 #: lms/static/js/student_profile/profile.js
 msgid "The data could not be saved."
@@ -3693,6 +3707,11 @@ msgid "Enter Your New Cohort Group's Name"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "(contains %(student_count)s student)"
+msgid_plural "(contains %(student_count)s students)"
+msgstr[0] ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "Students are added to this group only when you provide their email addresses"
 " or usernames on this page."
@@ -3826,7 +3845,7 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "Upload your first asset"
-msgstr ""
+msgstr "上傳您的第一個資源"
 
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "close"

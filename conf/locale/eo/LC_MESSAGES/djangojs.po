@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-14 12:44-0400\n"
-"PO-Revision-Date: 2014-10-14 16:45:52.446317\n"
+"POT-Creation-Date: 2014-10-20 10:50-0400\n"
+"PO-Revision-Date: 2014-10-20 14:51:41.242372\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3167,6 +3167,23 @@ msgstr "Pléäsé éntér ä välïd dönätïön ämöünt. Ⱡ'σяєм ιρѕ
 msgid "Your donation could not be submitted."
 msgstr "Ýöür dönätïön çöüld nöt ßé süßmïttéd. Ⱡ'σяєм ιρѕ#"
 
+#: lms/static/js/dashboard/legacy.js
+msgid "An error occurred. Please try again later."
+msgstr "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυ#"
+
+#: lms/static/js/dashboard/legacy.js
+msgid "Please verify your new email address"
+msgstr "Pléäsé vérïfý ýöür néw émäïl äddréss Ⱡ'σяєм ιρ#"
+
+#: lms/static/js/dashboard/legacy.js
+msgid ""
+"You'll receive a confirmation in your inbox. Please follow the link in the "
+"email to confirm your email address change."
+msgstr ""
+"Ýöü'll réçéïvé ä çönfïrmätïön ïn ýöür ïnßöx. Pléäsé föllöw thé lïnk ïn thé "
+"émäïl tö çönfïrm ýöür émäïl äddréss çhängé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
 #: lms/static/js/student_account/account.js
 #: lms/static/js/student_profile/profile.js
 msgid "The data could not be saved."
@@ -3179,6 +3196,18 @@ msgstr "Pléäsé éntér ä välïd émäïl äddréss Ⱡ'σяєм ιρ#"
 #: lms/static/js/student_account/account.js
 msgid "Please enter a valid password"
 msgstr "Pléäsé éntér ä välïd pässwörd Ⱡ'σяєм #"
+
+#: lms/static/js/student_account/account.js
+msgid ""
+"Password reset email sent. Follow the link in the email to change your "
+"password."
+msgstr ""
+"Pässwörd rését émäïl sént. Föllöw thé lïnk ïn thé émäïl tö çhängé ýöür "
+"pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/static/js/student_account/account.js
+msgid "We weren't able to send you a password reset email."
+msgstr "Wé wérén't äßlé tö sénd ýöü ä pässwörd rését émäïl. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/static/js/student_account/account.js
 msgid "Please check your email to confirm the change"
@@ -3995,6 +4024,12 @@ msgid "Enter Your New Cohort Group's Name"
 msgstr "Éntér Ýöür Néw Çöhört Gröüp's Nämé Ⱡ'σяєм ιρ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+msgid "(contains %(student_count)s student)"
+msgid_plural "(contains %(student_count)s students)"
+msgstr[0] "(çöntäïns %(student_count)s stüdént) Ⱡ'σяє#"
+msgstr[1] "(çöntäïns %(student_count)s stüdénts) Ⱡ'σяє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "Students are added to this group only when you provide their email addresses"
 " or usernames on this page."
@@ -4093,6 +4128,10 @@ msgstr "Pässwörd #"
 #: lms/templates/student_account/account.underscore
 msgid "Change My Email Address"
 msgstr "Çhängé Mý Émäïl Àddréss Ⱡ'σяє#"
+
+#: lms/templates/student_account/account.underscore
+msgid "Reset Password"
+msgstr "Rését Pässwörd Ⱡ'#"
 
 #: lms/templates/student_profile/profile.underscore
 msgid "Full Name"
