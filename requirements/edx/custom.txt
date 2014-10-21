@@ -5,6 +5,6 @@
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@eaa8dd4d934a374738fd7385fc636cbb99575c40#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@dbbd3afdf534059ee75d0e6c4f1ea7d750bc4d43#egg=xblock-drag-and-drop-v2
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@81f91e6b03a50907e6838f0494b0bcf14e968a5e#egg=xblock-ooyala
--e git+https://github.com/edx-solutions/xblock-group-project.git@3c96d3e9bc287048709659ae0dbf4b0923927839#egg=xblock-group-project
+-e git+https://github.com/edx-solutions/xblock-group-project.git@61ec5fde38393d403ea86e8e87937a37856d4958#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-discussion.git@a4ccc0e18b0aca14a3219afaa6ec6e8036821320#egg=xblock-discussion
 -e git+https://github.com/edx-solutions/xblock-adventure.git@30894de41ee7efe7d5b6400086463d12995893f7#egg=xblock-adventure
