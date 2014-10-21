@@ -49,6 +49,7 @@ def get_an_error_dialog(step):
 
 @step('I can click to go to the unit with the error$')
 def i_click_on_error_dialog(step):
+    world.wait_for_visible(".button.action-primary")
     world.click_link_by_text('Correct failed component')
 
     problem_string = unicode(world.scenario_dict['COURSE'].id.make_usage_key("problem", 'ignore'))
