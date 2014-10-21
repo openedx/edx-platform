@@ -66,8 +66,7 @@ class InheritanceMixin(XBlockMixin):
     giturl = String(
         display_name=_("GIT URL"),
         help=_("Enter the URL for the course data GIT repository."),
-        scope=Scope.settings,
-        deprecated=True  # Deprecated because GIT workflow users do not use Studio.
+        scope=Scope.settings
     )
     xqa_key = String(
         display_name=_("XQA Key"),
