@@ -1,0 +1,9 @@
+/* Override the default global box-sizing */
+@import "neat/neat-helpers"; // or "neat-helpers" when in Rails
+
+$border-box-sizing: false;
+
+/* Breakpoints */
+$mobile: new-breakpoint(max-width 320px 4);
+$tablet: new-breakpoint(min-width 321px max-width 768px, 8);
+$desktop: new-breakpoint(min-width 769px 12);
