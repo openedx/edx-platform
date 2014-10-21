@@ -6,8 +6,6 @@ only displayed at the course level. This is because it makes it a lot easier to
 optimize and reason about, and it avoids having to tackle the bigger problem of
 general XBlock representation in this rather specialized formatting.
 """
-from functools import partial
-
 from django.http import Http404, HttpResponse
 
 from rest_framework import generics, permissions
@@ -21,7 +19,7 @@ from courseware.access import has_access
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 
-from .serializers import BlockOutline, video_summary
+from .serializers import VideoOutline
 
 
 class VideoSummaryList(generics.ListAPIView):
@@ -34,14 +32,27 @@ class VideoSummaryList(generics.ListAPIView):
         course = get_mobile_course(course_id, request.user)
 
         video_outline = list(
-            BlockOutline(
+            VideoOutline(
                 course_id,
                 course,
-                {"video": partial(video_summary, course)},
                 request,
             )
         )
         return Response(video_outline)
+
+class MissingVideoList(generics.ListAPIView):
+    authentication_classes = (SessionAuthentication, )
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        course_id = CourseKey.from_string(kwargs['course_id'])
+        course = get_mobile_course(course_id, request.user)
+
+        missing = []
+        for vid in VideoOutline(course_id, course, request, debug=True):
+            if not vid['summary']['size']:
+                missing.append(vid)
+        return Response(missing)
 
 
 class VideoTranscripts(generics.RetrieveAPIView):

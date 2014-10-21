@@ -175,3 +175,20 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         url = reverse('video-transcripts-detail', kwargs=kwargs)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_missing_videos(self):
+        name = u"missing video omega \u03a9"
+        evid = 'completely_missing'
+        ItemFactory.create(
+            parent_location=self.unit.location,
+            category="video",
+            edx_video_id=evid,
+            display_name=name,
+        )
+        url = reverse('missing-video-list', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        missing = response.data
+        self.assertEqual(len(missing), 1)
+        self.assertEqual(missing[0]['summary']['name'], name)
+        self.assertEqual(missing[0]['summary']['video_id'], evid)
