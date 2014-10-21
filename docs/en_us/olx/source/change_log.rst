@@ -14,10 +14,9 @@ October, 2014
    * - Date
      - Change
    * - 10/17/14
-     - Provided more explanation to the introduction to :ref:`Problems and
-       Tools`.
+     - Provided more explanation to the introduction to :ref:`Problems`.
    * - 
-     - Reorganized the :ref:`Problems and Tools` and :ref:`Course Components`
+     - Reorganized the :ref:`Problems` and :ref:`Course Components`
        sections to properly categorize these types of objects.
    * - 
      - Updated the :ref:`ODL Directory Structure` chapter to accurately reflect

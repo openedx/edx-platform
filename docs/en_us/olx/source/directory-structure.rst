@@ -101,7 +101,7 @@ See :ref:`The Course About Pages` for more information.
 
 The ``info`` directory contains:
 
-* ``handouts.html``, which contains the contain for the Course Handouts page in
+* ``handouts.html``, which contains the content for the Course Handouts page in
   the course.
 
 * ``updates.html``, which contains the course updates students see when opening

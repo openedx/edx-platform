@@ -10,3 +10,7 @@
 .. _edX-Insider: https://github.com/pmitros/edX-Insider
 
 .. _Ongoing: https://github.com/pmitros/edX-Insider/tree/master/Ongoing
+
+.. _Week_overview.html: https://github.com/pmitros/edX-Insider/blob/master/Ongoing/html/Week_overview.html
+
+.. _Creating a Peer Assessment: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/index.html
