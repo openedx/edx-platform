@@ -24,11 +24,17 @@ from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
 from django_comment_common.models import FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
-from progress.models import StudentProgress, StudentProgressHistory
 from instructor.access import revoke_access, update_forum_role
+from lms.lib.comment_client.user import get_course_social_stats
+from lms.lib.comment_client.thread import get_course_thread_stats
+from lms.lib.comment_client.utils import CommentClientRequestError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from progress.models import StudentProgress, StudentProgressHistory
+from projects.models import Project, Workgroup
+from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole
-
 from xmodule.modulestore.django import modulestore
 
 from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
@@ -38,16 +44,10 @@ from api_manager.models import CourseGroupRelationship, CourseContentGroupRelati
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
 from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
-from projects.models import Project, Workgroup
-from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from .serializers import CourseModuleCompletionSerializer, CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 
-from lms.lib.comment_client.user import get_course_social_stats
-from lms.lib.comment_client.thread import get_course_thread_stats
-from lms.lib.comment_client.utils import CommentClientRequestError
 
-from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -69,52 +69,57 @@ def _get_content_children(content, content_type=None):
     return children
 
 
-def _serialize_content(request, content_key, content_descriptor):
+def _serialize_content(request, course_key, content_descriptor):
     """
     Loads the specified content object into the response dict
     This should probably evolve to use DRF serializers
     """
-    data = {}
-    if hasattr(content_descriptor, 'id') and unicode(content_descriptor.id) == unicode(content_key):
-        content_id = unicode(content_key)
-    else:
-        content_id = unicode(content_descriptor.scope_ids.usage_id)
-    data['id'] = unicode(content_id)
-
-    if hasattr(content_descriptor, 'display_name'):
-        data['name'] = content_descriptor.display_name
-
-    data['category'] = content_descriptor.location.category
-
     protocol = 'http'
     if request.is_secure():
         protocol = protocol + 's'
-    content_uri = '{}://{}/api/server/courses/{}'.format(
+
+    base_content_uri = '{}://{}/api/server/courses'.format(
         protocol,
-        request.get_host(),
-        unicode(content_key)
+        request.get_host()
     )
 
-    # Some things we do only if the content object is a course
-    if (unicode(content_key) == content_id):
-        data['number'] = content_descriptor.location.course
-        data['org'] = content_descriptor.location.org
+    data = {}
 
-    # Other things we do only if the content object is not a course
-    else:
-        content_uri = '{}/content/{}'.format(content_uri, content_id)
-    data['uri'] = content_uri
+    if hasattr(content_descriptor, 'display_name'):
+        data['name'] = content_descriptor.display_name
 
     if hasattr(content_descriptor, 'due'):
         data['due'] = content_descriptor.due
 
     data['start'] = getattr(content_descriptor, 'start', None)
     data['end'] = getattr(content_descriptor, 'end', None)
+
+    data['category'] = content_descriptor.location.category
+
+    # Some things we only do if the content object is a course
+    if hasattr(content_descriptor, 'category') and content_descriptor.category == 'course':
+        content_id = unicode(content_descriptor.id)
+        content_uri = '{}/{}'.format(base_content_uri, content_id)
+        data['number'] = content_descriptor.location.course
+        data['org'] = content_descriptor.location.org
+
+    # Other things we do only if the content object is not a course
+    else:
+        content_id = unicode(content_descriptor.location)
+        # Need to use the CourseKey here, which will possibly result in a different (but valid)
+        # URI due to the change in key formats during the "opaque keys" transition
+        content_uri = '{}/{}/content/{}'.format(base_content_uri, unicode(course_key), content_id)
+
+    data['id'] = unicode(content_id)
+    data['uri'] = content_uri
+
+    # Include any additional fields requested by the caller
     include_fields = request.QUERY_PARAMS.get('include_fields', None)
     if include_fields:
         include_fields = include_fields.split(',')
         for field in include_fields:
             data[field] = getattr(content_descriptor, field, None)
+
     return data
 
 
@@ -360,8 +365,8 @@ def _get_course_data(request, course_key, course_descriptor, depth=0):
             course_descriptor
         )
     base_uri_without_qs = generate_base_uri(request, True)
-    if unicode(course_key) not in base_uri_without_qs:
-        base_uri_without_qs = '{}/{}'.format(base_uri_without_qs, unicode(course_key))
+    if unicode(course_descriptor.id) not in base_uri_without_qs:
+        base_uri_without_qs = '{}/{}'.format(base_uri_without_qs, unicode(course_descriptor.id))
     data['course_image_url'] = course_image_url(course_descriptor)
     data['resources'] = []
     resource_uri = '{}/content/'.format(base_uri_without_qs)
