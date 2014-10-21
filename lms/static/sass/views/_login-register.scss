@@ -3,8 +3,9 @@
 
 .login-register {
     @include box-sizing(border-box);
-    @include span-columns(6);
-    @include shift(3);
+    @include span-columns(4);
+    width: 100%;
+    max-width: 1200px;
 
     /* Temp. fix until applied globally */
     & > {
@@ -81,9 +82,17 @@
         display: inline;
     }
 
+    @include media( $tablet ) {
+        @include span-columns(6);
+        @include shift(1);
+    }
 
-
+    @include media( $desktop ) {
+        @include span-columns(6);
+        @include shift(3);
+    }
 }
+
 
     /*// individual fields
     .field {
