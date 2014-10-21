@@ -1,9 +1,15 @@
 // lms - views - login/register view
 // ====================
-.login-register{
 
+.login-register {
+    @include box-sizing(border-box);
     @include span-columns(6);
     @include shift(3);
+
+    /* Temp. fix until applied globally */
+    & > {
+        @include box-sizing(border-box);
+    }
 
     input:-webkit-autofill {
         -webkit-box-shadow:0 0 0 50px white inset;
@@ -17,15 +23,159 @@
 
     .form-field {
         width: 100%;
+        margin: 0 0 $baseline 0;
+
+        /** FROM _accounts.scss - start **/
+        label, input, textarea {
+            border-radius: 0;
+            display: block;
+            height: auto;
+            font-family: $sans-serif;
+            font-style: normal;
+            font-weight: 500;
+            color: $base-font-color;
+        }
+
+        label {
+            @include transition(color 0.15s ease-in-out 0s);
+            margin: 0 0 ($baseline/4) 0;
+            color: tint($black, 20%);
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            margin: 0;
+            padding: ($baseline/2) ($baseline*.75);
+
+            &.long {
+                width: 100%;
+            }
+
+            &.short {
+                width: 25%;
+            }
+        }
+
+        textarea.long {
+            height: ($baseline*5);
+        }
+
+        select {
+            width: 100%;
+        }
+        /** FROM _accounts.scss - end **/
     }
 
-    .input-block,
+    .input-block {
+        width: 100%;
+    }
+
     .desc {
         display: block;
+        /*@extend %body-text-emphasized;*/
+        margin-bottom: $baseline;
     }
 
     .input-inline {
         display: inline;
     }
 
+
+
 }
+
+    /*// individual fields
+    .field {
+
+
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      // types - password
+
+      // types - select
+
+
+      // types - checkboxes/radio buttons
+      &.checkbox {
+
+        input[type="checkbox"] {
+          display: inline-block;
+          width: auto;
+          @include margin-right($baseline/4);
+        }
+
+        label {
+          display: inline-block;
+        }
+      }
+
+      // states - all
+      &.disabled,
+      &.submitted {
+        color: rgba(0,0,0,.25);
+
+        label {
+          cursor: text;
+
+          &:after {
+            margin-left: ($baseline/4);
+          }
+        }
+
+        textarea, input {
+          background: $container-bg;
+          color: rgba(0,0,0,.25);
+        }
+      }
+
+      // states - focused
+      &.is-focused {
+
+        label {
+          color: saturate($link-color-d1,15%);
+        }
+
+        .tip {
+          color: saturate($link-color-d1,15%);
+        }
+      }
+
+      // states - disabled
+      &.disabled {
+        label:after {
+          color: rgba(0,0,0,.35);
+          content: "(Disabled Currently)";
+        }
+      }
+
+      &.error {
+
+        label {
+          color: $red;
+        }
+
+        input, textarea {
+          border-color: tint($red,50%);
+        }
+      }
+
+      &.required {
+
+        label {
+          font-weight: 600;
+
+          a {
+            font-weight: 600 !important;
+          }
+        }
+
+        label:after {
+          margin-left: ($baseline/4);
+          content: "*";
+        }
+      }
+    }*/
