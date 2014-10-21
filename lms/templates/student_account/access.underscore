@@ -1,12 +1,12 @@
 <header class="js-login-register-header">
-    <h1>Welcome!</h1>
-    <p>Please log in to continue</p>
+    <h1 class="headline">Welcome!</h1>
+    <p class="tagline">Please log in to continue</p>
 </header>
 
 <section class="form-type">
     <h2>
         <input type="radio" name="form" id="register-option" value="register" class="form-toggle" <% if ( mode === 'register' ) { %>checked<% } %> >
-        <label for"register-option">I am a new user</label>
+        <label for"register-option" class="form-label">I am a new user</label>
     </h2>
     <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden<% } %>"></div>
 </section>
@@ -14,7 +14,7 @@
 <section class="form-type">
     <h2>
         <input type="radio" name="form" id="login-option" value="login" class="form-toggle" <% if ( mode === 'login' ) { %>checked<% } %>>
-        <label for="login-option">I am a returning user with an edX account</label>
+        <label for="login-option" class="form-label">I am a returning user with an edX account</label>
     </h2>
     <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden<% } %>"></div>
 </section>
