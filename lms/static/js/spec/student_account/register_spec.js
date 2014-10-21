@@ -1,8 +1,13 @@
-define(['js/student_account/views/RegisterView'],
-    function() {
-        'use strict';
-
+define(['js/common_helpers/template_helpers', 'js/student_account/views/RegisterView'],
+    function(TemplateHelpers) {
         describe("edx.student.account.RegisterView", function() {
+            'use strict';
+
+            beforeEach(function() {
+                setFixtures("<div></div>");
+                TemplateHelpers.installTemplate("templates/student_account/register");
+            });
+
             it("registers a new user", function() {
                 // TODO
             });
