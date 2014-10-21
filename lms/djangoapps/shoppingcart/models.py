@@ -254,7 +254,7 @@ class Order(models.Model):
             for registration_code in registration_codes:
                 redemption_url = reverse('register_code_redemption', args=[registration_code.code])
                 url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url)
-                csv_writer.writerow([course.display_name, registration_code.code, url])
+                csv_writer.writerow([unicode(course.display_name).encode("utf-8"), registration_code.code, url])
 
         return csv_file, course_info
 
