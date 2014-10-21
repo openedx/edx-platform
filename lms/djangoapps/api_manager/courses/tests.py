@@ -2095,6 +2095,11 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(len(response.data['modules_completed']), 5)
         total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
         self.assertEqual(total_modules_completed, 4)
+        self.assertEqual(len(response.data['active_users']), 5)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        self.assertEqual(total_active, 5)
+        self.assertEqual(response.data['users_enrolled'][0][1], 25)
+
 
         # get modules completed for first 5 days
         start_date = datetime.now().date() + relativedelta(days=-USER_COUNT)
@@ -2112,7 +2117,7 @@ class CoursesApiTests(ModuleStoreTestCase):
 
         # metrics with weeks as interval
         end_date = datetime.now().date()
-        start_date = end_date + relativedelta(days=-10)
+        start_date = end_date + relativedelta(weeks=-2)
         course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&' \
                              'interval=weeks'.format(self.base_courses_uri,
                                                      test_course_id,
@@ -2121,9 +2126,9 @@ class CoursesApiTests(ModuleStoreTestCase):
 
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 2)
-        self.assertEqual(len(response.data['users_started']), 2)
-        self.assertEqual(len(response.data['users_completed']), 2)
+        self.assertGreaterEqual(len(response.data['users_not_started']), 2)
+        self.assertGreaterEqual(len(response.data['users_started']), 2)
+        self.assertGreaterEqual(len(response.data['users_completed']), 2)
 
         # metrics with months as interval
         start_date = end_date + relativedelta(months=-3)
@@ -2156,6 +2161,7 @@ class CoursesApiTests(ModuleStoreTestCase):
 
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 400)
+
 
     def test_course_workgroups_list(self):
         projects_uri = self.base_projects_uri
