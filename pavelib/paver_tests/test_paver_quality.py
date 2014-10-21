@@ -1,9 +1,12 @@
-import unittest
-import pavelib.quality
-import tempfile
 import os
+import tempfile
+import unittest
+from mock import patch
 from ddt import ddt, file_data
 
+import pavelib.quality
+import paver.easy
+from paver.easy import BuildFailure
 
 @ddt
 class TestPaverQualityViolations(unittest.TestCase):
@@ -43,3 +46,79 @@ class TestPaverQualityViolations(unittest.TestCase):
 
     def tearDown(self):
         os.remove(self.f.name)
+
+
+class TestPaverRunQuality(unittest.TestCase):
+    """
+    For testing the paver run_quality task
+    """
+
+    def setUp(self):
+
+        # mock the @needs decorator to skip it
+        self._mock_paver_needs = patch.object(pavelib.quality.run_quality, 'needs').start()
+        self._mock_paver_needs.return_value = 0
+        self._mock_paver_sh = patch('pavelib.quality.sh').start()
+
+    def test_failure_on_diffquality_pep8(self):
+        """
+        Diff-quality is run 4x in the run_quality command (first pep8,
+        then pylint). If the first comparison fails, run_quality should still
+        continue to evaluate pylint.
+        """
+
+        # Underlying sh call must fail when it is running the pep8 diff-quality task
+        # See the CustomShMock object for more info.
+        self._mock_paver_sh.side_effect = CustomShMock().fail_on_pep8
+        with self.assertRaises(SystemExit):
+            pavelib.quality.run_quality("")
+            self.assertRaises(BuildFailure)
+        self.assertEqual(self._mock_paver_sh.call_count, 4)
+
+    def test_failure_on_diffquality_pylint(self):
+        """
+        If diff-quality fails on pylint, the paver task should also fail
+        """
+
+        # Underlying sh call must fail when it is running the pep8 diff-quality task
+        # See the CustomShMock object for more info.
+        self._mock_paver_sh.side_effect = CustomShMock().fail_on_pylint
+        with self.assertRaises(SystemExit):
+            pavelib.quality.run_quality("")
+            self.assertRaises(BuildFailure)
+        self.assertEqual(self._mock_paver_sh.call_count, 4)
+
+    def test_no_diff_quality_failures(self):
+        # Assert nothing is raised
+        pavelib.quality.run_quality("")
+
+
+class CustomShMock(object):
+    """
+    Diff-quality makes a number of sh calls. None of those calls should be made during tests; however, some
+    of them need to have certain responses.
+    """
+
+    def fail_on_pep8(self, arg):
+        """
+        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+        is going to fail when we pass in a percentage ("p") requirement.
+        """
+        # Condition is for the sh calls that contain both 'pep8' and 'html'
+        if "pep8" in arg and "html" not in arg:
+            # Essentially mock diff-quality exiting with 1
+            paver.easy.sh("exit 1")
+        else:
+            return
+
+    def fail_on_pylint(self, arg):
+        """
+        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+        is going to fail when we pass in a percentage ("p") requirement.
+        """
+        # Condition is for the sh calls that contain both 'pep8' and 'html'
+        if "pylint" in arg and "html" not in arg:
+            # Essentially mock diff-quality exiting with 1
+            paver.easy.sh("exit 1")
+        else:
+            return
