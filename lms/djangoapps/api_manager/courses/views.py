@@ -1769,14 +1769,15 @@ class CoursesMetricsSocial(SecureListAPIView):
     """
     ### The CoursesMetricsSocial view allows clients to query about the activity of all users in the
     forums
-    - URI: ```/api/users/{course_id}/metrics/social/```
-    - GET: Returns a list of social metrics for users in the specified course
+    - URI: ```/api/users/{course_id}/metrics/social/?organization={org_id}```
+    - GET: Returns a list of social metrics for users in the specified course. Results can be filtered by organization
     """
 
     def get(self, request, course_id): # pylint: disable=W0613
 
         try:
             slash_course_id = get_course_key(course_id, slashseparated=True)
+            organization = request.QUERY_PARAMS.get('organization', None)
             # the forum service expects the legacy slash separated string format
             data = get_course_social_stats(slash_course_id)
             course_key = get_course_key(course_id)
@@ -1787,7 +1788,18 @@ class CoursesMetricsSocial(SecureListAPIView):
             for user_id in exclude_users:
                 if str(user_id) in data:
                     del data[str(user_id)]
-            total_enrollments = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
+            enrollment_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+            if organization:
+                enrollment_qs = enrollment_qs.filter(organizations=organization)
+                users_in_org = enrollment_qs.values_list('id', flat=True)
+                # extract org users
+                org_data = {}
+                for user_id in users_in_org:
+                    if str(user_id) in data:
+                        org_data.update({str(user_id): data[str(user_id)]})
+                data = org_data
+
+            total_enrollments = enrollment_qs.count()
             data = {'total_enrollments': total_enrollments, 'users': data}
             http_status = status.HTTP_200_OK
         except CommentClientRequestError, e:
