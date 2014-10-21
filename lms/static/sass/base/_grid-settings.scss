@@ -1,7 +1,10 @@
-/* Override the default global box-sizing */
 @import "neat/neat-helpers"; // or "neat-helpers" when in Rails
 
+/* Change the grid settings */
+$max-width: 1200px;
+/* Override the default global box-sizing */
 $border-box-sizing: false;
+
 
 /* Breakpoints */
 $mobile: new-breakpoint(max-width 320px 4);
