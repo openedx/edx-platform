@@ -1,8 +1,13 @@
-define(['js/student_account/views/LoginView'],
-    function() {
-        'use strict';
-
+define(['js/common_helpers/template_helpers', 'js/student_account/views/LoginView'],
+    function(TemplateHelpers) {
         describe("edx.student.account.LoginView", function() {
+            'use strict';
+
+            beforeEach(function() {
+                setFixtures("<div></div>");
+                TemplateHelpers.installTemplate("templates/student_account/login");
+            });
+
             it("logs the user in", function() {
                 // TODO
             });

@@ -9,7 +9,7 @@ var edx = edx || {};
     edx.student.account.AccessView = Backbone.View.extend({
         el: '#login-and-registration-container',
 
-        tpl: $('#access-tpl').html(),
+        tpl: '#access-tpl',
 
         events: {
             'change .form-toggle': 'toggleForm'
@@ -25,9 +25,8 @@ var edx = edx || {};
         activeForm: '',
 
         initialize: function( obj ) {
+            this.tpl = $(this.tpl).html();
             this.activeForm = obj.mode;
-            console.log(obj);
-
             this.render();
         },
 

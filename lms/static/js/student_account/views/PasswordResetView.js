@@ -11,7 +11,7 @@ var edx = edx || {};
 
         el: '#password-reset-wrapper',
 
-        tpl: $('#password_reset-tpl').html(),
+        tpl: '#password_reset-tpl',
 
         fieldTpl: $('#form_field-tpl').html(),
 
@@ -35,6 +35,7 @@ var edx = edx || {};
                 restrictions: []
             }]);
 
+            this.tpl = $(this.tpl).html();
             this.initModel();
             this.render( fields );
         },
