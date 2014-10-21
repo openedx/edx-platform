@@ -6,13 +6,15 @@ from django.conf import settings
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 )
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response, render_to_string
-import third_party_auth
 from microsite_configuration import microsite
+import third_party_auth
 
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
@@ -58,23 +60,16 @@ def login_and_registration_form(request, initial_mode="login"):
         initial_mode (string): Either "login" or "registration".
 
     """
+    # If we're already logged in, redirect to the dashboard
+    if request.user.is_authenticated():
+        return redirect(reverse('dashboard'))
+
+    # Otherwise, render the combined login/registration page
     context = {
         'disable_courseware_js': True,
         'initial_mode': initial_mode,
-        'third_party_auth_providers': json.dumps([])
+        'third_party_auth': json.dumps(_third_party_auth_context(request)),
     }
-
-    if microsite.get_value("ENABLE_THIRD_PARTY_AUTH", settings.FEATURES.get("ENABLE_THIRD_PARTY_AUTH")):
-        context["third_party_auth_providers"] = json.dumps([
-            {
-                "name": enabled.NAME,
-                "icon_class": enabled.ICON_CLASS,
-                "login_url": third_party_auth.pipeline.get_login_url(
-                   enabled.NAME, third_party_auth.pipeline.AUTH_ENTRY_LOGIN
-                ),
-            }
-            for enabled in third_party_auth.provider.Registry.enabled()
-        ])
 
     return render_to_response('student_account/login_and_register.html', context)
 
@@ -266,3 +261,44 @@ def password_change_request_handler(request):
         return HttpResponse(status=200)
     else:
         return HttpResponseBadRequest("No email address provided.")
+
+
+def _third_party_auth_context(request):
+    """Context for third party auth providers and the currently running pipeline.
+
+    Arguments:
+        request (HttpRequest): The request, used to determine if a pipeline
+            is currently running.
+
+    Returns:
+        dict
+
+    """
+    context = {
+        "currentProvider": None,
+        "providers": []
+    }
+
+    if third_party_auth.is_enabled():
+        context["providers"] = [
+            {
+                "name": enabled.NAME,
+                "iconClass": enabled.ICON_CLASS,
+                "loginUrl": third_party_auth.pipeline.get_login_url(
+                   enabled.NAME, third_party_auth.pipeline.AUTH_ENTRY_LOGIN_2
+                ),
+                "registerUrl": third_party_auth.pipeline.get_login_url(
+                    enabled.NAME, third_party_auth.pipeline.AUTH_ENTRY_REGISTER_2
+                )
+            }
+            for enabled in third_party_auth.provider.Registry.enabled()
+        ]
+
+        running_pipeline = third_party_auth.pipeline.get(request)
+        if running_pipeline is not None:
+            current_provider = third_party_auth.provider.Registry.get_by_backend_name(
+                running_pipeline.get('backend')
+            )
+            context["currentProvider"] = current_provider.NAME
+
+    return context

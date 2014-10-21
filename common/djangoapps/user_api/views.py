@@ -24,6 +24,8 @@ from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from edxmako.shortcuts import marketing_link
 
+import third_party_auth
+from microsite_configuration import microsite
 from user_api.api import account as account_api, profile as profile_api
 from user_api.helpers import FormDescription, shim_student_view, require_post_params
 
@@ -111,6 +113,8 @@ class LoginSessionView(APIView):
         Returns:
             HttpResponse: 200 on success
             HttpResponse: 400 if the request is not valid.
+            HttpResponse: 401 if the user successfully authenticated with a third-party
+                provider but does not have a linked account.
             HttpResponse: 403 if authentication failed.
             HttpResponse: 302 if redirecting to another page.
 
@@ -189,6 +193,7 @@ class RegistrationView(APIView):
 
         """
         form_desc = FormDescription("post", reverse("user_api_registration"))
+        self._apply_third_party_auth_overrides(request, form_desc)
 
         # Default fields are always required
         for field_name in self.DEFAULT_FIELDS:
@@ -407,6 +412,53 @@ class RegistrationView(APIView):
         return (
             [("", "--")] + list(options)
         )
+
+    def _apply_third_party_auth_overrides(self, request, form_desc):
+        """Modify the registration form if the user has authenticated with a third-party provider.
+
+        If a user has successfully authenticated with a third-party provider,
+        but does not yet have an account with EdX, we want to fill in
+        the registration form with any info that we get from the
+        provider.
+
+        This will also hide the password field, since we assign users a default
+        (random) password on the assumption that they will be using
+        third-party auth to log in.
+
+        Arguments:
+            request (HttpRequest): The request for the registration form, used
+                to determine if the user has successfully authenticated
+                with a third-party provider.
+
+            form_desc (FormDescription): The registration form description
+
+        """
+        if third_party_auth.is_enabled():
+            running_pipeline = third_party_auth.pipeline.get(request)
+            if running_pipeline:
+                current_provider = third_party_auth.provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+
+                # Override username / email / full name
+                field_overrides = current_provider.get_register_form_data(
+                    running_pipeline.get('kwargs')
+                )
+
+                for field_name in self.DEFAULT_FIELDS:
+                    if field_name in field_overrides:
+                        form_desc.override_field_properties(
+                            field_name, default=field_overrides[field_name]
+                        )
+
+                # Hide the password field
+                form_desc.override_field_properties(
+                    "password",
+                    default="",
+                    field_type="hidden",
+                    required=False,
+                    label="",
+                    instructions="",
+                    restrictions={}
+                )
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):

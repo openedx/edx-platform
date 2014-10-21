@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 from unittest import SkipTest, skipUnless
 import ddt
 from pytz import UTC
-from mock import patch
+import mock
 
 from user_api.api import account as account_api, profile as profile_api
 
@@ -21,6 +21,7 @@ from student.tests.factories import UserFactory
 from user_api.tests.factories import UserPreferenceFactory
 from django_comment_common import models
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from third_party_auth.tests.testutil import simulate_running_pipeline
 
 from user_api.tests.test_constants import SORTED_COUNTRIES
 
@@ -808,6 +809,82 @@ class RegistrationViewTest(ApiTestCase):
             }
         )
 
+    def test_register_form_third_party_auth_running(self):
+        no_extra_fields_setting = {}
+
+        with simulate_running_pipeline(
+            "user_api.views.third_party_auth.pipeline",
+            "google-oauth2", email="bob@example.com",
+            fullname="Bob", username="Bob123"
+        ):
+            # Password field should be hidden
+            self._assert_reg_field(
+                no_extra_fields_setting,
+                {
+                    "name": "password",
+                    "default": "",
+                    "type": "hidden",
+                    "required": False,
+                    "label": "",
+                    "placeholder": "",
+                    "instructions": "",
+                    "restrictions": {},
+                }
+            )
+
+            # Email should be filled in
+            self._assert_reg_field(
+                no_extra_fields_setting,
+                {
+                    u"name": u"email",
+                    u"default": u"bob@example.com",
+                    u"type": u"text",
+                    u"required": True,
+                    u"label": u"E-mail",
+                    u"placeholder": u"example: username@domain.com",
+                    u"instructions": u"This is the e-mail address you used to register with edX",
+                    u"restrictions": {
+                        u"min_length": 3,
+                        u"max_length": 254
+                    },
+                }
+            )
+
+            # Full name should be filled in
+            self._assert_reg_field(
+                no_extra_fields_setting,
+                {
+                    u"name": u"name",
+                    u"default": u"Bob",
+                    u"type": u"text",
+                    u"required": True,
+                    u"label": u"Full Name",
+                    u"placeholder": u"",
+                    u"instructions": u"Needed for any certificates you may earn",
+                    u"restrictions": {
+                        "max_length": 255,
+                    }
+                }
+            )
+
+            # Username should be filled in
+            self._assert_reg_field(
+                no_extra_fields_setting,
+                {
+                    u"name": u"username",
+                    u"default": u"Bob123",
+                    u"type": u"text",
+                    u"required": True,
+                    u"label": u"Public Username",
+                    u"placeholder": u"",
+                    u"instructions": u"Will be shown in any discussions or forums you participate in (cannot be changed)",
+                    u"restrictions": {
+                        u"min_length": 2,
+                        u"max_length": 30,
+                    }
+                }
+            )
+
     def test_register_form_level_of_education(self):
         self._assert_reg_field(
             {"level_of_education": "optional"},
@@ -950,7 +1027,7 @@ class RegistrationViewTest(ApiTestCase):
     @override_settings(
         MKTG_URLS={"ROOT": "https://www.test.com/", "HONOR": "honor"},
     )
-    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
+    @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_honor_code_mktg_site_enabled(self):
         self._assert_reg_field(
             {"honor_code": "required"},
@@ -967,7 +1044,7 @@ class RegistrationViewTest(ApiTestCase):
         )
 
     @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor"})
-    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
+    @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
     def test_registration_honor_code_mktg_site_disabled(self):
         self._assert_reg_field(
             {"honor_code": "required"},
@@ -988,7 +1065,7 @@ class RegistrationViewTest(ApiTestCase):
         "HONOR": "honor",
         "TOS": "tos",
     })
-    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
+    @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
     def test_registration_separate_terms_of_service_mktg_site_enabled(self):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"
@@ -1022,7 +1099,7 @@ class RegistrationViewTest(ApiTestCase):
         )
 
     @override_settings(MKTG_URLS_LINK_MAP={"HONOR": "honor", "TOS": "tos"})
-    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
+    @mock.patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
     def test_registration_separate_terms_of_service_mktg_site_disabled(self):
         # Honor code field should say ONLY honor code,
         # not "terms of service and honor code"

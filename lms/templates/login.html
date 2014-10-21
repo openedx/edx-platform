@@ -4,6 +4,7 @@
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
+<%! import third_party_auth %>
 <%! from third_party_auth import provider, pipeline %>
 
 <%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
@@ -48,8 +49,16 @@
 
       $('#login-form').on('ajax:error', function(event, request, status_string) {
         toggleSubmitButton(true);
-        $('.third-party-signin.message').addClass('is-shown').focus();
-        $('.third-party-signin.message .instructions').html(request.responseText);
+
+        if (request.status === 401) {
+          $('.message.submission-error').removeClass('is-shown');
+          $('.third-party-signin.message').addClass('is-shown').focus();
+          $('.third-party-signin.message .instructions').html(request.responseText);
+        } else {
+          $('.third-party-signin.message').removeClass('is-shown');
+          $('.message.submission-error').addClass('is-shown').focus();
+          $('.message.submission-error').html(gettext("Your request could not be completed.  Please try again."));
+        }
       });
 
       $('#login-form').on('ajax:success', function(event, json, xhr) {
@@ -194,7 +203,7 @@
       </div>
     </form>
 
-    % if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')):
+    % if third_party_auth.is_enabled():
 
       <span class="deco-divider">
         ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.

@@ -5,6 +5,22 @@
             <p>Email or password is incorrent. <a href="#">Forgot password?</a></p>
         </div>
     </div>
+    <div class="already-authenticated-msg hidden">
+        <% if (currentProvider) { %>
+            <p class="instructions">
+            You've successfully logged into <%- currentProvider %>, but you need to link
+            your account.  Please click "I am a returning user" to create
+            an EdX account.
+            </p>
+        <% } %>
+    </div>
     <%= fields %>
     <button class="action action-primary action-update js-login">Log in</button>
 </form>
+<% for (var i=0; i < providers.length; i++) {
+    var provider = providers[i];
+%>
+    <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.loginUrl %>">
+        <span class="icon <%- provider.iconClass %>"></span>Sign in with <%- provider.name %>
+    </button>
+<% } %>
