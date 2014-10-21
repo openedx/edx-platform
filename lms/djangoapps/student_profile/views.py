@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
 from user_api.api import profile as profile_api
 from lang_pref import LANGUAGE_KEY, api as language_api
-from third_party_auth import pipeline
+import third_party_auth
 
 
 @login_required
@@ -60,8 +60,8 @@ def _get_profile(request):
         'disable_courseware_js': True
     }
 
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
-        context['provider_user_states'] = pipeline.get_provider_user_states(user)
+    if third_party_auth.is_enabled():
+        context['provider_user_states'] = third_party_auth.pipeline.get_provider_user_states(user)
 
     return render_to_response('student_profile/index.html', context)
 

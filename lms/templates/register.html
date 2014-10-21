@@ -12,6 +12,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
+<%! import third_party_auth %>
 <%! from third_party_auth import pipeline, provider %>
 <%! import calendar %>
 
@@ -116,7 +117,7 @@
         <ul class="message-copy"> </ul>
       </div>
 
-      % if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')):
+      % if third_party_auth.is_enabled():
 
         % if not running_pipeline:
 
@@ -182,7 +183,7 @@
             <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
 
-          % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and running_pipeline:
+          % if third_party_auth.is_enabled() and running_pipeline:
 
           <li class="is-disabled field optional password" id="field-password" hidden>
             <label for="password">${_('Password')}</label>

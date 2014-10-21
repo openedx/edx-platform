@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.template import RequestContext %>
+<%! import third_party_auth %>
 <%! from third_party_auth import pipeline %>
 <%! from microsite_configuration import microsite %>
 
@@ -95,7 +96,7 @@
         <%include file='dashboard/_dashboard_info_language.html' />
         %endif
 
-        % if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')):
+        % if third_party_auth.is_enabled():
         <li class="controls--account">
           <span class="title">
             ## Translators: this section lists all the third-party authentication providers (for example, Google and LinkedIn) the user can link with or unlink from their edX account.

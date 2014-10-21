@@ -16,15 +16,19 @@ var edx = edx || {};
         fieldTpl: $('#form_field-tpl').html(),
 
         events: {
-            'click .js-register': 'submitForm'
+            'click .js-register': 'submitForm',
+            'click .login-provider': 'thirdPartyAuth'
         },
 
         errors: [],
 
         $form: {},
 
-        initialize: function() {
+        initialize: function( thirdPartyAuthInfo ) {
             this.tpl = $(this.tpl).html();
+
+            this.providers = thirdPartyAuthInfo.providers || [];
+            this.currentProvider = thirdPartyAuthInfo.currentProvider || "";
             this.getInitialData();
         },
 
@@ -33,7 +37,9 @@ var edx = edx || {};
             var fields = html || '';
 
             $(this.el).html( _.template( this.tpl, {
-                fields: fields
+                fields: fields,
+                currentProvider: this.currentProvider,
+                providers: this.providers
             }));
 
             this.postRender();
@@ -81,8 +87,10 @@ var edx = edx || {};
                 i,
                 len = data.length,
                 fieldTpl = this.fieldTpl;
-console.log('buildForm ', data);
             for ( i=0; i<len; i++ ) {
+                // "default" is reserved in JavaScript
+                data[i].value = data[i]["default"];
+
                 html.push( _.template( fieldTpl, $.extend( data[i], {
                     form: 'register'
                 }) ) );
@@ -139,6 +147,16 @@ console.log(this.model);
             } else {
                 console.log('here are the errors ', this.errors);
                 this.toggleErrorMsg( true );
+            }
+        },
+
+        thirdPartyAuth: function( event ) {
+            var providerUrl = $(event.target).data("provider-url") || "";
+            if (providerUrl) {
+                window.location.href = providerUrl;
+            } else {
+                // TODO -- error handling here
+                console.log("No URL available for third party auth provider");
             }
         },
 

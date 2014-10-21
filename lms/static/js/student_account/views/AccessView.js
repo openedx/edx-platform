@@ -26,7 +26,13 @@ var edx = edx || {};
 
         initialize: function( obj ) {
             this.tpl = $(this.tpl).html();
-            this.activeForm = obj.mode;
+            this.activeForm = obj.mode || 'login';
+            this.thirdPartyAuth = obj.thirdPartyAuth || {
+                currentProvider: null,
+                providers: []
+            };
+            console.log(obj);
+
             this.render();
         },
 
@@ -48,12 +54,12 @@ var edx = edx || {};
 
         loadForm: function( type ) {
             if ( type === 'login' ) {
-                this.subview.login =  new edx.student.account.LoginView();
+                this.subview.login =  new edx.student.account.LoginView( this.thirdPartyAuth );
 
                 // Listen for 'password-help' event to toggle sub-views
                 this.listenTo( this.subview.login, 'password-help', this.resetPassword );
             } else if ( type === 'register' ) {
-                this.subview.register = new edx.student.account.RegisterView();
+                this.subview.register = new edx.student.account.RegisterView( this.thirdPartyAuth );
             } else if ( type === 'reset' ) {
                 this.subview.passwordHelp = new edx.student.account.PasswordResetView();
             }

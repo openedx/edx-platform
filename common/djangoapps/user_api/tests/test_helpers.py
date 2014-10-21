@@ -144,6 +144,15 @@ class StudentViewShimTest(TestCase):
         self.assertNotIn("enrollment_action", self.captured_request.POST)
         self.assertNotIn("course_id", self.captured_request.POST)
 
+    @ddt.data(True, False)
+    def test_preserve_401_status(self, check_logged_in):
+        view = self._shimmed_view(
+            HttpResponse(status=401),
+            check_logged_in=check_logged_in
+        )
+        response = view(HttpRequest())
+        self.assertEqual(response.status_code, 401)
+
     def test_non_json_response(self):
         view = self._shimmed_view(HttpResponse(content="Not a JSON dict"))
         response = view(HttpRequest())
@@ -160,7 +169,7 @@ class StudentViewShimTest(TestCase):
         )
         response = view(HttpRequest())
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.content, "/redirect")
+        self.assertEqual(response['Location'], "/redirect")
 
     def test_error_from_json(self):
         view = self._shimmed_view(
@@ -180,8 +189,13 @@ class StudentViewShimTest(TestCase):
         response = view(HttpRequest())
         self.assertEqual(response["test-header"], "test")
 
-    def _shimmed_view(self, response):
+    def test_check_logged_in(self):
+        view = self._shimmed_view(HttpResponse(), check_logged_in=True)
+        response = view(HttpRequest())
+        self.assertEqual(response.status_code, 403)
+
+    def _shimmed_view(self, response, check_logged_in=False):
         def stub_view(request):
             self.captured_request = request
             return response
-        return shim_student_view(stub_view)
+        return shim_student_view(stub_view, check_logged_in=check_logged_in)

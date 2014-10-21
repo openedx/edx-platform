@@ -1,3 +1,18 @@
+<% if (currentProvider) { %>
+    <p class="instructions">
+      You've successfully signed in with <strong><%- currentProvider %></strong>.<br />
+      We just need a little more information before you start learning with edX.
+    </p>
+<% } else {
+    for (var i=0; i < providers.length; i++) {
+        var provider = providers[i];
+%>
+    <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.registerUrl %>">
+        <span class="icon <%- provider.iconClass %>"></span>Sign up with <%- provider.name %>
+    </button>
+<% }
+} %>
+
 <form id="register" autocomplete="off">
     <div class="error-msg hidden">
         <h4>An error occured in your registration.</h4>
