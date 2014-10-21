@@ -464,7 +464,7 @@ def generate_email(start_ref, end_ref, release_date=None):
         changes on the staging servers before the code is released. Please go
         to the release page to do so:
 
-        https://edx-wiki.atlassian.net/wiki/display/ENG/Release+Page%3A+{date}
+        https://openedx.atlassian.net/wiki/display/ENG/{date}+Release
 
         The staging server is: https://www.stage.edx.org
 
