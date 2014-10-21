@@ -228,8 +228,9 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'dummy_handler'
             ).content,
             json.dumps({
-                'success': 'Submission aborted! Maximum %d files may be submitted at once' %
-                           settings.MAX_FILEUPLOADS_PER_INPUT
+                'success': False,
+                'msg': 'Submission aborted! Maximum %d files may be submitted at once' %
+                       settings.MAX_FILEUPLOADS_PER_INPUT
             })
         )
 
@@ -248,8 +249,9 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'dummy_handler'
             ).content,
             json.dumps({
-                'success': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
-                           (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
+                'success': False,
+                'msg': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
+                       (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
             })
         )
 

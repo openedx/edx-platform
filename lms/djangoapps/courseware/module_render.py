@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
@@ -741,7 +742,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     files = request.FILES or {}
     error_msg = _check_files_limits(files)
     if error_msg:
-        return HttpResponse(json.dumps({'success': error_msg}))
+        return HttpResponse(json.dumps({'success': False, 'msg': error_msg}))
 
     try:
         descriptor = modulestore().get_item(usage_key)
@@ -828,14 +829,14 @@ def _check_files_limits(files):
 
         # Check number of files submitted
         if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-            msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
+            msg = _('Submission aborted! Maximum %d files may be submitted at once') % \
                   settings.MAX_FILEUPLOADS_PER_INPUT
             return msg
 
         # Check file sizes
         for inputfile in inputfiles:
             if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
-                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
+                msg = _('Submission aborted! Your file "%s" is too large (max size: %d MB)') % \
                       (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                 return msg
 

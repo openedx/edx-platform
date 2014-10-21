@@ -222,3 +222,11 @@ msgstr "メール配信不能"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your registered Email address might be wrong or denied by Spam-filter"
 msgstr "登録されたメールアドレスが間違っているか迷惑メールフィルタによって拒否されている可能性があります"
+
+#: lms/djangoapps/courseware/module_render.py
+msgid "Submission aborted! Maximum %d files may be submitted at once"
+msgstr "一度にアップロードできるファイルは%d個までです"
+
+#: lms/djangoapps/courseware/module_render.py
+msgid "Submission aborted! Your file \"%s\" is too large (max size: %d MB)"
+msgstr "%s のファイルサイズが制限を超過しています(最大%dMB)"
