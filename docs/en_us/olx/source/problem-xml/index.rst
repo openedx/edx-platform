@@ -1,4 +1,4 @@
-.. _Problems and Tools:
+.. _Problems:
 
 #################################
 Problems

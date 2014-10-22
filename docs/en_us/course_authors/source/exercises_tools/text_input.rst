@@ -229,7 +229,7 @@ Template
 
   <problem>
       <p>Problem text</p>
-      <stringresponse answer="**.Correct answer 1.**" type="ci regexp">
+      <stringresponse answer="Correct answer 1" type="ci regexp">
           <additional_answer>Correct answer 2</additional_answer>
           <additional_answer>Correct answer 3</additional_answer>
           <textline size="20" label="label text"/>
