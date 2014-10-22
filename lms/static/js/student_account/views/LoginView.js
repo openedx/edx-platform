@@ -13,7 +13,7 @@ var edx = edx || {};
 
         tpl: '#login-tpl',
 
-        fieldTpl: $('#form_field-tpl').html(),
+        fieldTpl: '#form_field-tpl',
 
         events: {
             'click .js-login': 'submitForm',
@@ -27,6 +27,7 @@ var edx = edx || {};
 
         initialize: function( thirdPartyAuthInfo ) {
             this.tpl = $(this.tpl).html();
+            this.fieldTpl = $(this.fieldTpl).html();
 
             this.providers = thirdPartyAuthInfo.providers || [];
             this.currentProvider = thirdPartyAuthInfo.currentProvider || "";
