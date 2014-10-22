@@ -13,16 +13,18 @@ October, 2014
 
    * - Date
      - Change
+   * - 10/29/2014
+     - Added information about course start time visibility to :ref:`The Course Start Date`.
    * - 10/28/14
      - Added section for :ref:`Show Reset Button` in :ref:`Problem Settings`
-       and clarified Reset button behavior in :ref:`Problem Student View`.
+       and clarified **Reset** button behavior in :ref:`Problem Student View`.
    * - 10/27/14
      - Fixed the code sample in :ref:`Script Tag Format` in the :ref:`Write
        Your Own Grader` chapter.
    * - 
      - Fixed a bug in :ref:`Text Input Problem XML`.
    * -
-     - Added :ref:`Create a Randomized Custom Python-Evaluated Input Problem`
+     - Added :ref:`Create a Randomized Custom Python-Evaluated Input Problem`.
    * - 10/23/14
      - Added note about limited support of annotation problem type to
        :ref:`Annotation`.
