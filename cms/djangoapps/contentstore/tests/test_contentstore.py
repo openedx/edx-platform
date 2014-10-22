@@ -15,6 +15,8 @@ from path import path
 from tempdir import mkdtemp_clean
 from textwrap import dedent
 from uuid import uuid4
+from functools import wraps
+from unittest import SkipTest
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -60,6 +62,26 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
+def requires_pillow_jpeg(func):
+    """
+    A decorator to indicate that the function requires JPEG support for Pillow,
+    otherwise it cannot be run
+    """
+    @wraps(func)
+    def decorated_func(*args, **kwargs):
+        """
+        Execute the function if we have JPEG support in Pillow.
+        """
+        try:
+            from PIL import Image
+        except ImportError:
+            raise SkipTest("Pillow is not installed (or not found)")
+        if not getattr(Image.core, "jpeg_decoder", False):
+            raise SkipTest("Pillow cannot open JPEG files")
+        return func(*args, **kwargs)
+    return decorated_func
+
+
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreTestCase(CourseTestCase):
     """
@@ -102,6 +124,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         effort = self.store.get_item(course_key.make_usage_key('about', 'end_date'))
         self.assertEqual(effort.data, 'TBD')
 
+    @requires_pillow_jpeg
     def test_asset_import(self):
         '''
         This test validates that an image asset is imported and a thumbnail was generated for a .gif
