@@ -913,7 +913,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         raise NotImplementedError()
 
-    @contract(course_key='CourseKey', asset_metadata='AssetMetadata', user_id='str | unicode')
+    @contract(course_key='CourseKey', asset_metadata='AssetMetadata')
     def save_asset_metadata(self, course_key, asset_metadata, user_id):
         """
         Saves the asset metadata for a particular course's asset.
@@ -928,7 +928,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         return self._save_asset_info(course_key, asset_metadata, user_id, thumbnail=False)
 
     @contract(course_key='CourseKey', asset_thumbnail_metadata='AssetThumbnailMetadata')
-    def save_asset_thumbnail_metadata(self, course_key, asset_thumbnail_metadata):
+    def save_asset_thumbnail_metadata(self, course_key, asset_thumbnail_metadata, user_id):
         """
         Saves the asset thumbnail metadata for a particular course asset's thumbnail.
 
@@ -939,10 +939,10 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Returns:
             True if thumbnail metadata save was successful, else False
         """
-        return self._save_asset_info(course_key, asset_thumbnail_metadata, '', thumbnail=True)
+        return self._save_asset_info(course_key, asset_thumbnail_metadata, user_id, thumbnail=True)
 
     @contract(asset_key='AssetKey')
-    def _find_asset_info(self, asset_key, thumbnail=False):
+    def _find_asset_info(self, asset_key, thumbnail=False, **kwargs):
         """
         Find the info for a particular course asset/thumbnail.
 
@@ -959,16 +959,16 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
 
         if thumbnail:
             info = 'thumbnails'
-            mdata = AssetThumbnailMetadata(asset_key, asset_key.path)
+            mdata = AssetThumbnailMetadata(asset_key, asset_key.path, **kwargs)
         else:
             info = 'assets'
-            mdata = AssetMetadata(asset_key, asset_key.path)
+            mdata = AssetMetadata(asset_key, asset_key.path, **kwargs)
         all_assets = course_assets[info]
         mdata.from_mongo(all_assets[asset_idx])
         return mdata
 
     @contract(asset_key='AssetKey')
-    def find_asset_metadata(self, asset_key):
+    def find_asset_metadata(self, asset_key, **kwargs):
         """
         Find the metadata for a particular course asset.
 
@@ -978,10 +978,10 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Returns:
             asset metadata (AssetMetadata) -or- None if not found
         """
-        return self._find_asset_info(asset_key, thumbnail=False)
+        return self._find_asset_info(asset_key, thumbnail=False, **kwargs)
 
     @contract(asset_key='AssetKey')
-    def find_asset_thumbnail_metadata(self, asset_key):
+    def find_asset_thumbnail_metadata(self, asset_key, **kwargs):
         """
         Find the metadata for a particular course asset.
 
@@ -991,10 +991,10 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Returns:
             asset metadata (AssetMetadata) -or- None if not found
         """
-        return self._find_asset_info(asset_key, thumbnail=True)
+        return self._find_asset_info(asset_key, thumbnail=True, **kwargs)
 
     @contract(course_key='CourseKey', start='int | None', maxresults='int | None', sort='list | None', get_thumbnails='bool')
-    def _get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, get_thumbnails=False):
+    def _get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, get_thumbnails=False, **kwargs):
         """
         Returns a list of static asset (or thumbnail) metadata for a course.
 
@@ -1018,9 +1018,9 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             return None
 
         if get_thumbnails:
-            all_assets = course_assets['thumbnails']
+            all_assets = course_assets.get('thumbnails', [])
         else:
-            all_assets = course_assets['assets']
+            all_assets = course_assets.get('assets', [])
 
         # DO_NEXT: Add start/maxresults/sort functionality as part of https://openedx.atlassian.net/browse/PLAT-74
         if start and maxresults and sort:
@@ -1029,17 +1029,24 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         ret_assets = []
         for asset in all_assets:
             if get_thumbnails:
-                thumb = AssetThumbnailMetadata(course_key.make_asset_key('thumbnail', asset['filename']),
-                                               internal_name=asset['filename'])
+                thumb = AssetThumbnailMetadata(
+                    course_key.make_asset_key('thumbnail', asset['filename']),
+                    internal_name=asset['filename'], **kwargs
+                )
                 ret_assets.append(thumb)
             else:
-                one_asset = AssetMetadata(course_key.make_asset_key('asset', asset['filename']))
-                one_asset.from_mongo(asset)
-                ret_assets.append(one_asset)
+                asset = AssetMetadata(
+                    course_key.make_asset_key('asset', asset['filename']),
+                    basename=asset['filename'],
+                    edited_on=asset['edit_info']['edited_on'],
+                    contenttype=asset['contenttype'],
+                    md5=str(asset['md5']), **kwargs
+                )
+                ret_assets.append(asset)
         return ret_assets
 
     @contract(course_key='CourseKey', start='int | None', maxresults='int | None', sort='list | None')
-    def get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None):
+    def get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, **kwargs):
         """
         Returns a list of static assets for a course.
         By default all assets are returned, but start and maxresults can be provided to limit the query.
@@ -1056,10 +1063,10 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Returns:
             List of AssetMetadata objects.
         """
-        return self._get_all_asset_metadata(course_key, start, maxresults, sort, get_thumbnails=False)
+        return self._get_all_asset_metadata(course_key, start, maxresults, sort, get_thumbnails=False, **kwargs)
 
     @contract(course_key='CourseKey')
-    def get_all_asset_thumbnail_metadata(self, course_key):
+    def get_all_asset_thumbnail_metadata(self, course_key, **kwargs):
         """
         Returns a list of thumbnails for all course assets.
 
@@ -1069,7 +1076,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Returns:
             List of AssetThumbnailMetadata objects.
         """
-        return self._get_all_asset_metadata(course_key, get_thumbnails=True)
+        return self._get_all_asset_metadata(course_key, get_thumbnails=True, **kwargs)
 
     def set_asset_metadata_attrs(self, asset_key, attrs, user_id):
         """
@@ -1077,7 +1084,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         raise NotImplementedError()
 
-    def _delete_asset_data(self, asset_key, thumbnail=False):
+    def _delete_asset_data(self, asset_key, user_id, thumbnail=False):
         """
         Base method to over-ride in modulestore.
         """
@@ -1100,7 +1107,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         return self.set_asset_metadata_attrs(asset_key, {attr: value}, user_id)
 
     @contract(asset_key='AssetKey')
-    def delete_asset_metadata(self, asset_key):
+    def delete_asset_metadata(self, asset_key, user_id):
         """
         Deletes a single asset's metadata.
 
@@ -1110,10 +1117,10 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Returns:
             Number of asset metadata entries deleted (0 or 1)
         """
-        return self._delete_asset_data(asset_key, thumbnail=False)
+        return self._delete_asset_data(asset_key, user_id, thumbnail=False)
 
     @contract(asset_key='AssetKey')
-    def delete_asset_thumbnail_metadata(self, asset_key):
+    def delete_asset_thumbnail_metadata(self, asset_key, user_id):
         """
         Deletes a single asset's metadata.
 
@@ -1123,10 +1130,10 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         Returns:
             Number of asset metadata entries deleted (0 or 1)
         """
-        return self._delete_asset_data(asset_key, thumbnail=True)
+        return self._delete_asset_data(asset_key, user_id, thumbnail=True)
 
     @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
-    def copy_all_asset_metadata(self, source_course_key, dest_course_key):
+    def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
         """
         Copy all the course assets from source_course_key to dest_course_key.
 

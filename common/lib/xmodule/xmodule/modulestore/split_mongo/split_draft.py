@@ -2,7 +2,7 @@
 Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
-from split import SplitMongoModuleStore, EXCLUDE_ALL
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
@@ -13,7 +13,7 @@ from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.split_mongo import BlockKey
 
 
-class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleStore):
+class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPublished):
     """
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
@@ -43,9 +43,9 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 # create any other necessary things as a side effect: ensure they populate the draft branch
                 # and rely on auto publish to populate the published branch: split's create course doesn't
                 # call super b/c it needs the auto publish above to have happened before any of the create_items
-                # in this. The explicit use of SplitMongoModuleStore is intentional
+                # in this; so, this manually calls the grandparent and above methods.
                 with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, item.id):
-                    # pylint: disable=bad-super-call
+                    # NOTE: DO NOT CHANGE THE SUPER. See comment above
                     super(SplitMongoModuleStore, self).create_course(
                         org, course, run, user_id, runtime=item.runtime, **kwargs
                     )
@@ -229,7 +229,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         if revision == ModuleStoreEnum.RevisionOption.draft_preferred:
             revision = ModuleStoreEnum.RevisionOption.draft_only
         location = self._map_revision_to_branch(location, revision=revision)
-        return SplitMongoModuleStore.get_parent_location(self, location, **kwargs)
+        return super(DraftVersioningModuleStore, self).get_parent_location(location, **kwargs)
 
     def get_orphans(self, course_key, **kwargs):
         course_key = self._map_revision_to_branch(course_key)
@@ -275,8 +275,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Publishes the subtree under location from the draft branch to the published branch
         Returns the newly published item.
         """
-        SplitMongoModuleStore.copy(
-            self,
+        super(DraftVersioningModuleStore, self).copy(
             user_id,
             # Directly using the replace function rather than the for_branch function
             # because for_branch obliterates the version_guid and will lead to missed version conflicts.
@@ -446,3 +445,62 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         if published_block is not None:
             setattr(xblock, '_published_by', published_block['edit_info']['edited_by'])
             setattr(xblock, '_published_on', published_block['edit_info']['edited_on'])
+
+    def _find_asset_info(self, asset_key, thumbnail=False, **kwargs):
+        return super(DraftVersioningModuleStore, self)._find_asset_info(
+            self._map_revision_to_branch(asset_key), thumbnail, **kwargs
+        )
+
+    def _get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, get_thumbnails=False, **kwargs):
+        return super(DraftVersioningModuleStore, self)._get_all_asset_metadata(
+            self._map_revision_to_branch(course_key), start, maxresults, sort, get_thumbnails, **kwargs
+        )
+
+    def _update_course_assets(self, user_id, asset_key, update_function, get_thumbnail=False):
+        """
+        Updates both the published and draft branches
+        """
+        # if one call gets an exception, don't do the other call but pass on the exception
+        super(DraftVersioningModuleStore, self)._update_course_assets(
+            user_id, self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.published_only),
+            update_function, get_thumbnail
+        )
+        super(DraftVersioningModuleStore, self)._update_course_assets(
+            user_id, self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.draft_only),
+            update_function, get_thumbnail
+        )
+
+    def _find_course_asset(self, course_key, filename, get_thumbnail=False):
+        return super(DraftVersioningModuleStore, self)._find_course_asset(
+            self._map_revision_to_branch(course_key), filename, get_thumbnail=get_thumbnail
+        )
+
+    def _find_course_assets(self, course_key):
+        """
+        Split specific lookup
+        """
+        return super(DraftVersioningModuleStore, self)._find_course_assets(
+            self._map_revision_to_branch(course_key)
+        )
+
+    def delete_all_asset_metadata(self, course_key, user_id):
+        """
+        Deletes from both branches
+        """
+        super(DraftVersioningModuleStore, self).delete_all_asset_metadata(
+            self._map_revision_to_branch(course_key, ModuleStoreEnum.RevisionOption.published_only), user_id
+        )
+        super(DraftVersioningModuleStore, self).delete_all_asset_metadata(
+            self._map_revision_to_branch(course_key, ModuleStoreEnum.RevisionOption.draft_only), user_id
+        )
+
+    def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
+        """
+        Copies to and from both branches
+        """
+        for revision in [ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.draft_only]:
+            super(DraftVersioningModuleStore, self).copy_all_asset_metadata(
+                self._map_revision_to_branch(source_course_key, revision),
+                self._map_revision_to_branch(dest_course_key, revision),
+                user_id
+            )
