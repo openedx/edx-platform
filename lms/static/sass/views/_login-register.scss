@@ -161,6 +161,10 @@
                 width: auto;
                 margin-right: 5px;
             }
+
+            &.error {
+                border-color: tint($red,50%);
+            }
         }
 
         textarea.long {
@@ -225,99 +229,3 @@
         }
     }
 }
-
-
-    /*// individual fields
-    .field {
-
-
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      // types - password
-
-      // types - select
-
-
-      // types - checkboxes/radio buttons
-      &.checkbox {
-
-        input[type="checkbox"] {
-          display: inline-block;
-          width: auto;
-          @include margin-right($baseline/4);
-        }
-
-        label {
-          display: inline-block;
-        }
-      }
-
-      // states - all
-      &.disabled,
-      &.submitted {
-        color: rgba(0,0,0,.25);
-
-        label {
-          cursor: text;
-
-          &:after {
-            margin-left: ($baseline/4);
-          }
-        }
-
-        textarea, input {
-          background: $container-bg;
-          color: rgba(0,0,0,.25);
-        }
-      }
-
-      // states - focused
-      &.is-focused {
-
-        label {
-          color: saturate($link-color-d1,15%);
-        }
-
-        .tip {
-          color: saturate($link-color-d1,15%);
-        }
-      }
-
-      // states - disabled
-      &.disabled {
-        label:after {
-          color: rgba(0,0,0,.35);
-          content: "(Disabled Currently)";
-        }
-      }
-
-      &.error {
-
-        label {
-          color: $red;
-        }
-
-        input, textarea {
-          border-color: tint($red,50%);
-        }
-      }
-
-      &.required {
-
-        label {
-          font-weight: 600;
-
-          a {
-            font-weight: 600 !important;
-          }
-        }
-
-        label:after {
-          margin-left: ($baseline/4);
-          content: "*";
-        }
-      }
-    }*/
