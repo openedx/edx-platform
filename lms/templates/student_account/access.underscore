@@ -1,4 +1,4 @@
-<header class="js-login-register-header">
+<header class="js-login-register-header header">
     <h1 class="headline">Welcome!</h1>
     <p class="tagline">Please log in to continue</p>
 </header>
