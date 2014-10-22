@@ -69,7 +69,8 @@ class StudentGradebook(TimeStampedModel):
         if total_user_count:
             # Generate the base data set we're going to work with
             queryset = StudentGradebook.objects.select_related('user')\
-                .filter(course_id__exact=course_key, user__is_active=True, user__in=enrolled_users_not_excluded)
+                .filter(course_id__exact=course_key, user__is_active=True, user__courseenrollment__is_active=True,
+                        user__in=enrolled_users_not_excluded)
             gradebook_user_count = len(queryset)
 
             if gradebook_user_count:
