@@ -16,6 +16,8 @@ October, 2014
    * - 10/23/14
      - Fixed the code sample in :ref:`Script Tag Format` in the :ref:`Write
        Your Own Grader` chapter.
+   * - 
+     - Fixed a bug in the :ref:`Text Input Problem XML`.
    * - 10/17/14
      - Provided more explanation to the introduction to :ref:`Problems and
        Tools`.
