@@ -142,7 +142,8 @@ def detect_db_engine():
     return engine
 
 
-def get_time_series_data(queryset, start, end, interval='days', date_field='created', aggregate=None):
+def get_time_series_data(queryset, start, end, interval='days', date_field='created', date_field_model=None,
+                         aggregate=None):
     """
     Aggregate over time intervals to compute time series representation of data
     """
@@ -150,23 +151,26 @@ def get_time_series_data(queryset, start, end, interval='days', date_field='crea
     start, _ = get_interval_bounds(start, interval.rstrip('s'))
     _, end = get_interval_bounds(end, interval.rstrip('s'))
 
+    if date_field_model:
+        date_field = '"{}"."{}"'.format(date_field_model._meta.db_table, date_field)
+
     sql = {
         'mysql': {
-            'days': "DATE_FORMAT(`{}`, '%%Y-%%m-%%d')".format(date_field),
-            'weeks': "DATE_FORMAT(DATE_SUB(`{}`, INTERVAL(WEEKDAY(`{}`)) DAY), '%%Y-%%m-%%d')".format(date_field,
-                                                                                                      date_field),
-            'months': "DATE_FORMAT(`{}`, '%%Y-%%m-01')".format(date_field)
+            'days': "DATE_FORMAT({}, '%%Y-%%m-%%d')".format(date_field),
+            'weeks': "DATE_FORMAT(DATE_SUB({}, INTERVAL(WEEKDAY({})) DAY), '%%Y-%%m-%%d')".format(date_field,
+                                                                                                  date_field),
+            'months': "DATE_FORMAT({}, '%%Y-%%m-01')".format(date_field)
         },
         'sqlite': {
-            'days': "strftime('%%Y-%%m-%%d', `{}`)".format(date_field),
-            'weeks': "strftime('%%Y-%%m-%%d', julianday(`{}`) - strftime('%%w', `{}`) + 1)".format(date_field,
-                                                                                                   date_field),
-            'months': "strftime('%%Y-%%m-01', `{}`)".format(date_field)
+            'days': "strftime('%%Y-%%m-%%d', {})".format(date_field),
+            'weeks': "strftime('%%Y-%%m-%%d', julianday({}) - strftime('%%w', {}) + 1)".format(date_field,
+                                                                                               date_field),
+            'months': "strftime('%%Y-%%m-01', {})".format(date_field)
         }
     }
     interval_sql = sql[engine][interval]
-    kwargs = {'{}__range'.format(date_field): (start, end)}
-    aggregate_data = queryset.extra(select={'d': interval_sql}).filter(**kwargs).order_by().values('d').\
+    where_clause = '{} BETWEEN "{}" and "{}"'.format(date_field, start, end)
+    aggregate_data = queryset.extra(select={'d': interval_sql}, where=[where_clause]).order_by().values('d').\
         annotate(agg=aggregate)
 
     today = strip_time(now())
