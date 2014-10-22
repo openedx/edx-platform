@@ -1,17 +1,31 @@
+"""HTTP end-points for the User API. """
+import copy
+import json
+
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.core.urlresolvers import reverse
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext as _
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError
-from rest_framework.response import Response
+from django_countries import countries
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
-from user_api.models import UserPreference
+from user_api.models import UserPreference, UserProfile
 from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from edxmako.shortcuts import marketing_link
+
+from user_api.api import account as account_api, profile as profile_api
+from user_api.helpers import FormDescription, shim_student_view, require_post_params
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
@@ -28,6 +42,370 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
         return (
             (settings.DEBUG and api_key is None) or
             (api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key)
+        )
+
+
+class LoginSessionView(APIView):
+    """HTTP end-points for logging in users. """
+
+    def get(self, request):
+        """Return a description of the login form.
+
+        This decouples clients from the API definition:
+        if the API decides to modify the form, clients won't need
+        to be updated.
+
+        See `user_api.helpers.FormDescription` for examples
+        of the JSON-encoded form description.
+
+        Arguments:
+            request (HttpRequest)
+
+        Returns:
+            HttpResponse
+
+        """
+        form_desc = FormDescription("post", reverse("user_api_login_session"))
+
+        form_desc.add_field(
+            "email",
+            label=_(u"E-mail"),
+            placeholder=_(u"example: username@domain.com"),
+            instructions=_(
+                u"This is the e-mail address you used to register with {platform}"
+            ).format(platform=settings.PLATFORM_NAME),
+            restrictions={
+                "min_length": account_api.EMAIL_MIN_LENGTH,
+                "max_length": account_api.EMAIL_MAX_LENGTH,
+            }
+        )
+
+        form_desc.add_field(
+            "password",
+            label=_(u"Password"),
+            field_type="password",
+            restrictions={
+                "min_length": account_api.PASSWORD_MIN_LENGTH,
+                "max_length": account_api.PASSWORD_MAX_LENGTH,
+            }
+        )
+
+        form_desc.add_field(
+            "remember",
+            field_type="checkbox",
+            label=_("Remember me"),
+            default=False,
+            required=False,
+        )
+
+        return HttpResponse(form_desc.to_json(), content_type="application/json")
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(require_post_params(["email", "password"]))
+    def post(self, request):
+        """Log in a user.
+
+        Arguments:
+            request (HttpRequest)
+
+        Returns:
+            HttpResponse: 200 on success
+            HttpResponse: 400 if the request is not valid.
+            HttpResponse: 403 if authentication failed.
+            HttpResponse: 302 if redirecting to another page.
+
+        Example Usage:
+
+            POST /user_api/v1/login_session
+            with POST params `email` and `password`
+
+            200 OK
+
+        """
+        # For the initial implementation, shim the existing login view
+        # from the student Django app.
+        from student.views import login_user
+        return shim_student_view(login_user, check_logged_in=True)(request)
+
+
+class RegistrationView(APIView):
+    """HTTP end-points for creating a new user. """
+
+    DEFAULT_FIELDS = ["email", "name", "username", "password"]
+
+    EXTRA_FIELDS = [
+        "city", "country", "level_of_education", "gender",
+        "year_of_birth", "mailing_address", "goals",
+        "honor_code", "terms_of_service",
+    ]
+
+    def _is_field_visible(self, field_name):
+        """Check whether a field is visible based on Django settings. """
+        return self._extra_fields_setting.get(field_name) in ["required", "optional"]
+
+    def _is_field_required(self, field_name):
+        """Check whether a field is required based on Django settings. """
+        return self._extra_fields_setting.get(field_name) == "required"
+
+    def __init__(self, *args, **kwargs):
+        super(RegistrationView, self).__init__(*args, **kwargs)
+
+        # Backwards compatibility: Honor code is required by default, unless
+        # explicitly set to "optional" in Django settings.
+        self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
+        self._extra_fields_setting["honor_code"] = self._extra_fields_setting.get("honor_code", "required")
+
+        # Check that the setting is configured correctly
+        for field_name in self.EXTRA_FIELDS:
+            if self._extra_fields_setting.get(field_name, "hidden") not in ["required", "optional", "hidden"]:
+                msg = u"Setting REGISTRATION_EXTRA_FIELDS values must be either required, optional, or hidden."
+                raise ImproperlyConfigured(msg)
+
+        # Map field names to the instance method used to add the field to the form
+        self.field_handlers = {}
+        for field_name in (self.DEFAULT_FIELDS + self.EXTRA_FIELDS):
+            handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
+            self.field_handlers[field_name] = handler
+
+    def get(self, request):
+        """Return a description of the registration form.
+
+        This decouples clients from the API definition:
+        if the API decides to modify the form, clients won't need
+        to be updated.
+
+        This is especially important for the registration form,
+        since different edx-platform installations might
+        collect different demographic information.
+
+        See `user_api.helpers.FormDescription` for examples
+        of the JSON-encoded form description.
+
+        Arguments:
+            request (HttpRequest)
+
+        Returns:
+            HttpResponse
+
+        """
+        form_desc = FormDescription("post", reverse("user_api_registration"))
+
+        # Default fields are always required
+        for field_name in self.DEFAULT_FIELDS:
+            self.field_handlers[field_name](form_desc, required=True)
+
+        # Extra fields configured in Django settings
+        # may be required, optional, or hidden
+        for field_name in self.EXTRA_FIELDS:
+            if self._is_field_visible(field_name):
+                self.field_handlers[field_name](
+                    form_desc,
+                    required=self._is_field_required(field_name)
+                )
+
+        return HttpResponse(form_desc.to_json(), content_type="application/json")
+
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(require_post_params(DEFAULT_FIELDS))
+    def post(self, request):
+        """Create the user's account.
+
+        Arguments:
+            request (HTTPRequest)
+
+        Returns:
+            HttpResponse: 200 on success
+            HttpResponse: 400 if the request is not valid.
+            HttpResponse: 302 if redirecting to another page.
+
+        """
+        # Handle duplicate username/email
+        conflicts = account_api.check_account_exists(
+            username=request.POST.get('username'),
+            email=request.POST.get('email')
+        )
+        if conflicts:
+            return HttpResponse(
+                status=409,
+                content=json.dumps(conflicts),
+                content_type="application/json"
+            )
+
+        # For the initial implementation, shim the existing login view
+        # from the student Django app.
+        from student.views import create_account
+        return shim_student_view(create_account)(request)
+
+    def _add_email_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "email",
+            label=_(u"E-mail"),
+            placeholder=_(u"example: username@domain.com"),
+            instructions=_(
+                u"This is the e-mail address you used to register with {platform}"
+            ).format(platform=settings.PLATFORM_NAME),
+            restrictions={
+                "min_length": account_api.EMAIL_MIN_LENGTH,
+                "max_length": account_api.EMAIL_MAX_LENGTH,
+            },
+            required=required
+        )
+
+    def _add_name_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "name",
+            label=_(u"Full Name"),
+            instructions=_(u"Needed for any certificates you may earn"),
+            restrictions={
+                "max_length": profile_api.FULL_NAME_MAX_LENGTH,
+            },
+            required=required
+        )
+
+    def _add_username_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "username",
+            label=_(u"Public Username"),
+            instructions=_(u"Will be shown in any discussions or forums you participate in (cannot be changed)"),
+            restrictions={
+                "min_length": account_api.USERNAME_MIN_LENGTH,
+                "max_length": account_api.USERNAME_MAX_LENGTH,
+            },
+            required=required
+        )
+
+    def _add_password_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "password",
+            label=_(u"Password"),
+            restrictions={
+                "min_length": account_api.PASSWORD_MIN_LENGTH,
+                "max_length": account_api.PASSWORD_MAX_LENGTH,
+            },
+            required=required
+        )
+
+    def _add_level_of_education_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "level_of_education",
+            label=_("Highest Level of Education Completed"),
+            field_type="select",
+            options=self._options_with_default(UserProfile.LEVEL_OF_EDUCATION_CHOICES),
+            required=required
+        )
+
+    def _add_gender_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "gender",
+            label=_("Gender"),
+            field_type="select",
+            options=self._options_with_default(UserProfile.GENDER_CHOICES),
+            required=required
+        )
+
+    def _add_year_of_birth_field(self, form_desc, required=True):
+        options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+        form_desc.add_field(
+            "year_of_birth",
+            label=_("Year of Birth"),
+            field_type="select",
+            options=self._options_with_default(options),
+            required=required
+        )
+
+    def _add_mailing_address_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "mailing_address",
+            label=_("Mailing Address"),
+            field_type="textarea",
+            required=required
+        )
+
+    def _add_goals_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "goals",
+            label=_("Please share with us your reasons for registering with edX"),
+            field_type="textarea",
+            required=required
+        )
+
+    def _add_city_field(self, form_desc, required=True):
+        form_desc.add_field(
+            "city",
+            label=_("City"),
+            required=required
+        )
+
+    def _add_country_field(self, form_desc, required=True):
+        sorted_countries = sorted(
+            countries.countries, key=lambda(__, name): unicode(name)
+        )
+        options = [
+            (country_code, unicode(country_name))
+            for country_code, country_name in sorted_countries
+        ]
+        form_desc.add_field(
+            "country",
+            label=_("Country"),
+            field_type="select",
+            options=self._options_with_default(options),
+            required=required
+        )
+
+    def _add_honor_code_field(self, form_desc, required=True):
+        # Separate terms of service and honor code checkboxes
+        if self._is_field_visible("terms_of_service"):
+            terms_text = _(u"Honor Code")
+
+        # Combine terms of service and honor code checkboxes
+        else:
+            # Translators: This is a legal document users must agree to in order to register a new account.
+            terms_text = _(u"Terms of Service and Honor Code")
+
+        # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
+        label = _(
+            u"I agree to the {terms_of_service}"
+        ).format(
+            terms_of_service=u"<a href=\"{url}\">{terms_text}</a>".format(
+                url=marketing_link("HONOR"),
+                terms_text=terms_text
+            )
+        )
+
+        form_desc.add_field(
+            "honor_code",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=required,
+        )
+
+    def _add_terms_of_service_field(self, form_desc, required=True):
+        # Translators: This is a legal document users must agree to in order to register a new account.
+        terms_text = _(u"Terms of Service")
+
+        # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
+        label = _(
+            u"I agree to the {terms_of_service}"
+        ).format(
+            terms_of_service=u"<a href=\"{url}\">{terms_text}</a>".format(
+                url=marketing_link("TOS"),
+                terms_text=terms_text
+            )
+        )
+
+        form_desc.add_field(
+            "terms_of_service",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=required,
+        )
+
+    def _options_with_default(self, options):
+        """Include a default option as the first option. """
+        return (
+            [("", "--")] + list(options)
         )
 
 

@@ -4,6 +4,7 @@
 import re
 from unittest import skipUnless
 from urllib import urlencode
+import json
 
 from mock import patch
 import ddt
@@ -52,7 +53,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
     @patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
     def setUp(self):
-        super(StudentAccountViewTest, self).setUp()
+        super(StudentAccountViewTest, self).setUp("student_account.urls")
 
         # Create/activate a new account
         activation_key = account_api.create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
@@ -66,7 +67,38 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         response = self.client.get(reverse('account_index'))
         self.assertContains(response, "Student Account")
 
-    def test_email_change(self):
+    @ddt.data(
+        ("account_login", "login"),
+        ("account_register", "register"),
+    )
+    @ddt.unpack
+    def test_login_and_registration_form(self, url_name, initial_mode):
+        response = self.client.get(reverse(url_name))
+        expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
+        self.assertContains(response, expected_data)
+
+    @ddt.data("account_login", "account_register")
+    def test_login_and_registration_third_party_auth_urls(self, url_name):
+        response = self.client.get(reverse(url_name))
+
+        # This relies on the THIRD_PARTY_AUTH configuration in the test settings
+        expected_data = u"data-third-party-auth-providers=\"{providers}\"".format(
+            providers=json.dumps([
+                {
+                    u'icon_class': u'icon-facebook',
+                    u'login_url': u'/auth/login/facebook/?auth_entry=login',
+                    u'name': u'Facebook'
+                },
+                {
+                    u'icon_class': u'icon-google-plus',
+                    u'login_url': u'/auth/login/google-oauth2/?auth_entry=login',
+                    u'name': u'Google'
+                }
+            ])
+        )
+        self.assertContains(response, expected_data)
+
+    def test_change_email(self):
         response = self._change_email(self.NEW_EMAIL, self.OLD_PASSWORD)
         self.assertEquals(response.status_code, 200)
 
@@ -277,7 +309,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
         # Create a second user, but do not activate it
         account_api.create_account(self.ALTERNATE_USERNAME, self.OLD_PASSWORD, self.NEW_EMAIL)
-        
+
         # Send the view the email address tied to the inactive user
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 400)
@@ -285,7 +317,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
     def test_password_change_no_user(self):
         # Log out the user created during test setup
         self.client.logout()
-        
+
         # Send the view an email address not tied to any user
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 400)
@@ -299,7 +331,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         # Make many consecutive bad requests in an attempt to trigger the rate limiter
         for attempt in xrange(self.INVALID_ATTEMPTS):
             self._change_password(email=self.NEW_EMAIL)
-        
+
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 403)
 
