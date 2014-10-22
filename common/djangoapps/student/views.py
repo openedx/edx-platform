@@ -697,7 +697,10 @@ def _allow_donation(course_modes, course_id):
         True if the course is allowing donations.
 
     """
-    return DonationConfiguration.current().enabled and not CourseMode.has_verified_mode(course_modes[course_id])
+    donations_enabled = DonationConfiguration.current().enabled
+    is_verified_mode = CourseMode.has_verified_mode(course_modes[course_id])
+    is_microsite = microsite.is_request_in_microsite()
+    return  donations_enabled and not is_verified_mode and not is_microsite
 
 
 def try_change_enrollment(request):
