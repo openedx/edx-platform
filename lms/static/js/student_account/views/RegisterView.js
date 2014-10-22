@@ -11,7 +11,7 @@ var edx = edx || {};
 
         el: '#register-form',
 
-        tpl: $('#register-tpl').html(),
+        tpl: '#register-tpl',
 
         fieldTpl: $('#form_field-tpl').html(),
 
@@ -24,6 +24,7 @@ var edx = edx || {};
         $form: {},
 
         initialize: function() {
+            this.tpl = $(this.tpl).html();
             this.getInitialData();
         },
 
