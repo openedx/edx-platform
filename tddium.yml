@@ -1,6 +1,6 @@
 tddium:
   :firefox: '28.0'
-  :timeout: 3600
+  :timeout: 5400
   :timeout_hook: 900
   :tool_config:
     git:
