@@ -36,7 +36,7 @@ Top-level Directory
 The `Ongoing`_ directory in the edX-Insider Git repository contains the
 ``course.xml`` file as well as XBlock and Platform directories.
 
-The ``course.xml`` file contains the XML for the courseware. All chapters and
+The `course.xml`_ file contains the XML for the courseware. All chapters and
 sequentials are defined in ``course.xml``.
 
 Most and verticals are defined in ``course.xml``; two verticals are referenced
@@ -94,7 +94,7 @@ Example of an Inline XBlock
 ==============================
 
 You can include an XBlock content within the ``course.xml`` file. You may do
-this for ease of reading and maintenance whenn you do not need to reuse the
+this for ease of reading and maintenance when you do not need to reuse the
 content.
 
 For example, in ``course.xml``, within the sequential with the display name
