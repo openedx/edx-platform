@@ -1452,7 +1452,9 @@ class CoursesMetricsGradesList(SecureListAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
-        queryset = StudentGradebook.objects.filter(course_id__exact=course_key).exclude(user__in=exclude_users)
+        queryset = StudentGradebook.objects.filter(course_id__exact=course_key,
+                                                   user__courseenrollment__is_active=True)\
+            .exclude(user__in=exclude_users)
 
         upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 200)
         user_ids = self.request.QUERY_PARAMS.get('user_id', None)
@@ -1589,18 +1591,22 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         course_key = get_course_key(course_id)
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
         grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
-        grades_qs = StudentGradebook.objects.filter(course_id__exact=course_key, user__is_active=True).\
+        grades_qs = StudentGradebook.objects.filter(course_id__exact=course_key, user__is_active=True,
+                                                    user__courseenrollment__is_active=True).\
             exclude(user_id__in=exclude_users)
         grades_complete_qs = grades_qs.filter(proforma_grade__lte=F('grade') + grade_complete_match_range,
                                               proforma_grade__gt=0)
-        enrolled_qs = CourseEnrollment.objects.filter(course_id__exact=course_key, user__is_active=True)\
-            .exclude(user_id__in=exclude_users)
-        users_started_qs = StudentProgressHistory.objects.filter(course_id__exact=course_key, user__is_active=True)\
+        enrolled_qs = CourseEnrollment.objects.filter(course_id__exact=course_key, user__is_active=True,
+                                                      is_active=True).exclude(user_id__in=exclude_users)
+        users_started_qs = StudentProgressHistory.objects.filter(course_id__exact=course_key, user__is_active=True,
+                                                                 user__courseenrollment__is_active=True)\
             .exclude(user_id__in=exclude_users)
         modules_completed_qs = CourseModuleCompletion.get_actual_completions().filter(course_id__exact=course_key,
+                                                                                      user__courseenrollment__is_active=True,
                                                                                       user__is_active=True)\
             .exclude(user_id__in=exclude_users)
-        active_users_qs = StudentModule.objects.filter(course_id__exact=course_key, student__is_active=True)\
+        active_users_qs = StudentModule.objects.filter(course_id__exact=course_key, student__is_active=True,
+                                                       student__courseenrollment__is_active=True)\
             .exclude(student_id__in=exclude_users)
 
         organization = request.QUERY_PARAMS.get('organization', None)
@@ -1616,18 +1622,21 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         total_started = total_started_count['user__count'] or 0
         enrolled_series = get_time_series_data(enrolled_qs, start_dt, end_dt, interval=interval,
                                                date_field='created', aggregate=Count('id'))
-
         started_series = get_time_series_data(users_started_qs, start_dt, end_dt, interval=interval,
-                                              date_field='created', aggregate=Count('user', distinct=True))
+                                              date_field='created', date_field_model=StudentProgressHistory,
+                                              aggregate=Count('user', distinct=True))
         completed_series = get_time_series_data(grades_complete_qs, start_dt, end_dt, interval=interval,
-                                                date_field='modified', aggregate=Count('id'))
+                                                date_field='modified', date_field_model=StudentGradebook,
+                                                aggregate=Count('id'))
         modules_completed_series = get_time_series_data(modules_completed_qs, start_dt, end_dt, interval=interval,
-                                                        date_field='created', aggregate=Count('id'))
+                                                        date_field='created', date_field_model=CourseModuleCompletion,
+                                                        aggregate=Count('id'))
         # active users are those who accessed course in last 24 hours
         start_dt = start_dt + relativedelta(hours=-24)
         end_dt = end_dt + relativedelta(hours=-24)
         active_users_series = get_time_series_data(active_users_qs, start_dt, end_dt, interval=interval,
-                                                   date_field='modified', aggregate=Count('student', distinct=True))
+                                                   date_field='modified', date_field_model=StudentModule,
+                                                   aggregate=Count('student', distinct=True))
         not_started_series, total_enrolled_series = [], []
         for enrolled, started in zip(enrolled_series, started_series):
             not_started_series.append((started[0], (total_enrolled + enrolled[1]) - (total_started + started[1])))

@@ -2100,7 +2100,6 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(total_active, 5)
         self.assertEqual(response.data['users_enrolled'][0][1], 25)
 
-
         # get modules completed for first 5 days
         start_date = datetime.now().date() + relativedelta(days=-USER_COUNT)
         end_date = datetime.now().date() + relativedelta(days=-(USER_COUNT - 4))
@@ -2162,6 +2161,37 @@ class CoursesApiTests(ModuleStoreTestCase):
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 400)
 
+        # Test after un-enrolling some users
+        test_uri = self.base_courses_uri + '/' + test_course_id + '/users'
+        for j, user in enumerate(users[-5:]):
+            response = self.do_delete('{}/{}'.format(test_uri, user.id))
+            self.assertEqual(response.status_code, 204)
+        end_date = datetime.now().date()
+        start_date = end_date + relativedelta(days=-4)
+        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}'\
+            .format(self.base_courses_uri,
+                    test_course_id,
+                    start_date,
+                    end_date)
+
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['users_not_started']), 5)
+        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+        self.assertEqual(total_not_started, 0)
+        self.assertEqual(len(response.data['users_started']), 5)
+        total_started = sum([started[1] for started in response.data['users_started']])
+        self.assertEqual(total_started, 0)
+        self.assertEqual(len(response.data['users_completed']), 5)
+        total_completed = sum([completed[1] for completed in response.data['users_completed']])
+        self.assertEqual(total_completed, 0)
+        self.assertEqual(len(response.data['modules_completed']), 5)
+        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+        self.assertEqual(total_modules_completed, 0)
+        self.assertEqual(len(response.data['active_users']), 5)
+        total_active = sum([active[1] for active in response.data['active_users']])
+        self.assertEqual(total_active, 0)
+        self.assertEqual(response.data['users_enrolled'][0][1], 20)
 
     def test_course_workgroups_list(self):
         projects_uri = self.base_projects_uri
