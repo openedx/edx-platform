@@ -697,7 +697,10 @@ def _allow_donation(course_modes, course_id):
         True if the course is allowing donations.
 
     """
-    return DonationConfiguration.current().enabled and not CourseMode.has_verified_mode(course_modes[course_id])
+    donations_enabled = DonationConfiguration.current().enabled
+    is_verified_mode = CourseMode.has_verified_mode(course_modes[course_id])
+    has_payment_option = CourseMode.has_payment_options(course_id)
+    return donations_enabled and not is_verified_mode and not has_payment_option
 
 
 def try_change_enrollment(request):
