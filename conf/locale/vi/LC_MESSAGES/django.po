@@ -48,6 +48,7 @@
 # Translators:
 # Bùi Việt Thành <thanhbv@gmail.com>, 2014
 # Đoàn Trần Hoàng <dthoang92@gmail.com>, 2014
+# Doan Viet Hung <viethung.doan@gmail.com>, 2014
 # Duc <phamtrungduc.cd2@gmail.com>, 2013
 # Duc <phamtrungduc.cd2@gmail.com>, 2013
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
@@ -117,7 +118,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-14 11:53-0400\n"
+"POT-Creation-Date: 2014-10-20 10:16-0400\n"
 "PO-Revision-Date: 2014-09-29 02:20+0000\n"
 "Last-Translator: NGUYEN HOANG AN <neyugn2909@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
@@ -299,7 +300,7 @@ msgstr ""
 msgid "Course id is invalid"
 msgstr "Mã số khóa học không đúng"
 
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py
 msgid "Could not enroll"
 msgstr ""
 
@@ -1142,7 +1143,6 @@ msgstr ""
 #. in
 #. to the site.
 #: common/lib/capa/capa/responsetypes.py
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html lms/templates/login.html
 #: lms/templates/register.html
 msgid "or"
@@ -5559,6 +5559,10 @@ msgstr "Khóa học này không hỗ trợ giấy chứng nhận xác thực"
 msgid "No selected price or selected price is below minimum."
 msgstr "Không giá nào được chọn hoặc giá được chọn dưới mức tối thiểu."
 
+#: lms/envs/common.py
+msgid "Taiwan"
+msgstr ""
+
 #: lms/lib/xblock/mixin.py
 msgid "Courseware Chrome"
 msgstr ""
@@ -6677,16 +6681,15 @@ msgid "Terms of Service"
 msgstr "Điều khoản sử dụng dịch vụ"
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Chính sách bảo mật"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
-#: lms/templates/help_modal.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/static_templates/help.html
+#: lms/templates/help_modal.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html
 msgid "Help"
 msgstr "Trợ Giúp"
@@ -6702,96 +6705,6 @@ msgstr "Đăng ký {} | Chọn Hệ Khóa Học"
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to register you"
 msgstr "Rât tiếc, lỗi khi đăng ký cho bạn"
-
-#: common/templates/course_modes/choose.html
-msgid "Select your track:"
-msgstr "Chọn hệ khóa học:"
-
-#: common/templates/course_modes/choose.html
-msgid "Certificate of Achievement (ID Verified)"
-msgstr "Giấy Chứng nhận Thành tích (Xác Thực Danh Tính)"
-
-#: common/templates/course_modes/choose.html
-msgid "Upgrade and work toward a verified Certificate of Achievement."
-msgstr ""
-"Nâng cấp và phấn đấu học để nhận Giấy Chứng nhận Thành tích được xác thực."
-
-#: common/templates/course_modes/choose.html
-msgid "Sign up and work toward a verified Certificate of Achievement."
-msgstr "Đăng ký và phấn đấu học để nhận Giấy Chứng Nhận Thành Tích xác thực."
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Select your contribution for this course (min. $"
-msgstr "Chọn đóng góp của bạn cho khóa học này (min. $"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "):"
-msgstr "):"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration"
-msgstr "Hủy Đăng Ký"
-
-#: common/templates/course_modes/choose.html
-msgid "Select Certificate"
-msgstr "Chọn Chứng Chỉ"
-
-#: common/templates/course_modes/choose.html
-msgid "Verified Registration Requirements"
-msgstr "Yêu Cầu khi Đăng Ký Xác Thực"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To upgrade your registration and work towards a Verified Certificate of "
-"Achievement, you will need a webcam, a credit or debit card, and an ID."
-msgstr ""
-"Để nâng cấp đăng ký và phấn đấu học để nhận Giấy chứng nhận Thành tích được "
-"Xác thực, bạn cần có một webcam, một thẻ tín dụng hoặc thẻ ghi nợ, và một "
-"ID."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To register for a Verified Certificate of Achievement option, you will need "
-"a webcam, a credit or debit card, and an ID."
-msgstr ""
-"Để đăng ký nhận Giấy Chứng Nhận Thành Tích Xác Thực, bạn cần có một webcam, "
-"một thẻ tín dụng hoặc thẻ ghi nợ, và một ID."
-
-#: common/templates/course_modes/choose.html
-msgid "What is an ID Verified Certificate?"
-msgstr "Giấy Chứng Nhận Xác Thực Danh Tính là gì?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"An ID Verified Certificate requires proof of your identity through your "
-"photo and ID and is checked throughout the course to verify that it is you "
-"who earned the passing grade."
-msgstr ""
-"Giấy Chứng Nhận Đã Xác Thực Danh Tính đòi hỏi bằng chứng về danh tính của "
-"bạn thông qua hình ảnh và ID của bạn và được kiểm tra trong suốt khóa học để"
-" xác thực rằng chính bạn là người đạt điểm đậu."
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course"
-msgstr "Theo Dõi Khóa Học Này"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums. If your work is satisfactory and "
-"you abide by the Honor Code, you'll receive a personalized Honor Code "
-"Certificate to showcase your achievement."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Select Audit"
-msgstr "Chọn Theo Dõi Khóa Học"
 
 #: common/templates/course_modes/choose.html
 msgid "Now choose your course track:"
@@ -6824,6 +6737,31 @@ msgstr ""
 "nghiệp hay đăng ký học  lên không? Hãy nâng cấp lên hệ theo học nhằm đạt "
 "Giấy Chứng Nhận Thành Tích Xác Thực để có giấy tờ chứng thực thành tích. Bạn"
 " sẽ phải trả một khoản phí tối thiểu."
+
+#: common/templates/course_modes/choose.html
+msgid "Select your contribution for this course (min. $"
+msgstr "Chọn đóng góp của bạn cho khóa học này (min. $"
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/verify_student/photo_verification.html
+msgid "):"
+msgstr "):"
+
+#: common/templates/course_modes/choose.html
+msgid "Upgrade Your Registration"
+msgstr "Hủy Đăng Ký"
+
+#: common/templates/course_modes/choose.html
+msgid "Audit This Course"
+msgstr "Theo Dõi Khóa Học Này"
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue an Honor Code Certificate"
@@ -6865,12 +6803,12 @@ msgstr "Tầm nhìn"
 msgid "Faq"
 msgstr "Thắc mắc thường gặp"
 
-#: lms/templates/contact.html lms/templates/footer-edx.html
+#: lms/templates/contact.html lms/templates/footer-legacy.html
 msgid "Press"
 msgstr "Báo chí"
 
 #: lms/templates/contact.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
@@ -6904,12 +6842,12 @@ msgid ""
 " on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a "
 "chance to respond to every email, we take all feedback into consideration."
 msgstr ""
-"Nếu bạn có câu hỏi về {platform_name}, vui lòng gửi email tới "
-"{contact_email}. Để xem nếu câu hỏi của bạn đã được trả lời từ trước, vui "
-"lòng ghé thăm {faq_link_startt} trang FAQ{faq_link_end}. Bạn cũng có thể "
-"tham gia thảo luận trên {fb_link_start}trang facebook{fb_link_end}. Mặc dù "
-"chúng tôi không có cơ hội trả lời từng email, chúng tôi vẫn sẽ xem xét tất "
-"cả các phản hồi."
+"Nếu bạn có thắc mắc về {platform_name}, vui lòng gửi email tới "
+"{contact_email}. Để xem liệu câu hỏi của bạn đã được trả lời chưa, vui lòng "
+"ghé thăm {faq_link_start}trang FAQ{faq_link_end}. Bạn cũng có thể tham gia "
+"thảo luận trên {fb_link_start}trang facebook{fb_link_end}. Mặc dù chúng tôi "
+"không có cơ hội trả lời từng email, chúng tôi vẫn sẽ xem xét tất cả các phản"
+" hồi."
 
 #: lms/templates/contact.html
 msgid "Technical Inquiries and Feedback"
@@ -6966,22 +6904,6 @@ msgstr "Mới"
 #: lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Bảng Điều Khiển"
-
-#: lms/templates/dashboard.html lms/templates/courseware/course_about.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "Có lỗi xảy ra. Vui lòng thử lại sau."
-
-#: lms/templates/dashboard.html
-msgid "Please verify your new email address"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid ""
-"You'll receive a confirmation in your inbox. Please follow the link in the "
-"email to confirm your email address change."
-msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -7264,11 +7186,11 @@ msgstr ""
 "Vật lý, Thống kê và nhiều ngành khác nữa. {EdX} là một sản phẩm sáng tạo phi"
 " lợi nhuận tạo nên bởi hai thành viên đồng sáng lập {Harvard} và {MIT}."
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 msgid "&copy; 2014 edX, some rights reserved."
 msgstr "&copy; 2014 edX, một số quyền được bảo hộ."
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
 msgstr "Điều Khoản Sử Dụng Dịch Vụ và Cam Kết Danh Dự"
@@ -7281,7 +7203,7 @@ msgstr ""
 msgid "About & Company Info"
 msgstr "Thông Tin Về Công Ty"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "About"
 msgstr "Về edX"
@@ -7290,7 +7212,7 @@ msgstr "Về edX"
 msgid "News"
 msgstr "Tin Tức"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
@@ -7332,17 +7254,17 @@ msgstr "LinkedIn"
 msgid "Google+"
 msgstr "Google+"
 
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "Việc làm"
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid "edX Logo"
 msgstr "Logo edX "
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid ""
 "{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
 " mission is to bring the best of higher education to students of all ages "
@@ -7806,47 +7728,47 @@ msgstr "Xác nhận"
 msgid "Reject"
 msgstr "Từ chối"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Find Courses"
 msgstr "Tìm Khóa Học"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
 msgstr "Bảng Điều Khiển của:"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "More options dropdown"
 msgstr "Các tuỳ chọn thả xuống"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Log Out"
 msgstr "Đăng Xuất"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
 msgstr "Giỏ Hàng"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
 msgstr "Phương Thức Hoạt Động"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation-edx.html
 msgid "Schools & Partners"
 msgstr "Các Trường & Đối Tác"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/register.html
 msgid "Register"
 msgstr "Đăng ký"
 
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html lms/templates/register-sidebar.html
+#: lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "Đăng nhập"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -7854,30 +7776,28 @@ msgstr ""
 "<strong>Cảnh báo:</strong> Trình duyệt của bạn không được hỗ trợ đầy đủ. "
 "Chúng tôi khuyên bạn nên sử dụng {chrome_link} hoặc {ff_link}."
 
-#: lms/templates/notes.html lms/templates/textannotation.html
-#: lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "Bạn không có bất kỳ ghi chú nào."
-
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Global Navigation"
 msgstr "Định Vị Toàn Cầu"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/navigation.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 msgid "Courses"
 msgstr "Khóa học"
 
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Schools"
 msgstr "Trường"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Register Now"
 msgstr "Đăng Ký Ngay"
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "Bạn không có bất kỳ ghi chú nào."
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -8438,6 +8358,11 @@ msgstr "Ngày"
 msgid "Git Action"
 msgstr "Hoạt động Git"
 
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "No git import logs have been recorded for this course."
+msgstr ""
+
 #: lms/templates/textannotation.html
 msgid "Source:"
 msgstr "Nguồn:"
@@ -8561,7 +8486,7 @@ msgstr "Toàn màn hình"
 msgid "HD off"
 msgstr "Tắt chất lượng HD"
 
-#: lms/templates/video.html lms/templates/video.html
+#: lms/templates/video.html
 msgid "Turn off captions"
 msgstr "Tắt phụ đề"
 
@@ -8795,6 +8720,12 @@ msgstr "{chapter}, chương hiện tại"
 #: lms/templates/courseware/progress.html
 msgid "due {date}"
 msgstr "hạn {date}"
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/mktg_course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "Có lỗi xảy ra. Vui lòng thử lại sau."
 
 #: lms/templates/courseware/course_about.html
 msgid ""
@@ -9728,9 +9659,6 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -12701,12 +12629,10 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
 msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
@@ -12714,68 +12640,41 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your registration for"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Professional Education"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Upgrading to:"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Re-verifying for:"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Registering as: "
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Congrats! You are now registered to audit"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
-msgid "Change your mind?"
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "You can always continue to audit the course without verifying."
+#: lms/templates/verify_student/_verification_header.html
+msgid "Upgrading to:"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"You can always {a_start} audit the course for free {a_end} without "
-"verifying."
+#: lms/templates/verify_student/_verification_header.html
+msgid "Re-verifying for:"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "Registering as: "
+msgstr ""
+
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
 msgstr ""
 
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
@@ -13369,6 +13268,16 @@ msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "What if my camera isn't working?"
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "You can always continue to audit the course without verifying."
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"You can always {a_start} audit the course for free {a_end} without "
+"verifying."
 msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
@@ -14951,15 +14860,31 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
+#: cms/templates/index.html
+msgid "Courses Being Processed"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Course Run:"
 msgstr ""
 
 #: cms/templates/index.html
+msgid "This course run is currently being created."
+msgstr ""
+
+#. Translators: This is a status message, used to inform the user of what the
+#. system is doing. This status means that the user has requested to re-run an
+#. existing course, and the system is currently in the process of duplicating
+#. and configuring the existing course so that it can be re-run.
+#: cms/templates/index.html
+msgid "Configuring as re-run"
+msgstr ""
+
+#: cms/templates/index.html
 msgid ""
 "The new course will be added to your course list in 5-10 minutes. Return to "
-"this page or <a href=\"#\" class=\"action-reload\">refresh it</a> to update "
-"the course list. The new course will need some manual configuration."
+"this page or {link_start}refresh it{link_end} to update the course list. The"
+" new course will need some manual configuration."
 msgstr ""
 
 #: cms/templates/index.html
@@ -15071,6 +14996,10 @@ msgstr ""
 msgid "Getting Started with edX Studio"
 msgstr ""
 
+#: cms/templates/index.html cms/templates/index.html
+msgid "Use our feedback tool, Tender, to request help"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/widgets/sock.html
 msgid "Request help with edX Studio"
 msgstr ""
@@ -15080,11 +15009,9 @@ msgid "Can I create courses in Studio?"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "In order to create courses in Studio, you must"
-msgstr ""
-
-#: cms/templates/index.html
-msgid "contact edX staff to help you create a course"
+msgid ""
+"In order to create courses in Studio, you must {link_start}contact edX staff"
+" to help you create a course{link_end}."
 msgstr ""
 
 #: cms/templates/index.html
@@ -15094,11 +15021,9 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Your request to author courses in studio has been denied. Please"
-msgstr ""
-
-#: cms/templates/index.html
-msgid "contact edX Staff with further questions"
+msgid ""
+"Your request to author courses in Studio has been denied. Please "
+"{link_start}contact edX Staff with further questions{link_end}."
 msgstr ""
 
 #: cms/templates/index.html
@@ -15125,6 +15050,10 @@ msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Request help with your Studio account"
 msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html

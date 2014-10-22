@@ -264,7 +264,7 @@ class ViewsTestCase(TestCase):
 
     def test_course_mktg_register(self):
         response = self._load_mktg_about()
-        self.assertIn('Register for', response.content)
+        self.assertIn('Enroll in', response.content)
         self.assertNotIn('and choose your student track', response.content)
 
     def test_course_mktg_register_multiple_modes(self):
@@ -280,7 +280,7 @@ class ViewsTestCase(TestCase):
         )
 
         response = self._load_mktg_about()
-        self.assertIn('Register for', response.content)
+        self.assertIn('Enroll in', response.content)
         self.assertIn('and choose your student track', response.content)
         # clean up course modes
         CourseMode.objects.all().delete()
@@ -291,7 +291,7 @@ class ViewsTestCase(TestCase):
         # supports only English, override the language setting
         # and use English.
         response = self._load_mktg_about(language='eo')
-        self.assertContains(response, "Register for")
+        self.assertContains(response, "Enroll in")
 
     @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': False})
     def test_mktg_about_language_openedx(self):
@@ -299,7 +299,7 @@ class ViewsTestCase(TestCase):
         # may want to support languages other than English,
         # so respect the language code.
         response = self._load_mktg_about(language='eo')
-        self.assertContains(response, u"Régïstér för".encode('utf-8'))
+        self.assertContains(response, u"Énröll ïn".encode('utf-8'))
 
     def test_submission_history_accepts_valid_ids(self):
         # log into a staff account

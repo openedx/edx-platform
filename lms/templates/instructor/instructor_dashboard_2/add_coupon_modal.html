@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%page args="section_data"/>
-<section id="add-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Password Reset')}">
+<section id="add-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Add Coupon')}">
   <div class="inner-wrapper">
     <button class="close-modal">
       <i class="icon-remove"></i>
@@ -21,7 +21,7 @@
           ${_("Please enter Coupon detail below")}</p>
       </div>
 
-      <form id="add_coupon_form" action="${section_data['ajax_add_coupon']}" method="post" data-remote="true">
+      <form id="add_coupon_form">
         <div id="coupon_form_error" class="modal-form-error"></div>
         <fieldset class="group group-form group-form-requiredinformation">
           <legend class="is-hidden">${_("Required Information")}</legend>
@@ -54,7 +54,7 @@
         </fieldset>
 
         <div class="submit">
-          <input name="submit" type="submit" id="add_coupon_button" value="${_('Add Coupon')}"/>
+          <input name="submit" type="button" id="add_coupon_button" value="${_('Add Coupon')}"/>
         </div>
       </form>
     </div>

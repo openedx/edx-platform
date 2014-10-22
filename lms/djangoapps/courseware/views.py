@@ -39,7 +39,7 @@ from course_modes.models import CourseMode
 
 from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment
-from student.views import single_course_reverification_info
+from student.views import single_course_reverification_info, is_course_blocked
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
@@ -277,12 +277,22 @@ def index(request, course_id, chapter=None, section=None,
 
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
 
-    # Redirecting to dashboard if the course is blocked due to un payment.
-    redeemed_registration_codes = CourseRegistrationCode.objects.filter(course_id=course_key, registrationcoderedemption__redeemed_by=request.user)
-    for redeemed_registration in redeemed_registration_codes:
-        if not getattr(redeemed_registration.invoice, 'is_valid'):
-            log.warning(u'User %s cannot access the course %s because payment has not yet been received', user, course_key.to_deprecated_string())
-            return redirect(reverse('dashboard'))
+    redeemed_registration_codes = CourseRegistrationCode.objects.filter(
+        course_id=course_key,
+        registrationcoderedemption__redeemed_by=request.user
+    )
+
+    # Redirect to dashboard if the course is blocked due to non-payment.
+    if is_course_blocked(request, redeemed_registration_codes, course_key):
+        # registration codes may be generated via Bulk Purchase Scenario
+        # we have to check only for the invoice generated registration codes
+        # that their invoice is valid or not
+        log.warning(
+            u'User %s cannot access the course %s because payment has not yet been received',
+            user,
+            course_key.to_deprecated_string()
+        )
+        return redirect(reverse('dashboard'))
 
     request.user = user  # keep just one instance of User
     with modulestore().bulk_operations(course_key):
@@ -703,7 +713,8 @@ def course_about(request, course_id):
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
             cart = shoppingcart.models.Order.get_cart_for_user(request.user)
-            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key)
+            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
+                shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
 
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())

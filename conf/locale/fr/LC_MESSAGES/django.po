@@ -150,7 +150,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-14 11:53-0400\n"
+"POT-Creation-Date: 2014-10-20 10:16-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -332,7 +332,7 @@ msgstr "Identifiant de cours invalide"
 msgid "Course id is invalid"
 msgstr "Id de cours invalide"
 
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py
 msgid "Could not enroll"
 msgstr ""
 
@@ -1234,7 +1234,6 @@ msgstr "erreur"
 #. in
 #. to the site.
 #: common/lib/capa/capa/responsetypes.py
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html lms/templates/login.html
 #: lms/templates/register.html
 msgid "or"
@@ -6315,6 +6314,10 @@ msgid "No selected price or selected price is below minimum."
 msgstr ""
 "Aucun prix n'est sélectionné ou ce dernier est en dessous du seuil minimum."
 
+#: lms/envs/common.py
+msgid "Taiwan"
+msgstr ""
+
 #: lms/lib/xblock/mixin.py
 msgid "Courseware Chrome"
 msgstr "Ressources  de cours Chrome"
@@ -7450,16 +7453,15 @@ msgid "Terms of Service"
 msgstr "Conditions générales du service"
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Politique de confidentialité"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
-#: lms/templates/help_modal.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/static_templates/help.html
+#: lms/templates/help_modal.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html lms/templates/static_templates/help.html
 #: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Aide"
@@ -7475,103 +7477,6 @@ msgstr "S'inscrire à {} | Choisissez votre direction"
 #: common/templates/course_modes/choose.html
 msgid "Sorry, there was an error when trying to register you"
 msgstr "Désolé, une erreur s'est produite en tentant de vous inscrire."
-
-#: common/templates/course_modes/choose.html
-msgid "Select your track:"
-msgstr "Choisissez votre direction :"
-
-#: common/templates/course_modes/choose.html
-msgid "Certificate of Achievement (ID Verified)"
-msgstr "Attestation de Réussite (ID vérifié)"
-
-#: common/templates/course_modes/choose.html
-msgid "Upgrade and work toward a verified Certificate of Achievement."
-msgstr ""
-"Mettre à niveau et travailler pour obtenir un certificat vérifié de "
-"participation"
-
-#: common/templates/course_modes/choose.html
-msgid "Sign up and work toward a verified Certificate of Achievement."
-msgstr ""
-"Inscrivez vous et travaillez à l'obtention d'une Attestation vérifiée de "
-"Réussite."
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Select your contribution for this course (min. $"
-msgstr "Choisissez votre contribution à ce cours (€ minimum)"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "):"
-msgstr "):"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration"
-msgstr "Mettre à niveau votre inscription"
-
-#: common/templates/course_modes/choose.html
-msgid "Select Certificate"
-msgstr "Sélectionner un Certificat"
-
-#: common/templates/course_modes/choose.html
-msgid "Verified Registration Requirements"
-msgstr "Pré-requis pour l'inscription Vérifiée"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To upgrade your registration and work towards a Verified Certificate of "
-"Achievement, you will need a webcam, a credit or debit card, and an ID."
-msgstr ""
-"Pour mettre à niveau votre inscription et travailler pour obtenir un "
-"certificat vérifié de participation, vous aurez besoin d'une webcam, d'une "
-"carte de crédit et d'une pièce d'identité."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"To register for a Verified Certificate of Achievement option, you will need "
-"a webcam, a credit or debit card, and an ID."
-msgstr ""
-"Pour vous inscrire à l'option d'Attestation Vérifiée de Réussite, vous aurez"
-" besoin d'une webcam, une carte de crédit ou débit, et une pièce d'identité."
-
-#: common/templates/course_modes/choose.html
-msgid "What is an ID Verified Certificate?"
-msgstr "Qu'est ce qu'un Certificat avec ID Vérifiée ?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"An ID Verified Certificate requires proof of your identity through your "
-"photo and ID and is checked throughout the course to verify that it is you "
-"who earned the passing grade."
-msgstr ""
-"Un Certificat avec ID Vérifiée nécessite que votre identité soit vérifiée "
-"par votre photo et pièce d'identité durant le cours, pour prouver que c'est "
-"bien vous qui avez obtenu le grade."
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid "Audit This Course"
-msgstr "Suivre ce Cours"
-
-#: common/templates/course_modes/choose.html
-#: common/templates/course_modes/choose.html
-msgid ""
-"Audit this course for free and have complete access to all the course "
-"material, activities, tests, and forums. If your work is satisfactory and "
-"you abide by the Honor Code, you'll receive a personalized Honor Code "
-"Certificate to showcase your achievement."
-msgstr ""
-"Suivez gratuitement ce cours et accédez à toutes les données, activités, "
-"tests et forum. Si votre travail est satisfaisant et que vous suivez le Code"
-" d'Honneur, vous recevrez un Certificat de Code d'Honneur personnalisé pour "
-"officialiser votre réussite."
-
-#: common/templates/course_modes/choose.html
-msgid "Select Audit"
-msgstr "Sélectionner Audit"
 
 #: common/templates/course_modes/choose.html
 msgid "Now choose your course track:"
@@ -7604,6 +7509,35 @@ msgstr ""
 " l'avancement de carrière, ou des candidatures dans des écoles? Alors "
 "engagez-vous pour un certificat de réussite Vérifié pour accompagner vos "
 "réalisations. Un tarif minimum s'applique."
+
+#: common/templates/course_modes/choose.html
+msgid "Select your contribution for this course (min. $"
+msgstr "Choisissez votre contribution à ce cours (€ minimum)"
+
+#: common/templates/course_modes/choose.html
+#: lms/templates/verify_student/photo_verification.html
+msgid "):"
+msgstr "):"
+
+#: common/templates/course_modes/choose.html
+msgid "Upgrade Your Registration"
+msgstr "Mettre à niveau votre inscription"
+
+#: common/templates/course_modes/choose.html
+msgid "Audit This Course"
+msgstr "Suivre ce Cours"
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
+msgstr ""
+"Suivez gratuitement ce cours et accédez à toutes les données, activités, "
+"tests et forum. Si votre travail est satisfaisant et que vous suivez le Code"
+" d'Honneur, vous recevrez un Certificat de Code d'Honneur personnalisé pour "
+"officialiser votre réussite."
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue an Honor Code Certificate"
@@ -7645,12 +7579,12 @@ msgstr "Vision"
 msgid "Faq"
 msgstr "Faq"
 
-#: lms/templates/contact.html lms/templates/footer-edx.html
+#: lms/templates/contact.html lms/templates/footer-legacy.html
 msgid "Press"
 msgstr "Presse"
 
 #: lms/templates/contact.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
@@ -7747,22 +7681,6 @@ msgstr "Nouveau"
 #: lms/templates/dashboard.html
 msgid "Dashboard"
 msgstr "Tableau de bord"
-
-#: lms/templates/dashboard.html lms/templates/courseware/course_about.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/courseware/mktg_course_about.html
-msgid "An error occurred. Please try again later."
-msgstr "Une erreur s'est produite. Merci d'essayer de nouveau plus tard."
-
-#: lms/templates/dashboard.html
-msgid "Please verify your new email address"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid ""
-"You'll receive a confirmation in your inbox. Please follow the link in the "
-"email to confirm your email address change."
-msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -8049,11 +7967,11 @@ msgstr ""
 "sciences, les statistiques et plus encore. {EdX} est une initiative en ligne"
 " à but non lucratif créée par les partenaires fondateurs {Harvard} et {MIT}."
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 msgid "&copy; 2014 edX, some rights reserved."
 msgstr "&copy; 2014 edX, certains droits réservés."
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
 msgstr "Conditions générales du service et charte utilisateur"
@@ -8066,7 +7984,7 @@ msgstr "(Revisé le 16/04/2014)"
 msgid "About & Company Info"
 msgstr "Présentation et informations sur la compagnie"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html
 msgid "About"
 msgstr "A propos"
@@ -8075,7 +7993,7 @@ msgstr "A propos"
 msgid "News"
 msgstr "Nouvelles"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 #: lms/templates/footer.html lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
@@ -8117,17 +8035,17 @@ msgstr "LinkedIn"
 msgid "Google+"
 msgstr "Google+"
 
-#: lms/templates/footer-edx.html lms/templates/footer.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
 #: lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "Recrutement"
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid "edX Logo"
 msgstr "Logo edX"
 
-#: lms/templates/footer-edx.html
+#: lms/templates/footer-legacy.html
 msgid ""
 "{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
 " mission is to bring the best of higher education to students of all ages "
@@ -8603,47 +8521,47 @@ msgstr "Confirmer"
 msgid "Reject"
 msgstr "Rejeter"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Find Courses"
 msgstr "Trouver un cours"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
 msgstr "Tableau de bord pour :"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "More options dropdown"
 msgstr "Liste déroulante d'options supplémentaires"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Log Out"
 msgstr "Déconnexion"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
 msgstr "Panier"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
 msgstr "Comment ça marche"
 
-#: lms/templates/navigation.html
+#: lms/templates/navigation-edx.html
 msgid "Schools & Partners"
 msgstr "Écoles et Partenaires"
 
-#: lms/templates/navigation.html lms/templates/navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/register.html
 msgid "Register"
 msgstr "Inscription"
 
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html lms/templates/register-sidebar.html
+#: lms/templates/register-sidebar.html
 msgid "Log in"
 msgstr "Connexion"
 
-#: lms/templates/navigation.html lms/templates/original_navigation.html
+#: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
@@ -8651,30 +8569,28 @@ msgstr ""
 "<strong>Attention :</strong> Votre navigateur n'est pas complètement "
 "supporté. Nous recommandons vivement d'utiliser {chrome_link} ou {ff_link}."
 
-#: lms/templates/notes.html lms/templates/textannotation.html
-#: lms/templates/videoannotation.html
-msgid "You do not have any notes."
-msgstr "Vous n'avez pas de note."
-
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Global Navigation"
 msgstr "Navigation Globale"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/sysadmin_dashboard.html
+#: lms/templates/navigation.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 msgid "Courses"
 msgstr "Cours"
 
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html
 msgid "Schools"
 msgstr "Écoles"
 
-#: lms/templates/original_navigation.html
-#: lms/templates/original_navigation.html
+#: lms/templates/navigation.html lms/templates/navigation.html
 msgid "Register Now"
 msgstr "Inscription"
+
+#: lms/templates/notes.html lms/templates/textannotation.html
+#: lms/templates/videoannotation.html
+msgid "You do not have any notes."
+msgstr "Vous n'avez pas de note."
 
 #: lms/templates/problem.html
 msgid "Reset"
@@ -9258,6 +9174,11 @@ msgstr "Date"
 msgid "Git Action"
 msgstr "Action Git"
 
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "No git import logs have been recorded for this course."
+msgstr ""
+
 #: lms/templates/textannotation.html
 msgid "Source:"
 msgstr "Source:"
@@ -9383,7 +9304,7 @@ msgstr "Remplir le navigateur"
 msgid "HD off"
 msgstr "HD désactivée"
 
-#: lms/templates/video.html lms/templates/video.html
+#: lms/templates/video.html
 msgid "Turn off captions"
 msgstr "Masquer les sous-titres"
 
@@ -9631,6 +9552,12 @@ msgstr "{chapter}, chapitre en cours"
 #: lms/templates/courseware/progress.html
 msgid "due {date}"
 msgstr "Echéance le {date}"
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/mktg_course_about.html
+msgid "An error occurred. Please try again later."
+msgstr "Une erreur s'est produite. Merci d'essayer de nouveau plus tard."
 
 #: lms/templates/courseware/course_about.html
 msgid ""
@@ -10616,9 +10543,6 @@ msgstr "Inscrit en tant que:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -13956,12 +13880,10 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
 msgstr "Avez-vous des questions ?"
 
 #: lms/templates/verify_student/_reverification_support.html
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
@@ -13971,70 +13893,41 @@ msgstr ""
 "propos de nos certificats{a_end}."
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your registration for"
 msgstr "Vous mettez à jour votre enregistrement pour"
 
-#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for"
 msgstr "Vous faites une nouvelle vérification pour "
 
 #: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "Vous vous inscrivez à"
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Professional Education"
-msgstr ""
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Upgrading to:"
-msgstr "Mise à jour vers :"
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Re-verifying for:"
-msgstr "Nouvelle vérification pour : "
-
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-msgid "Registering as: "
-msgstr "Inscrit en tant que:"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Congrats! You are now registered to audit"
 msgstr "Félicitations ! Vous êtes maintenant inscrit pour auditer le cours"
 
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/_verification_support.html
-msgid "Change your mind?"
-msgstr "Avez-vous changé d'avis ?"
-
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "You can always continue to audit the course without verifying."
-msgstr "Vous pouvez toujours suivre le cours sans vérification."
-
-#: lms/templates/verify_student/_verification_support.html
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"You can always {a_start} audit the course for free {a_end} without "
-"verifying."
+#: lms/templates/verify_student/_verification_header.html
+msgid "Professional Education"
 msgstr ""
-"Vous pouvez toujours {a_start} suivre le cours gratuitement {a_end} sans "
-"vérification."
 
-#: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_header.html
+msgid "Upgrading to:"
+msgstr "Mise à jour vers :"
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Re-verifying for:"
+msgstr "Nouvelle vérification pour : "
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Registering as: "
+msgstr "Inscrit en tant que:"
+
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
 msgstr "Spécifications techniques"
 
-#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
@@ -14721,6 +14614,18 @@ msgstr "Prendre votre photo"
 #: lms/templates/verify_student/photo_verification.html
 msgid "What if my camera isn't working?"
 msgstr "Et si ma caméra ne marche pas ?"
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "You can always continue to audit the course without verifying."
+msgstr "Vous pouvez toujours suivre le cours sans vérification."
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"You can always {a_start} audit the course for free {a_end} without "
+"verifying."
+msgstr ""
+"Vous pouvez toujours {a_start} suivre le cours gratuitement {a_end} sans "
+"vérification."
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Go to Step 2: Take ID Photo"
@@ -16525,20 +16430,32 @@ msgstr "Le trimestre durant lequel le cours va s'exécuter."
 msgid "Create"
 msgstr "Créer"
 
+#: cms/templates/index.html
+msgid "Courses Being Processed"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Course Run:"
 msgstr "Cours dispensé:"
 
 #: cms/templates/index.html
+msgid "This course run is currently being created."
+msgstr ""
+
+#. Translators: This is a status message, used to inform the user of what the
+#. system is doing. This status means that the user has requested to re-run an
+#. existing course, and the system is currently in the process of duplicating
+#. and configuring the existing course so that it can be re-run.
+#: cms/templates/index.html
+msgid "Configuring as re-run"
+msgstr ""
+
+#: cms/templates/index.html
 msgid ""
 "The new course will be added to your course list in 5-10 minutes. Return to "
-"this page or <a href=\"#\" class=\"action-reload\">refresh it</a> to update "
-"the course list. The new course will need some manual configuration."
+"this page or {link_start}refresh it{link_end} to update the course list. The"
+" new course will need some manual configuration."
 msgstr ""
-"Le nouveau cours sera ajouté à votre liste de cours dans 5-10 minutes. "
-"Revenir à cette page ou <a href=\"#\" class=\"action-reload\"> la rafraîchir"
-" </a> pour mettre à jour la liste des cours. Le nouveau cours aura besoin de"
-" configuration manuelle."
 
 #: cms/templates/index.html
 msgid ""
@@ -16677,6 +16594,10 @@ msgstr ""
 msgid "Getting Started with edX Studio"
 msgstr "Premiers pas avec edX studio"
 
+#: cms/templates/index.html cms/templates/index.html
+msgid "Use our feedback tool, Tender, to request help"
+msgstr ""
+
 #: cms/templates/index.html cms/templates/widgets/sock.html
 msgid "Request help with edX Studio"
 msgstr "Demander de l'aide sur edX studio"
@@ -16686,12 +16607,10 @@ msgid "Can I create courses in Studio?"
 msgstr "Puis-je créer des cours dans Studio ?"
 
 #: cms/templates/index.html
-msgid "In order to create courses in Studio, you must"
-msgstr "Pour créer des cours dans Studio, vous devez"
-
-#: cms/templates/index.html
-msgid "contact edX staff to help you create a course"
-msgstr "Contacter l'équipe edX pour vous aider à créer un cours"
+msgid ""
+"In order to create courses in Studio, you must {link_start}contact edX staff"
+" to help you create a course{link_end}."
+msgstr ""
 
 #: cms/templates/index.html
 msgid ""
@@ -16702,13 +16621,10 @@ msgstr ""
 "créateur de cours pour pouvoir créer votre propre cours."
 
 #: cms/templates/index.html
-msgid "Your request to author courses in studio has been denied. Please"
-msgstr "Votre requête de création de cours dans Studio a été refusée. "
-
-#: cms/templates/index.html
-msgid "contact edX Staff with further questions"
+msgid ""
+"Your request to author courses in Studio has been denied. Please "
+"{link_start}contact edX Staff with further questions{link_end}."
 msgstr ""
-"Merci de contacter l'équipe edX pour des renseignements supplémentaires"
 
 #: cms/templates/index.html
 msgid "Thanks for signing up, %(name)s!"
@@ -16742,6 +16658,10 @@ msgstr ""
 "mail ne se trouve pas dans votre boite de réception. Vous ne trouvez "
 "toujours pas le mail de vérification ? Demandez de l'aide via le lien ci-"
 "dessous."
+
+#: cms/templates/index.html
+msgid "Request help with your Studio account"
+msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
