@@ -529,7 +529,8 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 # Extra ajax calls
 urlpatterns += (
     url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
-    url(r'^user_lookup/$', 'student.views.student_handler', name='student_handler')
+    url(r'^user_lookup/$', 'student.views.student_handler', name='student_handler'),
+    url(r'^entity_lookup/$', 'cities.views.entity_handler', name='entity_handler')
 )
 
 # If enabled, expose the URLs for the new dashboard, account, and profile pages

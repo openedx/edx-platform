@@ -229,17 +229,9 @@
 
           <li class="field required text" id="field-publicentity">
             <label for="publicentity">Institución Pública</label>
-	    <input value="NINGUNO" onclick="this.select();" id="publicentity" name="publicentity" type="text" list="entities" required aria-describedby="publicentity-tip"/>
-            <span class="tip tip-input" id="publicentity-tip"><strong>Si es servidor público, seleccione una institución de la lista.</strong></span>
-	    <datalist name="publicentity" id="entities">
-	      % for pe in public_entities:
-	          % if pe.name.upper() == "NINGUNO":
-	          <option id="${pe.id}" value="${pe.name.upper()}" selected="selected">${pe.name}</option>
-		  % else:
-		  <option id="${pe.id}" value="${pe.name.upper()}">${pe.name}</option>
-		  % endif
-	      % endfor
-            </select>
+	    <input placeholder="Su institución o NINGUNO" id="publicentity" name="publicentity" type="text" required aria-describedby="publicentity-tip"/>
+            <span class="tip tip-input" id="publicentity-tip"><strong>Si es servidor público, escriba su institución y seleccione de la lista.</strong></span>
+            <input type="hidden" name="entity_id" value="" id="entity_id"/>
           </li>
         </ol>
 
