@@ -7,6 +7,7 @@
 .login-register {
     @include box-sizing(border-box);
     @include outer-container;
+    $grid-columns: 4;
     background: white;
 
     width: 100%;
@@ -34,7 +35,7 @@
         -webkit-text-fill-color: #333;
     }
 
-    header {
+    .header {
         @include outer-container;
         border-bottom: 1px solid $gray-l4;
         width: 100%;
@@ -45,6 +46,7 @@
             @include box-sizing(border-box);
             @include span-columns(4);
             @include font-size(35);
+            padding: 0 10px;
             font-family: $sans-serif;
             font-weight: $font-semibold;
             text-align: left;
@@ -56,20 +58,20 @@
             @include box-sizing(border-box);
             @include span-columns(4);
             @include font-size(24);
+            padding: 0 10px;
             font-family: $sans-serif;
             font-weight: $font-regular;
         }
     }
 
     .form-toggle {
-        margin: 0 10px;
+        margin: 0;
     }
 
     .form-type {
-        padding-top: 25px;
-        padding-bottom: 25px;
         @include box-sizing(border-box);
         @include span-columns(4);
+        padding: 25px 10px;
 
         &:first-of-type {
             border-bottom: 1px solid $gray-l4;
@@ -83,7 +85,7 @@
         padding-top: 25px;
     }
 
-    .form-label {
+    %bold-label {
         @include font-size(16);
         font-family: $sans-serif;
         font-weight: $font-semibold;
@@ -91,10 +93,18 @@
         text-transform: none;
     }
 
+    .form-label {
+        @extend %bold-label;
+        padding: 0 0 0 5px;
+    }
+
+    .action-label {
+        @extend %bold-label;
+    }
+
     .form-field {
-        width: calc( 100% - 20px );
+        width: 100%;
         margin: 0 0 $baseline 0;
-        padding-left: 10px;
 
         /** FROM _accounts.scss - start **/
         label,
@@ -122,7 +132,13 @@
 
         .field-link {
             position: relative;
-            float: right
+            float: right;
+            color: $link-color-d1;
+            font-weight: $font-regular;
+            text-decoration: none !important; // needed but nasty
+            font-family: $sans-serif;
+            font-size: 0.8em;
+            padding-top: 7px;
         }
 
         input,
@@ -161,7 +177,6 @@
         width: 100%;
     }
 
-
     .input-inline {
         display: inline;
     }
@@ -176,26 +191,37 @@
 
     .action-primary {
         @extend %m-btn-primary;
-        width: calc( 100% - 20px );
-        margin-left: 10px;
+        width: 100%;
         text-transform: none;
     }
 
     @include media( $tablet ) {
-        header h1,
-        header p,
+        $grid-columns: 8;
+
+        .headline,
+        .tagline,
         .form-type {
             @include span-columns(6);
             @include shift(1);
         }
+
+        .form-toggle {
+            margin-right: 5px;
+        }
     }
 
     @include media( $desktop ) {
-        header h1,
-        header p,
+        $grid-columns: 12;
+
+        .headline,
+        .tagline,
         .form-type {
             @include span-columns(6);
             @include shift(3);
+        }
+
+        .form-toggle {
+            margin-right: 10px;
         }
     }
 }
