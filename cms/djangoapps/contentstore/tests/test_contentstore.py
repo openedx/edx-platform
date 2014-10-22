@@ -119,37 +119,16 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our contentstore
-        content_store.get_all_content_thumbnails_for_course(course.id)
+        all_thumbnails = content_store.get_all_content_thumbnails_for_course(course.id)
+        self.assertGreater(len(all_thumbnails), 0)
 
-        #
-        # cdodge: temporarily comment out assertion on thumbnails because many environments
-        # will not have the jpeg converter installed and this test will fail
-        #
-        #
-        # self.assertGreater(len(all_thumbnails), 0)
-
-        content = None
-        try:
-            location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
-            content = content_store.find(location)
-        except NotFoundError:
-            pass
-
+        location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
+        content = content_store.find(location)
         self.assertIsNotNone(content)
 
-        #
-        # cdodge: temporarily comment out assertion on thumbnails because many environments
-        # will not have the jpeg converter installed and this test will fail
-        #
-        # self.assertIsNotNone(content.thumbnail_location)
-        #
-        # thumbnail = None
-        # try:
-        #    thumbnail = content_store.find(content.thumbnail_location)
-        # except:
-        #    pass
-        #
-        # self.assertIsNotNone(thumbnail)
+        self.assertIsNotNone(content.thumbnail_location)
+        thumbnail = content_store.find(content.thumbnail_location)
+        self.assertIsNotNone(thumbnail)
 
     def test_course_info_updates_import_export(self):
         """
