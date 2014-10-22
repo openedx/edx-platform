@@ -13,7 +13,7 @@ var edx = edx || {};
 
         tpl: '#register-tpl',
 
-        fieldTpl: $('#form_field-tpl').html(),
+        fieldTpl: '#form_field-tpl',
 
         events: {
             'click .js-register': 'submitForm',
@@ -26,6 +26,7 @@ var edx = edx || {};
 
         initialize: function( thirdPartyAuthInfo ) {
             this.tpl = $(this.tpl).html();
+            this.fieldTpl = $(this.fieldTpl).html(),
 
             this.providers = thirdPartyAuthInfo.providers || [];
             this.currentProvider = thirdPartyAuthInfo.currentProvider || "";
@@ -87,6 +88,7 @@ var edx = edx || {};
                 i,
                 len = data.length,
                 fieldTpl = this.fieldTpl;
+
             for ( i=0; i<len; i++ ) {
                 html.push( _.template( fieldTpl, $.extend( data[i], {
                     form: 'register'

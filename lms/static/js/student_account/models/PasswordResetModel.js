@@ -29,9 +29,8 @@ var edx = edx || {};
             .done(function() {
                 model.trigger('success');
             })
-            .fail( function( error ) {
-                console.log('RegisterModel.save() FAILURE!!!!!');
-                model.trigger('error', error);
+            .fail( function() {
+                model.trigger('error');
             });
         }
     });

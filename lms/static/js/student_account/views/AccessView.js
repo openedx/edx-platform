@@ -31,7 +31,6 @@ var edx = edx || {};
                 currentProvider: null,
                 providers: []
             };
-            console.log(obj);
 
             this.render();
         },
@@ -54,7 +53,7 @@ var edx = edx || {};
 
         loadForm: function( type ) {
             if ( type === 'login' ) {
-                this.subview.login =  new edx.student.account.LoginView( this.thirdPartyAuth );
+                this.subview.login = new edx.student.account.LoginView( this.thirdPartyAuth );
 
                 // Listen for 'password-help' event to toggle sub-views
                 this.listenTo( this.subview.login, 'password-help', this.resetPassword );
