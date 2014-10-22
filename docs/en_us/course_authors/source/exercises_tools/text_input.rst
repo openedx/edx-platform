@@ -77,7 +77,7 @@ To create this problem in the Advanced Editor, click the **Advanced** tab in the
     <em>This problem is adapted from an exercise that first appeared in MITx's 14.73x The Challenges of Global Poverty course, spring 2013.</em>
   </p>
   <p>What is the technical term that refers to the fact that, when enough people sleep under a bednet, the disease may altogether disappear?</p>
-  <stringresponse answer=".*herd immunity.*" type="ci regexp">
+  <stringresponse answer="herd immunity" type="ci regexp">
          <additional_answer>community immunity</additional_answer>
           <additional_answer>population immunity</additional_answer>
           <textline size="20" label="What is the technical term that refers to the fact that, when enough people sleep under a bednet, the disease may altogether disappear?"/>
@@ -211,7 +211,7 @@ Hints and Regular Expressions in Text Input Problems
 
 You can provide hints that appear when students enter common incorrect answers in text input problems. You can also set a text input problem to allow a regular expression as an answer. To do this, you'll have to modify the problem's XML in the Advanced Editor. 
 
-The regular expression that the student enters must contain the part of the answer that the instructor specifies. For example, if an instructor has specified  ``<answer=".*example answer.*" type="regexp">``, correct answers include ``example answered``, ``two example answers``, or even ``==example answer==``, but not ``examples`` or ``example anser``.
+The regular expression that the student enters must contain the part of the answer that the instructor specifies. For example, if an instructor has specified  ``<answer="example answer" type="regexp">``, correct answers include ``example answered``, ``two example answers``, or even ``==example answer==``, but not ``examples`` or ``example anser``.
 
 You can add ``regexp`` to the value of the ``type`` attribute, for example: ``type="ci regexp"`` or ``type="regexp"`` or ``type="regexp cs"``. In this case, any answer or hint are treated as regular expressions.
 
@@ -229,7 +229,7 @@ Template
 
   <problem>
       <p>Problem text</p>
-      <stringresponse answer="**.Correct answer 1.**" type="ci regexp">
+      <stringresponse answer="Correct answer 1" type="ci regexp">
           <additional_answer>Correct answer 2</additional_answer>
           <additional_answer>Correct answer 3</additional_answer>
           <textline size="20" label="label text"/>
