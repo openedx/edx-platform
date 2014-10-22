@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from enrollment import api
-from student.models import NonExistentCourseError
+from student.models import NonExistentCourseError, CourseEnrollmentException
 
 
 class EnrollmentUserThrottle(UserRateThrottle):
@@ -73,4 +73,6 @@ def get_course_enrollment(request, course_id=None):
     except NonExistentCourseError:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     except api.EnrollmentNotFoundError:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    except CourseEnrollmentException:
         return Response(status=status.HTTP_400_BAD_REQUEST)

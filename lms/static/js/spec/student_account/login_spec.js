@@ -39,6 +39,10 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/LoginVie
             it("allows the user to navigate to the password assistance form", function() {
                 // TODO
             });
+
+            it("enrolls the student into the right location and forwards them properly", function() {
+                // TODO
+            });
         });
     }
 );
