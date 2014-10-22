@@ -164,6 +164,25 @@ class CourseMode(models.Model):
         return 0
 
     @classmethod
+    def has_payment_options(cls, course_id):
+        """Determines if there is any mode that has payment options
+
+        Check the dict of course modes and see if any of them have a minimum price or
+        suggested prices. Returns True if any course mode has a payment option.
+
+        Args:
+            course_mode_dict (dict): Dictionary mapping course mode slugs to Modes
+
+        Returns:
+            True if any course mode has a payment option.
+
+        """
+        for mode in cls.modes_for_course(course_id):
+            if mode.min_price > 0 or mode.suggested_prices != '':
+                return True
+        return False
+
+    @classmethod
     def min_course_price_for_currency(cls, course_id, currency):
         """
         Returns the minimum price of the course in the appropriate currency over all the course's

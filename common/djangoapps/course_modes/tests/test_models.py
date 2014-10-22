@@ -127,3 +127,22 @@ class CourseModeModelTest(TestCase):
         mode = CourseMode.verified_mode_for_course(self.course_key)
 
         self.assertEqual(mode.slug, 'professional')
+
+    def test_course_has_payment_options(self):
+        # Has no payment options.
+        honor, _ = self.create_mode('honor', 'Honor')
+        self.assertFalse(CourseMode.has_payment_options(self.course_key))
+
+        # Now we do have a payment option.
+        verified, _ = self.create_mode('verified', 'Verified', min_price=5)
+        self.assertTrue(CourseMode.has_payment_options(self.course_key))
+
+        # Unset verified's minimum price.
+        verified.min_price = 0
+        verified.save()
+        self.assertFalse(CourseMode.has_payment_options(self.course_key))
+
+        # Finally, give the honor mode payment options
+        honor.suggested_prices = '5, 10, 15'
+        honor.save()
+        self.assertTrue(CourseMode.has_payment_options(self.course_key))
