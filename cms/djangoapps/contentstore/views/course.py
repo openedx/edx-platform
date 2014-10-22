@@ -564,6 +564,22 @@ def _create_new_course(request, org, number, run, fields):
     Returns the URL for the course overview page.
     Raises DuplicateCourseError if the course already exists
     """
+    store_for_new_course = (
+        settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE') or
+        modulestore().default_modulestore.get_modulestore_type()
+    )
+    new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
+    return JsonResponse({
+        'url': reverse_course_url('course_handler', new_course.id),
+        'course_key': unicode(new_course.id),
+    })
+
+
+def create_new_course_in_store(store, user, org, number, run, fields):
+    """
+    Create course in store w/ handling instructor enrollment, permissions, and defaulting the wiki slug.
+    Separated out b/c command line course creation uses this as well as the web interface.
+    """
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
     # existing xml courses this cannot be changed in CourseDescriptor.
     # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
@@ -572,31 +588,22 @@ def _create_new_course(request, org, number, run, fields):
     definition_data = {'wiki_slug': wiki_slug}
     fields.update(definition_data)
 
-    store = modulestore()
-    store_for_new_course = (
-        settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE') or
-        store.default_modulestore.get_modulestore_type()
-    )
-    with store.default_store(store_for_new_course):
+    with modulestore().default_store(store):
         # Creating the course raises DuplicateCourseError if an existing course with this org/name is found
-        new_course = store.create_course(
+        new_course = modulestore().create_course(
             org,
             number,
             run,
-            request.user.id,
+            user.id,
             fields=fields,
         )
 
     # Make sure user has instructor and staff access to the new course
-    add_instructor(new_course.id, request.user, request.user)
+    add_instructor(new_course.id, user, user)
 
     # Initialize permissions for user in the new course
-    initialize_permissions(new_course.id, request.user)
-
-    return JsonResponse({
-        'url': reverse_course_url('course_handler', new_course.id),
-        'course_key': unicode(new_course.id),
-    })
+    initialize_permissions(new_course.id, user)
+    return new_course
 
 
 def _rerun_course(request, org, number, run, fields):
