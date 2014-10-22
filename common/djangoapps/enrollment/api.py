@@ -3,7 +3,11 @@ Enrollment API for creating, updating, and deleting enrollments. Also provides a
 course level, such as available course modes.
 
 """
-from enrollment import data
+from django.utils import importlib
+import logging
+from django.conf import settings
+
+log = logging.getLogger(__name__)
 
 
 class CourseEnrollmentError(Exception):
@@ -12,7 +16,24 @@ class CourseEnrollmentError(Exception):
     Describes any error that may occur when reading or updating enrollment information for a student or a course.
 
     """
+    def __init__(self, msg, data=None):
+        super(Exception, self).__init__(msg)
+        # Corresponding information to help resolve the error.
+        self.data = data
+
+
+class CourseModeNotFoundError(CourseEnrollmentError):
     pass
+
+
+class EnrollmentNotFoundError(CourseEnrollmentError):
+    pass
+
+
+class EnrollmentApiLoadError(CourseEnrollmentError):
+    pass
+
+DEFAULT_DATA_API = 'enrollment.data'
 
 
 def get_enrollments(student_id):
@@ -31,36 +52,58 @@ def get_enrollments(student_id):
         >>> get_enrollments("Bob")
         [
             {
-                course_id: "edX/DemoX/2014T2",
-                is_active: True,
-                mode: "honor",
-                student: "Bob",
-                course_modes: [
-                    "audit",
-                    "honor"
-                ],
-                enrollment_start: 2014-04-07,
-                enrollment_end: 2014-06-07,
-                invite_only: False
+                "created": "2014-10-20T20:18:00Z",
+                "mode": "honor",
+                "is_active": True,
+                "student": "Bob",
+                "course": {
+                    "course_id": "edX/DemoX/2014T2",
+                    "enrollment_end": 2014-12-20T20:18:00Z,
+                    "course_modes": [
+                        {
+                            "slug": "honor",
+                            "name": "Honor Code Certificate",
+                            "min_price": 0,
+                            "suggested_prices": "",
+                            "currency": "usd",
+                            "expiration_datetime": null,
+                            "description": null
+                        }
+                    ],
+                    "enrollment_start": 2014-10-15T20:18:00Z,
+                    "invite_only": False
+                }
             },
             {
-                course_id: "edX/edX-Insider/2014T2",
-                is_active: True,
-                mode: "honor",
-                student: "Bob",
-                course_modes: [
-                    "audit",
-                    "honor",
-                    "verified"
-                ],
-                enrollment_start: 2014-05-01,
-                enrollment_end: 2014-06-01,
-                invite_only: True
-            },
+                "created": "2014-10-25T20:18:00Z",
+                "mode": "verified",
+                "is_active": True,
+                "student": "Bob",
+                "course": {
+                    "course_id": "edX/edX-Insider/2014T2",
+                    "enrollment_end": 2014-12-20T20:18:00Z,
+                    "course_modes": [
+                        {
+                            "slug": "honor",
+                            "name": "Honor Code Certificate",
+                            "min_price": 0,
+                            "suggested_prices": "",
+                            "currency": "usd",
+                            "expiration_datetime": null,
+                            "description": null
+                        }
+                    ],
+                    "enrollment_start": 2014-10-15T20:18:00Z,
+                    "invite_only": True
+                }
+            }
         ]
 
     """
-    return data.get_course_enrollments(student_id)
+    enrollments = _data_api().get_course_enrollments(student_id)
+    for enrollment in enrollments:
+        enrollment['student'] = student_id
+    return enrollments
 
 
 def get_enrollment(student_id, course_id):
@@ -76,23 +119,35 @@ def get_enrollment(student_id, course_id):
         A serializable dictionary of the course enrollment.
 
     Example:
-        >>> add_enrollment("Bob", "edX/DemoX/2014T2")
+        >>> get_enrollment("Bob", "edX/DemoX/2014T2")
         {
-            course_id: "edX/DemoX/2014T2",
-            is_active: True,
-            mode: "honor",
-            student: "Bob",
-            course_modes: [
-                "audit",
-                "honor"
-            ],
-            enrollment_start: 2014-04-07,
-            enrollment_end: 2014-06-07,
-            invite_only: False
+            "created": "2014-10-20T20:18:00Z",
+            "mode": "honor",
+            "is_active": True,
+            "student": "Bob",
+            "course": {
+                "course_id": "edX/DemoX/2014T2",
+                "enrollment_end": 2014-12-20T20:18:00Z,
+                "course_modes": [
+                    {
+                        "slug": "honor",
+                        "name": "Honor Code Certificate",
+                        "min_price": 0,
+                        "suggested_prices": "",
+                        "currency": "usd",
+                        "expiration_datetime": null,
+                        "description": null
+                    }
+                ],
+                "enrollment_start": 2014-10-15T20:18:00Z,
+                "invite_only": False
+            }
         }
 
     """
-    return data.get_course_enrollment(student_id, course_id)
+    enrollment = _data_api().get_course_enrollment(student_id, course_id)
+    enrollment['student'] = student_id
+    return enrollment
 
 
 def add_enrollment(student_id, course_id, mode='honor', is_active=True):
@@ -114,20 +169,33 @@ def add_enrollment(student_id, course_id, mode='honor', is_active=True):
     Example:
         >>> add_enrollment("Bob", "edX/DemoX/2014T2", mode="audit")
         {
-            course_id: "edX/DemoX/2014T2",
-            is_active: True,
-            mode: "audit",
-            student: "Bob",
-            course_modes: [
-                "audit",
-                "honor"
-            ],
-            enrollment_start: 2014-04-07,
-            enrollment_end: 2014-06-07,
-            invite_only: False
+            "created": "2014-10-20T20:18:00Z",
+            "mode": "honor",
+            "is_active": True,
+            "student": "Bob",
+            "course": {
+                "course_id": "edX/DemoX/2014T2",
+                "enrollment_end": 2014-12-20T20:18:00Z,
+                "course_modes": [
+                    {
+                        "slug": "honor",
+                        "name": "Honor Code Certificate",
+                        "min_price": 0,
+                        "suggested_prices": "",
+                        "currency": "usd",
+                        "expiration_datetime": null,
+                        "description": null
+                    }
+                ],
+                "enrollment_start": 2014-10-15T20:18:00Z,
+                "invite_only": False
+            }
         }
     """
-    return data.update_course_enrollment(student_id, course_id, mode=mode, is_active=is_active)
+    _validate_course_mode(course_id, mode)
+    enrollment = _data_api().update_course_enrollment(student_id, course_id, mode=mode, is_active=is_active)
+    enrollment['student'] = student_id
+    return enrollment
 
 
 def deactivate_enrollment(student_id, course_id):
@@ -146,20 +214,38 @@ def deactivate_enrollment(student_id, course_id):
     Example:
         >>> deactivate_enrollment("Bob", "edX/DemoX/2014T2")
         {
-            course_id: "edX/DemoX/2014T2",
-            mode: "honor",
-            is_active: False,
-            student: "Bob",
-            course_modes: [
-                "audit",
-                "honor"
-            ],
-            enrollment_start: 2014-04-07,
-            enrollment_end: 2014-06-07,
-            invite_only: False
+            "created": "2014-10-20T20:18:00Z",
+            "mode": "honor",
+            "is_active": False,
+            "student": "Bob",
+            "course": {
+                "course_id": "edX/DemoX/2014T2",
+                "enrollment_end": 2014-12-20T20:18:00Z,
+                "course_modes": [
+                    {
+                        "slug": "honor",
+                        "name": "Honor Code Certificate",
+                        "min_price": 0,
+                        "suggested_prices": "",
+                        "currency": "usd",
+                        "expiration_datetime": null,
+                        "description": null
+                    }
+                ],
+                "enrollment_start": 2014-10-15T20:18:00Z,
+                "invite_only": False
+            }
         }
     """
-    return data.update_course_enrollment(student_id, course_id, is_active=False)
+    # Check to see if there is an enrollment. We do not want to create a deactivated enrollment.
+    if not _data_api().get_course_enrollment(student_id, course_id):
+        raise EnrollmentNotFoundError(
+            u"No enrollment was found for student {student} in course {course}"
+            .format(student=student_id, course=course_id)
+        )
+    enrollment = _data_api().update_course_enrollment(student_id, course_id, is_active=False)
+    enrollment['student'] = student_id
+    return enrollment
 
 
 def update_enrollment(student_id, course_id, mode):
@@ -178,21 +264,34 @@ def update_enrollment(student_id, course_id, mode):
     Example:
         >>> update_enrollment("Bob", "edX/DemoX/2014T2", "honor")
         {
-            course_id: "edX/DemoX/2014T2",
-            mode: "honor",
-            is_active: True,
-            student: "Bob",
-            course_modes: [
-                "audit",
-                "honor"
-            ],
-            enrollment_start: 2014-04-07,
-            enrollment_end: 2014-06-07,
-            invite_only: False
+            "created": "2014-10-20T20:18:00Z",
+            "mode": "honor",
+            "is_active": True,
+            "student": "Bob",
+            "course": {
+                "course_id": "edX/DemoX/2014T2",
+                "enrollment_end": 2014-12-20T20:18:00Z,
+                "course_modes": [
+                    {
+                        "slug": "honor",
+                        "name": "Honor Code Certificate",
+                        "min_price": 0,
+                        "suggested_prices": "",
+                        "currency": "usd",
+                        "expiration_datetime": null,
+                        "description": null
+                    }
+                ],
+                "enrollment_start": 2014-10-15T20:18:00Z,
+                "invite_only": False
+            }
         }
 
     """
-    return data.update_course_enrollment(student_id, course_id, mode)
+    _validate_course_mode(course_id, mode)
+    enrollment = _data_api().update_course_enrollment(student_id, course_id, mode)
+    enrollment['student'] = student_id
+    return enrollment
 
 
 def get_course_enrollment_details(course_id):
@@ -209,15 +308,67 @@ def get_course_enrollment_details(course_id):
     Example:
         >>> get_course_enrollment_details("edX/DemoX/2014T2")
         {
-            course_id: "edX/DemoX/2014T2",
-            course_modes: [
-                "audit",
-                "honor"
+            "course_id": "edX/DemoX/2014T2",
+            "enrollment_end": 2014-12-20T20:18:00Z,
+            "course_modes": [
+                {
+                    "slug": "honor",
+                    "name": "Honor Code Certificate",
+                    "min_price": 0,
+                    "suggested_prices": "",
+                    "currency": "usd",
+                    "expiration_datetime": null,
+                    "description": null
+                }
             ],
-            enrollment_start: 2014-04-01,
-            enrollment_end: 2014-06-01,
-            invite_only: False
+            "enrollment_start": 2014-10-15T20:18:00Z,
+            "invite_only": False
         }
 
     """
-    pass
+    return _data_api().get_course_enrollment_info(course_id)
+
+
+def _validate_course_mode(course_id, mode):
+    """Checks to see if the specified course mode is valid for the course.
+
+    If the requested course mode is not available for the course, raise an error with corresponding
+    course enrollment information.
+
+    'honor' is special cased. If there are no course modes configured, and the specified mode is
+    'honor', return true, allowing the enrollment to be 'honor' even if the mode is not explicitly
+    set for the course.
+
+    Args:
+        course_id (str): The course to check against for available course modes.
+        mode (str): The slug for the course mode specified in the enrollment.
+
+    Returns:
+        None
+
+    Raises:
+        CourseModeNotFound: raised if the course mode is not found.
+    """
+    course_enrollment_info = _data_api().get_course_enrollment_info(course_id)
+    course_modes = course_enrollment_info["course_modes"]
+    if mode not in (mode['slug'] for mode in course_modes):
+        msg = u"Specified course mode unavailable for course {course_id}".format(course_id=course_id)
+        log.warn(msg)
+        error = CourseModeNotFoundError(msg, course_enrollment_info)
+        raise error
+
+
+def _data_api():
+    """Returns a Data API.
+    This relies on Django settings to find the appropriate data API.
+
+    """
+    # We retrieve the settings in-line here (rather than using the
+    # top-level constant), so that @override_settings will work
+    # in the test suite.
+    api_path = getattr(settings, "ENROLLMENT_DATA_API", DEFAULT_DATA_API)
+
+    try:
+        return importlib.import_module(api_path)
+    except (ImportError, ValueError):
+        raise EnrollmentApiLoadError(api_path)
