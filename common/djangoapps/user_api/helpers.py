@@ -2,6 +2,7 @@
 Helper functions for the account/profile Python APIs.
 This is NOT part of the public API.
 """
+from collections import defaultdict
 from functools import wraps
 import logging
 import json
@@ -101,6 +102,12 @@ class FormDescription(object):
         "password": ["min_length", "max_length"],
     }
 
+    OVERRIDE_FIELD_PROPERTIES = [
+        "label", "type", "default", "placeholder",
+        "instructions", "required", "restrictions",
+        "options"
+    ]
+
     def __init__(self, method, submit_url):
         """Configure how the form should be submitted.
 
@@ -112,6 +119,7 @@ class FormDescription(object):
         self.method = method
         self.submit_url = submit_url
         self.fields = []
+        self._field_overrides = defaultdict(dict)
 
     def add_field(
         self, name, label=u"", field_type=u"text", default=u"",
@@ -161,8 +169,8 @@ class FormDescription(object):
             raise InvalidFieldError(msg)
 
         field_dict = {
-            "label": label,
             "name": name,
+            "label": label,
             "type": field_type,
             "default": default,
             "placeholder": placeholder,
@@ -191,6 +199,10 @@ class FormDescription(object):
                         field_type=field_type
                     )
                     raise InvalidFieldError(msg)
+
+        # If there are overrides for this field, apply them now.
+        # Any field property can be overwritten (for example, the default value or placeholder)
+        field_dict.update(self._field_overrides.get(name, {}))
 
         self.fields.append(field_dict)
 
@@ -242,6 +254,31 @@ class FormDescription(object):
             "method": self.method,
             "submit_url": self.submit_url,
             "fields": self.fields
+        })
+
+    def override_field_properties(self, field_name, **kwargs):
+        """Override properties of a field.
+
+        The overridden values take precedence over the values provided
+        to `add_field()`.
+
+        Field properties not in `OVERRIDE_FIELD_PROPERTIES` will be ignored.
+
+        Arguments:
+            field_name (string): The name of the field to override.
+
+        Keyword Args:
+            Same as to `add_field()`.
+
+        """
+        # Transform kwarg "field_type" to "type" (a reserved Python keyword)
+        if "field_type" in kwargs:
+            kwargs["type"] = kwargs["field_type"]
+
+        self._field_overrides[field_name].update({
+            property_name: property_value
+            for property_name, property_value in kwargs.iteritems()
+            if property_name in self.OVERRIDE_FIELD_PROPERTIES
         })
 
 
@@ -320,16 +357,28 @@ def shim_student_view(view_func, check_logged_in=False):
             success = True
             redirect_url = None
 
-        # If the user is not authenticated, and we expect them to be
-        # send a status 403.
-        if check_logged_in and not request.user.is_authenticated():
-            response.status_code = 403
+        # If the user is not authenticated when we expect them to be
+        # send the appropriate status code.
+        # We check whether the user attribute is set to make
+        # it easier to test this without necessarily running
+        # the request through authentication middleware.
+        is_authenticated = (
+            getattr(request, 'user', None) is not None
+            and request.user.is_authenticated()
+        )
+        if check_logged_in and not is_authenticated:
+            # Preserve the 401 status code so the client knows
+            # that the user successfully authenticated with third-party auth
+            # but does not have a linked account.
+            # Otherwise, send a 403 to indicate that the login failed.
+            if response.status_code != 401:
+                response.status_code = 403
             response.content = msg
 
         # If the view wants to redirect us, send a status 302
         elif redirect_url is not None:
             response.status_code = 302
-            response.content = redirect_url
+            response['Location'] = redirect_url
 
         # If an error condition occurs, send a status 400
         elif response.status_code != 200 or not success:
@@ -343,6 +392,9 @@ def shim_student_view(view_func, check_logged_in=False):
         # If the response is successful, then return the content
         # of the response directly rather than including it
         # in a JSON-serialized dictionary.
+        # This will also preserve error status codes such as a 401
+        # (if the user is trying to log in using a third-party provider
+        # but hasn't yet linked his or her account.)
         else:
             response.content = msg
 

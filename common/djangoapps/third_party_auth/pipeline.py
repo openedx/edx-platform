@@ -82,12 +82,27 @@ AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_PROFILE = 'profile'
 AUTH_ENTRY_REGISTER = 'register'
+
+# TODO (ECOM-369): Repace `AUTH_ENTRY_LOGIN` and `AUTH_ENTRY_REGISTER`
+# with these values once the A/B test completes, then delete
+# these constants.
+AUTH_ENTRY_LOGIN_2 = 'account_login'
+AUTH_ENTRY_REGISTER_2 = 'account_register'
+
 _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_DASHBOARD,
     AUTH_ENTRY_LOGIN,
     AUTH_ENTRY_PROFILE,
-    AUTH_ENTRY_REGISTER
+    AUTH_ENTRY_REGISTER,
+
+    # TODO (ECOM-369): For the A/B test of the combined
+    # login/registration, we needed to introduce two
+    # additional end-points.  Once the test completes,
+    # delete these constants from the choices list.
+    AUTH_ENTRY_LOGIN_2,
+    AUTH_ENTRY_REGISTER_2,
 ])
+
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
 _PASSWORD_CHARSET = string.letters + string.digits
 
@@ -346,11 +361,28 @@ def parse_query_params(strategy, response, *args, **kwargs):
         'is_register': auth_entry == AUTH_ENTRY_REGISTER,
         # Whether the auth pipeline entered from /profile.
         'is_profile': auth_entry == AUTH_ENTRY_PROFILE,
+
+        # TODO (ECOM-369): Delete these once the A/B test
+        # for the combined login/registration form completes.
+        'is_login_2': auth_entry == AUTH_ENTRY_LOGIN_2,
+        'is_register_2': auth_entry == AUTH_ENTRY_REGISTER_2,
     }
 
-
+# TODO (ECOM-369): Once the A/B test of the combined login/registration
+# form completes, we will be able to remove the extra login/registration
+# end-points.  HOWEVER, users who used the new forms during the A/B
+# test may still have values for "is_login_2" and "is_register_2"
+# in their sessions.  For this reason, we need to continue accepting
+# these kwargs in `redirect_to_supplementary_form`, but
+# these should redirect to the same location as "is_login" and "is_register"
+# (whichever login/registration end-points win in the test).
 @partial.partial
-def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboard=None, is_login=None, is_profile=None, is_register=None, user=None, *args, **kwargs):
+def redirect_to_supplementary_form(
+    strategy, details, response, uid,
+    is_dashboard=None, is_login=None, is_profile=None, is_register=None,
+    is_login_2=None, is_register_2=None,
+    user=None, *args, **kwargs
+):
     """Dispatches user to views outside the pipeline if necessary."""
 
     # We're deliberately verbose here to make it clear what the intended
@@ -364,10 +396,13 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
     # It is important that we always execute the entire pipeline. Even if
     # behavior appears correct without executing a step, it means important
     # invariants have been violated and future misbehavior is likely.
-
     user_inactive = user and not user.is_active
     user_unset = user is None
     dispatch_to_login = is_login and (user_unset or user_inactive)
+
+    # TODO (ECOM-369): Consolidate this with `dispatch_to_login`
+    # once the A/B test completes.
+    dispatch_to_login_2 = is_login_2 and (user_unset or user_inactive)
 
     if is_dashboard or is_profile:
         return
@@ -375,8 +410,18 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
     if dispatch_to_login:
         return redirect('/login', name='signin_user')
 
+    # TODO (ECOM-369): Consolidate this with `dispatch_to_login`
+    # once the A/B test completes.
+    if dispatch_to_login_2:
+        return redirect(reverse(AUTH_ENTRY_LOGIN_2))
+
     if is_register and user_unset:
         return redirect('/register', name='register_user')
+
+    # TODO (ECOM-369): Consolidate this with `is_register`
+    # once the A/B test completes.
+    if is_register_2 and user_unset:
+        return redirect(reverse(AUTH_ENTRY_REGISTER_2))
 
 @partial.partial
 def login_analytics(*args, **kwargs):
@@ -387,6 +432,12 @@ def login_analytics(*args, **kwargs):
         'is_login': 'edx.bi.user.account.authenticated',
         'is_dashboard': 'edx.bi.user.account.linked',
         'is_profile': 'edx.bi.user.account.linked',
+
+        # Backwards compatibility: during an A/B test for the combined
+        # login/registration form, we introduced a new login end-point.
+        # Since users may continue to have this in their sessions after
+        # the test concludes, we need to continue accepting this action.
+        'is_login_2': 'edx.bi.user.account.authenticated',
     }
 
     # Note: we assume only one of the `action` kwargs (is_dashboard, is_login) to be
@@ -408,7 +459,7 @@ def login_analytics(*args, **kwargs):
             },
             context={
                 'Google Analytics': {
-                    'clientId': tracking_context.get('client_id') 
+                    'clientId': tracking_context.get('client_id')
                 }
             }
         )

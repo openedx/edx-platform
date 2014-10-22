@@ -19,34 +19,10 @@
 % endfor
 </%block>
 
-
-## TODO: Use JavaScript to populate this div with
-## the actual registration/login forms (loaded asynchronously from the user API)
-## The URLS for the forms are:
-## - GET /user_api/v1/registration/
-## - GET /user_api/v1/login_session/
-##
-## You can post back to those URLs with JSON-serialized
-## data from the form fields in order to complete the registration
-## or login.
-##
-## Also TODO: we need to figure out how to enroll students in
-## a course if they got here from a course about page.
-##
-## third_party_auth_providers is a JSON-serialized list of
-## dictionaries of the form:
-## {
-##      "name": "Facebook",
-##      "icon_class": "facebook-icon",
-##      "login_url": "http://api.facebook.com/auth"
-## }
-##
-## Note that this list may be empty.
-##
 <div class="section-bkg-wrapper">
     <div id="login-and-registration-container"
         class="login-register"
         data-initial-mode="${initial_mode}"
-        data-third-party-auth-providers="${third_party_auth_providers}"
+        data-third-party-auth='${third_party_auth}'
     />
 </div>

@@ -6,7 +6,7 @@ from unittest import skipUnless
 from urllib import urlencode
 import json
 
-from mock import patch
+import mock
 import ddt
 from django.test import TestCase
 from django.conf import settings
@@ -14,14 +14,15 @@ from django.core.urlresolvers import reverse
 from django.core import mail
 
 from util.testing import UrlResetMixin
+from third_party_auth.tests.testutil import simulate_running_pipeline
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 
 @ddt.ddt
-class StudentAccountViewTest(UrlResetMixin, TestCase):
-    """ Tests for the student account views. """
+class StudentAccountUpdateTest(UrlResetMixin, TestCase):
+    """ Tests for the student account views that update the user's account information. """
 
     USERNAME = u"heisenberg"
     ALTERNATE_USERNAME = u"walt"
@@ -51,9 +52,9 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
     INVALID_KEY = u"123abc"
 
-    @patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
     def setUp(self):
-        super(StudentAccountViewTest, self).setUp("student_account.urls")
+        super(StudentAccountUpdateTest, self).setUp("student_account.urls")
 
         # Create/activate a new account
         activation_key = account_api.create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
@@ -66,37 +67,6 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
     def test_index(self):
         response = self.client.get(reverse('account_index'))
         self.assertContains(response, "Student Account")
-
-    @ddt.data(
-        ("account_login", "login"),
-        ("account_register", "register"),
-    )
-    @ddt.unpack
-    def test_login_and_registration_form(self, url_name, initial_mode):
-        response = self.client.get(reverse(url_name))
-        expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
-        self.assertContains(response, expected_data)
-
-    @ddt.data("account_login", "account_register")
-    def test_login_and_registration_third_party_auth_urls(self, url_name):
-        response = self.client.get(reverse(url_name))
-
-        # This relies on the THIRD_PARTY_AUTH configuration in the test settings
-        expected_data = u"data-third-party-auth-providers=\"{providers}\"".format(
-            providers=json.dumps([
-                {
-                    u'icon_class': u'icon-facebook',
-                    u'login_url': u'/auth/login/facebook/?auth_entry=login',
-                    u'name': u'Facebook'
-                },
-                {
-                    u'icon_class': u'icon-google-plus',
-                    u'login_url': u'/auth/login/google-oauth2/?auth_entry=login',
-                    u'name': u'Google'
-                }
-            ])
-        )
-        self.assertContains(response, expected_data)
 
     def test_change_email(self):
         response = self._change_email(self.NEW_EMAIL, self.OLD_PASSWORD)
@@ -144,7 +114,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
     def test_email_change_request_no_user(self):
         # Patch account API to raise an internal error when an email change is requested
-        with patch('student_account.views.account_api.request_email_change') as mock_call:
+        with mock.patch('student_account.views.account_api.request_email_change') as mock_call:
             mock_call.side_effect = account_api.AccountUserNotFound
             response = self._change_email(self.NEW_EMAIL, self.OLD_PASSWORD)
 
@@ -215,7 +185,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         activation_key = account_api.request_email_change(self.USERNAME, self.NEW_EMAIL, self.OLD_PASSWORD)
 
         # Patch account API to return an internal error
-        with patch('student_account.views.account_api.confirm_email_change') as mock_call:
+        with mock.patch('student_account.views.account_api.confirm_email_change') as mock_call:
             mock_call.side_effect = account_api.AccountInternalError
             response = self.client.get(reverse('email_change_confirm', kwargs={'key': activation_key}))
 
@@ -392,3 +362,88 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
             data['email'] = email
 
         return self.client.post(path=reverse('password_change_request'), data=data)
+
+
+@ddt.ddt
+class StudentAccountLoginAndRegistrationTest(TestCase):
+    """ Tests for the student account views that update the user's account information. """
+
+    USERNAME = "bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "password"
+
+    @ddt.data(
+        ("account_login", "login"),
+        ("account_register", "register"),
+    )
+    @ddt.unpack
+    def test_login_and_registration_form(self, url_name, initial_mode):
+        response = self.client.get(reverse(url_name))
+        expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
+        self.assertContains(response, expected_data)
+
+    @ddt.data("account_login", "account_register")
+    def test_login_and_registration_form_already_authenticated(self, url_name):
+        # Create/activate a new account and log in
+        activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        account_api.activate_account(activation_key)
+        result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.assertTrue(result)
+
+        # Verify that we're redirected to the dashboard
+        response = self.client.get(reverse(url_name))
+        self.assertRedirects(response, reverse("dashboard"))
+
+    @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
+    @ddt.data("account_login", "account_register")
+    def test_third_party_auth_disabled(self, url_name):
+        response = self.client.get(reverse(url_name))
+        expected_data = "data-third-party-auth='{auth_info}'".format(
+            auth_info=json.dumps({
+                "currentProvider": None,
+                "providers": []
+            })
+        )
+        self.assertContains(response, expected_data)
+
+    @ddt.data(
+        ("account_login", None, None),
+        ("account_register", None, None),
+        ("account_login", "google-oauth2", "Google"),
+        ("account_register", "google-oauth2", "Google"),
+        ("account_login", "facebook", "Facebook"),
+        ("account_register", "facebook", "Facebook"),
+    )
+    @ddt.unpack
+    def test_third_party_auth(self, url_name, current_backend, current_provider):
+        # Simulate a running pipeline
+        if current_backend is not None:
+            pipeline_target = "student_account.views.third_party_auth.pipeline"
+            with simulate_running_pipeline(pipeline_target, current_backend):
+                response = self.client.get(reverse(url_name))
+
+        # Do NOT simulate a running pipeline
+        else:
+            response = self.client.get(reverse(url_name))
+
+        # This relies on the THIRD_PARTY_AUTH configuration in the test settings
+        expected_data = u"data-third-party-auth='{auth_info}'".format(
+            auth_info=json.dumps({
+                "currentProvider": current_provider,
+                "providers": [
+                    {
+                        "name": "Facebook",
+                        "iconClass": "icon-facebook",
+                        "loginUrl": "/auth/login/facebook/?auth_entry=account_login",
+                        "registerUrl": "/auth/login/facebook/?auth_entry=account_register",
+                    },
+                    {
+                        "name": "Google",
+                        "iconClass": "icon-google-plus",
+                        "loginUrl": "/auth/login/google-oauth2/?auth_entry=account_login",
+                        "registerUrl": "/auth/login/google-oauth2/?auth_entry=account_register",
+                    }
+                ]
+            })
+        )
+        self.assertContains(response, expected_data)

@@ -17,15 +17,20 @@ var edx = edx || {};
 
         events: {
             'click .js-login': 'submitForm',
-            'click .forgot-password': 'forgotPassword'
+            'click .forgot-password': 'forgotPassword',
+            'click .login-provider': 'thirdPartyAuth'
         },
 
         errors: [],
 
         $form: {},
 
-        initialize: function() {
+        initialize: function( thirdPartyAuthInfo ) {
             this.tpl = $(this.tpl).html();
+
+            this.providers = thirdPartyAuthInfo.providers || [];
+            this.currentProvider = thirdPartyAuthInfo.currentProvider || "";
+
             this.getInitialData();
         },
 
@@ -34,7 +39,9 @@ var edx = edx || {};
             var fields = html || '';
 
             $(this.el).html( _.template( this.tpl, {
-                fields: fields
+                fields: fields,
+                currentProvider: this.currentProvider,
+                providers: this.providers
             }));
 
             this.postRender();
@@ -44,9 +51,16 @@ var edx = edx || {};
 
         postRender: function() {
             var $container = $(this.el);
-
             this.$form = $container.find('form');
             this.$errors = $container.find('.error-msg');
+            this.$alreadyAuthenticatedMsg =  $container.find('.already-authenticated-msg');
+
+            // If we're already authenticated with a third-party
+            // provider, try logging in.  The easiest way to do this
+            // is to simply submit the form.
+            if (this.currentProvider) {
+                this.model.save();
+            }
         },
 
         getInitialData: function() {
@@ -58,8 +72,8 @@ var edx = edx || {};
                 url: '/user_api/v1/account/login_session/',
                 success: function( data ) {
                     console.log(data);
-                    that.buildForm( data.fields );
                     that.initModel( data.submit_url, data.method );
+                    that.buildForm( data.fields );
                 },
                 error: function( jqXHR, textStatus, errorThrown ) {
                     console.log('fail ', errorThrown);
@@ -72,9 +86,7 @@ var edx = edx || {};
                 url: url
             });
 
-            this.listenTo( this.model, 'error', function( error ) {
-                console.log(error.status, ' error: ', error.responseText);
-            });
+            this.listenTo( this.model, 'error', this.saveError );
         },
 
         buildForm: function( data ) {
@@ -148,6 +160,16 @@ var edx = edx || {};
             }
         },
 
+        thirdPartyAuth: function( event ) {
+            var providerUrl = $(event.target).data("provider-url") || "";
+            if (providerUrl) {
+                window.location.href = providerUrl;
+            } else {
+                // TODO -- error handling here
+                console.log("No URL available for third party auth provider");
+            }
+        },
+
         toggleErrorMsg: function( show ) {
             if ( show ) {
                 this.$errors.removeClass('hidden');
@@ -158,6 +180,23 @@ var edx = edx || {};
 
         validate: function( $el ) {
             return edx.utils.validate( $el );
+        },
+
+        saveError: function( error ) {
+            console.log(error.status, ' error: ', error.responseText);
+
+            // If we've gotten a 401 error, it means that we've successfully
+            // authenticated with a third-party provider, but we haven't
+            // linked the account to an EdX account.  In this case,
+            // we need to prompt the user to enter a little more information
+            // to complete the registration process.
+            if (error.status === 401 && this.currentProvider) {
+                this.$alreadyAuthenticatedMsg.removeClass("hidden");
+            }
+            else {
+                this.$alreadyAuthenticatedMsg.addClass("hidden");
+                // TODO -- display the error
+            }
         }
     });
 
