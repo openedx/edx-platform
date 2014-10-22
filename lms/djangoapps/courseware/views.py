@@ -55,6 +55,7 @@ from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
 
+from util.db import commit_on_success_with_read_committed
 from util.views import ensure_valid_course_key
 log = logging.getLogger("edx.courseware")
 
@@ -248,6 +249,7 @@ def chat_settings(course, user):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @ensure_valid_course_key
+@commit_on_success_with_read_committed
 def index(request, course_id, chapter=None, section=None,
           position=None):
     """
