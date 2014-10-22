@@ -152,7 +152,7 @@ def get_time_series_data(queryset, start, end, interval='days', date_field='crea
     _, end = get_interval_bounds(end, interval.rstrip('s'))
 
     if date_field_model:
-        date_field = '"{}"."{}"'.format(date_field_model._meta.db_table, date_field)
+        date_field = '`{}`.`{}`'.format(date_field_model._meta.db_table, date_field)
 
     sql = {
         'mysql': {
@@ -169,7 +169,7 @@ def get_time_series_data(queryset, start, end, interval='days', date_field='crea
         }
     }
     interval_sql = sql[engine][interval]
-    where_clause = '{} BETWEEN "{}" and "{}"'.format(date_field, start, end)
+    where_clause = '{} BETWEEN "{}" AND "{}"'.format(date_field, start, end)
     aggregate_data = queryset.extra(select={'d': interval_sql}, where=[where_clause]).order_by().values('d').\
         annotate(agg=aggregate)
 
@@ -182,4 +182,5 @@ def get_time_series_data(queryset, start, end, interval='days', date_field='crea
         value = data.get(dt_key, 0)
         series.append((dt_key, value,))
         dt_key += relativedelta(**{interval: 1})
+
     return series
