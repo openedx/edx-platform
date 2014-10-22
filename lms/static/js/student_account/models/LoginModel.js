@@ -6,6 +6,7 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
+
     edx.student.account.LoginModel = Backbone.Model.extend({
 
         defaults: {
@@ -32,17 +33,31 @@ var edx = edx || {};
                 headers: headers
             })
             .done(function() {
-                var query = window.location.search,
-                    url = '/dashboard';
+                var enrollment = edx.student.account.EnrollmentInterface,
+                    query = new URI(window.location.search),
+                    url = '/dashboard',
+                    query_map = query.search(true),
+                    next = '';
+                
+                // check for forwarding url
+                if("next" in query_map) {
+                    next = query_map['next'];
+                    if(!window.isExternal(next)){
+                        url = next;
+                    }
+                }
 
                 model.trigger('sync');
 
-                // If query string in url go back to that page
-                if ( query.length > 1 ) {
-                    url = query.substring( query.indexOf('=') + 1 );
+                // if we need to enroll in the course, mark as enrolled
+                if('enrollment_action' in query_map && query_map['enrollment_action'] === 'enroll'){
+                    enrollment.enroll(query_map['course_id'], url);
+                }
+                else {
+                    window.location.href = url;
                 }
 
-                window.location.href = url;
+
             })
             .fail( function( error ) {
                 model.trigger('error', error);
