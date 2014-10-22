@@ -29,7 +29,8 @@ class StudentProgress(TimeStampedModel):
         """
         Returns count of completions for a given course.
         """
-        queryset = cls.objects.filter(course_id__exact=course_key, user__is_active=True)\
+        queryset = cls.objects.filter(course_id__exact=course_key, user__is_active=True,
+                                      user__courseenrollment__is_active=True)\
             .exclude(user__id__in=exclude_users)
         if org_ids:
             queryset = queryset.filter(user__organizations__in=org_ids)
@@ -42,7 +43,8 @@ class StudentProgress(TimeStampedModel):
         """
         Returns count of users who completed at least one module.
         """
-        queryset = cls.objects.filter(course_id__exact=course_key, user__is_active=True)\
+        queryset = cls.objects.filter(course_id__exact=course_key, user__is_active=True,
+                                      user__courseenrollment__is_active=True)\
             .exclude(user__id__in=exclude_users)
         if org_ids:
             queryset = queryset.filter(user__organizations__in=org_ids)
@@ -87,7 +89,8 @@ class StudentProgress(TimeStampedModel):
 
         """
         queryset = cls.objects\
-            .filter(course_id__exact=course_key, user__is_active=True).exclude(user__id__in=exclude_users)
+            .filter(course_id__exact=course_key, user__is_active=True, user__courseenrollment__is_active=True)\
+            .exclude(user__id__in=exclude_users)
         if org_ids:
             queryset = queryset.filter(user__organizations__in=org_ids)
         queryset = queryset.values(
