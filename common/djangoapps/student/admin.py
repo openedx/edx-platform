@@ -15,6 +15,8 @@ from student.models import (
 )
 from student.roles import REGISTERED_ACCESS_ROLES
 
+from edraak_validation import UnicodeUserAdmin
+
 User = get_user_model()  # pylint:disable=invalid-name
 
 
@@ -186,3 +188,6 @@ admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 
 # We must first un-register the User model since it may also be registered by the auth app.
 admin.site.register(User, UserAdmin)
+
+# Edraak: Support Unicode in admin/user pages
+admin.site.register(User, UnicodeUserAdmin)
