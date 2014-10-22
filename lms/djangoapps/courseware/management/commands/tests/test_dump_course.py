@@ -57,7 +57,7 @@ class CommandsTestBase(TestCase):
         courses = store.get_courses()
         # NOTE: if xml store owns these, it won't import them into mongo
         if SlashSeparatedCourseKey.from_deprecated_string(TEST_COURSE_ID) not in [c.id for c in courses]:
-            import_from_xml(store, ModuleStoreEnum.UserID.mgmt_command, DATA_DIR, ['toy', 'simple'])
+            import_from_xml(store, ModuleStoreEnum.UserID.mgmt_command, DATA_DIR, ['toy', 'simple', 'open_ended'])
 
         return [course.id for course in store.get_courses()]
 
@@ -76,6 +76,19 @@ class CommandsTestBase(TestCase):
         course_ids = {course_id.to_deprecated_string() for course_id in self.loaded_courses}
         dumped_ids = set(dumped_courses)
         self.assertEqual(course_ids, dumped_ids)
+
+    def test_correct_course_structure_metadata(self):
+        course_id = 'edX/open_ended/2012_Fall'
+        args = [course_id]
+        kwargs = {'modulestore': 'default'}
+
+        try:
+            output = self.call_command('dump_course_structure', *args, **kwargs)
+        except TypeError, exception:
+            self.fail(exception)
+
+        dump = json.loads(output)
+        self.assertGreater(len(dump.values()), 0)
 
     def test_dump_course_structure(self):
         args = [TEST_COURSE_ID]
