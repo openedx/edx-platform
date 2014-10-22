@@ -1,17 +1,30 @@
 // lms - views - login/register view
 // ====================
+.section-bkg-wrapper {
+    background: $m-gray-l4;
+}
 
 .login-register {
     @include box-sizing(border-box);
-    @include span-columns(4);
+    @include outer-container;
+    $grid-columns: 4;
+    background: white;
+
     width: 100%;
-    max-width: 1200px;
+
+    h2 {
+        line-height: 16px;
+        margin: 0;
+        font-family: $sans-serif;
+    }
 
     /* Temp. fix until applied globally */
-    & > {
+    > {
         @include box-sizing(border-box);
     }
 
+
+    /* Remove autocomplete yellow background */
     input:-webkit-autofill {
         -webkit-box-shadow:0 0 0 50px white inset;
         -webkit-text-fill-color: #333;
@@ -22,14 +35,82 @@
         -webkit-text-fill-color: #333;
     }
 
+    .header {
+        @include outer-container;
+        border-bottom: 1px solid $gray-l4;
+        width: 100%;
+        padding-top: 35px;
+        padding-bottom: 35px;
+
+        .headline {
+            @include box-sizing(border-box);
+            @include span-columns(4);
+            @include font-size(35);
+            padding: 0 10px;
+            font-family: $sans-serif;
+            font-weight: $font-semibold;
+            text-align: left;
+            margin-bottom: 0;
+            color: $m-blue-d5;
+        }
+
+        .tagline {
+            @include box-sizing(border-box);
+            @include span-columns(4);
+            @include font-size(24);
+            padding: 0 10px;
+            font-family: $sans-serif;
+            font-weight: $font-regular;
+        }
+    }
+
+    .form-toggle {
+        margin: 0;
+    }
+
+    .form-type {
+        @include box-sizing(border-box);
+        @include span-columns(4);
+        padding: 25px 10px;
+
+        &:first-of-type {
+            border-bottom: 1px solid $gray-l4;
+        }
+    }
+
+
+
+    /** The forms **/
+    .form-wrapper {
+        padding-top: 25px;
+    }
+
+    %bold-label {
+        @include font-size(16);
+        font-family: $sans-serif;
+        font-weight: $font-semibold;
+        font-style: normal;
+        text-transform: none;
+    }
+
+    .form-label {
+        @extend %bold-label;
+        padding: 0 0 0 5px;
+    }
+
+    .action-label {
+        @extend %bold-label;
+    }
+
     .form-field {
         width: 100%;
         margin: 0 0 $baseline 0;
 
         /** FROM _accounts.scss - start **/
-        label, input, textarea {
+        label,
+        input,
+        textarea {
             border-radius: 0;
-            display: block;
             height: auto;
             font-family: $sans-serif;
             font-style: normal;
@@ -41,10 +122,28 @@
             @include transition(color 0.15s ease-in-out 0s);
             margin: 0 0 ($baseline/4) 0;
             color: tint($black, 20%);
+            font-weight: $font-semibold;
+
+            &.inline {
+                display: inline;
+            }
+
+        }
+
+        .field-link {
+            position: relative;
+            float: right;
+            color: $link-color-d1;
+            font-weight: $font-regular;
+            text-decoration: none !important; // needed but nasty
+            font-family: $sans-serif;
+            font-size: 0.8em;
+            padding-top: 7px;
         }
 
         input,
         textarea {
+            display: block;
             width: 100%;
             margin: 0;
             padding: ($baseline/2) ($baseline*.75);
@@ -55,6 +154,16 @@
 
             &.short {
                 width: 25%;
+            }
+
+            &.checkbox {
+                display: inline;
+                width: auto;
+                margin-right: 5px;
+            }
+
+            &.error {
+                border-color: tint($red,50%);
             }
         }
 
@@ -72,119 +181,51 @@
         width: 100%;
     }
 
-    .desc {
-        display: block;
-        /*@extend %body-text-emphasized;*/
-        margin-bottom: $baseline;
-    }
-
     .input-inline {
         display: inline;
     }
 
+    .desc {
+        @include transition(color 0.15s ease-in-out 0s);
+        display: block;
+        margin-top: ($baseline/4);
+        color: $lighter-base-font-color;
+        font-size: em(13);
+    }
+
+    .action-primary {
+        @extend %m-btn-primary;
+        width: 100%;
+        text-transform: none;
+    }
+
     @include media( $tablet ) {
-        @include span-columns(6);
-        @include shift(1);
+        $grid-columns: 8;
+
+        .headline,
+        .tagline,
+        .form-type {
+            @include span-columns(6);
+            @include shift(1);
+        }
+
+        .form-toggle {
+            margin-right: 5px;
+        }
     }
 
     @include media( $desktop ) {
-        @include span-columns(6);
-        @include shift(3);
+        $grid-columns: 12;
+
+        .headline,
+        .tagline,
+        .form-type {
+            @include span-columns(6);
+            @include shift(3);
+        }
+
+        .form-toggle {
+            margin-right: 10px;
+        }
     }
 }
-
-
-    /*// individual fields
-    .field {
-
-
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      // types - password
-
-      // types - select
-
-
-      // types - checkboxes/radio buttons
-      &.checkbox {
-
-        input[type="checkbox"] {
-          display: inline-block;
-          width: auto;
-          @include margin-right($baseline/4);
-        }
-
-        label {
-          display: inline-block;
-        }
-      }
-
-      // states - all
-      &.disabled,
-      &.submitted {
-        color: rgba(0,0,0,.25);
-
-        label {
-          cursor: text;
-
-          &:after {
-            margin-left: ($baseline/4);
-          }
-        }
-
-        textarea, input {
-          background: $container-bg;
-          color: rgba(0,0,0,.25);
-        }
-      }
-
-      // states - focused
-      &.is-focused {
-
-        label {
-          color: saturate($link-color-d1,15%);
-        }
-
-        .tip {
-          color: saturate($link-color-d1,15%);
-        }
-      }
-
-      // states - disabled
-      &.disabled {
-        label:after {
-          color: rgba(0,0,0,.35);
-          content: "(Disabled Currently)";
-        }
-      }
-
-      &.error {
-
-        label {
-          color: $red;
-        }
-
-        input, textarea {
-          border-color: tint($red,50%);
-        }
-      }
-
-      &.required {
-
-        label {
-          font-weight: 600;
-
-          a {
-            font-weight: 600 !important;
-          }
-        }
-
-        label:after {
-          margin-left: ($baseline/4);
-          content: "*";
-        }
-      }
-    }*/
