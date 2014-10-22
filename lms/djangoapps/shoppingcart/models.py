@@ -312,7 +312,12 @@ class Order(models.Model):
                     from_email=from_address,
                     to=[recipient[1]]
                 )
-                email.content_subtype = "html"
+
+                # only the business order is HTML formatted
+                # the single seat is simple text
+                if is_order_type_business:
+                    email.content_subtype = "html"
+
                 if csv_file:
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
                 email.send()
