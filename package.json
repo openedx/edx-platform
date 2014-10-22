@@ -1,8 +1,8 @@
 {
     "name": "edx",
-    "version": "0.2.0",
+    "version": "0.1.0",
     "dependencies": {
       "coffee-script": "1.6.X",
-      "uglify-js": "2.4.4"
+      "uglify-js": "2.4.0"
     }
 }
