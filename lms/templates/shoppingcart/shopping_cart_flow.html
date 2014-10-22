@@ -5,13 +5,14 @@ from django.utils.translation import ugettext as _
 <%namespace name='static' file='/static_content.html'/>
 <%block name="pagetitle">${_("Shopping cart")}</%block>
 
-
+<%! from django.conf import settings %>
+<%! from microsite_configuration import microsite %>
 
 <%block name="bodyextra">
 
 <div class="container">
   <section class="wrapper confirm-enrollment shopping-cart">
-  <h1> ${_("{site_name} -  Shopping Cart").format(site_name=site_name)}</h1>
+  <h1> ${_("{platform_name} -  Shopping Cart").format(platform_name=microsite.get_value('platform_name', settings.PLATFORM_NAME))}</h1>
       % if shoppingcart_items:
       <ul class="steps">
           <li <%block name="review_highlight"/>>${_('Review')}</li>
