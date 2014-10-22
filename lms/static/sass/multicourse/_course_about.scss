@@ -500,19 +500,19 @@
         }
 
         .share {
-          height: 44px;
           display: inline-block;
-          margin-right: 10px;
+          height: 35px;
+          width: 35px;
+          margin-right: ($baseline);
+          margin-top: ($baseline/4);
+          font-size: 1.75em;
+          text-decoration: none;
+          color: $black;
           opacity: 0.5;
           @include transition(all 0.15s linear 0s);
-          width: 44px;
 
           &:hover, &:focus {
             opacity: 1.0;
-          }
-
-          img {
-            width: 100%;
           }
 
           &:last-child {
@@ -532,21 +532,21 @@
     .important-dates {
       list-style: none;
       margin: 0px;
-      padding: 0px 10px;
+      padding: 0 ($baseline/2);
 
       li {
         @include clearfix;
         border-bottom: 1px dotted $border-color-2;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
+        margin-bottom: $baseline;
+        padding-bottom: ($baseline/2);
 
         &.prerequisites {
           border: 1px solid $border-color-2;
-          margin: 0 -10px 0;
-          padding: 10px;
+          margin: 0 -($baseline/2) 0;
+          padding: ($baseline/2);
 
           p {
-            margin-right: 10px;
+            margin-right: ($baseline/2);
           }
         }
 
@@ -563,37 +563,10 @@
         }
 
         .icon {
-          background-size: cover;
-          float: left;
-          height: 19px;
-          margin: 2px 10px 0 0;
-          opacity: 0.6;
-          @include transition(all 0.15s linear 0s);
-          width: 19px;
-
-          &.start {
-            @include background-image(url('../images/portal-icons/calendar-icon.png'));
-          }
-
-          &.end {
-            @include background-image(url('../images/portal-icons/calendar-icon.png'));
-          }
-
-          &.length {
-            @include background-image(url('../images/portal-icons/chart-icon.png'));
-          }
-
-          &.course-number {
-            @include background-image(url('../images/portal-icons/course-info-icon.png'));
-          }
-
-          &.effort {
-            @include background-image(url('../images/portal-icons/pencil-icon.png'));
-          }
-
-          &.prereq {
-            @include background-image(url('../images/portal-icons/prerec-icon.png'));
-          }
+            float: left;
+            padding: 1px;
+            margin: ($baseline/5) ($baseline/2) 0 0;
+            opacity: .6;
         }
 
         span {
