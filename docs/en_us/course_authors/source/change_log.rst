@@ -13,6 +13,8 @@ October, 2014
 
    * - Date
      - Change
+   * - 10/23/14
+     - Added note about limited support of annotation problem type to :ref:`Annotation`.
    * - 10/16/14
      - Updated :ref:`Set Important Dates for Your Course` to reflect change
        that course dates now use UTC.
