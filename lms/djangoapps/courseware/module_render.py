@@ -626,7 +626,6 @@ def find_target_student_module(request, user_id, course_id, mod_id):
         user,
         modulestore().get_item(usage_key),
         depth=0,
-        select_for_update=True
     )
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue')
     if instance is None:
@@ -637,6 +636,7 @@ def find_target_student_module(request, user_id, course_id, mod_id):
 
 
 @csrf_exempt
+@commit_on_success_with_read_committed
 def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     '''
     Entry point for graded results from the queueing system.
