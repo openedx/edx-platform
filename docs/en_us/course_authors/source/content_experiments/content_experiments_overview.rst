@@ -16,10 +16,6 @@ Information on analyzing events from content experiments is included in the
 
 .. _edX Researcher Guide: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/tracking_logs.html#a-b-testing-events
 
-.. caution::
-  If you have graded problems within a content experiment, grade exports do not
-  work for your course. This issue is currently being addressed.
-
 For more information, see:
 
 * :ref:`Configure Your Course for Content Experiments`
