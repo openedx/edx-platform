@@ -327,7 +327,7 @@ class CourseKeyVerificationTestCase(CourseTestCase):
         super(CourseKeyVerificationTestCase, self).setUp()
         self.course = CourseFactory.create(org='edX', number='test_course_key', display_name='Test Course')
 
-    @data(('edX/test_course_key/Test_Course', 200), ('slashes:edX+test_course_key+Test_Course', 404))
+    @data(('edX/test_course_key/Test_Course', 200), ('garbage:edX+test_course_key+Test_Course', 404))
     @unpack
     def test_course_key_decorator(self, course_key, status_code):
         """
