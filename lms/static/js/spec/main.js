@@ -76,6 +76,9 @@
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
             'js/student_profile/profile': 'js/student_profile/profile'
+
+            // edxnotes
+            'annotator': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
         shim: {
             'gettext': {
@@ -365,6 +368,10 @@
                     'js/student_account/enrollment',
                     'js/student_account/shoppingcart',
                 ]
+            // edx notes
+            'annotator': {
+                exports: 'Annotator',
+                deps: ['jquery']
             }
         }
     });
@@ -377,6 +384,7 @@
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
+<<<<<<< HEAD
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
@@ -385,6 +393,12 @@
         'lms/include/js/spec/student_account/enrollment_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js'
+=======
+        'lms/include/js/spec/student_account/account.js',
+        'lms/include/js/spec/student_profile/profile.js',
+        'lms/include/js/spec/edxnotes/logger_spec.js',
+        'lms/include/js/spec/edxnotes/notes_spec.js'
+>>>>>>> TNL-655: Add/Edit/Remove notes.
     ]);
 
 }).call(this, requirejs, define);
