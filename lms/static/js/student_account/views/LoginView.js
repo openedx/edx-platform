@@ -73,7 +73,6 @@ var edx = edx || {};
         },
 
         saveError: function( error ) {
-            // console.log(error.status, ' error: ', error.responseText);
             this.errors = ['<li>' + error.responseText + '</li>'];
             this.setErrors();
 
@@ -83,13 +82,14 @@ var edx = edx || {};
              * we need to prompt the user to enter a little more information
              * to complete the registration process.
             */
-            if (error.status === 403 && error.responseText === "third-party-auth" && this.currentProvider) {
+            if ( error.status === 403 &&
+                 error.responseText === "third-party-auth" &&
+                 this.currentProvider) {
                 this.element.show( this.$alreadyAuthenticatedMsg );
             } else {
                 this.element.hide( this.$alreadyAuthenticatedMsg );
                 // TODO -- display the error
             }
-
         }
     });
 
