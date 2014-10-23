@@ -117,9 +117,10 @@ class LoginSessionView(APIView):
         Returns:
             HttpResponse: 200 on success
             HttpResponse: 400 if the request is not valid.
-            HttpResponse: 401 if the user successfully authenticated with a third-party
-                provider but does not have a linked account.
             HttpResponse: 403 if authentication failed.
+                403 with content "third-party-auth" if the user
+                has successfully authenticated with a third party provider
+                but does not have a linked account.
             HttpResponse: 302 if redirecting to another page.
 
         Example Usage:
