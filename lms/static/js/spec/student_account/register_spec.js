@@ -23,7 +23,7 @@ define([
                     year_of_birth: 2014,
                     mailing_address: '141 Portland',
                     goals: 'To boldly learn what no letter of the alphabet has learned before',
-                    terms_of_service: true
+                    honor_code: true
                 },
                 THIRD_PARTY_AUTH = {
                     currentProvider: null,
@@ -147,12 +147,12 @@ define([
                             restrictions: {}
                         },
                         {
-                            name: 'terms_of_service',
-                            label: 'Terms of Service',
+                            name: 'honor_code',
+                            label: 'I agree to the <a href="/honor">Terms of Service and Honor Code</a>',
                             defaultValue: '',
                             type: 'checkbox',
                             required: true,
-                            instructions: "Agree to the terms of service.",
+                            instructions: '',
                             restrictions: {}
                         }
                     ]
@@ -191,8 +191,8 @@ define([
                 $('#register-mailing_address').val(USER_DATA.mailing_address);
                 $('#register-goals').val(USER_DATA.goals);
 
-                // Check the terms of service checkbox
-                $('#register-terms_of_service').prop('checked', USER_DATA.terms_of_service);
+                // Check the honor code checkbox
+                $('#register-honor_code').prop('checked', USER_DATA.honor_code);
 
                 // Create a fake click event
                 var clickEvent = $.Event('click');

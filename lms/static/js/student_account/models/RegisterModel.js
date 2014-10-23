@@ -18,12 +18,15 @@ var edx = edx || {};
             year_of_birth: '',
             mailing_address: '',
             goals: '',
-            terms_of_service: false
+            honor_code: false
         },
+
+        ajaxType: '',
 
         urlRoot: '',
 
         initialize: function( obj ) {
+            this.ajaxType = obj.method;
             this.urlRoot = obj.url;
         },
 
@@ -34,15 +37,15 @@ var edx = edx || {};
 
             $.ajax({
                 url: model.urlRoot,
-                type: 'POST',
+                type: model.ajaxType,
                 data: model.attributes,
-                headers: headers
-            })
-            .done(function() {
-                model.trigger('sync');
-            })
-            .fail( function( error ) {
-                model.trigger('error', error);
+                headers: headers,
+                success: function() {
+                    model.trigger('sync');
+                },
+                error: function( error ) {
+                    model.trigger('error', error);
+                }
             });
         }
     });

@@ -14,9 +14,12 @@ var edx = edx || {};
             remember: false
         },
 
+        ajaxType: '',
+
         urlRoot: '',
 
         initialize: function( obj ) {
+            this.ajaxType = obj.method;
             this.urlRoot = obj.url;
         },
 
@@ -27,15 +30,15 @@ var edx = edx || {};
 
             $.ajax({
                 url: model.urlRoot,
-                type: 'POST',
+                type: model.ajaxType,
                 data: model.attributes,
-                headers: headers
-            })
-            .done(function() {
-                model.trigger('sync');
-            })
-            .fail( function( error ) {
-                model.trigger('error', error);
+                headers: headers,
+                success: function() {
+                    model.trigger('sync');
+                },
+                error: function( error ) {
+                    model.trigger('error', error);
+                }
             });
         }
     });

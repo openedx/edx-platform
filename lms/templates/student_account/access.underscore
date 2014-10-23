@@ -3,6 +3,12 @@
     <p class="tagline"><%- gettext("Log in or register to take courses from the world's best universities.") %></p>
 </header>
 
+<section id="form-load-fail" class="form-type hidden" aria-hidden="true">
+    <div class="status submission-error">
+        <p class="message-copy"><%- gettext("Apologies, we appear to be experiencing technical difficulties. Please try again later.") %></p>
+    </div>
+</section>
+
 <% if ( mode === 'login' ) { %>
     <section id="register-anchor" class="form-type">
         <span>
