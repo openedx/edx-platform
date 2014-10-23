@@ -13,7 +13,7 @@ var edx = edx || {};
 
         tpl: '#password_reset-tpl',
 
-        fieldTpl: $('#form_field-tpl').html(),
+        fieldTpl: '#form_field-tpl',
 
         events: {
             'click .js-reset': 'submitForm'
@@ -26,14 +26,17 @@ var edx = edx || {};
         $form: {},
 
         initialize: function() {
+            this.fieldTpl = $(this.fieldTpl).html();
+
             var fields = this.buildForm([{
-                label: 'E-mail',
-                instructions: 'This is the e-mail address you used to register with edX',
                 name: 'email',
+                label: 'Email',
+                defaultValue: '',
+                type: 'text',
                 required: true,
-                type: 'email',
-                restrictions: [],
-                defaultValue: ''
+                placeholder: 'xsy@edx.org',
+                instructions: 'This is the email address you used to register with edX.',
+                restrictions: {}
             }]);
 
             this.tpl = $(this.tpl).html();
@@ -59,16 +62,14 @@ var edx = edx || {};
 
             this.$form = $container.find('form');
             this.$errors = $container.find('.error-msg');
+            this.$resetFail = $container.find('.js-reset-fail');
 
-            this.listenTo( this.model, 'success', this.resetComplete) ;
+            this.listenTo( this.model, 'success', this.resetComplete );
+            this.listenTo( this.model, 'error', this.resetError );
         },
 
         initModel: function() {
             this.model = new edx.student.account.PasswordResetModel();
-
-            this.listenTo( this.model, 'error', function( error ) {
-                console.log(error.status, ' error: ', error.responseText);
-            });
         },
 
         buildForm: function( data ) {
@@ -87,7 +88,6 @@ var edx = edx || {};
         },
 
         getFormData: function() {
-
             var obj = {},
                 $form = this.$form,
                 elements = $form[0].elements,
@@ -123,6 +123,12 @@ var edx = edx || {};
 
             $el.find('#password-reset-form').addClass('hidden');
             $el.find('.js-reset-success').removeClass('hidden');
+
+            this.$resetFail.addClass('hidden');
+        },
+
+        resetError: function() {
+            this.$resetFail.removeClass('hidden');
         },
 
         submitForm: function( event ) {
@@ -131,12 +137,10 @@ var edx = edx || {};
             event.preventDefault();
 
             if ( !this.errors.length ) {
-                console.log('save me');
                 this.model.set( data );
                 this.model.save();
                 this.toggleErrorMsg( false );
             } else {
-                console.log('here are the errors ', this.errors);
                 this.toggleErrorMsg( true );
             }
         },
