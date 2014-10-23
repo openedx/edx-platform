@@ -10,8 +10,15 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             events : {
                 "click .column-sort-link": "onToggleColumn",
-                "click .upload-button": "showUploadModal"
+                "click .upload-button": "showUploadModal",
+                "click .filterable-column .nav-item": "onFilterColumn",
+                "click .filterable-column .column-filter-link": "toggleFilterColumn"
             },
+
+            typeData: ['Images', 'Documents'],
+
+            allLabel: 'ALL',
+
 
             initialize : function(options) {
                 options = options || {};
@@ -22,7 +29,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.listenTo(collection, 'destroy', this.handleDestroy);
                 this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
                 this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
+                this.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                 this.setInitialSortColumn('js-asset-date-col');
+                this.setInitialFilterColumn('js-asset-type-col');
                 ViewUtils.showLoadingIndicator();
                 this.setPage(0);
                 // set default file size for uploads via template var,
@@ -56,7 +65,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     ViewUtils.hideLoadingIndicator();
 
                     // Create the table
-                    this.$el.html(this.template());
+                    this.$el.html(this.template({typeData: this.typeData}));
                     tableBody = this.$('#asset-table-body');
                     this.tableBody = tableBody;
                     this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
@@ -74,7 +83,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             renderPageItems: function() {
                 var self = this,
                 assets = this.collection,
-                hasAssets = assets.length > 0,
+                hasAssets = this.collection.assetType !== '' || assets.length > 0,
                 tableBody = this.getTableBody();
                 tableBody.empty();
                 if (hasAssets) {
@@ -106,6 +115,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 // Switch the sort column back to the default (most recent date added) and show the first page
                 // so that the new asset is shown at the top of the page.
                 this.setInitialSortColumn('js-asset-date-col');
+                this.setInitialFilterColumn('js-asset-type-col');
                 this.setPage(0);
 
                 analytics.track('Uploaded a File', {
@@ -117,6 +127,11 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             onToggleColumn: function(event) {
                 var columnName = event.target.id;
                 this.toggleSortOrder(columnName);
+            },
+
+            onFilterColumn: function(event) {
+                this.openFilterColumn($(event.currentTarget));
+                event.stopPropagation();
             },
 
             hideModal: function (event) {
@@ -220,6 +235,65 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var percentVal = percentComplete + '%';
                 $('.upload-modal .progress-fill').width(percentVal);
                 $('.upload-modal .progress-fill').html(percentVal);
+            },
+
+            openFilterColumn: function($this) {
+                this.toggleFilterColumnState($this);
+            },
+
+            toggleFilterColumnState: function(menu, selected) {
+                var $subnav = menu.find('.wrapper-nav-sub');
+                var $title = menu.find('.title');
+                var titleText = $title.find('.type-filter');
+                var assettype = selected ? selected.data('assetfilter'): false;
+                if(assettype) {
+                    if(assettype === this.allLabel) {
+                        titleText.text(titleText.data('alllabel'));
+                    }
+                    else {
+                        titleText.text(assettype);
+                    }
+                }
+                if ($subnav.hasClass('is-shown')) {
+                    $subnav.removeClass('is-shown');
+                    $title.removeClass('is-selected');
+                } else {
+                    $title.addClass('is-selected');
+                    $subnav.addClass('is-shown');
+                }
+            },
+
+            toggleFilterColumn: function(event) {
+                event.preventDefault();
+                var $filterColumn = $(event.currentTarget);
+                this._toggleFilterColumn($filterColumn.data('assetfilter'), $filterColumn.text());
+            },
+
+            _toggleFilterColumn: function(assettype, assettypeLabel) {
+                var collection = this.collection;
+                var filterColumn = this.$el.find('.filterable-column');
+                var resetFilter = filterColumn.find('.reset-filter');
+                var title = filterColumn.find('.title');
+                if(assettype === this.allLabel) {
+                    collection.assetType = '';
+                    resetFilter.hide();
+                    title.removeClass('column-selected-link');
+                }
+                else {
+                    collection.assetType = assettype;
+                    resetFilter.show();
+                    title.addClass('column-selected-link');
+                }
+
+                this.filterableColumns['js-asset-type-col'].displayName = assettypeLabel;
+                this.selectFilter('js-asset-type-col');
+                this.closeFilterPopup(this.$el.find(
+                    '.column-filter-link[data-assetfilter="' + assettype + '"]'));
+            },
+
+            closeFilterPopup: function(element){
+                var $menu = element.parents('.nav-dd > .nav-item');
+                this.toggleFilterColumnState($menu, element);
             },
 
             displayFinishedUpload: function (resp) {

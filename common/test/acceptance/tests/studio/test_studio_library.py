@@ -51,6 +51,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         Then one XBlock is displayed
         And displayed XBlock are second one
         """
+        self.browser.save_screenshot('library_page')
         self.assertEqual(len(self.lib_page.xblocks), 0)
 
         # Create a new block:

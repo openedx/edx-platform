@@ -333,6 +333,10 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         location = Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')
         course_content, __ = self.content_store.get_all_content_for_course(location.course_key)
         assert_true(len(course_content) > 0)
+        filter_params = _build_requested_filter('Images')
+        filtered_course_content, __ = self.content_store.get_all_content_for_course(
+            location.course_key, filter_params=filter_params)
+        assert_true(len(filtered_course_content) < len(course_content))
         # a bit overkill, could just do for content[0]
         for content in course_content:
             assert not content.get('locked', False)
@@ -778,3 +782,35 @@ class TestMongoKeyValueStore(object):
         for scope in (Scope.preferences, Scope.user_info, Scope.user_state, Scope.parent):
             with assert_raises(InvalidScopeError):
                 self.kvs.delete(KeyValueStore.Key(scope, None, None, 'foo'))
+
+
+def _build_requested_filter(requested_filter):
+    """
+    Returns requested filter_params string.
+    """
+
+    # Files and Uploads type filter values
+    all_filters = {
+        "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif', 'image/x-icon'],
+        "Documents": [
+            'application/pdf',
+            'text/plain',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+            'application/vnd.openxmlformats-officedocument.presentationml.template',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+            'application/msword',
+            'application/vnd.ms-excel',
+            'application/vnd.ms-powerpoint',
+        ],
+    }
+    requested_file_types = all_filters.get(requested_filter, None)
+    where = ["JSON.stringify(this.contentType).toUpperCase() == JSON.stringify('{}').toUpperCase()".format(
+        req_filter) for req_filter in requested_file_types]
+    filter_params = {
+        "$where": ' || '.join(where),
+    }
+    return filter_params
