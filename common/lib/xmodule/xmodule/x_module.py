@@ -435,10 +435,9 @@ class XModuleMixin(XBlockMixin):
         """
         Set up this XBlock to act as an XModule instead of an XModuleDescriptor.
 
-        :param xmodule_runtime: the runtime to use when accessing student facing methods
-        :type xmodule_runtime: :class:`ModuleSystem`
-        :param field_data: The :class:`FieldData` to use for all subsequent data access
-        :type field_data: :class:`FieldData`
+        Arguments:
+            xmodule_runtime (:class:`ModuleSystem'): the runtime to use when accessing student facing methods
+            field_data (:class:`FieldData`): The :class:`FieldData` to use for all subsequent data access
         """
         # pylint: disable=attribute-defined-outside-init
         self.xmodule_runtime = xmodule_runtime
