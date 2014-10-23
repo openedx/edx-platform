@@ -287,6 +287,11 @@
           }
         }
 
+        .type-col {
+          @extend %t-copy-sub2;
+          color: $gray-l2;
+        }
+
         .date-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
           @extend %t-copy-sub2;
