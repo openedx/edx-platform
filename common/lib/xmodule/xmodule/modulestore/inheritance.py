@@ -142,8 +142,8 @@ class InheritanceMixin(XBlockMixin):
     # This is should be scoped to content, but since it's defined in the policy
     # file, it is currently scoped to settings.
     user_partitions = UserPartitionList(
-        display_name=_("Experiment Group Configurations"),
-        help=_("Enter the configurations that govern how students are grouped for content experiments."),
+        display_name=_("Group Configurations"),
+        help=_("Enter the configurations that govern how students are grouped together."),
         default=[],
         scope=Scope.settings
     )

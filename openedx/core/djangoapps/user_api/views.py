@@ -4,14 +4,13 @@ from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.exceptions import ParseError
-from rest_framework.response import Response
-from user_api.serializers import UserSerializer, UserPreferenceSerializer
-from user_api.models import UserPreference
 from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from .serializers import UserSerializer, UserPreferenceSerializer
+from .models import UserPreference
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):

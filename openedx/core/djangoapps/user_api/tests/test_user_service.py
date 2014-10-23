@@ -4,7 +4,7 @@ Test the user service
 from django.test import TestCase
 
 from student.tests.factories import UserFactory
-from user_api import user_service
+from .. import user_service
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 

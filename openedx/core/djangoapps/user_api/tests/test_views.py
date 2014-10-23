@@ -6,8 +6,7 @@ import json
 import re
 from student.tests.factories import UserFactory
 from unittest import SkipTest
-from user_api.models import UserPreference
-from user_api.tests.factories import UserPreferenceFactory
+from ..tests.factories import UserPreferenceFactory
 from django_comment_common import models
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
