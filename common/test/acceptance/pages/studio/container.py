@@ -16,6 +16,7 @@ class ContainerPage(PageObject):
     NAME_SELECTOR = '.page-header-title'
     NAME_INPUT_SELECTOR = '.page-header .xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.page-header .wrapper-xblock-field'
+    ADD_MISSING_GROUPS_SELECTOR = '.notification-action-button[data-notification-action="add-missing-groups"]'
 
     def __init__(self, browser, locator):
         super(ContainerPage, self).__init__(browser)
@@ -246,7 +247,7 @@ class ContainerPage(PageObject):
         Click the "add missing groups" link.
         Note that this does an ajax call.
         """
-        self.q(css='.add-missing-groups-button').first.click()
+        self.q(css=self.ADD_MISSING_GROUPS_SELECTOR).first.click()
         self.wait_for_ajax()
 
         # Wait until all xblocks rendered.
@@ -256,7 +257,7 @@ class ContainerPage(PageObject):
         """
         Returns True if the "add missing groups" button is present.
         """
-        return self.q(css='.add-missing-groups-button').present
+        return self.q(css=self.ADD_MISSING_GROUPS_SELECTOR).present
 
     def get_xblock_information_message(self):
         """
