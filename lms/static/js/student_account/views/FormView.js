@@ -133,7 +133,6 @@ var edx = edx || {};
                 $label,
                 key = '',
                 errors = [],
-                // $status = $form.find('.status'),
                 test = {};
 
             for ( i=0; i<len; i++ ) {
@@ -144,7 +143,6 @@ var edx = edx || {};
 
                 if ( key ) {
                     test = this.validate( elements[i] );
-
                     if ( test.isValid ) {
                         obj[key] = $el.attr('type') === 'checkbox' ? $el.is(':checked') : $el.val();
                         $el.removeClass('error');

@@ -59,12 +59,13 @@ var edx = edx || {};
         },
 
         loadForm: function( type ) {
-            this.getFormData( type, this.load[type], this );
+            this.getFormData( type, this );
         },
 
         load: {
             login: function( data, context ) {
                 var model = new edx.student.account.LoginModel({
+                    method: data.method,
                     url: data.submit_url
                 });
 
@@ -81,6 +82,7 @@ var edx = edx || {};
 
             reset: function( data, context ) {
                 var model = new edx.student.account.PasswordResetModel({
+                    method: data.method,
                     url: data.submit_url
                 });
 
@@ -92,6 +94,7 @@ var edx = edx || {};
 
             register: function( data, context ) {
                 var model = new edx.student.account.RegisterModel({
+                    method: data.method,
                     url: data.submit_url
                 });
 
@@ -104,7 +107,7 @@ var edx = edx || {};
             }
         },
 
-        getFormData: function( type, callback, context ) {
+        getFormData: function( type, context ) {
             var urls = {
                 login: 'login_session',
                 register: 'registration',
@@ -114,13 +117,12 @@ var edx = edx || {};
             $.ajax({
                 url: '/user_api/v1/account/' + urls[type] + '/',
                 type: 'GET',
-                dataType: 'json'
-            })
-            .done(function( data ) {
-                callback( data, context );
-            })
-            .fail(function( jqXHR, textStatus, errorThrown ) {
-                console.log('fail ', errorThrown);
+                dataType: 'json',
+                context: this,
+                success: function( data ) {
+                    this.load[type]( data, context );
+                },
+                error: this.showFormError
             });
         },
 
@@ -132,6 +134,10 @@ var edx = edx || {};
             this.element.hide( this.$header );
             this.element.hide( $(this.el).find('.form-type') );
             this.loadForm('reset');
+        },
+
+        showFormError: function() {
+            this.element.show( $('#form-load-fail') );
         },
 
         toggleForm: function( e ) {

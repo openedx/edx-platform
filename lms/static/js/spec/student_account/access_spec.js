@@ -138,7 +138,7 @@ define([
 
             it('displays the reset password form', function() {
                 ajaxSpyAndInitialize(this, 'login');
-                
+
                 // Simulate a click on the reset password link
                 view.resetPassword();
 
@@ -146,15 +146,30 @@ define([
                     AJAX_INFO['password_reset'].url,
                     AJAX_INFO['password_reset'].requestIndex
                 );
-                
+
                 // Verify that the password reset wrapper is populated
                 expect($('#password-reset-wrapper')).not.toBeEmpty();
             });
 
             it('displays an error if a form definition could not be loaded', function() {
-                /* TODO: Not yet implemeted in the access view; currently, it only
-                 * logs to the console.
-                 */
+                // Spy on AJAX requests
+                requests = AjaxHelpers.requests(this);
+
+                // Init AccessView
+                view = new AccessView({
+                    mode: 'login',
+                    thirdPartyAuth: {
+                        currentProvider: null,
+                        providers: []
+                    },
+                    platformName: 'edX'
+                });
+
+                // Simulate an error from the LMS servers
+                AjaxHelpers.respondWithError(requests);
+
+                // Error message should be displayed
+                expect( $('#form-load-fail').hasClass('hidden') ).toBe(false);
             });
         });
     }
