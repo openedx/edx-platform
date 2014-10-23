@@ -1802,17 +1802,18 @@ class CoursesMetricsSocial(SecureListAPIView):
             for user_id in exclude_users:
                 if str(user_id) in data:
                     del data[str(user_id)]
-            enrollment_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+            enrollment_qs = CourseEnrollment.users_enrolled_in(course_key).filter(is_active=True)\
+                .exclude(id__in=exclude_users)
+            actual_data = {}
             if organization:
                 enrollment_qs = enrollment_qs.filter(organizations=organization)
-                users_in_org = enrollment_qs.values_list('id', flat=True)
-                # extract org users
-                org_data = {}
-                for user_id in users_in_org:
-                    if str(user_id) in data:
-                        org_data.update({str(user_id): data[str(user_id)]})
-                data = org_data
 
+            actual_users = enrollment_qs.values_list('id', flat=True)
+            for user_id in actual_users:
+                if str(user_id) in data:
+                    actual_data.update({str(user_id): data[str(user_id)]})
+
+            data = actual_data
             total_enrollments = enrollment_qs.count()
             data = {'total_enrollments': total_enrollments, 'users': data}
             http_status = status.HTTP_200_OK
