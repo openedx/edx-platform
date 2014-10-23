@@ -1694,7 +1694,7 @@ class DiscussionService(object):
         user_cohort_id = get_cohort_id(user, course_id)
 
         unsafethreads, query_params = get_threads(request, course_id)
-        threads = [utils.prepare_content(thread) for thread in unsafethreads]
+        threads = [utils.prepare_content(thread, course_id) for thread in unsafethreads]
 
         flag_moderator = has_permission(user, 'openclose_thread', course_id) or \
                          has_access(user, 'staff', course)
