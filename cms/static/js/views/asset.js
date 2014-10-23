@@ -20,6 +20,7 @@ var AssetView = BaseView.extend({
       url: this.model.get('url'),
       external_url: this.model.get('external_url'),
       portable_url: this.model.get('portable_url'),
+      asset_type: this.model.get_extension(),
       uniqueId: uniqueId
     }));
     this.updateLockState();
