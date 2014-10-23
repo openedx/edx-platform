@@ -102,6 +102,13 @@ def strip_time(dt):
     return datetime.datetime(dt.year, dt.month, dt.day, tzinfo=tzinfo)
 
 
+def to_mysql_datetime(dt):
+    """
+    convert python datetime to mysql compatible datetime
+    """
+    return datetime.datetime.strftime(dt, '%Y-%m-%d %H:%M:%S')
+
+
 def parse_datetime(date_val, defaultdt=None):
     """
     Parses datetime value from string
@@ -169,7 +176,9 @@ def get_time_series_data(queryset, start, end, interval='days', date_field='crea
         }
     }
     interval_sql = sql[engine][interval]
-    where_clause = '{} BETWEEN "{}" AND "{}"'.format(date_field, start, end)
+    where_clause = '{} BETWEEN "{}" AND "{}"'.format(date_field,
+                                                     to_mysql_datetime(start) if engine == 'mysql' else start,
+                                                     to_mysql_datetime(end) if engine == 'mysql' else end)
     aggregate_data = queryset.extra(select={'d': interval_sql}, where=[where_clause]).order_by().values('d').\
         annotate(agg=aggregate)
 
