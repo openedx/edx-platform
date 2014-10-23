@@ -460,13 +460,28 @@ class DiscussionTabSingleThreadPage(CoursePage):
 class InlineDiscussionPage(PageObject):
     url = None
 
-    def __init__(self, browser, discussion_id):
+    def __init__(self, browser, discussion_id=None):
         super(InlineDiscussionPage, self).__init__(browser)
-        self._discussion_selector = (
-            ".discussion-module[data-discussion-id='{discussion_id}'] ".format(
-                discussion_id=discussion_id
+        if discussion_id:
+            self._discussion_selector = (
+                ".discussion-module[data-discussion-id='{discussion_id}'] ".format(
+                    discussion_id=discussion_id
+                )
             )
-        )
+            self._discussion_id = discussion_id
+        else:
+            self._discussion_selector = "body.courseware .discussion-module[data-discussion-id] "
+            self._discussion_id = None
+
+    def get_discussion_id(self):
+        """
+        Gets configured discussion_id for the page.
+        Uses discussion_id passed to __init__ if it was not None, otherwise picks it from XBlock element data attribute
+        """
+        if self._discussion_id is not None:
+            return self._discussion_id
+
+        return self.q(css=self._discussion_selector).first.attrs('data-discussion-id')[0]
 
     def _find_within(self, selector):
         """

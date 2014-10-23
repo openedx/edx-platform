@@ -1469,21 +1469,27 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         return result
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        # Currently, Modulestore is responsible for instantiating DescriptorSystems
-        # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
-        # that implements the correct handler url. So, for now, instead, we will reference a
-        # global function that the application can override.
-        return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
+        if block.xmodule_runtime is not None:
+            return block.xmodule_runtime.handler_url(block, handler_name, suffix, query, thirdparty)
+        else:
+            # Currently, Modulestore is responsible for instantiating DescriptorSystems
+            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
+            # that implements the correct handler url. So, for now, instead, we will reference a
+            # global function that the application can override.
+            return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
     def local_resource_url(self, block, uri):
         """
         See :meth:`xblock.runtime.Runtime:local_resource_url` for documentation.
         """
-        # Currently, Modulestore is responsible for instantiating DescriptorSystems
-        # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
-        # that implements the correct local_resource_url. So, for now, instead, we will reference a
-        # global function that the application can override.
-        return descriptor_global_local_resource_url(block, uri)
+        if block.xmodule_runtime is not None:
+            return block.xmodule_runtime.local_resource_url(block, uri)
+        else:
+            # Currently, Modulestore is responsible for instantiating DescriptorSystems
+            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
+            # that implements the correct local_resource_url. So, for now, instead, we will reference a
+            # global function that the application can override.
+            return descriptor_global_local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
         """
@@ -1501,6 +1507,13 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         See :meth:`xblock.runtime.Runtime:resource_url` for documentation.
         """
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
+
+    def publish(self, block, event_type, event):
+        """
+        See :meth:`xblock.runtime.Runtime:publish` for documentation.
+        """
+        if block.xmodule_runtime is not None:
+            return block.xmodule_runtime.publish(block, event_type, event)
 
     def add_block_as_child_node(self, block, node):
         child = etree.SubElement(node, "unknown")

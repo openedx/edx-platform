@@ -1,0 +1,11 @@
+.discussion-module {
+    display: block;
+    border: none;
+    box-shadow: none;
+    line-height: 1.4;
+    position: relative;
+    margin: 20px 0;
+    padding: 20px;
+    background: #f6f6f6;
+    border-radius: 3px;
+}
