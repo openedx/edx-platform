@@ -209,6 +209,10 @@ div.course-wrapper {
       margin-top: lh();
       line-height: lh();
       font-family: Consolas, "Lucida Console", Monaco, "Courier New", Courier, monospace;
+
+      // Debugging content is always in English, therefore it's never RTL
+      direction: ltr;
+      text-align: left;
     }
 
     div.ui-tabs {
