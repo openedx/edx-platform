@@ -39,6 +39,7 @@ var DetailsView = ValidatingView.extend({
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
         // Editor tinymce
+        cachethis = this;
         tinymce.init({
             selector: "textarea#course-overview",
             setup: function(editor) {
