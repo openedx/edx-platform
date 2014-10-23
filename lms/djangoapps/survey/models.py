@@ -6,17 +6,19 @@ import logging
 from django.db import models
 from student.models import User
 
+from model_utils.models import TimeStampedModel
+
 log = logging.getLogger("edx.survey")
 
 
-class SurveyForm(models.Model):
+class SurveyForm(TimeStampedModel):
     """
     Model to define a Survey Form that contains the HTML form data
     that is presented to the end user. A SurveyForm is not tied to
     a particular run of a course, to allow for sharing of Surveys
     across courses
     """
-    name = models.CharField(max_length=255, index=True, unique=True)
+    name = models.CharField(max_length=255, db_index=True, unique=True)
     form = models.TextField()
 
     def __unicode__(self):
@@ -36,13 +38,13 @@ class SurveyForm(models.Model):
         return SurveyAnswer.do_survey_answers_exist(self, user)
 
 
-class SurveyAnswer(models.Model):
+class SurveyAnswer(TimeStampedModel):
     """
     Model for the answers that a user gives for a particular form in a course
     """
-    user = models.ForeignKey(User, index=True)
-    form = models.ForeignKey(SurveyForm, index=True)
-    field_name = models.CharField(max_length=255, index=True)
+    user = models.ForeignKey(User, db_index=True)
+    form = models.ForeignKey(SurveyForm, db_index=True)
+    field_name = models.CharField(max_length=255, db_index=True)
     field_value = models.CharField(max_length=1024)
 
     @classmethod
