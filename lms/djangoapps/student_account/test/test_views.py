@@ -16,9 +16,8 @@ from django.test.utils import override_settings
 
 from util.testing import UrlResetMixin
 from third_party_auth.tests.testutil import simulate_running_pipeline
-from user_api.api import account as account_api
-from user_api.api import profile as profile_api
-from util.bad_request_rate_limiter import BadRequestRateLimiter
+from openedx.core.djangoapps.user_api.api import account as account_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )

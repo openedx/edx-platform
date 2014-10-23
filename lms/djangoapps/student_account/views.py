@@ -24,8 +24,8 @@ from student.views import (
     register_user as old_register_view
 )
 
-from user_api.api import account as account_api
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import account as account_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from student_account.helpers import auth_pipeline_urls

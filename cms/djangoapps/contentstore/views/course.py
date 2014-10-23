@@ -22,7 +22,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
-from xmodule.partitions.partitions import UserPartition, Group
+from xmodule.partitions.partitions import UserPartition
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -1173,7 +1173,7 @@ class GroupConfiguration(object):
             configuration = json.loads(json_string)
         except ValueError:
             raise GroupConfigurationsValidationError(_("invalid JSON"))
-
+        configuration["version"] = UserPartition.VERSION
         return configuration
 
     def validate(self):
@@ -1224,14 +1224,7 @@ class GroupConfiguration(object):
         """
         Get user partition for saving in course.
         """
-        groups = [Group(g["id"], g["name"]) for g in self.configuration["groups"]]
-
-        return UserPartition(
-            self.configuration["id"],
-            self.configuration["name"],
-            self.configuration["description"],
-            groups
-        )
+        return UserPartition.from_json(self.configuration)
 
     @staticmethod
     def get_usage_info(course, store):
@@ -1345,15 +1338,12 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
-            split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
-
             configurations = GroupConfiguration.add_usage_info(course, store)
-
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
-                'configurations': configurations if split_test_enabled else None,
+                'configurations': configurations if should_show_group_configurations_page(course) else None,
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':
@@ -1430,6 +1420,16 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             course.user_partitions.pop(index)
             store.update_item(course, request.user.id)
             return JsonResponse(status=204)
+
+
+def should_show_group_configurations_page(course):
+    """
+    Returns true if Studio should show the "Group Configurations" page for the specified course.
+    """
+    return (
+        SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and
+        SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+    )
 
 
 def _get_course_creator_status(user):

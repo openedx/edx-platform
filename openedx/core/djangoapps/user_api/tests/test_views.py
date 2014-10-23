@@ -16,16 +16,16 @@ from pytz import UTC
 import mock
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from user_api.api import account as account_api, profile as profile_api
-
 from student.tests.factories import UserFactory
-from user_api.models import UserOrgTag
-from user_api.tests.factories import UserPreferenceFactory
+from unittest import SkipTest
 from django_comment_common import models
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from third_party_auth.tests.testutil import simulate_running_pipeline
 
-from user_api.tests.test_constants import SORTED_COUNTRIES
+from ..api import account as account_api, profile as profile_api
+from ..models import UserOrgTag
+from ..tests.factories import UserPreferenceFactory
+from ..tests.test_constants import SORTED_COUNTRIES
 
 
 TEST_API_KEY = "test_api_key"

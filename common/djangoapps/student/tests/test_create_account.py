@@ -12,7 +12,7 @@ from django.test import TestCase, TransactionTestCase
 
 import mock
 
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
 from edxmako.tests import mako_middleware_process_request

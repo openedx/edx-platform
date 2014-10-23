@@ -48,7 +48,7 @@ def test_system(options):
     if test_id:
         if not system:
             system = test_id.split('/')[0]
-        if system == 'common':
+        if system in ['common', 'openedx']:
             system = 'lms'
         opts['test_id'] = test_id
 

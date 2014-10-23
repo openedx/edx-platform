@@ -83,7 +83,7 @@ from external_auth.login_and_register import (
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
 from shoppingcart.models import DonationConfiguration
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
 import track.views

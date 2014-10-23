@@ -4,7 +4,7 @@ Tests for the language setting view
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from student.tests.factories import UserFactory
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
 

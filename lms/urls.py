@@ -57,7 +57,7 @@ urlpatterns = ('',  # nopep8
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^user_api/', include('user_api.urls')),
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.urls')),
 
     url(r'^notifier_api/', include('notifier_api.urls')),
 
