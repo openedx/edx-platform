@@ -16,8 +16,8 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from microsite_configuration import microsite
 import third_party_auth
 
-from user_api.api import account as account_api
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import account as account_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from student_account.helpers import auth_pipeline_urls

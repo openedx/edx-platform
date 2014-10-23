@@ -11,8 +11,8 @@ from django.db import IntegrityError
 import logging
 from pytz import UTC
 
-from user_api.models import User, UserProfile, UserPreference, UserOrgTag
-from user_api.helpers import intercept_errors
+from ..models import User, UserProfile, UserPreference, UserOrgTag
+from ..helpers import intercept_errors
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +31,7 @@ class ProfileInvalidField(ProfileRequestError):
     """ The proposed value for a field is not in a valid format. """
 
     def __init__(self, field, value):
+        super(ProfileInvalidField, self).__init__()
         self.field = field
         self.value = value
 

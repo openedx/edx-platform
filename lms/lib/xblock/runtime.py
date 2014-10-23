@@ -7,7 +7,7 @@ import xblock.reference.plugins
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from user_api.api import course_tag as user_course_tag_api
+from openedx.core.djangoapps.user_api.api import course_tag as user_course_tag_api
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
@@ -128,13 +128,13 @@ class LmsPartitionService(PartitionService):
     course.
 
     (If and when XBlock directly provides access from one block (e.g. a split_test_module)
-    to another (e.g. a course_module), this won't be neccessary, but for now it seems like
+    to another (e.g. a course_module), this won't be necessary, but for now it seems like
     the least messy way to hook things through)
 
     """
     @property
     def course_partitions(self):
-        course = modulestore().get_course(self._course_id)
+        course = modulestore().get_course(self.runtime.course_id)
         return course.user_partitions
 
 
@@ -194,8 +194,7 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
         services = kwargs.setdefault('services', {})
         services['user_tags'] = UserTagsService(self)
         services['partitions'] = LmsPartitionService(
-            user_tags_service=services['user_tags'],
-            course_id=kwargs.get('course_id', None),
+            runtime=self,
             track_function=kwargs.get('track_function', None),
         )
         services['fs'] = xblock.reference.plugins.FSService()

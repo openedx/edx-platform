@@ -9,6 +9,7 @@ from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import Select
 
 from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from bok_choy.promise import Promise, EmptyPromise
 
 from ...fixtures.course import XBlockFixtureDesc
@@ -30,6 +31,16 @@ class SplitTestMixin(object):
     """
     Mixin that contains useful methods for split_test module testing.
     """
+    @staticmethod
+    def create_user_partition_json(partition_id, name, description, groups):
+        """
+        Helper method to create user partition JSON.
+        """
+        return UserPartition(
+            partition_id, name, description, groups, MockUserPartitionScheme("random")
+        ).to_json()
+
+
     def verify_groups(self, container, active_groups, inactive_groups, verify_missing_groups_not_present=True):
         """
         Check that the groups appear and are correctly categorized as to active and inactive.
@@ -80,8 +91,18 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Configuration alpha,beta', 'first', [Group("0", 'alpha'), Group("1", 'beta')]).to_json(),
-                    UserPartition(1, 'Configuration 0,1,2', 'second', [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]).to_json()
+                    self.create_user_partition_json(
+                        0,
+                        'Configuration alpha,beta',
+                        'first',
+                        [Group("0", 'alpha'), Group("1", 'beta')]
+                    ),
+                    self.create_user_partition_json(
+                        1,
+                        'Configuration 0,1,2',
+                        'second',
+                        [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]
+                    ),
                 ],
             },
         })
@@ -124,8 +145,12 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Configuration alpha,beta', 'first',
-                                  [Group("0", 'alpha'), Group("2", 'gamma')]).to_json()
+                    self.create_user_partition_json(
+                        0,
+                        'Configuration alpha,beta',
+                        'first',
+                        [Group("0", 'alpha'), Group("2", 'gamma')]
+                    )
                 ],
             },
         })
@@ -189,7 +214,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
 @attr('shard_1')
 class SettingsMenuTest(StudioCourseTest):
     """
-    Tests that Setting menu is rendered correctly in Studio
+    Tests that Settings menu is rendered correctly in Studio
     """
 
     def setUp(self):
@@ -324,7 +349,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", groups).to_json(),
+                    self.create_user_partition_json(0, "Name", "Description.", groups),
                 ],
             },
         })
@@ -396,8 +421,18 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
-                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json(),
+                    self.create_user_partition_json(
+                        0,
+                        'Name of the Group Configuration',
+                        'Description of the group configuration.',
+                        [Group("0", 'Group 0'), Group("1", 'Group 1')]
+                    ),
+                    self.create_user_partition_json(
+                        1,
+                        'Name of second Group Configuration',
+                        'Second group configuration.',
+                        [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]
+                    ),
                 ],
             },
         })
@@ -531,7 +566,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group A'), Group("1", 'Group B'), Group("2", 'Group C')]).to_json(),
+                    self.create_user_partition_json(
+                        0,
+                        'Name of the Group Configuration',
+                        'Description of the group configuration.',
+                        [Group("0", 'Group A'), Group("1", 'Group B'), Group("2", 'Group C')]
+                    ),
                 ],
             },
         })
@@ -610,8 +650,18 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
-                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json(),
+                    self.create_user_partition_json(
+                        0,
+                        'Name of the Group Configuration',
+                        'Description of the group configuration.',
+                        [Group("0", 'Group 0'), Group("1", 'Group 1')]
+                    ),
+                    self.create_user_partition_json(
+                        1,
+                        'Name of second Group Configuration',
+                        'Second group configuration.',
+                        [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]
+                    ),
                 ],
             },
         })
@@ -696,7 +746,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json(),
+                    self.create_user_partition_json(
+                        0,
+                        "Name",
+                        "Description.",
+                        [Group("0", "Group A"), Group("1", "Group B")]
+                    ),
                 ],
             },
         })
@@ -728,7 +783,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json(),
+                    self.create_user_partition_json(
+                        0,
+                        "Name",
+                        "Description.",
+                        [Group("0", "Group A"), Group("1", "Group B")]
+                    ),
                 ],
             },
         })
@@ -771,8 +831,18 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, 'Configuration 1', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
-                    UserPartition(1, 'Configuration 2', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json()
+                    self.create_user_partition_json(
+                        0,
+                        'Configuration 1',
+                        'Description of the group configuration.',
+                        [Group("0", 'Group 0'), Group("1", 'Group 1')]
+                    ),
+                    self.create_user_partition_json(
+                        1,
+                        'Configuration 2',
+                        'Second group configuration.',
+                        [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]
+                    )
                 ],
             },
         })
@@ -804,7 +874,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json()
+                    self.create_user_partition_json(
+                        0,
+                        "Name",
+                        "Description.",
+                        [Group("0", "Group A"), Group("1", "Group B")]
+                    )
                 ],
             },
         })
@@ -840,8 +915,18 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
-                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json(),
-                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json(),
+                    self.create_user_partition_json(
+                        0,
+                        "Name",
+                        "Description.",
+                        [Group("0", "Group A"), Group("1", "Group B")]
+                    ),
+                    self.create_user_partition_json(
+                        1,
+                        'Name of second Group Configuration',
+                        'Second group configuration.',
+                        [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]
+                    ),
                 ],
             },
         })
