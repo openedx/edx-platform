@@ -1,20 +1,13 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from xmodule.split_test_module import ValidationMessageType %>
 
 <%
 split_test = context.get('split_test')
 user_partition = split_test.descriptor.get_selected_partition()
-messages = split_test.descriptor.validation_messages()
 show_link = group_configuration_url is not None
 %>
 
-% if is_root and not is_configured:
-    <div class="no-container-content">
-% else:
-    <div class="wrapper-xblock-message">
-% endif
-
-% if user_partition:
+% if is_configured:
+<div class="wrapper-xblock-message">
     <div class="xblock-message information">
         <p>
             <span class="message-text">
@@ -24,56 +17,8 @@ show_link = group_configuration_url is not None
             </span>
         </p>
     </div>
-% endif
-% if len(messages) > 0:
-    <%
-    general_validation = split_test.descriptor.general_validation_message
-    def get_validation_icon(validation_type):
-        if validation_type == ValidationMessageType.error:
-            return 'icon-exclamation-sign'
-        elif validation_type == ValidationMessageType.warning:
-            return 'icon-warning-sign'
-        return None
-
-    aggregate_validation_class = 'has-errors' if general_validation['type']==ValidationMessageType.error else ' has-warnings'
-    %>
-    <div class="xblock-message validation ${aggregate_validation_class}">
-    % if is_configured:
-        <p class="${general_validation['type']}"><i class="${get_validation_icon(general_validation['type'])}"></i>
-        ${general_validation['message']}
-        </p>
-    % endif
-    % if is_root or not is_configured:
-        <ul class="xblock-message-list">
-        % for message in messages:
-            <%
-            message_type = message.message_type
-            message_type_display_name = ValidationMessageType.display_name(message_type) if message_type else None
-            %>
-                <li class="xblock-message-item ${message_type}">
-                    % if not is_configured:
-                        <i class="${get_validation_icon(message_type)}"></i>
-                    % endif
-                    <span class="message-text">
-                        % if message_type_display_name:
-                            <span class="sr">${message_type_display_name}:</span>
-                        % endif
-                        ${unicode(message)}
-
-                    % if message.action_class:
-                        <a href="#" class="button action-button ${message.action_class}">
-                            <span class="action-button-text">${message.action_label}</span>
-                        </a>
-                    % endif
-                    </span>
-                </li>
-        % endfor
-        </ul>
-    % endif
-    </div>
-% endif
-
 </div>
+% endif
 
 % if is_root:
     <div class="wrapper-groups is-active">

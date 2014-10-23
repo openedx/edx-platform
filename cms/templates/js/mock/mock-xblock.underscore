@@ -9,6 +9,9 @@
                     <span data-tooltip="Drag to reorder" class="drag-handle action"></span>
                 </li>
             </ul>
+            <a href="#" class="button action-button notification-action-button" data-notification-action="add-missing-groups">
+                <span class="action-button-text">Add Missing Groups</span>
+            </a>
         </div>
     </header>
     <article class="xblock-render">

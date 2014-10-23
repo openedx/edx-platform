@@ -215,7 +215,7 @@ define([
                     'label': 'label1',
                     'url': 'url1',
                     'validation': {
-                        'message': "Warning message",
+                        'text': "Warning message",
                         'type': 'warning'
                     }
                 }
@@ -233,7 +233,7 @@ define([
                     'label': 'label1',
                     'url': 'url1',
                     'validation': {
-                        'message': "Error message",
+                        'text': "Error message",
                         'type': 'error'
                     }
                 }
