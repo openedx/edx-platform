@@ -1,0 +1,96 @@
+"""
+A Fake Data API for testing purposes.
+"""
+import copy
+import datetime
+
+
+_DEFAULT_FAKE_MODE = {
+    "slug": "honor",
+    "name": "Honor Code Certificate",
+    "min_price": 0,
+    "suggested_prices": "",
+    "currency": "usd",
+    "expiration_datetime": None,
+    "description": None
+}
+
+_ENROLLMENTS = []
+
+_COURSES = []
+
+
+def get_course_enrollments(student_id):
+    """Stubbed out Enrollment data request."""
+    return _ENROLLMENTS
+
+
+def get_course_enrollment(student_id, course_id):
+    """Stubbed out Enrollment data request."""
+    return _get_fake_enrollment(student_id, course_id)
+
+
+def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
+    """Stubbed out Enrollment data request."""
+    enrollment = _get_fake_enrollment(student_id, course_id)
+    if not enrollment:
+        enrollment = add_enrollment(student_id, course_id)
+    if mode is not None:
+        enrollment['mode'] = mode
+    if is_active is not None:
+        enrollment['is_active'] = is_active
+    return enrollment
+
+
+def get_course_enrollment_info(course_id):
+    """Stubbed out Enrollment data request."""
+    return _get_fake_course_info(course_id)
+
+
+def _get_fake_enrollment(student_id, course_id):
+    for enrollment in _ENROLLMENTS:
+        if student_id == enrollment['student'] and course_id == enrollment['course']['course_id']:
+            return enrollment
+
+
+def _get_fake_course_info(course_id):
+    for course in _COURSES:
+        if course_id == course['course_id']:
+            return course
+
+
+def add_enrollment(student_id, course_id, is_active=True, mode='honor'):
+    enrollment = {
+        "created": datetime.datetime.now(),
+        "mode": mode,
+        "is_active": is_active,
+        "course": _get_fake_course_info(course_id),
+        "student": student_id
+    }
+    _ENROLLMENTS.append(enrollment)
+    return enrollment
+
+
+def add_course(course_id, enrollment_start=None, enrollment_end=None, invite_only=False, course_modes=None):
+    course_info = {
+        "course_id": course_id,
+        "enrollment_end": enrollment_end,
+        "course_modes": [],
+        "enrollment_start": enrollment_start,
+        "invite_only": invite_only,
+    }
+    if not course_modes:
+        course_info['course_modes'].append(_DEFAULT_FAKE_MODE)
+    else:
+        for mode in course_modes:
+            new_mode = copy.deepcopy(_DEFAULT_FAKE_MODE)
+            new_mode['slug'] = mode
+            course_info['course_modes'].append(new_mode)
+    _COURSES.append(course_info)
+
+
+def reset():
+    global _COURSES
+    _COURSES = []
+    global _ENROLLMENTS
+    _ENROLLMENTS = []
