@@ -78,7 +78,8 @@ var edx = edx || {};
 
             for ( i=0; i<len; i++ ) {
                 html.push( _.template( fieldTpl, $.extend( data[i], {
-                    form: 'reset-password'
+                    form: 'reset-password',
+                    value: ""
                 }) ) );
             }
 
