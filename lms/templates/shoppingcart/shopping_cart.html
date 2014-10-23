@@ -34,7 +34,7 @@ from django.utils.translation import ugettext as _
       </div>
       <div class="data-input">
         <h3>${_('Registration for:')} <span class="pull-right">${_('Course Dates:')}</span></h3>
-        <h1>${ course.display_name }<span class="pull-right">${course.start_date_text} -  ${course.end_date_text}</span></h1>
+        <h1>${ course.display_name }<span class="pull-right">${course.start_datetime_text()} -  ${course.end_datetime_text()}</span></h1>
         <hr />
         <div class="three-col">
             <div class="col-1">
