@@ -73,6 +73,16 @@
     <%static:js group='main_vendor'/>
   % endif
 
+  <script>
+    window.baseUrl = "${settings.STATIC_URL}";
+    (function (require) {
+      require.config({
+          baseUrl: baseUrl
+      });
+    }).call(this, require || RequireJS.require);
+  </script>
+  <script type="text/javascript" src="${static.url("require-config.js")}"></script>
+
   <%block name="headextra"/>
 
 <%
@@ -147,7 +157,6 @@
 
   </div>
 
-  <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   % if not disable_courseware_js:
     <%static:js group='application'/>
     <%static:js group='module-js'/>
