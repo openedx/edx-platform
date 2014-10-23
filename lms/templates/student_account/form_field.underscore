@@ -27,7 +27,7 @@
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
             <% if ( required ) { %> required<% } %>
-            value="<%- value %>"
+            value="<%- defaultValue %>"
         />
     <% } %>
 

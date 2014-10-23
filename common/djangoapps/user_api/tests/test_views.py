@@ -587,7 +587,7 @@ class LoginSessionViewTest(ApiTestCase):
         self.assertEqual(form_desc["fields"], [
             {
                 "name": "email",
-                "default": "",
+                "defaultValue": "",
                 "type": "text",
                 "required": True,
                 "label": "E-mail",
@@ -600,7 +600,7 @@ class LoginSessionViewTest(ApiTestCase):
             },
             {
                 "name": "password",
-                "default": "",
+                "defaultValue": "",
                 "type": "password",
                 "required": True,
                 "label": "Password",
@@ -613,7 +613,7 @@ class LoginSessionViewTest(ApiTestCase):
             },
             {
                 "name": "remember",
-                "default": False,
+                "defaultValue": False,
                 "type": "checkbox",
                 "required": False,
                 "label": "Remember me",
@@ -746,7 +746,7 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"email",
-                u"default": u"",
+                u"defaultValue": u"",
                 u"type": u"text",
                 u"required": True,
                 u"label": u"E-mail",
@@ -763,7 +763,7 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"name",
-                u"default": u"",
+                u"defaultValue": u"",
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Full Name",
@@ -779,7 +779,7 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"username",
-                u"default": u"",
+                u"defaultValue": u"",
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Public Username",
@@ -796,7 +796,7 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"password",
-                u"default": u"",
+                u"defaultValue": u"",
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Password",
@@ -822,7 +822,7 @@ class RegistrationViewTest(ApiTestCase):
                 no_extra_fields_setting,
                 {
                     "name": "password",
-                    "default": "",
+                    "defaultValue": "",
                     "type": "hidden",
                     "required": False,
                     "label": "",
@@ -837,7 +837,7 @@ class RegistrationViewTest(ApiTestCase):
                 no_extra_fields_setting,
                 {
                     u"name": u"email",
-                    u"default": u"bob@example.com",
+                    u"defaultValue": u"bob@example.com",
                     u"type": u"text",
                     u"required": True,
                     u"label": u"E-mail",
@@ -855,7 +855,7 @@ class RegistrationViewTest(ApiTestCase):
                 no_extra_fields_setting,
                 {
                     u"name": u"name",
-                    u"default": u"Bob",
+                    u"defaultValue": u"Bob",
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Full Name",
@@ -872,7 +872,7 @@ class RegistrationViewTest(ApiTestCase):
                 no_extra_fields_setting,
                 {
                     u"name": u"username",
-                    u"default": u"Bob123",
+                    u"defaultValue": u"Bob123",
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Public Username",
@@ -890,7 +890,7 @@ class RegistrationViewTest(ApiTestCase):
             {"level_of_education": "optional"},
             {
                 "name": "level_of_education",
-                "default": "",
+                "defaultValue": "",
                 "type": "select",
                 "required": False,
                 "label": "Highest Level of Education Completed",
@@ -917,7 +917,7 @@ class RegistrationViewTest(ApiTestCase):
             {"gender": "optional"},
             {
                 "name": "gender",
-                "default": "",
+                "defaultValue": "",
                 "type": "select",
                 "required": False,
                 "label": "Gender",
@@ -945,7 +945,7 @@ class RegistrationViewTest(ApiTestCase):
             {"year_of_birth": "optional"},
             {
                 "name": "year_of_birth",
-                "default": "",
+                "defaultValue": "",
                 "type": "select",
                 "required": False,
                 "label": "Year of Birth",
@@ -961,7 +961,7 @@ class RegistrationViewTest(ApiTestCase):
             {"mailing_address": "optional"},
             {
                 "name": "mailing_address",
-                "default": "",
+                "defaultValue": "",
                 "type": "textarea",
                 "required": False,
                 "label": "Mailing Address",
@@ -976,7 +976,7 @@ class RegistrationViewTest(ApiTestCase):
             {"goals": "optional"},
             {
                 "name": "goals",
-                "default": "",
+                "defaultValue": "",
                 "type": "textarea",
                 "required": False,
                 "label": "Please share with us your reasons for registering with edX",
@@ -991,7 +991,7 @@ class RegistrationViewTest(ApiTestCase):
             {"city": "optional"},
             {
                 "name": "city",
-                "default": "",
+                "defaultValue": "",
                 "type": "text",
                 "required": False,
                 "label": "City",
@@ -1014,7 +1014,7 @@ class RegistrationViewTest(ApiTestCase):
             {
                 "label": "Country",
                 "name": "country",
-                "default": "",
+                "defaultValue": "",
                 "type": "select",
                 "required": True,
                 "placeholder": "",
@@ -1034,7 +1034,7 @@ class RegistrationViewTest(ApiTestCase):
             {
                 "label": "I agree to the <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>",
                 "name": "honor_code",
-                "default": False,
+                "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "placeholder": "",
@@ -1051,7 +1051,7 @@ class RegistrationViewTest(ApiTestCase):
             {
                 "label": "I agree to the <a href=\"/honor\">Terms of Service and Honor Code</a>",
                 "name": "honor_code",
-                "default": False,
+                "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "placeholder": "",
@@ -1074,7 +1074,7 @@ class RegistrationViewTest(ApiTestCase):
             {
                 "label": "I agree to the <a href=\"https://www.test.com/honor\">Honor Code</a>",
                 "name": "honor_code",
-                "default": False,
+                "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "placeholder": "",
@@ -1089,7 +1089,7 @@ class RegistrationViewTest(ApiTestCase):
             {
                 "label": "I agree to the <a href=\"https://www.test.com/tos\">Terms of Service</a>",
                 "name": "terms_of_service",
-                "default": False,
+                "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "placeholder": "",
@@ -1108,7 +1108,7 @@ class RegistrationViewTest(ApiTestCase):
             {
                 "label": "I agree to the <a href=\"/honor\">Honor Code</a>",
                 "name": "honor_code",
-                "default": False,
+                "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "placeholder": "",
@@ -1123,7 +1123,7 @@ class RegistrationViewTest(ApiTestCase):
             {
                 "label": "I agree to the <a href=\"/tos\">Terms of Service</a>",
                 "name": "terms_of_service",
-                "default": False,
+                "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "placeholder": "",
