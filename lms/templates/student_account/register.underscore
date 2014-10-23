@@ -4,20 +4,18 @@
       We just need a little more information before you start learning with edX.
     </p>
 <% } else {
-    for (var i=0; i < providers.length; i++) {
-        var provider = providers[i];
-%>
-    <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.registerUrl %>">
-        <span class="icon <%- provider.iconClass %>"></span>Sign up with <%- provider.name %>
-    </button>
-<% }
+    _.each( providers, function( provider) { %>
+        <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.registerUrl %>">
+            <span class="icon <%- provider.iconClass %>"></span>Sign up with <%- provider.name %>
+        </button>
+    <% });
 } %>
 
 <form id="register" autocomplete="off">
-    <div class="error-msg hidden">
-        <h4>An error occured in your registration.</h4>
-        <div class="errors">
-            <p>Please enter a valid password</p>
+    <div class="status submission-error hidden" aria-hidden="true">
+        <h4 class="message-title">An error occurred in your registration.</h4>
+        <div class="message-copy">
+            <p>Please provide a valid email.</p>
         </div>
     </div>
     <%= fields %>

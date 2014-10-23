@@ -1030,6 +1030,7 @@ student_account_js = [
     'js/student_account/models/LoginModel.js',
     'js/student_account/models/RegisterModel.js',
     'js/student_account/models/PasswordResetModel.js',
+    'js/student_account/views/FormView.js',
     'js/student_account/views/LoginView.js',
     'js/student_account/views/RegisterView.js',
     'js/student_account/views/PasswordResetView.js',
@@ -1549,7 +1550,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'honor_code': 'required',
     'terms_of_service': 'hidden',
     'city': 'hidden',
-    'country': 'required',
+    'country': 'hidden',
 }
 
 ########################## CERTIFICATE NAME ########################
