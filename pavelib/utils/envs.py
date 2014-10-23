@@ -74,6 +74,11 @@ class Env(object):
         'youtube': {
             'port': 9080,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_youtube.log",
+        },
+
+        'edxnotes': {
+            'port': 8042,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_edxnotes.log",
         }
     }
 
