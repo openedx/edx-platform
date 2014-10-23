@@ -274,10 +274,6 @@ PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
 
-ANALYTICS_DATA_URL = "http://127.0.0.1:8080"
-ANALYTICS_DATA_TOKEN = ""
-FEATURES['ENABLE_ANALYTICS_ACTIVE_COUNT'] = False
-
 ##### Segment.io  ######
 
 # If there's an environment variable set, grab it and turn on Segment.io

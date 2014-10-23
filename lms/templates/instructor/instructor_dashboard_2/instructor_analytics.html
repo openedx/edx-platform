@@ -15,18 +15,6 @@
   </div>
 </script>
 
-%if settings.FEATURES.get('ENABLE_ANALYTICS_ACTIVE_COUNT'):
-  <div class="enrollment-wrapper" style="margin-bottom: 40px;">
-    <h2>${_("Active Students")}</h2>
-    <span class="tip">${_("The count of students who interacted at least once by opening pages, playing videos, posting in discussions, submitting problems, or completing other activities. The date range includes all activities from midnight on the start date (inclusive) though midnight on the end date (exclusive).")}</span>
-    <br/><br/>
-    <span style="color: green;"><b>${ section_data['active_student_count'] }</b></span>
-      for the week of (${ section_data['active_student_count_start'] } - ${ section_data['active_student_count_end'] })
-  </div>
-%endif
-
-<hr>
-
 %if settings.FEATURES['ENABLE_INSTRUCTOR_ANALYTICS']:
   <script type="text/template" id="grade-distributions-widget-template">
     <div class="grade-distributions-widget">
