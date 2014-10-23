@@ -6,6 +6,8 @@ from contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.x_module import STUDENT_VIEW
+from courseware.tests import render_to_string
+from courseware.tests import XModuleRenderingTestBase
 
 
 class UnitPageTestCase(StudioPageTestCase):
@@ -57,3 +59,34 @@ class UnitPageTestCase(StudioPageTestCase):
                            category='html', display_name='grandchild')
         draft_child_container = self.store.get_item(child_container.location)
         self.validate_preview_html(draft_child_container, STUDENT_VIEW, can_add=False)
+
+
+class RenderingTest(XModuleRenderingTestBase):
+    def test_reset_button_shows(self):
+        context = {
+            'answer_available': True,
+            'attempts_allowed': 2,
+            'attempts_used': 0,
+            'check_button': u'Submit',
+            'check_button_checking': u'Checking...',
+            'end_time_to_display': None,
+            'id': u'1',
+            'problem': {
+                'html': "",
+                'name': u'Checkboxes',
+                'weight': None
+            },
+            'problem_is_timed': False,
+            'reset_button': True,
+            'save_button': True,
+            'start_time': None
+        }
+
+        renderer = self.new_module_runtime()
+        html = renderer.render_template("problem.html", context, None, namespace="lms.main")
+        resetbutton = '<input class="reset" type="button" value="Reset" />'
+        self.assertIn(resetbutton, html)
+
+        context['reset_button'] = False
+        html2 = renderer.render_template("problem.html", context, None, namespace="lms.main")
+        self.assertNotIn(resetbutton, html2)

@@ -28,7 +28,7 @@
 -e git+https://github.com/edx/bok-choy.git@4a259e3548a19e41cc39433caf68ea58d10a27ba#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
--e git+https://github.com/Stanford-Online/edx-ora2.git@10c95f7de756415d62fa1b4f3299a070c5c45c9f#egg=edx-ora2
+-e git+https://github.com/Stanford-Online/edx-ora2.git@844326f094407c4dca9a5f6c1e026732e721a9a5#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@d45d0bd8d64c69531be69178b9505b5d38806ce0#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
@@ -39,3 +39,4 @@
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@7e308cf676b6f41493d9cf7864296bc1c089b36b#egg=edx-sga
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@32d52edaa820dbdbf846d8a84f6bccbf0b9c8218#egg=xblock_ooyala_player-master
+-e git+https://github.com/Stanford-Online/DoneXBlock.git@972d5e54a0422e9c6d822473c9bad14f16484d0f#egg=done-xblock

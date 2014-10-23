@@ -2,12 +2,13 @@
 
 from django.conf import settings
 
-import branding
 from courseware.access import has_access
 from student.models import anonymous_id_for_user
 from student.models import UserProfile
 from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
 
 
 class OpenIDHandler(object):
@@ -151,7 +152,7 @@ class CourseAccessHandler(object):
         user = data['user']
         values = set(data.get('values', []))
 
-        courses = branding.get_visible_courses()
+        courses = _get_all_courses()
         courses = (c for c in courses if has_access(user, access_type, c))
         course_ids = (unicode(c.id) for c in courses)
 
@@ -186,3 +187,13 @@ class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
 class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
     """ Configure the UserInfo handler for the LMS. """
     pass
+
+
+def _get_all_courses():
+    """
+    Utitilty function to list all available courses.
+
+    """
+    ms_courses = modulestore().get_courses()
+    courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
+    return courses

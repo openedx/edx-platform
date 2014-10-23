@@ -34,9 +34,9 @@
     <h2> ${_("Reports")}</h2>
 
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
-    <p>${_("Click to generate a CSV grade report for all currently enrolled students.  Links to generated reports appear in a table below when report generation is complete.")}</p>
+    <p>${_("Click to generate a CSV grade report for all currently enrolled students, or a CSV submissions report for all problems.  Links to generated reports appear in a table below when report generation is complete.")}</p>
 
-    <p>${_("For large courses, generating this report may take several hours. Please be patient and do not click the button multiple times. Clicking the button multiple times will significantly slow the grade generation process.")}</p>
+    <p>${_("For large courses, generating this report may take several hours. Please be patient and do not click the button multiple times. Clicking the button multiple times will significantly slow the generation process.")}</p>
 
     <p>${_("The report is generated in the background, meaning it is OK to navigate away from this page while your report is generating.")}</p>
 
@@ -44,12 +44,15 @@
     <div class="request-response-error msg msg-warning copy" id="grade-request-response-error"></div>
     <br>
 
-    <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
+    <p>
+      <input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
+      <input type="button" name="get-student-submissions" value="${_("Get Student Submissions Report")}" data-endpoint="${ section_data['get_student_submissions_url'] }"/>
+    </p>
   %endif
 
     <p><b>${_("Reports Available for Download")}</b></p>
     <p>
-      ${_("The grade reports listed below are generated each time the <b>Generate Grade Report</b> button is clicked. A link to each grade report remains available on this page, identified by the UTC date and time of generation. Grade reports are not deleted, so you will always be able to access previously generated reports from this page.")}
+      ${_("The grade reports listed below are generated each time the <b>Generate Grade Report</b> or <b>Get Student Submissions Report</b> button is clicked. A link to each report remains available on this page, identified by the UTC date and time of generation. Reports are not deleted, so you will always be able to access previously generated reports from this page.")}
     </p>
 
   %if settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
