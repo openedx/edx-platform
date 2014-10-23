@@ -21,10 +21,11 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
 
             // takes XBlockInfo as a model
 
-            initialize: function() {
-                BaseView.prototype.initialize.call(this);
+            initialize: function(options) {
+                BaseView.prototype.initialize.call(this, options);
                 this.fieldName = this.$el.data('field');
                 this.fieldDisplayName = this.$el.data('field-display-name');
+                this.maxLabelLength = this.options.maxLabelLength;
                 this.template = this.loadTemplate('xblock-string-field-editor');
                 this.model.on('change:' + this.fieldName, this.onChangeField, this);
             },
@@ -35,6 +36,7 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                     fieldName: this.fieldName,
                     fieldDisplayName: this.fieldDisplayName
                 }));
+                this.onChangeField();
                 return this;
             },
 
@@ -69,9 +71,17 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                 event.stopPropagation();
             },
 
+            getValueLabel: function(value) {
+                var label = value.toString();
+                if (label.length > this.maxLabelLength) {
+                    return _.escape(label.substring(0, this.maxLabelLength - 1)) + '&hellip;';
+                }
+                return _.escape(label);
+            },
+
             onChangeField: function() {
                 var value = this.model.get(this.fieldName);
-                this.getLabel().text(value);
+                this.getLabel().html(this.getValueLabel(value));
                 this.getInput().val(value);
                 this.hideInput();
             },

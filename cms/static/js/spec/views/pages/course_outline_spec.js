@@ -614,6 +614,35 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/views/utils/view_utils",
                     expect(subsectionModel.get('display_name')).toBe(updatedDisplayName);
                 });
 
+                it('shows a truncated label when updating the name to a long string', function() {
+                    var tenCharacterString = '....v....x',
+                        longName = tenCharacterString.concat(
+                            tenCharacterString, tenCharacterString, tenCharacterString, tenCharacterString,
+                            tenCharacterString, tenCharacterString, tenCharacterString, tenCharacterString
+                        ),
+                        displayNameWrapper,
+                        subsectionModel;
+                    createCourseOutlinePage(this, mockCourseJSON);
+                    displayNameWrapper = getDisplayNameWrapper();
+                    displayNameInput = EditHelpers.inlineEdit(displayNameWrapper, longName);
+                    displayNameInput.change();
+                    // This is the response for the change operation.
+                    AjaxHelpers.respondWithJson(requests, { });
+                    // This is the response for the subsequent fetch operation for the section.
+                    AjaxHelpers.respondWithJson(requests,
+                        createMockSectionJSON({}, [
+                            createMockSubsectionJSON({
+                                display_name: longName
+                            })
+                        ])
+                    );
+                    // Find the display name again in the refreshed DOM and verify it
+                    displayNameWrapper = getItemHeaders('subsection').find('.item-title');
+                    expect(displayNameWrapper.html().length).toBe(50);
+                    subsectionModel = outlinePage.model.get('child_info').children[0].get('child_info').children[0];
+                    expect(subsectionModel.get('display_name')).toBe(longName);
+                });
+
                 it('can be expanded and collapsed', function() {
                     createCourseOutlinePage(this, mockCourseJSON);
                     verifyItemsExpanded('subsection', false);

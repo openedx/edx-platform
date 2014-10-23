@@ -39,6 +39,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 return new CourseOutlineView({
                     model: xblockInfo,
                     parentInfo: parentInfo,
+                    maxLabelLength: this.maxLabelLength,
                     initialState: this.initialState,
                     expandedLocators: this.expandedLocators,
                     template: this.template,

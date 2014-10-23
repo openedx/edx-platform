@@ -30,6 +30,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 BaseView.prototype.initialize.call(this);
                 this.initialState = this.options.initialState;
                 this.expandedLocators = this.options.expandedLocators;
+                this.maxLabelLength = this.options.maxLabelLength;
                 this.template = this.options.template;
                 if (!this.template) {
                     this.template = this.loadTemplate(this.templateName);
@@ -130,7 +131,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     });
                     nameEditor = new XBlockOutlineFieldEditor({
                         el: xblockField,
-                        model: this.model
+                        model: this.model,
+                        maxLabelLength: this.maxLabelLength
                     });
                     nameEditor.render();
                 }
@@ -186,6 +188,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 return new XBlockOutlineView({
                     model: xblockInfo,
                     parentInfo: parentInfo,
+                    maxLabelLength: this.maxLabelLength,
                     initialState: this.initialState,
                     expandedLocators: this.expandedLocators,
                     template: this.template,
