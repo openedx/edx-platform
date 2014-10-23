@@ -103,7 +103,7 @@ class FormDescription(object):
     }
 
     OVERRIDE_FIELD_PROPERTIES = [
-        "label", "type", "default", "placeholder",
+        "label", "type", "defaultValue", "placeholder",
         "instructions", "required", "restrictions",
         "options"
     ]
@@ -172,7 +172,7 @@ class FormDescription(object):
             "name": name,
             "label": label,
             "type": field_type,
-            "default": default,
+            "defaultValue": default,
             "placeholder": placeholder,
             "instructions": instructions,
             "required": required,
@@ -217,7 +217,7 @@ class FormDescription(object):
                 {
                     "name": "cheese_or_wine",
                     "label": "Cheese or Wine?",
-                    "default": "cheese",
+                    "defaultValue": "cheese",
                     "type": "select",
                     "required": True,
                     "placeholder": "",
@@ -231,7 +231,7 @@ class FormDescription(object):
                 {
                     "name": "comments",
                     "label": "comments",
-                    "default": "",
+                    "defaultValue": "",
                     "type": "text",
                     "required": False,
                     "placeholder": "Any comments?",
@@ -274,6 +274,11 @@ class FormDescription(object):
         # Transform kwarg "field_type" to "type" (a reserved Python keyword)
         if "field_type" in kwargs:
             kwargs["type"] = kwargs["field_type"]
+
+        # Transform kwarg "default" to "defaultValue", since "default"
+        # is a reserved word in JavaScript
+        if "default" in kwargs:
+            kwargs["defaultValue"] = kwargs["default"]
 
         self._field_overrides[field_name].update({
             property_name: property_value
