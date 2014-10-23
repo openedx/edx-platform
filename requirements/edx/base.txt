@@ -34,7 +34,7 @@ django-storages==1.1.5
 django-threaded-multihost==1.4-1
 django-method-override==0.1.0
 djangorestframework==2.3.14
-django==1.4.14
+django==1.4.16
 feedparser==5.1.3
 firebase-token-generator==1.3.2
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
