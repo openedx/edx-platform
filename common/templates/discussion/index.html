@@ -1,0 +1,47 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! import django_comment_client.helpers as helpers %>
+<%! from django.template.defaultfilters import escapejs %>
+<%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%block name="bodyclass">discussion</%block>
+<%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
+<%block name="nav_skip">#discussion-container</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
+<%include file="_js_head_dependencies.html" />
+</%block>
+
+<%block name="js_extra">
+<%include file="_js_body_dependencies.html" />
+<%static:js group='discussion'/>
+</%block>
+
+<%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
+
+<section class="discussion container" id="discussion-container"
+         data-roles="${roles}"
+         data-course-id="${course_id | h}"
+         data-user-info="${user_info}"
+         data-threads="${threads}"
+         data-thread-pages="${thread_pages}"
+         data-content-info="${annotated_content_info}"
+         data-sort-preference="${sort_preference}"
+         data-flag-moderator="${flag_moderator}"
+         data-user-cohort-id="${user_cohort}"
+         data-course-settings="${course_settings}">
+    <div class="discussion-body">
+        <div class="forum-nav"></div>
+        <div class="discussion-column">
+          <article class="new-post-article" style="display: none"></article>
+          <div class="forum-content"></div>
+        </div>
+    </div>
+</section>
+
+<%include file="_underscore_templates.html" />
+<%include file="_thread_list_template.html" />

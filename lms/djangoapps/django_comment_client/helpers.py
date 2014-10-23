@@ -3,16 +3,14 @@ import os
 from django.conf import settings
 from mako.template import Template
 
-from discussion_app.views import get_template_dir as discussion_get_template_dir
-
 
 def include_mustache_templates():
-    mustache_dir = discussion_get_template_dir() + '/discussion/mustache'
+    mustache_dir = settings.COMMON_ROOT / 'templates' / 'discussion' / 'mustache'
 
     def is_valid_file_name(file_name):
         return file_name.endswith('.mustache')
     def read_file(file_name):
-        return open(mustache_dir + '/' + file_name, "r").read().decode('utf-8')
+        return open(mustache_dir / file_name, "r").read().decode('utf-8')
     def template_id_from_file_name(file_name):
         return file_name.rpartition('.')[0]
     def process_mako(template_content):

@@ -17,6 +17,3 @@ def run():
         clear_lookups(namespace)
         for directory in directories:
             add_lookup(namespace, directory)
-
-    # Add Discussion templates
-    add_lookup('main', 'templates', package='discussion_app')

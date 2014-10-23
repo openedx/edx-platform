@@ -9,10 +9,12 @@
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+
+<%include file="_js_head_dependencies.html" />
 </%block>
 
 <%block name="js_extra">
-<%include file="/discussion/_js_body_dependencies.html" />
+<%include file="_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 </%block>
 
@@ -24,14 +26,14 @@
       <nav>
 
         <article class="sidebar-module discussion-sidebar">
-          <%include file="/discussion/_user_profile.html" />
+          <%include file="_user_profile.html" />
         </article>
 
       </nav>
     </section>
 
-    <section class="course-content container discussion-user-threads" data-course-id="${course.id.to_deprecated_string() | h}" data-threads="${threads}" data-user-info="${user_info}" data-page="${page}" data-num-pages="${num_pages}"/>
+    <section class="course-content container discussion-user-threads" data-course-id="${course.id | h}" data-threads="${threads}" data-user-info="${user_info}" data-page="${page}" data-num-pages="${num_pages}"/>
   </div>
 </section>
 
-<%include file="/discussion/_underscore_templates.html" />
+<%include file="_underscore_templates.html" />
