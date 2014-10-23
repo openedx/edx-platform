@@ -220,7 +220,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
-        self.assertEqual(401, response.status_code)
+        self.assertEqual(403, response.status_code)
         self.assertIn("successfully logged into your %s account, but this account isn't linked" % self.PROVIDER_CLASS.NAME, response.content)
 
     def assert_json_failure_response_is_username_collision(self, response):

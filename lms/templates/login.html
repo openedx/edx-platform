@@ -50,7 +50,7 @@
       $('#login-form').on('ajax:error', function(event, request, status_string) {
         toggleSubmitButton(true);
 
-        if (request.status === 401) {
+        if (request.status === 403) {
           $('.message.submission-error').removeClass('is-shown');
           $('.third-party-signin.message').addClass('is-shown').focus();
           $('.third-party-signin.message .instructions').html(request.responseText);

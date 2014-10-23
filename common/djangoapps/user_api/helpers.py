@@ -372,13 +372,20 @@ def shim_student_view(view_func, check_logged_in=False):
             and request.user.is_authenticated()
         )
         if check_logged_in and not is_authenticated:
-            # Preserve the 401 status code so the client knows
-            # that the user successfully authenticated with third-party auth
-            # but does not have a linked account.
-            # Otherwise, send a 403 to indicate that the login failed.
-            if response.status_code != 401:
+            # If we get a 403 status code from the student view
+            # this means we've successfully authenticated with a
+            # third party provider, but we don't have a linked
+            # EdX account.  Send a helpful error code so the client
+            # knows this occurred.
+            if response.status_code == 403:
+                response.content = "third-party-auth"
+
+            # Otherwise, it's a general authentication failure.
+            # Ensure that the status code is a 403 and pass
+            # along the message from the view.
+            else:
                 response.status_code = 403
-            response.content = msg
+                response.content = msg
 
         # If the view wants to redirect us, send a status 302
         elif redirect_url is not None:
@@ -397,9 +404,6 @@ def shim_student_view(view_func, check_logged_in=False):
         # If the response is successful, then return the content
         # of the response directly rather than including it
         # in a JSON-serialized dictionary.
-        # This will also preserve error status codes such as a 401
-        # (if the user is trying to log in using a third-party provider
-        # but hasn't yet linked his or her account.)
         else:
             response.content = msg
 
