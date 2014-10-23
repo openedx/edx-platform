@@ -38,6 +38,7 @@ from bulk_email.models import (
     SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
 )
 from courseware.courses import get_course, course_image_url
+from student.models import UserStanding
 from student.roles import CourseStaffRole, CourseInstructorRole
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
@@ -118,7 +119,7 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
                 is_active=True,
                 courseenrollment__course_id=course_id,
                 courseenrollment__is_active=True
-            )
+            ).exclude(standing__account_status=UserStanding.ACCOUNT_DISABLED)
             # Now we do some queryset sidestepping to avoid doing a DISTINCT
             # query across the course staff and the enrolled students, which
             # forces the creation of a temporary table in the db.

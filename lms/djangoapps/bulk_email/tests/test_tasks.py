@@ -36,6 +36,7 @@ from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from student.models import UserStanding
 
 
 class TestTaskFailure(Exception):
@@ -221,6 +222,18 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         student = students[0]
         student.is_active = False
         student.save()
+        with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
+            get_conn.return_value.send_messages.side_effect = cycle([None])
+            self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails - 1, num_emails - 1)
+
+    def test_disabled_user(self):
+        # Select number of emails to fit into a single subtask.
+        num_emails = settings.BULK_EMAIL_EMAILS_PER_TASK
+        # We also send email to the instructor:
+        students = self._create_students(num_emails - 1)
+        # mark a student disabled:
+        student = students[0]
+        UserStanding.objects.create(user=student, account_status=UserStanding.ACCOUNT_DISABLED, changed_by=student)
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails - 1, num_emails - 1)
