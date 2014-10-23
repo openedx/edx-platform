@@ -1,5 +1,21 @@
 // lms - views - login/register view
 // ====================
+
+%heading-4 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0 !important;
+    color: $m-gray-d2;
+}
+
+%body-text {
+    font-size: 15px;
+    margin: 0 0 $baseline 0;
+    color: $base-font-color;
+    line-height: lh(1);
+}
+
 .section-bkg-wrapper {
     background: $m-gray-l4;
 }
@@ -128,6 +144,9 @@
                 display: inline;
             }
 
+            &.error {
+                color: $red;
+            }
         }
 
         .field-link {
@@ -199,6 +218,62 @@
         text-transform: none;
     }
 
+    /** Error Container - from _account.scss **/
+    .status {
+        @include box-sizing(border-box);
+        margin: 0 0 $baseline 0;
+        border-bottom: 3px solid shade($yellow, 10%);
+        padding: $baseline $baseline;
+        background: tint($yellow,20%);
+
+        .message-title {
+            @extend %heading-4;
+            margin: 0 0 ($baseline/4) 0;
+            font-size: em(14);
+            font-weight: 600;
+        }
+
+        .message-copy {
+            @extend %body-text;
+            margin: 0 !important;
+            padding: 0;
+            list-style: none;
+
+            li {
+                margin: 0 0 ($baseline/4) 0;
+            }
+        }
+    }
+
+    .submission-error, .system-error {
+        box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
+        border-bottom: 3px solid shade($red, 10%);
+        background: tint($red,95%);
+
+        .message-title {
+            color: shade($red, 10%) !important;
+        }
+
+        .message-copy {
+
+        }
+    }
+
+    .submission-success {
+        box-shadow: inset 0 -1px 2px 0 tint($green, 85%);
+        border-bottom: 3px solid shade($green, 10%);
+        background: tint($green, 95%);
+
+        .message-title {
+            color: shade($green, 10%) !important;
+        }
+
+        .message-copy {
+
+        }
+    }
+
+    /** RWD **/
     @include media( $tablet ) {
         $grid-columns: 8;
 

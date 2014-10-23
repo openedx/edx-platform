@@ -9,12 +9,37 @@ var edx = edx || {};
         var _fn = {
             validate: {
 
-                field: function( el ) {
-                    var $el = $(el);
+                msg: {
+                    email: '<p>A properly formatted e-mail is required</p>',
+                    min: '<p><%= field %> must be a minimum of <%= length %> characters long',
+                    max: '<p><%= field %> must be a maximum of <%= length %> characters long',
+                    password: '<p>A valid password is required</p>',
+                    required: '<p><%= field %> field is required</p>',
+                    terms: '<p>To enroll you must agree to the <a href="#">Terms of Service and Honor Code</a></p>'
+                },
 
-                    return _fn.validate.required( $el ) &&
-                           _fn.validate.charLength( $el ) &&
-                           _fn.validate.email.valid( $el );
+                field: function( el ) {
+                    var $el = $(el),
+                        required = _fn.validate.required( $el ),
+                        // length = _fn.validate.charLength( $el ),
+                        min = _fn.validate.str.minlength( $el ),
+                        max = _fn.validate.str.maxlength( $el ),
+                        email = _fn.validate.email.valid( $el ),
+                        response = {
+                            isValid: required && min && max && email
+                        };
+
+                    if ( !response.isValid ) {
+                        response.message = _fn.validate.getMessage( $el, {
+                            required: required,
+                            // length: length,
+                            min: min,
+                            max: max,
+                            email: email
+                        });
+                    }
+
+                    return response;
                 },
 
                 charLength: function( $el ) {
@@ -39,11 +64,30 @@ var edx = edx || {};
                     return within;
                 },
 
-                required: function( $el ) {
-                    if ($el.attr("type") === "checkbox") {
-                        return $el.attr('required') ? $el.prop("checked") : true;
+                str: {
+                    minlength: function( $el ) {
+                        var min = $el.attr('minlength') || 0;
+
+                        return min <= $el.val().length;
+                    },
+
+                    maxlength: function( $el ) {
+                        var max = $el.attr('maxlength') || false;
+
+                        return ( !!max ) ? max >= $el.val().length : true;
+                    },
+
+                    capitalizeFirstLetter: function( str ) {
+                        str = str.replace('_', ' ');
+
+                        return str.charAt(0).toUpperCase() + str.slice(1);
                     }
-                    else {
+                },
+
+                required: function( $el ) {
+                    if ( $el.attr('type') === 'checkbox' ) {
+                        return $el.attr('required') ? $el.prop('checked') : true;
+                    } else {
                         return $el.attr('required') ? $el.val() : true;
                     }
                 },
@@ -66,6 +110,26 @@ var edx = edx || {};
                     format: function( str ) {
                         return _fn.validate.email.regex.test( str );
                     }
+                },
+
+                getMessage: function( $el, tests ) {
+                    var txt = [],
+                        tpl,
+                        name;
+
+                    _.each( tests, function( value, key ) {
+                        if ( !value ) {
+                            name = $el.attr('name');
+
+                            tpl = _fn.validate.msg[key];
+
+                            txt.push( _.template( tpl, {
+                                field: _fn.validate.str.capitalizeFirstLetter( name )
+                            }));
+                        }
+                    });
+
+                    return txt.join(' ');
                 }
             }
         };
