@@ -41,6 +41,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/common_static/js/vendor/URI.min.js
+    - xmodule_js/common_static/js/vendor/url.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/coffee/src/xblock
     - xmodule_js/common_static/js/vendor/sinon-1.7.1.js
@@ -49,6 +50,7 @@ lib_paths:
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/src/
     - xmodule_js/common_static/js/vendor/underscore-min.js
+    - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
 
 # Paths to source JavaScript files

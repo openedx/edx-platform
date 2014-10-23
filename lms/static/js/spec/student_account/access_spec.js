@@ -1,95 +1,160 @@
-define(['js/common_helpers/template_helpers', 'js/student_account/views/AccessView'],
-    function(TemplateHelpers, AccessView) {
+define([
+    'jquery',
+    'js/common_helpers/template_helpers',
+    'js/common_helpers/ajax_helpers',
+    'js/student_account/views/AccessView',
+    'js/student_account/views/FormView'
+], function($, TemplateHelpers, AjaxHelpers, AccessView) {
         describe('edx.student.account.AccessView', function() {
             'use strict';
 
-            var view = null,
-                ajaxSuccess = true;
-
-            var assertForms = function(visible, hidden) {
-                expect($(visible)).not.toHaveClass('hidden');
-                expect($(hidden)).toHaveClass('hidden');
-                expect($('#password-reset-wrapper')).toBeEmpty();
-            };
-
-            beforeEach(function() {
-                setFixtures("<div id='login-and-registration-container'></div>");
-                TemplateHelpers.installTemplate('templates/student_account/access');
-                TemplateHelpers.installTemplate('templates/student_account/login');
-                TemplateHelpers.installTemplate('templates/student_account/register');
-                TemplateHelpers.installTemplate('templates/student_account/password_reset');
-                TemplateHelpers.installTemplate('templates/student_account/form_field');
-
-                // Used to populate forms
-                var form_description = {
-                    "method": "post",
-                    "submit_url": "/submit",
-                    "fields": [
+            var requests = null,
+                view = null,
+                AJAX_INFO = {
+                    register: {
+                        url: '/user_api/v1/account/registration/',
+                        requestIndex: 1
+                    },
+                    login: {
+                        url: '/user_api/v1/account/login_session/',
+                        requestIndex: 0
+                    },
+                    password_reset: {
+                        url: '/user_api/v1/account/password_reset/',
+                        requestIndex: 1
+                    }
+                },
+                FORM_DESCRIPTION = {
+                    method: 'post',
+                    submit_url: '/submit',
+                    fields: [
                         {
-                            "name": "email",
-                            "label": "Email",
-                            "default": "",
-                            "type": "text",
-                            "required": true,
-                            "placeholder": "xsy@edx.org",
-                            "instructions": "Enter your email here.",
-                            "restrictions": {},
+                            name: 'email',
+                            label: 'Email',
+                            defaultValue: '',
+                            type: 'text',
+                            required: true,
+                            placeholder: 'xsy@edx.org',
+                            instructions: 'Enter your email here.',
+                            restrictions: {},
                         },
                         {
-                            "name": "username",
-                            "label": "Username",
-                            "default": "",
-                            "type": "text",
-                            "required": true,
-                            "placeholder": "Xsy",
-                            "instructions": "Enter your username here.",
-                            "restrictions": {
-                                "max_length": 200
+                            name: 'username',
+                            label: 'Username',
+                            defaultValue: '',
+                            type: 'text',
+                            required: true,
+                            placeholder: 'Xsy',
+                            instructions: 'Enter your username here.',
+                            restrictions: {
+                                max_length: 200
                             }
                         }
                     ]
                 };
 
-                // Stub AJAX calls and force them to return a form description
-                spyOn($, 'ajax').andCallFake(function() {
-                    return $.Deferred(function(defer) {
-                        if (ajaxSuccess) {
-                            defer.resolveWith(this, [form_description]);
-                        } else {
-                            defer.reject();
-                        }
-                    }).promise();
-                });
+            var ajaxAssertAndRespond = function(url, requestIndex) {
+                // Verify that the client contacts the server as expected
+                AjaxHelpers.expectJsonRequest(requests, 'GET', url, null, requestIndex);
 
-                view = new edx.student.account.AccessView({
-                    mode: 'login',
+                /* Simulate a response from the server containing
+                /* a dummy form description
+                 */
+                AjaxHelpers.respondWithJson(requests, FORM_DESCRIPTION);
+            };
+
+            var ajaxSpyAndInitialize = function(that, mode) {
+                // Spy on AJAX requests
+                requests = AjaxHelpers.requests(that);
+
+                // Initialize the access view
+                view = new AccessView({
+                    mode: mode,
                     thirdPartyAuth: {
                         currentProvider: null,
                         providers: []
-                    }
+                    },
+                    platformName: 'edX'
                 });
+
+                ajaxAssertAndRespond(AJAX_INFO[mode].url);
+            };
+
+            var assertForms = function(visibleType, hiddenType) {
+                expect($(visibleType)).not.toHaveClass('hidden');
+                expect($(hiddenType)).toHaveClass('hidden');
+                expect($('#password-reset-wrapper')).toBeEmpty();
+            };
+
+            var selectForm = function(type) {
+                // Create a fake change event to control form toggling
+                var changeEvent = $.Event('change');
+                changeEvent.currentTarget = $('#' + type + '-option');
+
+                // Load form corresponding to the change event
+                view.toggleForm(changeEvent);
+
+                ajaxAssertAndRespond(AJAX_INFO[type].url, AJAX_INFO[type].requestIndex);
+            };
+
+            beforeEach(function() {
+                setFixtures('<div id="login-and-registration-container"></div>');
+                TemplateHelpers.installTemplate('templates/student_account/access');
+                TemplateHelpers.installTemplate('templates/student_account/login');
+                TemplateHelpers.installTemplate('templates/student_account/register');
+                TemplateHelpers.installTemplate('templates/student_account/password_reset');
+                TemplateHelpers.installTemplate('templates/student_account/form_field');
             });
 
-            it("initially displays the correct form", function() {
-                assertForms($('#login-form'), $('#register-form'));
+            it('can initially display the login form', function() {
+                ajaxSpyAndInitialize(this, 'login');
+
+                /* Verify that the login form is expanded, and that the
+                /* registration form is collapsed.
+                 */
+                assertForms('#login-form', '#register-form');
             });
 
-            it("toggles between the login and registration forms", function() {
-                var registerChangeEvent = $.Event('change', {currentTarget: $('#register-option')}),
-                    loginChangeEvent = $.Event('change', {currentTarget: $('#login-option')});
+            it('can initially display the registration form', function() {
+                ajaxSpyAndInitialize(this, 'register');
+
+                /* Verify that the registration form is expanded, and that the
+                /* login form is collapsed.
+                 */
+                assertForms('#register-form', '#login-form');
+            });
+
+            it('toggles between the login and registration forms', function() {
+                ajaxSpyAndInitialize(this, 'login');
 
                 // Simulate selection of the registration form
-                view.toggleForm(registerChangeEvent)
-                assertForms($('#register-form'), $('#login-form'));
+                selectForm('register');
+                assertForms('#register-form', '#login-form');
 
                 // Simulate selection of the login form
-                view.toggleForm(loginChangeEvent)
-                assertForms($('#login-form'), $('#register-form'));
+                selectForm('login');
+                assertForms('#login-form', '#register-form');
             });
 
-            it("displays the reset password form", function() {
+            it('displays the reset password form', function() {
+                ajaxSpyAndInitialize(this, 'login');
+                
+                // Simulate a click on the reset password link
                 view.resetPassword();
+
+                ajaxAssertAndRespond(
+                    AJAX_INFO['password_reset'].url,
+                    AJAX_INFO['password_reset'].requestIndex
+                );
+                
+                // Verify that the password reset wrapper is populated
                 expect($('#password-reset-wrapper')).not.toBeEmpty();
+            });
+
+            it('displays an error if a form definition could not be loaded', function() {
+                /* TODO: Not yet implemeted in the access view; currently, it only
+                 * logs to the console.
+                 */
             });
         });
     }
