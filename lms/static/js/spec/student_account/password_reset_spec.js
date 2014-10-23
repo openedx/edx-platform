@@ -1,5 +1,5 @@
-define(['js/common_helpers/template_helpers', 'js/student_account/views/PasswordResetView'],
-    function(TemplateHelpers) {
+define(['js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers', 'js/student_account/views/PasswordResetView'],
+    function(TemplateHelpers, AjaxHelpers) {
         describe('edx.student.account.PasswordResetView', function() {
             'use strict';
 
@@ -23,7 +23,8 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
                 // Create a fake click event
                 var clickEvent = $.Event('click');
 
-                // Used to avoid spying on view.validate twice
+                // If validationSuccess isn't passed, we avoid
+                // spying on `view.validate` twice
                 if (typeof validationSuccess !== 'undefined') {
                     // Force validation to return as expected
                     spyOn(view, 'validate').andReturn({
@@ -36,30 +37,13 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
                 view.submitForm(clickEvent);
             };
 
-            var assertAjax = function(url, method, data) {
-                expect($.ajax).toHaveBeenCalled();
-                var ajaxArgs = $.ajax.mostRecentCall.args[0];
-                expect(ajaxArgs.url).toEqual(url);
-                expect(ajaxArgs.type).toEqual(method);
-                expect(ajaxArgs.data).toEqual(data)
-                expect(ajaxArgs.headers.hasOwnProperty("X-CSRFToken")).toBe(true);
-            };
-
             beforeEach(function() {
                 setFixtures("<div id='password-reset-wrapper'></div>");
                 TemplateHelpers.installTemplate('templates/student_account/password_reset');
                 TemplateHelpers.installTemplate('templates/student_account/form_field');
 
-                // Stub AJAX calls
-                spyOn($, 'ajax').andCallFake(function() {
-                    return $.Deferred(function(defer) {
-                        if (ajaxSuccess) {
-                            defer.resolve();
-                        } else {
-                            defer.rejectWith(this, ["The server could not be contacted."]);
-                        }
-                    }).promise();
-                });
+                // Spy on AJAX requests
+                requests = AjaxHelpers.requests(this);
 
                 view = new edx.student.account.PasswordResetView({
                     fields: data,
@@ -69,7 +53,15 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
 
             it("allows the user to request a new password", function() {
                 submitEmail(true);
-                assertAjax('/account/password', 'POST', {email: 'foo@bar.baz'});
+
+                // Verify that the client contacts the server
+                AjaxHelpers.expectRequest(
+                    requests, 'POST', '/account/password', $.param({email: EMAIL})
+                );
+
+                // Respond with status code 200
+                AjaxHelpers.respondWithJson(requests, {});
+
                 expect($('.js-reset-success')).not.toHaveClass('hidden');
             });
 
@@ -84,16 +76,22 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
                 expect(view.$errors).not.toHaveClass('hidden');
             });
 
-            it("displays an error if the server could not be contacted", function() {
-                // If we get an error status on the AJAX request, display an error
-                ajaxSuccess = false;
+            it("displays an error if the server cannot be contacted", function() {
                 submitEmail(true);
+
+                // Simulate an error from the LMS servers
+                AjaxHelpers.respondWithError(requests);
+
+                // Expect that an error is displayed
                 expect(view.$'#submission-error').not.toHaveClass('hidden');
 
                 // If we try again and succeed, the error should go away
-                ajaxSuccess = true;
-                // No argument means we won't spy on view.validate again
                 submitEmail();
+                
+                // This time, respond with status code 200
+                AjaxHelpers.respondWithJson(requests, {});
+                
+                // Expect that the error is hidden
                 expect(view.$'#submission-error').toHaveClass('hidden');
             });
         });
