@@ -87,6 +87,7 @@ class MongoModulestoreBuilder(object):
         doc_store_config = dict(
             db='modulestore{}'.format(random.randint(0, 10000)),
             collection='xmodule',
+            asset_collection='asset_metadata',
             **COMMON_DOCSTORE_CONFIG
         )
 
