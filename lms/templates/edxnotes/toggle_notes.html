@@ -1,0 +1,27 @@
+<%! import json %>
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%page args="course"/>
+
+<%
+  edxnotes_visibility = course.edxnotes_visibility
+  edxnotes_visibility_url = reverse("edxnotes_visibility", kwargs={"course_id": course.id})
+%>
+<div class="wrapper-utility edx-notes-visibility">
+  <span class="action-toggle-message" aria-live="polite"></span>
+  <button class="utility-control utility-control-button action-toggle-notes is-disabled ${"is-active" if edxnotes_visibility else ""}" aria-pressed="${"true" if edxnotes_visibility else "false"}">
+    <i class="icon fa fa-pencil"></i>
+    % if edxnotes_visibility:
+    <span class="utility-control-label sr">${_("Hide notes")}</span>
+    % else:
+    <span class="utility-control-label sr">${_("Show notes")}</span>
+    % endif
+  </button>
+</div>
+<script type="text/javascript">
+  (function (require) {
+      require(['js/edxnotes/views/toggle_notes_factory'], function(ToggleNotesFactory) {
+          ToggleNotesFactory(${json.dumps(edxnotes_visibility)}, '${edxnotes_visibility_url}');
+      });
+  }).call(this, require || RequireJS.require);
+</script>

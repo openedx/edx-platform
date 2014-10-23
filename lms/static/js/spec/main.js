@@ -1,5 +1,4 @@
 (function(requirejs, define) {
-
     // TODO: how can we share the vast majority of this config that is in common with CMS?
     requirejs.config({
         paths: {
@@ -54,6 +53,7 @@
             'xblock/lms.runtime.v1': 'coffee/src/xblock/lms.runtime.v1',
             'capa/display': 'xmodule_js/src/capa/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
+            'logger': 'xmodule_js/common_static/js/src/logger',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -77,7 +77,10 @@
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
-            'js/student_profile/profile': 'js/student_profile/profile'
+            'js/student_profile/profile': 'js/student_profile/profile',
+
+            // edxnotes
+            'annotator': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
         shim: {
             'gettext': {
@@ -210,6 +213,9 @@
             },
             'xmodule': {
                 exports: 'XModule'
+            },
+            'logger': {
+                exports: 'Logger'
             },
             'sinon': {
                 exports: 'sinon'
@@ -488,6 +494,11 @@
                     'js/verify_student/views/enrollment_confirmation_step_view'
                 ]
             },
+            // Student Notes
+            'annotator': {
+                exports: 'Annotator',
+                deps: ['jquery']
+            }
         }
     });
 
@@ -514,7 +525,26 @@
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
-        'lms/include/js/spec/verify_student/make_payment_step_view_spec.js'
+        'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
+        'lms/include/js/spec/edxnotes/utils/logger_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_factory_spec.js',
+        'lms/include/js/spec/edxnotes/views/shim_spec.js',
+        'lms/include/js/spec/edxnotes/views/note_item_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_page_spec.js',
+        'lms/include/js/spec/edxnotes/views/search_box_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs_list_spec.js',
+        'lms/include/js/spec/edxnotes/views/tab_item_spec.js',
+        'lms/include/js/spec/edxnotes/views/tab_view_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs/search_results_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs/recent_activity_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs/course_structure_spec.js',
+        'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
+        'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
+        'lms/include/js/spec/edxnotes/models/tab_spec.js',
+        'lms/include/js/spec/edxnotes/models/note_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/events_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
+        'lms/include/js/spec/edxnotes/collections/notes_spec.js'
     ]);
 
 }).call(this, requirejs, define);

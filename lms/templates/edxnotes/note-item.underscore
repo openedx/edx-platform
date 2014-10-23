@@ -1,0 +1,38 @@
+<div class="wrapper-note-excerpts">
+    <% if (message) { %>
+    <div class="note-excerpt" role="region" aria-label="<%- gettext('Highlighted text') %>">
+        <p class="note-excerpt-p"><%= message %>
+          <% if (show_link) { %>
+          <% if (is_expanded) { %>
+              <a href="#" class="note-excerpt-more-link"><%- gettext('Less') %></a>
+          <% } else { %>
+              <a href="#" class="note-excerpt-more-link"><%- gettext('More') %></a>
+          <% } %>
+          <% } %>
+        </p>
+    </div>
+    <% } %>
+
+    <% if (text) { %>
+    <ol class="note-comments" role="region" aria-label="<%- gettext('Note') %>">
+        <li class="note-comment">
+            <h3 class="note-comment-title"><%- gettext("You commented...") %></h3>
+            <p class="note-comment-p"><%= text %></p>
+        </li>
+    </ol>
+    <% } %>
+</div>
+
+<footer class="reference" role="complementary" aria-label="<%- gettext('References') %>">
+    <div class="wrapper-reference-content">
+        <h3 class="reference-title"><%- gettext("Noted in:") %></h3>
+        <% if (unit.url) { %>
+          <a class="reference-meta reference-unit-link" href="<%= unit.url %>#<%= id %>"><%- unit.display_name %></a>
+        <% } else { %>
+          <span class="reference-meta"><%- unit.display_name %></span>
+        <% } %>
+
+        <h3 class="reference-title"><%- gettext("Last Edited:") %></h3>
+        <span class="reference-meta reference-updated-date"><%- updated %></span>
+    </div>
+</footer>

@@ -222,7 +222,7 @@ require.config({
         "coffee/src/main": {
             deps: ["coffee/src/ajax_prefix"]
         },
-        "coffee/src/logger": {
+        "js/src/logger": {
             exports: "Logger",
             deps: ["coffee/src/ajax_prefix"]
         },

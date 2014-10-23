@@ -231,3 +231,5 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 # Enable content libraries code for the tests
 FEATURES['ENABLE_CONTENT_LIBRARIES'] = True
+
+FEATURES['ENABLE_EDXNOTES'] = True
