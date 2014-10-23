@@ -99,6 +99,13 @@ def _assets_json(request, course_key):
     requested_page = int(request.REQUEST.get('page', 0))
     requested_page_size = int(request.REQUEST.get('page_size', 50))
     requested_sort = request.REQUEST.get('sort', 'date_added')
+    requested_filter = request.REQUEST.get('asset_type', '')
+    filter_params = None
+    if requested_filter is not None and len(requested_filter) > 0:
+        filter_params = {
+            "$where": "this.displayname.split('.').reverse()[0].toUpperCase() == '{}'.toUpperCase()".format(requested_filter),
+        }
+
     sort_direction = DESCENDING
     if request.REQUEST.get('direction', '').lower() == 'asc':
         sort_direction = ASCENDING
@@ -112,14 +119,14 @@ def _assets_json(request, course_key):
 
     current_page = max(requested_page, 0)
     start = current_page * requested_page_size
-    assets, total_count = _get_assets_for_page(request, course_key, current_page, requested_page_size, sort)
+    assets, total_count = _get_assets_for_page(request, course_key, current_page, requested_page_size, sort, filter_params=filter_params)
     end = start + len(assets)
 
     # If the query is beyond the final page, then re-query the final page so that at least one asset is returned
     if requested_page > 0 and start >= total_count:
         current_page = int(math.floor((total_count - 1) / requested_page_size))
         start = current_page * requested_page_size
-        assets, total_count = _get_assets_for_page(request, course_key, current_page, requested_page_size, sort)
+        assets, total_count = _get_assets_for_page(request, course_key, current_page, requested_page_size, sort, filter_params=filter_params)
         end = start + len(assets)
 
     asset_json = []
@@ -144,14 +151,14 @@ def _assets_json(request, course_key):
     })
 
 
-def _get_assets_for_page(request, course_key, current_page, page_size, sort):
+def _get_assets_for_page(request, course_key, current_page, page_size, sort, filter_params=None):
     """
     Returns the list of assets for the specified page and page size.
     """
     start = current_page * page_size
 
     return contentstore().get_all_content_for_course(
-        course_key, start=start, maxresults=page_size, sort=sort
+        course_key, start=start, maxresults=page_size, sort=sort, filter_params=filter_params
     )
 
 
