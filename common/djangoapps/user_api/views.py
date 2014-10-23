@@ -50,6 +50,10 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
 
+    # This end-point is available to anonymous users,
+    # so do not require authentication.
+    authentication_classes = []
+
     def get(self, request):
         """Return a description of the login form.
 
@@ -142,6 +146,10 @@ class RegistrationView(APIView):
         "year_of_birth", "mailing_address", "goals",
         "honor_code", "terms_of_service",
     ]
+
+    # This end-point is available to anonymous users,
+    # so do not require authentication.
+    authentication_classes = []
 
     def _is_field_visible(self, field_name):
         """Check whether a field is visible based on Django settings. """
