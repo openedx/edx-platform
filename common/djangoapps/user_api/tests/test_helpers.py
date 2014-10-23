@@ -98,7 +98,7 @@ class FormDescriptionTest(TestCase):
                     "name": "name",
                     "label": "label",
                     "type": "text",
-                    "default": "default",
+                    "defaultValue": "default",
                     "placeholder": "placeholder",
                     "instructions": "instructions",
                     "required": True,

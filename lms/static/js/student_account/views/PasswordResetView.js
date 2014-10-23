@@ -32,7 +32,8 @@ var edx = edx || {};
                 name: 'email',
                 required: true,
                 type: 'email',
-                restrictions: []
+                restrictions: [],
+                defaultValue: ''
             }]);
 
             this.tpl = $(this.tpl).html();

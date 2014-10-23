@@ -88,9 +88,6 @@ var edx = edx || {};
                 len = data.length,
                 fieldTpl = this.fieldTpl;
             for ( i=0; i<len; i++ ) {
-                // "default" is reserved in JavaScript
-                data[i].value = data[i]["default"];
-
                 html.push( _.template( fieldTpl, $.extend( data[i], {
                     form: 'register'
                 }) ) );
