@@ -7,6 +7,7 @@ from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, Invoice, CourseRegCodeItem,
     OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode
 )
+from django.db.models import Q
 from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,7 +16,7 @@ from django.core.exceptions import ObjectDoesNotExist
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
                     'level_of_education', 'mailing_address', 'goals', 'meta')
-ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
+ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'status')
 ORDER_FEATURES = ('purchase_time',)
 
 SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_name', 'company_contact_email', 'recipient_name',
@@ -42,8 +43,15 @@ def sale_order_record_features(course_id, features):
         {'company_name': 'group_C', 'total_codes': '3', total_amount:'total_amount3 in decimal'.}
     ]
     """
-    purchased_courses = PaidCourseRegistration.objects.filter(course_id=course_id, status='purchased').order_by('order')
-    purchased_course_reg_codes = CourseRegCodeItem.objects.filter(course_id=course_id, status='purchased').order_by('order')
+    purchased_courses = PaidCourseRegistration.objects.filter(
+        Q(course_id=course_id),
+        Q(status='purchased') | Q(status='refunded')
+    ).order_by('order')
+
+    purchased_course_reg_codes = CourseRegCodeItem.objects.filter(
+        Q(course_id=course_id),
+        Q(status='purchased') | Q(status='refunded')
+    ).order_by('order')
 
     def sale_order_info(purchased_course, features):
         """
@@ -52,6 +60,7 @@ def sale_order_record_features(course_id, features):
 
         sale_order_features = [x for x in SALE_ORDER_FEATURES if x in features]
         course_reg_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
+        order_item_features = [x for x in ORDER_ITEM_FEATURES if x in features]
 
         # Extracting order information
         sale_order_dict = dict((feature, getattr(purchased_course.order, feature))
@@ -67,14 +76,25 @@ def sale_order_record_features(course_id, features):
         sale_order_dict.update({"total_codes": 'N/A'})
         sale_order_dict.update({'total_used_codes': 'N/A'})
 
+        # Extracting OrderItem information of unit_cost, list_price and status
+        order_item_dict = dict((feature, getattr(purchased_course, feature, None))
+                               for feature in order_item_features)
+        order_item_dict.update({"coupon_code": 'N/A'})
+
+        coupon_redemption = CouponRedemption.objects.select_related('coupon').filter(order_id=purchased_course.order_id)
+        # if coupon is redeemed against the order, update the information in the order_item_dict
+        if coupon_redemption.exists():
+            coupon_codes = [redemption.coupon.code for redemption in coupon_redemption]
+            order_item_dict.update({'coupon_code': ", ".join(coupon_codes)})
+
+        sale_order_dict.update(dict(order_item_dict.items()))
         if getattr(purchased_course.order, 'order_type') == OrderTypes.BUSINESS:
             registration_codes = CourseRegistrationCode.objects.filter(order=purchased_course.order, course_id=course_id)
             sale_order_dict.update({"total_codes": registration_codes.count()})
-            sale_order_dict.update({'total_used_codes': RegistrationCodeRedemption.objects.filter(registration_code__in=registration_codes).count()})
+            total_used_codes = RegistrationCodeRedemption.objects.filter(registration_code__in=registration_codes).count()
+            sale_order_dict.update({'total_used_codes': total_used_codes})
 
-            codes = list()
-            for reg_code in registration_codes:
-                codes.append(reg_code.code)
+            codes = [reg_code.code for reg_code in registration_codes]
 
             # Extracting registration code information
             obj_course_reg_code = registration_codes.all()[:1].get()
@@ -88,7 +108,10 @@ def sale_order_record_features(course_id, features):
         return sale_order_dict
 
     csv_data = [sale_order_info(purchased_course, features) for purchased_course in purchased_courses]
-    csv_data.extend([sale_order_info(purchased_course_reg_code, features) for purchased_course_reg_code in purchased_course_reg_codes])
+    csv_data.extend(
+        [sale_order_info(purchased_course_reg_code, features)
+         for purchased_course_reg_code in purchased_course_reg_codes]
+    )
     return csv_data
 
 
@@ -115,14 +138,14 @@ def sale_record_features(course_id, features):
         sale_dict = dict((feature, getattr(sale, feature))
                          for feature in sale_features)
 
-        total_used_codes = RegistrationCodeRedemption.objects.filter(registration_code__in=sale.courseregistrationcode_set.all()).count()
+        total_used_codes = RegistrationCodeRedemption.objects.filter(
+            registration_code__in=sale.courseregistrationcode_set.all()
+        ).count()
         sale_dict.update({"invoice_number": getattr(sale, 'id')})
         sale_dict.update({"total_codes": sale.courseregistrationcode_set.all().count()})
         sale_dict.update({'total_used_codes': total_used_codes})
 
-        codes = list()
-        for reg_code in sale.courseregistrationcode_set.all():
-            codes.append(reg_code.code)
+        codes = [reg_code.code for reg_code in sale.courseregistrationcode_set.all()]
 
         # Extracting registration code information
         obj_course_reg_code = sale.courseregistrationcode_set.all()[:1].get()
@@ -136,59 +159,6 @@ def sale_record_features(course_id, features):
         return sale_dict
 
     return [sale_records_info(sale, features) for sale in sales]
-
-
-def purchase_transactions(course_id, features):
-    """
-    Return list of purchased transactions features as dictionaries.
-
-    purchase_transactions(course_id, ['username, email','created_by', unit_cost])
-    would return [
-        {'username': 'username1', 'email': 'email1', unit_cost:'cost1 in decimal'.}
-        {'username': 'username2', 'email': 'email2', unit_cost:'cost2 in decimal'.}
-        {'username': 'username3', 'email': 'email3', unit_cost:'cost3 in decimal'.}
-    ]
-    """
-
-    purchased_courses = PaidCourseRegistration.objects.filter(course_id=course_id, status='purchased').order_by('user')
-
-    def purchase_transactions_info(purchased_course, features):
-        """ convert purchase transactions to dictionary """
-        coupon_code_dict = dict()
-        student_features = [x for x in STUDENT_FEATURES if x in features]
-        order_features = [x for x in ORDER_FEATURES if x in features]
-        order_item_features = [x for x in ORDER_ITEM_FEATURES if x in features]
-
-        # Extracting user information
-        student_dict = dict((feature, getattr(purchased_course.user, feature))
-                            for feature in student_features)
-
-        # Extracting Order information
-        order_dict = dict((feature, getattr(purchased_course.order, feature))
-                          for feature in order_features)
-
-        # Extracting OrderItem information
-        order_item_dict = dict((feature, getattr(purchased_course, feature))
-                               for feature in order_item_features)
-        order_item_dict.update({"orderitem_id": getattr(purchased_course, 'id')})
-
-        coupon_redemption = CouponRedemption.objects.select_related('coupon').filter(order_id=purchased_course.order_id)
-        if coupon_redemption:
-            # we format the coupon codes in comma separated way if there are more then one coupon against a order id.
-            coupon_codes = list()
-            for redemption in coupon_redemption:
-                coupon_codes.append(redemption.coupon.code)
-
-            coupon_code_dict = {'coupon_code': ", ".join(coupon_codes)}
-
-        else:
-            coupon_code_dict = {'coupon_code': 'None'}
-
-        student_dict.update(dict(order_dict.items() + order_item_dict.items() + coupon_code_dict.items()))
-        student_dict.update({'course_id': course_id.to_deprecated_string()})
-        return student_dict
-
-    return [purchase_transactions_info(purchased_course, features) for purchased_course in purchased_courses]
 
 
 def enrolled_students_features(course_key, features):

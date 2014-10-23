@@ -53,20 +53,21 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertTrue(self.e_commerce_link in response.content)
 
-        # Total amount html should render in e-commerce page, total amount will be 0
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        self.assertTrue('<span>Total Amount: <span>$' + str(total_amount) + '</span></span>' in response.content)
-        self.assertTrue('Download All e-Commerce Purchase' in response.content)
+        # Order/Invoice sales csv button text should render in e-commerce page
+        self.assertTrue('Total CC Amount' in response.content)
+        self.assertTrue('Download All CC Sales' in response.content)
+        self.assertTrue('Download All Invoice Sales' in response.content)
+        self.assertTrue('Enter the invoice number to invalidate or re-validate sale' in response.content)
 
         # removing the course finance_admin role of login user
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
 
-        # total amount should not be visible in e-commerce page if the user is not finance admin
+        # Order/Invoice sales csv button text should not be visible in e-commerce page if the user is not finance admin
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url)
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        self.assertFalse('Download All e-Commerce Purchase' in response.content)
-        self.assertFalse('<span>Total Amount: <span>$' + str(total_amount) + '</span></span>' in response.content)
+        self.assertFalse('Download All Order Sales' in response.content)
+        self.assertFalse('Download All Invoice Sales' in response.content)
+        self.assertFalse('Enter the invoice number to invalidate or re-validate sale' in response.content)
 
     def test_user_view_course_price(self):
         """

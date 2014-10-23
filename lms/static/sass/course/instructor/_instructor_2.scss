@@ -259,10 +259,14 @@ section.instructor-dashboard-content-2 {
     }
   }
 
-  // type - error
+  // type - warning
   .message-warning {
     border-top: 2px solid $warning-color;
     background: tint($warning-color,95%);
+
+    .message-title {
+      color: $warning-color;
+    }
   }
 
   // grandfathered

@@ -19,8 +19,6 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_grading_config', name="get_grading_config"),
     url(r'^get_students_features(?P<csv>/csv)?$',
         'instructor.views.api.get_students_features', name="get_students_features"),
-    url(r'^get_purchase_transaction(?P<csv>/csv)?$',
-        'instructor.views.api.get_purchase_transaction', name="get_purchase_transaction"),
     url(r'^get_user_invoice_preference$',
         'instructor.views.api.get_user_invoice_preference', name="get_user_invoice_preference"),
     url(r'^get_sale_records(?P<csv>/csv)?$',
