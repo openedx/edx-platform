@@ -4,6 +4,7 @@
 <%!
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from contentstore.views.course import should_show_group_configurations_page
   from django.utils.html import escapejs
 %>
 <%block name="title">${_("Advanced Settings")}</%block>
@@ -91,9 +92,9 @@
             <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-          % if "split_test" in context_course.advanced_modules:
-            <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-          % endif
+            % if should_show_group_configurations_page(context_course):
+              <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
+            % endif
           </ul>
         </nav>
       % endif

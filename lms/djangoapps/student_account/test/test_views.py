@@ -13,8 +13,8 @@ from django.core.urlresolvers import reverse
 from django.core import mail
 
 from util.testing import UrlResetMixin
-from user_api.api import account as account_api
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import account as account_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 

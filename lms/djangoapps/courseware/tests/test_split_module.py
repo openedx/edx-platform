@@ -13,7 +13,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from xmodule.partitions.partitions import Group, UserPartition
-from user_api.tests.factories import UserCourseTagFactory
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

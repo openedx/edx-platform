@@ -229,7 +229,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         partitions_service = self.runtime.service(self, 'partitions')
         if not partitions_service:
             return None
-        return partitions_service.get_user_group_for_partition(self.user_partition_id)
+        return partitions_service.get_user_group_id_for_partition(self.user_partition_id)
 
     def _staff_view(self, context):
         """

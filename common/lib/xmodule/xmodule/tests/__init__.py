@@ -79,13 +79,15 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
+    user = Mock(is_staff=False)
     return TestModuleSystem(
         static_url='/static',
         track_function=Mock(),
         get_module=Mock(),
         render_template=mock_render_template,
         replace_urls=str,
-        user=Mock(is_staff=False),
+        user=user,
+        get_real_user=lambda(__): user,
         filestore=Mock(),
         debug=True,
         hostname="edx.org",

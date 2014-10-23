@@ -8,7 +8,8 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from track.contexts import COURSE_REGEX
-from user_api.models import UserCourseTag
+
+from .models import UserCourseTag
 
 
 class UserTagsEventContextMiddleware(object):

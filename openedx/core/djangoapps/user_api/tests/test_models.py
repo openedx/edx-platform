@@ -1,8 +1,9 @@
 from django.db import IntegrityError
 from django.test import TestCase
 from student.tests.factories import UserFactory
-from user_api.tests.factories import UserPreferenceFactory
-from user_api.models import UserPreference
+
+from ..tests.factories import UserPreferenceFactory
+from ..models import UserPreference
 
 
 class UserPreferenceModelTest(TestCase):

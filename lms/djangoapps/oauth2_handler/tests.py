@@ -9,7 +9,7 @@ from student.models import anonymous_id_for_user
 from student.models import UserProfile
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student.tests.factories import UserFactory, UserProfileFactory
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 # Will also run default tests for IDTokens and UserInfo
 from oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase

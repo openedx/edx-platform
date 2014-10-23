@@ -916,7 +916,7 @@ MIDDLEWARE_CLASSES = (
 
     # Adds user tags to tracking events
     # Must go before TrackMiddleware, to get the context set up
-    'user_api.middleware.UserTagsEventContextMiddleware',
+    'openedx.core.djangoapps.user_api.middleware.UserTagsEventContextMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -1441,7 +1441,7 @@ INSTALLED_APPS = (
 
     # User API
     'rest_framework',
-    'user_api',
+    'openedx.core.djangoapps.user_api',
 
     # Shopping cart
     'shoppingcart',

@@ -221,8 +221,9 @@ class GetItemTest(ItemTest):
         GROUP_CONFIGURATION_JSON = {
             u'id': 0,
             u'name': u'first_partition',
+            u'scheme': u'random',
             u'description': u'First Partition',
-            u'version': 1,
+            u'version': UserPartition.VERSION,
             u'groups': [
                 {u'id': 0, u'name': u'New_NAME_A', u'version': 1},
                 {u'id': 1, u'name': u'New_NAME_B', u'version': 1},
