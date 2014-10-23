@@ -97,7 +97,8 @@ var edx = edx || {};
 
             for ( i=0; i<len; i++ ) {
                 html.push( _.template( fieldTpl, $.extend( data[i], {
-                    form: 'login'
+                    form: 'login',
+                    value: ""
                 }) ) );
             }
 
