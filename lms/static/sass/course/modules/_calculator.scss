@@ -1,3 +1,6 @@
+// LMS -- modules -- calculator
+// ====================
+
 div.calc-main {
   bottom: -126px;
   left: 0;
@@ -5,39 +8,37 @@ div.calc-main {
   @include transition(bottom $tmg-avg linear 0s);
   -webkit-appearance: none;
   width: 100%;
-  z-index: 99;
 
   &.open {
     bottom: -36px;
   }
 
-  a.calc {
-    @include text-hide();
-    background: url("../images/calc-icon.png") rgba(#111, .9) no-repeat center;
+  .calc {
+    @include transition(background-color $tmg-f2 ease-in-out 0s);
+    background: url("../images/calc-icon.png") $black-t1 no-repeat center;
     border-bottom: 0;
-    border-radius: 3px 3px 0 0;
     color: $white;
     float: right;
-    height: 20px;
-    display: inline-block;
-    margin-right: ($baseline/2);
-    padding: 8px 12px;
+    height: $baseline;
+    margin-right: ($baseline*0.75);
+    padding: $baseline;
     position: relative;
-    top: -45px;
-    width: 16px;
+    top: -42px;
+    width: ($baseline*0.75);
 
     &:hover, &:focus {
-      opacity: 0.8;
+      background-color: $gray-d1;
     }
 
     &.closed {
       background-image: url("../images/close-calc-icon.png");
+      background-color: $black;
       top: -36px;
     }
   }
 
   div#calculator_wrapper {
-    background: rgba(#111, .9);
+    background: $black;
     clear: both;
     max-height: 90px;
     position: relative;

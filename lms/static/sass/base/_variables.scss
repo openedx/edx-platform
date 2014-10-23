@@ -329,6 +329,8 @@ $header-graphic-sub-color: $m-gray-d2;
 $error-color: $error-red;
 $warning-color: $m-pink;
 $confirm-color: $m-green;
+$active-color: $blue;
+$highlight-color: rgb(255,255,0);
 
 // Notifications
 $notify-banner-bg-1: rgb(56,56,56);
@@ -444,3 +446,13 @@ $blue1: #4A90E2;
 $blue2: #00A1E5;
 $green1: #61A12E;
 $red1: #D0021B;
+
+// +case: search/result highlight
+// --------------------
+$result-highlight-color-base: rgba($highlight-color, 0.25);
+
+// +feature: student notes
+// --------------------
+$student-notes-highlight-color-base: saturate($yellow, 65%);
+$student-notes-highlight-color: tint($student-notes-highlight-color-base, 50%);
+$student-notes-highlight-color-focus: $student-notes-highlight-color-base;

@@ -14,3 +14,6 @@ ORA_STUB_URL = os.environ.get('ora_url', 'http://localhost:8041')
 
 # Get the URL of the comments service stub used in the test
 COMMENTS_STUB_URL = os.environ.get('comments_url', 'http://localhost:4567')
+
+# Get the URL of the EdxNotes service stub used in the test
+EDXNOTES_STUB_URL = os.environ.get('edxnotes_url', 'http://localhost:8042')

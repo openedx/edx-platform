@@ -1,0 +1,13 @@
+<% var hasIcon = icon ? 1 : 0; %>
+
+<a class="tab-label <% if (hasIcon) { print('has-icon') } %>" href="#">
+  <% if (hasIcon) { %><i class="icon <%= icon %>"></i> <% } %><%- gettext(name) %>
+</a>
+
+<% if (is_closable) { %>
+  <a href="#" class="action-close">
+    <i class="icon fa fa-times-circle"></i>
+    <span class="sr"><%- gettext("Clear search results") %></span>
+  </a>
+<% } %>
+

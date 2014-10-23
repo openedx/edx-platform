@@ -47,6 +47,10 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
             filtered_list.append('giturl')
 
+        # Do not show edxnotes if the feature is disabled.
+        if not settings.FEATURES.get('ENABLE_EDXNOTES'):
+            filtered_list.append('edxnotes')
+
         return filtered_list
 
     @classmethod
