@@ -9,10 +9,12 @@
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+
+<%include file="_js_head_dependencies.html" />
 </%block>
 
 <%block name="js_extra">
-<%include file="/discussion/_js_body_dependencies.html" />
+<%include file="_js_body_dependencies.html" />
 <%static:js group='discussion'/>
 <script language="javascript">
     $(function () {
@@ -31,7 +33,7 @@
       <nav>
 
         <article class="sidebar-module discussion-sidebar">
-          <%include file="/discussion/_user_profile.html" />
+          <%include file="_user_profile.html" />
         </article>
 
       </nav>
@@ -41,4 +43,4 @@
   </div>
 </section>
 
-<%include file="/discussion/_underscore_templates.html" />
+<%include file="_underscore_templates.html" />
