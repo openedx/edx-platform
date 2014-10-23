@@ -15,14 +15,25 @@ from django.utils.translation import ugettext as _
   % if shoppingcart_items:
         <%block name="billing_details_highlight">
          % if order.order_type == 'business':
-            <li>${_('Billing Details')}</li>
+            <li class="billing">${_('Billing Details')}</li>
+         % else:
+            <li class="billing hidden">${_('Billing Details')}</li>
          % endif
         </%block>
- <% discount_applied = False %>
+
+ <%
+    discount_applied = False
+    order_type = 'personal'
+ %>
+
+
   <section class="wrapper confirm-enrollment shopping-cart">
     % for item, course in shoppingcart_items:
        % if loop.index > 0 :
         <hr>
+      %endif
+      % if item.order.order_type == 'business':
+       <% order_type = 'business' %>
       %endif
      <div class="user-data">
       <div class="clearfix">
@@ -34,7 +45,7 @@ from django.utils.translation import ugettext as _
       </div>
       <div class="data-input">
         <h3>${_('Registration for:')} <span class="pull-right">${_('Course Dates:')}</span></h3>
-        <h1>${ course.display_name }<span class="pull-right">${course.start_datetime_text()} -  ${course.end_datetime_text()}</span></h1>
+        <h1>${ course.display_name }</h1><span class="pull-right">${course.start_datetime_text()} -  ${course.end_datetime_text()}</span>
         <hr />
         <div class="three-col">
             <div class="col-1">
@@ -50,15 +61,15 @@ from django.utils.translation import ugettext as _
               <div class="numbers-row">
                 <label for="students">${_('Students:')}</label>
                 <div class="counter">
-                    <input maxlength="3" max="999" type="text" name="students" value="${item.qty}" id="${item.id}" >
+                    <input maxlength="3" title="Input qty and press enter." max="999" type="text" name="students" value="${item.qty}" id="${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}">
                 </div>
                 <div class="inc button"><i class="icon-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon-caret-down"></i></div>
-                    <a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>
+                    <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                 <span class="error-text hidden" id="students-${item.id}"></span>
             </div>
               </div>
 
-            <div class="col-3 no-width">
+            <div class="col-3">
                <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon-remove-sign"></i></a>
             </div>
         </div>
@@ -82,24 +93,41 @@ from django.utils.translation import ugettext as _
               <input type="submit" value="Reset" class="blue-border" id="submit-reset-redemption">
            </div>
             %endif
-              <span class="pull-right">${_('Total:')} <b id="total-amount">${currency_symbol}${"{0:0.2f}".format(amount)} ${currency.upper()}</b></span>
+              <span class="pull-right">${_('TOTAL:')} <b id="total-amount" data-amount="${'{0:0.2f}'.format(amount)}">${currency_symbol}${"{0:0.2f}".format(amount)} ${currency.upper()}</b></span>
           </div>
       </div>
       <div class="col-two">
           <div class="col-2 relative">
              % if amount == 0:
                 <input type="submit" value = "Register" id="register" >
-             % elif item.order.order_type == 'business':
-                <input type="submit" value = "Billing Details" id="billing-details"><i class="icon-caret-right"></i>
-                <p>
-                    ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
-                </p>
-             % else:
+             % elif order_type == 'business':
+              <div name="billing">
+                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon-caret-right"></i>
+                    <p>
+                        ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                    </p>
+              </div>
+               <div name="payment" class="hidden">
                 ${form_html}
                 <p>
                     ${_('After this purchase is complete,')}<br/><b>${order.user.username}</b>
                     ${_('will be enrolled in this course.')}
                 </p>
+              </div>
+             % else:
+              <div name="payment">
+                ${form_html}
+                <p>
+                    ${_('After this purchase is complete,')}<br/><b>${order.user.username}</b>
+                    ${_('will be enrolled in this course.')}
+                </p>
+              </div>
+              <div name="billing" class="hidden">
+                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon-caret-right"></i>
+                    <p>
+                        ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                    </p>
+              </div>
              %endif
           </div>
       </div>
@@ -115,6 +143,8 @@ from django.utils.translation import ugettext as _
 </%block>
 <script>
     $(function() {
+        var isSpinnerBtnEnabled = true;
+        var prevQty = 0;
 
         $('a.btn-remove').click(function(event) {
       event.preventDefault();
@@ -180,51 +210,60 @@ from django.utils.translation import ugettext as _
                })
    });
 
-   $('#billing-details').click(function(event){
+   $("input[name='billing-details']").click(function(event){
        event.preventDefault();
        location.href = "${reverse('shoppingcart.views.billing_details')}";
    });
 
 
  $(".button").on("click", function() {
-     var studentField =  $(this).parent().find('input');
-     var ItemId = studentField.attr('id');
-     var $button = $(this);
-     var oldValue = $button.parent().find("input").val();
-     var newVal = 1; // initialize with 1.
-     hideErrorMsg('students-'+ItemId);
-     if ($.isNumeric(oldValue)){
-         if ($button.text() == "+") {
-             if(oldValue > 0){
-                 newVal = parseFloat(oldValue) + 1;
-                 if(newVal > 1000){
-                     newVal = 1000;
+     if(isSpinnerBtnEnabled){
+         var isBusinessType = false;
+         var wasBusinessType = false;
+         var studentField =  $(this).parent().find("input[type='text']");
+         var unit_cost = parseFloat(studentField.data('unit-cost'));
+         var ItemId = studentField.attr('id');
+
+         var $button = $(this);
+         var oldValue =   $("#"+ItemId).data('qty');
+         var newVal = 1; // initialize with 1.
+         oldValue = parseFloat(oldValue);
+         hideErrorMsg('students-'+ItemId);
+         if ($.isNumeric(oldValue)){
+             if ($button.text() == "+") {
+                 if(oldValue > 0){
+                     newVal = oldValue + 1;
+                     if(newVal > 1000){
+                         newVal = 1000;
+                     }
                  }
              }
-         } else {
-     // Don't allow decrementing below one
-     if (oldValue > 1) {
-         newVal = parseFloat(oldValue) - 1;
-     }
+             else {
+                 // Don't allow decrementing below one
+                 if (oldValue > 1) {
+                     newVal = oldValue - 1;
+                 }
+             }
          }
-     }
-     $button.parent().find("input").val(newVal);
-     $('#updateBtn-'+ItemId).removeClass('hidden');
 
+         wasBusinessType = getBusinessType();
+         $button.parent().find("input").val(newVal);
+         isBusinessType = getBusinessType();
+         update_user_cart(ItemId, newVal, oldValue, unit_cost, wasBusinessType, isBusinessType);
+         $("#"+ItemId).data('qty', newVal);
+     }
  });
 
-$('a[name="updateBtn"]').click(function(event) {
-    var studentField =  $(this).parent().find('input');
-    var number_of_students = studentField.val();
-    var ItemId = studentField.attr('id');
-
-    if($.isNumeric(number_of_students) && number_of_students > 0 ){
-        hideErrorMsg('students-'+ItemId);
-        update_user_cart(ItemId, number_of_students);
-    }else{
-        showErrorMsgs('quantity must be greater then 0.', 'students-'+ItemId);
-    }
-});
+  function getBusinessType(){
+      var isTypeBusiness = false;
+      var elements = $('.numbers-row').find("input[type='text']");
+      elements.each(function(index){
+          if(this.value > 1){
+              isTypeBusiness = true;
+          }
+      });
+      return isTypeBusiness;
+  }
 
   function showErrorMsgs(msg, msg_area){
 
@@ -240,48 +279,133 @@ $('a[name="updateBtn"]').click(function(event) {
       $( "span.error-text#"+ msg_area +"" ).addClass("hidden");
   }
 
-  function update_user_cart(ItemId, number_of_students){
+  function getNewTotal(prevQty, newQty, unit_cost, prevTotal){
+
+      var prevQty   = parseInt(prevQty);
+      var newQty    = parseInt(newQty);
+      var unit_cost = parseFloat(unit_cost);
+
+      return (( newQty - prevQty ) * unit_cost + prevTotal)
+  }
+
+  function update_user_cart(ItemId, newQty, prevQty, unit_cost, wasbusinessType, isbusinessType){
+
       var post_url = "${reverse('shoppingcart.views.update_user_cart')}";
+      var typeChanged = false;
+      var prevTotal = $('#total-amount').data('amount')
+      var newTotal = getNewTotal(prevQty, newQty, unit_cost, prevTotal);
+      $('#total-amount').html('$'+newTotal.toFixed(2)+' USD');
+      $('#total-amount').data('amount', newTotal);
+
+      if(isbusinessType != wasbusinessType){
+          isSpinnerBtnEnabled = false;
+          typeChanged = true;
+          $('html').css({'cursor':'wait'});
+          $(".button").css({'cursor':'wait'});
+          $('.col-2.relative').find("input[type='submit']").attr('disabled', true);
+      }
+
+
+
       $.post(post_url, {
           ItemId:ItemId,
-          qty:number_of_students
+          qty:newQty
           }
       )
       .success(function(data) {
-                    location.reload(true);
+                  var prevTotal = data['total_cost'];
+                  $('html').css({'cursor':'default'});
+                  $(".button").css({'cursor':'default'});
+                  if(typeChanged){
+                      var submit_button = $('.col-2.relative').find("input[type='submit']")
+                      submit_button.removeAttr('disabled');
+                      for (var i = 0; i< data['oldToNewIdMap'].length; i++) {
+                          $('#'+data['oldToNewIdMap'][i]['oldId']+'').attr('id',data['oldToNewIdMap'][i]['newId']);
+                          $('a.btn-remove[data-item-id]=' +data['oldToNewIdMap'][i]['oldId']+'').data('item-id', data['oldToNewIdMap'][i]['newId']);
+                      }
+                      if(isbusinessType){
+                          $( "div[name='payment']").addClass('hidden');
+                          $( "div[name='billing']").removeClass('hidden');
+                          $('li.billing').removeClass('hidden');
+
+                      }else{
+                          $( "div[name='payment']").removeClass('hidden');
+                          $( "div[name='billing']").addClass('hidden');
+                          $('li.billing').addClass('hidden');
+                      }
+
+//                      $('#total-amount').html('$'+data['total_cost'].toFixed(2)+' USD');
+                      isSpinnerBtnEnabled = true;
+                  }
+
             })
       .error(function(data,status) {
                   location.reload(true);
               })
   }
 
-$('input[name="students"]').on("click", function() {
-    $('#updateBtn-'+this.id).removeClass('hidden');
-});
+  $("input[name=students]").keyup(function(event) {
+      var eventEnter        = 13;
+      if(event.keyCode == eventEnter){
+
+         updateTextFieldQty(event);
+      }
+      else{
+           event.preventDefault();
+       }
+  });
+
+  function updateTextFieldQty(event){
+
+      if(isSpinnerBtnEnabled){
+          var itemId = event.currentTarget.id;
+          var prevQty = $("#"+itemId).data('qty');
+          var newQty = event.currentTarget.value;
+          var unitCost = event.currentTarget.dataset.unitCost;
+          var isBusinessType = getBusinessType();
+
+          var wasBusinessType = !isBusinessType;
+          isSpinnerBtnEnabled = false;
+          update_user_cart(itemId, newQty, prevQty, unitCost, wasBusinessType, isBusinessType);
+          $("#"+itemId).data('qty', newQty);
+
+      }
+  }
+
+  $("input[name=students]").focusout(function(event) {
+      updateTextFieldQty(event);
+  });
 
 // allowing user to enter numeric qty only.
   $("input[name=students]").keydown(function(event) {
-      var eventDelete       = 46;
-      var eventBackSpace    = 8;
-      var eventLeftKey      = 37;
-      var eventRightKey     = 39;
-      var allowedEventCodes = [eventDelete, eventBackSpace, eventLeftKey, eventRightKey ];
-      // Allow only backspace and delete
-	  if (allowedEventCodes.indexOf(event.keyCode) > -1) {
-          // let it happen, don't do anything
-		}
-      else {
-	     /*
-          Ensure that it is a number.
-          KeyCode range 48 - 57 represents [0-9]
-          KeyCode range 96 - 105 represents [numpad 0 - numpad 9]
-         */
-		if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) ) {
-            $('#updateBtn-'+this.id).removeClass('hidden');
-        }else{
-            event.preventDefault();
-        }
-	  }
+      if(isSpinnerBtnEnabled){
+          var eventDelete       = 46;
+          var eventBackSpace    = 8;
+          var eventLeftKey      = 37;
+          var eventRightKey     = 39;
+          var allowedEventCodes = [eventDelete, eventBackSpace, eventLeftKey, eventRightKey ];
+
+          // Allow only backspace and delete
+          if (allowedEventCodes.indexOf(event.keyCode) > -1) {
+              // let it happen, don't do anything
+            }
+          else {
+             /*
+              Ensure that it is a number.
+              KeyCode range 48 - 57 represents [0-9]
+              KeyCode range 96 - 105 represents [numpad 0 - numpad 9]
+             */
+            if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) ) {
+
+            }
+            else{
+                event.preventDefault();
+            }
+          }
+      }
+      else{
+          event.preventDefault();
+      }
 
 	});
 });

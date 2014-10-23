@@ -362,15 +362,23 @@
         text-transform: uppercase;
         color: $light-gray2;
         padding: 0;
+        line-height: 20px;
       }
-      h1, h1 span{
+      h1{
         font-size: 24px;
         color: $dark-gray1;
         padding: 0 0 10px 0;
         text-transform: capitalize;
         span{font-size: 16px;}
+        width: 700px;
+        float: left;
       }
-      hr{border-top: 1px solid $dark-gray2;}
+      span.date{
+         width: calc(100% - 700px);
+        float: right;
+        text-align: right;
+        }
+      hr{border-top: 1px solid $dark-gray2;clear: both;}
       .three-col{
         .col-1{
           width: 450px;
@@ -378,6 +386,8 @@
           font-size: 16px;
           text-transform: uppercase;
           color: $light-gray2;
+          padding-top: 11px;
+          font-weight: 400;
           .price{
               span{
                 color: $dark-gray1;
@@ -394,6 +404,7 @@
           line-height: 44px;
           text-transform: uppercase;
           color: $light-gray2;
+          margin-top: 3px;
           .numbers-row{
             position: relative;
             label{
@@ -479,12 +490,10 @@
             pointer-events: none;
           }
         }
-        .no-width {
-          width: 0px !important;
-        }
         .col-3{
-          width: 100px;
+          width: 40px;
           float: right;
+          padding-top: 13px;
           a.btn-remove{
             float: right;
             opacity: 0.8;
@@ -519,6 +528,7 @@
         span{
           display: inline-block;
           padding: 9px 0px;
+          margin-right: -20px;
           b{
             font-weight: 600;
             font-size: 24px;
@@ -665,6 +675,7 @@
           &#register{
             padding: 18px 30px;
           }
+          &:hover{background: $m-blue-d2;box-shadow: none;}
          }
         p{
           font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
@@ -760,6 +771,7 @@
     margin: 20px 0;
     overflow: hidden;
     .message-left{
+      width: 100%;
       float: left;
       line-height: 24px;
       color: $dark-gray1;
@@ -771,6 +783,10 @@
         i{
           margin-left: 10px;
         }
+      }
+      .mt-7 {
+        display: block;
+        margin-top: 7px;
       }
     }
   }
@@ -803,6 +819,9 @@
     margin-bottom: 20px;
     padding:20px;
     color: $dark-gray1;
+    h2 {
+      font-family: $sans-serif;
+    }
   }
   hr.border{
     border-top: 2px solid $light-gray1;

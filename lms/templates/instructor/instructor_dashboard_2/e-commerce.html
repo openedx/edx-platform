@@ -54,25 +54,16 @@
       <!-- end wrap -->
       %if section_data['access']['finance_admin'] is True:
       <div class="wrap">
-         <h2>${_("Transactions")}</h2>
-         <div>
-            %if section_data['total_amount'] is not None:
-            <span>${_("Total Amount: ")}<span>${section_data['currency_symbol']}${section_data['total_amount']}</span></span>
-            %endif
-
-            <span class="csv_tip">${_("Click to generate a CSV file for all purchase transactions in this course")}
-                <input class="add blue-button"  type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true">
-            </span>
-         </div>
-      </div><!-- end wrap -->
-      <div class="wrap">
          <h2>${_("Sales")}</h2>
          <div>
+            %if section_data['total_amount'] is not None:
+              <span><strong>${_("Total CC Amount: ")}</strong></span><span>$${section_data['total_amount']}</span>
+            %endif
             <span class="csv_tip">
               <div >
               ${_("Click to generate a CSV file for all sales records in this course")}
                 <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoice Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
-                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All Order Sales")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
+                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All CC Sales")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
               </div>
             </span>
              <hr>
