@@ -43,11 +43,6 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
-from discussion_app.views import (
-    get_js_urls as discussion_get_js_urls,
-    get_css_urls as discussion_get_css_urls
-)
-
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
@@ -1262,14 +1257,14 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
     'js/vendor/URI.min.js',
+    'js/vendor/underscore-min.js',
+    'js/vendor/backbone-min.js',
 ]
 
-dashboard_js = (
-    sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
-)
 dashboard_search_js = ['js/search/dashboard/main.js']
 rwd_header_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/utils/rwd_header.js'))
-discussion_js = discussion_get_js_urls()
+dashboard_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
+discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1410,10 +1405,6 @@ PIPELINE_CSS = {
             'css/lms-main-rtl.css',
         ],
         'output_filename': 'css/lms-main-rtl.css',
-    },
-    'style-discussion-app': {
-        'source_filenames': discussion_get_css_urls(),
-        'output_filename': 'css/lms-style-discussion-app.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1865,7 +1856,6 @@ INSTALLED_APPS = (
     'django_comment_common',
     'discussion_api',
     'notes',
-    'discussion_app',
 
     'edxnotes',
 

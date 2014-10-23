@@ -62,7 +62,7 @@
         testCancel = function(view) {
             view.$('.post-cancel').click();
             expect($('.edit-post-form')).not.toExist();
-        }
+        };
 
         it('can close the view in tab mode', function() {
             this.createEditView();

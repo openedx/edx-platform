@@ -3,11 +3,9 @@ import os
 from django.conf import settings
 from mako.template import Template
 
-from discussion_app.views import get_template_dir as discussion_get_template_dir
-
 
 def include_mustache_templates():
-    mustache_dir = discussion_get_template_dir() + '/discussion/mustache'
+    mustache_dir = settings.COMMON_ROOT / 'templates' / 'discussion' / 'mustache'
 
     def is_valid_file_name(file_name):
         return file_name.endswith('.mustache')

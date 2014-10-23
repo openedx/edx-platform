@@ -1,0 +1,39 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<div id="discussion-edit" class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
+  <ul class="list-input settings-list">
+      <li class="field comp-setting-entry is-set">
+          <div class="wrapper-comp-setting">
+            <label class="label setting-label" for="display-name">Display Name</label>
+            <input class="input setting-input" id="display-name" value="${display_name}" type="text">
+          </div>
+          <span class="tip setting-help">Display Name</span>
+      </li>
+      <li class="field comp-setting-entry is-set">
+          <div class="wrapper-comp-setting">
+            <label class="label setting-label" for="discussion-category">Discussion Category</label>
+            <input class="input setting-input" id="discussion-category" value="${discussion_category}" type="text">
+          </div>
+          <span class="tip setting-help">Discussion Category</span>
+      </li>
+      <li class="field comp-setting-entry is-set">
+          <div class="wrapper-comp-setting">
+            <label class="label setting-label" for="discussion-target">Discussion Target</label>
+            <input class="input setting-input" id="discussion-target" value="${discussion_target}" type="text">
+          </div>
+          <span class="tip setting-help">Discussion Target</span>
+      </li>
+  </ul>
+  <div class="xblock-actions">
+    <span class="xblock-editor-error-message"></span>
+    <ul>
+      <li class="action-item">
+        <a href="#" class="button action-primary save-button">${_('Save')}</a>
+      </li>
+
+      <li class="action-item">
+        <a href="#" class="button cancel-button">${_('Cancel')}</a>
+      </li>
+    </ul>
+  </div>
+</div>

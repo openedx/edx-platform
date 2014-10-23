@@ -1,3 +1,4 @@
+<<<<<<< HEAD:lms/templates/discussion/_underscore_templates.html
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -18,12 +19,14 @@ from django_comment_client.permissions import has_permission
             </div>
             <div class="post-extended-content">
                 <div class="response-count"/>
+                % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
                 <div class="add-response">
                     <button class="button add-response-btn">
                         <i class="icon fa fa-reply"></i>
                         <span class="add-response-btn-text">${_('Add A Response')}</span>
                     </button>
                 </div>
+                % endif
                 <ol class="responses js-response-list"/>
                 <div class="response-pagination"/>
                 <div class="post-status-closed bottom-post-status" style="display: none">
@@ -400,7 +403,7 @@ from django_comment_client.permissions import has_permission
                     ${'<% }); %>'}
                  </select>
             </label><div class="field-help" id="field_help_visible_to">
-                ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.")}
+                ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort group.")}
             </div>
         </div>
         ${'<% } %>'}
