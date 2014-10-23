@@ -2,7 +2,7 @@
 // ====================
 // NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
 
-.discussion-body, .discussion-course {
+.discussion-body, .discussion-course, div.discussion-body {
   @include clearfix();
   border: none;
   background: transparent;

@@ -1,0 +1,25 @@
+/* Some fixes that should only be applied when using discussion as an xblock */
+
+.discussion-body .sort-bar li {
+    margin: 4px 0px 0 0 !important;
+}
+
+.discussion-body .post-list a .title {
+    width: 60% !important;
+}
+
+div.discussion-body div.forum-nav div.forum-nav-thread-list-wrapper ul.forum-nav-thread-list,
+div.discussion-body div.forum-nav div.forum-nav-browse-menu-wrapper ul.forum-nav-browse-menu,
+div.discussion-body div.forum-nav div.forum-nav-thread-list-wrapper ul.forum-nav-thread-list ul
+{
+    padding-left: 0;
+    list-style: none;
+}
+
+div.discussion-body div.forum-nav div.forum-nav-browse-menu-wrapper ul.forum-nav-browse-submenu {
+    list-style: none
+}
+
+div.discussion-body div.forum-nav div.forum-nav-thread-list-wrapper ul.forum-nav-thread-list li {
+    margin-bottom: 0;
+}
