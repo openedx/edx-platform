@@ -73,6 +73,7 @@ urlpatterns = ('',  # nopep8
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
+    url(r'^api/edxnotes/', include('edxnotes.urls')),
 )
 
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
