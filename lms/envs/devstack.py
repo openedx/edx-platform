@@ -95,6 +95,9 @@ CC_PROCESSOR = {
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
+################################ edX Student Notes ################################
+FEATURES['ENABLE_EDXNOTES'] = True
+
 #####################################################################
 # See if the developer has any local overrides.
 try:

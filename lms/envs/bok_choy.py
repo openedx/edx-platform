@@ -66,6 +66,12 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 # Configure the LMS to use our stub ORA implementation
 OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
 
+# Configure the LMS to use our stub EdxNotes implementation
+EDXNOTES_INTERFACE = {
+    'url': 'http://localhost:8042/',
+}
+FEATURES['ENABLE_EDXNOTES'] = True
+
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
 
