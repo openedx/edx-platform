@@ -15,10 +15,17 @@ from xmodule.modulestore import ModuleStoreEnum
 
 GROUP_CONFIGURATION_JSON = {
     u'name': u'Test name',
+    u'scheme': u'random',
     u'description': u'Test description',
+    u'version': UserPartition.VERSION,
     u'groups': [
-        {u'name': u'Group A'},
-        {u'name': u'Group B'},
+        {
+            u'name': u'Group A',
+            u'version': 1,
+        }, {
+            u'name': u'Group B',
+            u'version': 1,
+        },
     ],
 }
 
@@ -229,7 +236,8 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         expected = {
             u'description': u'Test description',
             u'name': u'Test name',
-            u'version': 1,
+            u'scheme': u'random',
+            u'version': UserPartition.VERSION,
             u'groups': [
                 {u'name': u'Group A', u'version': 1},
                 {u'name': u'Group B', u'version': 1},
@@ -279,15 +287,16 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             kwargs={'group_configuration_id': cid},
         )
 
-    def test_can_create_new_group_configuration_if_it_is_not_exist(self):
+    def test_can_create_new_group_configuration_if_it_does_not_exist(self):
         """
         PUT new group configuration when no configurations exist in the course.
         """
         expected = {
             u'id': 999,
             u'name': u'Test name',
+            u'scheme': u'random',
             u'description': u'Test description',
-            u'version': 1,
+            u'version': UserPartition.VERSION,
             u'groups': [
                 {u'id': 0, u'name': u'Group A', u'version': 1},
                 {u'id': 1, u'name': u'Group B', u'version': 1},
@@ -306,12 +315,12 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(content, expected)
         self.reload_course()
         # Verify that user_partitions in the course contains the new group configuration.
-        user_partititons = self.course.user_partitions
-        self.assertEqual(len(user_partititons), 1)
-        self.assertEqual(user_partititons[0].name, u'Test name')
-        self.assertEqual(len(user_partititons[0].groups), 2)
-        self.assertEqual(user_partititons[0].groups[0].name, u'Group A')
-        self.assertEqual(user_partititons[0].groups[1].name, u'Group B')
+        user_partitions = self.course.user_partitions
+        self.assertEqual(len(user_partitions), 1)
+        self.assertEqual(user_partitions[0].name, u'Test name')
+        self.assertEqual(len(user_partitions[0].groups), 2)
+        self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
+        self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
 
     def test_can_edit_group_configuration(self):
         """
@@ -323,8 +332,9 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         expected = {
             u'id': self.ID,
             u'name': u'New Test name',
+            u'scheme': u'random',
             u'description': u'New Test description',
-            u'version': 1,
+            u'version': UserPartition.VERSION,
             u'groups': [
                 {u'id': 0, u'name': u'New Group Name', u'version': 1},
                 {u'id': 2, u'name': u'Group C', u'version': 1},
@@ -430,8 +440,9 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         expected = [{
             'id': 0,
             'name': 'Name 0',
+            'scheme': 'random',
             'description': 'Description 0',
-            'version': 1,
+            'version': UserPartition.VERSION,
             'groups': [
                 {'id': 0, 'name': 'Group A', 'version': 1},
                 {'id': 1, 'name': 'Group B', 'version': 1},
@@ -454,8 +465,9 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         expected = [{
             'id': 0,
             'name': 'Name 0',
+            'scheme': 'random',
             'description': 'Description 0',
-            'version': 1,
+            'version': UserPartition.VERSION,
             'groups': [
                 {'id': 0, 'name': 'Group A', 'version': 1},
                 {'id': 1, 'name': 'Group B', 'version': 1},
@@ -469,8 +481,9 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         }, {
             'id': 1,
             'name': 'Name 1',
+            'scheme': 'random',
             'description': 'Description 1',
-            'version': 1,
+            'version': UserPartition.VERSION,
             'groups': [
                 {'id': 0, 'name': 'Group A', 'version': 1},
                 {'id': 1, 'name': 'Group B', 'version': 1},
@@ -495,8 +508,9 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         expected = [{
             'id': 0,
             'name': 'Name 0',
+            'scheme': 'random',
             'description': 'Description 0',
-            'version': 1,
+            'version': UserPartition.VERSION,
             'groups': [
                 {'id': 0, 'name': 'Group A', 'version': 1},
                 {'id': 1, 'name': 'Group B', 'version': 1},

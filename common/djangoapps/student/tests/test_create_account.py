@@ -12,7 +12,7 @@ from django.test import TestCase, TransactionTestCase
 
 import mock
 
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
 

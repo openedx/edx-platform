@@ -10,9 +10,9 @@ from dateutil.parser import parse as parse_datetime
 from xmodule.modulestore.tests.factories import CourseFactory
 import datetime
 
-from user_api.api import account as account_api
-from user_api.api import profile as profile_api
-from user_api.models import UserProfile, UserOrgTag
+from ..api import account as account_api
+from ..api import profile as profile_api
+from ..models import UserProfile, UserOrgTag
 
 
 @ddt.ddt

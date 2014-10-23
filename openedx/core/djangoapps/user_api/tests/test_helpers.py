@@ -4,10 +4,10 @@ Tests for helper functions.
 import json
 import mock
 import ddt
+from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 from nose.tools import raises
-from django.http import HttpRequest, HttpResponse
-from user_api.helpers import (
+from ..helpers import (
     intercept_errors, shim_student_view,
     FormDescription, InvalidFieldError
 )
@@ -49,12 +49,12 @@ class InterceptErrorsTest(TestCase):
     def test_ignores_expected_errors(self):
         intercepted_function(raise_error=ValueError)
 
-    @mock.patch('user_api.helpers.LOGGER')
+    @mock.patch('openedx.core.djangoapps.user_api.helpers.LOGGER')
     def test_logs_errors(self, mock_logger):
         expected_log_msg = (
             u"An unexpected error occurred when calling 'intercepted_function' "
             u"with arguments '()' and "
-            u"keyword arguments '{'raise_error': <class 'user_api.tests.test_helpers.FakeInputException'>}': "
+            u"keyword arguments '{'raise_error': <class 'openedx.core.djangoapps.user_api.tests.test_helpers.FakeInputException'>}': "
             u"FakeInputException()"
         )
 

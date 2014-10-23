@@ -13,8 +13,8 @@ from notifier_api.views import NotifierUsersViewSet
 from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from user_api.models import UserPreference
-from user_api.tests.factories import UserPreferenceFactory
+from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory

@@ -31,6 +31,7 @@ from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.partitions.tests.test_partitions import PartitionTestCase
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -291,7 +292,7 @@ COURSE_DATA_NAMES = (
 
 @ddt.ddt
 @attr('mongo')
-class CrossStoreXMLRoundtrip(CourseComparisonTest):
+class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
     """
     This class exists to test XML import and export between different modulestore
     classes.

@@ -62,7 +62,7 @@ import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from instructor.views import INVOICE_KEY
 
 from submissions import api as sub_api  # installed from the edx-submissions repository

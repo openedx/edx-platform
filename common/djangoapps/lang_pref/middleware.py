@@ -2,7 +2,7 @@
 Middleware for Language Preferences
 """
 
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
 

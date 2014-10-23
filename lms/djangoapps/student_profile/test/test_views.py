@@ -11,8 +11,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from util.testing import UrlResetMixin
-from user_api.api import account as account_api
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import account as account_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 from lang_pref import LANGUAGE_KEY, api as language_api
 
 

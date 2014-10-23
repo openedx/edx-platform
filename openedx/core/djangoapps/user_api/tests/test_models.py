@@ -2,8 +2,9 @@ from django.db import IntegrityError
 from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
-from user_api.tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
-from user_api.models import UserPreference
+
+from ..tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
+from ..models import UserPreference
 
 
 class UserPreferenceModelTest(TestCase):

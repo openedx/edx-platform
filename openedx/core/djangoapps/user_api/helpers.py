@@ -12,7 +12,7 @@ from django.http import HttpResponseBadRequest
 LOGGER = logging.getLogger(__name__)
 
 
-def intercept_errors(api_error, ignore_errors=[]):
+def intercept_errors(api_error, ignore_errors=None):
     """
     Function decorator that intercepts exceptions
     and translates them into API-specific errors (usually an "internal" error).
@@ -33,13 +33,20 @@ def intercept_errors(api_error, ignore_errors=[]):
 
     """
     def _decorator(func):
+        """
+        Function decorator that intercepts exceptions and translates them into API-specific errors.
+        """
         @wraps(func)
         def _wrapped(*args, **kwargs):
+            """
+            Wrapper that evaluates a function, intercepting exceptions and translating them into
+            API-specific errors.
+            """
             try:
                 return func(*args, **kwargs)
             except Exception as ex:
                 # Raise the original exception if it's in our list of "ignored" errors
-                for ignored in ignore_errors:
+                for ignored in ignore_errors or []:
                     if isinstance(ex, ignored):
                         raise
 

@@ -12,7 +12,7 @@ from notification_prefs import NOTIFICATION_PREF_KEY
 from notification_prefs.views import ajax_enable, ajax_disable, ajax_status, set_subscription, UsernameCipher
 from student.tests.factories import UserFactory
 from edxmako.tests import mako_middleware_process_request
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from util.testing import UrlResetMixin
 
 

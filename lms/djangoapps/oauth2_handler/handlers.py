@@ -6,7 +6,7 @@ from django.core.cache import cache
 from courseware.access import has_access
 from student.models import anonymous_id_for_user
 from student.models import UserProfile
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor

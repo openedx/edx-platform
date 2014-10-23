@@ -3,7 +3,7 @@ from django.test.client import RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
 
 from lang_pref.middleware import LanguagePreferenceMiddleware
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 from student.tests.factories import UserFactory
 

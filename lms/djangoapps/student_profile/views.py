@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 from lang_pref import LANGUAGE_KEY, api as language_api
 import third_party_auth
 

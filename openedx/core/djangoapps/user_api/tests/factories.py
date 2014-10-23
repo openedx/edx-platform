@@ -2,8 +2,9 @@
 from factory.django import DjangoModelFactory
 from factory import SubFactory
 from student.tests.factories import UserFactory
-from user_api.models import UserPreference, UserCourseTag, UserOrgTag
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from ..models import UserPreference, UserCourseTag, UserOrgTag
 
 
 # Factories are self documenting

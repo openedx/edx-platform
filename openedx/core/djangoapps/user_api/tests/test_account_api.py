@@ -12,8 +12,8 @@ from django.core import mail
 from django.test import TestCase
 from django.conf import settings
 
-from user_api.api import account as account_api
-from user_api.models import UserProfile
+from ..api import account as account_api
+from ..models import UserProfile
 
 
 @ddt.ddt

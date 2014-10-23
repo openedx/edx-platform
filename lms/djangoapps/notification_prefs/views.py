@@ -12,7 +12,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from edxmako.shortcuts import render_to_response
 from notification_prefs import NOTIFICATION_PREF_KEY
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 
 class UsernameDecryptionException(Exception):

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from student.models import UserProfile
-from user_api.models import UserPreference
+
+from .models import UserPreference
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

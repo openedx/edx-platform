@@ -1,5 +1,6 @@
 """HTTP end-points for the User API. """
 import copy
+import third_party_auth
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -19,16 +20,15 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError
 from django_countries import countries
-from user_api.serializers import UserSerializer, UserPreferenceSerializer
-from user_api.models import UserPreference, UserProfile
 from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from edxmako.shortcuts import marketing_link
 
-import third_party_auth
 from util.authentication import SessionAuthenticationAllowInactiveUser
-from user_api.api import account as account_api, profile as profile_api
-from user_api.helpers import FormDescription, shim_student_view, require_post_params
+from .api import account as account_api, profile as profile_api
+from .helpers import FormDescription, shim_student_view, require_post_params
+from .models import UserPreference
+from .serializers import UserSerializer, UserPreferenceSerializer
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):

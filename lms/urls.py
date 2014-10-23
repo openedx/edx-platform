@@ -56,8 +56,7 @@ urlpatterns = ('',  # nopep8
         name='auth_password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
-
-
+  
     url(r'^notifier_api/', include('notifier_api.urls')),
 
     url(r'^lang_pref/', include('lang_pref.urls')),
@@ -109,7 +108,7 @@ if settings.FEATURES["API"]:
 # the user_api will oddly begin to return server-oriented user URIs
 # At this time I'm not sure why this seems to be a one-way scenario.
 urlpatterns += (
-    url(r'^user_api/', include('user_api.urls')),
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.urls')),
 )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):

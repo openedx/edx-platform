@@ -7,6 +7,7 @@
 <%!
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from contentstore.views.course import should_show_group_configurations_page
   import urllib
 %>
 
@@ -312,10 +313,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
           <ul>
             <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
+            % if should_show_group_configurations_page(context_course):
+              <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
+            % endif
             <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
-          % if "split_test" in context_course.advanced_modules:
-            <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-          % endif
           </ul>
         </nav>
      % endif
