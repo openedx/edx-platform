@@ -43,6 +43,9 @@ def course_id_from_url(url):
     if '/' in url:
         deprecated = True
 
+    # Ignore query string
+    url = url.split('?')[0]
+
     if deprecated:
         COURSE_REGEX = re.compile(r'^.*/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)')
         key_generator = SlashSeparatedCourseKey.from_deprecated_string
