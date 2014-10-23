@@ -6,6 +6,7 @@ import lxml
 from mock import Mock, patch
 from fs.memoryfs import MemoryFS
 
+from xmodule.partitions.tests.test_partitions import StaticPartitionService, PartitionTestCase, MockUserPartitionScheme
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests import get_test_system
@@ -13,7 +14,6 @@ from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.validation import StudioValidationMessage
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields
 from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.partitions.test_partitions import StaticPartitionService, MemoryUserTagsService
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
@@ -23,11 +23,12 @@ class SplitTestModuleFactory(xml.XmlImportFactory):
     tag = 'split_test'
 
 
-class SplitTestModuleTest(XModuleXmlImportTest):
+class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
     """
     Base class for all split_module tests.
     """
     def setUp(self):
+        super(SplitTestModuleTest, self).setUp()
         self.course_id = 'test_org/test_course_number/test_run'
         # construct module
         course = xml.CourseFactory.build()
@@ -57,16 +58,16 @@ class SplitTestModuleTest(XModuleXmlImportTest):
         self.module_system.descriptor_system = self.course.runtime
         self.course.runtime.export_fs = MemoryFS()
 
-        self.tags_service = MemoryUserTagsService()
-        self.module_system._services['user_tags'] = self.tags_service  # pylint: disable=protected-access
-
         self.partitions_service = StaticPartitionService(
             [
-                UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')]),
-                UserPartition(1, 'second_partition', 'Second Partition', [Group("0", 'abel'), Group("1", 'baker'), Group("2", 'charlie')])
+                self.user_partition,
+                UserPartition(
+                    1, 'second_partition', 'Second Partition',
+                    [Group("0", 'abel'), Group("1", 'baker'), Group("2", 'charlie')],
+                    MockUserPartitionScheme()
+                )
             ],
-            user_tags_service=self.tags_service,
-            course_id=self.course.id,
+            runtime=self.module_system,
             track_function=Mock(name='track_function'),
         )
         self.module_system._services['partitions'] = self.partitions_service  # pylint: disable=protected-access
@@ -81,50 +82,28 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
     Test the split test module
     """
 
-    @ddt.data(('0', 'split_test_cond0'), ('1', 'split_test_cond1'))
+    @ddt.data((0, 'split_test_cond0'), (1, 'split_test_cond1'))
     @ddt.unpack
     def test_child(self, user_tag, child_url_name):
-        self.tags_service.set_tag(
-            self.tags_service.COURSE_SCOPE,
-            'xblock.partition_service.partition_0',
-            user_tag
-        )
-
+        self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]    # pylint: disable=no-member
         self.assertEquals(self.split_test_module.child_descriptor.url_name, child_url_name)
 
-    @ddt.data(('0',), ('1',))
-    @ddt.unpack
-    def test_child_old_tag_value(self, _user_tag):
-        # If user_tag has a stale value, we should still get back a valid child url
-        self.tags_service.set_tag(
-            self.tags_service.COURSE_SCOPE,
-            'xblock.partition_service.partition_0',
-            '2'
-        )
-
-        self.assertIn(self.split_test_module.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
-
-    @ddt.data(('0', 'HTML FOR GROUP 0'), ('1', 'HTML FOR GROUP 1'))
+    @ddt.data((0, 'HTML FOR GROUP 0'), (1, 'HTML FOR GROUP 1'))
     @ddt.unpack
     def test_get_html(self, user_tag, child_content):
-        self.tags_service.set_tag(
-            self.tags_service.COURSE_SCOPE,
-            'xblock.partition_service.partition_0',
-            user_tag
-        )
-
+        self.user_partition.scheme.current_group = self.user_partition.groups[user_tag]    # pylint: disable=no-member
         self.assertIn(
             child_content,
             self.module_system.render(self.split_test_module, STUDENT_VIEW).content
         )
 
-    @ddt.data(('0',), ('1',))
+    @ddt.data((0,), (1,))
     @ddt.unpack
     def test_child_missing_tag_value(self, _user_tag):
         # If user_tag has a missing value, we should still get back a valid child url
         self.assertIn(self.split_test_module.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
 
-    @ddt.data(('100',), ('200',), ('300',), ('400',), ('500',), ('600',), ('700',), ('800',), ('900',), ('1000',))
+    @ddt.data((100,), (200,), (300,), (400,), (500,), (600,), (700,), (800,), (900,), (1000,))
     @ddt.unpack
     def test_child_persist_new_tag_value_when_tag_missing(self, _user_tag):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.

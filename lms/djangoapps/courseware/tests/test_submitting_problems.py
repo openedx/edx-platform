@@ -33,7 +33,7 @@ from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
 
 from xmodule.partitions.partitions import Group, UserPartition
-from user_api.tests.factories import UserCourseTagFactory
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

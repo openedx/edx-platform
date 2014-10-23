@@ -11,8 +11,8 @@ from django.db import transaction, IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.contrib.auth.forms import PasswordResetForm
 
-from user_api.models import User, UserProfile, Registration, PendingEmailChange
-from user_api.helpers import intercept_errors
+from ..models import User, UserProfile, Registration, PendingEmailChange
+from ..helpers import intercept_errors
 
 
 USERNAME_MIN_LENGTH = 2

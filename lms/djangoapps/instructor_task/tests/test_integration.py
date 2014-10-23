@@ -17,7 +17,7 @@ from django.core.urlresolvers import reverse
 
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
-from user_api.tests.factories import UserCourseTagFactory
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.partitions.partitions import Group, UserPartition

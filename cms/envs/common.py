@@ -607,7 +607,7 @@ INSTALLED_APPS = (
     'reverification',
 
     # User preferences
-    'user_api',
+    'openedx.core.djangoapps.user_api',
     'django_openid_auth',
 
     'embargo',
