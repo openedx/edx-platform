@@ -6,116 +6,37 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
-    edx.student.account.PasswordResetView = Backbone.View.extend({
-        tagName: 'form',
-
+    edx.student.account.PasswordResetView = edx.student.account.FormView.extend({
         el: '#password-reset-wrapper',
 
         tpl: '#password_reset-tpl',
-
-        fieldTpl: '#form_field-tpl',
 
         events: {
             'click .js-reset': 'submitForm'
         },
 
-        errors: [],
-
-        mode: {},
-
-        $form: {},
-
-        initialize: function() {
-            this.fieldTpl = $(this.fieldTpl).html();
-
-            var fields = this.buildForm([{
-                name: 'email',
-                label: 'Email',
-                defaultValue: '',
-                type: 'text',
-                required: true,
-                placeholder: 'xsy@edx.org',
-                instructions: 'This is the email address you used to register with edX.',
-                restrictions: {}
-            }]);
-
-            this.tpl = $(this.tpl).html();
-            this.initModel();
-            this.render( fields );
-        },
-
-        // Renders the form.
-        render: function( html ) {
-            var fields = html || '';
-
-            $(this.el).html( _.template( this.tpl, {
-                fields: fields
-            }));
-
-            this.postRender();
-
-            return this;
-        },
+        requiredStr: '',
 
         postRender: function() {
             var $container = $(this.el);
 
             this.$form = $container.find('form');
-            this.$errors = $container.find('.error-msg');
+
             this.$resetFail = $container.find('.js-reset-fail');
+            this.$errors = $container.find('.submission-error');
 
             this.listenTo( this.model, 'success', this.resetComplete );
             this.listenTo( this.model, 'error', this.resetError );
         },
 
-        initModel: function() {
-            this.model = new edx.student.account.PasswordResetModel();
-        },
-
-        buildForm: function( data ) {
-            var html = [],
-                i,
-                len = data.length,
-                fieldTpl = this.fieldTpl;
-
-            for ( i=0; i<len; i++ ) {
-                html.push( _.template( fieldTpl, $.extend( data[i], {
-                    form: 'reset-password'
-                }) ) );
+        toggleErrorMsg: function( show ) {
+            if ( show ) {
+                this.setErrors();
+            } else {
+                this.$errors
+                    .addClass('hidden')
+                    .attr('aria-hidden', true);
             }
-
-            return html.join('');
-        },
-
-        getFormData: function() {
-            var obj = {},
-                $form = this.$form,
-                elements = $form[0].elements,
-                i,
-                len = elements.length,
-                $el,
-                key = '',
-                errors = [];
-
-            for ( i=0; i<len; i++ ) {
-
-                $el = $( elements[i] );
-                key = $el.attr('name') || false;
-
-                if ( key ) {
-                    if ( this.validate( elements[i] ) ) {
-                        obj[key] = $el.attr('type') === 'checkbox' ? $el.is(':checked') : $el.val();
-                        $el.css('border', '1px solid #ccc');
-                    } else {
-                        errors.push( key );
-                        $el.css('border', '2px solid red');
-                    }
-                }
-            }
-
-            this.errors = errors;
-
-            return obj;
         },
 
         resetComplete: function() {
@@ -136,20 +57,12 @@ var edx = edx || {};
 
             event.preventDefault();
 
-            if ( !this.errors.length ) {
+            if ( !_.compact(this.errors).length ) {
                 this.model.set( data );
                 this.model.save();
                 this.toggleErrorMsg( false );
             } else {
                 this.toggleErrorMsg( true );
-            }
-        },
-
-        toggleErrorMsg: function( show ) {
-            if ( show ) {
-                this.$errors.removeClass('hidden');
-            } else {
-                this.$errors.addClass('hidden');
             }
         },
 

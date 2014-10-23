@@ -2,7 +2,7 @@
     <% if ( type !== 'checkbox' ) { %>
         <label for="<%= form %>-<%= name %>">
             <%= label %>
-            <% if ( required ) { %> *</label><% } %>
+            <% if ( required && requiredStr ) { %> <%= requiredStr %></label><% } %>
         </label>
     <% } %>
 
@@ -34,7 +34,7 @@
     <% if ( type === 'checkbox' ) { %>
         <label for="<%= form %>-<%= name %>" class="inline">
             <%= label %>
-            <% if ( required ) { %> *</label><% } %>
+            <% if ( required && requiredStr ) { %> <%= requiredStr %></label><% } %>
         </label>
     <% } %>
 
