@@ -223,14 +223,21 @@ class Order(models.Model):
         if is_order_type_business:
             for cart_item in cart_items:
                 if hasattr(cart_item, 'paidcourseregistration'):
-                    CourseRegCodeItem.add_to_order(self, cart_item.paidcourseregistration.course_id, cart_item.qty)
+                    course_reg_code_item = CourseRegCodeItem.add_to_order(self, cart_item.paidcourseregistration.course_id, cart_item.qty)
+                    # update the discounted prices if coupon redemption applied
+                    course_reg_code_item.list_price = cart_item.list_price
+                    course_reg_code_item.unit_cost = cart_item.unit_cost
+                    course_reg_code_item.save()
                     items_to_delete.append(cart_item)
         else:
             for cart_item in cart_items:
                 if hasattr(cart_item, 'courseregcodeitem'):
-                    PaidCourseRegistration.add_to_order(self, cart_item.courseregcodeitem.course_id)
+                    paid_course_registration = PaidCourseRegistration.add_to_order(self, cart_item.courseregcodeitem.course_id)
+                    # update the discounted prices if coupon redemption applied
+                    paid_course_registration.list_price = cart_item.list_price
+                    paid_course_registration.unit_cost = cart_item.unit_cost
+                    paid_course_registration.save()
                     items_to_delete.append(cart_item)
-                    # CourseRegCodeItem.add_to_order
 
         for item in items_to_delete:
             item.delete()
@@ -254,7 +261,7 @@ class Order(models.Model):
             for registration_code in registration_codes:
                 redemption_url = reverse('register_code_redemption', args=[registration_code.code])
                 url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url)
-                csv_writer.writerow([course.display_name, registration_code.code, url])
+                csv_writer.writerow([unicode(course.display_name).encode("utf-8"), registration_code.code, url])
 
         return csv_file, course_info
 
@@ -312,7 +319,12 @@ class Order(models.Model):
                     from_email=from_address,
                     to=[recipient[1]]
                 )
-                email.content_subtype = "html"
+
+                # only the business order is HTML formatted
+                # the single seat is simple text
+                if is_order_type_business:
+                    email.content_subtype = "html"
+
                 if csv_file:
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
                 email.send()
