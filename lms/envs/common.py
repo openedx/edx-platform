@@ -894,6 +894,14 @@ MOCK_PEER_GRADING = False
 # Used for testing, debugging staff grading
 MOCK_STAFF_GRADING = False
 
+
+################################# EdxNotes config  #########################
+
+# Configure the LMS to use our stub EdxNotes implementation
+EDXNOTES_INTERFACE = {
+    'url': 'http://localhost:8042/',
+}
+
 ################################# Jasmine ##################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -1155,6 +1163,7 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
+            'css/vendor/edxnotes/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },
@@ -1500,6 +1509,8 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'notes',
+
+    'edxnotes',
 
     # Splash screen
     'splash',
