@@ -50,6 +50,7 @@ lib_paths:
     - xmodule_js/common_static/js/src/
     - xmodule_js/common_static/js/vendor/underscore-min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
+    - xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js
 
 # Paths to source JavaScript files
 src_paths:
@@ -74,6 +75,7 @@ fixture_paths:
     - templates/dashboard
     - templates/student_account
     - templates/student_profile
+    - js/fixtures/edxnotes
 
 requirejs:
   paths:
