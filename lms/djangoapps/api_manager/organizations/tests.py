@@ -315,6 +315,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             user_id = response.data['id']
             user = User.objects.get(pk=user_id)
             users.append(user_id)
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
             if i < 2:
                 StudentGradebook.objects.create(user=user, course_id=self.course.id, grade=0.75, proforma_grade=0.85)
             elif i < 4:
@@ -361,17 +362,23 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             course2 = CourseFactory.create(display_name="COURSE2", org="CRS2", run="RUN2")
             course3 = CourseFactory.create(display_name="COURSE3", org="CRS3", run="RUN3")
             if i < 3:
+                CourseEnrollmentFactory.create(user=user, course_id=course1.id)
                 StudentGradebook.objects.create(user=user, grade=0.75, proforma_grade=0.85, course_id=course1.id)
             elif i < 5:
+                CourseEnrollmentFactory.create(user=user, course_id=course2.id)
                 StudentGradebook.objects.create(user=user, grade=0.82, proforma_grade=0.82, course_id=course2.id)
             elif i < 7:
+                CourseEnrollmentFactory.create(user=user, course_id=course3.id)
                 StudentGradebook.objects.create(user=user, grade=0.72, proforma_grade=0.78, course_id=course3.id)
             elif i < 9:
+                CourseEnrollmentFactory.create(user=user, course_id=course1.id)
                 StudentGradebook.objects.create(user=user, grade=0.94, proforma_grade=0.67, course_id=course1.id)
             elif i < 11:
+                CourseEnrollmentFactory.create(user=user, course_id=course2.id)
                 StudentGradebook.objects.create(user=user, grade=0.90, proforma_grade=0.91, course_id=course2.id)
             else:
                 # Not started student - should be considered incomplete
+                CourseEnrollmentFactory.create(user=user, course_id=course2.id)
                 StudentGradebook.objects.create(user=user, grade=0.00, proforma_grade=0.00, course_id=course2.id)
 
         data = {
