@@ -16,6 +16,7 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
+from edxnotes.decorators import EdxNotes
 
 log = logging.getLogger("edx.courseware")
 
@@ -51,6 +52,7 @@ class HtmlFields(object):
     )
 
 
+@EdxNotes
 class HtmlModule(HtmlFields, XModule):
     js = {
         'coffee': [
