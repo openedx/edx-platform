@@ -4,7 +4,7 @@ var edx = edx || {};
     'use strict';
 
     edx.student = edx.student || {};
-    edx.student.account = {};
+    edx.student.account = edx.student.account || {};
 
     edx.student.account.AccountModel = Backbone.Model.extend({
         // These should be the same length limits enforced by the server

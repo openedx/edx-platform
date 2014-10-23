@@ -19,15 +19,8 @@ var edx = edx || {};
 
         requiredStr: '',
 
-        postRender: function() {
-            var $container = $(this.el);
-
-            this.$form = $container.find('form');
-
-            this.$errors = $container.find('.submission-error');
-
-            this.listenTo( this.model, 'success', this.resetComplete );
-            this.listenTo( this.model, 'error', this.saveError );
+        preRender: function( data ) {
+            this.listenTo( this.model, 'sync', this.saveSuccess );
         },
 
         toggleErrorMsg: function( show ) {
@@ -38,7 +31,7 @@ var edx = edx || {};
             }
         },
 
-        resetComplete: function() {
+        saveSuccess: function() {
             var $el = $(this.el);
 
             this.element.hide( $el.find('#password-reset-form') );

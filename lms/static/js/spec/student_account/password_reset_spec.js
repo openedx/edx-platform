@@ -1,34 +1,61 @@
-define(['js/common_helpers/template_helpers', 'js/student_account/views/PasswordResetView'],
-    function(TemplateHelpers) {
+define([
+    'jquery',
+    'underscore',
+    'js/common_helpers/template_helpers',
+    'js/common_helpers/ajax_helpers',
+    'js/student_account/models/PasswordResetModel',
+    'js/student_account/views/PasswordResetView',
+], function($, _, TemplateHelpers, AjaxHelpers, PasswordResetModel, PasswordResetView) {
         describe('edx.student.account.PasswordResetView', function() {
             'use strict';
 
-            var view = null,
-                ajaxSuccess = true,
-                model = new edx.student.account.PasswordResetModel(),
-                data = [{
-                    label: 'E-mail',
-                    instructions: 'This is the e-mail address you used to register with edX',
-                    name: 'email',
-                    required: true,
-                    type: 'email',
-                    restrictions: [],
-                    defaultValue: ''
-                }];
+            var model = null,
+                view = null,
+                requests = null,
+                EMAIL = 'xsy@edx.org',
+                FORM_DESCRIPTION = {
+                    method: 'post',
+                    submit_url: '/account/password',
+                    fields: [{
+                        name: 'email',
+                        label: 'Email',
+                        defaultValue: '',
+                        type: 'text',
+                        required: true,
+                        placeholder: 'place@holder.org',
+                        instructions: 'Enter your email.',
+                        restrictions: {}
+                    }]
+                };
+
+            var createPasswordResetView = function(that) {
+                // Initialize the password reset model
+                model = new PasswordResetModel({ url: FORM_DESCRIPTION.submit_url });
+
+                // Initialize the password reset view
+                view = new PasswordResetView({
+                    fields: FORM_DESCRIPTION.fields,
+                    model: model
+                });
+
+                // Spy on AJAX requests
+                requests = AjaxHelpers.requests(that);
+            };
 
             var submitEmail = function(validationSuccess) {
                 // Simulate manual entry of an email address
-                $('#password-reset-email').val('foo@bar.baz');
+                $('#password-reset-email').val(EMAIL);
 
                 // Create a fake click event
                 var clickEvent = $.Event('click');
 
-                // Used to avoid spying on view.validate twice
-                if (typeof validationSuccess !== 'undefined') {
+                // If validationSuccess isn't passed, we avoid
+                // spying on `view.validate` twice
+                if ( !_.isUndefined(validationSuccess) ) {
                     // Force validation to return as expected
                     spyOn(view, 'validate').andReturn({
                         isValid: validationSuccess,
-                        message: "We're all good."
+                        message: 'Submission was validated.'
                     });
                 }
 
@@ -36,65 +63,74 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
                 view.submitForm(clickEvent);
             };
 
-            var assertAjax = function(url, method, data) {
-                expect($.ajax).toHaveBeenCalled();
-                var ajaxArgs = $.ajax.mostRecentCall.args[0];
-                expect(ajaxArgs.url).toEqual(url);
-                expect(ajaxArgs.type).toEqual(method);
-                expect(ajaxArgs.data).toEqual(data)
-                expect(ajaxArgs.headers.hasOwnProperty("X-CSRFToken")).toBe(true);
-            };
-
             beforeEach(function() {
-                setFixtures("<div id='password-reset-wrapper'></div>");
+                setFixtures('<div id="password-reset-wrapper"></div>');
                 TemplateHelpers.installTemplate('templates/student_account/password_reset');
                 TemplateHelpers.installTemplate('templates/student_account/form_field');
-
-                // Stub AJAX calls
-                spyOn($, 'ajax').andCallFake(function() {
-                    return $.Deferred(function(defer) {
-                        if (ajaxSuccess) {
-                            defer.resolve();
-                        } else {
-                            defer.rejectWith(this, ["The server could not be contacted."]);
-                        }
-                    }).promise();
-                });
-
-                view = new edx.student.account.PasswordResetView({
-                    fields: data,
-                    model: model
-                });
             });
 
-            it("allows the user to request a new password", function() {
+            it('allows the user to request a new password', function() {
+                createPasswordResetView(this);
+
+                // Submit the form, with successful validation
                 submitEmail(true);
-                assertAjax('/account/password', 'POST', {email: 'foo@bar.baz'});
+
+                // Verify that the client contacts the server with the expected data
+                AjaxHelpers.expectRequest(
+                    requests, 'POST', FORM_DESCRIPTION.submit_url, $.param({
+                        url: FORM_DESCRIPTION.submit_url,
+                        email: EMAIL
+                    })
+                );
+
+                // Respond with status code 200
+                AjaxHelpers.respondWithJson(requests, {});
+
+                // Verify that the success message is visible
                 expect($('.js-reset-success')).not.toHaveClass('hidden');
             });
 
-            it("validates the email field", function() {
+            it('validates the email field', function() {
+                createPasswordResetView(this);
+
+                // Submit the form, with successful validation
                 submitEmail(true);
-                expect(view.validate).toHaveBeenCalled()
+
+                // Verify that validation of the email field occurred
+                expect(view.validate).toHaveBeenCalledWith($('#password-reset-email')[0]);
+
+                // Verify that no submission errors are visible
                 expect(view.$errors).toHaveClass('hidden');
             });
 
-            it("displays password reset validation errors", function() {
+            it('displays password reset validation errors', function() {
+                createPasswordResetView(this);
+
+                // Submit the form, with failed validation
                 submitEmail(false);
+
+                // Verify that submission errors are visible
                 expect(view.$errors).not.toHaveClass('hidden');
             });
 
-            it("displays an error if the server could not be contacted", function() {
-                // If we get an error status on the AJAX request, display an error
-                ajaxSuccess = false;
+            it('displays an error if the server returns an error while sending a password reset email', function() {
+                createPasswordResetView(this);
                 submitEmail(true);
-                expect(view.$'#submission-error').not.toHaveClass('hidden');
+
+                // Simulate an error from the LMS servers
+                AjaxHelpers.respondWithError(requests);
+
+                // Expect that an error is displayed
+                expect(view.$errors).not.toHaveClass('hidden');
 
                 // If we try again and succeed, the error should go away
-                ajaxSuccess = true;
-                // No argument means we won't spy on view.validate again
                 submitEmail();
-                expect(view.$'#submission-error').toHaveClass('hidden');
+                
+                // This time, respond with status code 200
+                AjaxHelpers.respondWithJson(requests, {});
+                
+                // Expect that the error is hidden
+                expect(view.$errors).toHaveClass('hidden');
             });
         });
     }

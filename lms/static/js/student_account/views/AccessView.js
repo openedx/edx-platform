@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext, analytics) {
+(function($, _, _s, Backbone, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
@@ -29,7 +29,7 @@ var edx = edx || {};
              * (all but include, contains, and reverse) into the
              * Underscore namespace
              */
-            _.mixin( _.str.exports() );
+            _.mixin( _s.exports() );
 
             this.tpl = $(this.tpl).html();
             this.activeForm = obj.mode || 'login';
@@ -112,20 +112,20 @@ var edx = edx || {};
             };
 
             $.ajax({
-                type: 'GET',
-                dataType: 'json',
                 url: '/user_api/v1/account/' + urls[type] + '/',
-                success: function( data ) {
-                    callback( data, context );
-                },
-                error: function( jqXHR, textStatus, errorThrown ) {
-                    console.log('fail ', errorThrown);
-                }
+                type: 'GET',
+                dataType: 'json'
+            })
+            .done(function( data ) {
+                callback( data, context );
+            })
+            .fail(function( jqXHR, textStatus, errorThrown ) {
+                console.log('fail ', errorThrown);
             });
         },
 
         resetPassword: function() {
-            analytics.track('edx.bi.password_reset_form.viewed', {
+            window.analytics.track('edx.bi.password_reset_form.viewed', {
                 category: 'user-engagement'
             });
 
@@ -139,7 +139,7 @@ var edx = edx || {};
                 $form = $('#' + type + '-form'),
                 $anchor = $('#' + type + '-anchor');
 
-            analytics.track('edx.bi.' + type + '_form.toggled', {
+            window.analytics.track('edx.bi.' + type + '_form.toggled', {
                 category: 'user-engagement'
             });
 
@@ -177,5 +177,4 @@ var edx = edx || {};
             }
         }
     });
-
-})(jQuery, _, Backbone, gettext, analytics);
+})(jQuery, _, _.str, Backbone, gettext);

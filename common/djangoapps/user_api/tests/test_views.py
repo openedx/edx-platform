@@ -728,10 +728,6 @@ class LoginSessionViewTest(ApiTestCase):
 class PasswordResetViewTest(ApiTestCase):
     """Tests of the user API's password reset endpoint. """
 
-    USERNAME = "bob"
-    EMAIL = "bob@example.com"
-    PASSWORD = "password"
-
     def setUp(self):
         super(PasswordResetViewTest, self).setUp()
         self.url = reverse("user_api_password_reset")

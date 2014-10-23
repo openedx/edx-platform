@@ -29,12 +29,12 @@ var edx = edx || {};
         requiredStr: '*',
 
         initialize: function( data ) {
+            this.model = data.model;
             this.preRender( data );
+
             this.tpl = $(this.tpl).html();
             this.fieldTpl = $(this.fieldTpl).html();
-
             this.buildForm( data.fields );
-            this.model = data.model;
 
             this.listenTo( this.model, 'error', this.saveError );
         },
