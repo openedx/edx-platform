@@ -35,7 +35,8 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         response_data = {}
         grade_avg = 0
         grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
-        org_user_grades = StudentGradebook.objects.filter(user__organizations=pk, user__is_active=True)
+        org_user_grades = StudentGradebook.objects.filter(user__organizations=pk, user__is_active=True,
+                                                          user__courseenrollment__is_active=True)
         courses_filter = request.QUERY_PARAMS.get('courses', None)
         if courses_filter:
             upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
