@@ -134,7 +134,9 @@ def index(request, extra_context=None, user=AnonymousUser()):
     if domain is False:
         domain = request.META.get('HTTP_HOST')
 
-    courses = get_courses(user, domain=domain)
+    # Hardcoded `AnonymousUser()` to hide unpublished courses always
+    courses = get_courses(AnonymousUser(), domain=domain)
+
     courses = sort_by_announcement(courses)
 
     context = {'courses': courses}

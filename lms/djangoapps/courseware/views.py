@@ -92,7 +92,8 @@ def courses(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
-    courses = get_courses(request.user, request.META.get('HTTP_HOST'))
+    # Hardcoded `AnonymousUser()` to hide unpublished courses always
+    courses = get_courses(AnonymousUser(), request.META.get('HTTP_HOST'))
     courses = sort_by_announcement(courses)
 
     return render_to_response("courseware/courses.html", {'courses': courses})
