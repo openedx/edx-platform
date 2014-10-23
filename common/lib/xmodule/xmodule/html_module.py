@@ -16,6 +16,8 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
+from xmodule.edxnotes_utils import edxnotes
+
 
 log = logging.getLogger("edx.courseware")
 
@@ -51,7 +53,10 @@ class HtmlFields(object):
     )
 
 
-class HtmlModule(HtmlFields, XModule):
+class HtmlModuleMixin(HtmlFields, XModule):
+    """
+    Attributes and methods used by HtmlModules internally.
+    """
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
@@ -70,6 +75,14 @@ class HtmlModule(HtmlFields, XModule):
         if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data
+
+
+@edxnotes
+class HtmlModule(HtmlModuleMixin):
+    """
+    Module for putting raw html in a course
+    """
+    pass
 
 
 class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
@@ -255,7 +268,7 @@ class AboutFields(object):
 
 
 @XBlock.tag("detached")
-class AboutModule(AboutFields, HtmlModule):
+class AboutModule(AboutFields, HtmlModuleMixin):
     """
     Overriding defaults but otherwise treated as HtmlModule.
     """
@@ -292,7 +305,7 @@ class StaticTabFields(object):
 
 
 @XBlock.tag("detached")
-class StaticTabModule(StaticTabFields, HtmlModule):
+class StaticTabModule(StaticTabFields, HtmlModuleMixin):
     """
     Supports the field overrides
     """
@@ -326,7 +339,7 @@ class CourseInfoFields(object):
 
 
 @XBlock.tag("detached")
-class CourseInfoModule(CourseInfoFields, HtmlModule):
+class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
     """
     Just to support xblock field overrides
     """

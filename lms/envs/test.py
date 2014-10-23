@@ -425,3 +425,6 @@ MONGODB_LOG = {
     'password': '',
     'db': 'xlog',
 }
+
+# Enable EdxNotes for tests.
+FEATURES['ENABLE_EDXNOTES'] = True

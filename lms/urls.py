@@ -380,6 +380,10 @@ if settings.COURSEWARE_ENABLED:
         # Student account and profile
         url(r'^account/', include('student_account.urls')),
         url(r'^profile/', include('student_profile.urls')),
+
+        # Student Notes
+        url(r'^courses/{}/edxnotes'.format(settings.COURSE_ID_PATTERN),
+            include('edxnotes.urls'), name="edxnotes_endpoints"),
     )
 
     # allow course staff to change to student view of courseware
