@@ -111,6 +111,14 @@ class ApiTestCase(TestCase):
         """Assert that the given response has the status code 405"""
         self.assertEqual(response.status_code, 405)
 
+    def assertAuthDisabled(self, method, uri):
+        # Django rest framework interprets basic auth headers
+        # as an attempt to authenticate with the API.
+        # We don't want this for views available to anonymous users.
+        basic_auth_header = "Basic " + base64.b64encode('username:password')
+        response = getattr(self.client, method)(uri, HTTP_AUTHORIZATION=basic_auth_header)
+        self.assertNotEqual(response.status_code, 403)
+
 
 class EmptyUserTestCase(ApiTestCase):
     def test_get_list_empty(self):
@@ -561,6 +569,10 @@ class LoginSessionViewTest(ApiTestCase):
         super(LoginSessionViewTest, self).setUp()
         self.url = reverse("user_api_login_session")
 
+    @ddt.data("get", "post")
+    def test_auth_disabled(self, method):
+        self.assertAuthDisabled(method, self.url)
+
     def test_allowed_methods(self):
         self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
 
@@ -724,6 +736,10 @@ class RegistrationViewTest(ApiTestCase):
     def setUp(self):
         super(RegistrationViewTest, self).setUp()
         self.url = reverse("user_api_registration")
+
+    @ddt.data("get", "post")
+    def test_auth_disabled(self, method):
+        self.assertAuthDisabled(method, self.url)
 
     def test_allowed_methods(self):
         self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
