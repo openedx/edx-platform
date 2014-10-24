@@ -479,7 +479,7 @@
       .sts-enrollment {
         position: absolute;
         top: 105px;
-        left: 0;
+        @include left(0);
         display: inline-block;
         text-align: center;
         width: 200px;
@@ -702,12 +702,19 @@
 
         .ui-toggle-expansion {
           @include transition(all 0.25s ease-in-out 0s);
-          @include transform(rotate(-90deg));
           @include transform-origin(50% 50%);
           @include font-size(21);
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/4);
+
+          @include rtl {
+            @include transform(rotate(90deg));
+          }
+
+          @include ltr {
+            @include transform(rotate(-90deg));
+          }
         }
 
         .message-copy {
