@@ -600,7 +600,7 @@ class LoginSessionViewTest(ApiTestCase):
             {
                 "name": "email",
                 "defaultValue": "",
-                "type": "text",
+                "type": "email",
                 "required": True,
                 "label": "E-mail",
                 "placeholder": "example: username@domain.com",
@@ -763,7 +763,7 @@ class RegistrationViewTest(ApiTestCase):
             {
                 u"name": u"email",
                 u"defaultValue": u"",
-                u"type": u"text",
+                u"type": u"email",
                 u"required": True,
                 u"label": u"E-mail",
                 u"placeholder": u"example: username@domain.com",
@@ -854,7 +854,7 @@ class RegistrationViewTest(ApiTestCase):
                 {
                     u"name": u"email",
                     u"defaultValue": u"bob@example.com",
-                    u"type": u"text",
+                    u"type": u"email",
                     u"required": True,
                     u"label": u"E-mail",
                     u"placeholder": u"example: username@domain.com",

@@ -95,11 +95,12 @@ class InvalidFieldError(Exception):
 class FormDescription(object):
     """Generate a JSON representation of a form. """
 
-    ALLOWED_TYPES = ["text", "select", "textarea", "checkbox", "password"]
+    ALLOWED_TYPES = ["text", "email", "select", "textarea", "checkbox", "password"]
 
     ALLOWED_RESTRICTIONS = {
         "text": ["min_length", "max_length"],
         "password": ["min_length", "max_length"],
+        "email": ["min_length", "max_length"],
     }
 
     OVERRIDE_FIELD_PROPERTIES = [
