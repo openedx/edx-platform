@@ -18,6 +18,10 @@ def get_prefix():
     return '/edxnotes/api'
 
 
+def get_token_url():
+    return '/edxnotes/token'
+
+
 def get_user_id():
     return 'edx_user'
 
@@ -51,6 +55,7 @@ def EdxNotes(cls):
             'content': original_get_html(self, *args, **kargs),
             'token': generate_token(),
             'prefix': get_prefix(),
+            'token_url': get_token_url(),
             'user': get_user_id(),
             'uid': generate_uid(),
         })

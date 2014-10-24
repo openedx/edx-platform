@@ -25,6 +25,7 @@
          * @param {String} params.token An auth token.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
+         * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @return {Object} Options.
          **/
         getOptions = function (element, params) {
@@ -43,7 +44,10 @@
                     showViewPermissionsCheckbox: false,
                     showEditPermissionsCheckbox: false,
                 },
-                auth: {token: params.token},
+                auth: {
+                    token: params.token,
+                    tokenUrl: params.tokenUrl
+                },
                 store: {
                     prefix: params.prefix,
                     annotationData: {
@@ -79,6 +83,7 @@
          * @param {String} params.token An auth token.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
+         * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @return {Object} An instance of Annotator.js.
          **/
         getAnnotator = function (element, params) {
