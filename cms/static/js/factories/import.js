@@ -28,6 +28,7 @@ define([
             autoUpload: false,
             add: function(e, data) {
                 CourseImport.clearImportDisplay();
+                CourseImport.okayToNavigateAway = false;
                 submitBtn.unbind('click');
                 file = data.files[0];
                 if (file.name.match(/tar\.gz$/)) {
@@ -97,7 +98,9 @@ define([
             },
             start: function(event) {
                 window.onbeforeunload = function() {
-                    return gettext('Your import is in progress; navigating away will abort it.');
+                    if (!CourseImport.okayToNavigateAway) {
+                        return "${_('Your import is in progress; navigating away will abort it.')}";
+                    }
                 };
             },
             sequentialUploads: true,
