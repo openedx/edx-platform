@@ -12,7 +12,7 @@ from edxval.api import (
 
 class BlockOutline(object):
     """
-    Serializes course videos, pulling data from VAL and the video modules.
+    Serializes blocks, using a mapping, `categories_to_outliner` (category: summary function).
     """
     def __init__(self, course_id, start_block, categories_to_outliner, request):
         """Create a BlockOutline using `start_block` as a starting point."""
@@ -20,13 +20,6 @@ class BlockOutline(object):
         self.categories_to_outliner = categories_to_outliner
         self.course_id = course_id
         self.request = request  # needed for making full URLS
-        self.local_cache = {}
-        try:
-            self.local_cache['course_videos'] = get_video_info_for_course_and_profile(
-                unicode(course_id), "mobile_low"
-            )
-        except ValInternalError:  # pragma: nocover
-            self.local_cache['course_videos'] = {}
 
     def __iter__(self):
         child_to_parent = {}
@@ -95,7 +88,7 @@ class BlockOutline(object):
                     "named_path": [b["name"] for b in block_path[:-1]],
                     "unit_url": unit_url,
                     "section_url": section_url,
-                    "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)
+                    "summary": summary_fn(curr_block)
                 }
 
             if curr_block.has_children:
@@ -104,48 +97,69 @@ class BlockOutline(object):
                     child_to_parent[block] = curr_block
 
 
-def video_summary(course, course_id, video_descriptor, request, local_cache):
+class VideoOutline(BlockOutline):
     """
-    returns summary dict for the given video module
+    Serializes course videos, pulling data from VAL and the video modules.
     """
-    # First try to check VAL for the URLs we want.
-    val_video_info = local_cache['course_videos'].get(video_descriptor.edx_video_id, {})
-    if val_video_info:
-        video_url = val_video_info['url']
-    # Then fall back to VideoDescriptor fields for video URLs
-    elif video_descriptor.html5_sources:
-        video_url = video_descriptor.html5_sources[0]
-    else:
-        video_url = video_descriptor.source
+    def __init__(self, course_id, start_block, request, debug=False):
+        BlockOutline.__init__(self, course_id, start_block, {'video': self.video_summary}, request)
+        self.debug = debug
+        try:
+            self.course_videos = get_video_info_for_course_and_profile(
+                unicode(course_id), "mobile_low"
+            )
+        except ValInternalError:  # pragma: nocover
+            self.course_videos = {}
 
-    # If we have the video information from VAL, we also have duration and size.
-    duration = val_video_info.get('duration', None)
-    size = val_video_info.get('file_size', 0)
+    def video_summary(self, video_descriptor):
+        """
+        returns summary dict for the given video module
+        """
+        # First try to check VAL for the URLs we want.
+        val_video_info = self.course_videos.get(video_descriptor.edx_video_id, {})
+        if val_video_info:
+            video_url = val_video_info['url']
+        # Then fall back to VideoDescriptor fields for video URLs
+        elif video_descriptor.html5_sources:
+            video_url = video_descriptor.html5_sources[0]
+        else:
+            video_url = video_descriptor.source
 
-    # Transcripts...
-    transcript_langs = video_descriptor.available_translations(verify_assets=False)
+        # If we have the video information from VAL, we also have duration and size.
+        duration = val_video_info.get('duration', None)
+        size = val_video_info.get('file_size', 0)
 
-    transcripts = {
-        lang: reverse(
-            'video-transcripts-detail',
-            kwargs={
-                'course_id': unicode(course_id),
-                'block_id': video_descriptor.scope_ids.usage_id.block_id,
-                'lang': lang
-            },
-            request=request,
-        )
-        for lang in transcript_langs
-    }
+        # Transcripts...
+        transcript_langs = video_descriptor.available_translations(verify_assets=False)
 
-    return {
-        "video_url": video_url,
-        "video_thumbnail_url": None,
-        "duration": duration,
-        "size": size,
-        "name": video_descriptor.display_name,
-        "transcripts": transcripts,
-        "language": video_descriptor.transcript_language,
-        "category": video_descriptor.category,
-        "id": unicode(video_descriptor.scope_ids.usage_id),
-    }
+        transcripts = {
+            lang: reverse(
+                'video-transcripts-detail',
+                kwargs={
+                    'course_id': unicode(self.course_id),
+                    'block_id': video_descriptor.scope_ids.usage_id.block_id,
+                    'lang': lang
+                },
+                request=self.request,
+            )
+            for lang in transcript_langs
+        }
+
+        vid_response = {
+            "video_url": video_url,
+            "video_thumbnail_url": None,
+            "duration": duration,
+            "size": size,
+            "name": video_descriptor.display_name,
+            "transcripts": transcripts,
+            "language": video_descriptor.transcript_language,
+            "category": video_descriptor.category,
+            "id": unicode(video_descriptor.scope_ids.usage_id),
+        }
+
+        if self.debug:
+            vid_response['video_id'] = video_descriptor.edx_video_id
+            # look for missing transcripts
+            avail_langs = video_descriptor.available_translations(verify_assets=True)
+            vid_response['missing_transcripts'] = [lang for lang in transcripts if lang not in avail_langs]
+        return vid_response

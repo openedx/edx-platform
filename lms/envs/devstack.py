@@ -98,6 +98,7 @@ CC_PROCESSOR = {
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 
 #####################################################################
 # See if the developer has any local overrides.
