@@ -17,6 +17,7 @@ from django.test.utils import override_settings
 from api_manager.models import GroupProfile
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from projects.models import Project, Workgroup
+from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from openedx.core.djangoapps.course_groups.cohorts import (get_cohort_by_name, remove_user_from_cohort,
                                    delete_empty_cohort, is_user_in_cohort, get_course_cohort_names)
@@ -110,6 +111,8 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             username=self.test_user_username2
         )
 
+        CourseEnrollmentFactory.create(user=self.test_user, course_id=self.test_course.id)
+        CourseEnrollmentFactory.create(user=self.test_user2, course_id=self.test_course.id)
         self.client = SecureClient()
         cache.clear()
 
