@@ -15,6 +15,8 @@ var edx = edx || {};
             'click .js-reset': 'submitForm'
         },
 
+        formType: 'password-reset',
+
         requiredStr: '',
 
         postRender: function() {

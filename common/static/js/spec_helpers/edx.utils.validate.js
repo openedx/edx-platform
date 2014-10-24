@@ -10,29 +10,40 @@ var edx = edx || {};
             validate: {
 
                 msg: {
-                    email: '<p>A properly formatted e-mail is required</p>',
-                    min: '<p><%= field %> must be a minimum of <%= length %> characters long',
-                    max: '<p><%= field %> must be a maximum of <%= length %> characters long',
-                    password: '<p>A valid password is required</p>',
-                    required: '<p><%= field %> field is required</p>',
-                    terms: '<p>To enroll you must agree to the <a href="#">Terms of Service and Honor Code</a></p>'
+                    email: '<li>A properly formatted e-mail is required</li>',
+                    min: '<li><%= field %> must be a minimum of <%= count %> characters long</li>',
+                    max: '<li><%= field %> must be a maximum of <%= count %> characters long</li>',
+                    password: '<li>A valid password is required</li>',
+                    required: '<li><%= field %> field is required</li>',
+                    terms: '<li>To enroll you must agree to the <a href="#">Terms of Service and Honor Code</a></li>'
                 },
 
                 field: function( el ) {
                     var $el = $(el),
-                        required = _fn.validate.required( $el ),
-                        // length = _fn.validate.charLength( $el ),
-                        min = _fn.validate.str.minlength( $el ),
-                        max = _fn.validate.str.maxlength( $el ),
-                        email = _fn.validate.email.valid( $el ),
-                        response = {
-                            isValid: required && min && max && email
-                        };
+                        required = true,
+                        min = true,
+                        max = true,
+                        email = true,
+                        response = {},
+                        isBlank = _fn.validate.isBlank( $el );
+
+                    if ( _fn.validate.isRequired( $el ) ) {
+                        if ( isBlank ) {
+                            required = false;
+                        } else {
+                            min = _fn.validate.str.minlength( $el );
+                            max = _fn.validate.str.maxlength( $el );
+                            email = _fn.validate.email.valid( $el );
+                        }
+                    } else if ( !isBlank ) {
+                        email = _fn.validate.email.valid( $el );
+                    }
+
+                    response.isValid = required && min && max && email;
 
                     if ( !response.isValid ) {
                         response.message = _fn.validate.getMessage( $el, {
                             required: required,
-                            // length: length,
                             min: min,
                             max: max,
                             email: email
@@ -40,28 +51,6 @@ var edx = edx || {};
                     }
 
                     return response;
-                },
-
-                charLength: function( $el ) {
-                    var type = $el.attr("type");
-                    if (type !== "text" && type !== "textarea" && type !== "password") {
-                        return true;
-                    }
-
-                    // Cannot assume there will be both min and max
-                    var min = $el.attr('minlength') || 0,
-                        max = $el.attr('maxlength') || false,
-                        chars = $el.val().length,
-                        within = false;
-
-                    // if max && min && within the range
-                    if ( min <= chars && ( max && chars <= max ) ) {
-                        within = true;
-                    } else if ( min <= chars && !max ) {
-                        within = true;
-                    }
-
-                    return within;
                 },
 
                 str: {
@@ -84,12 +73,12 @@ var edx = edx || {};
                     }
                 },
 
-                required: function( $el ) {
-                    if ( $el.attr('type') === 'checkbox' ) {
-                        return $el.attr('required') ? $el.prop('checked') : true;
-                    } else {
-                        return $el.attr('required') ? $el.val() : true;
-                    }
+                isRequired: function( $el ) {
+                    return $el.attr('required');
+                },
+
+                isBlank: function( $el ) {
+                    return ( $el.attr('type') === 'checkbox' ) ? $el.prop('checked') :  !$el.val();
                 },
 
                 email: {
@@ -104,7 +93,7 @@ var edx = edx || {};
                     ),
 
                     valid: function( $el ) {
-                        return  $el.data('email') ? _fn.validate.email.format( $el.val() ) : true;
+                        return  $el.attr('type') === 'email' ? _fn.validate.email.format( $el.val() ) : true;
                     },
 
                     format: function( str ) {
@@ -115,7 +104,8 @@ var edx = edx || {};
                 getMessage: function( $el, tests ) {
                     var txt = [],
                         tpl,
-                        name;
+                        name,
+                        obj;
 
                     _.each( tests, function( value, key ) {
                         if ( !value ) {
@@ -123,9 +113,17 @@ var edx = edx || {};
 
                             tpl = _fn.validate.msg[key];
 
-                            txt.push( _.template( tpl, {
+                            obj = {
                                 field: _fn.validate.str.capitalizeFirstLetter( name )
-                            }));
+                            };
+
+                            if ( key === 'min' ) {
+                                obj.count = $el.attr('minlength');
+                            } else if ( key === 'max' ) {
+                                obj.count = $el.attr('maxlength');
+                            }
+
+                            txt.push( _.template( tpl, obj ) );
                         }
                     });
 

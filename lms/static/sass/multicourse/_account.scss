@@ -586,7 +586,7 @@
       list-style: none;
 
       li {
-        margin: 0 0 ($baseline/4) 0;
+        margin: 0; /*0 0 ($baseline/4) 0;*/
       }
     }
   }
@@ -598,10 +598,6 @@
 
     .message-title {
       color: shade($red, 10%) !important;
-    }
-
-    .message-copy {
-
     }
   }
 
