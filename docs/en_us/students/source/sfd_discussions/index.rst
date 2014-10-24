@@ -1,7 +1,7 @@
 .. _Course Discussions Index:
 
 ######################################
-Student Guide to Course Discussions
+Course Discussions
 ######################################
 
 .. toctree::
