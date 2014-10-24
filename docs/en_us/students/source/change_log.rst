@@ -12,7 +12,9 @@ October 2014
 
    * - Date
      - Change
+   * - 10/27/14
+     - Updated SI affix list in :ref:`Math Formatting`.
    * - 10/24/14
-     - Added :ref:`Course Discussions` section
+     - Added :ref:`Course Discussions` section.
 
 .. _Preface: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
