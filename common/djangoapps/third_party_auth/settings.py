@@ -116,6 +116,7 @@ def _set_global_settings(django_settings):
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',
+        'third_party_auth.pipeline.set_logged_in_cookie',
         'third_party_auth.pipeline.login_analytics',
         'third_party_auth.pipeline.change_enrollment',
     )
