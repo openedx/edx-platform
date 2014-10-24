@@ -1,5 +1,7 @@
-import uuid
+from uuid import uuid4
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from .notes_list import LIST
 
 
 FORMAT = {
@@ -12,20 +14,20 @@ FORMAT = {
     "uri": "http://example.com",               # URI of annotated document (added by frontend)
     "ranges": [                                # list of ranges covered by annotation (usually only one entry)
         {
-            "start": "/p[69]/span/span",           # (relative) XPath to start element
-            "end": "/p[70]/span/span",             # (relative) XPath to end element
-            "startOffset": 0,                      # character offset within start element
-            "endOffset": 120                       # character offset within end element
+            "start": "/p[1]",                  # (relative) XPath to start element
+            "end": "/p[1]",                    # (relative) XPath to end element
+            "startOffset": 52,                 # character offset within start element
+            "endOffset": 54                    # character offset within end element
         }
     ],
-    "user": "user",                           # user id of annotation owner (can also be an object with an 'id' property)
+    "user": "user",                            # user id of annotation owner (can also be an object with an 'id' property)
+    "usage_id": "usage_id",                    # usage id of a component (added by frontend)
     "consumer": "annotateit",                  # consumer key of backend
-    "tags": [],             # list of tags (from Tags plugin)
     "permissions": {                           # annotation permissions (from Permissions/AnnotateItPermissions plugin)
-        "read": [],
-        "admin": [],
-        "update": [],
-        "delete": []
+        "read": ["user"],
+        "admin": ["user"],
+        "update": ["user"],
+        "delete": ["user"]
     }
 }
 
@@ -37,30 +39,36 @@ class EdxNotes(object):
 
     @staticmethod
     def create(note_info):
-        note_info['id'] = uuid.uuid4().hex
+        note_info['id'] = uuid4().hex
+        LIST.append(note_info)
         return note_info
 
     @staticmethod
-    def read(note_id):
-        if not note_id:
+    def read(note_id, user):
+        result = filter(lambda note: note.get('id') == note_id, LIST)
+        if result:
+            return result
+        else:
             raise ItemNotFoundError()
-        return FORMAT
 
     @staticmethod
     def update(note_id, note_info):
-        if not note_id:
+        result = filter(lambda note: note.get('id') == note_id, LIST)
+        if result:
+            return result
+        else:
             raise ItemNotFoundError()
-        return note_info
 
     @staticmethod
     def delete(note_id):
-        if not note_id:
+        result = filter(lambda note: note.get('id') == note_id, LIST)
+        if not result:
             raise ItemNotFoundError()
-        pass
 
     @staticmethod
-    def search(args):
+    def search(user, usage_id):
+        results = filter(lambda note: note.get('user') == user, LIST)
         return {
-            'total': 1,
-            'rows': [FORMAT]
+            'total': len(results),
+            'rows': results
         }

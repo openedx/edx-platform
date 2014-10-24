@@ -72,8 +72,6 @@ urlpatterns = ('',  # nopep8
 
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
-
-    url(r'^api/edxnotes/', include('edxnotes.urls')),
 )
 
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
@@ -121,7 +119,7 @@ favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
 urlpatterns += ((
     r'^favicon\.ico$',
     'django.views.generic.simple.redirect_to',
-    {'url':  settings.STATIC_URL + favicon_path}
+    {'url': settings.STATIC_URL + favicon_path}
 ),)
 
 # Semi-static views only used by edX, not by themes
@@ -152,7 +150,7 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
 
         # Press releases
         url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
-)
+    )
 
 # Only enable URLs for those marketing links actually enabled in the
 # settings. Disable URLs by marking them as None.
@@ -365,6 +363,9 @@ if settings.COURSEWARE_ENABLED:
         # LTI endpoints listing
         url(r'^courses/{}/lti_rest_endpoints/'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.get_course_lti_endpoints', name='lti_rest_endpoints'),
+
+        # EdX Notes
+        url(r'^edxnotes/api/', include('edxnotes.urls'), name='edxnotes_url'),
     )
 
     # allow course staff to change to student view of courseware
@@ -491,7 +492,6 @@ if settings.FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
     urlpatterns += (
         url(r'^edinsights_service/', include('edinsights.core.urls')),
     )
-    import edinsights.core.registry
 
 # FoldIt views
 urlpatterns += (
