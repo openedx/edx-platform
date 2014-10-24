@@ -28,7 +28,6 @@ var edx = edx || {};
                         isBlank = _fn.validate.isBlank( $el );
 
                     if ( _fn.validate.isRequired( $el ) ) {
-console.log('is required');
                         if ( isBlank ) {
                             required = false;
                         } else {
@@ -41,7 +40,7 @@ console.log('is required');
                     }
 
                     response.isValid = required && min && max && email;
-console.log(response.isValid);
+
                     if ( !response.isValid ) {
                         response.message = _fn.validate.getMessage( $el, {
                             required: required,

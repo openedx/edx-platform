@@ -8,7 +8,7 @@
         <input type="radio" name="form" id="register-option" value="register" class="form-toggle" <% if ( mode === 'register' ) { %>checked<% } %> >
         <label for"register-option" class="form-label">I am a new user</label>
     </h2>
-    <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden<% } %>"></div>
+    <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden" aria-hidden="true<% } %>"></div>
 </section>
 
 <section class="form-type">
@@ -16,7 +16,7 @@
         <input type="radio" name="form" id="login-option" value="login" class="form-toggle" <% if ( mode === 'login' ) { %>checked<% } %>>
         <label for="login-option" class="form-label">I am a returning user with an edX account</label>
     </h2>
-    <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden<% } %>"></div>
+    <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden" aria-hidden="true<% } %>"></div>
 </section>
 
 <div id="password-reset-wrapper"></div>

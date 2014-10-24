@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext) {
+(function($, _, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
@@ -21,17 +21,9 @@ var edx = edx || {};
 
         requiredStr: '',
 
-        initialize: function( data ) {
-            this.tpl = $(this.tpl).html();
-            this.fieldTpl = $(this.fieldTpl).html();
-
-            this.buildForm( data.fields );
-            this.model = data.model;
-
+        preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
-
-            this.listenTo( this.model, 'error', this.saveError );
         },
 
         render: function( html ) {
@@ -82,6 +74,7 @@ var edx = edx || {};
 
         saveError: function( error ) {
             console.log(error.status, ' error: ', error.responseText);
+            this.errors = ['<li>' + error.responseText + '</li>'];
 
             /* If we've gotten a 403 error, it means that we've successfully
              * authenticated with a third-party provider, but we haven't
@@ -90,14 +83,14 @@ var edx = edx || {};
              * to complete the registration process.
             */
             if (error.status === 403 && error.responseText === "third-party-auth" && this.currentProvider) {
-                this.$alreadyAuthenticatedMsg.removeClass("hidden");
-            }
-            else {
-                this.$alreadyAuthenticatedMsg.addClass("hidden");
+                this.element.show( this.$alreadyAuthenticatedMsg );
+            } else {
+                this.element.hide( this.$alreadyAuthenticatedMsg );
                 // TODO -- display the error
             }
 
+            this.setErrors();
         }
     });
 
-})(jQuery, _, Backbone, gettext);
+})(jQuery, _, gettext);
