@@ -152,12 +152,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             transcript_language = u'en'
             languages = {'en': 'English'}
         else:
-            if self.transcript_language in self.transcripts:
-                transcript_language = self.transcript_language
-            elif self.sub:
-                transcript_language = u'en'
-            else:
-                transcript_language = sorted(self.transcripts.keys())[0]
+            transcript_language = get_transcript_language(self)
 
             native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
             languages = {
@@ -176,7 +171,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
-
 
     def get_html(self):
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
@@ -201,16 +195,19 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # internally for download links (source, html5_sources) and the youtube
         # stream.
         if self.edx_video_id and edxval_api:
-            val_video_urls = edxval_api.get_urls_for_profiles(
-                self.edx_video_id, ["desktop_mp4", "youtube"]
-            )
-            # VAL will always give us the keys for the profiles we asked for, but 
-            # if it doesn't have an encoded video entry for that Video + Profile, the
-            # value will map to `None`
-            if val_video_urls["desktop_mp4"] and self.download_video:
-                download_video_link = val_video_urls["desktop_mp4"]
-            if val_video_urls["youtube"]:
-                youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
+            try:
+                val_video_urls = edxval_api.get_urls_for_profiles(
+                    self.edx_video_id, ["desktop_mp4", "youtube"]
+                )
+                # VAL will always give us the keys for the profiles we asked for, but
+                # if it doesn't have an encoded video entry for that Video + Profile, the
+                # value will map to `None`
+                if val_video_urls["desktop_mp4"] and self.download_video:
+                    download_video_link = val_video_urls["desktop_mp4"]
+                if val_video_urls["youtube"]:
+                    youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
+            except edxval_api.ValInternalError:
+                pass
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoDescriptor
@@ -604,3 +601,18 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             field_data['download_track'] = True
 
         return field_data
+
+
+def get_transcript_language(video):
+    """
+    Returns the transcript language for the given video module.
+    """
+    if video.transcript_language in video.transcripts:
+        transcript_language = video.transcript_language
+    elif video.sub:
+        transcript_language = u'en'
+    elif len(video.transcripts) > 0:
+        transcript_language = sorted(video.transcripts.keys())[0]
+    else:
+        transcript_language = u'en'
+    return transcript_language
