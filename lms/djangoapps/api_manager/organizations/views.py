@@ -2,7 +2,7 @@
 
 """ ORGANIZATIONS API VIEWS """
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Avg, F
 
@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from api_manager.courseware_access import get_course_key
 from api_manager.models import Organization
 from api_manager.users.serializers import UserSerializer
+from api_manager.groups.serializers import GroupSerializer
 from api_manager.utils import str2bool
 from gradebook.models import StudentGradebook
 from student.models import CourseEnrollment
@@ -84,5 +85,30 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                 return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
             organization = self.get_object()
             organization.users.add(user)
+            organization.save()
+            return Response({}, status=status.HTTP_201_CREATED)
+
+    @action(methods=['get', 'post'])
+    def groups(self, request, pk):
+        """
+        Add a Group to a organization or retrieve list of groups in organization
+        """
+        if request.method == 'GET':
+            groups = Group.objects.filter(organizations=pk)
+            response_data = []
+            if groups:
+                for group in groups:
+                    serializer = GroupSerializer(group)
+                    response_data.append(serializer.data)  # pylint: disable=E1101
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            group_id = request.DATA.get('id')
+            try:
+                group = Group.objects.get(id=group_id)
+            except ObjectDoesNotExist:
+                message = 'Group {} does not exist'.format(group_id)
+                return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+            organization = self.get_object()
+            organization.groups.add(group)
             organization.save()
             return Response({}, status=status.HTTP_201_CREATED)

@@ -254,6 +254,45 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         response = self.do_post(users_uri, data)
         self.assertEqual(response.status_code, 400)
 
+    def test_organizations_groups_get_post(self):
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'contact_name': self.test_organization_contact_name,
+            'contact_email': self.test_organization_contact_email,
+            'contact_phone': self.test_organization_contact_phone
+        }
+        response = self.do_post(self.base_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        org_id = response.data['id']
+
+        # create groups
+        max_groups, groups = 4, []
+        for i in xrange(1, max_groups + 1):
+            data = {
+                'name': '{} {}'.format('Test Group', i),
+                'type': 'contactgroup',
+                'data': {'display_name': 'organization contacts group'}
+            }
+            response = self.do_post(self.base_groups_uri, data)
+            self.assertEqual(response.status_code, 201)
+            groups.append(response.data['id'])
+
+        test_uri = '{}{}/'.format(self.base_organizations_uri, org_id)
+        groups_uri = '{}groups/'.format(test_uri)
+        for group in groups:
+            data = {"id": group}
+            response = self.do_post(groups_uri, data)
+            self.assertEqual(response.status_code, 201)
+        response = self.do_get(groups_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), max_groups)
+
+        # post an invalid group
+        data = {"id": '45533333'}
+        response = self.do_post(groups_uri, data)
+        self.assertEqual(response.status_code, 400)
+
     def test_organizations_users_get(self):
         data = {
             'name': self.test_organization_name,
