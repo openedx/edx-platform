@@ -29,8 +29,8 @@ var edx = edx || {};
             .done(function() {
                 model.trigger('success');
             })
-            .fail( function() {
-                model.trigger('error');
+            .fail( function( error ) {
+                model.trigger( 'error', error );
             });
         }
     });

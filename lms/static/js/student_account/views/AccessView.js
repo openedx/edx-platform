@@ -126,8 +126,8 @@ var edx = edx || {};
         },
 
         resetPassword: function() {
-            this.$header.addClass('hidden');
-            $(this.el).find('.form-type').addClass('hidden');
+            this.element.hide( this.$header );
+            this.element.hide( $(this.el).find('.form-type') );
             this.loadForm('reset');
         },
 
@@ -139,13 +139,28 @@ var edx = edx || {};
                 this.loadForm( type );
             }
 
-            $(this.el).find('.form-wrapper').addClass('hidden');
-            $form.removeClass('hidden');
+            this.element.hide( $(this.el).find('.form-wrapper') );
+            this.element.show( $form );
         },
 
         form: {
             isLoaded: function( $form ) {
                 return $form.html().length > 0;
+            }
+        },
+
+        /* Helper method ot toggle display
+         * including accessibility considerations
+         */
+        element: {
+            hide: function( $el ) {
+                $el.addClass('hidden')
+                   .attr('aria-hidden', true);
+            },
+
+            show: function( $el ) {
+                $el.removeClass('hidden')
+                   .attr('aria-hidden', false);
             }
         }
     });

@@ -3,7 +3,7 @@
         <h4 class="message-title">We couldn't log you in.</h4>
         <ul class="message-copy"></ul>
     </div>
-    <div class="already-authenticated-msg hidden">
+    <div class="already-authenticated-msg hidden" aria-hidden="true">
         <% if (currentProvider) { %>
             <p class="instructions">You've successfully logged into <%- currentProvider %>, but you need to link your account.  Please click "I am a returning user" to create an EdX account.</p>
         <% } %>

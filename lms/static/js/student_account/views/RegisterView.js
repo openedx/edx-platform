@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext) {
+(function($, _, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
@@ -18,13 +18,7 @@ var edx = edx || {};
 
         formType: 'register',
 
-        initialize: function( data ) {
-            this.tpl = $(this.tpl).html();
-            this.fieldTpl = $(this.fieldTpl).html();
-
-            this.buildForm( data.fields );
-            this.model = data.model;
-
+        preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
         },
@@ -45,6 +39,7 @@ var edx = edx || {};
 
         thirdPartyAuth: function( event ) {
             var providerUrl = $(event.target).data('provider-url') || '';
+
             if (providerUrl) {
                 window.location.href = providerUrl;
             } else {
@@ -54,4 +49,4 @@ var edx = edx || {};
         }
     });
 
-})(jQuery, _, Backbone, gettext);
+})(jQuery, _, gettext);

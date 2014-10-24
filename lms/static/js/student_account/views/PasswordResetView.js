@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext) {
+(function($, _, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
@@ -24,34 +24,25 @@ var edx = edx || {};
 
             this.$form = $container.find('form');
 
-            this.$resetFail = $container.find('.js-reset-fail');
             this.$errors = $container.find('.submission-error');
 
             this.listenTo( this.model, 'success', this.resetComplete );
-            this.listenTo( this.model, 'error', this.resetError );
+            this.listenTo( this.model, 'error', this.saveError );
         },
 
         toggleErrorMsg: function( show ) {
             if ( show ) {
                 this.setErrors();
             } else {
-                this.$errors
-                    .addClass('hidden')
-                    .attr('aria-hidden', true);
+                this.element.hide( this.$errors );
             }
         },
 
         resetComplete: function() {
             var $el = $(this.el);
 
-            $el.find('#password-reset-form').addClass('hidden');
-            $el.find('.js-reset-success').removeClass('hidden');
-
-            this.$resetFail.addClass('hidden');
-        },
-
-        resetError: function() {
-            this.$resetFail.removeClass('hidden');
+            this.element.hide( $el.find('#password-reset-form') );
+            this.element.show( $el.find('.js-reset-success') );
         },
 
         submitForm: function( event ) {
@@ -73,4 +64,4 @@ var edx = edx || {};
         }
     });
 
-})(jQuery, _, Backbone, gettext);
+})(jQuery, _, gettext);
