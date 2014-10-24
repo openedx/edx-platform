@@ -81,10 +81,10 @@ var edx = edx || {};
              * linked the account to an EdX account.  In this case,
              * we need to prompt the user to enter a little more information
              * to complete the registration process.
-            */
+             */
             if ( error.status === 403 &&
-                 error.responseText === "third-party-auth" &&
-                 this.currentProvider) {
+                 error.responseText === 'third-party-auth' &&
+                 this.currentProvider ) {
                 this.element.show( this.$alreadyAuthenticatedMsg );
             } else {
                 this.element.hide( this.$alreadyAuthenticatedMsg );
