@@ -17,6 +17,14 @@ class DashboardPage(PageObject):
         return self.q(css='body.view-dashboard').present
 
     @property
+    def course_runs(self):
+        """
+        The list of course run metadata for all displayed courses
+        Returns an empty string if there are none
+        """
+        return self.q(css='.course-run>.value').text
+
+    @property
     def has_processing_courses(self):
         return self.q(css='.courses-processing').present
 

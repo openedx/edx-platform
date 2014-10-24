@@ -4,6 +4,7 @@ Acceptance tests for Studio related to course reruns.
 
 import random
 from bok_choy.promise import EmptyPromise
+from nose.tools import assert_in
 
 from ...pages.studio.index import DashboardPage
 from ...pages.studio.course_rerun import CourseRerunPage
@@ -50,7 +51,7 @@ class CourseRerunTest(StudioCourseTest):
 
     def test_course_rerun(self):
         """
-        Scenario: Courses can be rurun
+        Scenario: Courses can be rerun
             Given I have a course with a section, subsesction, vertical, and html component with content 'Test Content'
             When I visit the course rerun page
             And I type 'test_rerun' in the course run field
@@ -81,6 +82,8 @@ class CourseRerunTest(StudioCourseTest):
             return not self.dashboard_page.has_processing_courses
 
         EmptyPromise(finished_processing, "Rerun finished processing", try_interval=5, timeout=60).fulfill()
+
+        assert_in(course_run, self.dashboard_page.course_runs)
         self.dashboard_page.click_course_run(course_run)
 
         outline_page = CourseOutlinePage(self.browser, *course_info)
