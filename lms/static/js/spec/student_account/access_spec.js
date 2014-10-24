@@ -38,6 +38,23 @@ define(['js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers', 
                     ]
                 };
 
+            var ajaxSpyAndInitialize = function(that) {
+                // Spy on AJAX requests
+                requests = AjaxHelpers.requests(that);
+
+                view = new edx.student.account.AccessView({
+                    mode: 'login',
+                    thirdPartyAuth: {
+                        currentProvider: null,
+                        providers: []
+                    }
+                });
+
+                // Simulate a response from the server containing
+                // a form description
+                AjaxHelpers.respondWithJson(requests, FORM_DESCRIPTION);
+            };
+
             var ajaxAssertAndRespond = function(url, requestIndex) {
                 // Verify that the client contacts the server
                 AjaxHelpers.expectJsonRequest(requests, 'GET', url, null, requestIndex);
@@ -45,7 +62,7 @@ define(['js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers', 
                 // Simulate a response from the server containing
                 // a form description
                 AjaxHelpers.respondWithJson(requests, FORM_DESCRIPTION);
-            }
+            };
 
             var assertForms = function(visible, hidden) {
                 expect($(visible)).not.toHaveClass('hidden');
@@ -73,24 +90,10 @@ define(['js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers', 
                 TemplateHelpers.installTemplate('templates/student_account/register');
                 TemplateHelpers.installTemplate('templates/student_account/password_reset');
                 TemplateHelpers.installTemplate('templates/student_account/form_field');
-
-                // Spy on AJAX requests
-                requests = AjaxHelpers.requests(this);
-
-                view = new edx.student.account.AccessView({
-                    mode: 'login',
-                    thirdPartyAuth: {
-                        currentProvider: null,
-                        providers: []
-                    }
-                });
-
-                // Simulate a response from the server containing
-                // a form description
-                AjaxHelpers.respondWithJson(requests, FORM_DESCRIPTION);
             });
 
             it("initially displays the correct form", function() {
+                ajaxSpyAndInitialize(this);
                 assertForms('#login-form', '#register-form');
             });
 
@@ -98,6 +101,8 @@ define(['js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers', 
                 // Create fake change events used to control form toggling
                 var registerChangeEvent = $.Event('change', {currentTarget: $('#register-option')}),
                     loginChangeEvent = $.Event('change', {currentTarget: $('#login-option')});
+
+                ajaxSpyAndInitialize(this);
 
                 // Simulate selection of the registration form
                 selectForm(registerChangeEvent);
@@ -107,6 +112,7 @@ define(['js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers', 
             });
 
             it("displays the reset password form", function() {
+                ajaxSpyAndInitialize(this);
                 view.resetPassword();
                 expect($('#password-reset-wrapper')).not.toBeEmpty();
             });
