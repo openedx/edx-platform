@@ -83,7 +83,7 @@ class Command(TrackedCommand):
                 # Move the Student between the classes.
                 mode = enrollment.mode
                 old_is_active = enrollment.is_active
-                CourseEnrollment.unenroll(user, source_key, emit_unenrollment_event=False)
+                CourseEnrollment.unenroll(user, source_key, skip_refund=True)
                 print(u"Unenrolled {} from {}".format(user.username, unicode(source_key)))
 
                 for dest_key in dest_keys:
@@ -98,7 +98,7 @@ class Command(TrackedCommand):
                         # Un-enroll from the new course if the user had un-enrolled
                         # form the old course.
                         if not old_is_active:
-                            new_enrollment.update_enrollment(is_active=False, emit_unenrollment_event=False)
+                            new_enrollment.update_enrollment(is_active=False, skip_refund=True)
 
                         if transfer_certificates:
                             self._transfer_certificate_item(source_key, enrollment, user, dest_keys, new_enrollment)
