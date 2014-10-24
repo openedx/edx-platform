@@ -597,7 +597,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         if not has_access(user, 'load', descriptor, course_id):
             return None
 
-    if descriptor._bound_student == user: # pylint: disable=protected-access
+    if descriptor._bound_student == user:  # pylint: disable=protected-access
         return descriptor
 
     (system, student_data) = get_module_system_for_user(
