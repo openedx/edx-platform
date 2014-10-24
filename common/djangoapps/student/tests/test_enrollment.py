@@ -116,6 +116,26 @@ class EnrollmentTest(ModuleStoreTestCase):
         change_enrollment_third_party(is_register=True, strategy=strategy, user=self.user)
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
+    def test_no_prof_ed_third_party_autoenroll(self):
+        """
+        Test that a user authenticating via third party auth while attempting to enroll
+        in a professional education course is not automatically enrolled in the course.
+        """
+        self.client.logout()
+
+        # Create the course mode required for this test case
+        CourseModeFactory(course_id=self.course.id, mode_slug='professional')
+
+        self.client.get(reverse('register_user'), {'course_id': self.course.id})
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.dummy_request = RequestFactory().request()
+        self.dummy_request.session = self.client.session
+        strategy = DjangoStrategy(RequestFactory, request=self.dummy_request)
+        change_enrollment_third_party(is_register=True, strategy=strategy, user=self.user)
+
+        # Verify that the user has not been enrolled in the course
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+
     def test_unenroll(self):
         # Enroll the student in the course
         CourseEnrollment.enroll(self.user, self.course.id, mode="honor")
