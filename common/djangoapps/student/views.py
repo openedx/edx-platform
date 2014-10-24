@@ -93,6 +93,7 @@ from util.password_policy_validators import (
 )
 
 from third_party_auth import pipeline, provider
+from student.helpers import set_logged_in_cookie
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
 
@@ -1097,25 +1098,9 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             "redirect_url": redirect_url,
         })
 
-        # set the login cookie for the edx marketing site
-        # we want this cookie to be accessed via javascript
-        # so httponly is set to None
-
-        if request.session.get_expire_at_browser_close():
-            max_age = None
-            expires = None
-        else:
-            max_age = request.session.get_expiry_age()
-            expires_time = time.time() + max_age
-            expires = cookie_date(expires_time)
-
-        response.set_cookie(
-            settings.EDXMKTG_COOKIE_NAME, 'true', max_age=max_age,
-            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-            path='/', secure=None, httponly=None,
-        )
-
-        return response
+        # Ensure that the external marketing site can
+        # detect that the user is logged in.
+        return set_logged_in_cookie(request, response)
 
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.warning(u"Login failed - Account not active for user.id: {0}, resending activation".format(user.id))
@@ -1128,6 +1113,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         "success": False,
         "value": not_activated_msg,
     })  # TODO: this should be status code 400  # pylint: disable=fixme
+
 
 
 @ensure_csrf_cookie
