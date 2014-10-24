@@ -1,7 +1,7 @@
 """
 Course Group Configurations page.
 """
-
+from bok_choy.promise import EmptyPromise
 from .course_page import CoursePage
 from .utils import confirm_prompt
 
@@ -14,7 +14,20 @@ class GroupConfigurationsPage(CoursePage):
     url_path = "group_configurations"
 
     def is_browser_on_page(self):
-        return self.q(css='body.view-group-configurations').present
+        """
+        Verify that the browser is on the page and it is not still loading.
+        """
+        EmptyPromise(
+            lambda: self.q(css='body.view-group-configurations').present,
+            'On the group configuration page'
+        ).fulfill()
+
+        EmptyPromise(
+            lambda: not self.q(css='span.spin').visible,
+            'Group Configurations are finished loading'
+        ).fulfill()
+
+        return True
 
     @property
     def group_configurations(self):
