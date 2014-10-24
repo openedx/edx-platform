@@ -145,7 +145,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         all_thumbnails = content_store.get_all_content_thumbnails_for_course(course.id)
         self.assertGreater(len(all_thumbnails), 0)
 
-        location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
+        location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/just_a_test.jpg')
         content = content_store.find(location)
         self.assertIsNotNone(content)
 
