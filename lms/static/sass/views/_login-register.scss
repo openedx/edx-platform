@@ -119,6 +119,8 @@
     }
 
     .form-field {
+        @include clearfix;
+        clear: both;
         width: 100%;
         margin: 0 0 $baseline 0;
 
@@ -277,6 +279,12 @@
     @include media( $tablet ) {
         $grid-columns: 8;
 
+        %inline-form-field-tablet {
+            clear: none;
+            display: inline-block;
+            float: left;
+        }
+
         .headline,
         .tagline,
         .form-type {
@@ -287,10 +295,29 @@
         .form-toggle {
             margin-right: 5px;
         }
+
+        .form-field {
+            &.select-gender {
+                @extend %inline-form-field-tablet;
+                width: calc( 50% - 10px );
+                margin-right: 20px;
+            }
+
+            &.select-year_of_birth {
+                @extend %inline-form-field-tablet;
+                width: calc( 50% - 10px );
+            }
+        }
     }
 
     @include media( $desktop ) {
         $grid-columns: 12;
+
+        %inline-form-field-desktop {
+            clear: none;
+            display: inline-block;
+            float: left;
+        }
 
         .headline,
         .tagline,
@@ -301,6 +328,25 @@
 
         .form-toggle {
             margin-right: 10px;
+        }
+
+        .form-field {
+            &.select-level_of_education {
+                @extend %inline-form-field-desktop;
+                width: 290px;
+                margin-right: 20px;
+            }
+
+            &.select-gender {
+                @extend %inline-form-field-desktop;
+                width: 60px;
+                margin-right: 20px;
+            }
+
+            &.select-year_of_birth {
+                @extend %inline-form-field-desktop;
+                width: 100px;
+            }
         }
     }
 }
