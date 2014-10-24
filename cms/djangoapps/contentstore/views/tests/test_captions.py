@@ -5,6 +5,7 @@ from uuid import uuid4
 import copy
 import textwrap
 from pymongo import MongoClient
+from mock import patch
 
 from django.test.utils import override_settings
 from django.conf import settings
@@ -114,6 +115,59 @@ class TestCheckcaptions(Basetranscripts):
         contentstore().save(content)
         del_cached_content(content_location)
         return content_location
+
+    def test_successful_download_youtube(self):
+        """ Tests downloading and saving transcripts from youtube """
+        subs_id = 'JMD_ifUUfsU'
+        self.item.data = '<video youtube="1:' + subs_id + '" />'
+        modulestore().update_item(self.item, self.user.id)
+
+        subs = {
+            'start': [100, 200, 240],
+            'end': [200, 240, 380],
+            'text': [
+                'subs #1',
+                'subs #2',
+                'subs #3'
+            ]
+        }
+
+        def mock_youtube_download(youtube_id, video_descriptor, settings):
+            # Mocks downloading from youtube by saving straight into modulestore
+            self.save_subs_to_store(subs, youtube_id)
+
+        with patch('contentstore.views.utilities.captions.download_youtube_subs') as youtube_download:
+            youtube_download.side_effect = mock_youtube_download
+            link = self.captions_url
+            data = {
+                'update_array': json.dumps([self.item_location_string]),
+            }
+            resp = self.client.post(link, data, HTTP_ACCEPT='application/json')
+            self.assertEqual(resp.status_code, 200)
+
+            video_response_status = json.loads(resp.content)[0]
+            self.assertDictEqual(
+                video_response_status,
+                {
+                    u'status': u'Success',
+                    u'html5_equal': False,
+                    u'youtube_local': True,
+                    u'is_youtube_mode': True,
+                    u'youtube_server': False,
+                    u'command': u'found',
+                    u'location': unicode(self.item_location_string),
+                    u'current_item_subs': subs_id,
+                    u'youtube_diff': True,
+                    u'html5_local': [],
+                    u'subs': subs_id,
+                }
+            )
+
+            # Ensure subs for video properly set
+            item = modulestore().get_item(self.item_location)
+            self.assertEqual(item.sub, subs_id)
+
+            transcripts_utils.remove_subs_from_store(subs_id, self.item)
 
     def test_success_download_nonyoutube(self):
         subs_id = str(uuid4())
