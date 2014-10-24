@@ -125,7 +125,7 @@ class FormDescription(object):
     def add_field(
         self, name, label=u"", field_type=u"text", default=u"",
         placeholder=u"", instructions=u"", required=True, restrictions=None,
-        options=None
+        options=None, error_messages=None
     ):
         """Add a field to the form description.
 
@@ -158,6 +158,11 @@ class FormDescription(object):
                 and `display_name` is the name to display to the user.
                 If the field type is "select", you *must* provide this kwarg.
 
+            error_messages (dict): Custom validation error messages.
+                Currently, the only supported key is "required" indicating
+                that the messages should be displayed if the user does
+                not provide a value for a required field.
+
         Raises:
             InvalidFieldError
 
@@ -177,7 +182,8 @@ class FormDescription(object):
             "placeholder": placeholder,
             "instructions": instructions,
             "required": required,
-            "restrictions": {}
+            "restrictions": {},
+            "errorMessages": {},
         }
 
         if field_type == "select":
@@ -200,6 +206,9 @@ class FormDescription(object):
                         field_type=field_type
                     )
                     raise InvalidFieldError(msg)
+
+        if error_messages is not None:
+            field_dict["errorMessages"] = error_messages
 
         # If there are overrides for this field, apply them now.
         # Any field property can be overwritten (for example, the default value or placeholder)
@@ -228,6 +237,7 @@ class FormDescription(object):
                         {"value": "wine", "name": "Wine"}
                     ]
                     "restrictions": {},
+                    "errorMessages": {},
                 },
                 {
                     "name": "comments",
@@ -240,6 +250,7 @@ class FormDescription(object):
                     "restrictions": {
                         "max_length": 200
                     }
+                    "errorMessages": {},
                 },
                 ...
             ]

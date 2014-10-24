@@ -609,6 +609,7 @@ class LoginSessionViewTest(ApiTestCase):
                     "min_length": 3,
                     "max_length": 254
                 },
+                "errorMessages": {},
             },
             {
                 "name": "password",
@@ -622,6 +623,7 @@ class LoginSessionViewTest(ApiTestCase):
                     "min_length": 2,
                     "max_length": 75
                 },
+                "errorMessages": {},
             },
             {
                 "name": "remember",
@@ -632,6 +634,7 @@ class LoginSessionViewTest(ApiTestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {},
+                "errorMessages": {},
             }
         ])
 
@@ -762,7 +765,6 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"email",
-                u"defaultValue": u"",
                 u"type": u"email",
                 u"required": True,
                 u"label": u"E-mail",
@@ -779,15 +781,13 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"name",
-                u"defaultValue": u"",
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Full Name",
-                u"placeholder": u"",
                 u"instructions": u"Needed for any certificates you may earn",
                 u"restrictions": {
                     "max_length": 255,
-                }
+                },
             }
         )
 
@@ -795,16 +795,14 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"username",
-                u"defaultValue": u"",
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Public Username",
-                u"placeholder": u"",
                 u"instructions": u"Will be shown in any discussions or forums you participate in (cannot be changed)",
                 u"restrictions": {
                     u"min_length": 2,
                     u"max_length": 30,
-                }
+                },
             }
         )
 
@@ -812,12 +810,9 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"password",
-                u"defaultValue": u"",
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Password",
-                u"placeholder": u"",
-                u"instructions": u"",
                 u"restrictions": {
                     u"min_length": 2,
                     u"max_length": 75
@@ -838,13 +833,8 @@ class RegistrationViewTest(ApiTestCase):
                 no_extra_fields_setting,
                 {
                     "name": "password",
-                    "defaultValue": "",
                     "type": "hidden",
                     "required": False,
-                    "label": "",
-                    "placeholder": "",
-                    "instructions": "",
-                    "restrictions": {},
                 }
             )
 
@@ -875,7 +865,6 @@ class RegistrationViewTest(ApiTestCase):
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Full Name",
-                    u"placeholder": u"",
                     u"instructions": u"Needed for any certificates you may earn",
                     u"restrictions": {
                         "max_length": 255,
@@ -906,12 +895,9 @@ class RegistrationViewTest(ApiTestCase):
             {"level_of_education": "optional"},
             {
                 "name": "level_of_education",
-                "defaultValue": "",
                 "type": "select",
                 "required": False,
                 "label": "Highest Level of Education Completed",
-                "placeholder": "",
-                "instructions": "",
                 "options": [
                     {"value": "", "name": "--"},
                     {"value": "p", "name": "Doctorate"},
@@ -924,7 +910,6 @@ class RegistrationViewTest(ApiTestCase):
                     {"value": "none", "name": "None"},
                     {"value": "other", "name": "Other"},
                 ],
-                "restrictions": {},
             }
         )
 
@@ -933,19 +918,15 @@ class RegistrationViewTest(ApiTestCase):
             {"gender": "optional"},
             {
                 "name": "gender",
-                "defaultValue": "",
                 "type": "select",
                 "required": False,
                 "label": "Gender",
-                "placeholder": "",
-                "instructions": "",
                 "options": [
                     {"value": "", "name": "--"},
                     {"value": "m", "name": "Male"},
                     {"value": "f", "name": "Female"},
                     {"value": "o", "name": "Other"},
                 ],
-                "restrictions": {},
             }
         )
 
@@ -961,14 +942,10 @@ class RegistrationViewTest(ApiTestCase):
             {"year_of_birth": "optional"},
             {
                 "name": "year_of_birth",
-                "defaultValue": "",
                 "type": "select",
                 "required": False,
                 "label": "Year of Birth",
-                "placeholder": "",
-                "instructions": "",
                 "options": year_options,
-                "restrictions": {},
             }
         )
 
@@ -977,13 +954,9 @@ class RegistrationViewTest(ApiTestCase):
             {"mailing_address": "optional"},
             {
                 "name": "mailing_address",
-                "defaultValue": "",
                 "type": "textarea",
                 "required": False,
                 "label": "Mailing Address",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
             }
         )
 
@@ -992,13 +965,9 @@ class RegistrationViewTest(ApiTestCase):
             {"goals": "optional"},
             {
                 "name": "goals",
-                "defaultValue": "",
                 "type": "textarea",
                 "required": False,
                 "label": "Please share with us your reasons for registering with edX",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
             }
         )
 
@@ -1007,13 +976,9 @@ class RegistrationViewTest(ApiTestCase):
             {"city": "optional"},
             {
                 "name": "city",
-                "defaultValue": "",
                 "type": "text",
                 "required": False,
                 "label": "City",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
             }
         )
 
@@ -1030,13 +995,9 @@ class RegistrationViewTest(ApiTestCase):
             {
                 "label": "Country",
                 "name": "country",
-                "defaultValue": "",
                 "type": "select",
                 "required": True,
-                "placeholder": "",
-                "instructions": "",
                 "options": country_options,
-                "restrictions": {},
             }
         )
 
@@ -1053,9 +1014,9 @@ class RegistrationViewTest(ApiTestCase):
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
+                "errorMessages": {
+                    "required": "You must agree to the <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>"
+                }
             }
         )
 
@@ -1070,9 +1031,9 @@ class RegistrationViewTest(ApiTestCase):
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
+                "errorMessages": {
+                    "required": "You must agree to the <a href=\"/honor\">Terms of Service and Honor Code</a>"
+                }
             }
         )
 
@@ -1093,9 +1054,9 @@ class RegistrationViewTest(ApiTestCase):
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
+                "errorMessages": {
+                    "required": "You must agree to the <a href=\"https://www.test.com/honor\">Honor Code</a>"
+                }
             }
         )
 
@@ -1108,9 +1069,9 @@ class RegistrationViewTest(ApiTestCase):
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
+                "errorMessages": {
+                    "required": "You must agree to the <a href=\"https://www.test.com/tos\">Terms of Service</a>"
+                }
             }
         )
 
@@ -1127,9 +1088,9 @@ class RegistrationViewTest(ApiTestCase):
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
+                "errorMessages": {
+                    "required": "You must agree to the <a href=\"/honor\">Honor Code</a>"
+                }
             }
         )
 
@@ -1142,9 +1103,9 @@ class RegistrationViewTest(ApiTestCase):
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
+                "errorMessages": {
+                    "required": "You must agree to the <a href=\"/tos\">Terms of Service</a>"
+                }
             }
         )
 
@@ -1384,6 +1345,19 @@ class RegistrationViewTest(ApiTestCase):
             AssertionError
 
         """
+        # Add in fields that are always present
+        defaults = [
+            ("label", ""),
+            ("instructions", ""),
+            ("placeholder", ""),
+            ("defaultValue", ""),
+            ("restrictions", {}),
+            ("errorMessages", {}),
+        ]
+        for key, value in defaults:
+            if key not in expected_field:
+                expected_field[key] = value
+
         # Retrieve the registration form description
         with override_settings(REGISTRATION_EXTRA_FIELDS=extra_fields_setting):
             response = self.client.get(self.url)

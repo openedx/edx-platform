@@ -87,6 +87,9 @@ class FormDescriptionTest(TestCase):
             restrictions={
                 "min_length": 2,
                 "max_length": 10
+            },
+            error_messages={
+                "required": "You must provide a value!"
             }
         )
 
@@ -105,6 +108,9 @@ class FormDescriptionTest(TestCase):
                     "restrictions": {
                         "min_length": 2,
                         "max_length": 10,
+                    },
+                    "errorMessages": {
+                        "required": "You must provide a value!"
                     }
                 }
             ]
