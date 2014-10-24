@@ -16,6 +16,8 @@ var edx = edx || {};
             'click .login-provider': 'thirdPartyAuth'
         },
 
+        formType: 'register',
+
         initialize: function( data ) {
             this.tpl = $(this.tpl).html();
             this.fieldTpl = $(this.fieldTpl).html();

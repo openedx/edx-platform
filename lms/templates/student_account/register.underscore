@@ -14,9 +14,7 @@
 <form id="register" autocomplete="off">
     <div class="status submission-error hidden" aria-hidden="true">
         <h4 class="message-title">An error occurred in your registration.</h4>
-        <div class="message-copy">
-            <p>Please provide a valid email.</p>
-        </div>
+        <ul class="message-copy"></ul>
     </div>
     <%= fields %>
     <button class="action action-primary action-update js-register">Create My edX Account</button>
