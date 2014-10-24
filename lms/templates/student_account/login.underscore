@@ -1,9 +1,7 @@
 <form id="login">
     <div class="status submission-error hidden" aria-hidden="true">
         <h4 class="message-title">We couldn't log you in.</h4>
-        <div class="message-copy">
-            <p>Email or password is incorrent. <a href="#">Forgot password?</a></p>
-        </div>
+        <ul class="message-copy"></ul>
     </div>
     <div class="already-authenticated-msg hidden">
         <% if (currentProvider) { %>
