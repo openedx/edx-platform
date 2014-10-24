@@ -592,3 +592,17 @@ class VideoTranscriptsMixin(object):
             raise ValueError
 
         return content, filename, Transcript.mime_types[transcript_format]
+
+    def get_default_transcript_language(self):
+        """
+        Returns the default transcript language for this video module.
+        """
+        if self.transcript_language in self.transcripts:
+            transcript_language = self.transcript_language
+        elif self.sub:
+            transcript_language = u'en'
+        elif len(self.transcripts) > 0:
+            transcript_language = sorted(self.transcripts)[0]
+        else:
+            transcript_language = u'en'
+        return transcript_language
