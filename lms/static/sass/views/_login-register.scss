@@ -99,6 +99,11 @@
     /** The forms **/
     .form-wrapper {
         padding-top: 25px;
+
+        form {
+            @include clearfix;
+            clear: both;
+        }
     }
 
     .login-form {

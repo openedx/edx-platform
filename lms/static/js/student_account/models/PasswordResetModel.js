@@ -12,14 +12,18 @@ var edx = edx || {};
             email: ''
         },
 
-        urlRoot: '/account/password',
+        urlRoot: '',
+
+        initialize: function( obj ) {
+            this.urlRoot = obj.url;
+        },
 
         sync: function(method, model) {
             var headers = {
                 'X-CSRFToken': $.cookie('csrftoken')
             };
 
-            // Is just expecting email address
+            // Only expects an email address.
             $.ajax({
                 url: model.urlRoot,
                 type: 'POST',

@@ -21,15 +21,21 @@ var edx = edx || {};
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+            this.platformName = data.platformName;
         },
 
         render: function( html ) {
             var fields = html || '';
 
             $(this.el).html( _.template( this.tpl, {
-                fields: fields,
-                currentProvider: this.currentProvider,
-                providers: this.providers
+                // We pass the context object to the template so that
+                // we can perform variable interpolation using sprintf
+                context: {
+                    fields: fields,
+                    currentProvider: this.currentProvider,
+                    providers: this.providers,
+                    platformName: this.platformName
+                }
             }));
 
             this.postRender();

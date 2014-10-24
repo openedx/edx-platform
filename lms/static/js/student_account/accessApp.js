@@ -8,6 +8,7 @@ var edx = edx || {};
 
     return new edx.student.account.AccessView({
         mode: $('#login-and-registration-container').data('initial-mode'),
-        thirdPartyAuth: $('#login-and-registration-container').data('third-party-auth')
+        thirdPartyAuth: $('#login-and-registration-container').data('third-party-auth'),
+        platformName: $('#login-and-registration-container').data('platform-name')
     });
 })(jQuery);

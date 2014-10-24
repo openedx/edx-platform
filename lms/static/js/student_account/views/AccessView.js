@@ -25,12 +25,19 @@ var edx = edx || {};
         activeForm: '',
 
         initialize: function( obj ) {
+            /* Mix non-conflicting functions from underscore.string
+             * (all but include, contains, and reverse) into the
+             * Underscore namespace
+             */
+            _.mixin(_.str.exports())
+
             this.tpl = $(this.tpl).html();
             this.activeForm = obj.mode || 'login';
             this.thirdPartyAuth = obj.thirdPartyAuth || {
                 currentProvider: null,
                 providers: []
             };
+            this.platformName = obj.platformName;
 
             this.render();
         },
@@ -52,11 +59,7 @@ var edx = edx || {};
         },
 
         loadForm: function( type ) {
-            if ( type === 'reset' ) {
-                this.load.reset( this );
-            } else {
-                this.getFormData( type, this.load[type], this );
-            }
+            this.getFormData( type, this.load[type], this );
         },
 
         load: {
@@ -68,27 +71,21 @@ var edx = edx || {};
                 context.subview.login =  new edx.student.account.LoginView({
                     fields: data.fields,
                     model: model,
-                    thirdPartyAuth: context.thirdPartyAuth
+                    thirdPartyAuth: context.thirdPartyAuth,
+                    platformName: context.platformName
                 });
 
                 // Listen for 'password-help' event to toggle sub-views
                 context.listenTo( context.subview.login, 'password-help', context.resetPassword );
             },
 
-            reset: function( context ) {
-                var model = new edx.student.account.PasswordResetModel(),
-                    data = [{
-                        label: 'Email',
-                        instructions: 'The email address you used to register with edX',
-                        name: 'email',
-                        required: true,
-                        type: 'email',
-                        restrictions: [],
-                        defaultValue: ''
-                    }];
+            reset: function( data, context ) {
+                var model = new edx.student.account.PasswordResetModel({
+                    url: data.submit_url
+                });
 
                 context.subview.passwordHelp = new edx.student.account.PasswordResetView({
-                    fields: data,
+                    fields: data.fields,
                     model: model
                 });
             },
@@ -101,7 +98,8 @@ var edx = edx || {};
                 context.subview.register =  new edx.student.account.RegisterView({
                     fields: data.fields,
                     model: model,
-                    thirdPartyAuth: context.thirdPartyAuth
+                    thirdPartyAuth: context.thirdPartyAuth,
+                    platformName: context.platformName
                 });
             }
         },
@@ -109,7 +107,8 @@ var edx = edx || {};
         getFormData: function( type, callback, context ) {
             var urls = {
                 login: 'login_session',
-                register: 'registration'
+                register: 'registration',
+                reset: 'password_reset'
             };
 
             $.ajax({

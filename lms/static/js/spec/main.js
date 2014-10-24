@@ -275,7 +275,8 @@
                 exports: 'js/student_account/views/LoginView',
                 deps: [
                     'js/student_account/models/LoginModel',
-                    'js/student_account/views/FormView'
+                    'js/student_account/views/FormView',
+                    'underscore.string'
                 ]
             },
             'js/student_account/models/PasswordResetModel': {
@@ -297,7 +298,8 @@
                 exports: 'js/student_account/views/RegisterView',
                 deps: [
                     'js/student_account/models/RegisterModel',
-                    'js/student_account/views/FormView'
+                    'js/student_account/views/FormView',
+                    'underscore.string'
                 ]
             },
             'js/student_account/views/AccessView': {
@@ -305,7 +307,8 @@
                 deps: [
                     'js/student_account/views/LoginView',
                     'js/student_account/views/PasswordResetView',
-                    'js/student_account/views/RegisterView'
+                    'js/student_account/views/RegisterView',
+                    'underscore.string'
                 ]
             },
         },

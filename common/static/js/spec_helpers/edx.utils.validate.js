@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function( $, _ ) {
+(function( $, _, gettext ) {
     'use strict';
 
     edx.utils = edx.utils || {};
@@ -10,10 +10,10 @@ var edx = edx || {};
             validate: {
 
                 msg: {
-                    email: '<li>The email address you\'ve provided is invalid.</li>',
-                    min: '<li><%= field %> must have at least <%= count %> characters.</li>',
-                    max: '<li><%= field %> can only contain up to <%= count %> characters.</li>',
-                    required: '<li><%= field %> is required.</li>',
+                    email: '<li><%- gettext("The email address you\'ve provided is invalid.") %></li>',
+                    min: '<li><%- _.sprintf(gettext("%(field)s must have at least %(count)d characters"), context) %></li>',
+                    max: '<li><%- _.sprintf(gettext("%(field)s can only contain up to %(count)d characters"), context) %></li>',
+                    required: '<li><%- _.sprintf(gettext("%(field)s is required"), context) %></li>',
                     custom: '<li><%= content %></li>'
                 },
 
@@ -123,13 +123,17 @@ var edx = edx || {};
                                 tpl = _fn.validate.msg[key];
 
                                 obj = {
-                                    field: _fn.validate.str.capitalizeFirstLetter( name )
+                                    // We pass the context object to the template so that
+                                    // we can perform variable interpolation using sprintf
+                                    context: {
+                                        field: _fn.validate.str.capitalizeFirstLetter( name )
+                                    }
                                 };
 
                                 if ( key === 'min' ) {
-                                    obj.count = $el.attr('minlength');
+                                    obj.context.count = $el.attr('minlength');
                                 } else if ( key === 'max' ) {
-                                    obj.count = $el.attr('maxlength');
+                                    obj.context.count = $el.attr('maxlength');
                                 }
                             }
 
@@ -150,4 +154,4 @@ var edx = edx || {};
 
     edx.utils.validate = utils.validate;
 
-})( jQuery, _ );
+})( jQuery, _, gettext );
