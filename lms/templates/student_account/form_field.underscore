@@ -1,4 +1,4 @@
-<p class="form-field">
+<p class="form-field <%=type%>-<%= name %>">
     <% if ( type !== 'checkbox' ) { %>
         <label for="<%= form %>-<%= name %>">
             <%= label %>
@@ -11,22 +11,39 @@
     <% } %>
 
     <% if ( type === 'select' ) { %>
-        <select id="<%= form %>-<%= name %>" name="<%= name %>" class="input-inline" aria-describedby="<%= form %>-<%= name %>-desc">
+        <select id="<%= form %>-<%= name %>"
+            name="<%= name %>"
+            class="input-inline"
+            aria-describedby="<%= form %>-<%= name %>-desc">
         <% _.each(options, function(el) { %>
             <option value="<%= el.value%>"><%= el.name %></option>
         <% }); %>
         </select>
     <% } else if ( type === 'textarea' ) { %>
-        <textarea id="<%= form %>-<%= name %>" type="<%= type %>" name="<%= name %>" class="input-block" aria-describedby="<%= form %>-<%= name %>-desc"
+        <textarea id="<%= form %>-<%= name %>"
+            type="<%= type %>"
+            name="<%= name %>"
+            class="input-block"
+            aria-describedby="<%= form %>-<%= name %>-desc"
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
+            <% if ( typeof errorMessages !== 'undefined' ) { _.each(errorMessages, function(msg, type) {%>
+                data-errormsg-<%= type %>="<%= msg %>"
+            <% }); } %>
             <% if ( required ) { %> required<% } %> >
         </textarea>
     <% } else { %>
-        <input id="<%= form %>-<%= name %>" type="<%= type %>" name="<%= name %>" class="input-block <% if ( type === 'checkbox' ) { %>checkbox<% } %>" aria-describedby="<%= form %>-<%= name %>-desc"
+        <input id="<%= form %>-<%= name %>"
+           type="<%= type %>"
+           name="<%= name %>"
+           class="input-block <% if ( type === 'checkbox' ) { %>checkbox<% } %>"
+           aria-describedby="<%= form %>-<%= name %>-desc"
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
             <% if ( required ) { %> required<% } %>
+            <% if ( typeof errorMessages !== 'undefined' ) { _.each(errorMessages, function(msg, type) {%>
+                data-errormsg-<%= type %>="<%= msg %>"
+            <% }); } %>
             value="<%- defaultValue %>"
         />
     <% } %>
