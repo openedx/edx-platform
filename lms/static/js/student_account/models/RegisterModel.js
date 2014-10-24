@@ -52,7 +52,6 @@ var edx = edx || {};
                 window.location.href = url;
             })
             .fail( function( error ) {
-                console.log('RegisterModel.save() FAILURE!!!!!');
                 model.trigger('error', error);
             });
         }

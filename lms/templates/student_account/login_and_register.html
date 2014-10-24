@@ -6,16 +6,16 @@
 <%block name="pagetitle">${_("Log in or Register")}</%block>
 
 <%block name="js_extra">
-    <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/underscore.string.min.js')}"></script>
     <%static:js group='student_account'/>
 </%block>
 
 <%block name="header_extras">
-% for template_name in ["account", "access", "form_field", "login", "register", "password_reset"]:
-<script type="text/template" id="${template_name}-tpl">
-    <%static:include path="student_account/${template_name}.underscore" />
-</script>
+    % for template_name in ["account", "access", "form_field", "login", "register", "password_reset"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_account/${template_name}.underscore" />
+        </script>
 % endfor
 </%block>
 
@@ -24,5 +24,6 @@
         class="login-register"
         data-initial-mode="${initial_mode}"
         data-third-party-auth='${third_party_auth}'
+        data-platform-name='${platform_name}'
     />
 </div>
