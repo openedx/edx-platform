@@ -75,6 +75,7 @@ class LoginSessionView(APIView):
 
         form_desc.add_field(
             "email",
+            field_type="email",
             label=_(u"E-mail"),
             placeholder=_(u"example: username@domain.com"),
             instructions=_(
@@ -252,6 +253,7 @@ class RegistrationView(APIView):
     def _add_email_field(self, form_desc, required=True):
         form_desc.add_field(
             "email",
+            field_type="email",
             label=_(u"E-mail"),
             placeholder=_(u"example: username@domain.com"),
             instructions=_(
