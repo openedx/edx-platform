@@ -262,6 +262,22 @@
 
         .item-title {
           @extend %cont-text-wrap;
+
+          a {
+            color: $blue;
+
+            &:hover {
+              color: $orange-d1;
+            }
+          }
+        }
+
+        // CASE: is current item being edited/viewed
+        .is-current {
+
+          .unit-title a {
+            color: $color-heading-base;
+          }
         }
       }
     }
