@@ -44,7 +44,7 @@ class CourseField(serializers.RelatedField):
         return {
             "id": course_id,
             "name": course.display_name,
-            "number": course.number,
+            "number": course.display_number_with_default,
             "org": course.display_org_with_default,
             "start": course.start,
             "end": course.end,
