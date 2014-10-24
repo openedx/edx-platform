@@ -193,6 +193,7 @@ class XModuleMixin(XBlockMixin):
 
     def __init__(self, *args, **kwargs):
         self.xmodule_runtime = None
+        self._bound_student = None
         super(XModuleMixin, self).__init__(*args, **kwargs)
 
     @property
