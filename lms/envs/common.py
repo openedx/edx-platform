@@ -1848,3 +1848,14 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 COUNTRIES_OVERRIDE = {
     "TW": _("Taiwan"),
 }
+
+####################### In-line Analytics ######################
+ANALYTICS_ANSWER_DIST_URL = None
+INLINE_ANALYTICS_SUPPORTED_TYPES = {
+    'MultipleChoiceResponse': 'radio',
+    'ChoiceResponse': 'checkbox',
+    'OptionResponse': 'option',
+    'NumericalResponse': 'numerical',
+    'StringResponse': 'string',
+    'FormulaResponse': 'formula',
+}

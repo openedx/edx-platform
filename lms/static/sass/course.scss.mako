@@ -38,6 +38,7 @@
 
 // courseware
 @import 'course/courseware/courseware';
+@import 'course/courseware/instructor';
 @import 'course/courseware/sidebar';
 @import 'course/courseware/amplifier';
 @import 'course/layout/calculator';
