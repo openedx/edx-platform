@@ -83,13 +83,13 @@ var edx = edx || {};
         saveError: function( error ) {
             console.log(error.status, ' error: ', error.responseText);
 
-            /* If we've gotten a 401 error, it means that we've successfully
+            /* If we've gotten a 403 error, it means that we've successfully
              * authenticated with a third-party provider, but we haven't
              * linked the account to an EdX account.  In this case,
              * we need to prompt the user to enter a little more information
              * to complete the registration process.
-             */
-            if (error.status === 401 && this.currentProvider) {
+            */
+            if (error.status === 403 && error.responseText === "third-party-auth" && this.currentProvider) {
                 this.$alreadyAuthenticatedMsg.removeClass("hidden");
             }
             else {

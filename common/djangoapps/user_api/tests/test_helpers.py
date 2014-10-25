@@ -144,14 +144,14 @@ class StudentViewShimTest(TestCase):
         self.assertNotIn("enrollment_action", self.captured_request.POST)
         self.assertNotIn("course_id", self.captured_request.POST)
 
-    @ddt.data(True, False)
-    def test_preserve_401_status(self, check_logged_in):
+    def test_third_party_auth_login_failure(self):
         view = self._shimmed_view(
-            HttpResponse(status=401),
-            check_logged_in=check_logged_in
+            HttpResponse(status=403),
+            check_logged_in=True
         )
         response = view(HttpRequest())
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.content, "third-party-auth")
 
     def test_non_json_response(self):
         view = self._shimmed_view(HttpResponse(content="Not a JSON dict"))

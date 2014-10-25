@@ -952,7 +952,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                     platform_name=settings.PLATFORM_NAME
                 ),
                 content_type="text/plain",
-                status=401
+                status=403
             )
 
     else:
