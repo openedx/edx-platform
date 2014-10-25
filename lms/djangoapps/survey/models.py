@@ -3,10 +3,13 @@ Models to support Course Surveys feature
 """
 
 import logging
+from collections import OrderedDict
 from django.db import models
 from student.models import User
 
 from model_utils.models import TimeStampedModel
+
+from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 
 log = logging.getLogger("edx.survey")
 
@@ -24,11 +27,48 @@ class SurveyForm(TimeStampedModel):
     def __unicode__(self):
         return u'{}'.format(self.name)
 
-    def get_all_answers(self):
+    @classmethod
+    def create(cls, name, form, update_if_exists=False):
+        """
+        Helper class method to create a new Survey Form.
+
+        update_if_exists=True means that if a form already exists with that name, then update it.
+        Otherwise throw an SurveyFormAlreadyExists exception
+        """
+
+        survey = cls.get(name, throw_if_not_found=False)
+        if not survey:
+            survey = SurveyForm(name=name, form=form)
+        else:
+            if update_if_exists:
+                survey.form = form
+            else:
+                raise SurveyFormNameAlreadyExists()
+
+        survey.save()
+        return survey
+
+    @classmethod
+    def get(cls, name, throw_if_not_found=True):
+        """
+        Helper class method to look up a Survey Form, throw FormItemNotFound if it does not exists
+        in the database, unless throw_if_not_found=False then we return None
+        """
+
+        survey = None
+        exists = SurveyForm.objects.filter(name=name).exists()
+        if exists:
+            survey = SurveyForm.objects.get(name=name)
+        elif throw_if_not_found:
+            raise SurveyFormNotFound()
+
+        return survey
+
+    def get_answers(self, user=None):
         """
         Returns all answers for all users for this Survey
         """
-        return SurveyAnswer.get_user_answers(self)
+        return SurveyAnswer.get_answers(self, user)
 
     def has_user_answered_survey(self, user):
         """
@@ -36,6 +76,16 @@ class SurveyForm(TimeStampedModel):
         survey
         """
         return SurveyAnswer.do_survey_answers_exist(self, user)
+
+    def save_user_answers(self, user, answers):
+        """
+        Store answers to the form for a given user. Answers is a dict of simple
+        name/value pairs
+
+        IMPORTANT: There is no validaton of form answers at this point. All data
+        supplied to this method is presumed to be previously validated
+        """
+        SurveyAnswer.save_answers(self, user, answers)
 
 
 class SurveyAnswer(TimeStampedModel):
@@ -53,7 +103,7 @@ class SurveyAnswer(TimeStampedModel):
         Returns whether a user has any answers for a given SurveyForm for a course
         This can be used to determine if a user has taken a CourseSurvey.
         """
-        return SurveyAnswer.objects.find(form=form, user=user).exists()
+        return SurveyAnswer.objects.filter(form=form, user=user).exists()
 
     @classmethod
     def get_answers(cls, form, user=None):
@@ -79,15 +129,15 @@ class SurveyAnswer(TimeStampedModel):
         """
 
         if user:
-            answers = SurveyAnswer.objects.find(form=form, user=user)
+            answers = SurveyAnswer.objects.filter(form=form, user=user)
         else:
-            answers = SurveyAnswer.objects.find(form=form)
+            answers = SurveyAnswer.objects.filter(form=form)
 
-        results = dict()
+        results = OrderedDict()
         for answer in answers:
-            user_id = answer.user__id
+            user_id = answer.user.id
             if user_id not in results:
-                results[user_id] = dict()
+                results[user_id] = OrderedDict()
 
             results[user_id][answer.field_name] = answer.field_value
 
