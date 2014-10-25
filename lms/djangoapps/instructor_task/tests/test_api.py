@@ -23,6 +23,7 @@ from instructor_task.models import InstructorTask, PROGRESS
 from instructor_task.tests.test_base import (InstructorTaskTestCase,
                                              InstructorTaskCourseTestCase,
                                              InstructorTaskModuleTestCase,
+                                             TestReportMixin,
                                              TEST_COURSE_KEY)
 
 
@@ -158,7 +159,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         self._test_submit_task(submit_delete_problem_state_for_all_students)
 
 
-class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
+class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
 
     def setUp(self):
