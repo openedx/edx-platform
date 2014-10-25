@@ -15,7 +15,7 @@ from mock import patch
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL
-from bulk_email.tasks import perform_delegate_email_batches, send_course_email
+from bulk_email_lms.tasks import perform_delegate_email_batches, send_course_email
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
@@ -62,8 +62,8 @@ class TestEmailErrors(ModuleStoreTestCase):
     def tearDown(self):
         patch.stopall()
 
-    @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.send_course_email.retry')
+    @patch('bulk_email_lms.tasks.get_connection', autospec=True)
+    @patch('bulk_email_lms.tasks.send_course_email.retry')
     def test_data_err_retry(self, retry, get_conn):
         """
         Test that celery handles transient SMTPDataErrors by retrying.
@@ -84,9 +84,9 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPDataError)
 
-    @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.update_subtask_status')
-    @patch('bulk_email.tasks.send_course_email.retry')
+    @patch('bulk_email_lms.tasks.get_connection', autospec=True)
+    @patch('bulk_email_lms.tasks.update_subtask_status')
+    @patch('bulk_email_lms.tasks.send_course_email.retry')
     def test_data_err_fail(self, retry, result, get_conn):
         """
         Test that celery handles permanent SMTPDataErrors by failing and not retrying.
@@ -116,8 +116,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertEquals(subtask_status.failed, expected_fails)
         self.assertEquals(subtask_status.succeeded, settings.BULK_EMAIL_EMAILS_PER_TASK - expected_fails)
 
-    @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.send_course_email.retry')
+    @patch('bulk_email_lms.tasks.get_connection', autospec=True)
+    @patch('bulk_email_lms.tasks.send_course_email.retry')
     def test_disconn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPServerDisconnected by retrying.
@@ -137,8 +137,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPServerDisconnected)
 
-    @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.send_course_email.retry')
+    @patch('bulk_email_lms.tasks.get_connection', autospec=True)
+    @patch('bulk_email_lms.tasks.send_course_email.retry')
     def test_conn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPConnectError by retrying.
@@ -159,8 +159,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPConnectError)
 
-    @patch('bulk_email.tasks.SubtaskStatus.increment')
-    @patch('bulk_email.tasks.log')
+    @patch('bulk_email_lms.tasks.SubtaskStatus.increment')
+    @patch('bulk_email_lms.tasks.log')
     def test_nonexistent_email(self, mock_log, result):
         """
         Tests retries when the email doesn't exist
@@ -328,5 +328,5 @@ class TestEmailErrors(ModuleStoreTestCase):
         with self.assertRaises(CourseEmail.DoesNotExist):
             # we skip the call that updates subtask status, since we've not set up the InstructorTask
             # for the subtask, and it's not important to the test.
-            with patch('bulk_email.tasks.update_subtask_status'):
+            with patch('bulk_email_lms.tasks.update_subtask_status'):
                 send_course_email(entry_id, bogus_email_id, to_list, global_email_context, subtask_status.to_dict())

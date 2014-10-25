@@ -7,7 +7,7 @@ from django.test.utils import override_settings
 from mock import patch
 
 from bulk_email.models import CourseAuthorization, CourseEmailTemplate
-from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
+from bulk_email_lms.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
 )
@@ -114,7 +114,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         # Validation shouldn't work
         self.assertFalse(form.is_valid())
 
-        error_msg = form._errors['course_id'][0]
+        error_msg = form._errors['course_id'][0]  # pylint: disable=protected-access
         self.assertIn(u'--- Entered course id was: "{0}". '.format(self.course.id.run), error_msg)
         self.assertIn(u'Please recheck that you have supplied a valid course id.', error_msg)
 

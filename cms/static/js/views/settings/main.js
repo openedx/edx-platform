@@ -12,6 +12,13 @@ var DetailsView = ValidatingView.extend({
         "change textarea" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
+        'click #enable-enrollment-email' : "toggleEnrollmentEmails",
+        'focus #pre-enrollment-email' : "codeMirrorize",
+        'focus #post-enrollment-email' : "codeMirrorize",
+        'click #test_email_pre': "sendTestEmail",
+        'click #test_email_post': "sendTestEmail",
+        'click #fill_default_email_pre': "showDefaultTemplate",
+        'click #fill_default_email_post': "showDefaultTemplate",
         'mouseover .timezone' : "updateTime",
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
@@ -38,6 +45,24 @@ var DetailsView = ValidatingView.extend({
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
+
+        /* Memoize html elements for enrollment emails */
+        this.enrollment_email_settings = this.$el.find('#enrollment-email-settings');
+
+        this.pre_enrollment_email_elem = this.$el.find('#' + this.fieldToSelectorMap['pre_enrollment_email']);
+        this.pre_enrollment_email_subject_elem = this.$el.find('#' + this.fieldToSelectorMap['pre_enrollment_email_subject']);
+        this.pre_enrollment_email_field = this.$el.find('#field-pre-enrollment-email');
+        this.pre_enrollment_email_subject_field = this.$el.find('#field-pre-enrollment-email-subject');
+
+        this.post_enrollment_email_elem = this.$el.find('#' + this.fieldToSelectorMap['post_enrollment_email']);
+        this.post_enrollment_email_subject_elem = this.$el.find('#' + this.fieldToSelectorMap['post_enrollment_email_subject']);
+        this.post_enrollment_email_field = this.$el.find('#field-post-enrollment-email');
+        this.post_enrollment_email_subject_field = this.$el.find('#field-post-enrollment-email-subject');
+
+        this.enable_enrollment_email_box = this.$el.find('#' + this.fieldToSelectorMap['enable_enrollment_email']);
+
+        this.default_pre_template = this.$el.find('#default_pre_enrollment_email_template');
+        this.default_post_template = this.$el.find('#default_post_enrollment_email_template');
     },
 
     render: function() {
@@ -48,6 +73,23 @@ var DetailsView = ValidatingView.extend({
 
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
+
+        this.pre_enrollment_email_subject_elem.val(this.model.get('pre_enrollment_email_subject'));
+        this.post_enrollment_email_subject_elem.val(this.model.get('post_enrollment_email_subject'));
+
+        this.pre_enrollment_email_elem.val(this.model.get('pre_enrollment_email'));
+        this.codeMirrorize(null, $('#pre-enrollment-email')[0]);
+
+        this.post_enrollment_email_elem.val(this.model.get('post_enrollment_email'));
+        this.codeMirrorize(null, $('#post-enrollment-email')[0]);
+
+        this.enable_enrollment_email_box.prop('checked', this.model.get('enable_enrollment_email'));
+
+        if (this.enable_enrollment_email_box.prop('checked')) {
+            this.enrollment_email_settings.show();
+        } else {
+            this.enrollment_email_settings.hide();
+        }
 
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
 
@@ -72,10 +114,15 @@ var DetailsView = ValidatingView.extend({
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
         'overview' : 'course-overview',
+        'pre_enrollment_email' : 'pre-enrollment-email',
+        'post_enrollment_email' : 'post-enrollment-email',
         'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
-        'course_image_asset_path': 'course-image-url'
+        'course_image_asset_path': 'course-image-url',
+        'enable_enrollment_email': 'enable-enrollment-email',
+        'pre_enrollment_email_subject' :'pre-enrollment-email-subject',
+        'post_enrollment_email_subject':'post-enrollment-email-subject',
     },
 
     updateTime : function(e) {
@@ -151,6 +198,12 @@ var DetailsView = ValidatingView.extend({
         case 'course-effort':
             this.setField(event);
             break;
+        case 'pre-enrollment-email-subject':
+            this.setField(event);
+            break;
+        case 'post-enrollment-email-subject':
+            this.setField(event);
+            break;
         case 'course-short-description':
             this.setField(event);
             break;
@@ -184,6 +237,23 @@ var DetailsView = ValidatingView.extend({
             this.$el.find('.remove-course-introduction-video').hide();
         }
     },
+
+    toggleEnrollmentEmails: function(event) {
+        var isChecked = this.enable_enrollment_email_box.prop('checked');
+
+        /* enable & disable default will show the template */
+        if(isChecked) {
+            this.enrollment_email_settings.slideDown();
+        } else {
+            this.enrollment_email_settings.slideUp();
+        }
+
+        var field = this.selectorToField['enable-enrollment-email'];
+        if (this.model.get(field) != isChecked) {
+            this.setAndValidate(field, isChecked);
+        }
+    },
+
     codeMirrors : {},
     codeMirrorize: function (e, forcedTarget) {
         var thisTarget;
@@ -224,13 +294,13 @@ var DetailsView = ValidatingView.extend({
         var self = this;
         this.model.fetch({
             success: function() {
-                self.render();
                 _.each(self.codeMirrors,
                        function(mirror) {
                            var ele = mirror.getTextArea();
                            var field = self.selectorToField[ele.id];
                            mirror.setValue(self.model.get(field));
                        });
+                self.render();
             },
             reset: true,
             silent: true});
@@ -276,6 +346,55 @@ var DetailsView = ValidatingView.extend({
             }
         });
         modal.show();
+    },
+
+    sendTestEmail: function (event) {
+        event.preventDefault();
+        var email_type = event.target.id;
+        var subject = "";
+        var message = "";
+        if (email_type === "test_email_pre") {
+            subject = this.pre_enrollment_email_subject_elem.val();
+            message = this.pre_enrollment_email_elem.val();
+        } else {
+            subject = this.post_enrollment_email_subject_elem.val();
+            message = this.post_enrollment_email_elem.val();
+        }
+
+        $.post($(event.target).data('endpoint'),
+               {
+                 subject: subject,
+                 message:message
+               },
+               function (data) {
+                   alert(gettext("Test email sent! Please check your inbox. Don't forget to save!"));
+               }
+        );
+    },
+
+    showDefaultTemplate: function (event) {
+        event.preventDefault();
+
+        var content = "";
+        var codeMirrorItem;
+        var oldContent = "";
+        var target_id = event.target.id;
+
+        if (target_id === "fill_default_email_pre") {
+            content = $('#default_pre_enrollment_email_template').text();
+            codeMirrorItem = this.codeMirrors[this.pre_enrollment_email_elem[0].id];
+            oldContent = codeMirrorItem.getValue();
+        } else {
+            content = $('#default_post_enrollment_email_template').text();
+            codeMirrorItem = this.codeMirrors[this.post_enrollment_email_elem[0].id];
+            oldContent = codeMirrorItem.getValue();
+        }
+
+        if (oldContent.trim() !== "") {
+            var confirmed = confirm(gettext("This will overwrite the current message with the default one. Do you wish to continue?"));
+            if (!confirmed) return;
+        }
+        codeMirrorItem.setValue(content);
     }
 });
 

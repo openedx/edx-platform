@@ -86,6 +86,38 @@ class LMSLinksTestCase(TestCase):
         link = utils.get_lms_link_for_item(location)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test")
 
+    def test_dashboard_link(self):
+        """ Tests get_lms_link_for_dashboard. """
+        dashboard_link = utils.get_lms_link_for_dashboard()
+        self.assertEquals(dashboard_link, u"https://localhost:8000/dashboard")
+
+    @override_settings(LMS_BASE=None)
+    def test_dashboard_link_no_lms_base(self):
+        """ Tests get_lms_link_for_dashboard with no LMS_BASE. """
+        self.assertEquals(utils.get_lms_link_for_dashboard(), None)
+
+    def test_login_link(self):
+        """ Tests get_lms_link_for_login. """
+        login_link = utils.get_lms_link_for_login()
+        self.assertEquals(login_link, u"https://localhost:8000/login")
+
+    @override_settings(LMS_BASE=None)
+    def test_login_link_no_lms_base(self):
+        """ Tests get_lms_link_for_login with no LMS_BASE. """
+        self.assertEquals(utils.get_lms_link_for_login(), None)
+
+    def test_course_link(self):
+        """ Tests get_lms_link_for_course. """
+        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        course_link = utils.get_lms_link_for_course(course_key)
+        self.assertEquals(course_link, u"https://localhost:8000/courses/mitX/101/test/")
+
+    @override_settings(LMS_BASE=None)
+    def test_course_link_no_lms_base(self):
+        """ Tests get_lms_link_for_course with no LMS_BASE. """
+        course_key = SlashSeparatedCourseKey('mitX', '101', 'test')
+        self.assertEquals(utils.get_lms_link_for_course(course_key), None)
+
 
 class ExtraPanelTabTestCase(TestCase):
     """ Tests adding and removing extra course tabs. """

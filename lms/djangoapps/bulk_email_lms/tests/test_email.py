@@ -277,7 +277,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         )
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
-    @patch('bulk_email.tasks.update_subtask_status')
+    @patch('bulk_email_lms.tasks.update_subtask_status')
     def test_chunked_queries_send_numerous_emails(self, email_mock):
         """
         Test sending a large number of emails, to test the chunked querying

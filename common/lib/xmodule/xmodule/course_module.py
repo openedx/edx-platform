@@ -173,6 +173,7 @@ class CourseFields(object):
                              default=[], scope=Scope.content)
 
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
+    enable_enrollment_email = Boolean(help="Whether to send notification email upon enrollment or not", default=False, scope=Scope.settings)
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible",

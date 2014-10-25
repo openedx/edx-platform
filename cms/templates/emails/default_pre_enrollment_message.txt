@@ -1,0 +1,20 @@
+<%! from django.utils.translation import ugettext as _ %>${_("Hi there!")}
+
+${_("Thank you for enrolling in a {platform_name} course.  You are receiving this "
+"email from {platform_name} as a confirmation that you have "
+"successfully enrolled in one of our online courses.  Your chosen course will "
+"now appear on your dashboard ({dashboard_url}).  As it has not yet started, "
+"you'll notice that it isn't yet possible to access the course site.  Once the "
+"course begins, the course team will send out a welcome email to everyone "
+"enrolled with more information.").format(
+  platform_name=settings.PLATFORM_NAME,
+  dashboard_url=dashboard_url
+)}
+
+${_("For the time being, you can return to your course's About page at {about_url} "
+"for more information, such as when the course will start, and what topics will be "
+"covered in the course.").format(
+  about_url=about_url
+)}
+
+${_("See you soon!")}

@@ -19,7 +19,8 @@ define([
                 intro_video : null,
                 effort : null,
                 course_image_name : '',
-                course_image_asset_path : ''
+                course_image_asset_path : '',
+                enable_enrollment_email: false
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 

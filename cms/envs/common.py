@@ -107,6 +107,9 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': None,
+
+    # Toggle option to send email confirmation of course enrollment
+    'ENABLE_ENROLLMENT_EMAIL': False,
 }
 ENABLE_JASMINE = False
 
@@ -528,6 +531,13 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
+############################# Enrollment Email #############################
+# Override for the default email template to use for users enrolling before
+# and after a course starts. Leave empty to use templates provided in
+# cms/templates/emails/
+# Set these values in your environment settings files, not here.
+DEFAULT_PRE_ENROLLMENT_EMAIL = ''
+DEFAULT_POST_ENROLLMENT_EMAIL = ''
 
 ############################## Video ##########################################
 
@@ -620,6 +630,9 @@ INSTALLED_APPS = (
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
+
+    # For email template footer
+    'bulk_email'
 )
 
 

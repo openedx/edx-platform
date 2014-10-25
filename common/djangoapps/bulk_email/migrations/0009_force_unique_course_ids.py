@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -7,18 +8,12 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'CourseEmailTemplate'
-        db.create_table('bulk_email_courseemailtemplate', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('html_template', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('plain_template', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal('bulk_email', ['CourseEmailTemplate'])
+        # Adding unique constraint on 'CourseAuthorization', fields ['course_id']
+        db.create_unique('bulk_email_courseauthorization', ['course_id'])
 
     def backwards(self, orm):
-        # Deleting model 'CourseEmailTemplate'
-        db.delete_table('bulk_email_courseemailtemplate')
-
+        # Removing unique constraint on 'CourseAuthorization', fields ['course_id']
+        db.delete_unique('bulk_email_courseauthorization', ['course_id'])
 
     models = {
         'auth.group': {
@@ -49,6 +44,12 @@ class Migration(SchemaMigration):
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
+        },
+        'bulk_email.courseauthorization': {
+            'Meta': {'object_name': 'CourseAuthorization'},
+            'course_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'email_enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'bulk_email.courseemail': {
             'Meta': {'object_name': 'CourseEmail'},

@@ -37,6 +37,7 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=incomplete-pr
             msg = 'Multiple instances of tag: "{}"'.format(COURSE_EMAIL_MESSAGE_BODY_TAG)
             log.warning(msg)
             raise ValidationError(msg)
+        # pylint: disable=fixme
         # TODO: add more validation here, including the set of known tags
         # for which values will be supplied.  (Email will fail if the template
         # uses tags for which values are not supplied.)

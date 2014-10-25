@@ -203,7 +203,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <ol class="list-input">
                 % if short_description_editable:
                 <li class="field text" id="field-course-short-description">
-                  <label for="course-overview">${_("Course Short Description")}</label>
+                  <label for="course-short-description">${_("Course Short Description")}</label>
                   <textarea class="text" id="course-short-description"></textarea>
                   <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
                 </li>
@@ -273,6 +273,65 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </ol>
             </section>
 
+        % if settings.FEATURES.get('ENABLE_ENROLLMENT_EMAIL'):
+        <hr class="divide" />
+        <section class="group-settings enrollment-email">
+          <header>
+            <h2 class="title-2">${_("Course Enrollment Email")}</h2>
+            <span class="tip">${_("Settings for emails that students receive upon course enrollment")}</span>
+          </header>
+          <section class="group-settings">
+            <p><strong>By default, this feature is disabled.</strong> You can either use the default email content or create your own.<br />
+              Students enrolling right on the start date will receive the post-course-start email.<br />
+            </p>
+            <input type="checkbox" id="enable-enrollment-email"/><!-- IMPORTANT -->
+            <label for="enable-enrollment-email">${_("Enable enrollment emails")}</label>
+          </section>
+          <section class="group-settings" id="enrollment-email-settings"><!-- IMPORTANT -->
+	    <section class="group-settings">
+	      <p>
+		${_("Message for students who enroll {strong_start}before the start date{strong_end}").format(strong_start="<strong>", strong_end="</strong>")}
+		<a class="send-test-email" id='test_email_pre' title="${_('Send me a copy of this via email')}" href="#" data-endpoint="${test_email_url}">${_("Send me a test email")}</a>
+		<a class="fill-default-email" id='fill_default_email_pre' title="${_('Reset to default content')}" href="#">${_("Reset to default content")}</a>
+	      </p>
+	      <ol class="list-input">
+		<li class="field text">
+		  <p>
+		    <label for="pre-enrollment-email-subject">${_("Subject of the Email (required)")}</label>
+		    <input type="text" class='text subject' id="pre-enrollment-email-subject"/>
+		  </p>
+		  <p>
+		    <label for="pre-enrollment-email">${_("Body of the Email (required)")}</label>
+		    <textarea class="tinymce text-editor" id="pre-enrollment-email"></textarea>
+		    <span class="tip tip-stacked">${_("This email will be sent to any student who enrolls in the course before its start date.")}</span>
+		  </p>
+		</li>
+	      </ol>
+	    </section>
+	    <section class="group-settings">
+	      <p>
+		${_("Message for students who enroll {strong_start}on or after the start date{strong_end}").format(strong_start="<strong>", strong_end="</strong>")}
+		<a class="send-test-email" id='test_email_post' title="${_('Send me a copy of this via email')}" href="#" data-endpoint="${test_email_url}">${_("Send me a test email")}</a>
+		<a class="fill-default-email" id='fill_default_email_post' title="${_('Reset to default content')}" href="#">${_("Reset to default content")}</a>
+	      </p>
+	      <ol class="list-input">
+		<li class="field text">
+		  <p>
+		    <label for="post-enrollment-email-subject">${_("Subject of the Email (required)")}</label>
+		    <input type="text" class='text subject' id="post-enrollment-email-subject"/>
+		  </p>
+		  <p>
+		    <label for="post-enrollment-email">${_("Body of the Email (required)")}</label>
+		    <textarea class="tinymce text-editor" id="post-enrollment-email"></textarea>
+		    <span class="tip tip-stacked">${_("This email will be sent to any student who enrolls in the course after its start date.")}</span>
+		  </p>
+		</li>
+	      </ol>
+	    </section>
+          </section>
+        </section>
+        % endif
+
           % if about_page_editable:
             <hr class="divide" />
 
@@ -323,5 +382,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
      </div>
     </aside>
   </section>
+  <div id="default_pre_enrollment_email_template" style="display:none;">${default_pre_template}</div>
+  <div id="default_post_enrollment_email_template" style="display:none;">${default_post_template}</div>
 </div>
 </%block>

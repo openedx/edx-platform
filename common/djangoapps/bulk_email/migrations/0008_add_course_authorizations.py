@@ -16,11 +16,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('bulk_email', ['CourseAuthorization'])
 
-
     def backwards(self, orm):
         # Deleting model 'CourseAuthorization'
         db.delete_table('bulk_email_courseauthorization')
-
 
     models = {
         'auth.group': {
