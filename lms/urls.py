@@ -446,6 +446,10 @@ urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
+# Survey Djangoapp
+urlpatterns += (
+    url(r'^survey/', include('survey.urls')),
+)
 
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (

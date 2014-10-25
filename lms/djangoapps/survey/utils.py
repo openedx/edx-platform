@@ -24,9 +24,9 @@ def has_user_answered_required_survey_for_course(course_descriptor, user):
     if not is_survey_required_for_course(course_descriptor):
         return False
 
-    survey = SurveyForm.get(course_descriptor.course_survey_name, throw_if_not_found=False)
-    if not survey:
-        return False
+    # this will throw exception if not found, but a non existing survey name will
+    # be trapped in the above is_survey_required_for_course() method
+    survey = SurveyForm.get(course_descriptor.course_survey_name)
 
     # survey is required and it exists, let's see if user has answered the survey
     return SurveyAnswer.do_survey_answers_exist(survey, user)

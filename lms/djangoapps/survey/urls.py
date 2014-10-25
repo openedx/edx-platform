@@ -6,5 +6,6 @@ from django.conf.urls import patterns, url
 
 
 urlpatterns = patterns('survey.views',  # nopep8
-    url(r'^survey_postback/$', 'survey_postback'),
+    url(r'^(?P<survey_name>[0-9A-Za-z]+)/$', 'view_survey', name='view_survey'),
+    url(r'^(?P<survey_name>[0-9A-Za-z]+)/answers/$', 'submit_answers', name='submit_answers'),
 )
