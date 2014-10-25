@@ -2,12 +2,16 @@
 Base test classes for LMS instructor-initiated background tasks
 
 """
+import os
+import shutil
+
 import json
 from uuid import uuid4
 from mock import Mock
 
 from celery.states import SUCCESS, FAILURE
 
+from django.conf import settings
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
@@ -104,14 +108,25 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     course = None
     current_user = None
 
-    def initialize_course(self):
-        """Create a course in the store, with a chapter and section."""
+    def initialize_course(self, course_factory_kwargs=None):
+        """
+        Create a course in the store, with a chapter and section.
+
+        Arguments:
+            course_factory_kwargs (dict): kwargs dict to pass to
+            CourseFactory.create()
+        """
         self.module_store = modulestore()
 
         # Create the course
-        self.course = CourseFactory.create(org=TEST_COURSE_ORG,
-                                           number=TEST_COURSE_NUMBER,
-                                           display_name=TEST_COURSE_NAME)
+        course_args = {
+            "org": TEST_COURSE_ORG,
+            "number": TEST_COURSE_NUMBER,
+            "display_name": TEST_COURSE_NAME
+        }
+        if course_factory_kwargs is not None:
+            course_args.update(course_factory_kwargs)
+        self.course = CourseFactory.create(**course_args)
 
         # Add a chapter to the course
         chapter = ItemFactory.create(parent_location=self.course.location,
@@ -134,20 +149,21 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
             self.login(InstructorTaskCourseTestCase.get_user_email(username), "test")
             self.current_user = username
 
-    def _create_user(self, username, is_staff=False):
+    def _create_user(self, username, email=None, is_staff=False):
         """Creates a user and enrolls them in the test course."""
-        email = InstructorTaskCourseTestCase.get_user_email(username)
+        if email is None:
+            email = InstructorTaskCourseTestCase.get_user_email(username)
         thisuser = UserFactory.create(username=username, email=email, is_staff=is_staff)
         CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id)
         return thisuser
 
-    def create_instructor(self, username):
+    def create_instructor(self, username, email=None):
         """Creates an instructor for the test course."""
-        return self._create_user(username, is_staff=True)
+        return self._create_user(username, email, is_staff=True)
 
-    def create_student(self, username):
+    def create_student(self, username, email=None):
         """Creates a student for the test course."""
-        return self._create_user(username, is_staff=False)
+        return self._create_user(username, email, is_staff=False)
 
     @staticmethod
     def get_task_status(task_id):
@@ -184,16 +200,18 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         else:
             return TEST_COURSE_KEY.make_usage_key('problem', problem_url_name)
 
-    def define_option_problem(self, problem_url_name):
+    def define_option_problem(self, problem_url_name, parent=None):
         """Create the problem definition so the answer is Option 1"""
+        if parent is None:
+            parent = self.problem_section
         factory = OptionResponseXMLFactory()
         factory_args = {'question_text': 'The correct answer is {0}'.format(OPTION_1),
                         'options': [OPTION_1, OPTION_2],
                         'correct_option': OPTION_1,
                         'num_responses': 2}
         problem_xml = factory.build_xml(**factory_args)
-        ItemFactory.create(parent_location=self.problem_section.location,
-                           parent=self.problem_section,
+        ItemFactory.create(parent_location=parent.location,
+                           parent=parent,
                            category="problem",
                            display_name=str(problem_url_name),
                            data=problem_xml)
@@ -220,3 +238,13 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                                          module_type=descriptor.location.category,
                                          module_state_key=descriptor.location,
                                          )
+
+
+class TestReportMixin(object):
+    """
+    Cleans up after tests that place files in the reports directory.
+    """
+    def tearDown(self):
+        reports_download_path = settings.GRADES_DOWNLOAD['ROOT_PATH']
+        if os.path.exists(reports_download_path):
+            shutil.rmtree(reports_download_path)
