@@ -206,7 +206,7 @@
 
     % for enabled in provider.Registry.enabled():
       ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
-      <button type="submit" class="button button-primary button-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_LOGIN)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
+      <button type="submit" class="button button-primary button-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline_url[enabled.NAME]}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
     % endfor
 
     </div>
