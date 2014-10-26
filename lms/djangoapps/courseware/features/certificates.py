@@ -69,7 +69,7 @@ def click_verified_track_button():
 def select_verified_track_upgrade(step):
     select_contribution(32)
     world.wait_for_ajax_complete()
-    btn_css = 'input[value="Upgrade Your Registration"]'
+    btn_css = 'input[value="Upgrade Your Enrollment"]'
     world.css_click(btn_css)
     # TODO: might want to change this depending on the changes for upgrade
     assert world.is_css_present('section.progress')

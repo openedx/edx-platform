@@ -4,13 +4,13 @@
     <h2 class="title">
         <span class="wrapper-sts">
             % if upgrade:
-                <span class="sts-label">${_("You are upgrading your registration for")}</span>
+                <span class="sts-label">${_("You are upgrading your enrollment for")}</span>
             % elif reverify:
                 <span class="sts-label">${_("You are re-verifying for")}</span>
             % elif modes_dict and "professional" in modes_dict:
                 <span class="sts-label">${_("You are registering for")}</span>
             % else:
-                <span class="sts-label">${_("Congrats! You are now registered to audit")}</span>
+                <span class="sts-label">${_("Congrats! You are now enrolled in the audit track")}</span>
             % endif
                 <span class="sts-course-org">${course_org}'s</span>
                 <span class="sts-course-number">${course_num}</span>
