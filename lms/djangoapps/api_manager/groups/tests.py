@@ -16,7 +16,8 @@ from django.test import Client
 from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from api_manager.models import GroupRelationship, GroupProfile, Organization
+from api_manager.models import GroupRelationship, GroupProfile
+from organizations.models import Organization
 from projects.models import Project
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

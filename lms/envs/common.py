@@ -432,6 +432,9 @@ FEATURES = {
     # In order to use the "progress", you must add it to the list of INSTALLED_APPS in
     # addition to setting the flag to True here.  A reference is available in aws.py
     'STUDENT_PROGRESS': False,
+
+    # Enable the Organizations,
+    'ORGANIZATIONS_APP': False,
 }
 
 # Ignore static asset files on import which match this pattern

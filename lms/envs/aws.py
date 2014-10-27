@@ -712,6 +712,10 @@ if FEATURES.get('STUDENT_GRADEBOOK') and "'gradebook'" not in INSTALLED_APPS:
 if FEATURES.get('STUDENT_PROGRESS') and "progress" not in INSTALLED_APPS:
     INSTALLED_APPS += ('progress',)
 
+############# Organizations app #################
+if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('organizations',)
+
 ##### SET THE LIST OF ALLOWED IP ADDRESSES FOR THE API ######
 API_ALLOWED_IP_ADDRESSES = ENV_TOKENS.get('API_ALLOWED_IP_ADDRESSES')
 

@@ -15,7 +15,7 @@ class Project(TimeStampedModel):
     course_id = models.CharField(max_length=255)
     content_id = models.CharField(max_length=255)
     organization = models.ForeignKey(
-        'api_manager.Organization',
+        'organizations.Organization',
         blank=True,
         null=True,
         related_name="projects",
