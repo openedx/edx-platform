@@ -72,7 +72,7 @@ class TestPaverRunQuality(unittest.TestCase):
             pavelib.quality.run_quality("")
             self.assertRaises(BuildFailure)
         # Test that both pep8 and pylint were called by counting the calls
-        self.assertEqual(self._mock_paver_sh.call_count, 4)
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     def test_failure_on_diffquality_pylint(self):
         """
@@ -85,22 +85,23 @@ class TestPaverRunQuality(unittest.TestCase):
             pavelib.quality.run_quality("")
             self.assertRaises(BuildFailure)
         # Test that both pep8 and pylint were called by counting the calls
-        self.assertEqual(self._mock_paver_sh.call_count, 4)
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
     def test_other_exception(self):
         """
         If diff-quality fails for an unknown reason on the first run (pep8), then
         pylint should not be run
         """
-        self._mock_paver_sh.side_effect = [0, Exception('unrecognized failure!'), 0, 0]
+        self._mock_paver_sh.side_effect = [Exception('unrecognized failure!'), 0]
         with self.assertRaises(Exception):
             pavelib.quality.run_quality("")
         # Test that pylint is NOT called by counting calls
-        self.assertEqual(self._mock_paver_sh.call_count, 2)
+        self.assertEqual(self._mock_paver_sh.call_count, 1)
 
     def test_no_diff_quality_failures(self):
         # Assert nothing is raised
         pavelib.quality.run_quality("")
+        self.assertEqual(self._mock_paver_sh.call_count, 2)
 
 
 class CustomShMock(object):
@@ -114,8 +115,7 @@ class CustomShMock(object):
         For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
         is going to fail when we pass in a percentage ("p") requirement.
         """
-        # Condition is for the sh calls that contain both 'pep8' and 'html'
-        if "pep8" in arg and "html" not in arg:
+        if "pep8" in arg:
             # Essentially mock diff-quality exiting with 1
             paver.easy.sh("exit 1")
         else:
@@ -126,8 +126,7 @@ class CustomShMock(object):
         For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
         is going to fail when we pass in a percentage ("p") requirement.
         """
-        # Condition is for the sh calls that contain both 'pep8' and 'html'
-        if "pylint" in arg and "html" not in arg:
+        if "pylint" in arg:
             # Essentially mock diff-quality exiting with 1
             paver.easy.sh("exit 1")
         else:
