@@ -288,6 +288,10 @@
       .section-header {
         @extend %outline-item-header;
 
+        .incontext-editor-value {
+          white-space: nowrap;
+        }
+
         .incontext-editor-input {
           @extend %t-strong;
           @extend %t-title5;
@@ -376,6 +380,10 @@
       // header
       .subsection-header {
         @extend %outline-item-header;
+
+        .incontext-editor-value {
+          white-space: nowrap;
+        }
 
         .incontext-editor-input {
           @extend %t-title6;
