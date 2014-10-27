@@ -1,7 +1,6 @@
 <% if (currentProvider) { %>
     <div class="status" aria-hidden="false">
-        <h4 class="message-title">You've successfully signed in with <strong><%- currentProvider %></strong>.</h4>
-        <p class="message-copy">You've successfully signed in with <strong><%- currentProvider %></strong>. We just need a little more information before you start learning with edX.</p>
+        <p class="message-copy">You've successfully signed in with <%- currentProvider %>. We just need a little more information before you start learning with edX.</p>
     </div>
 <% } else {
     _.each( providers, function( provider) { %>

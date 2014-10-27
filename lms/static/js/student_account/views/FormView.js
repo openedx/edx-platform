@@ -76,6 +76,10 @@ var edx = edx || {};
             this.fields = data;
 
             for ( i=0; i<len; i++ ) {
+                if ( data[i].errorMessages ) {
+                    data[i].errorMessages = this.escapeStrings( data[i].errorMessages );
+                }
+
                 html.push( _.template( fieldTpl, $.extend( data[i], {
                     form: this.formType,
                     requiredStr: this.requiredStr
@@ -102,6 +106,14 @@ var edx = edx || {};
                        .attr('aria-hidden', false);
                 }
             }
+        },
+
+        escapeStrings: function( obj ) {
+            _.each( obj, function( val, key ) {
+                obj[key] = _.escape( val );
+            });
+
+            return obj;
         },
 
         forgotPassword: function( event ) {

@@ -27,9 +27,11 @@
             aria-describedby="<%= form %>-<%= name %>-desc"
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
-            <% if ( typeof errorMessages !== 'undefined' ) { _.each(errorMessages, function(msg, type) {%>
-                data-errormsg-<%= type %>="<%= msg %>"
-            <% }); } %>
+            <% if ( typeof errorMessages !== 'undefined' ) {
+                _.each(errorMessages, function( msg, type ) {%>
+                    data-errormsg-<%= type %>="<%= msg %>"
+            <%  });
+            } %>
             <% if ( required ) { %> required<% } %> >
         </textarea>
     <% } else { %>
@@ -41,9 +43,11 @@
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
             <% if ( required ) { %> required<% } %>
-            <% if ( typeof errorMessages !== 'undefined' ) { _.each(errorMessages, function(msg, type) {%>
-                data-errormsg-<%= type %>="<%= msg %>"
-            <% }); } %>
+            <% if ( typeof errorMessages !== 'undefined' ) {
+                _.each(errorMessages, function( msg, type ) {%>
+                    data-errormsg-<%= type %>="<%= msg %>"
+            <%  });
+            } %>
             value="<%- defaultValue %>"
         />
     <% } %>
@@ -51,7 +55,7 @@
     <% if ( type === 'checkbox' ) { %>
         <label for="<%= form %>-<%= name %>" class="inline">
             <%= label %>
-            <% if ( required && requiredStr ) { %> <%= requiredStr %></label><% } %>
+            <% if ( required && requiredStr ) { %> <%= requiredStr %><% } %>
         </label>
     <% } %>
 
