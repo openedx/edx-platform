@@ -1,3 +1,6 @@
+"""
+Port of `send_mail` from Django 1.7.
+"""
 from django.core.mail import get_connection
 from django.core.mail.message import EmailMultiAlternatives
 
@@ -19,8 +22,8 @@ def send_mail(subject, message, from_email, recipient_list,
     functionality should use the EmailMessage class directly.
     """
     connection = connection or get_connection(username=auth_user,
-                                    password=auth_password,
-                                    fail_silently=fail_silently)
+                                              password=auth_password,
+                                              fail_silently=fail_silently)
     mail = EmailMultiAlternatives(subject, message, from_email, recipient_list,
                                   connection=connection)
     if html_message:
