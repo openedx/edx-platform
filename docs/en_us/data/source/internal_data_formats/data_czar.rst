@@ -8,8 +8,15 @@ A data czar is the single representative at a partner institution who has the
 credentials to download and decrypt edX data packages. The data czar is
 responsible for transferring data securely to researchers and other interested
 parties after it is received. Due to the sensitivity of this data, the
-responsibility for these activities is restricted to one individual. At each
-partner institution, the data czar is the primary point of contact for
+responsibility for these activities is restricted to one individual. 
+
+.. important:: As a best practice for working with student data, edX strongly 
+ recommends a single data czar at each partner institution. However, if an
+ additional individual is given this responsibility at your institution, be
+ sure to work with edX to set up individual credentials for that additional
+ data czar.
+
+At each partner institution, the data czar is the primary point of contact for
 information about edX data.
 
 * :ref:`Skills_Experience_Data_Czar`
@@ -23,11 +30,13 @@ making a secure transfer of the data to the research team. Typically, the data
 team includes members in the following roles (or a data czar with these skill
 sets):
 
-* Database administrators work with the SQL and NoSQL data files and write queries on the data.
+* Database administrators work with the SQL and NoSQL data files and write
+  queries on the data.
 
 * Statisticians and data analysts mine the data.
 
-* Educational researchers pose questions and interpret the results of queries on the data.
+* Educational researchers pose questions and interpret the results of queries
+  on the data.
 
 See :ref:`Skills_Experience_Contributors`.
 
@@ -137,7 +146,8 @@ Technical Skills
   join, and aggregate data from different data sources, handle JSON
   serialization, and Unicode specificities.
 
-- Experience with data mining and data aggregation across a rich, varied data set.
+- Experience with data mining and data aggregation across a rich, varied data
+  set.
 
 - Ability to write parsing scripts that properly handle JSON serialization and
   Unicode.

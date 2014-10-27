@@ -14,6 +14,9 @@ October-December 2014
 
    * - Date
      - Change
+   * - 10/28/14
+     - Added best practices for passphrases to the
+       :ref:`Getting_Credentials_Data_Czar` chapter.
    * - 10/23/14
      - Added examples of the format used to identify course components to the
        :ref:`Student_Info` and :ref:`Tracking Logs` chapters.
