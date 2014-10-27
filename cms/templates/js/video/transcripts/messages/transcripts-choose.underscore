@@ -1,17 +1,17 @@
 <div class="transcripts-message-status status-error">
     <i class="icon-remove"></i>
-    <%= gettext("Timed Transcript Conflict") %>
+    <%- gettext("Timed Transcript Conflict") %>
 </div>
 
 <p class="transcripts-message">
-    <%= gettext("The timed transcript for the first video file does not appear to be the same as the timed transcript for the second video file.") %>
+    <%- gettext("The timed transcript for the first video file does not appear to be the same as the timed transcript for the second video file.") %>
     <strong>
-        <%= gettext("Which timed transcript would you like to use?") %>
+        <%- gettext("Which timed transcript would you like to use?") %>
     </strong>
 </p>
 
 <p class="transcripts-error-message is-invisible">
-    <%= gettext("Error.") %>
+    <%- gettext("Error.") %>
 </p>
 
 <div class="wrapper-transcripts-buttons">
@@ -24,12 +24,12 @@
             class="action setting-choose"
             type="button"
             name="setting-choose"
-            data-video-id="<%= value %>"
-            value="<%= message %>"
-            data-tooltip="<%= message %>"
+            data-video-id="<%- value %>"
+            value="<%- message %>"
+            data-tooltip="<%- message %>"
         >
             <span>
-                <%= message %>
+                <%- message %>
             </span>
         </button>
     <% }) %>

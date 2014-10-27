@@ -9,7 +9,7 @@
             strong_end: '</strong>'
         },
         {interpolate: /\{(.+?)\}/g})%>
-        <%= gettext("Please check the following validation feedbacks and reflect them in your course settings:")%></p>
+        <%- gettext("Please check the following validation feedbacks and reflect them in your course settings:")%></p>
     </div>
 
     <hr>
@@ -20,9 +20,9 @@
             <li class = "error-item">
                 <span class='error-item-title'>
                     <i class="icon-warning-sign"></i> 
-                    <strong><%= value.model.display_name %></strong>:
+                    <strong><%- value.model.display_name %></strong>:
                 </span>
-                <textarea class = "error-item-message" disabled='disabled'><%=value.message%></textarea>
+                <textarea class = "error-item-message" disabled='disabled'><%-value.message%></textarea>
             </li>
 
         <% }); %>
