@@ -59,7 +59,7 @@ class EnrollmentTest(ModuleStoreTestCase):
         # Professional ed
         # Expect that we're sent to the "choose your track" page
         # (which will, in turn, redirect us to a page where we can verify/pay)
-        # We should NOT be auto-enrolled, because that would be giving 
+        # We should NOT be auto-enrolled, because that would be giving
         # away an expensive course for free :)
         (['professional'], 'course_modes_choose', None),
     )
@@ -110,9 +110,9 @@ class EnrollmentTest(ModuleStoreTestCase):
         self.client.logout()
         self.client.get(reverse('register_user'), {'course_id': self.course.id})
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.dummy_request = RequestFactory().request()
-        self.dummy_request.session = self.client.session
-        strategy = DjangoStrategy(RequestFactory, request=self.dummy_request)
+        dummy_request = RequestFactory().request()
+        dummy_request.session = self.client.session
+        strategy = DjangoStrategy(RequestFactory, request=dummy_request)
         change_enrollment_third_party(is_register=True, strategy=strategy, user=self.user)
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
@@ -128,9 +128,9 @@ class EnrollmentTest(ModuleStoreTestCase):
 
         self.client.get(reverse('register_user'), {'course_id': self.course.id})
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
-        self.dummy_request = RequestFactory().request()
-        self.dummy_request.session = self.client.session
-        strategy = DjangoStrategy(RequestFactory, request=self.dummy_request)
+        dummy_request = RequestFactory().request()
+        dummy_request.session = self.client.session
+        strategy = DjangoStrategy(RequestFactory, request=dummy_request)
         change_enrollment_third_party(is_register=True, strategy=strategy, user=self.user)
 
         # Verify that the user has not been enrolled in the course

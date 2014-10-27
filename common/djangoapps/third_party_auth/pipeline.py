@@ -408,7 +408,7 @@ def login_analytics(*args, **kwargs):
             },
             context={
                 'Google Analytics': {
-                    'clientId': tracking_context.get('client_id') 
+                    'clientId': tracking_context.get('client_id')
                 }
             }
         )
@@ -430,5 +430,5 @@ def change_enrollment(*args, **kwargs):
                 CourseEnrollment.enroll(kwargs['user'], course_id)
             except CourseEnrollmentException:
                 pass
-            except Exception, e:
-                logger.exception(e)
+            except Exception as ex:
+                logger.exception(ex)
