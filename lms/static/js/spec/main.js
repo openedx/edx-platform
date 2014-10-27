@@ -263,13 +263,20 @@
 
             // Student account registration/login
             // Loaded explicitly until these are converted to RequireJS
+            'js/student_account/views/FormView': {
+                exports: 'js/student_account/views/FormView',
+                deps: ['jquery', 'underscore', 'backbone', 'gettext']
+            },
             'js/student_account/models/LoginModel': {
                 exports: 'js/student_account/models/LoginModel',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
             },
             'js/student_account/views/LoginView': {
                 exports: 'js/student_account/views/LoginView',
-                deps: ['js/student_account/models/LoginModel']
+                deps: [
+                    'js/student_account/models/LoginModel',
+                    'js/student_account/views/FormView'
+                ]
             },
             'js/student_account/models/PasswordResetModel': {
                 exports: 'js/student_account/models/PasswordResetModel',
@@ -277,7 +284,10 @@
             },
             'js/student_account/views/PasswordResetView': {
                 exports: 'js/student_account/views/PasswordResetView',
-                deps: ['js/student_account/models/PasswordResetModel']
+                deps: [
+                    'js/student_account/models/PasswordResetModel',
+                    'js/student_account/views/FormView'
+                ]
             },
             'js/student_account/models/RegisterModel': {
                 exports: 'js/student_account/models/RegisterModel',
@@ -285,7 +295,10 @@
             },
             'js/student_account/views/RegisterView': {
                 exports: 'js/student_account/views/RegisterView',
-                deps: ['js/student_account/models/RegisterModel']
+                deps: [
+                    'js/student_account/models/RegisterModel',
+                    'js/student_account/views/FormView'
+                ]
             },
             'js/student_account/views/AccessView': {
                 exports: 'js/student_account/views/AccessView',
