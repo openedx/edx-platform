@@ -13,6 +13,9 @@ October, 2014
 
    * - Date
      - Change
+   * - 10/28/14
+     - Added section for :ref:`Show Reset Button` in :ref:`Problem Settings`
+       and clarified Reset button behavior in :ref:`Problem Student View`.
    * - 10/27/14
      - Fixed the code sample in :ref:`Script Tag Format` in the :ref:`Write
        Your Own Grader` chapter.
