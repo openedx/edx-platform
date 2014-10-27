@@ -1474,7 +1474,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         return course_assets
 
-    @contract(course_key='CourseKey', asset_metadata='AssetMetadata | AssetThumbnailMetadata', user_id='str | unicode')
+    @contract(course_key='CourseKey', asset_metadata='AssetMetadata | AssetThumbnailMetadata')
     def _save_asset_info(self, course_key, asset_metadata, user_id, thumbnail=False):
         """
         Saves the info for a particular course's asset/thumbnail.
@@ -1537,7 +1537,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         md = AssetMetadata(asset_key, asset_key.path)
         md.from_mongo(all_assets[asset_idx])
         md.update(attr_dict)
-        md.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
 
         # Generate a Mongo doc from the metadata and update the course asset info.
         all_assets[asset_idx] = md.to_mongo()
@@ -1545,7 +1544,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.asset_collection.update({'_id': course_assets['_id']}, {"$set": {'assets': all_assets}})
 
     @contract(asset_key='AssetKey')
-    def _delete_asset_data(self, asset_key, thumbnail=False):
+    def _delete_asset_data(self, asset_key, user_id, thumbnail=False):
         """
         Internal; deletes a single asset's metadata -or- thumbnail.
 
@@ -1572,8 +1571,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.asset_collection.update({'_id': course_assets['_id']}, {'$set': {info: all_asset_info}})
         return 1
 
+    # pylint: disable=unused-argument
     @contract(course_key='CourseKey')
-    def delete_all_asset_metadata(self, course_key):
+    def delete_all_asset_metadata(self, course_key, user_id):
         """
         Delete all of the assets which use this course_key as an identifier.
 

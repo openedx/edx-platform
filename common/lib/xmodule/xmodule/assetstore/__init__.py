@@ -3,11 +3,13 @@ Classes representing asset & asset thumbnail metadata.
 """
 
 from datetime import datetime
+import pytz
 from contracts import contract, new_contract
 from opaque_keys.edx.keys import CourseKey, AssetKey
 
 new_contract('AssetKey', AssetKey)
 new_contract('datetime', datetime)
+new_contract('basestring', basestring)
 
 
 class IncorrectAssetIdType(Exception):
@@ -31,12 +33,13 @@ class AssetMetadata(object):
     # All AssetMetadata objects should have AssetLocators with this type.
     ASSET_TYPE = 'asset'
 
-    @contract(asset_id='AssetKey', basename='str | unicode | None', internal_name='str | None', locked='bool | None',
-              contenttype='str | unicode | None', md5='str | None', curr_version='str | None', prev_version='str | None')
+    @contract(asset_id='AssetKey', basename='basestring | None', internal_name='str | None', locked='bool | None', contenttype='basestring | None',
+              md5='str | None', curr_version='str | None', prev_version='str | None', edited_by='int | None', edited_on='datetime | None')
     def __init__(self, asset_id,
                  basename=None, internal_name=None,
                  locked=None, contenttype=None, md5=None,
-                 curr_version=None, prev_version=None):
+                 curr_version=None, prev_version=None,
+                 edited_by=None, edited_on=None, field_decorator=None):
         """
         Construct a AssetMetadata object.
 
@@ -48,10 +51,13 @@ class AssetMetadata(object):
             contenttype (str): MIME type of the asset.
             curr_version (str): Current version of the asset.
             prev_version (str): Previous version of the asset.
+            edited_by (str): Username of last user to upload this asset.
+            edited_on (datetime): Datetime of last upload of this asset.
+            field_decorator (function): used by strip_key to convert OpaqueKeys to the app's understanding
         """
         if asset_id.asset_type != self.ASSET_TYPE:
             raise IncorrectAssetIdType()
-        self.asset_id = asset_id
+        self.asset_id = asset_id if field_decorator is None else field_decorator(asset_id)
         self.basename = basename  # Path w/o filename.
         self.internal_name = internal_name
         self.locked = locked
@@ -59,8 +65,8 @@ class AssetMetadata(object):
         self.md5 = md5
         self.curr_version = curr_version
         self.prev_version = prev_version
-        self.edited_by = None
-        self.edited_on = None
+        self.edited_by = edited_by
+        self.edited_on = edited_on or datetime.now(pytz.utc)
 
     def __repr__(self):
         return """AssetMetadata{!r}""".format((
@@ -131,7 +137,7 @@ class AssetThumbnailMetadata(object):
     ASSET_TYPE = 'thumbnail'
 
     @contract(asset_id='AssetKey', internal_name='str | unicode | None')
-    def __init__(self, asset_id, internal_name=None):
+    def __init__(self, asset_id, internal_name=None, field_decorator=None):
         """
         Construct a AssetThumbnailMetadata object.
 
@@ -141,7 +147,7 @@ class AssetThumbnailMetadata(object):
         """
         if asset_id.asset_type != self.ASSET_TYPE:
             raise IncorrectAssetIdType()
-        self.asset_id = asset_id
+        self.asset_id = asset_id if field_decorator is None else field_decorator(asset_id)
         self.internal_name = internal_name
 
     def __repr__(self):
