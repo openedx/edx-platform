@@ -91,8 +91,13 @@ All problems on the edX platform have several component parts.
 #. **Explanation.** The instructor may include an explanation that
    appears when a student clicks **Show Answer**.
 
-#. **Reset button.** This button clears the student input, so that the
-   problem looks the way it did originally.
+#. **Reset button.** Students can click **Reset** to clear any input that has
+   not yet been submitted, and try again to answer the question. If the student
+   has already submitted an answer, clicking **Reset** clears the submission
+   and, if the problem contains randomized variables and randomization is set
+   to **On Reset**, changes the values the student sees in the problem. If the
+   number of Maximum Attempts that was set for this problem has been reached,
+   the **Reset** button is not visible.
 
 #. **Hide Answer button.**
 
@@ -260,6 +265,7 @@ Problem component have the following settings. These settings appear on the
 *  **Problem Weight**
 *  **Randomization**
 *  **Show Answer**
+*  **Show Reset Button**
 
 .. image:: ../Images/ProbComponent_Attributes.png
  :alt: Image of the Settings tab in a Problem component
@@ -455,6 +461,22 @@ This setting has the following options.
 |                   | appear next to the problem in Studio |
 |                   | or in the LMS.                       |
 +-------------------+--------------------------------------+
+
+.. _Show Reset Button:
+
+=================
+Show Reset Button
+=================
+
+This setting defines whether a **Reset** button is visible on the problem.
+Students can click **Reset** to clear any input that has not yet been submitted,
+and try again to answer the problem. If the student has already submitted an
+answer, clicking **Reset** clears the submission and, if the problem contains
+randomized variables and randomization is set to **On Reset**, changes the
+values the student sees in the problem. If the number of Maximum  Attempts that
+was set for this problem has been reached, the **Reset** button is not visible.
+
+This problem-level settimg overrides the course-level **Show Reset Button for Problems** setting.
 
 .. _Modifying a Released Problem:
 
