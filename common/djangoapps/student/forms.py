@@ -64,6 +64,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 )
             else:
                 site_name = domain_override
+
             context = {
                 'email': user.email,
                 'site_name': site_name,

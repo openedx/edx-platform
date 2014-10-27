@@ -2010,12 +2010,12 @@ def reactivation_email_for_user(user):
     message = render_to_string('emails/activation_email.txt', context)
     message_html = None
     if (settings.FEATURES.get('ENABLE_MULTIPART_EMAIL')):
-        message_html = render_to_string('emails/html/activation_email.html', d)
+        message_html = render_to_string('emails/html/activation_email.html', context)
 
     from_address = microsite.get_value(
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL
-        )
+        'email_from_address',
+        settings.DEFAULT_FROM_EMAIL
+    )
 
     try:
         send_mail(subject, message, from_address, [user.email], html_message=message_html)
