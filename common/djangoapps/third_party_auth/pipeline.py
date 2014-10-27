@@ -69,8 +69,8 @@ from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 
-from student.models import CourseEnrollment, CourseEnrollmentException
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from student.models import CourseMode, CourseEnrollment, CourseEnrollmentException
+from opaque_keys.edx.keys import CourseKey
 
 from logging import getLogger
 
@@ -420,14 +420,15 @@ def change_enrollment(*args, **kwargs):
     a course, we automatically log them into that course.
     """
     if kwargs['strategy'].session_get('registration_course_id'):
-        try:
-            CourseEnrollment.enroll(
-                kwargs['user'],
-                SlashSeparatedCourseKey.from_deprecated_string(
-                    kwargs['strategy'].session_get('registration_course_id')
-                )
-            )
-        except CourseEnrollmentException:
-            pass
-        except Exception, e:
-            logger.exception(e)
+        course_id = CourseKey.from_string(
+            kwargs['strategy'].session_get('registration_course_id')
+        )
+        available_modes = CourseMode.modes_for_course_dict(course_id)
+
+        if 'honor' in available_modes:
+            try:
+                CourseEnrollment.enroll(kwargs['user'], course_id)
+            except CourseEnrollmentException:
+                pass
+            except Exception, e:
+                logger.exception(e)
