@@ -126,10 +126,10 @@ The script tag format encloses a Python script that contains a "check function" 
   <p>Enter two integers that sum to 10. </p>
   <customresponse cfn="test_add_to_ten">
           <textline size="10"/><br/>
-          <textline size="10/>
+          <textline size="10"/>
   </customresponse>
 
-    </problem>
+  </problem>
 
 **Important**: Python honors indentation. Within the ``<script>`` tag, the ``def check_func(expect, ans):`` line must have no indentation.
 
