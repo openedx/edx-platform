@@ -28,6 +28,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
                for user in self.users_cache):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
+
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
@@ -49,7 +50,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 domain = current_site.domain
             else:
                 site_name = domain = domain_override
-            c = {
+            context = {
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
@@ -58,11 +59,11 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'token': token_generator.make_token(user),
                 'protocol': use_https and 'https' or 'http',
             }
-            subject = loader.render_to_string(subject_template_name, c)
+            subject = loader.render_to_string(subject_template_name, context)
             # Email subject *must not* contain newlines
             subject = ''.join(subject.splitlines())
-            email = loader.render_to_string(email_template_name, c)
+            email = loader.render_to_string(email_template_name, context)
             email_html = None
             if (settings.FEATURES.get('ENABLE_MULTIPART_EMAIL')):
-                email_html = render_to_string(html_email_template_name, c)
+                email_html = render_to_string(html_email_template_name, context)
             send_mail(subject, email, from_email, [user.email], html_message=email_html)

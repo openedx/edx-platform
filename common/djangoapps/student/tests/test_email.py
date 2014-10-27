@@ -115,7 +115,7 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
         self.assertReactivateEmailSent(send_mail)
         self.assertFalse(response_data['success'])
 
-    def test_reactivation_for_unregistered_user(self, send_mail):
+    def test_reactivation_for_unregistered_user(self, __):
         """
         Test that trying to send a reactivation email to an unregistered
         user fails without throwing a 500 error.
