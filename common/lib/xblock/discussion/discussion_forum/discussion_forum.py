@@ -55,14 +55,7 @@ class DiscussionXBlock(XBlock):
         """
         :return: int course id
         """
-        # TODO really implement this
-        # pylint: disable=no-member
-        if hasattr(self, 'xmodule_runtime'):
-            if hasattr(self.xmodule_runtime.course_id, 'to_deprecated_string'):
-                return self.xmodule_runtime.course_id.to_deprecated_string()
-            else:
-                return self.xmodule_runtime.course_id
-        return 'foo'
+        return unicode(self.location.course_key)
 
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """ Renders student view for LMS and Studio """
@@ -78,7 +71,7 @@ class DiscussionXBlock(XBlock):
         """ Renders student view for LMS """
         fragment = Fragment()
         discussion_service = self.xmodule_runtime.service(self, 'discussion')  # pylint: disable=no-member
-        context = discussion_service.get_inline_template_context(self.discussion_id)
+        context = discussion_service.get_inline_template_context()
         context['discussion_id'] = self.discussion_id
 
         fragment.add_content(render_mako_template('discussion/_discussion_inline.html', context))
@@ -174,6 +167,12 @@ class DiscussionCourseXBlock(XBlock):
         context = discussion_service.get_course_template_context()
         context['enable_new_post_btn'] = True
 
+        for url in get_js_urls():
+            fragment.add_javascript_url(url)
+
+        for url in get_css_urls():
+            fragment.add_css_url(url)
+
         fragment.add_content(render_mako_template('discussion/_discussion_course.html', context))
 
         fragment.add_javascript(render_template('static/js/discussion_course.js', {
@@ -181,12 +180,6 @@ class DiscussionCourseXBlock(XBlock):
         }))
 
         fragment.add_content(render_mustache_templates())
-
-        for url in get_js_urls():
-            fragment.add_javascript_url(url)
-
-        for url in get_css_urls():
-            fragment.add_css_url(url)
 
         fragment.initialize_js('DiscussionCourseBlock')
 
