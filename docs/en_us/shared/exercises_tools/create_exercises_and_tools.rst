@@ -91,11 +91,7 @@ General Exercises and Tools
           :alt: Example write-your-own-grader problem
      - :ref:`Write Your Own Grader`
      - In custom Python-evaluated input (also called "write-your-own-grader") problems, the grader uses a Python script that you create and embed in the problem to evaluates a student's response or provide hints. These problems can be any type.
-   * - .. image:: /Images/VitalSource.png
-          :width: 100
-          :alt: VitalSource e-book with highlighted note
-     - :ref:`VitalSource`
-     - The VitalSource Online Bookshelf e-reader allows students to read, browse, and search content (including figures and notes), as well as work with multiple highlighters and copy notes into external documents.
+
 
 ********************************
 Image-Based Exercises and Tools
@@ -185,6 +181,11 @@ STEM Exercises and Tools
           :alt: Example molecule editor problem
      - :ref:`Molecule Editor`
      - The molecule editor allows students to draw molecules that follow the rules for covalent bond formation and formal charge, even if the molecules are chemically impossible, are unstable, or do not exist in living systems.
+   * - .. image:: /Images/Molecule_Viewer.png
+          :width: 100
+          :alt: Example molecule viewer tool
+     - :ref:`Molecule Viewer`
+     - The molecule viewer allows you to create three-dimensional representations of molecules for students to view.
    * - .. image:: /Images/image292.png
           :width: 100
           :alt: Example numerical input problem
