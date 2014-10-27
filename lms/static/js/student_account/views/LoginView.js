@@ -24,8 +24,6 @@ var edx = edx || {};
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
-
-            console.log(data);
         },
 
         render: function( html ) {
@@ -47,7 +45,6 @@ var edx = edx || {};
 
             this.$form = $container.find('form');
             this.$errors = $container.find('.submission-error');
-            this.$alreadyAuthenticatedMsg =  $container.find('.already-authenticated-msg');
 
             /* If we're already authenticated with a third-party
              * provider, try logging in.  The easiest way to do this

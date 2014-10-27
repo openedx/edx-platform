@@ -388,8 +388,10 @@
             }
         }
 
+        // TODO: Update so actually using the grid
         .login-provider {
-            width: calc( 50% - 12px );
+            @include span-columns(6);
+            /*width: calc( 50% - 12px );
 
             &:nth-child(odd) {
                 margin-left: 10px;
@@ -397,7 +399,7 @@
 
             &:nth-child(even) {
                 margin-right: 10px;
-            }
+            }*/
         }
     }
 }
