@@ -3,6 +3,7 @@
   import json
   import math
   from django.utils.html import escapejs
+  from markupsafe import escape
 %>
 
 $(function () {
@@ -49,7 +50,7 @@ $(function () {
       categoryData = categories[ section['category'] ]
     
       categoryData['data'].append( [tickIndex, section['percent']] )
-      ticks.append( [tickIndex, section['label'] ] )
+      ticks.append( [tickIndex, escape(section['label']) ] )
     
       if section['category'] in detail_tooltips:
           detail_tooltips[ section['category'] ].append( section['detail'] )
