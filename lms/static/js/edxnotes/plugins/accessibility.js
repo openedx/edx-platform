@@ -1,6 +1,6 @@
 (function (define, $, _, Annotator, undefined) {
     'use strict';
-    define('edxnotes/plugins/accessability', function () {
+    define('edxnotes/plugins/accessibility', function () {
         var wrap = function (orig, wrapper) {
             Annotator.prototype[orig] = _.wrap(Annotator.prototype[orig], function (func) {
                 var args = Array.prototype.slice.call(arguments, 1);

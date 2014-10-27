@@ -1,6 +1,6 @@
 (function (define, $, _, Annotator, undefined) {
     'use strict';
-    define('edxnotes/notes.js', ['edxnotes/plugins/accessability'], function () {
+    define('edxnotes/notes.js', ['edxnotes/plugins/accessibility'], function () {
         var getUri, getUsageId, getOptions, setupPlugins, getAnnotator;
         /**
          * Returns current URI for the page.
