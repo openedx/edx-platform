@@ -101,6 +101,10 @@
         padding-top: 25px;
     }
 
+    .login-form {
+        margin-bottom: 20px;
+    }
+
     %bold-label {
         @include font-size(16);
         font-family: $sans-serif;
@@ -116,6 +120,7 @@
 
     .action-label {
         @extend %bold-label;
+        margin-bottom: 20px;
     }
 
     .form-field {
@@ -221,41 +226,50 @@
     }
 
     .login-provider {
-      @extend %btn-secondary-blue-outline;
-      width: 100%;
-      margin-top: 20px;
+        @extend %btn-secondary-blue-outline;
+        width: 100%;
+        margin-bottom: 20px;
+        text-shadow: none;
+        text-transform: none;
 
-      .icon {
-        color: inherit;
-        margin-right: $baseline/2;
-      }
+        .icon {
+            color: inherit;
+            margin-right: $baseline/2;
+        }
 
-      &.button-Google:hover, &.button-Google:focus {
-        background-color: #dd4b39;
-        border: 1px solid #A5382B;
-      }
+        &:last-child {
+            margin-bottom: 20px;
+        }
 
-      &.button-Google:hover {
-        box-shadow: 0 2px 1px 0 #8D3024;
-      }
+        &.button-Google:hover,
+        &.button-Google:focus {
+            background-color: #dd4b39;
+            border: 1px solid #A5382B;
+        }
 
-      &.button-Facebook:hover, &.button-Facebook:focus {
-        background-color: #3b5998;
-        border: 1px solid #263A62;
-      }
+        &.button-Google:hover {
+            box-shadow: 0 2px 1px 0 #8D3024;
+        }
 
-      &.button-Facebook:hover {
-        box-shadow: 0 2px 1px 0 #30487C;
-      }
+        &.button-Facebook:hover,
+        &.button-Facebook:focus {
+            background-color: #3b5998;
+            border: 1px solid #263A62;
+        }
 
-      &.button-LinkedIn:hover , &.button-LinkedIn:focus {
-        background-color: #0077b5;
-        border: 1px solid #06527D;
-      }
+        &.button-Facebook:hover {
+            box-shadow: 0 2px 1px 0 #30487C;
+        }
 
-      &.button-LinkedIn:hover {
-        box-shadow: 0 2px 1px 0 #005D8E;
-      }
+        &.button-LinkedIn:hover,
+        &.button-LinkedIn:focus {
+            background-color: #0077b5;
+            border: 1px solid #06527D;
+        }
+
+        &.button-LinkedIn:hover {
+            box-shadow: 0 2px 1px 0 #005D8E;
+        }
 
     }
 
@@ -269,6 +283,7 @@
 
         .message-title {
             @extend %heading-4;
+            font-family: $sans-serif;
             margin: 0 0 ($baseline/4) 0;
             font-size: em(14);
             font-weight: 600;
@@ -276,6 +291,7 @@
 
         .message-copy {
             @extend %body-text;
+            font-family: $sans-serif;
             margin: 0 !important;
             padding: 0;
             list-style: none;
@@ -361,8 +377,9 @@
         .headline,
         .tagline,
         .form-type {
-            @include span-columns(6);
-            @include shift(3);
+            width: 600px;
+            margin-left: calc( 50% - 300px );
+            margin-right: calc( 50% - 300px );
         }
 
         .form-toggle {
@@ -388,18 +405,13 @@
             }
         }
 
-        // TODO: Update so actually using the grid
         .login-provider {
             @include span-columns(6);
-            /*width: calc( 50% - 12px );
 
-            &:nth-child(odd) {
-                margin-left: 10px;
+            /* Node uses last-child which is not specific enough */
+            &:nth-of-type(2n) {
+                margin-right: 0;
             }
-
-            &:nth-child(even) {
-                margin-right: 10px;
-            }*/
         }
     }
 }
