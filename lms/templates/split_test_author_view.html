@@ -24,13 +24,13 @@ show_link = group_configuration_url is not None
 % if is_root:
     <div class="wrapper-groups is-active">
         <h3 class="sr">${_("Active Groups")}</h3>
-        ${active_groups_preview}
+        ${active_groups_preview | n}
     </div>
 
     % if inactive_groups_preview:
         <div class="wrapper-groups is-inactive">
             <h3 class="title">${_("Inactive Groups")}</h3>
-            ${inactive_groups_preview}
+            ${inactive_groups_preview | n}
         </div>
     % endif
 % endif
