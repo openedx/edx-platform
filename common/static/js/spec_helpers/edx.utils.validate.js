@@ -14,7 +14,6 @@ var edx = edx || {};
                     min: '<li><%= field %> must be a minimum of <%= count %> characters long</li>',
                     max: '<li><%= field %> must be a maximum of <%= count %> characters long</li>',
                     required: '<li><%= field %> field is required</li>',
-                    terms: '<li>To enroll you must agree to the <a href="#">Terms of Service and Honor Code</a></li>',
                     custom: '<li><%= content %></li>'
                 },
 
