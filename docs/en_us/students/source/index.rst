@@ -12,6 +12,7 @@ edX Guide for Students
    :maxdepth: 2
 
    change_log
+   SFD_introduction
    SFD_certificates
    SFD_mathformatting
    SFD_ORA
