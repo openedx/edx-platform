@@ -63,6 +63,7 @@
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2014
+# mustafasadiq <mustafasadiq0@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013-2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
@@ -113,7 +114,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-20 10:16-0400\n"
+"POT-Creation-Date: 2014-10-27 10:50-0400\n"
 "PO-Revision-Date: 2014-09-02 00:40+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -1442,6 +1443,16 @@ msgstr "أبداً"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether to force the save button to appear on the page"
 msgstr "اختيار فرض إظهار زرّ الحفظ على الصفحة "
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Show Reset Button"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Determines whether a 'Reset' button is shown so the user may reset their "
+"answer. A default value can be set in Advanced Settings."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3294,13 +3305,13 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter the maximum number of times a student can try to answer problems. This"
-" is a course-wide setting, but you can specify a different number when you "
-"create an individual problem. To allow unlimited attempts, enter null."
+"Enter the maximum number of times a student can try to answer problems. By "
+"default, Maximum Attempts is set to null, meaning that students have an "
+"unlimited number of attempts for problems. You can override this course-wide"
+" setting for individual problems. However, if the course-wide setting is a "
+"specific number, you cannot set the Maximum Attempts for individual problems"
+" to unlimited."
 msgstr ""
-"إدخال الحدّ الأقصى لعدد المرّات التي يسمح فيها للطالب بمحاولة الإجابة على "
-"المسائل. إنّه إعداد على نطاق المساق، ولكن يمكنك تحديد رقم مختلف عندما تقوم "
-"بإنشاء مسألة فردية. للسماح بعدد محاولات غير محدّد، الرجاء إدخال \"لا يوجد\"."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
@@ -3344,6 +3355,17 @@ msgid ""
 msgstr ""
 "الرجاء إدخال صواب أو خطأ، في حال الصواب سيتمّ اعتماد التخزين المؤثت لمقاطع "
 "الفيديو بلغة HTML5."
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Show Reset Button for Problems"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, problems default to displaying a 'Reset' "
+"button. This value may be overriden in each problem's settings. Existing "
+"problems whose reset setting have not been changed are affected."
+msgstr ""
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
@@ -3883,6 +3905,9 @@ msgstr "حقوق الطبع والنشر "
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Name"
 msgstr "الاسم "
 
@@ -4225,14 +4250,8 @@ msgid "Loaded course {course_name}<br/>Errors:"
 msgstr "المساق الذي تمّ تحميله  {course_name} <br/> الأخطاء:"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: cms/templates/course-create-rerun.html cms/templates/index.html
-#, fuzzy
 msgid "Course Name"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"اسم المساق \n"
-"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
-"اسم المساق"
+msgstr "اسم المساق "
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Directory/ID"
@@ -4354,6 +4373,34 @@ msgstr "المستخدم غير موجود."
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "المهمة قيد التشغيل بالفعل."
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Could not read uploaded file."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Data in row #{row_num} must have exactly four columns: email, username, full"
+" name, and country"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid email {email_address}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"An account with email {email} exists but the provided username {username} is"
+" different. Enrolling anyway with {email}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Username {user} already exists."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "File is not attached."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{0}' does not exist."
@@ -5290,6 +5337,12 @@ msgid "Order Payment Confirmation"
 msgstr "تأكيد الدفع لطلب الشراء"
 
 #: lms/djangoapps/shoppingcart/models.py
+msgid ""
+"Confirmation and Registration Codes for the following courses: "
+"{course_name_list}"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
 msgstr "محاولة إضافة عملة مختلفة لسلة التسوق"
 
@@ -5304,6 +5357,10 @@ msgid ""
 msgstr ""
 "يرجى زيارة <a href=\"{dashboard_link}\">لوحة المعلومات الخاصة بك</a> لمشاهدة"
 " مساقك الجديد."
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Enrollment codes for Course: {course_name}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
@@ -5413,8 +5470,6 @@ msgstr "التكلفة الإجمالية"
 
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Currency"
 msgstr "العملة "
 
@@ -5422,8 +5477,6 @@ msgstr "العملة "
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: wiki/plugins/attachments/forms.py
@@ -5559,6 +5612,10 @@ msgstr "يُسمح باسترداد قسيمة واحدة فقط للطلب ال
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Coupon '{0}' is not valid for any course in the shopping cart."
 msgstr "ليست القسيمة '{0}' صالحة لإي مساق في عربة التسوّق."
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "success"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
@@ -7580,17 +7637,13 @@ msgstr "إعادة ضبط كلمة السر"
 msgid "Current Courses"
 msgstr "المساقات الحالية"
 
-#: lms/templates/dashboard.html
-msgid "Looks like you haven't registered for any courses yet."
-msgstr "يبدو أنك لم تقم بالتسجيل في أي من المساقات حتى الآن."
+#: lms/templates/dashboard.html lms/templates/dashboard.html
+msgid "Looks like you haven't enrolled in any courses yet."
+msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
 msgstr "قم بإيجاد المساقات الآن!"
-
-#: lms/templates/dashboard.html
-msgid "Looks like you haven't been enrolled in any courses yet."
-msgstr "يبدو أنك لم تقم بالتسجيل في أيٍ من المساقات حتى الآن. "
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
@@ -7694,8 +7747,9 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Unregister"
-msgstr "إلغاء التسجيل"
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Unenroll"
+msgstr "إلغاء التسجيل "
 
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
@@ -7819,7 +7873,7 @@ msgstr ""
 "الأحياء والأعمال والكيمياء وعلوم الكومبيوتر والاقتصاد والتمويل والإلكترونيات"
 " والهندسة وعلوم التغذية والتاريخ والعلوم الإنسانية والحقوق والآداب "
 "والرياضيات والطب والموسيقى والفلسفة والفيزياء والعلوم والإحصاء وغيرها. {EdX}"
-" هي مبادرة إلكترونية لاربحية أسسها الشركاء {HarvardX} و {MITx}."
+" هي مبادرة إلكترونية لاربحية أسسها الشركاء {Harvard} و {MIT}."
 
 #: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 msgid "&copy; 2014 edX, some rights reserved."
@@ -7920,7 +7974,6 @@ msgstr "&copy; 2014 {platform_name}، بعض الحقوق محفوظة."
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Password Reset"
 msgstr "إعادة ضبط كلمة السر"
 
@@ -8682,6 +8735,7 @@ msgstr "معلومات شخصية إضافية"
 
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "City"
 msgstr "المدينة"
 
@@ -8691,6 +8745,7 @@ msgstr "مثال: نيويورك"
 
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Country"
 msgstr "الدولة"
 
@@ -10059,6 +10114,8 @@ msgid "Day"
 msgstr "اليوم "
 
 #: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Students"
 msgstr "الطلاب "
 
@@ -10179,16 +10236,16 @@ msgid "Access Courseware"
 msgstr "الدخول لمنهاج المساق "
 
 #: lms/templates/courseware/mktg_course_about.html
-msgid "You Are Registered"
-msgstr "أنت مسجَل "
+msgid "You Are Enrolled"
+msgstr ""
 
 #: lms/templates/courseware/mktg_course_about.html
-msgid "Register for"
-msgstr "قم بالتسجيل في "
+msgid "Enroll in"
+msgstr ""
 
 #. Translators: This is the second line on a button users can click.  The
 #. first
-#. line is "Register for COURSE_NAME"
+#. line is "Enroll in COURSE_NAME"
 #. The "choose your student track" means users can select between taking the
 #. course as an auditor, as a verified student, etc
 #: lms/templates/courseware/mktg_course_about.html
@@ -10197,7 +10254,7 @@ msgstr "واختر مساقك كطالب"
 
 #. Translators: This is the second line on a button users can click.  The
 #. first
-#. line is "Register for COURSE_NAME"
+#. line is "Enroll in COURSE_NAME"
 #. 'Verification' here refers to verifying one's identity in order to receive
 #. a
 #. verified certificate.
@@ -10206,8 +10263,8 @@ msgid "and proceed to verification"
 msgstr "وتابع لتستكمل التحقق"
 
 #: lms/templates/courseware/mktg_course_about.html
-msgid "Registration Is Closed"
-msgstr "التسجيل مغلق "
+msgid "Enrollment Is Closed"
+msgstr ""
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -10451,8 +10508,8 @@ msgstr ""
 "href=\"#\">التواصل مع صاحب الحساب </a>لطلب دفعة، أو يمكنك"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "unregister"
-msgstr "إلغاء التسجيل"
+msgid "unenroll"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for this course."
@@ -10473,24 +10530,22 @@ msgstr "استعراض المساق "
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unregister from the purchased course"
-msgstr "هل أنت متأكد من رغبتك بإلغاء تسجيلك من المساق الذي اشتركت فيه"
+msgid "Are you sure you want to unenroll from the purchased course"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unregister from"
-msgstr "هل أنت واثقٌ من رغبتك إلغاء تسجيلك بـ"
+msgid "Are you sure you want to unenroll from"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Are you sure you want to unregister from the verified {cert_name_long} track"
-" of"
+"Are you sure you want to unenroll from the verified {cert_name_long} track "
+"of"
 msgstr ""
-"هل أنت واثقٌ من رغبتك إلغاء تسجيلك من مسار الشهادات الموثّقة "
-"{cert_name_long} لـ"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -11115,6 +11170,36 @@ msgstr "عرض النقاش"
 msgid "Active Threads"
 msgstr "المواضيع الفعالة "
 
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "Welcome to {course_name}"
+msgstr ""
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid ""
+"To get started, please visit https://{site_name}. The login information for "
+"your account follows."
+msgstr ""
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "email: {email}"
+msgstr ""
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "password: {password}"
+msgstr ""
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "It is recommended that you change your password."
+msgstr ""
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "Sincerely yours,"
+msgstr ""
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "The {course_name} Team"
+msgstr ""
+
 #: lms/templates/emails/activation_email.txt
 msgid "Thank you for signing up for {platform_name}."
 msgstr "شكرًا لتسجيلك في {platform_name}."
@@ -11143,6 +11228,8 @@ msgid "We hope you enjoy learning with {platform_name}!"
 msgstr "نتمنى لك الاستمتاع بالتعلّم مع {platform_name}!"
 
 #: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr "فريق {platform_name}"
 
@@ -11225,6 +11312,137 @@ msgstr ""
 #: lms/templates/emails/add_beta_tester_email_subject.txt
 msgid "You have been invited to a beta test for {course_name}"
 msgstr "لقد تمت دعوتك لإجراء اختبار بيتا للمساق {course_name}"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Hi {name},"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Thank you for your purchase of "
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Your payment was successful."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid ""
+"If you have billing questions, please read the FAQ ({faq_url}) or contact "
+"{billing_email}."
+msgstr ""
+"في حال كان لديك أية استفسارات تتعلق بالفواتير والدفعات، الرجاء قراءة قسم "
+"الأسئلة الأكثر تكراراً على الرابط ({faq_url}) أو الإتصال ب {billing_email}"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "If you have billing questions, please contact {billing_email}."
+msgstr ""
+"في حال كان لديك أية استفسارات تتعلق بالفواتير والدفعات، الرجاء الإتصال ب "
+"{billing_email}."
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"{order_placed_by} placed an order and mentioned your name as the "
+"Organization contact."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"{order_placed_by} placed an order and mentioned your name as the additional "
+"receipt recipient."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "The items in your order are:"
+msgstr "العناصر التي يشتمل عليها طلبك:"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Quantity - Description - Price"
+msgstr "الكمية - الوصف - السعر"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Total billed to credit/debit card: {currency_symbol}{total_cost}"
+msgstr ""
+"المجموع الذي تم اقتطاعه من بطاقة الائتمان/الخصم المباشر: "
+"{currency_symbol}{total_cost}"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Company Name:"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Purchase Order Number:"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Company Contact Name:"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Company Contact Email:"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Recipient Name:"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Recipient Email:"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "#:"
+msgstr "#:  "
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Order Number: {order_number}"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"A CSV file of your registration URLs is attached. Please distribute "
+"registration URLs to each student planning to enroll using the email "
+"template below."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Warm regards,"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(1) Register for an account at <a href='https://{site_name}' "
+">https://{site_name}</a>."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(2) Once registered, copy the redeem URL and paste it in your web browser."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(3) On the enrollment confirmation page, Click the 'Activate Enrollment "
+"Code' button. This will show the enrollment confirmation."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(4) You should be able to click on 'view course' button or see your course "
+"on your student dashboard at <a "
+"href='https://{dashboard_url}'>https://{dashboard_url}</a>"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(5) Course materials will not be available until the course start date."
+msgstr ""
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -11375,45 +11593,8 @@ msgstr ""
 "ستظهر الرسوم المسددة على البيان الخاص بك تحت اسم الشركة {merchant_name}."
 
 #: lms/templates/emails/order_confirmation_email.txt
-msgid ""
-"If you have billing questions, please read the FAQ ({faq_url}) or contact "
-"{billing_email}."
-msgstr ""
-"في حال كان لديك أية استفسارات تتعلق بالفواتير والدفعات، الرجاء قراءة قسم "
-"الأسئلة الأكثر تكراراً على الرابط ({faq_url}) أو الإتصال ب {billing_email}"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "If you have billing questions, please contact {billing_email}."
-msgstr ""
-"في حال كان لديك أية استفسارات تتعلق بالفواتير والدفعات، الرجاء الإتصال ب "
-"{billing_email}."
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "-The {platform_name} Team"
-msgstr "فريق {platform_name} "
-
-#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "رقم طلبك هو : {order_number}"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "The items in your order are:"
-msgstr "العناصر التي يشتمل عليها طلبك:"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "Quantity - Description - Price"
-msgstr "الكمية - الوصف - السعر"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "Total billed to credit/debit card: {currency_symbol}{total_cost}"
-msgstr ""
-"المجموع الذي تم اقتطاعه من بطاقة الائتمان/الخصم المباشر: "
-"{currency_symbol}{total_cost}"
-
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/shoppingcart/receipt.html
-msgid "#:"
-msgstr "#:  "
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for your purchase of {course_name}!"
@@ -11732,6 +11913,7 @@ msgstr "تخطي "
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Add Coupon"
 msgstr "إضافة قسيمة"
@@ -11771,6 +11953,8 @@ msgid "Honor"
 msgstr "منح"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "المجموع "
@@ -12027,8 +12211,12 @@ msgstr ""
 "انقر هنا لإنشاء ملف بصيغة CSV يحتوي على جميع سجلات المبيعات في هذا المساق"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Download All e-Commerce Sales"
-msgstr "تنزيل جميع عمليات مبيعات مساق التجارة الإلكترونية"
+msgid "Download All Invoice Sales"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download All Order Sales"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter the invoice number to invalidate or re-validate sale"
@@ -12238,6 +12426,7 @@ msgid "What is the company the seats were sold to?"
 msgstr "ما هي الشركة التي بيعَت لها المقاعد؟"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/billing_details.html
 msgid "Organization Contact"
 msgstr "موظف الاتصال في المنظمة"
 
@@ -12429,8 +12618,20 @@ msgid "Enroll"
 msgstr "تسجيل"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Unenroll"
-msgstr "إلغاء التسجيل "
+msgid "Register/Enroll Students"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"To register and enroll a list of users in this course, choose a CSV file "
+"that contains the following columns in this exact order: email, username, "
+"name, and country. Please include one student per row and do not include any"
+" headers, footers, or blank lines."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Upload CSV"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Beta Tester Addition"
@@ -13134,6 +13335,59 @@ msgstr ""
 "لقد قمنا بإرسال رسالةٍ على عنوان البريد الإلكتروني الذي زودتنا به تتضمن "
 "التعليمات الخاصة بضبط كلمة السر، وستصلك قريباً. "
 
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Billing Details"
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid ""
+"You can proceed to payment at any point in time. Any additional information "
+"you provide will be included in your receipt."
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Purchasing Organizational Details"
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Purchasing organization"
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Purchase order number (if any)"
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/billing_details.html
+msgid "email@example.com"
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Additional Receipt Recipient"
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid ""
+"If no additional billing details are populated the payment confirmation will"
+" be sent to the user making the purchase"
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Payment processing occurs on a separate secure site."
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Your Shopping cart is currently empty."
+msgstr ""
+
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "View Courses"
+msgstr ""
+
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
 msgstr "تنزيل البيانات بصيغة CSV"
@@ -13176,71 +13430,150 @@ msgstr "حدث خطأ في عملية الدفع "
 msgid "There was an error processing your order!"
 msgstr "لقد حدث خطأ لدى إجراء العملية الخاصة طلبك! "
 
-#: lms/templates/shoppingcart/list.html
-msgid "Your Shopping Cart"
-msgstr "سلة التسوق الخاصة بك "
-
-#: lms/templates/shoppingcart/list.html
-msgid "Your selected items:"
-msgstr "العناصر المختارة من قبلك:   "
-
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Price"
-msgstr "السعر "
-
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total Amount"
-msgstr "المبلغ الإجمالي "
-
-#: lms/templates/shoppingcart/list.html
-msgid "You have selected no items for purchase."
-msgstr "لم تقم باختيار أي عنصر للشراء. "
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Register for [Course Name] | Receipt (Order"
-msgstr "قم بالتسجيل في [اسم المساق] | إيصال (الطلب"
-
 #: lms/templates/shoppingcart/receipt.html
 msgid "Thank you for your Purchase!"
 msgstr "شكرا لك على الشراء"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid ""
-"Please print this receipt page for your records. You should also have "
-"received a receipt in your email."
+msgid "View Dashboard"
 msgstr ""
-"الرجاء طباعة صفحة الإيصال هذه للاحتفاظ بها في سجلاتك. يجب أن تكون قد استلمت "
-"أيضاً رسالة إلكترونية تحتوي على إيصال."
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "{platform_name} ({site_name}) Electronic Receipt"
-msgstr "إيصال إلكتروني من {platform_name} ({site_name})"
+msgid ""
+"You have successfully been enrolled for <b>{appended_course_names}</b>. The "
+"following receipt has been emailed to "
+"<strong>{appended_recipient_emails}</strong>"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Order #"
-msgstr "طلبية # "
+msgid ""
+"You have successfully purchased <b>{total_registration_codes} course "
+"registration codes</b> for <b>{appended_course_names}. </b>The following "
+"receipt has been emailed to <strong>{appended_recipient_emails}</strong>"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Date:"
-msgstr "التاريخ: "
+msgid ""
+"Please send each professional one of these unique registration codes to "
+"enroll into the course. The confirmation/receipt email you will receive has "
+"an example email template with directions for the individuals enrolling."
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Items ordered:"
-msgstr "العناصر المطلوبة: "
+msgid "Enrollment Code"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Qty"
-msgstr "الكمية "
+msgid "Enrollment Link"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "URL"
-msgstr "الرابط"
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{course_name}"
+msgstr "{course_name}"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Unit Price"
-msgstr "سعر الوحدة "
+msgid "Invoice"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Date of purchase"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Print Receipt"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Billed To Details"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Company Name"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "{company_name}"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Purchase Order Number"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "{customer_reference_number}"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Company Contact Name"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "{company_contact_name}"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Company Contact Email"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Recipient Name"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "{recipient_name}"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Recipient Email"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Card Type"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Credit Card Number"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Address 1"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Address 2"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "State"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Registration for"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Course Dates"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid " {course_name} "
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/shopping_cart.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Price per student:"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Discount Applied:"
+msgstr ""
 
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
@@ -13248,10 +13581,6 @@ msgstr "سعر الوحدة "
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Note: items with strikethough like <del>this</del> have been refunded."
 msgstr "ملاحظة: تمّ رد قيمة العناصر المشطوبة على النحو <del>هذا</del>."
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Billed To:"
-msgstr "تم تسجيل الفاتورة لـ: "
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "Confirm Enrollment"
@@ -13268,10 +13597,6 @@ msgstr "يرجى تأكيد تسجيلك في:"
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "course dates"
 msgstr "تواريخ المساق"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{course_name}"
-msgstr "{course_name}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{start_date}"
@@ -13320,6 +13645,72 @@ msgstr ""
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "View Course &nbsp; &nbsp; &#x25b8;"
 msgstr "عرض المساق &nbsp; &nbsp; &#x25b8;"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Registration for:"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Course Dates:"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Students:"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "code has been applied"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Total:"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid ""
+"After this purchase is complete, a receipt is generated with relative "
+"billing details and registration codes for students."
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "After this purchase is complete,"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "will be enrolled in this course."
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Shopping cart"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "{platform_name} -  Shopping Cart"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/reverification_confirmation.html
+#: lms/templates/verify_student/show_requirements.html
+#: lms/templates/verify_student/verified.html
+msgid "Review"
+msgstr "مراجعة "
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Payment"
+msgstr ""
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/reverification_confirmation.html
+#: lms/templates/verify_student/show_requirements.html
+#: lms/templates/verify_student/verified.html
+msgid "Confirmation"
+msgstr "تأكيد "
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
@@ -13375,29 +13766,11 @@ msgid "Take ID Photo"
 msgstr "قم بأخذ صورة بطاقة شخصية "
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
-msgid "Review"
-msgstr "مراجعة "
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/show_requirements.html
 #: lms/templates/verify_student/verified.html
 msgid "Make Payment"
 msgstr "القيام بالدفع"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
-msgid "Confirmation"
-msgstr "تأكيد "
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Congratulations! You are now verified on "
@@ -13483,9 +13856,9 @@ msgid ""
 "{link_start}homepage{link_end} or let us know about any pages that may have "
 "been moved at {email}."
 msgstr ""
-"لم يتم إيجاد الصفحة التي كنت تبحث عنها، الرجاء العودة إلى {link_start}الصفحة"
-" الرئيسية{link_end}، أو إعلامنا عبر البريد الإلكتروني {email} عن أية صفحات "
-"يحتمل يكون قد تغير موقعها."
+"عذراً، الصفحة التي تبحث عنها غير متوفرة. الرجاء إعلامنا عبر البريد "
+"الإلكتروني {email} إن كنت تعتقد انها مشكلة من العنوان المستخدم. يمكنك العودة"
+" الى {link_start}الصفحة الرئيسية{link_end}."
 
 #: lms/templates/static_templates/about.html
 #: lms/templates/static_templates/blog.html
@@ -13615,7 +13988,6 @@ msgstr ""
 msgid "Student Account"
 msgstr "حساب الطالب"
 
-#: lms/templates/student_profile/index.html
 #: lms/templates/student_profile/index.html
 msgid "Student Profile"
 msgstr "صفحة الطالب"
@@ -16049,35 +16421,6 @@ msgstr ""
 "url_name) مكوِّن للمسائل، قد يتمّ فقدان بيانات الطالب المرتبطة بمكوِّنات "
 "المسائل هذه. وتتضمّن هذه البيانات المسائل غير المقيّمة الخاصة بالطالب."
 
-#: cms/templates/import.html
-msgid "There was an error during the upload process."
-msgstr "حدث خطأ أثناء عملية التحميل.  "
-
-#: cms/templates/import.html
-msgid "There was an error while unpacking the file."
-msgstr "حدث خطأ أثناء عملية تفريغ الملف. "
-
-#: cms/templates/import.html
-msgid "There was an error while verifying the file you submitted."
-msgstr "حدث خطأ أثناء عملية التحقق من الملف الذي قمت بتقديمه. "
-
-#: cms/templates/import.html
-msgid "There was an error while importing the new course to our database."
-msgstr "حدث خطأ خلال عملية استيراد المساق الجديد إلى قاعدة البيانات لدينا. "
-
-#: cms/templates/import.html
-msgid "Your import has failed."
-msgstr "لم تنجح عملية الاستيراد"
-
-#: cms/templates/import.html cms/templates/import.html
-msgid "Choose new file"
-msgstr "اختيار ملف جديد "
-
-#: cms/templates/import.html
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-"جاري عمل عملية الاستيراد؛ سيؤدّي تصفّح موقعٍ مختلف إلى إيقاف العملية. "
-
 #: cms/templates/index.html cms/templates/index.html
 #: cms/templates/widgets/header.html
 msgid "My Courses"
@@ -16884,14 +17227,6 @@ msgstr ""
 "الجديدة التي سيلتحقون بها."
 
 #: cms/templates/settings_advanced.html
-msgid "Hide Deprecated Settings"
-msgstr "إخفاء الإعدادات المهملة"
-
-#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
-msgid "Show Deprecated Settings"
-msgstr "إظهار الإعدادات المهملة"
-
-#: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
 msgstr "تم حفظ التغييرات على السياسة الخاصة بك."
 
@@ -16910,6 +17245,10 @@ msgid ""
 msgstr ""
 "<strong> تحذير </strong>: لا تقم بتعديل هذه السياسات إلا إذا كنت على علمٍ "
 "بأغراضها."
+
+#: cms/templates/settings_advanced.html
+msgid "Show Deprecated Settings"
+msgstr "إظهار الإعدادات المهملة"
 
 #: cms/templates/settings_advanced.html
 msgid "What do advanced settings do?"
@@ -17021,10 +17360,6 @@ msgstr "تكبير أو تصغير"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "تحتوي هذه الخانة على عدة مكوِّنات "
-
-#: cms/templates/textbooks.html
-msgid "You have unsaved changes. Do you really want to leave this page?"
-msgstr "ثّمة بعض التغييرات التي لم يتمّ حفظها. هل تريد حقّاً مغادرة الصفحة؟"
 
 #: cms/templates/textbooks.html
 msgid "New Textbook"
