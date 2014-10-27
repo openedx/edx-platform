@@ -1,6 +1,9 @@
 define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging", "js/views/asset",
-    "js/views/paging_header", "js/views/paging_footer", "js/utils/modal", "js/views/utils/view_utils"],
-    function($, _, gettext, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter, ModalUtils, ViewUtils) {
+    "js/views/paging_header", "js/views/paging_footer", "js/utils/modal", "js/views/utils/view_utils",
+    "js/views/feedback_notification", "jquery.fileupload-process", "jquery.fileupload-validate"],
+    function($, _, gettext, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter, ModalUtils, ViewUtils, NotificationView) {
+
+        var CONVERSION_FACTOR_MBS_TO_BYTES = 1000 * 1000;
 
         var AssetsView = PagingView.extend({
             // takes AssetCollection as model
@@ -10,7 +13,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 "click .upload-button": "showUploadModal"
             },
 
-            initialize : function() {
+            initialize : function(options) {
+                options = options || {};
+
                 PagingView.prototype.initialize.call(this);
                 var collection = this.collection;
                 this.template = this.loadTemplate("asset-library");
@@ -20,7 +25,16 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.setInitialSortColumn('js-asset-date-col');
                 ViewUtils.showLoadingIndicator();
                 this.setPage(0);
+                // set default file size for uploads via template var,
+                // and default to static old value if none exists
+                this.uploadChunkSizeInMBs = options.uploadChunkSizeInMBs || 10;
+                this.maxFileSizeInMBs = options.maxFileSizeInMBs || 10;
+                this.uploadChunkSizeInBytes = this.uploadChunkSizeInMBs * CONVERSION_FACTOR_MBS_TO_BYTES;
+                this.maxFileSizeInBytes = this.maxFileSizeInMBs * CONVERSION_FACTOR_MBS_TO_BYTES;
+                this.maxFileSizeRedirectUrl = options.maxFileSizeRedirectUrl || '';
                 assetsView = this;
+                // error message modal for large file uploads
+                this.largeFileErrorMsg = null;
             },
 
             render: function() {
@@ -111,6 +125,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 }
                 $('.file-input').unbind('change.startUpload');
                 ModalUtils.hideModal();
+                if (assetsView.largeFileErrorMsg) {
+                  assetsView.largeFileErrorMsg.hide();
+                }
             },
 
             showUploadModal: function (event) {
@@ -122,23 +139,44 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .file-chooser').fileupload({
                     dataType: 'json',
                     type: 'POST',
-                    maxChunkSize: 100 * 1000 * 1000,      // 100 MB
+                    maxChunkSize: self.uploadChunkSizeInBytes,
                     autoUpload: true,
                     progressall: function(event, data) {
                         var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
                         self.showUploadFeedback(event, percentComplete);
                     },
-                    maxFileSize: 100 * 1000 * 1000,   // 100 MB
+                    maxFileSize: self.maxFileSizeInBytes,
                     maxNumberofFiles: 100,
-                    add: function(event, data) {
-                        data.process().done(function () {
-                            data.submit();
-                        });
-                    },
                     done: function(event, data) {
                         self.displayFinishedUpload(data.result);
-                    }
+                    },
+                    processfail: function(event, data) {
+                        var filename = data.files[data.index].name;
+                        var error = gettext("File {filename} exceeds maximum size of {maxFileSizeInMBs} MB")
+                                    .replace("{filename}", filename)
+                                    .replace("{maxFileSizeInMBs}", self.maxFileSizeInMBs)
+                        
+                        // disable second part of message for any falsy value, 
+                        // which can be null or an empty string
+                        if(self.maxFileSizeRedirectUrl) {
+                            var instructions = gettext("Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}")
+                                    .replace("{maxFileSizeRedirectUrl}", self.maxFileSizeRedirectUrl);
+                            error = error + " " + instructions;
+                        }
 
+                        assetsView.largeFileErrorMsg = new NotificationView.Error({
+                            "title": gettext("Your file could not be uploaded"),
+                            "message": error
+                        });
+                        assetsView.largeFileErrorMsg.show();
+
+                        assetsView.displayFailedUpload({
+                            "msg": gettext("Max file size exceeded")
+                        });
+                    },
+                    processdone: function(event, data) {
+                        assetsView.largeFileErrorMsg = null;
+                    }
                 });
             },
 
@@ -149,11 +187,12 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             startUpload: function (event) {
                 var file = event.target.value;
-
-                $('.upload-modal h1').text(gettext('Uploading…'));
-                $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
-                $('.upload-modal .choose-file-button').hide();
-                $('.upload-modal .progress-bar').removeClass('loaded').show();
+                if (!assetsView.largeFileErrorMsg) {
+                    $('.upload-modal h1').text(gettext('Uploading'));
+                    $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
+                    $('.upload-modal .choose-file-button').hide();
+                    $('.upload-modal .progress-bar').removeClass('loaded').show();
+                }
             },
 
             resetUploadModal: function () {
@@ -169,6 +208,8 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .choose-file-button').text(gettext('Choose File'));
                 $('.upload-modal .embeddable-xml-input').val('');
                 $('.upload-modal .embeddable').hide();
+
+                assetsView.largeFileErrorMsg = null;
             },
 
             showUploadFeedback: function (event, percentComplete) {
@@ -181,7 +222,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var asset = resp.asset;
 
                 $('.upload-modal h1').text(gettext('Upload New File'));
-                $('.upload-modal .embeddable-xml-input').val(asset.portable_url);
+                $('.upload-modal .embeddable-xml-input').val(asset.portable_url).show();
                 $('.upload-modal .embeddable').show();
                 $('.upload-modal .file-name').hide();
                 $('.upload-modal .progress-fill').html(resp.msg);
@@ -189,6 +230,16 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .progress-fill').width('100%');
 
                 assetsView.addAsset(new AssetModel(asset));
+            },
+
+            displayFailedUpload: function (resp) {
+                $('.upload-modal h1').text(gettext('Upload New File'));
+                $('.upload-modal .embeddable-xml-input').hide();
+                $('.upload-modal .embeddable').hide();
+                $('.upload-modal .file-name').hide();
+                $('.upload-modal .progress-fill').html(resp.msg);
+                $('.upload-modal .choose-file-button').text(gettext('Load Another File')).show();
+                $('.upload-modal .progress-fill').width('0%');
             }
         });
 

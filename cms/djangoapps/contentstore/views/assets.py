@@ -83,6 +83,9 @@ def _asset_index(request, course_key):
 
     return render_to_response('asset_index.html', {
         'context_course': course_module,
+        'max_file_size_in_mbs': settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
+        'chunk_size_in_mbs': settings.UPLOAD_CHUNK_SIZE_IN_MB,
+        'max_file_size_redirect_url': settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
         'asset_callback_url': reverse_course_url('assets_handler', course_key)
     })
 
@@ -152,6 +155,14 @@ def _get_assets_for_page(request, course_key, current_page, page_size, sort):
     )
 
 
+def get_file_size(upload_file):
+    """
+    Helper method for getting file size of an upload file.
+    Can be used for mocking test file sizes.
+    """
+    return upload_file.size
+
+
 @require_POST
 @ensure_csrf_cookie
 @login_required
@@ -176,6 +187,26 @@ def _upload_asset(request, course_key):
     upload_file = request.FILES['file']
     filename = upload_file.name
     mime_type = upload_file.content_type
+    size = get_file_size(upload_file)
+
+    # If file is greater than a specified size, reject the upload
+    # request and send a message to the user. Note that since
+    # the front-end may batch large file uploads in smaller chunks,
+    # we validate the file-size on the front-end in addition to
+    # validating on the backend. (see cms/static/js/views/assets.js)
+    max_file_size_in_bytes = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
+    if size > max_file_size_in_bytes:
+        return JsonResponse({
+            'error': _(
+                'File {filename} exceeds maximum size of '
+                '{size_mb} MB. Please follow the instructions here '
+                'to upload a file elsewhere and link to it instead: '
+                '{faq_url}').format(
+                    filename=filename,
+                    size_mb=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
+                    faq_url=settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
+                )
+        }, status=413)
 
     content_loc = StaticContent.compute_location(course_key, filename)
 
