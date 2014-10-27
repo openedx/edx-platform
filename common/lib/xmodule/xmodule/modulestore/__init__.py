@@ -892,6 +892,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             Asset info for the course, index of asset/thumbnail in list (None if asset/thumbnail does not exist)
         """
         course_assets = self._find_course_assets(course_key)
+        if course_assets is None:
+            return None, None
 
         if get_thumbnail:
             all_assets = course_assets['thumbnails']
