@@ -60,3 +60,9 @@ file_filter = conf/locale/<lang>/LC_MESSAGES/wiki.po
 source_file = conf/locale/en/LC_MESSAGES/wiki.po
 source_lang = en
 type = PO
+
+[edraak.edraak-platform]
+file_filter = conf/locale/<lang>/LC_MESSAGES/edraak-platform.po
+source_file = conf/locale/en/LC_MESSAGES/edraak-platform.po
+source_lang = en
+type = PO
