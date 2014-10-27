@@ -57,6 +57,10 @@ lib_paths:
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/coffee/src/xblock/
     - xmodule_js/common_static/js/vendor/URI.min.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate.js
 
 # Paths to source JavaScript files
 src_paths:
