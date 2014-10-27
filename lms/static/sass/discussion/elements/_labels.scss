@@ -1,7 +1,7 @@
 // discussion - elements - labels
 // ====================
 
-body.discussion, .discussion-module, .discussion-body {
+body.discussion, .discussion-module, .discussion-body, .discussion-course {
   .post-label-pinned {
     @include forum-post-label($forum-color-pinned);
   }

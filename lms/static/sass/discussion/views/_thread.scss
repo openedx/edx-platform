@@ -10,7 +10,7 @@
 // * +post - answered question - collapsed comment area
 
 // +general thread layout
-body.discussion, .discussion-module {
+body.discussion, .discussion-module, div.discussion-course {
 
   // post layout
   .discussion-post {
@@ -208,5 +208,11 @@ body.view-in-course .discussion-article {
 .forum-new-post-form {
   img {
     max-width: 100%;
+  }
+}
+
+body.discussion, .discussion-thread.expanded, div.discussion-course  {
+  .forum-thread-main-wrapper {
+    box-shadow: 0 1px 3px $shadow;
   }
 }

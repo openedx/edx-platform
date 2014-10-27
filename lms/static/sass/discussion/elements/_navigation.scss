@@ -8,6 +8,31 @@
   width: 31%;
   border: 1px solid #aaa;
   border-radius: 3px;
+div.discussion-course, div.content-wrapper {
+  section.discussion {
+    div.forum-nav {
+      @include box-sizing(border-box);
+      float: left;
+      position: relative;
+      width: 31%;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+
+      ul, ol {
+        list-style: none;
+        padding-left: 0;
+
+        li.forum-nav-thread {
+          margin-bottom: 0;
+        }
+
+        &.forum-nav-browse-submenu {
+          padding-left: $baseline;
+          list-style: none;
+        }
+      }
+    }
+  }
 }
 
 // ------
@@ -139,16 +164,8 @@
   list-style: none;
 }
 
-.forum-nav-browse-submenu {
-    list-style: none;
-    padding: 0;
-
-    li {
-
-        .forum-nav-browse-title {
-            padding-left: $baseline;
-        }
-    }
+.forum-nav-browse-title {
+    padding-left: $baseline;
 }
 
 // -------------------

@@ -101,7 +101,7 @@
     line-height: 36px;
 
     .icon {
-      margin-right: ($baseline/4);
+      margin-right: 5px;
     }
   }
 
@@ -213,6 +213,7 @@
     position: absolute;
     top: 40px;
     left: 0;
+    z-index: 9999;
     border: 1px solid $forum-color-border;
     width: 100%;
     background: $forum-color-background;
