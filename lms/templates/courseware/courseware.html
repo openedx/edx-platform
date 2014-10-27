@@ -70,7 +70,9 @@ ${page_title_breadcrumbs(course_name())}
             for (i=0;i<=wordArray.length-1;i++) {
               finalTitle += wordArray[i];
               if (i == (wordArray.length-2)) {
-                finalTitle += "&nbsp;";
+                // Add non-breakable space before last word
+                // TODO: use real filter like widont or typogrify
+                finalTitle += "\xa0";
               } else if (i == (wordArray.length-1)) {
                 // Do nothing
               } else {
@@ -78,7 +80,7 @@ ${page_title_breadcrumbs(course_name())}
               }
             }
           }
-          $(this).html(finalTitle);
+          $(this).text(finalTitle);
         });
       });
   </script>
