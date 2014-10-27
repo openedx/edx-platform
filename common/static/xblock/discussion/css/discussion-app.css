@@ -1,0 +1,2981 @@
+@charset "UTF-8";
+.container .discussion-body .sr, .container .discussion-module .sr, .container .discussion-user-threads .sr, .discussion-module .sr, .discussion-user-threads .sr, .discussion-course .sr {
+    border: 0;
+    clip: rect(1px 1px 1px 1px);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px
+}
+
+.modal-settings-language .list-input, .modal-settings-language .list-actions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-indent: 0
+}
+
+.modal-settings-language .list-input li, .modal-settings-language .list-actions li, .modal-settings-language .list-input dt, .modal-settings-language .list-actions dt, .modal-settings-language .list-input dd, .modal-settings-language .list-actions dd {
+    margin: 0;
+    padding: 0
+}
+
+.tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+    padding: 0 10px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.85);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 26px;
+    color: #fff;
+    pointer-events: none;
+    opacity: 0;
+    -webkit-transition: opacity 0.1s linear 0s;
+    -moz-transition: opacity 0.1s linear 0s;
+    transition: opacity 0.1s linear 0s
+}
+
+.tooltip:after {
+    content: '▾';
+    display: block;
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    margin-left: -7px;
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.85)
+}
+
+.loading-animation {
+    position: absolute;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    background: url(../../../images/spinner.gif) no-repeat
+}
+
+.modal .inner-wrapper header hr::after, .leanModal_box .inner-wrapper header hr::after, body.discussion .wmd-prompt-dialog .inner-wrapper header hr::after, .discussion-course .wmd-prompt-dialog .inner-wrapper header hr::after, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper header hr::after, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper header hr::after {
+    background-image: -webkit-linear-gradient(-450deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+    background-image: linear-gradient(180deg, rgba(200, 200, 200, 0) 0%, #c8c8c8 50%, rgba(200, 200, 200, 0));
+    height: 1px;
+    width: 100%
+}
+
+.modal .inner-wrapper header hr, .leanModal_box .inner-wrapper header hr, body.discussion .wmd-prompt-dialog .inner-wrapper header hr, .discussion-course .wmd-prompt-dialog .inner-wrapper header hr, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper header hr, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper header hr {
+    background-image: -webkit-linear-gradient(-450deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(255, 255, 255, 0));
+    height: 1px;
+    width: 100%
+}
+
+.global h2 {
+    display: none
+}
+
+.modal-settings-language .list-input, .modal-settings-language .list-actions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-indent: 0
+}
+
+.modal-settings-language .list-input li, .modal-settings-language .list-actions li {
+    margin: 0;
+    padding: 0
+}
+
+body.discussion .comments .edit-post-form h1, .discussion-course .comments .edit-post-form h1 {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif
+}
+
+body.discussion .comments .edit-post-form h1, .discussion-course .comments .edit-post-form h1 {
+    font-size: 16px;
+    line-height: 23.68px
+}
+
+.modal-settings-language .actions-supplemental .list-actions-item {
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif
+}
+
+.modal-settings-language .actions-supplemental .list-actions-item {
+    font-size: 14px;
+    line-height: 20.72px
+}
+
+#lean_overlay {
+    background: transparent;
+    background-image: -webkit-radial-gradient(50% 30%, circle, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
+    background-image: radial-gradient(circle at 50% 30%, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8));
+    display: none;
+    height: 100%;
+    left: 0px;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    z-index: 100
+}
+
+.modal, .leanModal_box, body.discussion .wmd-prompt-dialog, .discussion-course .wmd-prompt-dialog, .discussion-module .new-post-body .wmd-prompt-dialog, .discussion-user-threads .new-post-body .wmd-prompt-dialog {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.9);
+    border-radius: 0px;
+    box-shadow: 0 15px 80px 15px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    display: none;
+    left: 50%;
+    padding: 8px;
+    position: absolute;
+    width: 480px;
+    z-index: 12
+}
+
+.modal.video-modal, .video-modal.leanModal_box, body.discussion .video-modal.wmd-prompt-dialog, .discussion-course .video-modal.wmd-prompt-dialog, .discussion-module .new-post-body .video-modal.wmd-prompt-dialog, .discussion-user-threads .new-post-body .video-modal.wmd-prompt-dialog {
+    left: 50%;
+    padding: 10px;
+    width: 582px
+}
+
+.modal.video-modal .inner-wrapper, .video-modal.leanModal_box .inner-wrapper, body.discussion .video-modal.wmd-prompt-dialog .inner-wrapper, .discussion-course .video-modal.wmd-prompt-dialog .inner-wrapper, .discussion-module .new-post-body .video-modal.wmd-prompt-dialog .inner-wrapper, .discussion-user-threads .new-post-body .video-modal.wmd-prompt-dialog .inner-wrapper {
+    background: #000;
+    box-shadow: none;
+    height: 315px;
+    padding: 10px;
+    width: 560px
+}
+
+.modal.home-page-video-modal, .home-page-video-modal.leanModal_box, body.discussion .home-page-video-modal.wmd-prompt-dialog, .discussion-course .home-page-video-modal.wmd-prompt-dialog, .discussion-module .new-post-body .home-page-video-modal.wmd-prompt-dialog, .discussion-user-threads .new-post-body .home-page-video-modal.wmd-prompt-dialog {
+    left: 50%;
+    padding: 10px;
+    width: 662px
+}
+
+.modal.home-page-video-modal .inner-wrapper, .home-page-video-modal.leanModal_box .inner-wrapper, body.discussion .home-page-video-modal.wmd-prompt-dialog .inner-wrapper, .discussion-course .home-page-video-modal.wmd-prompt-dialog .inner-wrapper, .discussion-module .new-post-body .home-page-video-modal.wmd-prompt-dialog .inner-wrapper, .discussion-user-threads .new-post-body .home-page-video-modal.wmd-prompt-dialog .inner-wrapper {
+    background: #000;
+    box-shadow: none;
+    height: 360px;
+    padding: 10px;
+    width: 640px
+}
+
+.modal .inner-wrapper, .leanModal_box .inner-wrapper, body.discussion .wmd-prompt-dialog .inner-wrapper, .discussion-course .wmd-prompt-dialog .inner-wrapper, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper {
+    background: #f5f5f5;
+    border-radius: 0px;
+    border: 1px solid rgba(0, 0, 0, 0.9);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    position: relative;
+    z-index: 2
+}
+
+.modal .inner-wrapper header, .leanModal_box .inner-wrapper header, body.discussion .wmd-prompt-dialog .inner-wrapper header, .discussion-course .wmd-prompt-dialog .inner-wrapper header, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper header, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper header {
+    margin-bottom: 30px;
+    overflow: hidden;
+    padding: 28px 20px 0px;
+    position: relative;
+    z-index: 2
+}
+
+.modal .inner-wrapper header::before, .leanModal_box .inner-wrapper header::before, body.discussion .wmd-prompt-dialog .inner-wrapper header::before, .discussion-course .wmd-prompt-dialog .inner-wrapper header::before, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper header::before, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper header::before {
+    background-image: -webkit-radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+    background-image: radial-gradient(50% 50%, circle closest-side, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 100%);
+    content: "";
+    display: block;
+    height: 400px;
+    left: 0px;
+    margin: 0 auto;
+    position: absolute;
+    top: -140px;
+    width: 100%;
+    z-index: 1
+}
+
+.modal .inner-wrapper header hr, .leanModal_box .inner-wrapper header hr, body.discussion .wmd-prompt-dialog .inner-wrapper header hr, .discussion-course .wmd-prompt-dialog .inner-wrapper header hr, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper header hr, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper header hr {
+    border: none;
+    margin: 0px;
+    position: relative;
+    z-index: 2
+}
+
+.modal .inner-wrapper header hr::after, .leanModal_box .inner-wrapper header hr::after, body.discussion .wmd-prompt-dialog .inner-wrapper header hr::after, .discussion-course .wmd-prompt-dialog .inner-wrapper header hr::after, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper header hr::after, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper header hr::after {
+    bottom: 0px;
+    content: "";
+    display: block;
+    position: absolute;
+    top: -1px
+}
+
+.modal .inner-wrapper header h2, .leanModal_box .inner-wrapper header h2, body.discussion .wmd-prompt-dialog .inner-wrapper header h2, .discussion-course .wmd-prompt-dialog .inner-wrapper header h2, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper header h2, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper header h2 {
+    position: relative;
+    text-align: center;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+    z-index: 2
+}
+
+.modal .inner-wrapper .modal-form-error, .leanModal_box .inner-wrapper .modal-form-error, body.discussion .wmd-prompt-dialog .inner-wrapper .modal-form-error, .discussion-course .wmd-prompt-dialog .inner-wrapper .modal-form-error, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .modal-form-error, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .modal-form-error {
+    background: #f7e6e7;
+    border: 1px solid #8f0e0e;
+    color: #8f0e0e;
+    display: none;
+    margin-bottom: 20px;
+    padding: 12px
+}
+
+.modal .inner-wrapper .notice, .leanModal_box .inner-wrapper .notice, body.discussion .wmd-prompt-dialog .inner-wrapper .notice, .discussion-course .wmd-prompt-dialog .inner-wrapper .notice, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .notice, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .notice {
+    background: #fffcdd;
+    border: 1px solid #aa9b00;
+    color: #aa9b00;
+    display: none;
+    margin-bottom: 20px;
+    padding: 12px
+}
+
+.modal .inner-wrapper .activation-message, .leanModal_box .inner-wrapper .activation-message, body.discussion .wmd-prompt-dialog .inner-wrapper .activation-message, .discussion-course .wmd-prompt-dialog .inner-wrapper .activation-message, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .activation-message, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .activation-message, .modal .inner-wrapper .message, .leanModal_box .inner-wrapper .message, body.discussion .wmd-prompt-dialog .inner-wrapper .message, .discussion-course .wmd-prompt-dialog .inner-wrapper .message, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .message, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .message {
+    padding: 0 40px 10px
+}
+
+.modal .inner-wrapper .activation-message p, .leanModal_box .inner-wrapper .activation-message p, body.discussion .wmd-prompt-dialog .inner-wrapper .activation-message p, .discussion-course .wmd-prompt-dialog .inner-wrapper .activation-message p, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .activation-message p, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .activation-message p, .modal .inner-wrapper .message p, .leanModal_box .inner-wrapper .message p, body.discussion .wmd-prompt-dialog .inner-wrapper .message p, .discussion-course .wmd-prompt-dialog .inner-wrapper .message p, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .message p, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .message p {
+    margin-bottom: 10px
+}
+
+.modal .inner-wrapper form, .leanModal_box .inner-wrapper form, body.discussion .wmd-prompt-dialog .inner-wrapper form, .discussion-course .wmd-prompt-dialog .inner-wrapper form, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form {
+    margin-bottom: 12px;
+    padding: 0px 40px 20px;
+    position: relative;
+    z-index: 2
+}
+
+.modal .inner-wrapper form .input-group, .leanModal_box .inner-wrapper form .input-group, body.discussion .wmd-prompt-dialog .inner-wrapper form .input-group, .discussion-course .wmd-prompt-dialog .inner-wrapper form .input-group, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .input-group, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .input-group {
+    border-bottom: 1px solid #d2d2d2;
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+    margin-bottom: 30px;
+    padding-bottom: 10px
+}
+
+.modal .inner-wrapper form .input-group:after, .leanModal_box .inner-wrapper form .input-group:after, body.discussion .wmd-prompt-dialog .inner-wrapper form .input-group:after, .discussion-course .wmd-prompt-dialog .inner-wrapper form .input-group:after, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .input-group:after, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .input-group:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.modal .inner-wrapper form label, .leanModal_box .inner-wrapper form label, body.discussion .wmd-prompt-dialog .inner-wrapper form label, .discussion-course .wmd-prompt-dialog .inner-wrapper form label, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label {
+    color: #333
+}
+
+.modal .inner-wrapper form label.field-error, .leanModal_box .inner-wrapper form label.field-error, body.discussion .wmd-prompt-dialog .inner-wrapper form label.field-error, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.field-error, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.field-error, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.field-error {
+    display: block;
+    color: #8F0E0E
+}
+
+.modal .inner-wrapper form label.field-error + input, .leanModal_box .inner-wrapper form label.field-error + input, body.discussion .wmd-prompt-dialog .inner-wrapper form label.field-error + input, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.field-error + input, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.field-error + input, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.field-error + input, .modal .inner-wrapper form label.field-error + textarea, .leanModal_box .inner-wrapper form label.field-error + textarea, body.discussion .wmd-prompt-dialog .inner-wrapper form label.field-error + textarea, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.field-error + textarea, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.field-error + textarea, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.field-error + textarea {
+    border: 1px solid #CA1111;
+    color: #8F0E0E
+}
+
+.modal .inner-wrapper form input[type="checkbox"], .leanModal_box .inner-wrapper form input[type="checkbox"], body.discussion .wmd-prompt-dialog .inner-wrapper form input[type="checkbox"], .discussion-course .wmd-prompt-dialog .inner-wrapper form input[type="checkbox"], .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form input[type="checkbox"], .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form input[type="checkbox"] {
+    margin-right: 5px
+}
+
+.modal .inner-wrapper form textarea, .leanModal_box .inner-wrapper form textarea, body.discussion .wmd-prompt-dialog .inner-wrapper form textarea, .discussion-course .wmd-prompt-dialog .inner-wrapper form textarea, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form textarea, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form textarea {
+    background: #fff;
+    display: block;
+    height: 45px;
+    margin-bottom: 20px;
+    width: 100%
+}
+
+.modal .inner-wrapper form input[type="email"], .leanModal_box .inner-wrapper form input[type="email"], body.discussion .wmd-prompt-dialog .inner-wrapper form input[type="email"], .discussion-course .wmd-prompt-dialog .inner-wrapper form input[type="email"], .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form input[type="email"], .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form input[type="email"], .modal .inner-wrapper form input[type="text"], .leanModal_box .inner-wrapper form input[type="text"], body.discussion .wmd-prompt-dialog .inner-wrapper form input[type="text"], .discussion-course .wmd-prompt-dialog .inner-wrapper form input[type="text"], .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form input[type="text"], .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form input[type="text"], .modal .inner-wrapper form input[type="password"], .leanModal_box .inner-wrapper form input[type="password"], body.discussion .wmd-prompt-dialog .inner-wrapper form input[type="password"], .discussion-course .wmd-prompt-dialog .inner-wrapper form input[type="password"], .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form input[type="password"], .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form input[type="password"] {
+    background: #fff;
+    display: block;
+    height: 45px;
+    margin-bottom: 20px;
+    width: 100%
+}
+
+.modal .inner-wrapper form label.remember-me, .leanModal_box .inner-wrapper form label.remember-me, body.discussion .wmd-prompt-dialog .inner-wrapper form label.remember-me, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.remember-me, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me, .modal .inner-wrapper form label.terms-of-service, .leanModal_box .inner-wrapper form label.terms-of-service, body.discussion .wmd-prompt-dialog .inner-wrapper form label.terms-of-service, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.terms-of-service, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service, .modal .inner-wrapper form label.honor-code, .leanModal_box .inner-wrapper form label.honor-code, body.discussion .wmd-prompt-dialog .inner-wrapper form label.honor-code, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.honor-code, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code {
+    background: #e9e9e9;
+    border: 1px solid #c8c8c8;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6);
+    display: block;
+    margin-bottom: 20px;
+    padding: 8px 10px
+}
+
+.modal .inner-wrapper form label.remember-me:hover, .leanModal_box .inner-wrapper form label.remember-me:hover, body.discussion .wmd-prompt-dialog .inner-wrapper form label.remember-me:hover, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.remember-me:hover, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me:hover, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me:hover, .modal .inner-wrapper form label.remember-me:focus, .leanModal_box .inner-wrapper form label.remember-me:focus, body.discussion .wmd-prompt-dialog .inner-wrapper form label.remember-me:focus, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.remember-me:focus, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me:focus, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me:focus, .modal .inner-wrapper form label.terms-of-service:hover, .leanModal_box .inner-wrapper form label.terms-of-service:hover, body.discussion .wmd-prompt-dialog .inner-wrapper form label.terms-of-service:hover, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.terms-of-service:hover, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service:hover, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service:hover, .modal .inner-wrapper form label.terms-of-service:focus, .leanModal_box .inner-wrapper form label.terms-of-service:focus, body.discussion .wmd-prompt-dialog .inner-wrapper form label.terms-of-service:focus, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.terms-of-service:focus, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service:focus, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service:focus, .modal .inner-wrapper form label.honor-code:hover, .leanModal_box .inner-wrapper form label.honor-code:hover, body.discussion .wmd-prompt-dialog .inner-wrapper form label.honor-code:hover, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.honor-code:hover, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code:hover, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code:hover, .modal .inner-wrapper form label.honor-code:focus, .leanModal_box .inner-wrapper form label.honor-code:focus, body.discussion .wmd-prompt-dialog .inner-wrapper form label.honor-code:focus, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.honor-code:focus, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code:focus, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code:focus {
+    background: #e6e6e6
+}
+
+.modal .inner-wrapper form label.remember-me.field-error, .leanModal_box .inner-wrapper form label.remember-me.field-error, body.discussion .wmd-prompt-dialog .inner-wrapper form label.remember-me.field-error, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.remember-me.field-error, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me.field-error, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me.field-error, .modal .inner-wrapper form label.terms-of-service.field-error, .leanModal_box .inner-wrapper form label.terms-of-service.field-error, body.discussion .wmd-prompt-dialog .inner-wrapper form label.terms-of-service.field-error, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.terms-of-service.field-error, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service.field-error, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service.field-error, .modal .inner-wrapper form label.honor-code.field-error, .leanModal_box .inner-wrapper form label.honor-code.field-error, body.discussion .wmd-prompt-dialog .inner-wrapper form label.honor-code.field-error, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.honor-code.field-error, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code.field-error, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code.field-error {
+    border: 1px solid #CA1111
+}
+
+.modal .inner-wrapper form label.remember-me a, .leanModal_box .inner-wrapper form label.remember-me a, body.discussion .wmd-prompt-dialog .inner-wrapper form label.remember-me a, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.remember-me a, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me a, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.remember-me a, .modal .inner-wrapper form label.terms-of-service a, .leanModal_box .inner-wrapper form label.terms-of-service a, body.discussion .wmd-prompt-dialog .inner-wrapper form label.terms-of-service a, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.terms-of-service a, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service a, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.terms-of-service a, .modal .inner-wrapper form label.honor-code a, .leanModal_box .inner-wrapper form label.honor-code a, body.discussion .wmd-prompt-dialog .inner-wrapper form label.honor-code a, .discussion-course .wmd-prompt-dialog .inner-wrapper form label.honor-code a, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code a, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form label.honor-code a {
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+    font-style: italic
+}
+
+.modal .inner-wrapper form .citizenship, .leanModal_box .inner-wrapper form .citizenship, body.discussion .wmd-prompt-dialog .inner-wrapper form .citizenship, .discussion-course .wmd-prompt-dialog .inner-wrapper form .citizenship, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .citizenship, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .citizenship, .modal .inner-wrapper form .gender, .leanModal_box .inner-wrapper form .gender, body.discussion .wmd-prompt-dialog .inner-wrapper form .gender, .discussion-course .wmd-prompt-dialog .inner-wrapper form .gender, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .gender, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .gender, .modal .inner-wrapper form .date-of-birth, .leanModal_box .inner-wrapper form .date-of-birth, body.discussion .wmd-prompt-dialog .inner-wrapper form .date-of-birth, .discussion-course .wmd-prompt-dialog .inner-wrapper form .date-of-birth, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .date-of-birth, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .date-of-birth {
+    margin-bottom: 20px;
+    float: left;
+    width: 32.20339%
+}
+
+.modal .inner-wrapper form .citizenship label, .leanModal_box .inner-wrapper form .citizenship label, body.discussion .wmd-prompt-dialog .inner-wrapper form .citizenship label, .discussion-course .wmd-prompt-dialog .inner-wrapper form .citizenship label, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .citizenship label, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .citizenship label, .modal .inner-wrapper form .gender label, .leanModal_box .inner-wrapper form .gender label, body.discussion .wmd-prompt-dialog .inner-wrapper form .gender label, .discussion-course .wmd-prompt-dialog .inner-wrapper form .gender label, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .gender label, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .gender label, .modal .inner-wrapper form .date-of-birth label, .leanModal_box .inner-wrapper form .date-of-birth label, body.discussion .wmd-prompt-dialog .inner-wrapper form .date-of-birth label, .discussion-course .wmd-prompt-dialog .inner-wrapper form .date-of-birth label, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .date-of-birth label, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .date-of-birth label {
+    display: block
+}
+
+.modal .inner-wrapper form .citizenship select, .leanModal_box .inner-wrapper form .citizenship select, body.discussion .wmd-prompt-dialog .inner-wrapper form .citizenship select, .discussion-course .wmd-prompt-dialog .inner-wrapper form .citizenship select, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .citizenship select, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .citizenship select, .modal .inner-wrapper form .gender select, .leanModal_box .inner-wrapper form .gender select, body.discussion .wmd-prompt-dialog .inner-wrapper form .gender select, .discussion-course .wmd-prompt-dialog .inner-wrapper form .gender select, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .gender select, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .gender select, .modal .inner-wrapper form .date-of-birth select, .leanModal_box .inner-wrapper form .date-of-birth select, body.discussion .wmd-prompt-dialog .inner-wrapper form .date-of-birth select, .discussion-course .wmd-prompt-dialog .inner-wrapper form .date-of-birth select, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .date-of-birth select, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .date-of-birth select {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block
+}
+
+.modal .inner-wrapper form .citizenship, .leanModal_box .inner-wrapper form .citizenship, body.discussion .wmd-prompt-dialog .inner-wrapper form .citizenship, .discussion-course .wmd-prompt-dialog .inner-wrapper form .citizenship, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .citizenship, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .citizenship, .modal .inner-wrapper form .gender, .leanModal_box .inner-wrapper form .gender, body.discussion .wmd-prompt-dialog .inner-wrapper form .gender, .discussion-course .wmd-prompt-dialog .inner-wrapper form .gender, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .gender, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .gender {
+    margin-right: 1.69492%
+}
+
+.modal .inner-wrapper form .submit, .leanModal_box .inner-wrapper form .submit, body.discussion .wmd-prompt-dialog .inner-wrapper form .submit, .discussion-course .wmd-prompt-dialog .inner-wrapper form .submit, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .submit, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .submit {
+    padding-top: 10px
+}
+
+.modal .inner-wrapper form .submit input[type="submit"], .leanModal_box .inner-wrapper form .submit input[type="submit"], body.discussion .wmd-prompt-dialog .inner-wrapper form .submit input[type="submit"], .discussion-course .wmd-prompt-dialog .inner-wrapper form .submit input[type="submit"], .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper form .submit input[type="submit"], .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper form .submit input[type="submit"] {
+    display: block;
+    height: auto;
+    margin: 0 auto;
+    width: 100%;
+    white-space: normal
+}
+
+.modal .inner-wrapper .login-extra, .leanModal_box .inner-wrapper .login-extra, body.discussion .wmd-prompt-dialog .inner-wrapper .login-extra, .discussion-course .wmd-prompt-dialog .inner-wrapper .login-extra, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra {
+    position: relative;
+    z-index: 2
+}
+
+.modal .inner-wrapper .login-extra p, .leanModal_box .inner-wrapper .login-extra p, body.discussion .wmd-prompt-dialog .inner-wrapper .login-extra p, .discussion-course .wmd-prompt-dialog .inner-wrapper .login-extra p, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p {
+    color: #646464;
+    font-style: italic;
+    text-align: center
+}
+
+.modal .inner-wrapper .login-extra p span, .leanModal_box .inner-wrapper .login-extra p span, body.discussion .wmd-prompt-dialog .inner-wrapper .login-extra p span, .discussion-course .wmd-prompt-dialog .inner-wrapper .login-extra p span, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p span, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p span {
+    color: #646464;
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+    font-style: italic
+}
+
+.modal .inner-wrapper .login-extra p a, .leanModal_box .inner-wrapper .login-extra p a, body.discussion .wmd-prompt-dialog .inner-wrapper .login-extra p a, .discussion-course .wmd-prompt-dialog .inner-wrapper .login-extra p a, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p a, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p a {
+    color: #646464;
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+    font-style: italic;
+    text-decoration: underline
+}
+
+.modal .inner-wrapper .login-extra p a:hover, .leanModal_box .inner-wrapper .login-extra p a:hover, body.discussion .wmd-prompt-dialog .inner-wrapper .login-extra p a:hover, .discussion-course .wmd-prompt-dialog .inner-wrapper .login-extra p a:hover, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p a:hover, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p a:hover, .modal .inner-wrapper .login-extra p a:focus, .leanModal_box .inner-wrapper .login-extra p a:focus, body.discussion .wmd-prompt-dialog .inner-wrapper .login-extra p a:focus, .discussion-course .wmd-prompt-dialog .inner-wrapper .login-extra p a:focus, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p a:focus, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p a:focus {
+    color: #3c3c3c
+}
+
+.modal .inner-wrapper .login-extra p span + a, .leanModal_box .inner-wrapper .login-extra p span + a, body.discussion .wmd-prompt-dialog .inner-wrapper .login-extra p span + a, .discussion-course .wmd-prompt-dialog .inner-wrapper .login-extra p span + a, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p span + a, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .login-extra p span + a {
+    margin-left: 15px
+}
+
+.modal .inner-wrapper .close-modal, .leanModal_box .inner-wrapper .close-modal, body.discussion .wmd-prompt-dialog .inner-wrapper .close-modal, .discussion-course .wmd-prompt-dialog .inner-wrapper .close-modal, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .close-modal, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .close-modal {
+    border-radius: 2px;
+    cursor: pointer;
+    display: inline-block;
+    padding: 10px;
+    position: absolute;
+    right: 2px;
+    top: 0px;
+    z-index: 3;
+    color: #646464;
+    font: normal 1.2rem/1.2rem "Open Sans", Verdana, Geneva, sans-serif, sans-serif;
+    text-align: center;
+    text-shadow: 0 1px rgba(255, 255, 255, 0.8);
+    -webkit-transition: all 0.15s ease-out 0s;
+    -moz-transition: all 0.15s ease-out 0s;
+    transition: all 0.15s ease-out 0s
+}
+
+.modal .inner-wrapper .close-modal:hover, .leanModal_box .inner-wrapper .close-modal:hover, body.discussion .wmd-prompt-dialog .inner-wrapper .close-modal:hover, .discussion-course .wmd-prompt-dialog .inner-wrapper .close-modal:hover, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .close-modal:hover, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .close-modal:hover, .modal .inner-wrapper .close-modal:focus, .leanModal_box .inner-wrapper .close-modal:focus, body.discussion .wmd-prompt-dialog .inner-wrapper .close-modal:focus, .discussion-course .wmd-prompt-dialog .inner-wrapper .close-modal:focus, .discussion-module .new-post-body .wmd-prompt-dialog .inner-wrapper .close-modal:focus, .discussion-user-threads .new-post-body .wmd-prompt-dialog .inner-wrapper .close-modal:focus {
+    color: #3c3c3c;
+    text-decoration: none
+}
+
+.modal #help_wrapper, .leanModal_box #help_wrapper, body.discussion .wmd-prompt-dialog #help_wrapper, .discussion-course .wmd-prompt-dialog #help_wrapper, .discussion-module .new-post-body .wmd-prompt-dialog #help_wrapper, .discussion-user-threads .new-post-body .wmd-prompt-dialog #help_wrapper, .modal .discussion-alert-wrapper, .leanModal_box .discussion-alert-wrapper, body.discussion .wmd-prompt-dialog .discussion-alert-wrapper, .discussion-course .wmd-prompt-dialog .discussion-alert-wrapper, .discussion-module .new-post-body .wmd-prompt-dialog .discussion-alert-wrapper, .discussion-user-threads .new-post-body .wmd-prompt-dialog .discussion-alert-wrapper {
+    padding: 0 30px 30px 30px
+}
+
+.modal #help_wrapper header, .leanModal_box #help_wrapper header, body.discussion .wmd-prompt-dialog #help_wrapper header, .discussion-course .wmd-prompt-dialog #help_wrapper header, .discussion-module .new-post-body .wmd-prompt-dialog #help_wrapper header, .discussion-user-threads .new-post-body .wmd-prompt-dialog #help_wrapper header, .modal .discussion-alert-wrapper header, .leanModal_box .discussion-alert-wrapper header, body.discussion .wmd-prompt-dialog .discussion-alert-wrapper header, .discussion-course .wmd-prompt-dialog .discussion-alert-wrapper header, .discussion-module .new-post-body .wmd-prompt-dialog .discussion-alert-wrapper header, .discussion-user-threads .new-post-body .wmd-prompt-dialog .discussion-alert-wrapper header {
+    margin-bottom: 20px;
+    padding-right: 0;
+    padding-left: 0
+}
+
+.modal #help_wrapper .note, .leanModal_box #help_wrapper .note, body.discussion .wmd-prompt-dialog #help_wrapper .note, .discussion-course .wmd-prompt-dialog #help_wrapper .note, .discussion-module .new-post-body .wmd-prompt-dialog #help_wrapper .note, .discussion-user-threads .new-post-body .wmd-prompt-dialog #help_wrapper .note, .modal .discussion-alert-wrapper .note, .leanModal_box .discussion-alert-wrapper .note, body.discussion .wmd-prompt-dialog .discussion-alert-wrapper .note, .discussion-course .wmd-prompt-dialog .discussion-alert-wrapper .note, .discussion-module .new-post-body .wmd-prompt-dialog .discussion-alert-wrapper .note, .discussion-user-threads .new-post-body .wmd-prompt-dialog .discussion-alert-wrapper .note {
+    font-size: 12px;
+    line-height: 17.76px;
+    margin-top: 10px;
+    color: #646464
+}
+
+.modal .discussion-alert-wrapper button, .leanModal_box .discussion-alert-wrapper button, body.discussion .wmd-prompt-dialog .discussion-alert-wrapper button, .discussion-course .wmd-prompt-dialog .discussion-alert-wrapper button, .discussion-module .new-post-body .wmd-prompt-dialog .discussion-alert-wrapper button, .discussion-user-threads .new-post-body .wmd-prompt-dialog .discussion-alert-wrapper button {
+    display: block;
+    margin: 0 auto
+}
+
+.modal .tip, .leanModal_box .tip, body.discussion .wmd-prompt-dialog .tip, .discussion-course .wmd-prompt-dialog .tip, .discussion-module .new-post-body .wmd-prompt-dialog .tip, .discussion-user-threads .new-post-body .wmd-prompt-dialog .tip {
+    font-size: 12px;
+    display: block;
+    color: #333
+}
+
+.modal-settings-language .settings-language-select .select {
+    width: 100%
+}
+
+.modal-settings-language .list-input {
+    margin-bottom: 20px
+}
+
+.modal-settings-language .actions-supplemental {
+    padding: 0 40px 20px 40px
+}
+
+.modal-settings-language .actions-supplemental .list-actions-item {
+    color: #3c3c3c;
+    text-align: center
+}
+
+.modal-settings-language .actions-supplemental .action {
+    display: block;
+    margin-top: 5px
+}
+
+.forum-nav-browse {
+    color: #000 !important
+}
+
+.forum-nav-search label {
+    margin-bottom: 0
+}
+
+.forum-nav-search-input {
+    box-shadow: none !important;
+    border: 1px solid #b2b2b2 !important;
+    border-radius: 3px !important;
+    height: auto !important;
+    padding-left: 5px !important;
+    padding-right: 22px !important;
+    font-size: 12px !important
+}
+
+.forum-nav-search-ff-position-fix {
+    position: relative
+}
+
+.forum-nav-browse-title {
+    color: inherit !important
+}
+
+.forum-nav-browse-filter label {
+    margin-bottom: 0
+}
+
+.forum-nav-browse-filter-input {
+    box-shadow: none !important;
+    border-radius: 3px !important;
+    height: auto !important;
+    padding-left: 5px !important;
+    padding-right: 22px !important;
+    font-size: 12px !important
+}
+
+.forum-nav-browse-menu, .forum-nav-browse-submenu {
+    margin: 0
+}
+
+.forum-nav-browse-menu {
+    padding-left: 0
+}
+
+.forum-nav-sort-label {
+    color: inherit
+}
+
+.forum-nav-thread, .forum-nav-thread-list, .forum-nav-thread-labels {
+    margin: 0 !important;
+    padding-left: 0 !important
+}
+
+li[class*=forum-nav-thread-label-] span {
+    color: inherit
+}
+
+li[class*=forum-nav-thread-label-]:before, li[class*=forum-nav-thread-label-]:after {
+    display: none !important
+}
+
+@-webkit-keyframes fadeIn {
+    0% {
+        opacity: 0.0
+    }
+    100% {
+        opacity: 1.0
+    }
+}
+
+body.discussion .new-post-form-errors, .discussion-course .new-post-form-errors {
+    display: none;
+    background: #fd5757;
+    padding: 0;
+    border: 1px solid #333;
+    list-style: none;
+    color: #fff;
+    line-height: 1.6;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, 0.2)
+}
+
+body.discussion .new-post-form-errors li, .discussion-course .new-post-form-errors li {
+    padding: 10px 20px 12px 45px;
+    border-bottom: 1px solid #dc4949;
+    background: url(../../../images/white-error-icon.png) no-repeat 15px 14px
+}
+
+body.discussion .new-post-form-errors li:last-child, .discussion-course .new-post-form-errors li:last-child {
+    border-bottom: none
+}
+
+body.discussion .course-tabs .right, body.discussion .discussion-course-new.right, .discussion-course .course-tabs .right, .discussion-course .discussion-course-new.right {
+    float: right
+}
+
+body.discussion .course-tabs .right .new-post-btn, body.discussion .discussion-course-new.right .new-post-btn, .discussion-course .course-tabs .right .new-post-btn, .discussion-course .discussion-course-new.right .new-post-btn {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    margin-right: 4px
+}
+
+body.discussion .course-tabs .right .new-post-btn:hover, body.discussion .course-tabs .right .new-post-btn:focus, body.discussion .discussion-course-new.right .new-post-btn:hover, body.discussion .discussion-course-new.right .new-post-btn:focus, .discussion-course .course-tabs .right .new-post-btn:hover, .discussion-course .course-tabs .right .new-post-btn:focus, .discussion-course .discussion-course-new.right .new-post-btn:hover, .discussion-course .discussion-course-new.right .new-post-btn:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+body.discussion .course-tabs .right .new-post-icon, body.discussion .discussion-course-new.right .new-post-icon, .discussion-course .course-tabs .right .new-post-icon, .discussion-course .discussion-course-new.right .new-post-icon {
+    margin: 8px 7px 0 0;
+    font-size: 16px;
+    vertical-align: middle;
+    color: #fff
+}
+
+body.discussion .new-post-article, .discussion-course .new-post-article {
+    display: none;
+    margin-top: 20px
+}
+
+body.discussion .new-post-article .inner-wrapper, .discussion-course .new-post-article .inner-wrapper {
+    max-width: 1180px;
+    min-width: 760px;
+    margin: auto
+}
+
+body.discussion .new-post-article .left-column, .discussion-course .new-post-article .left-column {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    padding: 40px;
+    width: 32%
+}
+
+body.discussion .new-post-article .left-column .topic-dropdown-label, .discussion-course .new-post-article .left-column .topic-dropdown-label {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: none
+}
+
+body.discussion .new-post-article .left-column .form-topic-drop, .discussion-course .new-post-article .left-column .form-topic-drop {
+    position: relative
+}
+
+body.discussion .new-post-article .left-column .form-topic-drop ul, .discussion-course .new-post-article .left-column .form-topic-drop ul {
+    list-style: none;
+    margin: 0;
+    padding: 0
+}
+
+body.discussion .new-post-article .left-column .form-group-label, .discussion-course .new-post-article .left-column .form-group-label {
+    display: block;
+    padding-top: 5px;
+    color: #fff
+}
+
+body.discussion .new-post-article .left-column .topic_dropdown_button, .discussion-course .new-post-article .left-column .topic_dropdown_button {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    position: relative;
+    z-index: 1000;
+    margin-top: 15px;
+    border-color: #444;
+    height: 40px;
+    line-height: 36px
+}
+
+body.discussion .new-post-article .left-column .topic_dropdown_button:hover, body.discussion .new-post-article .left-column .topic_dropdown_button:focus, .discussion-course .new-post-article .left-column .topic_dropdown_button:hover, .discussion-course .new-post-article .left-column .topic_dropdown_button:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+body.discussion .new-post-article .left-column .topic_dropdown_button .drop-arrow, .discussion-course .new-post-article .left-column .topic_dropdown_button .drop-arrow {
+    float: right;
+    color: #999;
+    line-height: 37px
+}
+
+body.discussion .new-post-article .left-column .topic_menu_wrapper, .discussion-course .new-post-article .left-column .topic_menu_wrapper {
+    display: none;
+    position: absolute;
+    top: 40px;
+    left: 0;
+    z-index: 9999;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #797979;
+    border: 1px solid #333;
+    box-shadow: 0 2px 50px rgba(0, 0, 0, 0.4)
+}
+
+body.discussion .new-post-article .left-column .topic_menu, .discussion-course .new-post-article .left-column .topic_menu {
+    max-height: 400px;
+    overflow-y: scroll
+}
+
+body.discussion .new-post-article .left-column .topic_menu a, .discussion-course .new-post-article .left-column .topic_menu a {
+    display: block;
+    padding: 10px 15px;
+    border-top: 1px solid #5f5f5f;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    color: #eee;
+    -webkit-transition: none;
+    -moz-transition: none;
+    transition: none
+}
+
+body.discussion .new-post-article .left-column .topic_menu a:hover, body.discussion .new-post-article .left-column .topic_menu a:focus, .discussion-course .new-post-article .left-column .topic_menu a:hover, .discussion-course .new-post-article .left-column .topic_menu a:focus {
+    background-color: #666
+}
+
+body.discussion .new-post-article .left-column .topic_menu a .topic-menu-span, .discussion-course .new-post-article .left-column .topic_menu a .topic-menu-span {
+    color: #eee
+}
+
+body.discussion .new-post-article .left-column .topic_menu li li a, .discussion-course .new-post-article .left-column .topic_menu li li a {
+    padding-left: 39px;
+    background: url(../../../images/nested-icon.png) no-repeat 17px 10px
+}
+
+body.discussion .new-post-article .left-column .topic_menu li li li a, .discussion-course .new-post-article .left-column .topic_menu li li li a {
+    padding-left: 63px;
+    background: url(../../../images/nested-icon.png) no-repeat 41px 10px
+}
+
+body.discussion .new-post-article .left-column .topic_menu_search, .discussion-course .new-post-article .left-column .topic_menu_search {
+    padding: 10px;
+    border-bottom: 1px solid black
+}
+
+body.discussion .new-post-article .left-column .form-topic-drop-search-input, .discussion-course .new-post-article .left-column .form-topic-drop-search-input {
+    width: 100%;
+    height: 30px;
+    padding: 0 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 30px;
+    border: 1px solid #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) inset;
+    background: -webkit-linear-gradient(top, #eee, #fff);
+    font-size: 11px;
+    line-height: 16px;
+    color: #333
+}
+
+body.discussion .new-post-article .right-column, .discussion-course .new-post-article .right-column {
+    float: left;
+    width: 68%;
+    padding: 40px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+body.discussion .new-post-article .wmd-button, .discussion-course .new-post-article .wmd-button {
+    background: none
+}
+
+body.discussion .new-post-article .wmd-button span, .discussion-course .new-post-article .wmd-button span {
+    background: url(../../../images/new-post-icons-full.png) no-repeat
+}
+
+body.discussion .edit-post-form, .discussion-course .edit-post-form {
+    margin-bottom: 40px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+body.discussion .edit-post-form:after, .discussion-course .edit-post-form:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+body.discussion .edit-post-form h1, .discussion-course .edit-post-form h1 {
+    font-size: 20px
+}
+
+body.discussion .edit-post-form .form-row, .discussion-course .edit-post-form .form-row {
+    margin-top: 20px
+}
+
+body.discussion .edit-post-form .post-cancel, .discussion-course .edit-post-form .post-cancel {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    float: left;
+    margin: 10px 0 0 15px
+}
+
+body.discussion .edit-post-form .post-cancel:hover, body.discussion .edit-post-form .post-cancel:focus, .discussion-course .edit-post-form .post-cancel:hover, .discussion-course .edit-post-form .post-cancel:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+body.discussion .edit-post-form .post-update, .discussion-course .edit-post-form .post-update {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    float: left;
+    margin-top: 10px;
+    padding-bottom: 2px;
+    height: 37px
+}
+
+body.discussion .edit-post-form .post-update:hover, body.discussion .edit-post-form .post-update:focus, .discussion-course .edit-post-form .post-update:hover, .discussion-course .edit-post-form .post-update:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+body.discussion .edit-post-form .post-update:hover, body.discussion .edit-post-form .post-update:focus, .discussion-course .edit-post-form .post-update:hover, .discussion-course .edit-post-form .post-update:focus {
+    border-color: #222
+}
+
+body.discussion .edit-post-form .edit-post-title, .discussion-course .edit-post-form .edit-post-title {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 10px;
+    width: 100%;
+    height: 40px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    color: #333;
+    font-size: 16px;
+    font-family: "Open Sans", Verdana, Geneva, sans-serif, sans-serif
+}
+
+body.discussion .new-post-form, .discussion-course .new-post-form {
+    border-radius: 3px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6) inset, 0 1px 0 rgba(255, 255, 255, 0.5);
+    color: #fff
+}
+
+body.discussion .new-post-form:after, .discussion-course .new-post-form:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+body.discussion .new-post-form .form-row, .discussion-course .new-post-form .form-row {
+    margin-bottom: 20px
+}
+
+body.discussion .new-post-form .new-post-body .wmd-input, .discussion-course .new-post-form .new-post-body .wmd-input {
+    width: 100%;
+    height: 240px;
+    margin-top: 0;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-radius: 3px 3px 0 0;
+    background: #fff;
+    font-family: 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 150px;
+    background: #fff
+}
+
+body.discussion .new-post-form .new-post-body .wmd-preview-container, .discussion-course .new-post-form .new-post-body .wmd-preview-container {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    background: #eee;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    border-color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset
+}
+
+body.discussion .new-post-form .new-post-body .wmd-preview-label, .discussion-course .new-post-form .new-post-body .wmd-preview-label {
+    width: 100%;
+    padding-top: 3px;
+    padding-left: 5px;
+    color: #bbb;
+    font-size: 11px;
+    text-transform: uppercase
+}
+
+body.discussion .new-post-form .new-post-body .wmd-preview, .discussion-course .new-post-form .new-post-body .wmd-preview {
+    width: 100%;
+    padding: 10px 20px;
+    color: #333
+}
+
+body.discussion .new-post-form .new-post-title, .discussion-course .new-post-form .new-post-title {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #333;
+    border-radius: 3px;
+    padding: 0 10px;
+    width: 100%;
+    height: 40px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) inset;
+    color: #333;
+    font-weight: 700
+}
+
+body.discussion .new-post-form .submit, .discussion-course .new-post-form .submit {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    float: left;
+    margin-top: 10px;
+    border-color: #333;
+    padding-bottom: 2px;
+    height: 37px
+}
+
+body.discussion .new-post-form .submit:hover, body.discussion .new-post-form .submit:focus, .discussion-course .new-post-form .submit:hover, .discussion-course .new-post-form .submit:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+body.discussion .new-post-form .submit:hover, body.discussion .new-post-form .submit:focus, .discussion-course .new-post-form .submit:hover, .discussion-course .new-post-form .submit:focus {
+    border-color: #222
+}
+
+body.discussion .new-post-form .new-post-cancel, .discussion-course .new-post-form .new-post-cancel {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    float: left;
+    margin: 10px 0 0 15px;
+    border-color: #444
+}
+
+body.discussion .new-post-form .new-post-cancel:hover, body.discussion .new-post-form .new-post-cancel:focus, .discussion-course .new-post-form .new-post-cancel:hover, .discussion-course .new-post-form .new-post-cancel:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+body.discussion .new-post-form .options, .discussion-course .new-post-form .options {
+    margin-top: 40px
+}
+
+body.discussion .new-post-form .options label, .discussion-course .new-post-form .options label {
+    display: inline;
+    margin-left: 10px;
+    color: #fff;
+    text-shadow: none;
+    font-size: 15px
+}
+
+body.discussion .thread-title, .discussion-course .thread-title {
+    display: block;
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: 700;
+    font-size: 21px
+}
+
+body.discussion section.user-profile, .discussion-course section.user-profile {
+    display: table-cell;
+    border-right: 1px solid #ddd;
+    border-radius: 3px 0 0 3px;
+    background-color: #f6f6f6;
+    box-shadow: none
+}
+
+body.discussion section.user-profile .user-profile, .discussion-course section.user-profile .user-profile {
+    padding: 32px 36px
+}
+
+body.discussion section.user-profile .sidebar-username, .discussion-course section.user-profile .sidebar-username {
+    font-weight: 700;
+    font-size: 18px
+}
+
+body.discussion section.user-profile .sidebar-user-roles, .discussion-course section.user-profile .sidebar-user-roles {
+    margin-top: 6px;
+    font-style: italic;
+    font-size: 13px
+}
+
+body.discussion section.user-profile .sidebar-threads-count, .discussion-course section.user-profile .sidebar-threads-count {
+    margin-top: 14px
+}
+
+body.discussion section.user-profile .sidebar-threads-count span, body.discussion section.user-profile .sidebar-comments-count span, .discussion-course section.user-profile .sidebar-threads-count span, .discussion-course section.user-profile .sidebar-comments-count span {
+    font-weight: 700
+}
+
+body.discussion .wmd-panel, .discussion-course .wmd-panel {
+    min-width: 425px;
+    width: 100%
+}
+
+body.discussion .wmd-button-bar, .discussion-course .wmd-button-bar {
+    width: 100%;
+    background-color: Silver
+}
+
+body.discussion .wmd-input, .discussion-course .wmd-input {
+    border: 1px solid #c8c8c8;
+    border-radius: 3px 3px 0 0;
+    width: 100%;
+    height: 150px;
+    background-color: #e9e9e9;
+    font-style: normal;
+    font-size: 0.8em;
+    font-family: Monaco, 'Lucida Console', monospace;
+    line-height: 1.6em
+}
+
+body.discussion .wmd-input::-webkit-input-placeholder, .discussion-course .wmd-input::-webkit-input-placeholder {
+    color: #888
+}
+
+body.discussion .wmd-button-row, .discussion-course .wmd-button-row {
+    -webkit-transition: all 0.2s ease-out 0s;
+    -moz-transition: all 0.2s ease-out 0s;
+    transition: all 0.2s ease-out 0s;
+    position: relative;
+    overflow: hidden;
+    margin: 10px 5px 5px 5px;
+    padding: 0;
+    height: 20px
+}
+
+body.discussion .wmd-spacer, .discussion-course .wmd-spacer {
+    position: absolute;
+    display: inline-block;
+    margin-left: 14px;
+    width: 1px;
+    height: 20px;
+    background-color: Silver;
+    list-style: none
+}
+
+body.discussion .wmd-button, .discussion-course .wmd-button {
+    position: absolute;
+    display: inline-block;
+    padding-right: 3px;
+    padding-left: 2px;
+    width: 20px;
+    height: 20px;
+    background: none;
+    list-style: none;
+    cursor: pointer
+}
+
+body.discussion .wmd-button > span, .discussion-course .wmd-button > span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url("/static/images/wmd-buttons-transparent.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat
+}
+
+body.discussion .wmd-spacer1, .discussion-course .wmd-spacer1 {
+    left: 50px
+}
+
+body.discussion .wmd-spacer2, .discussion-course .wmd-spacer2 {
+    left: 175px
+}
+
+body.discussion .wmd-spacer3, .discussion-course .wmd-spacer3 {
+    left: 300px
+}
+
+body.discussion .wmd-prompt-background, .discussion-course .wmd-prompt-background {
+    background-color: Black
+}
+
+body.discussion .wmd-prompt-dialog, .discussion-course .wmd-prompt-dialog {
+    background: #fff
+}
+
+body.discussion .wmd-prompt-dialog, .discussion-course .wmd-prompt-dialog {
+    padding: 20px
+}
+
+body.discussion .wmd-prompt-dialog > div, .discussion-course .wmd-prompt-dialog > div {
+    font-size: 0.8em;
+    font-family: arial, helvetica, sans-serif
+}
+
+body.discussion .wmd-prompt-dialog b, .discussion-course .wmd-prompt-dialog b {
+    font-size: 16px
+}
+
+body.discussion .wmd-prompt-dialog > form > input[type="text"], .discussion-course .wmd-prompt-dialog > form > input[type="text"] {
+    border-radius: 3px;
+    color: #333
+}
+
+body.discussion .wmd-prompt-dialog > form > input[type="button"], .discussion-course .wmd-prompt-dialog > form > input[type="button"] {
+    border: 1px solid #888;
+    font-size: 14px;
+    font-family: "Open Sans", Verdana, Geneva, sans-serif, sans-serif
+}
+
+body.discussion .wmd-prompt-dialog > form > input[type="file"], .discussion-course .wmd-prompt-dialog > form > input[type="file"] {
+    margin-bottom: 18px
+}
+
+.container .discussion-body, .container .discussion-module, .container .discussion-user-threads, .discussion-module, .discussion-user-threads, .discussion-course {
+    display: block;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    line-height: 1.4
+}
+
+.container .discussion-body:after, .container .discussion-module:after, .container .discussion-user-threads:after, .discussion-module:after, .discussion-user-threads:after, .discussion-course:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.container .discussion-body .sidebar ul, .container .discussion-module .sidebar ul, .container .discussion-user-threads .sidebar ul, .discussion-module .sidebar ul, .discussion-user-threads .sidebar ul, .discussion-course .sidebar ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important
+}
+
+.container .discussion-body .wmd-panel textarea.wmd-input, .container .discussion-module .wmd-panel textarea.wmd-input, .container .discussion-user-threads .wmd-panel textarea.wmd-input, .discussion-module .wmd-panel textarea.wmd-input, .discussion-user-threads .wmd-panel textarea.wmd-input, .discussion-course .wmd-panel textarea.wmd-input {
+    margin-bottom: 0px
+}
+
+.container .discussion-body .bottom-post-status, .container .discussion-module .bottom-post-status, .container .discussion-user-threads .bottom-post-status, .discussion-module .bottom-post-status, .discussion-user-threads .bottom-post-status, .discussion-course .bottom-post-status {
+    padding: 30px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #ccc;
+    text-align: center
+}
+
+.container .discussion-body .discussion-column, .container .discussion-module .discussion-column, .container .discussion-user-threads .discussion-column, .discussion-module .discussion-column, .discussion-user-threads .discussion-column, .discussion-course .discussion-column {
+    float: right;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 68%;
+    max-width: 800px;
+    min-height: 500px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05)
+}
+
+.container .discussion-body .blank-slate, .container .discussion-module .blank-slate, .container .discussion-user-threads .blank-slate, .discussion-module .blank-slate, .discussion-user-threads .blank-slate, .discussion-course .blank-slate {
+    padding: 40px 40px 10px
+}
+
+.container .discussion-body .blank-slate section, .container .discussion-module .blank-slate section, .container .discussion-user-threads .blank-slate section, .discussion-module .blank-slate section, .discussion-user-threads .blank-slate section, .discussion-course .blank-slate section {
+    border-bottom: 1px solid #ccc
+}
+
+.container .discussion-body .blank-slate .label, .container .discussion-module .blank-slate .label, .container .discussion-user-threads .blank-slate .label, .discussion-module .blank-slate .label, .discussion-user-threads .blank-slate .label, .discussion-course .blank-slate .label {
+    display: block;
+    font-size: 12px
+}
+
+.container .discussion-body .blank-slate .label-settings, .container .discussion-module .blank-slate .label-settings, .container .discussion-user-threads .blank-slate .label-settings, .discussion-module .blank-slate .label-settings, .discussion-user-threads .blank-slate .label-settings, .discussion-course .blank-slate .label-settings {
+    padding-top: 20px;
+    padding-bottom: 10px
+}
+
+.container .discussion-body .blank-slate .home-header, .container .discussion-module .blank-slate .home-header, .container .discussion-user-threads .blank-slate .home-header, .discussion-module .blank-slate .home-header, .discussion-user-threads .blank-slate .home-header, .discussion-course .blank-slate .home-header {
+    margin: 0
+}
+
+.container .discussion-body .blank-slate .home-title, .container .discussion-module .blank-slate .home-title, .container .discussion-user-threads .blank-slate .home-title, .discussion-module .blank-slate .home-title, .discussion-user-threads .blank-slate .home-title, .discussion-course .blank-slate .home-title {
+    font-size: 18px;
+    color: #000;
+    margin-bottom: 5px
+}
+
+.container .discussion-body .blank-slate .home-description, .container .discussion-module .blank-slate .home-description, .container .discussion-user-threads .blank-slate .home-description, .discussion-module .blank-slate .home-description, .discussion-user-threads .blank-slate .home-description, .discussion-course .blank-slate .home-description {
+    font-size: 12px;
+    line-height: 1;
+    margin-bottom: 10px
+}
+
+.container .discussion-body .blank-slate .home-stats, .container .discussion-module .blank-slate .home-stats, .container .discussion-user-threads .blank-slate .home-stats, .discussion-module .blank-slate .home-stats, .discussion-user-threads .blank-slate .home-stats, .discussion-course .blank-slate .home-stats {
+    padding: 20px 0
+}
+
+.container .discussion-body .blank-slate .home-stats .label-area, .container .discussion-module .blank-slate .home-stats .label-area, .container .discussion-user-threads .blank-slate .home-stats .label-area, .discussion-module .blank-slate .home-stats .label-area, .discussion-user-threads .blank-slate .home-stats .label-area, .discussion-course .blank-slate .home-stats .label-area {
+    display: inline-block;
+    min-width: 100px;
+    width: 25%;
+    vertical-align: middle
+}
+
+.container .discussion-body .blank-slate .home-stats .label-area .profile-link, .container .discussion-module .blank-slate .home-stats .label-area .profile-link, .container .discussion-user-threads .blank-slate .home-stats .label-area .profile-link, .discussion-module .blank-slate .home-stats .label-area .profile-link, .discussion-user-threads .blank-slate .home-stats .label-area .profile-link, .discussion-course .blank-slate .home-stats .label-area .profile-link {
+    font-weight: 700
+}
+
+.container .discussion-body .blank-slate .home-stats .stats-grouping, .container .discussion-module .blank-slate .home-stats .stats-grouping, .container .discussion-user-threads .blank-slate .home-stats .stats-grouping, .discussion-module .blank-slate .home-stats .stats-grouping, .discussion-user-threads .blank-slate .home-stats .stats-grouping, .discussion-course .blank-slate .home-stats .stats-grouping {
+    display: inline-block;
+    width: 70%;
+    padding-left: 20px
+}
+
+.container .discussion-body .blank-slate .home-stats .stats-grouping .profile-stat, .container .discussion-module .blank-slate .home-stats .stats-grouping .profile-stat, .container .discussion-user-threads .blank-slate .home-stats .stats-grouping .profile-stat, .discussion-module .blank-slate .home-stats .stats-grouping .profile-stat, .discussion-user-threads .blank-slate .home-stats .stats-grouping .profile-stat, .discussion-course .blank-slate .home-stats .stats-grouping .profile-stat {
+    display: inline-block;
+    width: 32.5%;
+    vertical-align: middle;
+    font-size: 12px
+}
+
+.container .discussion-body .blank-slate .home-stats .stats-grouping .profile-stat .count, .container .discussion-module .blank-slate .home-stats .stats-grouping .profile-stat .count, .container .discussion-user-threads .blank-slate .home-stats .stats-grouping .profile-stat .count, .discussion-module .blank-slate .home-stats .stats-grouping .profile-stat .count, .discussion-user-threads .blank-slate .home-stats .stats-grouping .profile-stat .count, .discussion-course .blank-slate .home-stats .stats-grouping .profile-stat .count {
+    display: inline-block;
+    font-size: 28px;
+    padding: 0 10px;
+    vertical-align: middle
+}
+
+.container .discussion-body .blank-slate .home-stats .stats-grouping .profile-stat .profile-stat-label, .container .discussion-module .blank-slate .home-stats .stats-grouping .profile-stat .profile-stat-label, .container .discussion-user-threads .blank-slate .home-stats .stats-grouping .profile-stat .profile-stat-label, .discussion-module .blank-slate .home-stats .stats-grouping .profile-stat .profile-stat-label, .discussion-user-threads .blank-slate .home-stats .stats-grouping .profile-stat .profile-stat-label, .discussion-course .blank-slate .home-stats .stats-grouping .profile-stat .profile-stat-label {
+    vertical-align: middle
+}
+
+.container .discussion-body .blank-slate .home-helpgrid, .container .discussion-module .blank-slate .home-helpgrid, .container .discussion-user-threads .blank-slate .home-helpgrid, .discussion-module .blank-slate .home-helpgrid, .discussion-user-threads .blank-slate .home-helpgrid, .discussion-course .blank-slate .home-helpgrid {
+    border-bottom: none;
+    border-radius: 3px;
+    border: 1px solid #b2b2b2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15)
+}
+
+.container .discussion-body .helpgrid-row, .container .discussion-module .helpgrid-row, .container .discussion-user-threads .helpgrid-row, .discussion-module .helpgrid-row, .discussion-user-threads .helpgrid-row, .discussion-course .helpgrid-row {
+    border-bottom: 1px solid #b2b2b2
+}
+
+.container .discussion-body .helpgrid-row .row-title, .container .discussion-module .helpgrid-row .row-title, .container .discussion-user-threads .helpgrid-row .row-title, .discussion-module .helpgrid-row .row-title, .discussion-user-threads .helpgrid-row .row-title, .discussion-course .helpgrid-row .row-title {
+    padding: 30px 20px;
+    background-color: #dedede;
+    font-size: 12px
+}
+
+.container .discussion-body .helpgrid-row .row-item-full, .container .discussion-module .helpgrid-row .row-item-full, .container .discussion-user-threads .helpgrid-row .row-item-full, .container .discussion-body .helpgrid-row .row-item, .container .discussion-module .helpgrid-row .row-item, .container .discussion-user-threads .helpgrid-row .row-item, .discussion-module .helpgrid-row .row-item-full, .discussion-user-threads .helpgrid-row .row-item-full, .discussion-module .helpgrid-row .row-item, .discussion-user-threads .helpgrid-row .row-item, .discussion-course .helpgrid-row .row-item-full, .discussion-course .helpgrid-row .row-item {
+    font-size: 12px;
+    padding: 0px 10px;
+    width: 26%;
+    vertical-align: middle
+}
+
+.container .discussion-body .helpgrid-row .row-item-full .icon, .container .discussion-module .helpgrid-row .row-item-full .icon, .container .discussion-user-threads .helpgrid-row .row-item-full .icon, .container .discussion-body .helpgrid-row .row-item .icon, .container .discussion-module .helpgrid-row .row-item .icon, .container .discussion-user-threads .helpgrid-row .row-item .icon, .discussion-module .helpgrid-row .row-item-full .icon, .discussion-user-threads .helpgrid-row .row-item-full .icon, .discussion-module .helpgrid-row .row-item .icon, .discussion-user-threads .helpgrid-row .row-item .icon, .discussion-course .helpgrid-row .row-item-full .icon, .discussion-course .helpgrid-row .row-item .icon {
+    padding: 0 10px;
+    font-size: 24px;
+    vertical-align: middle;
+    display: table-cell
+}
+
+.container .discussion-body .helpgrid-row .row-item-full .icon-stack i, .container .discussion-module .helpgrid-row .row-item-full .icon-stack i, .container .discussion-user-threads .helpgrid-row .row-item-full .icon-stack i, .container .discussion-body .helpgrid-row .row-item .icon-stack i, .container .discussion-module .helpgrid-row .row-item .icon-stack i, .container .discussion-user-threads .helpgrid-row .row-item .icon-stack i, .discussion-module .helpgrid-row .row-item-full .icon-stack i, .discussion-user-threads .helpgrid-row .row-item-full .icon-stack i, .discussion-module .helpgrid-row .row-item .icon-stack i, .discussion-user-threads .helpgrid-row .row-item .icon-stack i, .discussion-course .helpgrid-row .row-item-full .icon-stack i, .discussion-course .helpgrid-row .row-item .icon-stack i {
+    padding: 0 10px
+}
+
+.container .discussion-body .helpgrid-row .row-item-full .row-description, .container .discussion-module .helpgrid-row .row-item-full .row-description, .container .discussion-user-threads .helpgrid-row .row-item-full .row-description, .container .discussion-body .helpgrid-row .row-item .row-description, .container .discussion-module .helpgrid-row .row-item .row-description, .container .discussion-user-threads .helpgrid-row .row-item .row-description, .discussion-module .helpgrid-row .row-item-full .row-description, .discussion-user-threads .helpgrid-row .row-item-full .row-description, .discussion-module .helpgrid-row .row-item .row-description, .discussion-user-threads .helpgrid-row .row-item .row-description, .discussion-course .helpgrid-row .row-item-full .row-description, .discussion-course .helpgrid-row .row-item .row-description {
+    vertical-align: middle;
+    display: table-cell
+}
+
+.container .discussion-body .helpgrid-row .row-item-full .notification-checkbox, .container .discussion-module .helpgrid-row .row-item-full .notification-checkbox, .container .discussion-user-threads .helpgrid-row .row-item-full .notification-checkbox, .discussion-module .helpgrid-row .row-item-full .notification-checkbox, .discussion-user-threads .helpgrid-row .row-item-full .notification-checkbox, .discussion-course .helpgrid-row .row-item-full .notification-checkbox {
+    display: inline-block;
+    padding: 5px 0 10px 0;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid gray
+}
+
+.container .discussion-body .helpgrid-row .row-item-full .notification-checkbox .email-setting, .container .discussion-module .helpgrid-row .row-item-full .notification-checkbox .email-setting, .container .discussion-user-threads .helpgrid-row .row-item-full .notification-checkbox .email-setting, .discussion-module .helpgrid-row .row-item-full .notification-checkbox .email-setting, .discussion-user-threads .helpgrid-row .row-item-full .notification-checkbox .email-setting, .discussion-course .helpgrid-row .row-item-full .notification-checkbox .email-setting {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    margin-left: 10px
+}
+
+.container .discussion-body .helpgrid-row .row-item-full .notification-checkbox .icon, .container .discussion-module .helpgrid-row .row-item-full .notification-checkbox .icon, .container .discussion-user-threads .helpgrid-row .row-item-full .notification-checkbox .icon, .discussion-module .helpgrid-row .row-item-full .notification-checkbox .icon, .discussion-user-threads .helpgrid-row .row-item-full .notification-checkbox .icon, .discussion-course .helpgrid-row .row-item-full .notification-checkbox .icon {
+    display: inline-block
+}
+
+.container .discussion-body .helpgrid-row .row-item-full .notification-checkbox .email-setting:checked ~ .icon, .container .discussion-module .helpgrid-row .row-item-full .notification-checkbox .email-setting:checked ~ .icon, .container .discussion-user-threads .helpgrid-row .row-item-full .notification-checkbox .email-setting:checked ~ .icon, .discussion-module .helpgrid-row .row-item-full .notification-checkbox .email-setting:checked ~ .icon, .discussion-user-threads .helpgrid-row .row-item-full .notification-checkbox .email-setting:checked ~ .icon, .discussion-course .helpgrid-row .row-item-full .notification-checkbox .email-setting:checked ~ .icon {
+    color: #25b85a
+}
+
+.container .discussion-body .helpgrid-row .row-item-full .row-description, .container .discussion-module .helpgrid-row .row-item-full .row-description, .container .discussion-user-threads .helpgrid-row .row-item-full .row-description, .discussion-module .helpgrid-row .row-item-full .row-description, .discussion-user-threads .helpgrid-row .row-item-full .row-description, .discussion-course .helpgrid-row .row-item-full .row-description {
+    display: inline-block;
+    width: 80%
+}
+
+.container .discussion-body .helpgrid-row-navigation .icon-reorder, .container .discussion-module .helpgrid-row-navigation .icon-reorder, .container .discussion-user-threads .helpgrid-row-navigation .icon-reorder, .discussion-module .helpgrid-row-navigation .icon-reorder, .discussion-user-threads .helpgrid-row-navigation .icon-reorder, .discussion-course .helpgrid-row-navigation .icon-reorder {
+    color: #ddd
+}
+
+.container .discussion-body .helpgrid-row-navigation .icon-search, .container .discussion-module .helpgrid-row-navigation .icon-search, .container .discussion-user-threads .helpgrid-row-navigation .icon-search, .discussion-module .helpgrid-row-navigation .icon-search, .discussion-user-threads .helpgrid-row-navigation .icon-search, .discussion-course .helpgrid-row-navigation .icon-search {
+    color: #ddd
+}
+
+.container .discussion-body .helpgrid-row-navigation .icon-sort, .container .discussion-module .helpgrid-row-navigation .icon-sort, .container .discussion-user-threads .helpgrid-row-navigation .icon-sort, .discussion-module .helpgrid-row-navigation .icon-sort, .discussion-user-threads .helpgrid-row-navigation .icon-sort, .discussion-course .helpgrid-row-navigation .icon-sort {
+    color: #ddd
+}
+
+.container .discussion-body .helpgrid-row-participation .icon-plus, .container .discussion-module .helpgrid-row-participation .icon-plus, .container .discussion-user-threads .helpgrid-row-participation .icon-plus, .discussion-module .helpgrid-row-participation .icon-plus, .discussion-user-threads .helpgrid-row-participation .icon-plus, .discussion-course .helpgrid-row-participation .icon-plus {
+    color: #25b85a
+}
+
+.container .discussion-body .helpgrid-row-participation .icon-flag, .container .discussion-module .helpgrid-row-participation .icon-flag, .container .discussion-user-threads .helpgrid-row-participation .icon-flag, .discussion-module .helpgrid-row-participation .icon-flag, .discussion-user-threads .helpgrid-row-participation .icon-flag, .discussion-course .helpgrid-row-participation .icon-flag {
+    color: #b62567
+}
+
+.container .discussion-body .helpgrid-row-participation .icon-star, .container .discussion-module .helpgrid-row-participation .icon-star, .container .discussion-user-threads .helpgrid-row-participation .icon-star, .discussion-module .helpgrid-row-participation .icon-star, .discussion-user-threads .helpgrid-row-participation .icon-star, .discussion-course .helpgrid-row-participation .icon-star {
+    color: #1d9dd9
+}
+
+.container .discussion-body .helpgrid-row-notification .icon-sign-blank, .container .discussion-module .helpgrid-row-notification .icon-sign-blank, .container .discussion-user-threads .helpgrid-row-notification .icon-sign-blank, .discussion-module .helpgrid-row-notification .icon-sign-blank, .discussion-user-threads .helpgrid-row-notification .icon-sign-blank, .discussion-course .helpgrid-row-notification .icon-sign-blank {
+    color: #25b85a
+}
+
+.container .discussion-body .helpgrid-row-notification .icon-envelope, .container .discussion-module .helpgrid-row-notification .icon-envelope, .container .discussion-user-threads .helpgrid-row-notification .icon-envelope, .discussion-module .helpgrid-row-notification .icon-envelope, .discussion-user-threads .helpgrid-row-notification .icon-envelope, .discussion-course .helpgrid-row-notification .icon-envelope {
+    color: #ddd
+}
+
+.container .discussion-body .discussion-article, .container .discussion-module .discussion-article, .container .discussion-user-threads .discussion-article, .discussion-module .discussion-article, .discussion-user-threads .discussion-article, .discussion-course .discussion-article {
+    position: relative;
+    min-height: 468px;
+    background-image: url(../../../images/bg-texture.png)
+}
+
+.container .discussion-body .discussion-article a, .container .discussion-module .discussion-article a, .container .discussion-user-threads .discussion-article a, .discussion-module .discussion-article a, .discussion-user-threads .discussion-article a, .discussion-course .discussion-article a {
+    word-wrap: break-word
+}
+
+.container .discussion-body .discussion-article h1, .container .discussion-module .discussion-article h1, .container .discussion-user-threads .discussion-article h1, .discussion-module .discussion-article h1, .discussion-user-threads .discussion-article h1, .discussion-course .discussion-article h1 {
+    margin-bottom: 10px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.2
+}
+
+.container .discussion-body .discussion-article .posted-details, .container .discussion-module .discussion-article .posted-details, .container .discussion-user-threads .discussion-article .posted-details, .discussion-module .discussion-article .posted-details, .discussion-user-threads .discussion-article .posted-details, .discussion-course .discussion-article .posted-details {
+    font-size: 12px;
+    font-style: italic;
+    color: #888
+}
+
+.container .discussion-body .discussion-article .posted-details .username, .container .discussion-module .discussion-article .posted-details .username, .container .discussion-user-threads .discussion-article .posted-details .username, .discussion-module .discussion-article .posted-details .username, .discussion-user-threads .discussion-article .posted-details .username, .discussion-course .discussion-article .posted-details .username {
+    display: block;
+    font-size: 16px;
+    font-weight: 700
+}
+
+.container .discussion-body .discussion-article .posted-details span, .container .discussion-module .discussion-article .posted-details span, .container .discussion-user-threads .discussion-article .posted-details span, .discussion-module .discussion-article .posted-details span, .discussion-user-threads .discussion-article .posted-details span, .discussion-course .discussion-article .posted-details span {
+    font-style: italic
+}
+
+.container .discussion-body .discussion-article .post-context, .container .discussion-module .discussion-article .post-context, .container .discussion-user-threads .discussion-article .post-context, .discussion-module .discussion-article .post-context, .discussion-user-threads .discussion-article .post-context, .discussion-course .discussion-article .post-context {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #888
+}
+
+.container .discussion-body .discussion-article p + p, .container .discussion-module .discussion-article p + p, .container .discussion-user-threads .discussion-article p + p, .discussion-module .discussion-article p + p, .discussion-user-threads .discussion-article p + p, .discussion-course .discussion-article p + p {
+    margin-top: 20px
+}
+
+.container .discussion-body .discussion-article .dogear, .container .discussion-module .discussion-article .dogear, .container .discussion-user-threads .discussion-article .dogear, .discussion-module .discussion-article .dogear, .discussion-user-threads .discussion-article .dogear, .discussion-course .discussion-article .dogear {
+    display: block;
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 52px;
+    height: 51px;
+    background: url(../../../images/follow-dog-ear.png) 0 -52px no-repeat;
+    -webkit-transition: none;
+    -moz-transition: none;
+    transition: none
+}
+
+.container .discussion-body .discussion-article .dogear.is-followed, .container .discussion-module .discussion-article .dogear.is-followed, .container .discussion-user-threads .discussion-article .dogear.is-followed, .discussion-module .discussion-article .dogear.is-followed, .discussion-user-threads .discussion-article .dogear.is-followed, .discussion-course .discussion-article .dogear.is-followed {
+    background-position: 0 0
+}
+
+.container .discussion-body .discussion-post, .container .discussion-module .discussion-post, .container .discussion-user-threads .discussion-post, .discussion-module .discussion-post, .discussion-user-threads .discussion-post, .discussion-course .discussion-post {
+    padding: 40px 40px 20px 40px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    border-radius: 3px 3px 0 0
+}
+
+.container .discussion-body .discussion-post > header .vote-btn, .container .discussion-module .discussion-post > header .vote-btn, .container .discussion-user-threads .discussion-post > header .vote-btn, .discussion-module .discussion-post > header .vote-btn, .discussion-user-threads .discussion-post > header .vote-btn, .discussion-course .discussion-post > header .vote-btn {
+    position: relative;
+    z-index: 100;
+    margin-top: 5px;
+    margin-left: 40px
+}
+
+.container .discussion-body .discussion-post .post-tools, .container .discussion-module .discussion-post .post-tools, .container .discussion-user-threads .discussion-post .post-tools, .discussion-module .discussion-post .post-tools, .discussion-user-threads .discussion-post .post-tools, .discussion-course .discussion-post .post-tools {
+    margin-top: 15px
+}
+
+.container .discussion-body .discussion-post .post-tools:after, .container .discussion-module .discussion-post .post-tools:after, .container .discussion-user-threads .discussion-post .post-tools:after, .discussion-module .discussion-post .post-tools:after, .discussion-user-threads .discussion-post .post-tools:after, .discussion-course .discussion-post .post-tools:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.container .discussion-body .discussion-post header, .container .discussion-module .discussion-post header, .container .discussion-user-threads .discussion-post header, .container .discussion-body .responses li header, .container .discussion-module .responses li header, .container .discussion-user-threads .responses li header, .discussion-module .discussion-post header, .discussion-user-threads .discussion-post header, .discussion-module .responses li header, .discussion-user-threads .responses li header, .discussion-course .discussion-post header, .discussion-course .responses li header {
+    margin-bottom: 20px
+}
+
+.container .discussion-body .responses, .container .discussion-module .responses, .container .discussion-user-threads .responses, .discussion-module .responses, .discussion-user-threads .responses, .discussion-course .responses {
+    list-style: none;
+    margin-top: 20px;
+    padding: 0px 40px
+}
+
+.container .discussion-body .responses > li, .container .discussion-module .responses > li, .container .discussion-user-threads .responses > li, .discussion-module .responses > li, .discussion-user-threads .responses > li, .discussion-course .responses > li {
+    -webkit-animation: fadeIn 0.3s;
+    -moz-animation: fadeIn 0.3s;
+    animation: fadeIn 0.3s;
+    position: relative;
+    margin: 0 -10px 30px;
+    border: 1px solid #b2b2b2;
+    border-radius: 3px;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.2)
+}
+
+.container .discussion-body .responses > li.staff, .container .discussion-module .responses > li.staff, .container .discussion-user-threads .responses > li.staff, .discussion-module .responses > li.staff, .discussion-user-threads .responses > li.staff, .discussion-course .responses > li.staff {
+    padding-top: 38px;
+    border-color: #009fe2
+}
+
+.container .discussion-body .responses > li.community-ta, .container .discussion-module .responses > li.community-ta, .container .discussion-user-threads .responses > li.community-ta, .discussion-module .responses > li.community-ta, .discussion-user-threads .responses > li.community-ta, .discussion-course .responses > li.community-ta {
+    padding-top: 38px;
+    border-color: #1d9348
+}
+
+.container .discussion-body .responses > li .staff-banner, .container .discussion-module .responses > li .staff-banner, .container .discussion-user-threads .responses > li .staff-banner, .discussion-module .responses > li .staff-banner, .discussion-user-threads .responses > li .staff-banner, .discussion-course .responses > li .staff-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 14px;
+    padding: 1px 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 2px 2px 0 0;
+    background: #009fe2;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase
+}
+
+.container .discussion-body .responses > li .community-ta-banner, .container .discussion-module .responses > li .community-ta-banner, .container .discussion-user-threads .responses > li .community-ta-banner, .discussion-module .responses > li .community-ta-banner, .discussion-user-threads .responses > li .community-ta-banner, .discussion-course .responses > li .community-ta-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 14px;
+    padding: 1px 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 2px 2px 0 0;
+    background: #1d9348;
+    font-size: 9px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase
+}
+
+.container .discussion-body .responses > li.loading, .container .discussion-module .responses > li.loading, .container .discussion-user-threads .responses > li.loading, .discussion-module .responses > li.loading, .discussion-user-threads .responses > li.loading, .discussion-course .responses > li.loading {
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none
+}
+
+.container .discussion-body .responses .discussion-response, .container .discussion-module .responses .discussion-response, .container .discussion-user-threads .responses .discussion-response, .discussion-module .responses .discussion-response, .discussion-user-threads .responses .discussion-response, .discussion-course .responses .discussion-response {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 3px 3px 0 0;
+    padding: 20px 20px 0;
+    background-color: #fff
+}
+
+.container .discussion-body .responses .posted-by, .container .discussion-module .responses .posted-by, .container .discussion-user-threads .responses .posted-by, .discussion-module .responses .posted-by, .discussion-user-threads .responses .posted-by, .discussion-course .responses .posted-by {
+    font-weight: 700
+}
+
+.container .discussion-body .add-response, .container .discussion-module .add-response, .container .discussion-user-threads .add-response, .discussion-module .add-response, .discussion-user-threads .add-response, .discussion-course .add-response {
+    margin-top: 20px;
+    padding: 0 30px
+}
+
+.container .discussion-body .add-response .add-response-btn, .container .discussion-module .add-response .add-response-btn, .container .discussion-user-threads .add-response .add-response-btn, .discussion-module .add-response .add-response-btn, .discussion-user-threads .add-response .add-response-btn, .discussion-course .add-response .add-response-btn {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    background-image: linear-gradient(to bottom, #fff 35%, #ebebeb);
+    position: relative;
+    border: 1px solid #b2b2b2;
+    padding: 0 18px;
+    width: 100%;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    font-size: 13px
+}
+
+.container .discussion-body .add-response .add-response-btn:hover, .container .discussion-module .add-response .add-response-btn:hover, .container .discussion-user-threads .add-response .add-response-btn:hover, .container .discussion-body .add-response .add-response-btn:focus, .container .discussion-module .add-response .add-response-btn:focus, .container .discussion-user-threads .add-response .add-response-btn:focus, .discussion-module .add-response .add-response-btn:hover, .discussion-user-threads .add-response .add-response-btn:hover, .discussion-module .add-response .add-response-btn:focus, .discussion-user-threads .add-response .add-response-btn:focus, .discussion-course .add-response .add-response-btn:hover, .discussion-course .add-response .add-response-btn:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+.container .discussion-body .add-response .add-response-btn span.add-response-btn-text, .container .discussion-module .add-response .add-response-btn span.add-response-btn-text, .container .discussion-user-threads .add-response .add-response-btn span.add-response-btn-text, .discussion-module .add-response .add-response-btn span.add-response-btn-text, .discussion-user-threads .add-response .add-response-btn span.add-response-btn-text, .discussion-course .add-response .add-response-btn span.add-response-btn-text {
+    padding-left: 4px
+}
+
+.container .discussion-body .vote-btn, .container .discussion-module .vote-btn, .container .discussion-user-threads .vote-btn, .discussion-module .vote-btn, .discussion-user-threads .vote-btn, .discussion-course .vote-btn {
+    position: relative;
+    z-index: 100;
+    float: right;
+    display: block;
+    height: 27px;
+    padding: 0 8px;
+    border-radius: 5px;
+    border: 1px solid #b2b2b2;
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    background-image: linear-gradient(to bottom, #fff 35%, #ebebeb);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 25px;
+    color: #333
+}
+
+.container .discussion-body .vote-btn .plus-icon, .container .discussion-module .vote-btn .plus-icon, .container .discussion-user-threads .vote-btn .plus-icon, .discussion-module .vote-btn .plus-icon, .discussion-user-threads .vote-btn .plus-icon, .discussion-course .vote-btn .plus-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin: 8px 6px 0 0;
+    background: url(../../../images/vote-plus-icon.png) no-repeat;
+    font-size: 18px;
+    text-indent: -9999px;
+    color: #17b429;
+    overflow: hidden
+}
+
+.container .discussion-body .vote-btn.is-cast, .container .discussion-module .vote-btn.is-cast, .container .discussion-user-threads .vote-btn.is-cast, .discussion-module .vote-btn.is-cast, .discussion-user-threads .vote-btn.is-cast, .discussion-course .vote-btn.is-cast {
+    border-color: #379a42;
+    background-color: #50cc5e;
+    background-image: -webkit-linear-gradient(top, #50cc5e, #3db84b);
+    background-image: linear-gradient(to bottom, #50cc5e, #3db84b);
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 2px rgba(0, 0, 0, 0.2)
+}
+
+.container .discussion-body .vote-btn.is-cast .plus-icon, .container .discussion-module .vote-btn.is-cast .plus-icon, .container .discussion-user-threads .vote-btn.is-cast .plus-icon, .discussion-module .vote-btn.is-cast .plus-icon, .discussion-user-threads .vote-btn.is-cast .plus-icon, .discussion-course .vote-btn.is-cast .plus-icon {
+    background-position: 0 -10px;
+    color: #336a39;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4)
+}
+
+.container .discussion-body .endorse-btn, .container .discussion-module .endorse-btn, .container .discussion-user-threads .endorse-btn, .discussion-module .endorse-btn, .discussion-user-threads .endorse-btn, .discussion-course .endorse-btn {
+    display: block;
+    float: right;
+    width: 27px;
+    height: 27px;
+    margin-right: 10px;
+    border-radius: 27px;
+    border: 1px solid #a0a0a0;
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff 35%, #e5e5e5);
+    background-image: linear-gradient(to bottom, #fff 35%, #e5e5e5);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1)
+}
+
+.container .discussion-body .endorse-btn .check-icon, .container .discussion-module .endorse-btn .check-icon, .container .discussion-user-threads .endorse-btn .check-icon, .discussion-module .endorse-btn .check-icon, .discussion-user-threads .endorse-btn .check-icon, .discussion-course .endorse-btn .check-icon {
+    display: block;
+    width: 13px;
+    height: 12px;
+    margin: 8px auto;
+    background: url(../../../images/endorse-icon.png) no-repeat
+}
+
+.container .discussion-body .endorse-btn.is-endorsed, .container .discussion-module .endorse-btn.is-endorsed, .container .discussion-user-threads .endorse-btn.is-endorsed, .discussion-module .endorse-btn.is-endorsed, .discussion-user-threads .endorse-btn.is-endorsed, .discussion-course .endorse-btn.is-endorsed {
+    border: 1px solid #4697c1;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.4) inset
+}
+
+.container .discussion-body .endorse-btn.is-endorsed .check-icon, .container .discussion-module .endorse-btn.is-endorsed .check-icon, .container .discussion-user-threads .endorse-btn.is-endorsed .check-icon, .discussion-module .endorse-btn.is-endorsed .check-icon, .discussion-user-threads .endorse-btn.is-endorsed .check-icon, .discussion-course .endorse-btn.is-endorsed .check-icon {
+    background-position: 0 -12px
+}
+
+.container .discussion-body blockquote, .container .discussion-module blockquote, .container .discussion-user-threads blockquote, .discussion-module blockquote, .discussion-user-threads blockquote, .discussion-course blockquote {
+    background: #f2f2f2;
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 14px
+}
+
+.container .discussion-body .comments, .container .discussion-module .comments, .container .discussion-user-threads .comments, .discussion-module .comments, .discussion-user-threads .comments, .discussion-course .comments {
+    margin: 0;
+    border-radius: 0 0 3px 3px;
+    padding: 0;
+    background: #f8f8f8;
+    box-shadow: 0 1px 3px -1px rgba(0, 0, 0, 0.2) inset;
+    list-style: none
+}
+
+.container .discussion-body .comments > li, .container .discussion-module .comments > li, .container .discussion-user-threads .comments > li, .discussion-module .comments > li, .discussion-user-threads .comments > li, .discussion-course .comments > li {
+    border-top: 1px solid #e5e5e5;
+    padding: 10px 20px
+}
+
+.container .discussion-body .comments blockquote, .container .discussion-module .comments blockquote, .container .discussion-user-threads .comments blockquote, .discussion-module .comments blockquote, .discussion-user-threads .comments blockquote, .discussion-course .comments blockquote {
+    background: #e5e5e5;
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 14px
+}
+
+.container .discussion-body .comments .comment-form:after, .container .discussion-module .comments .comment-form:after, .container .discussion-user-threads .comments .comment-form:after, .discussion-module .comments .comment-form:after, .discussion-user-threads .comments .comment-form:after, .discussion-course .comments .comment-form:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.container .discussion-body .comments .comment-form .comment-form-input, .container .discussion-module .comments .comment-form .comment-form-input, .container .discussion-user-threads .comments .comment-form .comment-form-input, .discussion-module .comments .comment-form .comment-form-input, .discussion-user-threads .comments .comment-form .comment-form-input, .discussion-course .comments .comment-form .comment-form-input {
+    padding: 5px 10px;
+    background-color: #fff;
+    font-size: 14px
+}
+
+.container .discussion-body .comments .comment-form .discussion-submit-comment, .container .discussion-module .comments .comment-form .discussion-submit-comment, .container .discussion-user-threads .comments .comment-form .discussion-submit-comment, .discussion-module .comments .comment-form .discussion-submit-comment, .discussion-user-threads .comments .comment-form .discussion-submit-comment, .discussion-course .comments .comment-form .discussion-submit-comment {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    float: left;
+    margin-top: 8px
+}
+
+.container .discussion-body .comments .comment-form .discussion-submit-comment:hover, .container .discussion-module .comments .comment-form .discussion-submit-comment:hover, .container .discussion-user-threads .comments .comment-form .discussion-submit-comment:hover, .container .discussion-body .comments .comment-form .discussion-submit-comment:focus, .container .discussion-module .comments .comment-form .discussion-submit-comment:focus, .container .discussion-user-threads .comments .comment-form .discussion-submit-comment:focus, .discussion-module .comments .comment-form .discussion-submit-comment:hover, .discussion-user-threads .comments .comment-form .discussion-submit-comment:hover, .discussion-module .comments .comment-form .discussion-submit-comment:focus, .discussion-user-threads .comments .comment-form .discussion-submit-comment:focus, .discussion-course .comments .comment-form .discussion-submit-comment:hover, .discussion-course .comments .comment-form .discussion-submit-comment:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+.container .discussion-body .comments .comment-form .wmd-input, .container .discussion-module .comments .comment-form .wmd-input, .container .discussion-user-threads .comments .comment-form .wmd-input, .discussion-module .comments .comment-form .wmd-input, .discussion-user-threads .comments .comment-form .wmd-input, .discussion-course .comments .comment-form .wmd-input {
+    height: 40px
+}
+
+.container .discussion-body .comments .comment-form .discussion-errors, .container .discussion-module .comments .comment-form .discussion-errors, .container .discussion-user-threads .comments .comment-form .discussion-errors, .discussion-module .comments .comment-form .discussion-errors, .discussion-user-threads .comments .comment-form .discussion-errors, .discussion-course .comments .comment-form .discussion-errors {
+    margin: 0
+}
+
+.container .discussion-body .comments .response-body, .container .discussion-module .comments .response-body, .container .discussion-user-threads .comments .response-body, .discussion-module .comments .response-body, .discussion-user-threads .comments .response-body, .discussion-course .comments .response-body {
+    font-size: 13px;
+    margin-bottom: 10px
+}
+
+.container .discussion-body .comments .response-body p + p, .container .discussion-module .comments .response-body p + p, .container .discussion-user-threads .comments .response-body p + p, .discussion-module .comments .response-body p + p, .discussion-user-threads .comments .response-body p + p, .discussion-course .comments .response-body p + p {
+    margin-top: 12px
+}
+
+.container .discussion-body .comments .posted-details, .container .discussion-module .comments .posted-details, .container .discussion-user-threads .comments .posted-details, .discussion-module .comments .posted-details, .discussion-user-threads .comments .posted-details, .discussion-course .comments .posted-details {
+    font-size: 11px
+}
+
+.container .discussion-body .comments .staff-label, .container .discussion-module .comments .staff-label, .container .discussion-user-threads .comments .staff-label, .discussion-module .comments .staff-label, .discussion-user-threads .comments .staff-label, .discussion-course .comments .staff-label {
+    margin-left: 2px;
+    padding: 0 4px;
+    border-radius: 2px;
+    background: #009FE2;
+    font-size: 9px;
+    font-weight: 700;
+    font-style: normal;
+    color: white;
+    text-transform: uppercase
+}
+
+.container .discussion-body .community-ta-label, .container .discussion-module .community-ta-label, .container .discussion-user-threads .community-ta-label, .discussion-module .community-ta-label, .discussion-user-threads .community-ta-label, .discussion-course .community-ta-label {
+    margin-left: 2px;
+    padding: 0 4px;
+    border-radius: 2px;
+    background: #1d9348;
+    font-size: 9px;
+    font-weight: 700;
+    font-style: normal;
+    color: white;
+    text-transform: uppercase
+}
+
+.container .discussion-body .comment-form, .container .discussion-module .comment-form, .container .discussion-user-threads .comment-form, .discussion-module .comment-form, .discussion-user-threads .comment-form, .discussion-course .comment-form {
+    padding: 10px 0
+}
+
+.container .discussion-body .comment-form .wmd-input, .container .discussion-module .comment-form .wmd-input, .container .discussion-user-threads .comment-form .wmd-input, .discussion-module .comment-form .wmd-input, .discussion-user-threads .comment-form .wmd-input, .discussion-course .comment-form .wmd-input {
+    -webkit-transition: all 0.2s linear 0s;
+    -moz-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s
+}
+
+.container .discussion-body .comment-form .wmd-button, .container .discussion-module .comment-form .wmd-button, .container .discussion-user-threads .comment-form .wmd-button, .discussion-module .comment-form .wmd-button, .discussion-user-threads .comment-form .wmd-button, .discussion-course .comment-form .wmd-button {
+    background: transparent
+}
+
+.container .discussion-body .comment-form .wmd-button span, .container .discussion-module .comment-form .wmd-button span, .container .discussion-user-threads .comment-form .wmd-button span, .discussion-module .comment-form .wmd-button span, .discussion-user-threads .comment-form .wmd-button span, .discussion-course .comment-form .wmd-button span {
+    background-image: url(../../../images/wmd-buttons-transparent.png)
+}
+
+.container .discussion-body .comment-form-input, .container .discussion-module .comment-form-input, .container .discussion-user-threads .comment-form-input, .discussion-module .comment-form-input, .discussion-user-threads .comment-form-input, .discussion-course .comment-form-input {
+    width: 100%;
+    height: 31px;
+    padding: 0 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #b2b2b2;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    -webkit-transition: border-color 0.1s linear 0s;
+    -moz-transition: border-color 0.1s linear 0s;
+    transition: border-color 0.1s linear 0s
+}
+
+.container .discussion-body .comment-form-input:focus, .container .discussion-module .comment-form-input:focus, .container .discussion-user-threads .comment-form-input:focus, .discussion-module .comment-form-input:focus, .discussion-user-threads .comment-form-input:focus, .discussion-course .comment-form-input:focus {
+    border-color: #4697c1
+}
+
+.container .discussion-body .moderator-actions, .container .discussion-module .moderator-actions, .container .discussion-user-threads .moderator-actions, .discussion-module .moderator-actions, .discussion-user-threads .moderator-actions, .discussion-course .moderator-actions {
+    margin: 0;
+    padding: 20px 0
+}
+
+.container .discussion-body .moderator-actions:after, .container .discussion-module .moderator-actions:after, .container .discussion-user-threads .moderator-actions:after, .discussion-module .moderator-actions:after, .discussion-user-threads .moderator-actions:after, .discussion-course .moderator-actions:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.container .discussion-body .moderator-actions li, .container .discussion-module .moderator-actions li, .container .discussion-user-threads .moderator-actions li, .discussion-module .moderator-actions li, .discussion-user-threads .moderator-actions li, .discussion-course .moderator-actions li {
+    float: left;
+    margin-right: 10px;
+    list-style: none
+}
+
+.container .discussion-body .moderator-actions a, .container .discussion-module .moderator-actions a, .container .discussion-user-threads .moderator-actions a, .discussion-module .moderator-actions a, .discussion-user-threads .moderator-actions a, .discussion-course .moderator-actions a {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    height: 26px;
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    background-image: linear-gradient(to bottom, #fff 35%, #ebebeb);
+    font-size: 13px;
+    line-height: 24px;
+    color: #737373;
+    font-weight: normal;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1)
+}
+
+.container .discussion-body .moderator-actions a:hover, .container .discussion-module .moderator-actions a:hover, .container .discussion-user-threads .moderator-actions a:hover, .container .discussion-body .moderator-actions a:focus, .container .discussion-module .moderator-actions a:focus, .container .discussion-user-threads .moderator-actions a:focus, .discussion-module .moderator-actions a:hover, .discussion-user-threads .moderator-actions a:hover, .discussion-module .moderator-actions a:focus, .discussion-user-threads .moderator-actions a:focus, .discussion-course .moderator-actions a:hover, .discussion-course .moderator-actions a:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+.container .discussion-body .moderator-actions a:hover, .container .discussion-module .moderator-actions a:hover, .container .discussion-user-threads .moderator-actions a:hover, .container .discussion-body .moderator-actions a:focus, .container .discussion-module .moderator-actions a:focus, .container .discussion-user-threads .moderator-actions a:focus, .discussion-module .moderator-actions a:hover, .discussion-user-threads .moderator-actions a:hover, .discussion-module .moderator-actions a:focus, .discussion-user-threads .moderator-actions a:focus, .discussion-course .moderator-actions a:hover, .discussion-course .moderator-actions a:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff 35%, #ddd);
+    background-image: linear-gradient(to bottom, #fff 35%, #ddd)
+}
+
+.container .discussion-body .moderator-actions a .delete-icon, .container .discussion-module .moderator-actions a .delete-icon, .container .discussion-user-threads .moderator-actions a .delete-icon, .discussion-module .moderator-actions a .delete-icon, .discussion-user-threads .moderator-actions a .delete-icon, .discussion-course .moderator-actions a .delete-icon {
+    display: block;
+    float: left;
+    width: 10px;
+    height: 10px;
+    margin: 8px 4px 0 0;
+    background: url(../../../images/moderator-delete-icon.png) no-repeat
+}
+
+.container .discussion-body .moderator-actions a .edit-icon, .container .discussion-module .moderator-actions a .edit-icon, .container .discussion-user-threads .moderator-actions a .edit-icon, .discussion-module .moderator-actions a .edit-icon, .discussion-user-threads .moderator-actions a .edit-icon, .discussion-course .moderator-actions a .edit-icon {
+    display: block;
+    float: left;
+    width: 10px;
+    height: 10px;
+    margin: 7px 4px 0 0;
+    background: url(../../../images/moderator-edit-icon.png) no-repeat
+}
+
+.container .discussion-body .main-article.new, .container .discussion-module .main-article.new, .container .discussion-user-threads .main-article.new, .discussion-module .main-article.new, .discussion-user-threads .main-article.new, .discussion-course .main-article.new {
+    display: none;
+    padding: 50px
+}
+
+.container .discussion-body .new-post-form, .container .discussion-module .new-post-form, .container .discussion-user-threads .new-post-form, .discussion-module .new-post-form, .discussion-user-threads .new-post-form, .discussion-course .new-post-form {
+    margin-top: 20px
+}
+
+.container .discussion-body .new-post-form:after, .container .discussion-module .new-post-form:after, .container .discussion-user-threads .new-post-form:after, .discussion-module .new-post-form:after, .discussion-user-threads .new-post-form:after, .discussion-course .new-post-form:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.container .discussion-body .new-post-form .submit, .container .discussion-module .new-post-form .submit, .container .discussion-user-threads .new-post-form .submit, .discussion-module .new-post-form .submit, .discussion-user-threads .new-post-form .submit, .discussion-course .new-post-form .submit {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    float: left;
+    margin-top: 10px;
+    padding-bottom: 2px
+}
+
+.container .discussion-body .new-post-form .submit:hover, .container .discussion-module .new-post-form .submit:hover, .container .discussion-user-threads .new-post-form .submit:hover, .container .discussion-body .new-post-form .submit:focus, .container .discussion-module .new-post-form .submit:focus, .container .discussion-user-threads .new-post-form .submit:focus, .discussion-module .new-post-form .submit:hover, .discussion-user-threads .new-post-form .submit:hover, .discussion-module .new-post-form .submit:focus, .discussion-user-threads .new-post-form .submit:focus, .discussion-course .new-post-form .submit:hover, .discussion-course .new-post-form .submit:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+.container .discussion-body .new-post-form .options, .container .discussion-module .new-post-form .options, .container .discussion-user-threads .new-post-form .options, .discussion-module .new-post-form .options, .discussion-user-threads .new-post-form .options, .discussion-course .new-post-form .options {
+    float: right;
+    margin-top: 20px;
+    font-size: 14px
+}
+
+.container .discussion-body .new-post-form .options label, .container .discussion-module .new-post-form .options label, .container .discussion-user-threads .new-post-form .options label, .discussion-module .new-post-form .options label, .discussion-user-threads .new-post-form .options label, .discussion-course .new-post-form .options label {
+    margin-left: 4px
+}
+
+.container .discussion-body .discussion-reply-new, .container .discussion-module .discussion-reply-new, .container .discussion-user-threads .discussion-reply-new, .discussion-module .discussion-reply-new, .discussion-user-threads .discussion-reply-new, .discussion-course .discussion-reply-new {
+    padding: 20px 30px;
+    -webkit-transition: opacity 0.2s linear 0s;
+    -moz-transition: opacity 0.2s linear 0s;
+    transition: opacity 0.2s linear 0s
+}
+
+.container .discussion-body .discussion-reply-new:after, .container .discussion-module .discussion-reply-new:after, .container .discussion-user-threads .discussion-reply-new:after, .discussion-module .discussion-reply-new:after, .discussion-user-threads .discussion-reply-new:after, .discussion-course .discussion-reply-new:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.container .discussion-body .discussion-reply-new h4, .container .discussion-module .discussion-reply-new h4, .container .discussion-user-threads .discussion-reply-new h4, .discussion-module .discussion-reply-new h4, .discussion-user-threads .discussion-reply-new h4, .discussion-course .discussion-reply-new h4 {
+    font-size: 16px;
+    font-weight: 700
+}
+
+.container .discussion-body .wmd-button-bar, .container .discussion-module .wmd-button-bar, .container .discussion-user-threads .wmd-button-bar, .discussion-module .wmd-button-bar, .discussion-user-threads .wmd-button-bar, .discussion-course .wmd-button-bar {
+    border: none
+}
+
+.container .discussion-body .wmd-input, .container .discussion-module .wmd-input, .container .discussion-user-threads .wmd-input, .discussion-module .wmd-input, .discussion-user-threads .wmd-input, .discussion-course .wmd-input {
+    width: 100%;
+    height: 240px;
+    margin-top: 0;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-radius: 3px 3px 0 0;
+    background: #fff;
+    font-family: 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset
+}
+
+.container .discussion-body .wmd-preview-container, .container .discussion-module .wmd-preview-container, .container .discussion-user-threads .wmd-preview-container, .discussion-module .wmd-preview-container, .discussion-user-threads .wmd-preview-container, .discussion-course .wmd-preview-container {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    background: #eee;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset
+}
+
+.container .discussion-body .wmd-preview-label, .container .discussion-module .wmd-preview-label, .container .discussion-user-threads .wmd-preview-label, .discussion-module .wmd-preview-label, .discussion-user-threads .wmd-preview-label, .discussion-course .wmd-preview-label {
+    width: 100%;
+    padding-top: 3px;
+    padding-left: 5px;
+    color: #bbb;
+    font-size: 11px;
+    text-transform: uppercase
+}
+
+.container .discussion-body .wmd-preview, .container .discussion-module .wmd-preview, .container .discussion-user-threads .wmd-preview, .discussion-module .wmd-preview, .discussion-user-threads .wmd-preview, .discussion-course .wmd-preview {
+    width: 100%;
+    padding: 10px 20px;
+    color: #333
+}
+
+.container .discussion-body .reply-post-control, .container .discussion-module .reply-post-control, .container .discussion-user-threads .reply-post-control, .discussion-module .reply-post-control, .discussion-user-threads .reply-post-control, .discussion-course .reply-post-control {
+    margin-top: 20px
+}
+
+.container .discussion-body .discussion-submit-post, .container .discussion-module .discussion-submit-post, .container .discussion-user-threads .discussion-submit-post, .discussion-module .discussion-submit-post, .discussion-user-threads .discussion-submit-post, .discussion-course .discussion-submit-post {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    float: left
+}
+
+.container .discussion-body .discussion-submit-post:hover, .container .discussion-module .discussion-submit-post:hover, .container .discussion-user-threads .discussion-submit-post:hover, .container .discussion-body .discussion-submit-post:focus, .container .discussion-module .discussion-submit-post:focus, .container .discussion-user-threads .discussion-submit-post:focus, .discussion-module .discussion-submit-post:hover, .discussion-user-threads .discussion-submit-post:hover, .discussion-module .discussion-submit-post:focus, .discussion-user-threads .discussion-submit-post:focus, .discussion-course .discussion-submit-post:hover, .discussion-course .discussion-submit-post:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+.container .discussion-body .wmd-button, .container .discussion-module .wmd-button, .container .discussion-user-threads .wmd-button, .discussion-module .wmd-button, .discussion-user-threads .wmd-button, .discussion-course .wmd-button {
+    width: 15px
+}
+
+.global-discussion-actions {
+    height: 60px;
+    background-color: #ebebeb;
+    background-image: -webkit-linear-gradient(top, #ebebeb, #d9d9d9);
+    background-image: linear-gradient(to bottom, #ebebeb, #d9d9d9);
+    border-radius: 0 3px 0 0;
+    border-bottom: 1px solid #bcbcbc
+}
+
+.discussion-module, .discussion-user-threads {
+    position: relative;
+    margin: 20px 0;
+    padding: 20px;
+    background: #f6f6f6 !important;
+    border-radius: 3px
+}
+
+.discussion-module header .anonymous, .discussion-user-threads header .anonymous {
+    font-size: 15px
+}
+
+.discussion-module div.add-response.post-extended-content, .discussion-user-threads div.add-response.post-extended-content {
+    margin-top: 20px;
+    margin-bottom: 20px
+}
+
+.discussion-module div.add-response.post-extended-content button.add-response-btn, .discussion-user-threads div.add-response.post-extended-content button.add-response-btn {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    background-image: linear-gradient(to bottom, #fff 35%, #ebebeb);
+    position: relative;
+    padding-left: 30px;
+    width: 100%;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    text-align: left
+}
+
+.discussion-module div.add-response.post-extended-content button.add-response-btn:hover, .discussion-user-threads div.add-response.post-extended-content button.add-response-btn:hover, .discussion-module div.add-response.post-extended-content button.add-response-btn:focus, .discussion-user-threads div.add-response.post-extended-content button.add-response-btn:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+.discussion-module div.add-response.post-extended-content button.add-response-btn:hover, .discussion-user-threads div.add-response.post-extended-content button.add-response-btn:hover, .discussion-module div.add-response.post-extended-content button.add-response-btn:focus, .discussion-user-threads div.add-response.post-extended-content button.add-response-btn:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff 35%, #ddd);
+    background-image: linear-gradient(to bottom, #fff 35%, #ddd)
+}
+
+.discussion-module div.add-response.post-extended-content button.add-response-btn span.add-response-btn-text, .discussion-user-threads div.add-response.post-extended-content button.add-response-btn span.add-response-btn-text {
+    padding-left: 4px
+}
+
+.discussion-module .loading-animation, .discussion-user-threads .loading-animation {
+    background-image: url(../../../images/spinner-on-grey.gif)
+}
+
+.discussion-module .discussion-show, .discussion-user-threads .discussion-show {
+    position: relative;
+    top: 3px;
+    font-size: 14px;
+    text-align: center
+}
+
+.discussion-module .discussion-show.shown .show-hide-discussion-icon, .discussion-user-threads .discussion-show.shown .show-hide-discussion-icon {
+    background-position: 0 0
+}
+
+.discussion-module .discussion-show .show-hide-discussion-icon, .discussion-user-threads .discussion-show .show-hide-discussion-icon {
+    display: inline-block;
+    position: relative;
+    top: 5px;
+    margin-right: 6px;
+    width: 21px;
+    height: 19px;
+    background: url(../../../images/show-hide-discussion-icon.png) no-repeat;
+    background-position: -21px 0
+}
+
+.discussion-module .new-post-btn, .discussion-user-threads .new-post-btn {
+    display: inline-block;
+    float: right
+}
+
+.discussion-module section.discussion, .discussion-user-threads section.discussion {
+    margin-top: 30px
+}
+
+.discussion-module section.discussion .threads, .discussion-user-threads section.discussion .threads {
+    margin-top: 20px
+}
+
+.discussion-module section.discussion .discussion-thread, .discussion-user-threads section.discussion .discussion-thread {
+    padding: 0;
+    margin-bottom: 20px;
+    -webkit-transition: all 0.25s linear 0s;
+    -moz-transition: all 0.25s linear 0s;
+    transition: all 0.25s linear 0s
+}
+
+.discussion-module section.discussion .discussion-thread .dogear, .discussion-user-threads section.discussion .discussion-thread .dogear {
+    display: none
+}
+
+.discussion-module section.discussion .discussion-thread.expanded .dogear, .discussion-user-threads section.discussion .discussion-thread.expanded .dogear {
+    display: block
+}
+
+.discussion-module section.discussion .discussion-thread p, .discussion-user-threads section.discussion .discussion-thread p {
+    margin-bottom: 0
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article, .discussion-user-threads section.discussion .discussion-thread .discussion-article {
+    -webkit-transition: all 0.2s linear 0s;
+    -moz-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    min-height: 0;
+    background: #fff;
+    padding: 0;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+    -webkit-transition: all 0.2s linear 0s;
+    -moz-transition: all 0.2s linear 0s;
+    transition: all 0.2s linear 0s
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper {
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 600px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .group-visibility-label, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .group-visibility-label {
+    margin: 20px 30px -10px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post:after, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post .inline-comment-count, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post .inline-comment-count {
+    position: relative;
+    z-index: 100;
+    float: right;
+    display: block;
+    height: 27px;
+    margin-top: 6px;
+    margin-right: 8px;
+    padding: 0 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 25px;
+    color: #888
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header {
+    padding-bottom: 0;
+    margin-bottom: 15px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header .posted-details, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header .posted-details {
+    margin-top: 4px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header .posted-details .username, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header .posted-details .username {
+    display: inline;
+    font-size: 14px;
+    font-weight: 700
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header h3, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 0px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header h4, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post header h4 {
+    font-size: 16px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post .post-body, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-post .post-body {
+    font-size: 14px;
+    clear: both
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .responses header, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .responses header {
+    padding-bottom: 0;
+    margin-bottom: 15px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .responses header .posted-by, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .responses header .posted-by {
+    float: left;
+    margin-right: 5px;
+    font-size: 16px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .responses .response-body, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .responses .response-body {
+    margin-bottom: 0.2em;
+    font-size: 14px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-reply-new .wmd-input, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .discussion-reply-new .wmd-input {
+    height: 120px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .thread-wrapper .post-extended-content, .discussion-user-threads section.discussion .discussion-thread .discussion-article .thread-wrapper .post-extended-content {
+    display: none
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .post-tools, .discussion-user-threads section.discussion .discussion-thread .discussion-article .post-tools {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2) inset;
+    background: #f6f6f6
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .post-tools:hover, .discussion-user-threads section.discussion .discussion-thread .discussion-article .post-tools:hover {
+    background: #fcfcfc
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .post-tools:hover .icon, .discussion-user-threads section.discussion .discussion-thread .discussion-article .post-tools:hover .icon {
+    color: #b62567
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .post-tools a, .discussion-user-threads section.discussion .discussion-thread .discussion-article .post-tools a {
+    display: block;
+    padding: 5px 20px;
+    font-size: 12px;
+    line-height: 30px
+}
+
+.discussion-module section.discussion .discussion-thread .discussion-article .post-tools a .icon, .discussion-user-threads section.discussion .discussion-thread .discussion-article .post-tools a .icon {
+    color: #1d9dd9;
+    margin-right: 5px
+}
+
+.discussion-module .new-post-article, .discussion-user-threads .new-post-article {
+    display: none;
+    margin-top: 20px
+}
+
+.discussion-module .new-post-article .inner-wrapper, .discussion-user-threads .new-post-article .inner-wrapper {
+    max-width: 1180px;
+    min-width: 760px;
+    margin: auto
+}
+
+.discussion-module .new-post-article .new-post-form, .discussion-user-threads .new-post-article .new-post-form {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 30px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    box-shadow: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+.discussion-module .new-post-article .new-post-form:after, .discussion-user-threads .new-post-article .new-post-form:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.discussion-module .new-post-article .new-post-form .form-row, .discussion-user-threads .new-post-article .new-post-form .form-row {
+    margin-bottom: 20px
+}
+
+.discussion-module .new-post-article .new-post-form .new-post-body .wmd-input, .discussion-user-threads .new-post-article .new-post-form .new-post-body .wmd-input {
+    width: 100%;
+    height: 240px;
+    margin-top: 0;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-radius: 3px 3px 0 0;
+    background: #fff;
+    font-family: 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    position: relative;
+    width: 100%;
+    height: 200px;
+    z-index: 1;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #333;
+    border-radius: 3px 3px 0 0;
+    background: #fff;
+    font-family: 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset
+}
+
+.discussion-module .new-post-article .new-post-form .new-post-body .wmd-preview-container, .discussion-user-threads .new-post-article .new-post-form .new-post-body .wmd-preview-container {
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #aaa;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    background: #eee;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    border-color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset
+}
+
+.discussion-module .new-post-article .new-post-form .new-post-body .wmd-preview-label, .discussion-user-threads .new-post-article .new-post-form .new-post-body .wmd-preview-label {
+    width: 100%;
+    padding-top: 3px;
+    padding-left: 5px;
+    color: #bbb;
+    font-size: 11px;
+    text-transform: uppercase
+}
+
+.discussion-module .new-post-article .new-post-form .new-post-body .wmd-preview, .discussion-user-threads .new-post-article .new-post-form .new-post-body .wmd-preview {
+    width: 100%;
+    padding: 10px 20px;
+    color: #333
+}
+
+.discussion-module .new-post-article .new-post-form .new-post-title, .discussion-user-threads .new-post-article .new-post-form .new-post-title {
+    width: 100%;
+    height: 40px;
+    padding: 0 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 3px;
+    border: 1px solid #333;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Open Sans', sans-serif;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset
+}
+
+.discussion-module .new-post-article .new-post-form .submit, .discussion-user-threads .new-post-article .new-post-form .submit {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    float: left;
+    height: 37px;
+    margin-top: 10px;
+    padding-bottom: 2px;
+    border-color: #333
+}
+
+.discussion-module .new-post-article .new-post-form .submit:hover, .discussion-user-threads .new-post-article .new-post-form .submit:hover, .discussion-module .new-post-article .new-post-form .submit:focus, .discussion-user-threads .new-post-article .new-post-form .submit:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+.discussion-module .new-post-article .new-post-form .submit:hover, .discussion-user-threads .new-post-article .new-post-form .submit:hover, .discussion-module .new-post-article .new-post-form .submit:focus, .discussion-user-threads .new-post-article .new-post-form .submit:focus {
+    border-color: #222
+}
+
+.discussion-module .new-post-article .new-post-form .new-post-cancel, .discussion-user-threads .new-post-article .new-post-form .new-post-cancel {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    float: left;
+    margin: 10px 0 0 15px;
+    border-color: #444
+}
+
+.discussion-module .new-post-article .new-post-form .new-post-cancel:hover, .discussion-user-threads .new-post-article .new-post-form .new-post-cancel:hover, .discussion-module .new-post-article .new-post-form .new-post-cancel:focus, .discussion-user-threads .new-post-article .new-post-form .new-post-cancel:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+.discussion-module .new-post-article .new-post-form .options, .discussion-user-threads .new-post-article .new-post-form .options {
+    margin-top: 5px
+}
+
+.discussion-module .new-post-article .new-post-form .options label, .discussion-user-threads .new-post-article .new-post-form .options label {
+    display: inline;
+    margin-left: 8px;
+    font-size: 15px;
+    color: #fff;
+    text-shadow: none
+}
+
+.discussion-module .new-post-article .thread-title, .discussion-user-threads .new-post-article .thread-title {
+    display: block;
+    margin-bottom: 20px;
+    font-size: 21px;
+    color: #333;
+    font-weight: 700
+}
+
+.discussion-module .new-post-btn, .discussion-user-threads .new-post-btn {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    font-size: 13px;
+    margin-right: 4px
+}
+
+.discussion-module .new-post-btn:hover, .discussion-user-threads .new-post-btn:hover, .discussion-module .new-post-btn:focus, .discussion-user-threads .new-post-btn:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+.discussion-module .new-post-icon, .discussion-user-threads .new-post-icon {
+    display: block;
+    float: left;
+    width: 16px;
+    height: 17px;
+    margin: 8px 7px 0 0;
+    font-size: 16px;
+    padding-right: 10px;
+    vertical-align: middle;
+    color: #fff
+}
+
+.discussion-module .moderator-actions, .discussion-user-threads .moderator-actions {
+    padding-left: 0 !important
+}
+
+.discussion-module section.pagination, .discussion-user-threads section.pagination {
+    margin-top: 30px
+}
+
+.discussion-module section.pagination nav.discussion-paginator, .discussion-user-threads section.pagination nav.discussion-paginator {
+    float: right
+}
+
+.discussion-module section.pagination nav.discussion-paginator ol li, .discussion-user-threads section.pagination nav.discussion-paginator ol li {
+    list-style: none;
+    display: inline-block;
+    padding-right: 0.5em
+}
+
+.discussion-module section.pagination nav.discussion-paginator ol li a, .discussion-user-threads section.pagination nav.discussion-paginator ol li a {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px
+}
+
+.discussion-module section.pagination nav.discussion-paginator ol li a:hover, .discussion-user-threads section.pagination nav.discussion-paginator ol li a:hover, .discussion-module section.pagination nav.discussion-paginator ol li a:focus, .discussion-user-threads section.pagination nav.discussion-paginator ol li a:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+.discussion-module section.pagination nav.discussion-paginator ol li.current-page span, .discussion-user-threads section.pagination nav.discussion-paginator ol li.current-page span {
+    display: inline-block;
+    height: 35px;
+    padding: 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6)
+}
+
+.discussion-module .new-post-body .wmd-panel, .discussion-user-threads .new-post-body .wmd-panel {
+    width: 100%;
+    min-width: 500px
+}
+
+.discussion-module .new-post-body .wmd-button-bar, .discussion-user-threads .new-post-body .wmd-button-bar {
+    width: 100%
+}
+
+.discussion-module .new-post-body .wmd-input, .discussion-user-threads .new-post-body .wmd-input {
+    height: 150px;
+    width: 100%;
+    background-color: #e9e9e9;
+    border: 1px solid #c8c8c8;
+    font-family: Monaco, 'Lucida Console', monospace;
+    font-style: normal;
+    font-size: 0.8em;
+    line-height: 1.6em;
+    border-radius: 3px 3px 0 0
+}
+
+.discussion-module .new-post-body .wmd-input::-webkit-input-placeholder, .discussion-user-threads .new-post-body .wmd-input::-webkit-input-placeholder {
+    color: #888
+}
+
+.discussion-module .new-post-body .wmd-button-row, .discussion-user-threads .new-post-body .wmd-button-row {
+    position: relative;
+    margin: 10px 5px 5px 5px;
+    padding: 0;
+    height: 30px;
+    overflow: hidden;
+    -webkit-transition: all 0.2s ease-out 0s;
+    -moz-transition: all 0.2s ease-out 0s;
+    transition: all 0.2s ease-out 0s
+}
+
+.discussion-module .new-post-body .wmd-spacer, .discussion-user-threads .new-post-body .wmd-spacer {
+    width: 1px;
+    height: 20px;
+    margin-left: 14px;
+    position: absolute;
+    background-color: Silver;
+    display: inline-block;
+    list-style: none
+}
+
+.discussion-module .new-post-body .wmd-button, .discussion-user-threads .new-post-body .wmd-button {
+    width: 20px;
+    height: 20px;
+    padding-left: 2px;
+    padding-right: 3px;
+    position: absolute;
+    display: inline-block;
+    list-style: none;
+    cursor: pointer;
+    background: none
+}
+
+.discussion-module .new-post-body .wmd-button > span, .discussion-user-threads .new-post-body .wmd-button > span {
+    display: inline-block;
+    background-image: url(../../../images/new-post-icons-full.png);
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    width: 20px;
+    height: 20px
+}
+
+.discussion-module .new-post-body .wmd-spacer1, .discussion-user-threads .new-post-body .wmd-spacer1 {
+    left: 50px
+}
+
+.discussion-module .new-post-body .wmd-spacer2, .discussion-user-threads .new-post-body .wmd-spacer2 {
+    left: 175px
+}
+
+.discussion-module .new-post-body .wmd-spacer3, .discussion-user-threads .new-post-body .wmd-spacer3 {
+    left: 300px
+}
+
+.discussion-module .new-post-body .wmd-prompt-background, .discussion-user-threads .new-post-body .wmd-prompt-background {
+    background-color: Black
+}
+
+.discussion-module .new-post-body .wmd-prompt-dialog, .discussion-user-threads .new-post-body .wmd-prompt-dialog {
+    background: #fff
+}
+
+.discussion-module .new-post-body .wmd-prompt-dialog, .discussion-user-threads .new-post-body .wmd-prompt-dialog {
+    padding: 20px
+}
+
+.discussion-module .new-post-body .wmd-prompt-dialog > div, .discussion-user-threads .new-post-body .wmd-prompt-dialog > div {
+    font-size: 0.8em;
+    font-family: arial, helvetica, sans-serif
+}
+
+.discussion-module .new-post-body .wmd-prompt-dialog b, .discussion-user-threads .new-post-body .wmd-prompt-dialog b {
+    font-size: 16px
+}
+
+.discussion-module .new-post-body .wmd-prompt-dialog > form > input[type="text"], .discussion-user-threads .new-post-body .wmd-prompt-dialog > form > input[type="text"] {
+    border-radius: 3px;
+    color: #333
+}
+
+.discussion-module .new-post-body .wmd-prompt-dialog > form > input[type="button"], .discussion-user-threads .new-post-body .wmd-prompt-dialog > form > input[type="button"] {
+    border: 1px solid #888;
+    font-family: "Open Sans", Verdana, Geneva, sans-serif, sans-serif;
+    font-size: 14px
+}
+
+.discussion-module .new-post-body .wmd-prompt-dialog > form > input[type="file"], .discussion-user-threads .new-post-body .wmd-prompt-dialog > form > input[type="file"] {
+    margin-bottom: 18px
+}
+
+.discussion-module .wmd-button-row, .discussion-user-threads .wmd-button-row {
+    position: relative;
+    height: 25px
+}
+
+.discussion-module .wmd-button span, .discussion-user-threads .wmd-button span {
+    width: 20px;
+    height: 20px;
+    background-image: url("/static/images/wmd-buttons.png");
+    display: inline-block
+}
+
+.discussion-module .wmd-spacer1, .discussion-user-threads .wmd-spacer1 {
+    left: 50px
+}
+
+.discussion-module .wmd-spacer2, .discussion-user-threads .wmd-spacer2 {
+    left: 175px
+}
+
+.discussion-module .wmd-spacer3, .discussion-user-threads .wmd-spacer3 {
+    left: 300px
+}
+
+.discussion-module .edit-post-form, .discussion-user-threads .edit-post-form {
+    width: 100%;
+    margin-bottom: 20px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box
+}
+
+.discussion-module .edit-post-form:after, .discussion-user-threads .edit-post-form:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.discussion-module .edit-post-form .form-row, .discussion-user-threads .edit-post-form .form-row {
+    margin-top: 20px
+}
+
+.discussion-module .edit-post-form .post-cancel, .discussion-user-threads .edit-post-form .post-cancel {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    float: left;
+    margin: 10px 0 0 15px
+}
+
+.discussion-module .edit-post-form .post-cancel:hover, .discussion-user-threads .edit-post-form .post-cancel:hover, .discussion-module .edit-post-form .post-cancel:focus, .discussion-user-threads .edit-post-form .post-cancel:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+.discussion-module .edit-post-form .post-update, .discussion-user-threads .edit-post-form .post-update {
+    display: block;
+    height: 35px;
+    padding: 0 15px;
+    border-radius: 3px;
+    border: 1px solid #2d81ad;
+    background-color: #6dccf1;
+    background-image: -webkit-linear-gradient(top, #6dccf1, #38a8e5);
+    background-image: linear-gradient(to bottom, #6dccf1, #38a8e5);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 32px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    float: left;
+    height: 37px;
+    margin-top: 10px;
+    padding-bottom: 2px
+}
+
+.discussion-module .edit-post-form .post-update:hover, .discussion-user-threads .edit-post-form .post-update:hover, .discussion-module .edit-post-form .post-update:focus, .discussion-user-threads .edit-post-form .post-update:focus {
+    border-color: #297095;
+    background-color: #4fbbe4;
+    background-image: -webkit-linear-gradient(top, #4fbbe4, #2090d0);
+    background-image: linear-gradient(to bottom, #4fbbe4, #2090d0)
+}
+
+.discussion-module .edit-post-form .post-update:hover, .discussion-user-threads .edit-post-form .post-update:hover, .discussion-module .edit-post-form .post-update:focus, .discussion-user-threads .edit-post-form .post-update:focus {
+    border-color: #222
+}
+
+.discussion-module .edit-post-form .edit-post-title, .discussion-user-threads .edit-post-form .edit-post-title {
+    width: 100%;
+    height: 40px;
+    padding: 0 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 3px;
+    border: 1px solid #aaa;
+    font-size: 16px;
+    font-family: "Open Sans", Verdana, Geneva, sans-serif, sans-serif;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset
+}
+
+.discussion-pin {
+    font-size: 12px;
+    float: right;
+    padding-right: 5px;
+    font-style: italic;
+    margin-right: 10px;
+    opacity: 0.8
+}
+
+.discussion-pin.admin-pin {
+    cursor: pointer
+}
+
+.discussion-pin.admin-pin:hover, .discussion-pin.admin-pin:focus {
+    -webkit-transition: opacity 0.2s linear 0s;
+    -moz-transition: opacity 0.2s linear 0s;
+    transition: opacity 0.2s linear 0s;
+    opacity: 1.0
+}
+
+.discussion-pin-inline {
+    font-size: 12px;
+    float: right;
+    font-style: italic;
+    position: relative;
+    right: -20px;
+    top: -13px;
+    margin-right: 35px;
+    margin-top: 13px;
+    opacity: 1.0
+}
+
+.notpinned .icon {
+    display: block;
+    float: left;
+    margin: 3px;
+    width: 10px;
+    height: 14px;
+    padding-right: 3px;
+    color: #333
+}
+
+.pinned .icon {
+    display: block;
+    float: left;
+    margin: 3px;
+    width: 10px;
+    height: 14px;
+    padding-right: 3px;
+    color: #b62567
+}
+
+.pinned span {
+    color: #b62567;
+    font-style: italic
+}
+
+.notpinned span {
+    color: #333;
+    font-style: italic
+}
+
+.pinned-false {
+    display: none
+}
+
+.discussion-flag-abuse, .discussion-delete-comment, .discussion-edit-comment {
+    font-size: 12px;
+    float: right;
+    margin-left: 10px;
+    font-style: italic;
+    cursor: pointer;
+    color: #333;
+    opacity: 0.8
+}
+
+.discussion-flag-abuse:hover, .discussion-flag-abuse:focus, .discussion-delete-comment:hover, .discussion-delete-comment:focus, .discussion-edit-comment:hover, .discussion-edit-comment:focus {
+    -webkit-transition: opacity 0.2s linear 0s;
+    -moz-transition: opacity 0.2s linear 0s;
+    transition: opacity 0.2s linear 0s;
+    opacity: 1.0
+}
+
+.discussion-flag-abuse .flag-label, .discussion-delete-comment .flag-label, .discussion-edit-comment .flag-label {
+    font-style: italic;
+    margin-left: 5px
+}
+
+.flagged * {
+    color: #b62567
+}
+
+.response-count {
+    margin-top: 20px;
+    padding: 0 30px;
+    color: #7f7f7f;
+    font-size: 14px
+}
+
+.response-pagination {
+    visibility: visible;
+    padding: 10px 30px;
+    background-color: #f8f8f8;
+    box-shadow: 0 1px 1px #e5e5e5 inset, 0 -1px 1px #e5e5e5 inset
+}
+
+.response-pagination:empty {
+    visibility: hidden
+}
+
+.response-pagination .response-display-count {
+    display: block;
+    padding: 10px 0;
+    color: #7f7f7f;
+    font-size: 14px
+}
+
+.response-pagination .load-response-button {
+    background-color: #eee;
+    background-image: -webkit-linear-gradient(top, #eee, #ccc);
+    background-image: linear-gradient(to bottom, #eee, #ccc);
+    display: block;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 0 15px;
+    height: 35px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, 0.15);
+    color: #333;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 32px;
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff 35%, #ebebeb);
+    background-image: linear-gradient(to bottom, #fff 35%, #ebebeb);
+    position: relative;
+    margin: 10px 0;
+    border: 1px solid #b2b2b2;
+    width: 100%;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    font-weight: normal
+}
+
+.response-pagination .load-response-button:hover, .response-pagination .load-response-button:focus {
+    background-color: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #ddd);
+    background-image: linear-gradient(to bottom, #fff, #ddd)
+}
+
+.response-pagination .load-response-button span.add-response-btn-text {
+    padding-left: 4px
+}
+
+.group-visibility-label {
+    font-size: 12px;
+    color: #000;
+    font-style: italic;
+    background-color: #fff
+}
