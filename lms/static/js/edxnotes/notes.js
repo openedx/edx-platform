@@ -1,6 +1,6 @@
 (function (define, $, _, Annotator, undefined) {
     'use strict';
-    define('edxnotes/notes.js', function () {
+    define('edxnotes/notes.js', ['edxnotes/plugins/accessability'], function () {
         var getUri, getUsageId, getOptions, setupPlugins, getAnnotator;
         /**
          * Returns current URI for the page.
@@ -71,9 +71,7 @@
         setupPlugins = function (annotator, plugins, options) {
             _.each(plugins, function(plugin) {
                 var settings = options[plugin.toLowerCase()];
-                if (settings) {
-                    annotator.addPlugin(plugin, settings);
-                }
+                annotator.addPlugin(plugin, settings);
             }, this);
         };
 
