@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-20 10:15-0400\n"
+"POT-Creation-Date: 2014-10-27 10:49-0400\n"
 "PO-Revision-Date: 2014-10-08 18:08+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Thai (http://www.transifex.com/projects/p/edx-platform/language/th/)\n"
@@ -44,7 +44,8 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/views/tabs.js cms/static/js/factories/manage_users.js
+#: cms/static/js/factories/manage_users.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -55,7 +56,8 @@ msgstr ""
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/coffee/src/views/tabs.js cms/static/js/views/asset.js
+#: cms/static/coffee/src/views/tabs.js cms/static/js/factories/export.js
+#: cms/static/js/factories/manage_users.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
@@ -80,7 +82,14 @@ msgstr ""
 msgid "This link will open in a new browser window/tab"
 msgstr ""
 
-#: cms/static/js/views/asset.js
+#: cms/static/js/factories/manage_users.js
+#: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Unknown"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js cms/static/js/views/asset.js
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
@@ -2377,6 +2386,18 @@ msgid "Error: You cannot remove yourself from the Instructor group!"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "The following errors were generated:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "The following warnings were generated:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "All accounts were created successfully."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
 msgstr ""
 
@@ -2701,12 +2722,6 @@ msgid ""
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
-msgid "Unknown"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Subject"
 msgstr ""
 
@@ -2980,6 +2995,16 @@ msgid "Please enter a valid password"
 msgstr ""
 
 #: lms/static/js/student_account/account.js
+msgid ""
+"Password reset email sent. Follow the link in the email to change your "
+"password."
+msgstr ""
+
+#: lms/static/js/student_account/account.js
+msgid "We weren't able to send you a password reset email."
+msgstr ""
+
+#: lms/static/js/student_account/account.js
 msgid "Please check your email to confirm the change"
 msgstr ""
 
@@ -3141,6 +3166,139 @@ msgstr ""
 #. Group B, ..., Group AA, etc.
 #: cms/static/js/collections/group.js
 msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid "There has been an error while exporting."
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid ""
+"There has been a failure to export to XML at least one component. It is "
+"recommended that you go to the edit page and repair the error before "
+"attempting another export. Please check that all components on the page are "
+"valid and do not display any error messages."
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid "Correct failed component"
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid "Return to Export"
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid ""
+"There has been a failure to export your course to XML. Unfortunately, we do "
+"not have specific enough information to assist you in identifying the failed"
+" component. It is recommended that you inspect your courseware to identify "
+"any components in error and try again."
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid "The raw error message is:"
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid "There has been an error with your export."
+msgstr ""
+
+#: cms/static/js/factories/export.js
+msgid "Yes, take me to the main course page"
+msgstr ""
+
+#: cms/static/js/factories/import.js
+msgid "There was an error during the upload process."
+msgstr ""
+
+#: cms/static/js/factories/import.js
+msgid "There was an error while unpacking the file."
+msgstr ""
+
+#: cms/static/js/factories/import.js
+msgid "There was an error while verifying the file you submitted."
+msgstr ""
+
+#: cms/static/js/factories/import.js
+msgid "There was an error while importing the new course to our database."
+msgstr ""
+
+#: cms/static/js/factories/import.js
+msgid "Your import has failed."
+msgstr ""
+
+#: cms/static/js/factories/import.js cms/static/js/factories/import.js
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/factories/import.js
+msgid "Your import is in progress; navigating away will abort it."
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "A valid email address is required"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "You must enter a valid email address in order to add a new team member"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "Return and add email address"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "Already a course team member"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid ""
+"{email} is already on the “{course}” team. If you're trying to add a new "
+"member, please double-check the email address you provided."
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "Return to team listing"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "Error adding user"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "Are you sure?"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid ""
+"Are you sure you want to delete {email} from the course team for “{course}”?"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "Error removing user"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "There was an error changing the user's role"
+msgstr ""
+
+#: cms/static/js/factories/manage_users.js
+msgid "Try Again"
+msgstr ""
+
+#: cms/static/js/factories/settings_advanced.js
+msgid "Hide Deprecated Settings"
+msgstr ""
+
+#: cms/static/js/factories/settings_advanced.js
+msgid "Show Deprecated Settings"
+msgstr ""
+
+#: cms/static/js/factories/textbooks.js
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
@@ -3337,10 +3495,6 @@ msgstr ""
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
-msgstr ""
-
-#: cms/static/js/views/import.js cms/static/js/views/import.js.c
-msgid "Choose new file"
 msgstr ""
 
 #: cms/static/js/views/import.js
@@ -3565,10 +3719,6 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Making Visible to Students&hellip;"
-msgstr ""
-
-#: cms/static/js/views/pages/group_configurations.js
-msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
@@ -3807,6 +3957,10 @@ msgstr ""
 
 #: lms/templates/student_account/account.underscore
 msgid "Change My Email Address"
+msgstr ""
+
+#: lms/templates/student_account/account.underscore
+msgid "Reset Password"
 msgstr ""
 
 #: lms/templates/student_profile/profile.underscore
