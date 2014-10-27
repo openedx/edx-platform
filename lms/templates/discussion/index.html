@@ -1,6 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! import django_comment_client.helpers as helpers %>
-<%! from django.template.defaultfilters import escapejs %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%inherit file="../main.html" />
@@ -24,16 +23,16 @@
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
 <section class="discussion container" id="discussion-container"
-         data-roles="${roles | n}"
+         data-roles="${roles}"
          data-course-id="${course_id}"
-         data-user-info="${user_info | n}"
-         data-threads="${threads | n}"
+         data-user-info="${user_info}"
+         data-threads="${threads}"
          data-thread-pages="${thread_pages}"
-         data-content-info="${annotated_content_info | n}"
-         data-sort-preference="${sort_preference | n}"
+         data-content-info="${annotated_content_info}"
+         data-sort-preference="${sort_preference}"
          data-flag-moderator="${flag_moderator}"
          data-user-cohort-id="${user_cohort}"
-         data-course-settings="${course_settings | n}">
+         data-course-settings="${course_settings}">
     <div class="discussion-body">
         <div class="forum-nav"></div>
         <div class="discussion-column">
