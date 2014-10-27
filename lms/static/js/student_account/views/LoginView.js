@@ -24,6 +24,8 @@ var edx = edx || {};
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+
+            console.log(data);
         },
 
         render: function( html ) {
