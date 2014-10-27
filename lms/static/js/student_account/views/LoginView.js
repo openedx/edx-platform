@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext) {
+(function($, _, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
@@ -21,17 +21,9 @@ var edx = edx || {};
 
         requiredStr: '',
 
-        initialize: function( data ) {
-            this.tpl = $(this.tpl).html();
-            this.fieldTpl = $(this.fieldTpl).html();
-
-            this.buildForm( data.fields );
-            this.model = data.model;
-
+        preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
-
-            this.listenTo( this.model, 'error', this.saveError );
         },
 
         render: function( html ) {
@@ -49,11 +41,11 @@ var edx = edx || {};
         },
 
         postRender: function() {
-            var $container = $(this.el);
+            this.$container = $(this.el);
 
-            this.$form = $container.find('form');
-            this.$errors = $container.find('.submission-error');
-            this.$alreadyAuthenticatedMsg =  $container.find('.already-authenticated-msg');
+            this.$form = this.$container.find('form');
+            this.$errors = this.$container.find('.submission-error');
+            this.$authError = this.$container.find('.already-authenticated-msg');
 
             /* If we're already authenticated with a third-party
              * provider, try logging in.  The easiest way to do this
@@ -72,6 +64,7 @@ var edx = edx || {};
 
         thirdPartyAuth: function( event ) {
             var providerUrl = $(event.target).data('provider-url') || '';
+
             if (providerUrl) {
                 window.location.href = providerUrl;
             } else {
@@ -81,23 +74,25 @@ var edx = edx || {};
         },
 
         saveError: function( error ) {
-            console.log(error.status, ' error: ', error.responseText);
+            this.errors = ['<li>' + error.responseText + '</li>'];
+            this.setErrors();
 
             /* If we've gotten a 403 error, it means that we've successfully
              * authenticated with a third-party provider, but we haven't
              * linked the account to an EdX account.  In this case,
              * we need to prompt the user to enter a little more information
              * to complete the registration process.
-            */
-            if (error.status === 403 && error.responseText === "third-party-auth" && this.currentProvider) {
-                this.$alreadyAuthenticatedMsg.removeClass("hidden");
+             */
+            if ( error.status === 403 &&
+                 error.responseText === 'third-party-auth' &&
+                 this.currentProvider ) {
+                this.element.show( this.$authError );
+                this.element.hide( this.$errors );
+            } else {
+                this.element.hide( this.$authError );
+                this.element.show( this.$errors );
             }
-            else {
-                this.$alreadyAuthenticatedMsg.addClass("hidden");
-                // TODO -- display the error
-            }
-
         }
     });
 
-})(jQuery, _, Backbone, gettext);
+})(jQuery, _, gettext);

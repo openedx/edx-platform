@@ -29,16 +29,25 @@ var edx = edx || {};
         requiredStr: '*',
 
         initialize: function( data ) {
+            this.preRender( data );
             this.tpl = $(this.tpl).html();
             this.fieldTpl = $(this.fieldTpl).html();
 
             this.buildForm( data.fields );
             this.model = data.model;
 
-            this.listenTo( this.model, 'error', this.modelError );
+            this.listenTo( this.model, 'error', this.saveError );
         },
 
-        // Renders the form.
+        /* Allows extended views to add custom
+         * init steps without needing to repeat
+         * default init steps
+         */
+        preRender: function( data ) {
+            /* custom code goes here */
+            return data;
+        },
+
         render: function( html ) {
             var fields = html || '';
 
@@ -74,6 +83,31 @@ var edx = edx || {};
             }
 
             this.render( html.join('') );
+        },
+
+        /* Helper method ot toggle display
+         * including accessibility considerations
+         */
+        element: {
+            hide: function( $el ) {
+                if ( $el ) {
+                    $el.addClass('hidden')
+                       .attr('aria-hidden', true);
+                }
+            },
+
+            show: function( $el ) {
+                if ( $el ) {
+                    $el.removeClass('hidden')
+                       .attr('aria-hidden', false);
+                }
+            }
+        },
+
+        forgotPassword: function( event ) {
+            event.preventDefault();
+
+            this.trigger('password-help');
         },
 
         getFormData: function() {
@@ -116,10 +150,25 @@ var edx = edx || {};
             return obj;
         },
 
-        forgotPassword: function( event ) {
-            event.preventDefault();
+        saveError: function( error ) {
+            this.errors = ['<li>' + error.responseText + '</li>'];
+            this.setErrors();
+        },
 
-            this.trigger('password-help');
+        setErrors: function() {
+            var $msg = this.$errors.find('.message-copy'),
+                html = [],
+                errors = this.errors,
+                i,
+                len = errors.length;
+
+            for ( i=0; i<len; i++ ) {
+                html.push( errors[i] );
+            }
+
+            $msg.html( html.join('') );
+
+            this.element.show( this.$errors );
         },
 
         submitForm: function( event ) {
@@ -140,34 +189,9 @@ var edx = edx || {};
             if ( show ) {
                 this.setErrors();
             } else {
-                this.$errors
-                    .addClass('hidden')
-                    .attr('aria-hidden', true);
+                this.element.hide( this.$errors );
             }
         },
-
-        setErrors: function() {
-            var $msg = this.$errors.find('.message-copy'),
-                html = [],
-                errors = this.errors,
-                i,
-                len = errors.length;
-
-            for ( i=0; i<len; i++ ) {
-                html.push( errors[i] );
-            }
-
-            $msg.html( html.join('') );
-
-            this.$errors
-                .removeClass('hidden')
-                .attr('aria-hidden', false);
-        },
-
-        modelError: function( error ) {
-            console.log('error ', error);
-        },
-
         validate: function( $el, form ) {
             return edx.utils.validate( $el, form );
         }

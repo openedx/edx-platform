@@ -4,11 +4,21 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
             'use strict';
 
             var view = null,
-                ajaxSuccess = true;
+                ajaxSuccess = true,
+                model = new edx.student.account.PasswordResetModel(),
+                data = [{
+                    label: 'E-mail',
+                    instructions: 'This is the e-mail address you used to register with edX',
+                    name: 'email',
+                    required: true,
+                    type: 'email',
+                    restrictions: [],
+                    defaultValue: ''
+                }];
 
             var submitEmail = function(validationSuccess) {
                 // Simulate manual entry of an email address
-                $('#reset-password-email').val('foo@bar.baz');
+                $('#password-reset-email').val('foo@bar.baz');
 
                 // Create a fake click event
                 var clickEvent = $.Event('click');
@@ -16,7 +26,10 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
                 // Used to avoid spying on view.validate twice
                 if (typeof validationSuccess !== 'undefined') {
                     // Force validation to return as expected
-                    spyOn(view, 'validate').andReturn(validationSuccess);
+                    spyOn(view, 'validate').andReturn({
+                        isValid: validationSuccess,
+                        message: "We're all good."
+                    });
                 }
 
                 // Submit the email address
@@ -43,12 +56,15 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
                         if (ajaxSuccess) {
                             defer.resolve();
                         } else {
-                            defer.reject();
+                            defer.rejectWith(this, ["The server could not be contacted."]);
                         }
                     }).promise();
                 });
 
-                view = new edx.student.account.PasswordResetView();
+                view = new edx.student.account.PasswordResetView({
+                    fields: data,
+                    model: model
+                });
             });
 
             it("allows the user to request a new password", function() {
@@ -72,13 +88,13 @@ define(['js/common_helpers/template_helpers', 'js/student_account/views/Password
                 // If we get an error status on the AJAX request, display an error
                 ajaxSuccess = false;
                 submitEmail(true);
-                expect(view.$resetFail).not.toHaveClass('hidden');
+                expect(view.$'#submission-error').not.toHaveClass('hidden');
 
                 // If we try again and succeed, the error should go away
                 ajaxSuccess = true;
                 // No argument means we won't spy on view.validate again
                 submitEmail();
-                expect(view.$resetFail).toHaveClass('hidden');
+                expect(view.$'#submission-error').toHaveClass('hidden');
             });
         });
     }

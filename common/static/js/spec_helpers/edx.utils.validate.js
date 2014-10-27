@@ -13,9 +13,8 @@ var edx = edx || {};
                     email: '<li>A properly formatted e-mail is required</li>',
                     min: '<li><%= field %> must be a minimum of <%= count %> characters long</li>',
                     max: '<li><%= field %> must be a maximum of <%= count %> characters long</li>',
-                    password: '<li>A valid password is required</li>',
                     required: '<li><%= field %> field is required</li>',
-                    terms: '<li>To enroll you must agree to the <a href="#">Terms of Service and Honor Code</a></li>'
+                    custom: '<li><%= content %></li>'
                 },
 
                 field: function( el ) {
@@ -78,7 +77,7 @@ var edx = edx || {};
                 },
 
                 isBlank: function( $el ) {
-                    return ( $el.attr('type') === 'checkbox' ) ? $el.prop('checked') :  !$el.val();
+                    return ( $el.attr('type') === 'checkbox' ) ? !$el.prop('checked') :  !$el.val();
                 },
 
                 email: {
@@ -105,22 +104,33 @@ var edx = edx || {};
                     var txt = [],
                         tpl,
                         name,
-                        obj;
+                        obj,
+                        customMsg;
 
                     _.each( tests, function( value, key ) {
                         if ( !value ) {
                             name = $el.attr('name');
+                            customMsg = $el.data('errormsg-' + key) || false;
 
-                            tpl = _fn.validate.msg[key];
+                            // If the field has a custom error msg attached use it
+                            if ( customMsg ) {
+                                tpl = _fn.validate.msg.custom;
 
-                            obj = {
-                                field: _fn.validate.str.capitalizeFirstLetter( name )
-                            };
+                                obj = {
+                                    content: customMsg
+                                };
+                            } else {
+                                tpl = _fn.validate.msg[key];
 
-                            if ( key === 'min' ) {
-                                obj.count = $el.attr('minlength');
-                            } else if ( key === 'max' ) {
-                                obj.count = $el.attr('maxlength');
+                                obj = {
+                                    field: _fn.validate.str.capitalizeFirstLetter( name )
+                                };
+
+                                if ( key === 'min' ) {
+                                    obj.count = $el.attr('minlength');
+                                } else if ( key === 'max' ) {
+                                    obj.count = $el.attr('maxlength');
+                                }
                             }
 
                             txt.push( _.template( tpl, obj ) );
