@@ -9,6 +9,7 @@ from django.conf import settings
 
 from mako.template import Template as MakoTemplate
 
+
 JS_URLS = [
     # VENDOR
     'js/vendor/URI.min.js',
@@ -17,6 +18,7 @@ JS_URLS = [
     'js/vendor/underscore-min.js',
     'js/vendor/backbone-min.js',
     'js/vendor/mustache.js',
+    'js/vendor/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full',
 
     'xblock/discussion/js/vendor/split.js',
     'xblock/discussion/js/vendor/i18n.js',
@@ -28,9 +30,15 @@ JS_URLS = [
 ]
 
 CSS_URLS = [
-    # 'xblock/discussion/css/discussion-app.css',
-    'xblock/discussion/css/vendor/font-awesome.css'
+    'xblock/discussion/css/vendor/font-awesome.css',
+    'sass/discussion-forum.css',
 ]
+
+main_js = u'coffee/src/discussion/main.js'
+all_js = set(rooted_glob(settings.COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+all_js.remove(main_js)
+
+discussion_js = sorted(all_js) + [main_js]
 
 
 def load_resource(resource_path):
@@ -47,7 +55,7 @@ def render_template(template_path, context=None):
     """
     template_str = load_resource(template_path)
     template = Template(template_str)
-    return template.render(Context(context if context else {}))
+    return template.render(Context(context or {}))
 
 
 def render_mako_template(template_path, context=None):
@@ -67,7 +75,7 @@ def render_mustache_templates():
 
     def read_file(file_name):
         """ Reads file and decodes it's content """
-        return open(mustache_dir + '/' + file_name, "r").read().decode('utf-8')
+        return (mustache_dir / file_name).text("utf-8")
 
     def template_id_from_file_name(file_name):
         """ Generates template_id from file name """
@@ -121,7 +129,7 @@ def load_scenarios_from_path(scenarios_path):
 
 def get_js_urls():
     """ Returns a list of all additional javascript files """
-    return [asset_to_static_url(path) for path in JS_URLS]
+    return [asset_to_static_url(path) for path in JS_URLS + discussion_js]
 
 
 def get_css_urls():

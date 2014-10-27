@@ -20,7 +20,9 @@ class @DiscussionSpecHelper
         )
 
     @makeEventSpy = () ->
-        jasmine.createSpyObj('event', ['preventDefault', 'target'])
+        obj = jasmine.createSpyObj('event', ['preventDefault'])
+        obj.target = document.createElement('div');
+        obj
 
     @makeCourseSettings = (is_cohorted=true) ->
         new DiscussionCourseSettings(
