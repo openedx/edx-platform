@@ -29,6 +29,7 @@ var edx = edx || {};
         requiredStr: '*',
 
         initialize: function( data ) {
+            this.preRender( data );
             this.tpl = $(this.tpl).html();
             this.fieldTpl = $(this.fieldTpl).html();
 
@@ -36,8 +37,6 @@ var edx = edx || {};
             this.model = data.model;
 
             this.listenTo( this.model, 'error', this.saveError );
-
-            this.preRender( data );
         },
 
         /* Allows extended views to add custom
