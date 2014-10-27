@@ -1,9 +1,7 @@
 """ Django REST Framework Serializers """
-from django.contrib.auth.models import User
-
 from rest_framework import serializers
 
-from api_manager.models import Organization
+from organizations.models import Organization
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -13,8 +11,8 @@ class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         """ Serializer/field specification """
         model = Organization
-        fields = ('url', 'id', 'name', 'display_name', 'contact_name', 'contact_email', 'contact_phone'
-                  , 'logo_url', 'workgroups', 'users', 'groups', 'created', 'modified')
+        fields = ('url', 'id', 'name', 'display_name', 'contact_name', 'contact_email', 'contact_phone',
+                  'logo_url', 'workgroups', 'users', 'groups', 'created', 'modified')
         read_only = ('url', 'id', 'created')
 
 

@@ -267,11 +267,12 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         org_id = response.data['id']
 
         # create groups
-        max_groups, groups = 4, []
+        max_groups, groups, contactgroup_count = 4, [], 2
         for i in xrange(1, max_groups + 1):
+            grouptype = 'contactgroup' if i <= contactgroup_count else 'series'
             data = {
                 'name': '{} {}'.format('Test Group', i),
-                'type': 'contactgroup',
+                'type': grouptype,
                 'data': {'display_name': 'organization contacts group'}
             }
             response = self.do_post(self.base_groups_uri, data)
@@ -287,6 +288,11 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         response = self.do_get(groups_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), max_groups)
+
+        # get organization groups with type filter
+        response = self.do_get('{}?type=contactgroup'.format(groups_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), contactgroup_count)
 
         # post an invalid group
         data = {"id": '45533333'}
@@ -337,7 +343,6 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data[0]['id'], self.test_user.id)
         self.assertEqual(response.data[0]['course_count'], 2)
 
-
     def test_organizations_metrics_get(self):
         users = []
         for i in xrange(1, 6):
@@ -379,7 +384,6 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_average'], 0.838)
         self.assertEqual(response.data['users_grade_complete_count'], 4)
-
 
     def test_organizations_metrics_get_courses_filter(self):
         users = []

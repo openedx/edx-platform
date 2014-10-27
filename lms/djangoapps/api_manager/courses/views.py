@@ -1713,6 +1713,10 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
     ```/api/courses/{course_id}/metrics/completions/leaders/?count=6```
     To get only percentage of a user and course average skipleaders parameter can be used
     ```/api/courses/{course_id}/metrics/completions/leaders/?user_id={user_id}&skipleaders=true```
+    To get data for one or more orgnaizations organizations filter can be applied
+    * organizations filter can be a single id or multiple ids separated by comma
+    ```/api/courses/{course_id}/metrics/completions/leaders/?organizations={organization_id1},{organization_id2}```
+
     ### Use Cases/Notes:
     * Example: Display leaders in terms of completions in a given course
     * Example: Display top 3 users leading in terms of completions in a given course
