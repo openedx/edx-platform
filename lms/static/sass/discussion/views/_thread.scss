@@ -285,3 +285,9 @@
     max-width: 100%;
   }
 }
+
+body.discussion, .discussion-thread.expanded, div.discussion-course  {
+  .forum-thread-main-wrapper {
+    box-shadow: 0 1px 3px $shadow;
+  }
+}

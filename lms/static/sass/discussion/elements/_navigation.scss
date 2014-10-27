@@ -4,8 +4,33 @@
 @import '../../edx-pattern-library-shims/base/variables';
 
 .forum-nav {
-    border: 1px solid #aaa;
-    border-radius: $forum-border-radius;
+  border: 1px solid #aaa;
+  border-radius: $forum-border-radius;
+div.discussion-course, div.content-wrapper {
+  section.discussion {
+    div.forum-nav {
+      @include box-sizing(border-box);
+      float: left;
+      position: relative;
+      width: 31%;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+
+      ul, ol {
+        list-style: none;
+        padding-left: 0;
+
+        li.forum-nav-thread {
+          margin-bottom: 0;
+        }
+
+        &.forum-nav-browse-submenu {
+          padding-left: $baseline;
+          list-style: none;
+        }
+      }
+    }
+  }
 }
 
 // ------
