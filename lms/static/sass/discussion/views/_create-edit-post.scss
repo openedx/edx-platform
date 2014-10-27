@@ -2,7 +2,8 @@
 // ====================
 
 // UI: form structure
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   @include clearfix;
   box-sizing: border-box;
   margin: 0;
@@ -45,7 +46,7 @@
     .field-help {
       @include box-sizing(border-box);
       display: inline-block;
-      padding-left: $baseline;
+      padding-left: ($baseline);
       width: 50%;
       font-size: 12px;
     }
@@ -64,7 +65,8 @@
 // ====================
 
 // UI: inputs
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   .post-topic-button {
     @include white-button;
     @extend %cont-truncated;
@@ -129,7 +131,7 @@
   .post-option {
     @include box-sizing(border-box);
     display: inline-block;
-    margin-right: $baseline;
+    margin-right: ($baseline);
     border: 1px solid transparent;
     border-radius: 3px;
     padding: ($baseline/2);
@@ -172,7 +174,8 @@
 // ====================
 
 // UI: errors - new post creation
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   .post-errors {
     margin-bottom: $baseline;
     border-radius: 3px;
@@ -199,7 +202,8 @@
 // UI: topic menu
 
 // TO-DO: refactor to use _navigation.scss as general topic selector
-.forum-new-post-form .post-topic {
+.forum-new-post-form .post-topic ,
+.edit-post-form .post-topic {
   position: relative;
 
   .topic-menu-wrapper {

@@ -11,7 +11,6 @@
 // ====================
 
 // base - utilities
-@import 'base/reset';
 @import 'base/variables';
 @import 'base/mixins';
 
@@ -28,24 +27,16 @@
   @import '${env.get('THEME_NAME')}';
 % endif
 
-@import 'base/base';
-
 // base - assets
 @import 'base/font_face';
 @import 'base/extends';
-@import 'base/animations';
-
-// base - starter
-@import 'base/base';
 
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
-@import 'elements/system-feedback';
 
-// base - specific views
-@import 'views/verification';
-@import 'views/shoppingcart';
+// shared
+@import 'shared/modal';
 
 // applications
 @import "discussion/utilities/variables";
@@ -60,10 +51,3 @@
 @import "discussion/views/response";
 @import 'discussion/utilities/developer';
 @import 'discussion/utilities/shame';
-
-@import 'news';
-
-// temp - shame and developer
-@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
-@import 'shame';     // used for any bad-form/orphaned scss
-## NOTE: needed here for cascade and dependency purposes, but not a great permanent solution
