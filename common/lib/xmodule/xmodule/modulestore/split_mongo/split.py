@@ -72,6 +72,7 @@ from xmodule.modulestore.exceptions import InsufficientSpecificationError, Versi
 from xmodule.modulestore import (
     inheritance, ModuleStoreWriteBase, ModuleStoreEnum, BulkOpsRecord, BulkOperationsMixin
 )
+from xmodule.modulestore.mongodb_proxy import autoretry_read
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
@@ -775,6 +776,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # add it in the envelope for the structure.
         return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
 
+    @autoretry_read()
     def get_courses(self, branch, **kwargs):
         '''
         Returns a list of course descriptors matching any given qualifiers.
@@ -2631,6 +2633,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         structure['blocks'][block_key] = content
 
+    @autoretry_read()
     def find_courses_by_search_target(self, field_name, field_value):
         """
         Find all the courses which cached that they have the given field with the given value.

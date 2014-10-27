@@ -526,6 +526,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         connection.drop_database(self.collection.database.proxied_object)
         connection.close()
 
+    @autoretry_read()
     def fill_in_run(self, course_key):
         """
         In mongo some course_keys are used without runs. This helper function returns
@@ -699,6 +700,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         item['location'] = item['_id']
         del item['_id']
 
+    @autoretry_read()
     def _query_children_for_cache_children(self, course_key, items):
         """
         Generate a pymongo in query for finding the items and return the payloads
@@ -803,6 +805,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for item in items
         ]
 
+    @autoretry_read()
     def get_courses(self, **kwargs):
         '''
         Returns a list of course descriptors.
@@ -934,6 +937,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for key in ('tag', 'org', 'course', 'category', 'name', 'revision')
         ])
 
+    @autoretry_read()
     def get_items(
             self,
             course_id,
