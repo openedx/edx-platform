@@ -364,6 +364,8 @@ A problem’s weight is set to 2. The problem has four response fields.
 If a student’s response contains one correct answer and three incorrect
 answers, the student’s score is 0.5 out of 2 points.
 
+.. _Randomization:
+
 ===============
 Randomization
 ===============
@@ -412,6 +414,8 @@ This setting has the following options.
 |                   | is different from the version that   |
 |                   | other students see.                  |
 +-------------------+--------------------------------------+
+
+.. note:: The edX Platform has a 20-seed limit for randomization.
 
 ===============
 Show Answer

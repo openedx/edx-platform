@@ -18,6 +18,8 @@ October, 2014
        Your Own Grader` chapter.
    * - 
      - Fixed a bug in :ref:`Text Input Problem XML`.
+   * -
+     - Added :ref:`Create a Randomized Custom Python-Evaluated Input Problem`
    * - 10/23/14
      - Added note about limited support of annotation problem type to
        :ref:`Annotation`.
