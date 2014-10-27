@@ -24,8 +24,6 @@ var edx = edx || {};
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
-
-            console.log(data);
         },
 
         render: function( html ) {
@@ -43,10 +41,11 @@ var edx = edx || {};
         },
 
         postRender: function() {
-            var $container = $(this.el);
+            this.$container = $(this.el);
 
-            this.$form = $container.find('form');
-            this.$errors = $container.find('.submission-error');
+            this.$form = this.$container.find('form');
+            this.$errors = this.$container.find('.submission-error');
+            this.$authError = this.$container.find('.already-authenticated-msg');
 
             /* If we're already authenticated with a third-party
              * provider, try logging in.  The easiest way to do this
@@ -87,10 +86,11 @@ var edx = edx || {};
             if ( error.status === 403 &&
                  error.responseText === 'third-party-auth' &&
                  this.currentProvider ) {
-                this.element.show( this.$alreadyAuthenticatedMsg );
+                this.element.show( this.$authError );
+                this.element.hide( this.$errors );
             } else {
-                this.element.hide( this.$alreadyAuthenticatedMsg );
-                // TODO -- display the error
+                this.element.hide( this.$authError );
+                this.element.show( this.$errors );
             }
         }
     });
