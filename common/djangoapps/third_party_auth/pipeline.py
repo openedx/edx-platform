@@ -481,5 +481,5 @@ def change_enrollment(*args, **kwargs):
                 CourseEnrollment.enroll(kwargs['user'], course_id)
             except CourseEnrollmentException:
                 pass
-            except Exception, e:
-                logger.exception(e)
+            except Exception as ex:
+                logger.exception(ex)
