@@ -9,7 +9,7 @@ from django.http import (
 )
 from student.models import CourseEnrollment
 
-from xmodule.contentstore.django import contentstore
+from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
 from opaque_keys import InvalidKeyError
@@ -42,7 +42,7 @@ class StaticContentServer(object):
             if content is None:
                 # nope, not in cache, let's fetch from DB
                 try:
-                    content = contentstore().find(loc, as_stream=True)
+                    content = AssetManager.find(loc, as_stream=True)
                 except NotFoundError:
                     response = HttpResponse()
                     response.status_code = 404
@@ -94,7 +94,7 @@ class StaticContentServer(object):
             if request.META.get('HTTP_RANGE'):
                 # Data from cache (StaticContent) has no easy byte management, so we use the DB instead (StaticContentStream)
                 if type(content) == StaticContent:
-                    content = contentstore().find(loc, as_stream=True)
+                    content = AssetManager.find(loc, as_stream=True)
 
                 header_value = request.META['HTTP_RANGE']
                 try:
