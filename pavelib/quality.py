@@ -154,16 +154,14 @@ def run_quality(options):
 
     pep8_reports = u' '.join(pep8_files)
 
-    sh(
-        "diff-quality --violations=pep8 --html-report {dquality_dir}/"
-        "diff_quality_pep8.html {pep8_reports}".format(
-            dquality_dir=dquality_dir, pep8_reports=pep8_reports)
-    )
-
     try:
         sh(
-            "diff-quality --violations=pep8 {pep8_reports} {percentage_string}".format(
-                pep8_reports=pep8_reports, percentage_string=percentage_string)
+            "diff-quality --violations=pep8 {pep8_reports} {percentage_string} "
+            "--html-report {dquality_dir}/diff_quality_pep8.html".format(
+                pep8_reports=pep8_reports,
+                percentage_string=percentage_string,
+                dquality_dir=dquality_dir
+            )
         )
     except BuildFailure, error_message:
         if is_percentage_failure(error_message):
@@ -188,21 +186,14 @@ def run_quality(options):
         "common:common/djangoapps:common/lib"
     )
 
-    sh(
-        "{pythonpath_prefix} diff-quality --violations=pylint --html-report "
-        "{dquality_dir}/diff_quality_pylint.html {pylint_reports}".format(
-            pythonpath_prefix=pythonpath_prefix,
-            dquality_dir=dquality_dir,
-            pylint_reports=pylint_reports
-        )
-    )
-
     try:
         sh(
-            "{pythonpath_prefix} diff-quality --violations=pylint {pylint_reports} {percentage_string}".format(
+            "{pythonpath_prefix} diff-quality --violations=pylint {pylint_reports} {percentage_string} "
+            "--html-report {dquality_dir}/diff_quality_pylint.html".format(
                 pythonpath_prefix=pythonpath_prefix,
                 pylint_reports=pylint_reports,
-                percentage_string=percentage_string
+                percentage_string=percentage_string,
+                dquality_dir=dquality_dir
             )
         )
     except BuildFailure, error_message:
@@ -211,7 +202,7 @@ def run_quality(options):
         else:
             raise BuildFailure(error_message)
 
-    # if one of the diff-quality runs failed, then paver quits with an error
+    # If one of the diff-quality runs fails, then paver exits with an error when it is finished
     if diff_quality_percentage_failure:
         raise BuildFailure("Diff-quality failure(s).")
 
