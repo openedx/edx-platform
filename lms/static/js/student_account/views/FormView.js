@@ -90,13 +90,17 @@ var edx = edx || {};
          */
         element: {
             hide: function( $el ) {
-                $el.addClass('hidden')
-                   .attr('aria-hidden', true);
+                if ( $el ) {
+                    $el.addClass('hidden')
+                       .attr('aria-hidden', true);
+                }
             },
 
             show: function( $el ) {
-                $el.removeClass('hidden')
-                   .attr('aria-hidden', false);
+                if ( $el ) {
+                    $el.removeClass('hidden')
+                       .attr('aria-hidden', false);
+                }
             }
         },
 
