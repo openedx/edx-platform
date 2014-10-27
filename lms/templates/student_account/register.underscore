@@ -1,8 +1,10 @@
 <% if (currentProvider) { %>
-    <p class="instructions">
-      You've successfully signed in with <strong><%- currentProvider %></strong>.<br />
-      We just need a little more information before you start learning with edX.
-    </p>
+    <div class="status submission-success" aria-hidden="false">
+        <h4 class="message-title">You've successfully signed in with <strong><%- currentProvider %></strong>.</h4>
+        <ul class="message-copy">
+          <li>We just need a little more information before you start learning with edX.</li>
+        </ul>
+    </div>
 <% } else {
     _.each( providers, function( provider) { %>
         <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.registerUrl %>">

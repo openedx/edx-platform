@@ -24,6 +24,8 @@ var edx = edx || {};
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+
+            console.log(data);
         },
 
         render: function( html ) {
@@ -64,6 +66,7 @@ var edx = edx || {};
 
         thirdPartyAuth: function( event ) {
             var providerUrl = $(event.target).data('provider-url') || '';
+
             if (providerUrl) {
                 window.location.href = providerUrl;
             } else {
@@ -73,8 +76,9 @@ var edx = edx || {};
         },
 
         saveError: function( error ) {
-            console.log(error.status, ' error: ', error.responseText);
+            // console.log(error.status, ' error: ', error.responseText);
             this.errors = ['<li>' + error.responseText + '</li>'];
+            this.setErrors();
 
             /* If we've gotten a 403 error, it means that we've successfully
              * authenticated with a third-party provider, but we haven't
@@ -89,7 +93,6 @@ var edx = edx || {};
                 // TODO -- display the error
             }
 
-            this.setErrors();
         }
     });
 
