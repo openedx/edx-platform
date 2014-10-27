@@ -55,6 +55,9 @@ from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
 
+import survey.utils
+import survey.views
+
 from util.views import ensure_valid_course_key
 log = logging.getLogger("edx.courseware")
 
@@ -301,12 +304,19 @@ def index(request, course_id, chapter=None, section=None,
 
 def _index_bulk_op(request, user, course_key, chapter, section, position):
     course = get_course_with_access(user, 'load', course_key, depth=2)
+
     staff_access = has_access(user, 'staff', course)
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
+
+    # check to see if there is a required survey that must be taken before
+    # the user can access the course.
+    if survey.utils.is_survey_required_for_course(course):
+        if not survey.utils.has_user_answered_required_survey_for_course(course, user):
+            return redirect(reverse('course_survey', args=[course.id.to_deprecated_string()]))
 
     masq = setup_masquerade(request, staff_access)
 
@@ -1059,3 +1069,30 @@ def get_course_lti_endpoints(request, course_id):
     ]
 
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
+
+@login_required
+def course_survey(request, course_id):
+    """
+    URL endpoint to present a survey that is associated with a course_id
+    Note that the actual implementation of course survey is handled in the
+    views.py file in the Survey Djangoapp
+    """
+
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'see_exists', course_key)
+
+    redirect_url = reverse('courseware', args=[course_id])
+
+    # if there is no Survey associated with this course,
+    # then redirect to the course instead
+    if not course.course_survey_name:
+        return redirect(redirect_url)
+
+    return survey.views.view_student_survey(
+        request,
+        request.user,
+        course.course_survey_name,
+        course = course,
+        redirect_url = redirect_url,
+        is_required = course.course_survey_required,
+    )
