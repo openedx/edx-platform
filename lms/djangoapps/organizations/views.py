@@ -11,7 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api_manager.courseware_access import get_course_key
-from api_manager.models import Organization
+from organizations.models import Organization
 from api_manager.users.serializers import UserSerializer
 from api_manager.groups.serializers import GroupSerializer
 from api_manager.utils import str2bool
@@ -28,7 +28,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
     serializer_class = OrganizationSerializer
     model = Organization
 
-    @action(methods=['get',])
+    @action(methods=['get', ])
     def metrics(self, request, pk):
         """
         Provide statistical information for the specified Organization
@@ -95,7 +95,10 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         Add a Group to a organization or retrieve list of groups in organization
         """
         if request.method == 'GET':
+            group_type = request.QUERY_PARAMS.get('type', None)
             groups = Group.objects.filter(organizations=pk)
+            if group_type:
+                groups = groups.filter(groupprofile__group_type=group_type)
             response_data = []
             if groups:
                 for group in groups:

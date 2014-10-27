@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from api_manager.models import APIUser
-from api_manager.organizations.serializers import BasicOrganizationSerializer
+from organizations.serializers import BasicOrganizationSerializer
 from student.models import UserProfile
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):

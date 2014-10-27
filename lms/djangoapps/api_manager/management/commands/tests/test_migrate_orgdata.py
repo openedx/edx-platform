@@ -9,7 +9,8 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase
 
 from api_manager.management.commands import migrate_orgdata
-from api_manager.models import GroupProfile, GroupRelationship, Organization
+from api_manager.models import GroupProfile, GroupRelationship
+from organizations.models import Organization
 
 
 class MigrateOrgDataTests(TestCase):
