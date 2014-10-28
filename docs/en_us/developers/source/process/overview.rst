@@ -50,7 +50,7 @@ If you are a :doc:`contributor <contributor>` submitting a pull request, expect 
 take a few weeks before it can be merged. The earlier you can start talking
 with the rest of the Open edX community about the changes you want to make,
 before you even start changing code, the better the whole process
-will go. 
+will go.
 
 Follow the guidelines in this document for a high-quality pull request: include a detailed
 description of your pull request when you open it on Github (we recommend using a
@@ -72,7 +72,7 @@ If you are a :doc:`core committer <core-committer>`, allocate some time
 in every two-week sprint to review pull requests from other contributors.
 The community managers will make sure that these pull requests meet a
 basic standard for quality before asking you spend time reviewing them.
-More details are in the :doc:`core committer guidelines <code-committer>`.
+More details are in the :doc:`core committer guidelines <core-committer>`.
 
 Feel free to read the other documentation specific to each individual role in the
 process, but you don’t need to read everything to get started! If you're not
