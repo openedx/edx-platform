@@ -105,7 +105,6 @@ class TestMongoModuleStoreBase(unittest.TestCase):
             'port': PORT,
             'db': DB,
             'collection': COLLECTION,
-            #'asset_collection': ASSET_COLLECTION,
         }
         cls.add_asset_collection(doc_store_config)
 
