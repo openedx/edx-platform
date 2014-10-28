@@ -1453,7 +1453,9 @@ class CoursesMetricsGradesList(SecureListAPIView):
         course_key = get_course_key(course_id)
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
         queryset = StudentGradebook.objects.filter(course_id__exact=course_key,
-                                                   user__courseenrollment__is_active=True)\
+                                                   user__is_active=True,
+                                                   user__courseenrollment__is_active=True,
+                                                   user__courseenrollment__course_id__exact=course_key)\
             .exclude(user__in=exclude_users)
 
         upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 200)
@@ -1592,21 +1594,25 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
         grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
         grades_qs = StudentGradebook.objects.filter(course_id__exact=course_key, user__is_active=True,
-                                                    user__courseenrollment__is_active=True).\
+                                                    user__courseenrollment__is_active=True,
+                                                    user__courseenrollment__course_id__exact=course_key).\
             exclude(user_id__in=exclude_users)
         grades_complete_qs = grades_qs.filter(proforma_grade__lte=F('grade') + grade_complete_match_range,
                                               proforma_grade__gt=0)
         enrolled_qs = CourseEnrollment.objects.filter(course_id__exact=course_key, user__is_active=True,
                                                       is_active=True).exclude(user_id__in=exclude_users)
         users_started_qs = StudentProgressHistory.objects.filter(course_id__exact=course_key, user__is_active=True,
-                                                                 user__courseenrollment__is_active=True)\
+                                                                 user__courseenrollment__is_active=True,
+                                                                 user__courseenrollment__course_id__exact=course_key)\
             .exclude(user_id__in=exclude_users)
         modules_completed_qs = CourseModuleCompletion.get_actual_completions().filter(course_id__exact=course_key,
                                                                                       user__courseenrollment__is_active=True,
+                                                                                      user__courseenrollment__course_id__exact=course_key,
                                                                                       user__is_active=True)\
             .exclude(user_id__in=exclude_users)
         active_users_qs = StudentModule.objects.filter(course_id__exact=course_key, student__is_active=True,
-                                                       student__courseenrollment__is_active=True)\
+                                                       student__courseenrollment__is_active=True,
+                                                       student__courseenrollment__course_id__exact=course_key)\
             .exclude(student_id__in=exclude_users)
 
         organization = request.QUERY_PARAMS.get('organization', None)
