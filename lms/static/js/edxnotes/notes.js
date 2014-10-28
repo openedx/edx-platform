@@ -1,15 +1,7 @@
 (function (define, $, _, Annotator, undefined) {
     'use strict';
     define('edxnotes/notes.js', ['edxnotes/plugins/accessibility'], function () {
-        var getUri, getUsageId, getOptions, setupPlugins, getAnnotator;
-        /**
-         * Returns current URI for the page.
-         * @return {String} URI.
-         **/
-        getUri = function () {
-            return window.location.href.replace(/\?.*|\#.*/g, '');
-        };
-
+        var getUsageId, getOptions, setupPlugins, getAnnotator;
         /**
          * Returns Usage id for the component.
          * @param {jQuery Element} The container element.
@@ -25,25 +17,14 @@
          * @param {String} params.token An auth token.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
+         * @param {String} params.usageId Usage Id of the component.
+         * @param {String} params.courseId Course id.
          * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @return {Object} Options.
          **/
         getOptions = function (element, params) {
-            var uri = getUri(),
-                usageId = getUsageId(element);
-
+            var usageId = params.usageId || getUsageId();
             return {
-                permissions: {
-                    user: params.user,
-                    permissions: {
-                        'read':   [params.user],
-                        'update': [params.user],
-                        'delete': [params.user],
-                        'admin':  [params.user]
-                    },
-                    showViewPermissionsCheckbox: false,
-                    showEditPermissionsCheckbox: false,
-                },
                 auth: {
                     token: params.token,
                     tokenUrl: params.tokenUrl
@@ -52,11 +33,13 @@
                     prefix: params.prefix,
                     annotationData: {
                         user: params.user,
-                        usage_id: usageId
+                        usage_id: usageId,
+                        course_id: params.courseId
                     },
                     loadFromSearch: {
                         user: params.user,
-                        usage_id: usageId
+                        usage_id: usageId,
+                        course_id: params.courseId
                     }
                 }
             };
@@ -81,14 +64,16 @@
          * @param {String} params.token An auth token.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
+         * @param {String} params.usageId Usage Id of the component.
+         * @param {String} params.courseId Course id.
          * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @return {Object} An instance of Annotator.js.
          **/
         getAnnotator = function (element, params) {
-            var element = $(element),
-                options = getOptions(element, params),
-                annotator = element.annotator(options).data('annotator'),
-                plugins = ['Auth', 'Permissions', 'Store'];
+            var el = $(element),
+                options = getOptions(el, params),
+                annotator = el.annotator(options).data('annotator'),
+                plugins = [/*'Auth', */'Store'];
 
             setupPlugins(annotator, plugins, options);
             return annotator;

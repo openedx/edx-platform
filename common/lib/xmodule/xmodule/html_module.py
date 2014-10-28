@@ -16,7 +16,7 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
-from edxnotes.decorators import EdxNotes
+from edxnotes.decorators import edxnotes
 
 log = logging.getLogger("edx.courseware")
 
@@ -52,8 +52,7 @@ class HtmlFields(object):
     )
 
 
-@EdxNotes
-class HtmlModule(HtmlFields, XModule):
+class HtmlModuleMixin(HtmlFields, XModule):
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
@@ -74,12 +73,11 @@ class HtmlModule(HtmlFields, XModule):
         return self.data
 
 
-class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
+class HtmlDescriptorMixin(HtmlFields, XmlDescriptor, EditingDescriptor):
     """
     Module for putting raw html in a course
     """
     mako_template = "widgets/html-edit.html"
-    module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
 
@@ -237,6 +235,15 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         return non_editable_fields
 
 
+@edxnotes
+class HtmlModule(HtmlModuleMixin):
+    pass
+
+
+class HtmlDescriptor(HtmlDescriptorMixin):
+    module_class = HtmlModule
+
+
 class AboutFields(object):
     display_name = String(
         help=_("Display name for this module"),
@@ -251,7 +258,7 @@ class AboutFields(object):
 
 
 @XBlock.tag("detached")
-class AboutModule(AboutFields, HtmlModule):
+class AboutModule(AboutFields, HtmlModuleMixin):
     """
     Overriding defaults but otherwise treated as HtmlModule.
     """
@@ -259,7 +266,7 @@ class AboutModule(AboutFields, HtmlModule):
 
 
 @XBlock.tag("detached")
-class AboutDescriptor(AboutFields, HtmlDescriptor):
+class AboutDescriptor(AboutFields, HtmlDescriptorMixin):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
@@ -288,7 +295,7 @@ class StaticTabFields(object):
 
 
 @XBlock.tag("detached")
-class StaticTabModule(StaticTabFields, HtmlModule):
+class StaticTabModule(StaticTabFields, HtmlModuleMixin):
     """
     Supports the field overrides
     """
@@ -296,7 +303,7 @@ class StaticTabModule(StaticTabFields, HtmlModule):
 
 
 @XBlock.tag("detached")
-class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
+class StaticTabDescriptor(StaticTabFields, HtmlDescriptorMixin):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
@@ -322,7 +329,7 @@ class CourseInfoFields(object):
 
 
 @XBlock.tag("detached")
-class CourseInfoModule(CourseInfoFields, HtmlModule):
+class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
     """
     Just to support xblock field overrides
     """
@@ -332,7 +339,7 @@ class CourseInfoModule(CourseInfoFields, HtmlModule):
 
 
 @XBlock.tag("detached")
-class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
+class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptorMixin):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones

@@ -1,3 +1,5 @@
+import jwt
+import datetime
 from uuid import uuid4
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -11,7 +13,6 @@ FORMAT = {
     "updated": "2011-05-26T12:17:05.012544",   # updated datetime in iso8601 format (added by backend)
     "text": "A note I wrote",                  # content of annotation
     "quote": "the text that was annotated",    # the annotated text (added by frontend)
-    "uri": "http://example.com",               # URI of annotated document (added by frontend)
     "ranges": [                                # list of ranges covered by annotation (usually only one entry)
         {
             "start": "/p[1]",                  # (relative) XPath to start element
@@ -22,14 +23,14 @@ FORMAT = {
     ],
     "user": "user",                            # user id of annotation owner (can also be an object with an 'id' property)
     "usage_id": "usage_id",                    # usage id of a component (added by frontend)
-    "consumer": "annotateit",                  # consumer key of backend
-    "permissions": {                           # annotation permissions (from Permissions/AnnotateItPermissions plugin)
-        "read": ["user"],
-        "admin": ["user"],
-        "update": ["user"],
-        "delete": ["user"]
-    }
+    "course_id": "course_id",                  # course id
 }
+
+
+# Replace these with your details
+CONSUMER_KEY = 'yourconsumerkey'
+CONSUMER_SECRET = 'yourconsumersecret'
+DEFAULT_TTL = 86400
 
 
 class EdxNotes(object):
@@ -45,7 +46,7 @@ class EdxNotes(object):
 
     @staticmethod
     def read(note_id, user):
-        result = filter(lambda note: note.get('id') == note_id, LIST)
+        result = EdxNotes.filter_by_id(note_id)
         if result:
             return result
         else:
@@ -53,7 +54,7 @@ class EdxNotes(object):
 
     @staticmethod
     def update(note_id, note_info):
-        result = filter(lambda note: note.get('id') == note_id, LIST)
+        result = EdxNotes.filter_by_id(note_id)
         if result:
             return result
         else:
@@ -61,14 +62,68 @@ class EdxNotes(object):
 
     @staticmethod
     def delete(note_id):
-        result = filter(lambda note: note.get('id') == note_id, LIST)
+        result = EdxNotes.filter_by_id(note_id)
         if not result:
             raise ItemNotFoundError()
 
     @staticmethod
     def search(user, usage_id):
-        results = filter(lambda note: note.get('user') == user, LIST)
+        results = EdxNotes.filter_by_user(user)
         return {
             'total': len(results),
             'rows': results
         }
+
+    @staticmethod
+    def filter_by_id(note_id):
+        return EdxNotes.filter_by('id', note_id)
+
+    @staticmethod
+    def filter_by_user(user):
+        return EdxNotes.filter_by('user', user)
+
+    @staticmethod
+    def filter_by(field_name, value):
+        return filter(lambda note: note.get(field_name) == value, LIST)
+
+
+def _now():
+    return datetime.datetime.utcnow().replace(microsecond=0)
+
+
+def get_prefix():
+    return '/edxnotes/api'
+
+
+def get_token_url():
+    return '/edxnotes/token'
+
+
+def get_user_id():
+    return 'edx_user'
+
+
+def get_usage_id():
+    return 'usage_id'
+
+
+def get_course_id():
+    return 'course_id'
+
+
+def generate_uid():
+    return uuid4().int
+
+
+def generate_token():
+    """
+    Generetes token.
+    """
+    return jwt.encode({
+        'd': {
+            'consumerKey': 'consumerKey',
+            'userId': 'edx_user',
+            'issuedAt': _now().isoformat() + 'Z',
+            'ttl': DEFAULT_TTL,
+        },
+    }, CONSUMER_SECRET)

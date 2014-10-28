@@ -1,16 +1,10 @@
+<%! import json %>
 <div id="edx-notes-wrapper-${uid}" class="edx-notes-wrapper">${content}</div>
 <script type="text/javascript">
     (function (require) {
         require(['edxnotes/notes.js'], function (Notes) {
-            var element = document.getElementById('edx-notes-wrapper-${uid}'),
-                params = {
-                    prefix: "${prefix}",
-                    token: "${token}",
-                    user: "${user}",
-                    tokenUrl: "${token_url}",
-                };
-
-            Notes.factory(element, params);
+            var element = document.getElementById('edx-notes-wrapper-${uid}');
+            Notes.factory(element, ${json.dumps(params)});
         });
     }).call(this, RequireJS.require);
 </script>

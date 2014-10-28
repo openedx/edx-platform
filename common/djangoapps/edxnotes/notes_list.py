@@ -6,7 +6,6 @@ LIST = [
         "updated": "2011-05-26T12:17:05.012544",   # updated datetime in iso8601 format (added by backend)
         "text": "A note I wrote",                  # content of annotation
         "quote": "the basics",                     # the annotated text (added by frontend)
-        "uri": "http://example.com",               # URI of annotated document (added by frontend)
         "ranges": [                                # list of ranges covered by annotation (usually only one entry)
             {
                 "start": "/p[1]",                  # (relative) XPath to start element
@@ -16,13 +15,8 @@ LIST = [
             }
         ],
         "user": "user",                           # user id of annotation owner (can also be an object with an 'id' property)
-        "consumer": "annotateit",                  # consumer key of backend
-        "permissions": {                           # annotation permissions (from Permissions/AnnotateItPermissions plugin)
-            "read": ["user"],
-            "admin": ["user"],
-            "update": ["user"],
-            "delete": ["user"]
-        }
+        "usage_id": "usage_id",                    # usage id of a component (added by frontend)
+        "course_id": "course_id",                  # course id
     },
     {
         "id": "39fc339cf058bd22176771b3e3187330",  # unique id (added by backend)
@@ -31,7 +25,6 @@ LIST = [
         "updated": "2014-05-26T12:17:05.012544",   # updated datetime in iso8601 format (added by backend)
         "text": "Test note",                  # content of annotation
         "quote": "We",    # the annotated text (added by frontend)
-        "uri": "http://example.com",               # URI of annotated document (added by frontend)
         "ranges": [                                # list of ranges covered by annotation (usually only one entry)
             {
                 "start": "/p[1]",                  # (relative) XPath to start element
@@ -40,14 +33,9 @@ LIST = [
                 "endOffset": 54                    # character offset within end element
             }
         ],
-        "user": "edx_user",                           # user id of annotation owner (can also be an object with an 'id' property)
-        "consumer": "annotateit",                  # consumer key of backend
-        "permissions": {                           # annotation permissions (from Permissions/AnnotateItPermissions plugin)
-            "read": ["edx_user"],
-            "admin": ["edx_user"],
-            "update": ["edx_user"],
-            "delete": ["edx_user"]
-        }
+        "user": "edx_user",                        # user id of annotation owner (can also be an object with an 'id' property)
+        "usage_id": "usage_id",                    # usage id of a component (added by frontend)
+        "course_id": "course_id",                  # course id
     }
 
 ]
