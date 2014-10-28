@@ -171,3 +171,18 @@ class SurveyModelsTests(TestCase):
         self.assertEquals(len(answers.keys()), 1)
         self.assertTrue(self.student2.id in answers)
         self.assertEquals(all_answers[self.student2.id], self.student2_answers)
+
+    def test_get_field_names(self):
+        """
+        Create a new survey and add answers to it
+        """
+
+        survey = self._create_test_survey()
+        self.assertIsNotNone(survey)
+
+        survey.save_user_answers(self.student, self.student_answers)
+        survey.save_user_answers(self.student2, self.student2_answers)
+
+        names = survey.get_field_names()
+
+        self.assertEqual(names, ['field1', 'field2'])

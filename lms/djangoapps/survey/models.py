@@ -87,6 +87,13 @@ class SurveyForm(TimeStampedModel):
         """
         SurveyAnswer.save_answers(self, user, answers)
 
+    def get_field_names(self):
+        """
+        Returns a list of defined field names for all answers in a survey. This can be
+        helpful for reporting like features, i.e. adding headers to the reports
+        """
+        return SurveyAnswer.get_field_names(self)
+
 
 class SurveyAnswer(TimeStampedModel):
     """
@@ -172,6 +179,6 @@ class SurveyAnswer(TimeStampedModel):
 
         results = []
         for name in field_names:
-            results.append(name)
+            results.append(name['field_name'])
 
-            return results
+        return results
