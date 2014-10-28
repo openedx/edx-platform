@@ -22,6 +22,19 @@
         });
 
         /**
+         * Modifies Annotator.highlightRange to add a "tabindex=0" attribute
+         * to the <span class="annotator-hl"> markup that encloses the note.
+         * These are then focusable via the TAB key.
+         **/
+        Annotator.prototype.highlightRange = _.compose(
+            function (results) {
+                $('.annotator-hl').attr('tabindex', 0);
+                return results;
+            },
+            Annotator.prototype.highlightRange
+        );
+
+        /**
          * Annotator#element callback. Sets the @keyIsDown property used to
          * determine if a selection may have started to true. Also calls
          * Annotator#startViewerHideTimer() to hide the Annotator#viewer.
