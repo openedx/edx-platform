@@ -561,7 +561,7 @@ class CourseFields(object):
 
     course_survey_name = String(
         display_name=_("Course Survey Name"),
-        help="Whether to display a pre-course survey to the user.",
+        help="Name of SurveyForm to display as a pre-course survey to the user.",
         default=None,
         scope=Scope.settings
     )
