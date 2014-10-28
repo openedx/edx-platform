@@ -236,11 +236,12 @@ class AboutWithInvitationOnly(ModuleStoreTestCase):
 
         url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
+        unicode_content = resp.content.decode('utf8')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content)
+        self.assertIn(u"Register for {}".format(self.course.id.course), unicode_content)
 
         # Check that registration button is present
-        self.assertIn(REG_STR, resp.content)
+        self.assertIn(REG_STR, unicode_content)
 
 
 @patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
@@ -264,11 +265,12 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.setup_user()
         url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
+        unicode_content = resp.content.decode('utf8')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("OOGIE BLOOGIE", resp.content)
-        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content)
-        self.assertIn(SHIB_ERROR_STR, resp.content)
-        self.assertIn(REG_STR, resp.content)
+        self.assertIn("OOGIE BLOOGIE", unicode_content)
+        self.assertIn(u"Register for {}".format(self.course.id.course), unicode_content)
+        self.assertIn(SHIB_ERROR_STR, unicode_content)
+        self.assertIn(REG_STR, unicode_content)
 
     def test_anonymous_user_shib_course(self):
         """
@@ -276,11 +278,12 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
         """
         url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
+        unicode_content = resp.content.decode('utf8')
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("OOGIE BLOOGIE", resp.content)
-        self.assertIn(u"Register for {}".format(self.course.id.course), resp.content)
-        self.assertIn(SHIB_ERROR_STR, resp.content)
-        self.assertIn(REG_STR, resp.content)
+        self.assertIn("OOGIE BLOOGIE", unicode_content)
+        self.assertIn(u"Register for {}".format(self.course.id.course), unicode_content)
+        self.assertIn(SHIB_ERROR_STR, unicode_content)
+        self.assertIn(REG_STR, unicode_content)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
