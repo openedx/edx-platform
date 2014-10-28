@@ -41,11 +41,16 @@ GNU Privacy Guard (GnuPG or GPG). Essentially, you install a cryptographic
 application on your local computer and then supply your email address and a
 secret passphrase (a password).
 
-.. important:: The email address that you supply when you create your keys 
- must be your official email address at your edX partner institution. After you
- specify the passphrase, be sure to take any steps necessary to assure that you
- can use it in the future. To minimize security risks, GPG does not provide a
- mechanism for supplying you with a reminder hint.
+.. important:: 
+
+ * The email address that you supply when you create your keys must be your
+   official email address at your edX partner institution.
+
+ * After you specify the passphrase, be sure to take any steps necessary to
+   assure that you can use it in the future. To minimize security risks, GPG
+   does not provide a mechanism for supplying you with a reminder hint.
+
+ * Do not reveal your passphrase to anyone else.
 
 The result is the public key that you send to edX to use in encrypting data
 files for your institution, and the private key which you keep secret and use
@@ -88,7 +93,10 @@ Create Keys: Windows
 #. Optionally, click **Make a Backup Copy of Your Key Pair** to store both of
    the keys on a removable data storage device.
 
-.. important:: Do not reveal your passphrase, or share your private key, with anyone else.
+.. important:: Do not reveal your passphrase, or share your private key, with 
+ anyone else. If you need another person to be able to transfer and decrypt
+ files, work with edX to set her or him up as an additional data czar. Data
+ czars must create and use their own passphrases.
 
 .. _Gpg4win: http://gpg4win.org/
 
@@ -187,7 +195,8 @@ credentials.csv file. Open the decrypted credentials.csv file to see that it
 contains your email address, your Access Key, and your Secret Key.
 
  .. image:: ../Images/AWS_Credentials.png
-  :alt: A csv file, open in Notepad, with the Access Key value and the Secret Key value underlined
+  :alt: A csv file, open in Notepad, with the Access Key value and the Secret 
+        Key value underlined
 
 .. _Access Amazon S3:
 
