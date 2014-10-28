@@ -363,14 +363,21 @@
         color: $light-gray2;
         padding: 0;
       }
-      h1, h1 span{
+      h1{
         font-size: 24px;
         color: $dark-gray1;
         padding: 0 0 10px 0;
         text-transform: capitalize;
         span{font-size: 16px;}
+        width: 700px;
+        float: left;
       }
-      hr{border-top: 1px solid $dark-gray2;}
+      span.date{
+         width: calc(100% - 700px);
+        float: right;
+        text-align: right;
+        }
+      hr{border-top: 1px solid $dark-gray2;clear: both;}
       .three-col{
         .col-1{
           width: 450px;
@@ -378,6 +385,7 @@
           font-size: 16px;
           text-transform: uppercase;
           color: $light-gray2;
+          padding-top: 13px;
           .price{
               span{
                 color: $dark-gray1;
@@ -479,12 +487,10 @@
             pointer-events: none;
           }
         }
-        .no-width {
-          width: 0px !important;
-        }
         .col-3{
-          width: 100px;
+          width: 40px;
           float: right;
+          padding-top: 13px;
           a.btn-remove{
             float: right;
             opacity: 0.8;
