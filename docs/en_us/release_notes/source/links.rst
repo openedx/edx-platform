@@ -87,7 +87,9 @@
 
 .. _Data Delivered in Data Packages: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/package.html
 
-.. _edX Developer's Guide: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/index.html
+
+.. _edX Platform Developer's Guide: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/
+
 
 .. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html
 
