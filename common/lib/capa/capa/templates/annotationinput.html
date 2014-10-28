@@ -10,13 +10,13 @@
 </div>
 <div class="annotation-body">
 
-    <div class="block block-highlight">${text}</div>
-    <div class="block block-comment">${comment}</div>
+    <div class="block block-highlight">${text | n}</div>
+    <div class="block block-comment">${comment | n}</div>
 
-    <div class="block">${comment_prompt}</div>
+    <div class="block">${comment_prompt | n}</div>
     <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value}</textarea>
 
-    <div class="block">${tag_prompt}</div>
+    <div class="block">${tag_prompt | n}</div>
     <ul class="tags">
     % for option in options:
         <li>
@@ -35,7 +35,7 @@
                 selected
             % endif
             " data-id="${option['id']}">
-                ${option['description']}
+                ${option['description'] | n}
             </span>
         </li>
     % endfor
