@@ -71,7 +71,7 @@
               }
             } else if (typeof(val) === "object") {
               /* for SELECT statements */
-              if (val.length === 0 || val[0] === "") {
+              if (val === null || val.length === 0 || val[0] === "") {
                 var field_label = $(this).parent().find("label");
                 $(this).parent().addClass('field-error');
                 $('.status.message.submission-error .message-copy').append("<li>"+field_label.text()+"</li>");
