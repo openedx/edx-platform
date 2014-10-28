@@ -45,6 +45,7 @@ Overview
 .. image:: pr-process.png
    :align: center
    :alt: A visualization of the pull request process
+   :target: ../_images/pr-process.png
 
 If you are a :doc:`contributor <contributor>` submitting a pull request, expect that it will
 take a few weeks before it can be merged. The earlier you can start talking
