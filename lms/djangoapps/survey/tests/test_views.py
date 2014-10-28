@@ -173,4 +173,3 @@ class SurveyViewsTests(TestCase):
 
         # is the existing data present in the HTML response?
         self.assertIn('"field1": "value1"', resp.content)
-

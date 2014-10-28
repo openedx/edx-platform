@@ -28,10 +28,10 @@ def view_survey(request, survey_name):
     """
     redirect_url = request.GET.get('redirect_url')
 
-    return view_student_survey(request, request.user, survey_name, redirect_url=redirect_url)
+    return view_student_survey(request.user, survey_name, redirect_url=redirect_url)
 
 
-def view_student_survey(request, user, survey_name, course=None, redirect_url=None, is_required=False, optout_redirect_url=None):
+def view_student_survey(user, survey_name, course=None, redirect_url=None, is_required=False, optout_redirect_url=None):
     """
     Shared utility method to render a survey form
     NOTE: This method is shared between the Survey and Courseware Djangoapps

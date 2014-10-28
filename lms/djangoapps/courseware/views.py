@@ -1090,7 +1090,6 @@ def course_survey(request, course_id):
         return redirect(redirect_url)
 
     return survey.views.view_student_survey(
-        request,
         request.user,
         course.course_survey_name,
         course=course,
