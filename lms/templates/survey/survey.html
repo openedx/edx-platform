@@ -96,7 +96,6 @@
 
       $('#survey-form').on('ajax:success', function(event, json, xhr) {
         var url = json.redirect_url || "${reverse('dashboard')}";
-        $('.status.message.submission-error').css("display", "block").focus();
         location.href = url;
       });
 
@@ -104,9 +103,7 @@
         toggleSubmitButton(true);
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
-        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
-        $(".field-error").removeClass('field-error');
-        $("[data-field='"+json.field+"']").addClass('field-error')
+        $('.status.message.submission-error .message-copy').html(${_("There has been an error processing your survey.")}).stop().css("display", "block");
       });
     })(this);
 
