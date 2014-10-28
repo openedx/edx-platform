@@ -351,7 +351,7 @@
 
         &.information {
           @extend %t-copy-sub2;
-          padding: 0 0 ($baseline/2) $baseline;
+          padding: 0 $baseline ($baseline*0.75) $baseline;
           color: $gray-l1;
         }
 
