@@ -1742,6 +1742,7 @@ class CoursesApiTests(TestCase):
 
         for user in users:
             CourseEnrollmentFactory.create(user=user, course_id=course.id)
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
         test_course_id = unicode(course.id)
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, test_course_id)
