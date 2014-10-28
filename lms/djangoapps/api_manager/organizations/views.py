@@ -45,7 +45,8 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             courses = []
             for course_string in courses_filter:
                 courses.append(get_course_key(course_string))
-            org_user_grades = org_user_grades.filter(course_id__in=courses)
+            org_user_grades = org_user_grades.filter(course_id__in=courses,
+                                                     user__courseenrollment__course_id__in=courses)
 
         users_grade_average = org_user_grades.aggregate(Avg('grade'))
         if users_grade_average['grade__avg']:
