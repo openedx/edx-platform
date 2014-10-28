@@ -191,13 +191,13 @@ class TestVerifyView(ModuleStoreTestCase):
                       kwargs={"course_id": unicode(self.course_key)})
         response = self.client.get(url)
 
-        self.assertIn("You are now registered to audit", response.content)
+        self.assertIn("You are now enrolled in the audit track", response.content)
 
     def test_valid_course_upgrade_text(self):
         url = reverse('verify_student_verify',
                       kwargs={"course_id": unicode(self.course_key)})
         response = self.client.get(url, {'upgrade': "True"})
-        self.assertIn("You are upgrading your registration for", response.content)
+        self.assertIn("You are upgrading your enrollment for", response.content)
 
     def test_show_selected_contribution_amount(self):
         # Set the donation amount in the client's session
