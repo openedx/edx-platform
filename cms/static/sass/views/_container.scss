@@ -276,6 +276,7 @@
         .is-current {
 
           .unit-title a {
+            @extend %ui-disabled;
             color: $color-heading-base;
           }
         }
