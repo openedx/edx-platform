@@ -29,8 +29,7 @@ When you see a time in your course, we recommend that you use a time zone conver
 to convert the UTC time to your local time. You can any converter that you want, 
 including one of the following time zone converters.
 
-`Time and Date Time Zone Converter <http://www.timeanddate.com/worldclock/converter.html
->`_
+`Time and Date Time Zone Converter <http://www.timeanddate.com/worldclock/converter.html>`_
 
 `Time Zone Converter <http://www.timezoneconverter.com/cgi-bin/tzc.tzc>`_
 
