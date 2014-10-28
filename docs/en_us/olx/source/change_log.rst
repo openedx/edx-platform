@@ -13,8 +13,11 @@ October, 2014
 
    * - Date
      - Change
+
    * - 10/28/14
      - Added the section :ref:`Example of an OLX Course`.
+   * - 
+     - Added :ref:`Create a Randomized Custom Python-Evaluated Input Problem`
    * - 10/23/14
      - Fixed the code sample in :ref:`Script Tag Format` in the :ref:`Write
        Your Own Grader` chapter.
