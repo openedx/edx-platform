@@ -1,7 +1,7 @@
-<form id="login">
+<form id="login" class="login-form">
     <div class="status already-authenticated-msg hidden" aria-hidden="true">
         <% if (currentProvider) { %>
-            <p class="message-copy">You've successfully logged into <%- currentProvider %>, but you need to link your account.  Please click "I am a returning user" to create an EdX account.</p>
+            <p class="message-copy">You've successfully logged into <%- currentProvider %>, but you need to link your account.  Please click "I am a new user" to create an edX account.</p>
         <% } %>
     </div>
 
