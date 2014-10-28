@@ -1,7 +1,7 @@
 .. _Math Formatting:
 
 #####################################################################
-Student Guide to Entering Mathematical and Scientific Expressions
+Entering Mathematical and Scientific Expressions
 #####################################################################
 
 For some math, science, and other problems, you'll enter a numerical or math expression, such as a formula, into a response field. You enter your response as plain text, and the edX system then converts your text into numbers and symbols that appear below the response field:
@@ -66,37 +66,49 @@ You can also use the following International System of Units (SI) affixes:
 
   * - Affix
     - Stands for
+    - Expanded
     - Example
   * - %
     - percent
-    - 0.01 = 1e-2
-  * - k
-    - kilo
-    - 1000 = 1e3
-  * - M
-    - mega
-    - 1e6
-  * - G
-    - giga
-    - 1e9
-  * - T
-    - tera
-    - 1e12
+    - 0.01
+    - 1e-2
   * - c
     - centi
-    - 0.01 = 1e-2
+    - 0.01
+    - 1e-2
   * - m
     - milli
-    - 0.001 = 1e-3
+    - 0.001
+    - 1e-3
   * - u
     - micro
+    - 0.000001
     - 1e-6
   * - n
     - nano
+    - 0.000000001
     - 1e-9
   * - p
     - pico
+    - 0.000000000001
     - 1e-12
+  * - k
+    - kilo
+    - 1000
+    - 1e3
+  * - M
+    - mega
+    - 1,000,000
+    - 1e6
+  * - G
+    - giga
+    - 1,000,000,000
+    - 1e9
+  * - T
+    - tera
+    - 1,000,000,000,000
+    - 1e12
+
 
 ============
 Constants

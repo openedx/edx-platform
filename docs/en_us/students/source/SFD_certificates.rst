@@ -1,7 +1,7 @@
 .. _Certificates:
 
 ##############################
-Student Guide to Certificates
+Certificates
 ##############################
 
 Nearly every course on edx.org offers a certificate when you complete a course

@@ -1,7 +1,7 @@
 .. _SFD_ORA:
 
 ###########################################
-Student Guide to Open Response Assessments
+Open Response Assessments
 ###########################################
 
 In an open response assessment, you'll provide a written response to a question that may not have a simple or definitive answer. For some open response assessments, you can submit an image to accompany your written response.
