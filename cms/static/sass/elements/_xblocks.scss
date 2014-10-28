@@ -11,8 +11,8 @@
   background: $white;
   box-shadow: 0px 1px 1px $shadow-l1;
 
-
-  &:hover {
+  // STATE: hover/focus
+  &:hover, &:focus {
     box-shadow: 0 0 1px $shadow;
   }
 
@@ -165,7 +165,7 @@
     .xblock-message {
       @extend %t-copy-sub1;
       background-color: $gray-d2;
-      padding: ($baseline/2) ($baseline*.75);
+      padding: ($baseline*0.75);
       color: $white;
 
       [class^="icon-"] {
@@ -187,7 +187,7 @@
         }
 
         &.has-warnings {
-          border-bottom: 3px solid $orange;
+          border-top: 3px solid $orange;
 
           .icon-warning-sign {
             margin-right: ($baseline/2);
@@ -196,7 +196,7 @@
         }
 
         &.has-errors {
-          border-bottom: 3px solid $red-l2;
+          border-top: 3px solid $red-l2;
 
           .icon-exclamation-sign {
             margin-right: ($baseline/2);
@@ -231,14 +231,13 @@
     }
 
     .xblock-message {
-      border-radius: 3px 3px 0 0;
 
       &.validation {
-        padding-top: ($baseline*.75);
+        padding-top: ($baseline*0.75);
       }
 
       .xblock-message-list {
-        margin: ($baseline/5) ($baseline*2.5);
+        margin: 0 ($baseline*2.25);
         list-style-type: disc;
         color: $gray-l3;
       }
@@ -248,7 +247,7 @@
       }
 
       &.information {
-        padding: 0 0 ($baseline/2) 0;
+        padding: ($baseline/2) 0;
         background-color: $gray-l5;
         color: $gray-d1;
       }
@@ -342,27 +341,11 @@
     .wrapper-xblock-message {
 
       .xblock-message {
-        border-radius: 0 0 3px 3px;
-
-        .xblock-message-list {
-          margin: 0;
-          list-style-type: none;
-        }
 
         &.information {
           @extend %t-copy-sub2;
           padding: 0 $baseline ($baseline*0.75) $baseline;
           color: $gray-l1;
-        }
-
-        &.validation.has-warnings {
-          border: 0;
-          border-top: 3px solid $orange;
-        }
-
-        &.validation.has-errors {
-          border: 0;
-          border-top: 3px solid $red-l2;
         }
       }
     }
