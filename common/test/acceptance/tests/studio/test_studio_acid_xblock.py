@@ -86,8 +86,6 @@ class XBlockAcidBase(WebAppTest):
         acid_block = AcidView(self.browser, unit.xblocks[0].edit().editor_selector)
         self.assertTrue(acid_block.init_fn_passed)
         self.assertTrue(acid_block.resource_url_passed)
-        self.assertTrue(acid_block.scope_passed('content'))
-        self.assertTrue(acid_block.scope_passed('settings'))
 
 
 class XBlockAcidNoChildTest(XBlockAcidBase):
@@ -202,10 +200,8 @@ class XBlockAcidChildTest(XBlockAcidParentBase):
 
         self.user = course_fix.user
 
-    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_preview(self):
         super(XBlockAcidChildTest, self).test_acid_block_preview()
 
-    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_editor(self):
         super(XBlockAcidChildTest, self).test_acid_block_editor()

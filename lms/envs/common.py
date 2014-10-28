@@ -287,6 +287,11 @@ FEATURES = {
 
     # Enable the new dashboard, account, and profile pages
     'ENABLE_NEW_DASHBOARD': False,
+
+    # Show a section in the membership tab of the instructor dashboard
+    # to allow an upload of a CSV file that contains a list of new accounts to create
+    # and register for course.
+    'ALLOW_AUTOMATED_SIGNUPS': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -561,6 +566,7 @@ DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'xmodule',
     'collection': 'modulestore',
+    'asset_collection': 'assetstore',
 }
 MODULESTORE = {
     'default': {
@@ -677,11 +683,16 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+# these languages display right to left
+LANGUAGES_BIDI = ("en@rtl", "he", "ar", "fa", "ur", "fa-ir")
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
     ('en', u'English'),
-    ('eo', u'Dummy Language (Esperanto)'),  # Dummy language used for testing
+    ('en@rtl', u'English (right-to-left)'),
+    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('am', u'አማርኛ'),  # Amharic
@@ -1072,6 +1083,25 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-app-extend2.css',
     },
+    'style-app-rtl': {
+        'source_filenames': [
+            'sass/application-rtl.css',
+            'sass/ie-rtl.css'
+        ],
+        'output_filename': 'css/lms-style-app-rtl.css',
+    },
+    'style-app-extend1-rtl': {
+        'source_filenames': [
+            'sass/application-extend1-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend1-rtl.css',
+    },
+    'style-app-extend2-rtl': {
+        'source_filenames': [
+            'sass/application-extend2-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend2-rtl.css',
+    },
     'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
@@ -1086,6 +1116,13 @@ PIPELINE_CSS = {
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-style-course.css',
+    },
+    'style-course-rtl': {
+        'source_filenames': [
+            'sass/course-rtl.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-style-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [

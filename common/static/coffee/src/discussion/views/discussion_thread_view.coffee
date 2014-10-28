@@ -34,6 +34,20 @@ if Backbone?
       if @isQuestion()
         @markedAnswers = new Comments()
 
+    rerender: () ->
+      if @showView?
+        @showView.undelegateEvents()
+      @undelegateEvents()
+      @$el.empty()
+      @initialize(
+        mode: @mode
+        model: @model
+        el: @el
+        course_settings: @course_settings
+        topicId: @topicId
+      )
+      @render()
+
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
       @template(@model.toJSON())
@@ -272,7 +286,6 @@ if Backbone?
         model: @model
         mode: @mode
         course_settings: @options.course_settings
-        topicId: @model.get('commentable_id')
       )
       @editView.bind "thread:updated thread:cancel_edit", @closeEditView
       @editView.bind "comment:endorse", @endorseThread
@@ -296,6 +309,9 @@ if Backbone?
     closeEditView: (event) =>
       @createShowView()
       @renderShowView()
+      # next call is necessary to re-render the post action controls after
+      # submitting or cancelling a thread edit in inline mode.
+      @$el.find(".post-extended-content").show()
 
     # If you use "delete" here, it will compile down into JS that includes the
     # use of DiscussionThreadView.prototype.delete, and that will break IE8

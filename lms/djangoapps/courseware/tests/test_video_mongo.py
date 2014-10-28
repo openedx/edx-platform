@@ -441,8 +441,10 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 {sources}
             </video>
         """
+
         data = {
-            'download_video': 'true',
+            # test with download_video set to false and make sure download_video_link is not set (is None)
+            'download_video': 'false',
             'source': 'example_source.mp4',
             'sources': """
                 <source src="example.mp4"/>
@@ -450,11 +452,10 @@ class TestGetHtmlMethod(BaseTestXmodule):
             """,
             'edx_video_id': "mock item",
             'result': {
-                'download_video_link': u'http://www.meowmix.com',
+                'download_video_link': None,
                 'sources': json.dumps([u'example.mp4', u'example.webm']),
             }
         }
-
 
         # Video found for edx_video_id
         initial_context = {

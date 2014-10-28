@@ -1,23 +1,15 @@
-.. _ODL Directory Structure with edX Studio:
+.. _ODL Directory Structure:
 
 ###############################################
-OLX Directory Structure
+OLX Course Structure
 ###############################################
 
 See:
 
 * `OLX and Directory File Structures`_
 * `Top-level Directory`_
-* `about Directory`_
-* `html Directory`_
-* `info Directory`_
-* `policies Directory`_
-* `problem Directory`_
-* `static Directory`_
-* `tabs Directory`_
-* `video Directory`_
-
-
+* `XBlock directories`_
+* `edX Platform Directories`_
 
 ****************************************
 OLX and Directory File Structures
@@ -26,26 +18,27 @@ OLX and Directory File Structures
 All files and sub-directories that comprise your OLX course are stored within
 a single directory.
 
-OLX provides for flexibility in the directory and file structure you use to
-build your course.
+OLX provides for some flexibility in the directory and file structure
+you use to build your course.
 
 ************************
 Top-level Directory
 ************************
 
-In most cases, it is easiest to create your courseware structure in a
+Starting out, it is easiest to create your courseware structure in a
 single file, the ``course.xml file``. 
 
-The ``course.xml`` file would contain the
-definition of all chapters (sections), sequentials (subsections), and verticals
-(units) in your courseware. The courseware structure would then refer to files
-for components, which are stored in a directory for each type of XBlock.
+This file can contain your entire course, but in most cases, it is convenient
+to split out large chunks of content into individual files. This is typically
+done either at the level of large components, such as problems or homework
+assignments.
 
-For example, the edX Platform contains a directory called `manual-testing-complete`_ that contains a course with all component types for testing
-purposes.
+Currently, when Studio exports a course, it places each component in its own
+file. 
 
-Course content, other than the courseware, is stored in separate directories
-and files as shown in the rest of this chapter.
+For example, the edX Platform contains a directory called
+`manual-testing-complete`_ that contains a course with all component
+types for testing purposes.
 
 Following are descriptions of directories needed for a typical course. You
 should set up these directories in preparation for developing your course
@@ -55,9 +48,38 @@ content.
  If you are using custom XBlocks, you can have
  additional directories that store the XML for XBlocks of that type.
 
-********************
+*******************
+XBlock directories
+*******************
+
+edX course components can be broken out of the main ``course.xml`` file
+into individual files. Those files go into directories of the name of
+the component type (XML tag). For example, components of type ``html``
+can be placed as individual files in the ``html`` directory. If your
+course does not contain html files, or if they are all embedded in
+their top-level components, you do not need to create an ``html``
+directory.
+
+For information about several examples of these directories, see: 
+
+See :ref:`HTML Components` for more information.
+See :ref:`Problems and Tools` for more information.
+See :ref:`Video Components` for more information.
+
+As the set of XBlocks grows, so does the set of associated XML tags
+and directories.
+
+*************************
+edX Platform Directories
+*************************
+
+In addition to the course hierarchy, which is designed to be generic
+and cross-platform, OLX courses contain a set of JSON and HTML
+files that specify course policies and non-courseare content.
+
+====================
 ``about`` Directory
-********************
+====================
 
 The ``about`` directory contains:
 
@@ -70,21 +92,9 @@ The ``about`` directory contains:
 See :ref:`The Course About Pages` for more information.
 
 
-********************
-``html`` Directory
-********************
-
-The ``html`` directory contains an HTML file for each HTML component in
-the course.
-
-If you do not need HTML components in the course, you do not need to create
-this directory.
-
-See :ref:`HTML Components` for more information.
-
-********************
+====================
 ``info`` Directory
-********************
+====================
 
 The ``info`` directory contains:
 
@@ -94,9 +104,9 @@ The ``info`` directory contains:
 * ``updates.html``, which contains the course updates students see when opening
   a course.
 
-***********************
+=======================
 ``policies`` Directory
-***********************
+=======================
 
 The ``policies`` directory contains:
 
@@ -109,46 +119,22 @@ The ``policies`` directory contains:
   
 See :ref:`Course Policies` for more information.
 
-**********************
-``problem`` Directory
-**********************
-
-The ``problem`` directory contains an XML file for each problem component you
-use in your course.
-
-If you do not need problem components in the course, you do not need to create
-this directory.
-
-See :ref:`Problems and Tools` for more information.
-
-********************
+====================
 ``static`` Directory
-********************
+====================
 
 The ``static`` directory contains the files used in your course, such as images
 or PDFs.
 
 See :ref:`Course Assets` for more information.
 
-********************
+====================
 ``tabs`` Directory
-********************
+====================
 
 The ``tabs`` directory contains an HTML file for each page you add to your
 course.
 
-See :ref:`Course Pages` for more information.
-
-********************
-``video`` Directory
-********************
-
-The ``video`` directory contains an XML file for each video component you use
-in your course.
-
-If you do not need video components in the course, you do not need to create
-this directory.
-
-See :ref:`Video Components` for more information.
+See :ref:`Course Tabs` for more information.
 
  .. include:: links.rst

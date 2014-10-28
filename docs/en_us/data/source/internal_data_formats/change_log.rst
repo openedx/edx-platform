@@ -14,6 +14,18 @@ October-December 2014
 
    * - Date
      - Change
+   * - 10/23/14
+     - Added examples of the format used to identify course components to the
+       :ref:`Student_Info` and :ref:`Tracking Logs` chapters.
+   * - 
+     - Updated the ``child_render`` event to reflect the name change for the
+       ``child_id`` member field. See :ref:`Tracking Logs`.
+   * - 10/20/14
+     - Updated the :ref:`Package` chapter to remove instructions for
+       downloading weekly event files.
+   * - 10/16/14
+     - Updated video events with new fields relating to mobile device use in
+       the :ref:`Tracking Logs` chapter.
    * - 10/07/14
      - Added new student and instructor events relating to cohort use to the
        :ref:`Tracking Logs` chapter.
@@ -84,7 +96,7 @@ April-June 2014
    * - 
      - Updated the ``seek_video`` event in the :ref:`Tracking Logs` chapter.
    * - 06/23/14
-     - Added a :ref:`Preface` with resources for course teams, developers,
+     - Added a `Preface`_ with resources for course teams, developers,
        researchers, and students.
    * - 05/23/14
      - Added descriptions of the enrollment upgrade events to the
@@ -154,3 +166,4 @@ January-March 2014
    * - 02/14/14
      - Added the ``seek_video`` and ``speed_change_video`` event types to the :ref:`Tracking Logs` chapter.
 
+.. _Preface: http://edx.readthedocs.org/projects/devdata/en/latest/preface.html

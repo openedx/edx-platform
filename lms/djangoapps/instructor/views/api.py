@@ -50,6 +50,7 @@ from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
     enroll_email,
+    send_mail_to_student,
     get_email_params,
     send_beta_role_email,
     unenroll_email
@@ -83,6 +84,7 @@ from .tools import (
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
+from student.models import UserProfile, Registration
 
 log = logging.getLogger(__name__)
 
@@ -214,6 +216,187 @@ def require_level(level):
                 return HttpResponseForbidden()
         return wrapped
     return decorator
+
+
+EMAIL_INDEX = 0
+USERNAME_INDEX = 1
+NAME_INDEX = 2
+COUNTRY_INDEX = 3
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def register_and_enroll_students(request, course_id):  # pylint: disable=R0915
+    """
+    Create new account and Enroll students in this course.
+    Passing a csv file that contains a list of students.
+    Order in csv should be the following email = 0; username = 1; name = 2; country = 3.
+    Requires staff access.
+
+    -If the email address and username already exists and the user is enrolled in the course,
+    do nothing (including no email gets sent out)
+
+    -If the email address already exists, but the username is different,
+    match on the email address only and continue to enroll the user in the course using the email address
+    as the matching criteria. Note the change of username as a warning message (but not a failure). Send a standard enrollment email
+    which is the same as the existing manual enrollment
+
+    -If the username already exists (but not the email), assume it is a different user and fail to create the new account.
+     The failure will be messaged in a response in the browser.
+    """
+
+    if not microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+        return HttpResponseForbidden()
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    warnings = []
+    row_errors = []
+    general_errors = []
+
+    if 'students_list' in request.FILES:
+        students = []
+
+        try:
+            upload_file = request.FILES.get('students_list')
+            students = [row for row in csv.reader(upload_file.read().splitlines())]
+        except Exception:  # pylint: disable=W0703
+            general_errors.append({
+                'username': '', 'email': '', 'response': _('Could not read uploaded file.')
+            })
+        finally:
+            upload_file.close()
+
+        generated_passwords = []
+        course = get_course_by_id(course_id)
+        row_num = 0
+        for student in students:
+            row_num = row_num + 1
+
+            # verify that we have exactly four columns in every row but allow for blank lines
+            if len(student) != 4:
+                if len(student) > 0:
+                    general_errors.append({
+                        'username': '',
+                        'email': '',
+                        'response': _('Data in row #{row_num} must have exactly four columns: email, username, full name, and country').format(row_num=row_num)
+                    })
+                continue
+
+            # Iterate each student in the uploaded csv file.
+            email = student[EMAIL_INDEX]
+            username = student[USERNAME_INDEX]
+            name = student[NAME_INDEX]
+            country = student[COUNTRY_INDEX][:2]
+
+            email_params = get_email_params(course, True, secure=request.is_secure())
+            try:
+                validate_email(email)  # Raises ValidationError if invalid
+            except ValidationError:
+                row_errors.append({
+                    'username': username, 'email': email, 'response': _('Invalid email {email_address}.').format(email_address=email)})
+            else:
+                if User.objects.filter(email=email).exists():
+                    # Email address already exists. assume it is the correct user
+                    # and just register the user in the course and send an enrollment email.
+                    user = User.objects.get(email=email)
+
+                    # see if it is an exact match with email and username
+                    # if it's not an exact match then just display a warning message, but continue onwards
+                    if not User.objects.filter(email=email, username=username).exists():
+                        warning_message = _(
+                            'An account with email {email} exists but the provided username {username} '
+                            'is different. Enrolling anyway with {email}.'
+                        ).format(email=email, username=username)
+
+                        warnings.append({
+                            'username': username, 'email': email, 'response': warning_message})
+                        log.warning('email {email} already exist'.format(email=email))
+                    else:
+                        log.info("user already exists with username '{username}' and email '{email}'".format(email=email, username=username))
+
+                    # make sure user is enrolled in course
+                    if not CourseEnrollment.is_enrolled(user, course_id):
+                        CourseEnrollment.enroll(user, course_id)
+                        log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
+                        enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
+                else:
+                    # This email does not yet exist, so we need to create a new account
+                    # If username already exists in the database, then create_and_enroll_user
+                    # will raise an IntegrityError exception.
+                    password = generate_unique_password(generated_passwords)
+
+                    try:
+                        create_and_enroll_user(email, username, name, country, password, course_id)
+                    except IntegrityError:
+                        row_errors.append({
+                            'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)})
+                    except Exception as ex:
+                        log.exception(type(ex).__name__)
+                        row_errors.append({
+                            'username': username, 'email': email, 'response': _(type(ex).__name__)})
+                    else:
+                        # It's a new user, an email will be sent to each newly created user.
+                        email_params['message'] = 'account_creation_and_enrollment'
+                        email_params['email_address'] = email
+                        email_params['password'] = password
+                        email_params['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+                        send_mail_to_student(email, email_params)
+                        log.info('email sent to new created user at {email}'.format(email=email))
+
+    else:
+        general_errors.append({
+            'username': '', 'email': '', 'response': _('File is not attached.')
+        })
+
+    results = {
+        'row_errors': row_errors,
+        'general_errors': general_errors,
+        'warnings': warnings
+    }
+    return JsonResponse(results)
+
+
+def generate_random_string(length):
+    """
+    Create a string of random characters of specified length
+    """
+    chars = [
+        char for char in string.ascii_uppercase + string.digits + string.ascii_lowercase
+        if char not in 'aAeEiIoOuU1l'
+    ]
+
+    return string.join((random.choice(chars) for __ in range(length)), '')
+
+
+def generate_unique_password(generated_passwords, password_length=12):
+    """
+    generate a unique password for each student.
+    """
+
+    password = generate_random_string(password_length)
+    while password in generated_passwords:
+        password = generate_random_string(password_length)
+
+    generated_passwords.append(password)
+
+    return password
+
+
+def create_and_enroll_user(email, username, name, country, password, course_id):
+    """ Creates a user and enroll him/her in the course"""
+
+    user = User.objects.create_user(username, email, password)
+    reg = Registration()
+    reg.register(user)
+
+    profile = UserProfile(user=user)
+    profile.name = name
+    profile.country = country
+    profile.save()
+
+    # try to enroll the user in this course
+    CourseEnrollment.enroll(user, course_id)
 
 
 @ensure_csrf_cookie
@@ -588,7 +771,47 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W
         return JsonResponse(response_payload)
     else:
         header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("e-commerce_sale_records.csv", header, datarows)
+        return instructor_analytics.csvs.create_csv_response("e-commerce_sale_invoice_records.csv", header, datarows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_sale_order_records(request, course_id):  # pylint: disable=W0613, W0621
+    """
+    return the summary of all sales records for a particular course
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    query_features = [
+        ('id', 'Order Id'),
+        ('company_name', 'Company Name'),
+        ('company_contact_name', 'Company Contact Name'),
+        ('company_contact_email', 'Company Contact Email'),
+        ('total_amount', 'Total Amount'),
+        ('total_codes', 'Total Codes'),
+        ('total_used_codes', 'Total Used Codes'),
+        ('logged_in_username', 'Login Username'),
+        ('logged_in_email', 'Login User Email'),
+        ('purchase_time', 'Date of Sale'),
+        ('customer_reference_number', 'Customer Reference Number'),
+        ('recipient_name', 'Recipient Name'),
+        ('recipient_email', 'Recipient Email'),
+        ('bill_to_street1', 'Street 1'),
+        ('bill_to_street2', 'Street 2'),
+        ('bill_to_city', 'City'),
+        ('bill_to_state', 'State'),
+        ('bill_to_postalcode', 'Postal Code'),
+        ('bill_to_country', 'Country'),
+        ('order_type', 'Order Type'),
+        ('codes', 'Registration Codes'),
+        ('course_id', 'Course Id')
+    ]
+
+    db_columns = [x[0] for x in query_features]
+    csv_columns = [x[1] for x in query_features]
+    sale_data = instructor_analytics.basic.sale_order_record_features(course_id, db_columns)
+    header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)  # pylint: disable=W0612
+    return instructor_analytics.csvs.create_csv_response("e-commerce_sale_order_records.csv", csv_columns, datarows)
 
 
 @require_level('staff')
@@ -766,7 +989,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=W0613
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_codes(request, course_id, generated_codes_list, invoice):
+def save_registration_code(user, course_id, invoice=None, order=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -776,16 +999,16 @@ def save_registration_codes(request, course_id, generated_codes_list, invoice):
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_codes(request, course_id, generated_codes_list, invoice)
+        return save_registration_code(user, course_id, invoice, order)
 
     course_registration = CourseRegistrationCode(
-        code=code, course_id=course_id.to_deprecated_string(), created_by=request.user, invoice=invoice
+        code=code, course_id=course_id.to_deprecated_string(), created_by=user, invoice=invoice, order=order
     )
     try:
         course_registration.save()
-        generated_codes_list.append(course_registration)
+        return course_registration
     except IntegrityError:
-        return save_registration_codes(request, course_id, generated_codes_list, invoice)
+        return save_registration_code(user, course_id, invoice, order)
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -812,13 +1035,8 @@ def random_code_generator():
     generate a random alphanumeric code of length defined in
     REGISTRATION_CODE_LENGTH settings
     """
-    chars = ''
-    for char in string.ascii_uppercase + string.digits + string.ascii_lowercase:
-        # removing vowel words and specific characters
-        chars += char.strip('aAeEiIoOuU1l')
-
     code_length = getattr(settings, 'REGISTRATION_CODE_LENGTH', 8)
-    return string.join((random.choice(chars) for _ in range(code_length)), '')
+    return generate_random_string(code_length)
 
 
 @ensure_csrf_cookie
@@ -851,7 +1069,6 @@ def generate_registration_codes(request, course_id):
     Respond with csv which contains a summary of all Generated Codes.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course_registration_codes = []
     invoice_copy = False
 
     # covert the course registration code number into integer
@@ -888,8 +1105,10 @@ def generate_registration_codes(request, course_id):
         address_line_3=address_line_3, city=city, state=state, zip=zip_code, country=country,
         internal_reference=internal_reference, customer_reference_number=customer_reference_number
     )
+    registration_codes = []
     for _ in range(course_code_number):  # pylint: disable=W0621
-        save_registration_codes(request, course_id, course_registration_codes, sale_invoice)
+        generated_registration_code = save_registration_code(request.user, course_id, sale_invoice, order=None)
+        registration_codes.append(generated_registration_code)
 
     site_name = microsite.get_value('SITE_NAME', 'localhost')
     course = get_course_by_id(course_id, depth=None)
@@ -916,7 +1135,7 @@ def generate_registration_codes(request, course_id):
         'discount': discount,
         'sale_price': sale_price,
         'quantity': quantity,
-        'registration_codes': course_registration_codes,
+        'registration_codes': registration_codes,
         'course_url': course_url,
         'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         'dashboard_url': dashboard_url,
@@ -934,7 +1153,7 @@ def generate_registration_codes(request, course_id):
     #send_mail(subject, message, from_address, recipient_list, fail_silently=False)
     csv_file = StringIO.StringIO()
     csv_writer = csv.writer(csv_file)
-    for registration_code in course_registration_codes:
+    for registration_code in registration_codes:
         csv_writer.writerow([registration_code.code])
 
     # send a unique email for each recipient, don't put all email addresses in a single email
@@ -948,7 +1167,7 @@ def generate_registration_codes(request, course_id):
         email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
         email.send()
 
-    return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
+    return registration_codes_csv("Registration_Codes.csv", registration_codes)
 
 
 @ensure_csrf_cookie

@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
+<%! from microsite_configuration import microsite %>
 
 <script type="text/template" id="member-list-widget-template">
   <div class="member-list-widget">
@@ -67,6 +68,30 @@
   <div class="request-response"></div>
   <div class="request-response-error"></div>
 </div>
+
+%if microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+  <hr class="divider" />
+
+  <div class="auto_enroll auto_enroll_csv">
+    <h2> ${_("Register/Enroll Students")} </h2>
+    <p>
+    ${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.")}
+    </p>
+    <form id="student-auto-enroll-form" method="post" action="${ section_data['upload_student_csv_button_url'] }" enctype="multipart/form-data">
+      <div class="customBrowseBtn">
+        <input disabled="disabled" id="browseFile" placeholder="choose file" />
+        <div class="file-browse btn btn-primary">
+            <span class="browse"> Browse </span>
+            <input class="file_field" id="browseBtn" name="students_list" type="file" accept=".csv"/>
+        </div>
+      </div>
+      <button type="submit" name="enrollment_signup_button">${_("Upload CSV")}</button>
+
+      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    </form>
+    <div class="results"></div>
+  </div>
+%endif
 
 <hr class="divider" />
 
@@ -245,5 +270,6 @@
             }
         });
         </script>
+
     </%block>
 % endif

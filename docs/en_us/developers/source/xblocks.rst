@@ -78,14 +78,11 @@ Studio
 Class Features
 ~~~~~~~~~~~~~~
 
-* studio_view (XBlock.view): The view used to render an editor in Studio. The editor rendering can
-be completely different from the LMS student_view, and it is only shown when the author selects "Edit".
-* author_view (XBlock.view): An optional view of the XBlock similar to student_view, but with possible inline
-editing capabilities. This view differs from studio_view in that it should be as similar to student_view
-as possible. When previewing XBlocks within Studio, Studio will prefer author_view to student_view.
+* studio_view (XBlock.view): The view used to render an editor in Studio. The editor rendering can be completely different from the LMS student_view, and it is only shown when the author selects "Edit".
 
-* non_editable_metadata_fields (property): A list of :class:`~xblock.fields.Field` objects that
-  shouldn't be displayed in the default editing view for Studio.
+* author_view (XBlock.view): An optional view of the XBlock similar to student_view, but with possible inline editing capabilities. This view differs from studio_view in that it should be as similar to student_view as possible. When previewing XBlocks within Studio, Studio will prefer author_view to student_view.
+
+* non_editable_metadata_fields (property): A list of ``xblock.fields.Field`` objects that shouldn't be displayed in the default editing view for Studio.
 
 Restrictions
 ~~~~~~~~~~~~

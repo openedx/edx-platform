@@ -17,12 +17,10 @@ describe 'ResponseCommentView', ->
         spyOn(DiscussionUtil, "makeWmdEditor")
         @view.render()
 
-    makeEventSpy = () -> jasmine.createSpyObj('event', ['preventDefault', 'target'])
-
     describe '_delete', ->
         beforeEach ->
             @comment.updateInfo {ability: {can_delete: true}}
-            @event = makeEventSpy()
+            @event = DiscussionSpecHelper.makeEventSpy()
             spyOn(@comment, "remove")
             spyOn(@view.$el, "remove")
 
@@ -81,9 +79,9 @@ describe 'ResponseCommentView', ->
             # Without calling renderEditView first, renderShowView is a no-op
             @view.renderEditView()
             @view.renderShowView()
-            @view.showView.trigger "comment:_delete", makeEventSpy()
+            @view.showView.trigger "comment:_delete", DiscussionSpecHelper.makeEventSpy()
             expect(@view._delete).toHaveBeenCalled()
-            @view.showView.trigger "comment:edit", makeEventSpy()
+            @view.showView.trigger "comment:edit", DiscussionSpecHelper.makeEventSpy()
             expect(@view.edit).toHaveBeenCalled()
             expect(@view.$(".edit-post-form#comment_#{@comment.id}")).not.toHaveClass("edit-post-form")
 
@@ -92,9 +90,9 @@ describe 'ResponseCommentView', ->
             spyOn(@view, "update")
             spyOn(@view, "cancelEdit")
             @view.renderEditView()
-            @view.editView.trigger "comment:update", makeEventSpy()
+            @view.editView.trigger "comment:update", DiscussionSpecHelper.makeEventSpy()
             expect(@view.update).toHaveBeenCalled()
-            @view.editView.trigger "comment:cancel_edit", makeEventSpy()
+            @view.editView.trigger "comment:cancel_edit", DiscussionSpecHelper.makeEventSpy()
             expect(@view.cancelEdit).toHaveBeenCalled()
             expect(@view.$(".edit-post-form#comment_#{@comment.id}")).toHaveClass("edit-post-form")
 
@@ -138,7 +136,7 @@ describe 'ResponseCommentView', ->
 
             it 'calls the update endpoint correctly and displays the show view on success', ->
                 @ajaxSucceed = true
-                @view.update(makeEventSpy())
+                @view.update(DiscussionSpecHelper.makeEventSpy())
                 expect($.ajax).toHaveBeenCalled()
                 expect($.ajax.mostRecentCall.args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update')
                 expect($.ajax.mostRecentCall.args[0].data.body).toEqual(@updatedBody)
@@ -148,7 +146,7 @@ describe 'ResponseCommentView', ->
             it 'handles AJAX errors', ->
                 originalBody = @comment.get("body")
                 @ajaxSucceed = false
-                @view.update(makeEventSpy())
+                @view.update(DiscussionSpecHelper.makeEventSpy())
                 expect($.ajax).toHaveBeenCalled()
                 expect($.ajax.mostRecentCall.args[0].url._parts.path).toEqual('/courses/edX/999/test/discussion/comments/01234567/update')
                 expect($.ajax.mostRecentCall.args[0].data.body).toEqual(@updatedBody)

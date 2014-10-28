@@ -278,7 +278,16 @@
       height: ($baseline*1.2);
       width: ($baseline);
       margin: 0;
-      background: transparent url("../img/drag-handles.png") no-repeat right center;
+
+      // CASE: right to left layout
+      @include rtl {
+       background: transparent url("../img/drag-handles.png") no-repeat left center;
+      }
+
+      // CASE: left to right layout
+      @include ltr {
+        background: transparent url("../img/drag-handles.png") no-repeat right center;
+      }
     }
 
     &.toggle-action {

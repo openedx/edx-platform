@@ -2111,7 +2111,13 @@ class CodeResponse(LoncapaResponse):
         except etree.XMLSyntaxError as _err:
             # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>,
             # XML parser will raise exception, so wee fallback to html5parser, which will set empty "" values for such attrs.
-            parsed = html5lib.parseFragment(msg, treebuilder='lxml', namespaceHTMLElements=False)
+            try:
+                parsed = html5lib.parseFragment(msg, treebuilder='lxml', namespaceHTMLElements=False)
+            except ValueError:
+                # the parsed message might contain strings that are not
+                # xml compatible, in which case, throw the error message
+                parsed = False
+
             if not parsed:
                 log.error("Unable to parse external grader message as valid"
                       " XML: score_msg['msg']=%s", msg)

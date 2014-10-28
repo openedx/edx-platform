@@ -9,10 +9,12 @@ import logging
 from contextlib import contextmanager
 import itertools
 import functools
+from contracts import contract, new_contract
 
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.assetstore import AssetMetadata, AssetThumbnailMetadata
 
 from . import ModuleStoreWriteBase
 from . import ModuleStoreEnum
@@ -20,6 +22,10 @@ from .exceptions import ItemNotFoundError, DuplicateCourseError
 from .draft_and_published import ModuleStoreDraftAndPublished
 from .split_migrator import SplitMigrator
 
+new_contract('CourseKey', CourseKey)
+new_contract('AssetKey', AssetKey)
+new_contract('AssetMetadata', AssetMetadata)
+new_contract('AssetThumbnailMetadata', AssetThumbnailMetadata)
 
 log = logging.getLogger(__name__)
 
@@ -308,6 +314,189 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         assert(isinstance(course_key, CourseKey))
         store = self._get_modulestore_for_courseid(course_key)
         return store.delete_course(course_key, user_id)
+
+    @contract(course_key='CourseKey', asset_metadata='AssetMetadata')
+    def save_asset_metadata(self, course_key, asset_metadata, user_id):
+        """
+        Saves the asset metadata for a particular course's asset.
+
+        Args:
+        course_key (CourseKey): course identifier
+        asset_metadata (AssetMetadata): data about the course asset data
+        """
+        store = self._get_modulestore_for_courseid(course_key)
+        return store.save_asset_metadata(course_key, asset_metadata, user_id)
+
+    @contract(course_key='CourseKey', asset_thumbnail_metadata='AssetThumbnailMetadata')
+    def save_asset_thumbnail_metadata(self, course_key, asset_thumbnail_metadata, user_id):
+        """
+        Saves the asset thumbnail metadata for a particular course asset's thumbnail.
+
+        Arguments:
+            course_key (CourseKey): course identifier
+            asset_thumbnail_metadata (AssetThumbnailMetadata): data about the course asset thumbnail
+        """
+        store = self._get_modulestore_for_courseid(course_key)
+        return store.save_asset_thumbnail_metadata(course_key, asset_thumbnail_metadata, user_id)
+
+    @strip_key
+    @contract(asset_key='AssetKey')
+    def find_asset_metadata(self, asset_key, **kwargs):
+        """
+        Find the metadata for a particular course asset.
+
+        Args:
+            asset_key (AssetKey): locator containing original asset filename
+
+        Returns:
+            asset metadata (AssetMetadata) -or- None if not found
+        """
+        store = self._get_modulestore_for_courseid(asset_key.course_key)
+        return store.find_asset_metadata(asset_key, **kwargs)
+
+    @strip_key
+    @contract(asset_key='AssetKey')
+    def find_asset_thumbnail_metadata(self, asset_key, **kwargs):
+        """
+        Find the metadata for a particular course asset.
+
+        Arguments:
+            asset_key (AssetKey): key containing original asset filename
+
+        Returns:
+            asset metadata (AssetMetadata) -or- None if not found
+        """
+        store = self._get_modulestore_for_courseid(asset_key.course_key)
+        return store.find_asset_thumbnail_metadata(asset_key, **kwargs)
+
+    @strip_key
+    @contract(course_key='CourseKey', start=int, maxresults=int, sort='list | None')
+    def get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, **kwargs):
+        """
+        Returns a list of static assets for a course.
+        By default all assets are returned, but start and maxresults can be provided to limit the query.
+
+        Args:
+            course_key (CourseKey): course identifier
+            start (int): optional - start at this asset number
+            maxresults (int): optional - return at most this many, -1 means no limit
+            sort (array): optional - None means no sort
+                (sort_by (str), sort_order (str))
+                sort_by - one of 'uploadDate' or 'displayname'
+                sort_order - one of 'ascending' or 'descending'
+
+        Returns:
+            List of asset data dictionaries, which have the following keys:
+                asset_key (AssetKey): asset identifier
+                displayname: The human-readable name of the asset
+                uploadDate (datetime.datetime): The date and time that the file was uploaded
+                contentType: The mimetype string of the asset
+                md5: An md5 hash of the asset content
+        """
+        store = self._get_modulestore_for_courseid(course_key)
+        return store.get_all_asset_metadata(course_key, start, maxresults, sort, **kwargs)
+
+    @strip_key
+    @contract(course_key='CourseKey')
+    def get_all_asset_thumbnail_metadata(self, course_key, **kwargs):
+        """
+        Returns a list of thumbnails for all course assets.
+
+        Args:
+            course_key (CourseKey): course identifier
+
+        Returns:
+            List of AssetThumbnailMetadata objects.
+        """
+        store = self._get_modulestore_for_courseid(course_key)
+        return store.get_all_asset_thumbnail_metadata(course_key, **kwargs)
+
+    @contract(asset_key='AssetKey')
+    def delete_asset_metadata(self, asset_key, user_id):
+        """
+        Deletes a single asset's metadata.
+
+        Arguments:
+            asset_id (AssetKey): locator containing original asset filename
+
+        Returns:
+            Number of asset metadata entries deleted (0 or 1)
+        """
+        store = self._get_modulestore_for_courseid(asset_key.course_key)
+        return store.delete_asset_metadata(asset_key, user_id)
+
+    @contract(asset_key='AssetKey')
+    def delete_asset_thumbnail_metadata(self, asset_key, user_id):
+        """
+        Deletes a single asset's metadata.
+
+        Arguments:
+            asset_key (AssetKey): locator containing original asset filename
+
+        Returns:
+            Number of asset metadata entries deleted (0 or 1)
+        """
+        store = self._get_modulestore_for_courseid(asset_key.course_key)
+        return store.delete_asset_thumbnail_metadata(asset_key, user_id)
+
+    @contract(course_key='CourseKey')
+    def delete_all_asset_metadata(self, course_key, user_id):
+        """
+        Delete all of the assets which use this course_key as an identifier.
+
+        Arguments:
+            course_key (CourseKey): course_identifier
+        """
+        store = self._get_modulestore_for_courseid(course_key)
+        return store.delete_all_asset_metadata(course_key, user_id)
+
+    @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
+    def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
+        """
+        Copy all the course assets from source_course_key to dest_course_key.
+
+        Arguments:
+            source_course_key (CourseKey): identifier of course to copy from
+            dest_course_key (CourseKey): identifier of course to copy to
+        """
+        # When implementing this in https://openedx.atlassian.net/browse/PLAT-78 , consider this:
+        #  Check the modulestores of both the source and dest course_keys. If in different modulestores,
+        #  export all asset data from one modulestore and import it into the dest one.
+        store = self._get_modulestore_for_courseid(source_course_key)
+        return store.copy_all_asset_metadata(source_course_key, dest_course_key, user_id)
+
+    @contract(asset_key='AssetKey', attr=str)
+    def set_asset_metadata_attr(self, asset_key, attr, value, user_id):
+        """
+        Add/set the given attr on the asset at the given location. Value can be any type which pymongo accepts.
+
+        Arguments:
+            asset_key (AssetKey): asset identifier
+            attr (str): which attribute to set
+            value: the value to set it to (any type pymongo accepts such as datetime, number, string)
+
+        Raises:
+            NotFoundError if no such item exists
+            AttributeError is attr is one of the build in attrs.
+        """
+        store = self._get_modulestore_for_courseid(asset_key.course_key)
+        return store.set_asset_metadata_attrs(asset_key, {attr: value}, user_id)
+
+    @contract(asset_key='AssetKey', attr_dict=dict)
+    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
+        """
+        Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
+
+        Arguments:
+            asset_key (AssetKey): asset identifier
+            attr_dict (dict): attribute/value pairs to set
+
+        Raises:
+            NotFoundError if no such item exists
+            AttributeError is attr is one of the build in attrs.
+        """
+        store = self._get_modulestore_for_courseid(asset_key.course_key)
+        return store.set_asset_metadata_attrs(asset_key, attr_dict, user_id)
 
     @strip_key
     def get_parent_location(self, location, **kwargs):

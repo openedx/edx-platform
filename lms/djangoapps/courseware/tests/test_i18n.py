@@ -17,7 +17,7 @@ class I18nTestCase(TestCase):
         self.assertIn('<html lang="en">', response.content)
         self.assertEqual(response['Content-Language'], 'en')
         self.assertTrue(re.search('<body.*class=".*lang_en">', response.content))
-        
+
     def test_esperanto(self):
         response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='eo')
         self.assertIn('<html lang="eo">', response.content)

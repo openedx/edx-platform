@@ -450,13 +450,17 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
     """Checking either registration is blocked or not ."""
     blocked = False
     for redeemed_registration in redeemed_registration_codes:
-        if not getattr(redeemed_registration.invoice, 'is_valid'):
-            blocked = True
-            # disabling email notifications for unpaid registration courses
-            Optout.objects.get_or_create(user=request.user, course_id=course_key)
-            log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(request.user.username, request.user.email, course_key))
-            track.views.server_track(request, "change-email1-settings", {"receive_emails": "no", "course": course_key.to_deprecated_string()}, page='dashboard')
-            break
+        # registration codes may be generated via Bulk Purchase Scenario
+        # we have to check only for the invoice generated registration codes
+        # that their invoice is valid or not
+        if redeemed_registration.invoice:
+            if not getattr(redeemed_registration.invoice, 'is_valid'):
+                blocked = True
+                # disabling email notifications for unpaid registration courses
+                Optout.objects.get_or_create(user=request.user, course_id=course_key)
+                log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(request.user.username, request.user.email, course_key))
+                track.views.server_track(request, "change-email1-settings", {"receive_emails": "no", "course": course_key.to_deprecated_string()}, page='dashboard')
+                break
 
     return blocked
 
@@ -697,7 +701,10 @@ def _allow_donation(course_modes, course_id):
         True if the course is allowing donations.
 
     """
-    return DonationConfiguration.current().enabled and not CourseMode.has_verified_mode(course_modes[course_id])
+    donations_enabled = DonationConfiguration.current().enabled
+    is_verified_mode = CourseMode.has_verified_mode(course_modes[course_id])
+    has_payment_option = CourseMode.has_payment_options(course_id)
+    return donations_enabled and not is_verified_mode and not has_payment_option
 
 
 def try_change_enrollment(request):

@@ -5,9 +5,11 @@ import datetime
 import json
 import copy
 import mock
+from mock import patch
 
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
+from django.conf import settings
 
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
 from models.settings.course_grading import CourseGradingModel
@@ -475,6 +477,80 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
+
+    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': True})
+    def test_fetch_giturl_present(self):
+        """
+        If feature flag ENABLE_EXPORT_GIT is on, show the setting as a non-deprecated Advanced Setting.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertIn('giturl', test_model)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': False})
+    def test_fetch_giturl_not_present(self):
+        """
+        If feature flag ENABLE_EXPORT_GIT is off, don't show the setting at all on the Advanced Settings page.
+        """
+        test_model = CourseMetadata.fetch(self.fullcourse)
+        self.assertNotIn('giturl', test_model)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': False})
+    def test_validate_update_filtered_off(self):
+        """
+        If feature flag is off, then giturl must be filtered.
+        """
+        # pylint: disable=unused-variable
+        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "giturl": {"value": "http://example.com"},
+            },
+            user=self.user
+        )
+        self.assertNotIn('giturl', test_model)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': True})
+    def test_validate_update_filtered_on(self):
+        """
+        If feature flag is on, then giturl must not be filtered.
+        """
+        # pylint: disable=unused-variable
+        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "giturl": {"value": "http://example.com"},
+            },
+            user=self.user
+        )
+        self.assertIn('giturl', test_model)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': True})
+    def test_update_from_json_filtered_on(self):
+        """
+        If feature flag is on, then giturl must be updated.
+        """
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                "giturl": {"value": "http://example.com"},
+            },
+            user=self.user
+        )
+        self.assertIn('giturl', test_model)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_EXPORT_GIT': False})
+    def test_update_from_json_filtered_off(self):
+        """
+        If feature flag is on, then giturl must not be updated.
+        """
+        test_model = CourseMetadata.update_from_json(
+            self.course,
+            {
+                "giturl": {"value": "http://example.com"},
+            },
+            user=self.user
+        )
+        self.assertNotIn('giturl', test_model)
 
     def test_validate_and_update_from_json_correct_inputs(self):
         is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(

@@ -16,9 +16,9 @@ if Backbone?
               form_id: @mode + (if @topicId then "-" + @topicId else "")
           })
           @$el.html(_.template($("#new-post-template").html(), context))
+          threadTypeTemplate = _.template($("#thread-type-template").html());
+          @addField(threadTypeTemplate({form_id: _.uniqueId("form-")}));
           if @isTabMode()
-              threadTypeTemplate = _.template($("#thread-type-template").html());
-              @addField(threadTypeTemplate({form_id: _.uniqueId("form-")}));
               @topicView = new DiscussionTopicMenuView {
                   topicId:  @topicId
                   course_settings: @course_settings
