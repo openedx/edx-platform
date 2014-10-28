@@ -13,7 +13,9 @@ from survey.models import SurveyForm
 
 
 class SurveyModelsTests(TestCase):
-
+    """
+    All tests for the Survey models.py file
+    """
     def setUp(self):
         """
         Set up the test data used in the specific tests

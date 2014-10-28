@@ -7,8 +7,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.http import (
-    HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
-    HttpResponseBadRequest, HttpResponseForbidden, Http404
+    HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 )
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
@@ -45,7 +44,7 @@ def view_student_survey(request, user, survey_name, course=None, redirect_url=No
     if not survey:
         HttpResponseRedirect(redirect_url)
 
-    existing_answers = survey.get_answers(user=request.user)
+    existing_answers = survey.get_answers(user=user)
 
     # the result set from get_answers, has an outer key with the user_id
     # just remove that outer key to make the JSON payload simplier

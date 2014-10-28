@@ -30,14 +30,12 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('survey', ['SurveyAnswer'])
 
-
     def backwards(self, orm):
         # Deleting model 'SurveyForm'
         db.delete_table('survey_surveyform')
 
         # Deleting model 'SurveyAnswer'
         db.delete_table('survey_surveyanswer')
-
 
     models = {
         'auth.group': {

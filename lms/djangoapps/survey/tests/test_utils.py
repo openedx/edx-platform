@@ -12,11 +12,13 @@ from survey.models import SurveyForm
 
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from survey.utils import is_survey_required_for_course, has_user_answered_required_survey_for_course
+from survey.utils import is_survey_required_for_course, has_answered_required_survey
 
 
 class SurveyModelsTests(TestCase):
-
+    """
+    All tests for the utils.py file
+    """
     def setUp(self):
         """
         Set up the test data used in the specific tests
@@ -42,9 +44,9 @@ class SurveyModelsTests(TestCase):
         })
 
         self.course = CourseFactory.create(
-                    course_survey_required=True,
-                    course_survey_name=self.test_survey_name
-                )
+            course_survey_required=True,
+            course_survey_name=self.test_survey_name
+        )
 
         self.survey = SurveyForm.create(self.test_survey_name, self.test_form)
 
@@ -78,24 +80,22 @@ class SurveyModelsTests(TestCase):
         """
         Assert that a new course which has a required survey but user has not answered it yet
         """
-        self.assertFalse(has_user_answered_required_survey_for_course(self.course, self.student))
+        self.assertFalse(has_answered_required_survey(self.course, self.student))
 
         temp_course = CourseFactory.create(
             course_survey_required=False
         )
-        self.assertFalse(has_user_answered_required_survey_for_course(temp_course, self.student))
+        self.assertFalse(has_answered_required_survey(temp_course, self.student))
 
         temp_course = CourseFactory.create(
             course_survey_required=True,
             course_survey_name="NonExisting"
         )
-        self.assertFalse(has_user_answered_required_survey_for_course(temp_course, self.student))
+        self.assertFalse(has_answered_required_survey(temp_course, self.student))
 
     def test_user_has_answered_required_survey(self):
         """
         Assert that a new course which has a required survey and user has answers for it
         """
         self.survey.save_user_answers(self.student, self.student_answers)
-        self.assertTrue(has_user_answered_required_survey_for_course(self.course, self.student))
-
-
+        self.assertTrue(has_answered_required_survey(self.course, self.student))

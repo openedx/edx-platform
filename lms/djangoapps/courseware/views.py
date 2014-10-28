@@ -315,7 +315,7 @@ def _index_bulk_op(request, user, course_key, chapter, section, position):
     # check to see if there is a required survey that must be taken before
     # the user can access the course.
     if survey.utils.is_survey_required_for_course(course):
-        if not survey.utils.has_user_answered_required_survey_for_course(course, user):
+        if not survey.utils.has_answered_required_survey(course, user):
             return redirect(reverse('course_survey', args=[course.id.to_deprecated_string()]))
 
     masq = setup_masquerade(request, staff_access)
@@ -1070,6 +1070,7 @@ def get_course_lti_endpoints(request, course_id):
 
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
 
+
 @login_required
 def course_survey(request, course_id):
     """
@@ -1092,7 +1093,7 @@ def course_survey(request, course_id):
         request,
         request.user,
         course.course_survey_name,
-        course = course,
-        redirect_url = redirect_url,
-        is_required = course.course_survey_required,
+        course=course,
+        redirect_url=redirect_url,
+        is_required=course.course_survey_required,
     )

@@ -4,6 +4,7 @@ Helper methods for Surveys
 
 from survey.models import SurveyForm, SurveyAnswer
 
+
 def is_survey_required_for_course(course_descriptor):
     """
     Returns whether a Survey is required for this course
@@ -16,7 +17,7 @@ def is_survey_required_for_course(course_descriptor):
         SurveyForm.get(course_descriptor.course_survey_name, throw_if_not_found=False)
 
 
-def has_user_answered_required_survey_for_course(course_descriptor, user):
+def has_answered_required_survey(course_descriptor, user):
     """
     Returns whether a user needs to answer a required course
     """
