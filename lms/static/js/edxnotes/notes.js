@@ -24,7 +24,6 @@
          **/
         getOptions = function (element, params) {
             var usageId = params.usageId || getUsageId(element);
-            console.log(params, getUsageId(element))
             return {
                 auth: {
                     token: params.token,
