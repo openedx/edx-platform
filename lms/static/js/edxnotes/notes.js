@@ -1,6 +1,6 @@
-(function (define, $, _, Annotator, undefined) {
+(function (define, $, _, undefined) {
     'use strict';
-    define('edxnotes/notes.js', ['edxnotes/plugins/accessibility'], function () {
+    define(['annotator', 'js/edxnotes/plugins/accessibility'], function (Annotator) {
         var getUsageId, getOptions, setupPlugins, getAnnotator;
         /**
          * Returns Usage id for the component.
@@ -15,11 +15,11 @@
          * Returns options for the annotator.
          * @param {jQuery Element} The container element.
          * @param {String} params.token An auth token.
+         * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
          * @param {String} params.usageId Usage Id of the component.
          * @param {String} params.courseId Course id.
-         * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @return {Object} Options.
          **/
         getOptions = function (element, params) {
@@ -62,11 +62,11 @@
          * Factory method that returns Annotator.js instantiates.
          * @param {DOM Element} element The container element.
          * @param {String} params.token An auth token.
+         * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
          * @param {String} params.usageId Usage Id of the component.
          * @param {String} params.courseId Course id.
-         * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @return {Object} An instance of Annotator.js.
          **/
         getAnnotator = function (element, params) {
@@ -83,4 +83,4 @@
             factory: getAnnotator
         };
     });
-}).call(this, RequireJS.define, jQuery, _, Annotator);
+}).call(this, RequireJS.define, jQuery, _);

@@ -1,6 +1,6 @@
-(function (define, $, _, Annotator, undefined) {
+(function (define, $, _, undefined) {
     'use strict';
-    define('edxnotes/plugins/accessibility', function () {
+    define(['annotator'], function (Annotator) {
         var wrap = function (orig, wrapper) {
             Annotator.prototype[orig] = _.wrap(Annotator.prototype[orig], function (func) {
                 var args = Array.prototype.slice.call(arguments, 1);
@@ -95,4 +95,4 @@
             }
         }, 300);
     });
-}).call(this, RequireJS.define, jQuery, _, Annotator);
+}).call(this, RequireJS.define, jQuery, _);

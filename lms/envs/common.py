@@ -1019,7 +1019,7 @@ main_vendor_js = base_vendor_js + [
     'js/vendor/ova/catch/js/catch.js',
     'js/vendor/ova/catch/js/handlebars-1.1.2.js',
     'js/vendor/URI.min.js',
-] + sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/edxnotes/**/*.js'))
+]
 
 dashboard_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
@@ -1099,6 +1099,7 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
+            'css/vendor/edxnotes/annotator.min'
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },

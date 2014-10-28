@@ -70,6 +70,30 @@
     <%static:js group='main_vendor'/>
   % endif
 
+  <script>
+    window.baseUrl = "${settings.STATIC_URL}";
+    RequireJS.requirejs.config({
+        baseUrl: baseUrl,
+        waitSeconds: 60,
+        paths: {
+          'annotator_1.2.9': 'js/vendor/edxnotes/annotator-full.min'
+        },
+        shim: {
+          "annotator_1.2.9": {
+            exports: "Annotator"
+          },
+        },
+        map: {
+          'js/edxnotes/notes': {
+            'annotator': 'annotator_1.2.9'
+          },
+          'js/edxnotes/plugins/accessibility': {
+            'annotator': 'annotator_1.2.9'
+          }
+        }
+    });
+  </script>
+
   <%block name="headextra"/>
 
 <%
@@ -143,7 +167,6 @@
 
   </div>
 
-  <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   % if not disable_courseware_js:
     <%static:js group='application'/>
     <%static:js group='module-js'/>

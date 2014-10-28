@@ -1,7 +1,7 @@
-import jwt
 import datetime
 from uuid import uuid4
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from firebase_token_generator import create_token
 
 from .notes_list import LIST
 
@@ -119,11 +119,9 @@ def generate_token():
     """
     Generetes token.
     """
-    return jwt.encode({
-        'd': {
-            'consumerKey': 'consumerKey',
-            'userId': 'edx_user',
-            'issuedAt': _now().isoformat() + 'Z',
-            'ttl': DEFAULT_TTL,
-        },
-    }, CONSUMER_SECRET)
+    return create_token(CONSUMER_SECRET, {
+        'consumerKey': 'consumerKey',
+        'userId': 'edx_user',
+        'issuedAt': _now().isoformat() + 'Z',
+        'ttl': DEFAULT_TTL,
+    })

@@ -1,4 +1,3 @@
-import json
 from edxnotes.api import (
     get_prefix,
     get_token_url,
