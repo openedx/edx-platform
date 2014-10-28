@@ -12,6 +12,8 @@ October 2014
 
    * - Date
      - Change
+   * - 10/28/14
+     - Added :ref:`Introduction` section
    * - 10/24/14
      - Added :ref:`Course Discussions` section
 
