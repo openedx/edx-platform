@@ -337,7 +337,15 @@ class XModuleMixin(XBlockMixin):
                     child = self.runtime.get_block(child_loc)
                     child.runtime.export_fs = self.runtime.export_fs
                 except ItemNotFoundError:
-                    log.exception(u'Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    log.warning(u'Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    dog_stats_api.increment(
+                        "xmodule.item_not_found_error",
+                        tags=[
+                            u"course_id:{}".format(child_loc.course_key),
+                            u"block_type:{}".format(child_loc.block_type),
+                            u"parent_block_type:{}".format(self.location.block_type),
+                        ]
+                    )
                     continue
                 self._child_instances.append(child)
 
