@@ -1306,7 +1306,6 @@ def _do_create_account(post_vars, extended_profile=None):
     password_history_entry.create(user)
 
     registration.register(user)
-    city = City.objects.get(id=post_vars['city_id'])
 
     profile = UserProfile(user=user)
     profile.name = post_vars['name']
@@ -1317,12 +1316,12 @@ def _do_create_account(post_vars, extended_profile=None):
     profile.country = post_vars.get('country')
     profile.goals = post_vars.get('goals')
     profile.cedula = post_vars.get('cedula')
-    profile.city = city
 
     city = City.objects.get(id=post_vars['city_id'])
     profile.city = city
     type_id = post_vars['type_id']
     if type_id == 'cedula':
+        js = {}
         try:
             validate_cedula(post_vars['cedula'])
         except ValidationError:
@@ -1332,7 +1331,7 @@ def _do_create_account(post_vars, extended_profile=None):
             return JsonResponse(js, status=400)
 
     profile.cedula = post_vars['cedula']
-        
+
     # add any extended profile information in the denormalized 'meta' field in the profile
     if extended_profile:
         profile.meta = json.dumps(extended_profile)
@@ -1465,8 +1464,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
             js['field'] = field_name
             return JsonResponse(js, status=400)
-    
-    city = City.objects.get(id=post_vars['city_id'])
+
     type_id = post_vars['type_id']
     if type_id == 'cedula':
         try:
