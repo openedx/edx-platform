@@ -203,8 +203,9 @@ class XModuleMixin(XBlockMixin):
         # so we should use the xmodule_runtime (ModuleSystem) as the runtime.
         if (not isinstance(self, (XModule, XModuleDescriptor)) and
             self.xmodule_runtime is not None):
-            return self.xmodule_runtime
-        return self._runtime
+            return PureSystem(self.xmodule_runtime, self._runtime)
+        else:
+            return self._runtime
 
     @runtime.setter
     def runtime(self, value):
@@ -443,10 +444,9 @@ class XModuleMixin(XBlockMixin):
         """
         Set up this XBlock to act as an XModule instead of an XModuleDescriptor.
 
-        :param xmodule_runtime: the runtime to use when accessing student facing methods
-        :type xmodule_runtime: :class:`ModuleSystem`
-        :param field_data: The :class:`FieldData` to use for all subsequent data access
-        :type field_data: :class:`FieldData`
+        Arguments:
+            xmodule_runtime (:class:`ModuleSystem'): the runtime to use when accessing student facing methods
+            field_data (:class:`FieldData`): The :class:`FieldData` to use for all subsequent data access
         """
         # pylint: disable=attribute-defined-outside-init
         self.xmodule_runtime = xmodule_runtime
@@ -1406,6 +1406,36 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
 
     def publish(self, block, event_type, event):
         pass
+
+
+class PureSystem(ModuleSystem, DescriptorSystem):
+    """
+    A subclass of both ModuleSystem and DescriptorSystem to provide pure (non-XModule) XBlocks
+    a single Runtime interface for both the ModuleSystem and DescriptorSystem, when available.
+    """
+    # This system doesn't override a number of methods that are provided by ModuleSystem and DescriptorSystem,
+    # namely handler_url, local_resource_url, query, and resource_url.
+    #
+    # At runtime, the ModuleSystem and/or DescriptorSystem will define those methods
+    #
+    # pylint: disable=abstract-method
+    def __init__(self, module_system, descriptor_system):
+        # N.B. This doesn't call super(PureSystem, self).__init__, because it is only inheriting from
+        # ModuleSystem and DescriptorSystem to pass isinstance checks.
+        # pylint: disable=super-init-not-called
+        self._module_system = module_system
+        self._descriptor_system = descriptor_system
+
+    def __getattr__(self, name):
+        """
+        If the ModuleSystem doesn't have an attribute, try returning the same attribute from the
+        DescriptorSystem, instead. This allows XModuleDescriptors that are bound as XModules
+        to still function as XModuleDescriptors.
+        """
+        try:
+            return getattr(self._module_system, name)
+        except AttributeError:
+            return getattr(self._descriptor_system, name)
 
 
 class DoNothingCache(object):
