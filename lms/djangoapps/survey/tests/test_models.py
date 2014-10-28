@@ -119,6 +119,7 @@ class SurveyModelsTests(TestCase):
 
         survey = self._create_test_survey()
         self.assertFalse(survey.has_user_answered_survey(self.student))
+        self.assertEquals(len(survey.get_answers()), 0)
 
     def test_single_user_answers(self):
         """
@@ -185,4 +186,4 @@ class SurveyModelsTests(TestCase):
 
         names = survey.get_field_names()
 
-        self.assertEqual(names, ['field1', 'field2'])
+        self.assertEqual(sorted(names), ['field1', 'field2'])

@@ -45,11 +45,9 @@ def view_student_survey(user, survey_name, course=None, redirect_url=None, is_re
     if not survey:
         return HttpResponseRedirect(redirect_url)
 
-    existing_answers = survey.get_answers(user=user)
-
     # the result set from get_answers, has an outer key with the user_id
     # just remove that outer key to make the JSON payload simplier
-    existing_answers = existing_answers[user.id] if user.id in existing_answers else {}
+    existing_answers = survey.get_answers(user=user).get(user.id, {})
 
     context = {
         'existing_data_json': json.dumps(existing_answers),
@@ -72,7 +70,7 @@ def submit_answers(request, survey_name):
     """
     Form submission post-back endpoint.
 
-    NOTE: We do not have a formal definiation of a Survey Form, it's just some authored html
+    NOTE: We do not have a formal definition of a Survey Form, it's just some authored HTML
     form fields (via Django Admin site). Therefore we do not do any validation of the submission server side. It is
     assumed that all validation is done via JavaScript in the survey.html file
     """
@@ -98,10 +96,11 @@ def submit_answers(request, survey_name):
     if '_redirect_url' in answers:
         del answers['_redirect_url']
 
-    # scrub the remaining answers to make sure nothing malicious from the user gets stored in
+    # scrub the answers to make sure nothing malicious from the user gets stored in
     # our database, e.g. JavaScript
     for answer_key in answers.keys():
-        answers[answer_key] = escape(answers[answer_key])
+        scrubbed_key = escape(answer_key)
+        answers[scrubbed_key] = escape(answers[answer_key])
 
     survey.save_user_answers(request.user, answers)
 

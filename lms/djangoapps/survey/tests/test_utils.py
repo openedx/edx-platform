@@ -57,7 +57,7 @@ class SurveyModelsTests(TestCase):
         """
         self.assertTrue(is_survey_required_for_course(self.course))
 
-    def test_is_survey_no_required_for_course(self):
+    def test_is_survey_not_required_for_course(self):
         """
         Assert that if various data is not available or if the survey is not found
         then the survey is not considered required

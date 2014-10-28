@@ -45,7 +45,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
             course_survey_name="DoesNotExist"
         )
 
-        self.course_no_survey = CourseFactory.create()
+        self.course_without_survey = CourseFactory.create()
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
@@ -57,20 +57,21 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)
         self.enroll(self.course, True)
-        self.enroll(self.course_no_survey, True)
+        self.enroll(self.course_without_survey, True)
         self.enroll(self.course_with_bogus_survey, True)
 
         self.view_url = reverse('view_survey', args=[self.test_survey_name])
         self.postback_url = reverse('submit_answers', args=[self.test_survey_name])
 
-    def test_visiting_course_no_survey(self):
+    def test_visiting_course_without_survey(self):
         """
-        Verifies that going to the courseware which does not
+        Verifies that going to the courseware which does not have a survey does
+        not redirect to a survey
         """
         resp = self.client.get(
             reverse(
                 'courseware',
-                kwargs={'course_id': self.course_no_survey.id.to_deprecated_string()}
+                kwargs={'course_id': unicode(self.course_without_survey.id)}
             )
         )
         self.assertEquals(resp.status_code, 200)
@@ -82,12 +83,12 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         resp = self.client.get(
             reverse(
                 'courseware',
-                kwargs={'course_id': self.course.id.to_deprecated_string()}
+                kwargs={'course_id': unicode(self.course.id)}
             )
         )
         self.assertRedirects(
             resp,
-            reverse('course_survey', kwargs={'course_id': self.course.id.to_deprecated_string()})
+            reverse('course_survey', kwargs={'course_id': unicode(self.course.id)})
         )
 
     def test_visiting_course_with_existing_answers(self):
@@ -103,7 +104,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         resp = self.client.get(
             reverse(
                 'courseware',
-                kwargs={'course_id': self.course.id.to_deprecated_string()}
+                kwargs={'course_id': unicode(self.course.id)}
             )
         )
         self.assertEquals(resp.status_code, 200)
@@ -116,7 +117,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         resp = self.client.get(
             reverse(
                 'courseware',
-                kwargs={'course_id': self.course_with_bogus_survey.id.to_deprecated_string()}
+                kwargs={'course_id': unicode(self.course_with_bogus_survey.id)}
             )
         )
         self.assertEquals(resp.status_code, 200)
@@ -129,7 +130,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         resp = self.client.get(
             reverse(
                 'course_survey',
-                kwargs={'course_id': self.course_with_bogus_survey.id.to_deprecated_string()}
+                kwargs={'course_id': unicode(self.course_with_bogus_survey.id)}
             )
         )
         self.assertRedirects(
@@ -145,10 +146,10 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         resp = self.client.get(
             reverse(
                 'course_survey',
-                kwargs={'course_id': self.course_no_survey.id.to_deprecated_string()}
+                kwargs={'course_id': unicode(self.course_without_survey.id)}
             )
         )
         self.assertRedirects(
             resp,
-            reverse('courseware', kwargs={'course_id': self.course_no_survey.id.to_deprecated_string()})
+            reverse('courseware', kwargs={'course_id': unicode(self.course_without_survey.id)})
         )

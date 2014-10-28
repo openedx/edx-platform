@@ -111,7 +111,8 @@ class SurveyViewsTests(TestCase):
 
     def test_survey_postback(self):
         """
-        Asserts that any attempts to postback to a non existing survey returns a 404
+        Asserts that a well formed postback of survey answers is properly stored in the
+        database
         """
         resp = self.client.post(
             self.postback_url,
@@ -144,7 +145,7 @@ class SurveyViewsTests(TestCase):
 
     def test_encoding_answers(self):
         """
-        Verify that the two known hidden fields are not stored as survey results
+        Verify that if some potentially harmful input data is sent, that is is properly HTML encoded
         """
         data = dict.copy(self.student_answers)
 
@@ -156,7 +157,10 @@ class SurveyViewsTests(TestCase):
         )
         self.assertEquals(resp.status_code, 200)
         answers = self.survey.get_answers(self.student)
-        self.assertNotEqual(data['something_malicious'], answers[self.student.id]['something_malicious'])
+        self.assertEqual(
+            '&lt;script type=&quot;javascript&quot;&gt;alert(&quot;Deleting filesystem...&quot;)&lt;/script&gt;',
+            answers[self.student.id]['something_malicious']
+        )
 
     def test_round_trip(self):
         """

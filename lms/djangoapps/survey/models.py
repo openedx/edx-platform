@@ -25,7 +25,7 @@ class SurveyForm(TimeStampedModel):
     form = models.TextField()
 
     def __unicode__(self):
-        return u'{}'.format(self.name)
+        return self.name
 
     @classmethod
     def create(cls, name, form, update_if_exists=False):
@@ -175,7 +175,7 @@ class SurveyAnswer(TimeStampedModel):
         Returns a list of unique field names for a given Survey.
         This can be useful for formatting reports, e.g. putting table headers on each column
         """
-        field_names = SurveyAnswer.objects.filter(form=form).order_by('field_name').values('field_name').distinct()
+        field_names = SurveyAnswer.objects.filter(form=form).values('field_name').distinct()
 
         results = []
         for name in field_names:

@@ -316,7 +316,7 @@ def _index_bulk_op(request, user, course_key, chapter, section, position):
     # the user can access the course.
     if survey.utils.is_survey_required_for_course(course):
         if not survey.utils.has_answered_required_survey(course, user):
-            return redirect(reverse('course_survey', args=[course.id.to_deprecated_string()]))
+            return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
     masq = setup_masquerade(request, staff_access)
 
@@ -1080,7 +1080,7 @@ def course_survey(request, course_id):
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'see_exists', course_key)
+    course = get_course_with_access(request.user, 'load', course_key)
 
     redirect_url = reverse('courseware', args=[course_id])
 
