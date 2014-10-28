@@ -12,6 +12,7 @@ from django.http import (
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
 from django.conf import settings
+from django.utils.html import escape
 
 from edxmako.shortcuts import render_to_response
 from survey.models import SurveyForm
@@ -100,10 +101,8 @@ def submit_answers(request, survey_name):
 
     # scrub the remaining answers to make sure nothing malicious from the user gets stored in
     # our database, e.g. JavaScript
-
-    for answer in answers:
-        # TODO: scrub the text submissions for every field
-        pass
+    for answer_key in answers.keys():
+        answers[answer_key] = escape(answers[answer_key])
 
     survey.save_user_answers(request.user, answers)
 
