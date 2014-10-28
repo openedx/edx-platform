@@ -19,10 +19,26 @@
 
 .. _Course Components (XBlocks): http://edx-open-learning-xml.readthedocs.org/en/latest/components/index.html
 
+.. _Example of an OLX Course: http://edx-open-learning-xml.readthedocs.org/en/latest/example-course/index.html#example-of-an-olx-course
+
+.. _Create a Randomized Custom Python-Evaluated Input Problem for OLX: http://edx-open-learning-xml.readthedocs.org/en/latest/problem-xml/custom_python.html#create-a-randomized-custom-python-evaluated-input-problem
+
+.. _Script Tag Format for OLX: http://edx-open-learning-
+    xml.readthedocs.org/en/latest/problem-xml/custom_python.html#script-tag-
+    format>
+
+
+.. _Write-Your-Own-Grader for OLX: http://edx-open-learning-
+    xml.readthedocs.org/en/latest/problem-xml/custom_python.html
+
+
 .. Student-facing doc links
 
 .. _EdX Guide for Students: http://edx-guide-for-students.readthedocs.org/en/latest/
 
+.. _Introduction: http://edx-guide-for-students.readthedocs.org/en/latest/SFD_introduction.html
+
+.. _Student Guide to Course Discussions: http://edx-guide-for-students.readthedocs.org/en/latest/sfd_discussions/index.html
 
 .. Platform API guide links
 
@@ -71,7 +87,7 @@
 
 .. _Data Delivered in Data Packages: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/package.html
 
-.. _edX Developer's Guide: http://edx.readthedocs.org/projects/userdocs/en/latest/
+.. _edX Developer's Guide: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/index.html
 
 .. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html
 
@@ -234,6 +250,25 @@
 .. _Add Content Experiments to Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/content_experiments/content_experiments_add.html
 
 
+.. _Script Tag Format:  http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_python.html#script-tag-format
+
+.. _Write-Your-Own-Grader: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_python.html#write-your-own-grader
+
+.. _Text Input Problem XML: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/text_input.html#text-input-problem-xml
+
+.. _Create a Randomized Custom Python-Evaluated Input Problem: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_python.html#create-a-randomized-custom-python-evaluated-input-problem
+
+.. _Annotation Problem: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/annotation.html#annotation
+
+.. _Set Important Dates for Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/setting_up_student_view.html#set-important-dates-for-your-course
+
+.. _Problem Settings: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_problem.html#problem-settings
+
+.. _Problem Student View: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_problem.html#problem-student-view
+
+
+.. _Show Reset Button: http://edx-partner-course-staff.readthedocs.org/en/latest/creating_content/create_problem.html#show-reset-button
+
 
 .. Peer Assessments
 
@@ -258,6 +293,8 @@
 .. _Data Czar/Data Team Selection and Responsibilities: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/data_czar.html
 
 .. _event list: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/event_list.html#event-list
+
+.. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html
 
 .. Developer Doc
 

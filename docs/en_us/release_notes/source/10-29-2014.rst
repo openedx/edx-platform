@@ -1,0 +1,143 @@
+###################################
+October 29, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of
+October 29, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we update the edX Course Staff Release Notes.
+
+*******************************
+edX Website
+*******************************
+
+* The student dashboard now shows the start time as well as the date for new
+  courses. (TNL-567)
+
+
+*******************************
+edX Learning Management System 
+*******************************
+
+* In Firefox and Safari browsers, after a student changed the video speed,
+  videos in other units still played at the default speed, 1.0X. This problem
+  is fixed and videos in other units play at the selected speed. (TNL-537)
+
+
+********************************************
+edX Learning Management System Accessibility
+********************************************
+
+* For improved accessibility, the progress meter in the video player now has
+  three additional aria state attributes: ``aria-valuemax``, ``aria-valuemin``,
+  and ``aria-valuenow``. (TNL-89)
+
+* The problem status after a student checks or shows an answer is now
+  accessible to screen readers. (TNL-568, TNL-588, TNL-595)
+
+
+*************
+edX Studio
+*************
+
+* Course staff now have the ability to add a **Reset** button to problems.
+  Students can click **Reset** to clear any input that has not yet been
+  submitted, and try again to answer the question. See `Show Reset Button`_.
+
+
+**************************
+edX Documentation
+**************************
+
+All guides now include a section that lists browsers supported for use with the
+edX platform.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  Recent changes include:
+
+  * Added the section `Show Reset Button`_ in `Problem Settings`_ and
+    clarified Reset button behavior in `Problem Student View`_.
+
+  * Fixed the code sample in `Script Tag Format`_ in the `Write-Your-Own-Grader`_ Problem chapter.
+
+  * Fixed a bug in `Text Input Problem XML`_.
+  
+  * Added `Create a Randomized Custom Python-Evaluated Input Problem`_
+  
+  * Added note about limited support of annotation problem type to `Annotation
+    Problem`_.
+
+  * Updated `Set Important Dates for Your Course`_ to reflect change that
+    course dates now use UTC.
+
+
+* `Using edX Insights`_
+
+* `EdX Guide for Students`_
+  
+  Recent changes include:
+
+  * Added the `Introduction`_ section.
+
+  * Added the `Student Guide to Course Discussions`_ section.
+
+* `Creating Peer Assessments`_
+
+* `edX Research Guide`_
+  
+  Recent changes include:
+
+  * Added best practices for passphrases to the `Keys and Credentials for Data
+    Transfers`_ chapter.
+
+  * Added examples of the format used to identify course components to the
+    `Student Info and Progress Data`_ and `Tracking Logs`_ chapters.
+
+  * Updated the ``child_render`` event to reflect the name change for the
+    ``child_id`` member field. See `Tracking Logs`_.
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+* `edX Open Learning XML Guide`_
+  
+  Recent changes include:
+
+  * Added the section `Example of an OLX Course`_.
+  
+  * Added `Create a Randomized Custom Python-Evaluated Input Problem for OLX`_ 
+    
+  * Fixed the code sample in `Script Tag Format for OLX`_ in the `Write-Your-Own-Grader for OLX`_ chapter.
+
+
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst
