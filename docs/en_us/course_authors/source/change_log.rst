@@ -13,7 +13,9 @@ October, 2014
 
    * - Date
      - Change
-   * - 10/29/2014
+   * - 10/30/14
+     - Added :ref:`email template<Verified Registration Reminder>` for reminding students of last day to register for verified certificates.
+   * - 10/29/14
      - Added information about course start time visibility to :ref:`The Course Start Date`.
    * - 10/28/14
      - Added section for :ref:`Show Reset Button` in :ref:`Problem Settings`
