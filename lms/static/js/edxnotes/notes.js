@@ -23,7 +23,8 @@
          * @return {Object} Options.
          **/
         getOptions = function (element, params) {
-            var usageId = params.usageId || getUsageId();
+            var usageId = params.usageId || getUsageId(element);
+            console.log(params, getUsageId(element))
             return {
                 auth: {
                     token: params.token,
@@ -72,9 +73,10 @@
         getAnnotator = function (element, params) {
             var el = $(element),
                 options = getOptions(el, params),
-                annotator = el.annotator(options).data('annotator'),
+                annotator = new Annotator(element, options),
                 plugins = [/*'Auth', */'Store'];
 
+            el.data('annotator', annotator);
             setupPlugins(annotator, plugins, options);
             return annotator;
         };
