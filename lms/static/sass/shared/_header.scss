@@ -1,3 +1,6 @@
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
 header.global {
   border-bottom: 1px solid $m-gray;
   box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
@@ -331,8 +334,11 @@ header.global {
 // CASE: marketing/course discovery
 header.global-new {
   @extend %ui-depth1;
+  /* Temp. fix until applied globally */
+  @include box-sizing(border-box);
+
   position: relative;
-  height: ($baseline*3.75);
+  /*height: ($baseline*3.75);*/
   width: 100%;
   border-bottom: 4px solid $courseware-border-bottom-color;
   box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
@@ -340,15 +346,16 @@ header.global-new {
 
   nav {
     @include clearfix();
+    @include box-sizing(border-box);
     width: grid-width(12);
-    height: ($baseline*2);
+    height: 74px; /*($baseline*2);*/
     margin: 0 auto;
-    padding: 18px ($baseline/2) 0;
+    padding: 17px 0; /*($baseline/2);*/
   }
 
   h1.logo {
     float: left;
-    margin: -2px 39px 0px 0px;
+    margin: -2px 39px 0 10px;
     position: relative;
 
     a {
@@ -560,7 +567,7 @@ header.global-new {
     }
   }
 
-  .nav-global {
+  %default-header-nav {
     margin-top: ($baseline/4);
     list-style: none;
     float: left;
@@ -568,21 +575,16 @@ header.global-new {
     li,
     div {
       display: inline-block;
-      margin: 0 $baseline+1 0 0;
+      margin: 0;
       text-transform: uppercase;
       letter-spacing: 0 !important;
 
-      &:last-child {
-        margin-right: 0;
-      }
-
       a {
-        border-bottom: 4px solid $header-bg;
         display:block;
-        padding: ($baseline/4);
+        padding: 3px 10px; /*($baseline/4);*/
         font-size: 18px;
-        padding-bottom: ($baseline*1.25);
-        font-weight: 600;
+        line-height: 24px;
+        font-weight: 500;
         font-family: $header-sans-serif;
         color: $courseware-navigation-color;
 
@@ -594,25 +596,29 @@ header.global-new {
     }
   }
 
+  .nav-global {
+    @extend %default-header-nav;
+  }
+
   .nav-courseware {
-    @extend .nav-global;
+    @extend %default-header-nav;
     float: right;
 
     div {
       display: inline-block;
-      margin: 0 21px 0 0;
+      /*margin: 0 21px 0 0;*/
       text-transform: uppercase;
       letter-spacing: 0!important;
       position: relative;
-      vertical-align: middle;
+      /*vertical-align: middle;*/
 
       &:last-child {
-        margin-right: 0;
+        margin-right: 10px;
       }
 
       a {
         &.nav-courseware-button {
-          padding: 5px 45px 5px 45px;
+          /*padding: 5px 45px 5px 45px;*/
           border: 3px solid $courseware-button-border-color;
           border-radius: 5px;
           margin-top: -22px;
@@ -625,6 +631,164 @@ header.global-new {
             border-color: $courseware-button-border-color;
           }
         }
+      }
+    }
+  }
+
+  &.rwd {
+    nav {
+      max-width: 1180px;
+      width: 320px;
+    }
+
+    .mobile-menu-button {
+      display: inline;
+      float: left;
+      text-decoration: none;
+      color: #9a9b9e;
+      margin-toP: 9px;
+      font-size: 18px;
+
+      &:hover,
+      &:active,
+      &:focus {
+        text-decoration: none;
+      }
+    }
+
+    .logo {
+      position: absolute;
+      width: 54px;
+      left: calc( 50% - 90px );
+      top: 20px;
+
+      img {
+        width: 54px;
+      }
+    }
+
+    .nav-global,
+    .nav-courseware {
+      a {
+        font-size: 14px;
+
+        &.nav-courseware-button {
+          width: 86px;
+          text-align: center;
+          margin-top: -3px;
+        }
+      }
+    }
+
+    .nav-global,
+    .nav-courseware-01 {
+      display: none;
+    }
+
+    .nav-global {
+      position: absolute;
+      top: 73px;
+      left: calc( 50% - 160px );
+      z-index: 1000;
+      width: 320px;
+      background: #126f9a;
+
+      &.show {
+        display: inline;
+      }
+
+      a {
+        color: white;
+        padding: 10px;
+        font-weight: 300;
+      }
+
+      li {
+        display: block;
+        border-bottom: 1px solid #009ee7;
+      }
+    }
+
+    .nav-courseware {
+      display: inline;
+
+      div:last-child {
+        margin-right: 0;
+      }
+    }
+
+    @include media( $desktop ) {
+      /*$grid-columns: 12;*/
+      nav {
+        width: 100%;
+      }
+
+      .mobile-menu-button {
+        display: none;
+      }
+
+      .logo {
+        position: relative;
+        width: auto;
+        top: inherit;
+        left: inherit;
+        margin-left: 10px;
+
+        img {
+          width: auto;
+        }
+      }
+
+      .nav-global {
+        display: inline;
+        position: relative;
+        z-index: auto;
+        width: auto;
+        top: auto;
+        left: auto;
+        background: inherit;
+
+        a {
+          color: $courseware-navigation-color;
+          padding: 3px 10px;
+          font-weight: 500;
+        }
+
+        li {
+          display: inline-block;
+          border-bottom: none;
+        }
+      }
+
+      .nav-courseware {
+        div:last-child {
+          margin-right: 10px;
+        }
+      }
+
+      .nav-courseware-01 {
+        display: inline-block;
+      }
+
+      .desktop-hide {
+        display: none!important;
+      }
+    }
+
+    @include media( $xl-desktop ) {
+      nav {
+        padding: 17px 10px;
+      }
+
+      .nav-global,
+      .nav-courseware {
+        a {
+          font-size: 18px;
+        }
+      }
+
+      .logo {
+        margin-left: 0;
       }
     }
   }
