@@ -43,14 +43,13 @@ def view_student_survey(request, user, survey_name, course=None, redirect_url=No
 
     survey = SurveyForm.get(survey_name, throw_if_not_found=False)
     if not survey:
-        HttpResponseRedirect(redirect_url)
+        return HttpResponseRedirect(redirect_url)
 
     existing_answers = survey.get_answers(user=user)
 
     # the result set from get_answers, has an outer key with the user_id
     # just remove that outer key to make the JSON payload simplier
-    if request.user.id in existing_answers:
-        existing_answers = existing_answers[request.user.id]
+    existing_answers = existing_answers[user.id] if user.id in existing_answers else {}
 
     context = {
         'existing_data_json': json.dumps(existing_answers),
