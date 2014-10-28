@@ -684,6 +684,52 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
+  // Auto Enroll Csv Section
+  .auto_enroll_csv {
+    .results {
+
+    }
+    .enrollment_signup_button {
+      margin-right: ($baseline/4);
+    }
+    // Custom File upload
+    .customBrowseBtn {
+      margin: ($baseline/2) 0;
+      display: inline-block;
+      .file-browse {
+        position:relative;
+        overflow:hidden;
+        display: inline;
+        margin-left: -5px;
+        span.browse{
+          @include button(simple, $blue);
+          padding: 6px ($baseline/2);
+          font-size: 12px;
+          border-radius: 0 3px 3px 0;
+          margin-right: ($baseline);
+        }
+        input.file_field {
+          position:absolute;
+          top:0;
+          right:0;
+          margin:0;
+          padding:0;
+          cursor:pointer;
+          opacity:0;
+          filter:alpha(opacity=0);
+        }
+      }
+      & > span, & input[disabled]{
+        vertical-align: middle;
+      }
+      input[disabled] {
+        cursor: not-allowed;
+        border: 1px solid $lightGrey1;
+        border-radius: 4px 0 0 4px;
+        padding: 6px 6px 5px;
+      }
+    }
+  }
 
   .enroll-option {
     margin: ($baseline/2) 0;

@@ -17,6 +17,7 @@ from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from util.db import commit_on_success_with_read_committed
 from xmodule.modulestore.django import modulestore
 
@@ -26,10 +27,10 @@ class ChooseModeView(View):
 
     When a get request is used, shows the selection page.
 
-    When a post request is used, assumes that it is a form submission 
+    When a post request is used, assumes that it is a form submission
     from the selection page, parses the response, and then sends user
     to the next step in the flow.
-    
+
     """
 
     @method_decorator(login_required)
@@ -48,28 +49,19 @@ class ChooseModeView(View):
             Response
 
         """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
-        
+        course_key = CourseKey.from_string(course_id)
+
         upgrade = request.GET.get('upgrade', False)
         request.session['attempting_upgrade'] = upgrade
 
-        # Students will already have an active course enrollment at this stage,
-        # but we should still show them the "choose your track" page so they have
-        # the option to enter the verification/payment flow.
-        go_to_dashboard = (
-            not upgrade and enrollment_mode in ['verified', 'professional']
-        )
-
-        if go_to_dashboard:
-            return redirect(reverse('dashboard'))
-
+        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         modes = CourseMode.modes_for_course_dict(course_key)
 
         # We assume that, if 'professional' is one of the modes, it is the *only* mode.
         # If we offer more modes alongside 'professional' in the future, this will need to route
         # to the usual "choose your track" page.
-        if "professional" in modes:
+        has_enrolled_professional = (enrollment_mode == "professional" and is_active)
+        if "professional" in modes and not has_enrolled_professional:
             return redirect(
                 reverse(
                     'verify_student_show_requirements',
@@ -77,14 +69,15 @@ class ChooseModeView(View):
                 )
             )
 
-        # If a user's course enrollment is inactive at this stage, the track
-        # selection page may have been visited directly, so we should redirect
-        # the user to their dashboard. By the time the user gets here during the
-        # normal registration process, they will already have an activated enrollment;
-        # the button appearing on the track selection page only redirects the user to
-        # the dashboard, and we don't want the user to be confused when they click the
-        # honor button and are taken to their dashboard without being enrolled.
-        if not is_active:
+        # If there isn't a verified mode available, then there's nothing
+        # to do on this page.  The user has almost certainly been auto-registered
+        # in the "honor" track by this point, so we send the user
+        # to the dashboard.
+        if not CourseMode.has_verified_mode(modes):
+            return redirect(reverse('dashboard'))
+
+        # If a user has already paid, redirect them to the dashboard.
+        if is_active and enrollment_mode in CourseMode.VERIFIED_MODES:
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})

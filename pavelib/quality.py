@@ -1,11 +1,9 @@
 """
 Check code quality using pep8, pylint, and diff_quality.
 """
-from paver.easy import sh, task, cmdopts, needs
+from paver.easy import sh, task, cmdopts, needs, BuildFailure
 import os
-import errno
 import re
-from optparse import make_option
 
 from .utils.envs import Env
 
@@ -136,12 +134,13 @@ def run_quality(options):
     # Directory to put the diff reports in.
     # This makes the folder if it doesn't already exist.
     dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
+    diff_quality_percentage_failure = False
 
     # Set the string, if needed, to be used for the diff-quality --fail-under switch.
     diff_threshold = int(getattr(options, 'percentage', -1))
-    threshold_string = ''
+    percentage_string = ''
     if diff_threshold > -1:
-        threshold_string = '--fail-under={0}'.format(diff_threshold)
+        percentage_string = '--fail-under={0}'.format(diff_threshold)
 
     # Generate diff-quality html report for pep8, and print to console
     # If pep8 reports exist, use those
@@ -155,18 +154,22 @@ def run_quality(options):
 
     pep8_reports = u' '.join(pep8_files)
 
-    sh(
-        "diff-quality --violations=pep8 --html-report {dquality_dir}/"
-        "diff_quality_pep8.html {pep8_reports}".format(
-            dquality_dir=dquality_dir, pep8_reports=pep8_reports)
-    )
+    try:
+        sh(
+            "diff-quality --violations=pep8 {pep8_reports} {percentage_string} "
+            "--html-report {dquality_dir}/diff_quality_pep8.html".format(
+                pep8_reports=pep8_reports,
+                percentage_string=percentage_string,
+                dquality_dir=dquality_dir
+            )
+        )
+    except BuildFailure, error_message:
+        if is_percentage_failure(error_message):
+            diff_quality_percentage_failure = True
+        else:
+            raise BuildFailure(error_message)
 
-    sh(
-        "diff-quality --violations=pep8 {pep8_reports} {threshold_string}".format(
-            pep8_reports=pep8_reports, threshold_string=threshold_string)
-    )
-
-    # Generage diff-quality html report for pylint, and print to console
+    # Generate diff-quality html report for pylint, and print to console
     # If pylint reports exist, use those
     # Otherwise, `diff-quality` will call pylint itself
 
@@ -183,19 +186,34 @@ def run_quality(options):
         "common:common/djangoapps:common/lib"
     )
 
-    sh(
-        "{pythonpath_prefix} diff-quality --violations=pylint --html-report "
-        "{dquality_dir}/diff_quality_pylint.html {pylint_reports}".format(
-            pythonpath_prefix=pythonpath_prefix,
-            dquality_dir=dquality_dir,
-            pylint_reports=pylint_reports
+    try:
+        sh(
+            "{pythonpath_prefix} diff-quality --violations=pylint {pylint_reports} {percentage_string} "
+            "--html-report {dquality_dir}/diff_quality_pylint.html".format(
+                pythonpath_prefix=pythonpath_prefix,
+                pylint_reports=pylint_reports,
+                percentage_string=percentage_string,
+                dquality_dir=dquality_dir
+            )
         )
-    )
+    except BuildFailure, error_message:
+        if is_percentage_failure(error_message):
+            diff_quality_percentage_failure = True
+        else:
+            raise BuildFailure(error_message)
 
-    sh(
-        "{pythonpath_prefix} diff-quality --violations=pylint {pylint_reports} {threshold_string}".format(
-            pythonpath_prefix=pythonpath_prefix,
-            pylint_reports=pylint_reports,
-            threshold_string=threshold_string
-        )
-    )
+    # If one of the diff-quality runs fails, then paver exits with an error when it is finished
+    if diff_quality_percentage_failure:
+        raise BuildFailure("Diff-quality failure(s).")
+
+
+def is_percentage_failure(error_message):
+    """
+    When diff-quality is run with a threshold percentage, it ends with an exit code of 1. This bubbles up to
+    paver with a subprocess return code error. If the subprocess exits with anything other than 1, raise
+    a paver exception.
+    """
+    if "Subprocess return code: 1" not in error_message:
+        return False
+    else:
+        return True

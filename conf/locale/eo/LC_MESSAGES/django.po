@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-17 14:16+0000\n"
-"PO-Revision-Date: 2014-10-17 14:16:50.815957\n"
+"POT-Creation-Date: 2014-10-27 11:02-0400\n"
+"PO-Revision-Date: 2014-10-27 15:02:51.541121\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1372,6 +1372,19 @@ msgstr "Névér Ⱡ'σяєм ι#"
 msgid "Whether to force the save button to appear on the page"
 msgstr ""
 "Whéthér tö förçé thé sävé ßüttön tö äppéär ön thé pägé Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Show Reset Button"
+msgstr "Shöw Rését Büttön Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Determines whether a 'Reset' button is shown so the user may reset their "
+"answer. A default value can be set in Advanced Settings."
+msgstr ""
+"Détérmïnés whéthér ä 'Rését' ßüttön ïs shöwn sö thé üsér mäý rését théïr "
+"änswér. À défäült välüé çän ßé sét ïn Àdvänçéd Séttïngs. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3325,14 +3338,20 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter the maximum number of times a student can try to answer problems. This"
-" is a course-wide setting, but you can specify a different number when you "
-"create an individual problem. To allow unlimited attempts, enter null."
+"Enter the maximum number of times a student can try to answer problems. By "
+"default, Maximum Attempts is set to null, meaning that students have an "
+"unlimited number of attempts for problems. You can override this course-wide"
+" setting for individual problems. However, if the course-wide setting is a "
+"specific number, you cannot set the Maximum Attempts for individual problems"
+" to unlimited."
 msgstr ""
-"Éntér thé mäxïmüm nümßér öf tïmés ä stüdént çän trý tö änswér prößléms. Thïs"
-" ïs ä çöürsé-wïdé séttïng, ßüt ýöü çän spéçïfý ä dïfférént nümßér whén ýöü "
-"çréäté än ïndïvïdüäl prößlém. Tö ällöw ünlïmïtéd ättémpts, éntér nüll. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕ#"
+"Éntér thé mäxïmüm nümßér öf tïmés ä stüdént çän trý tö änswér prößléms. Bý "
+"défäült, Mäxïmüm Àttémpts ïs sét tö nüll, méänïng thät stüdénts hävé än "
+"ünlïmïtéd nümßér öf ättémpts för prößléms. Ýöü çän övérrïdé thïs çöürsé-wïdé"
+" séttïng för ïndïvïdüäl prößléms. Höwévér, ïf thé çöürsé-wïdé séttïng ïs ä "
+"spéçïfïç nümßér, ýöü çännöt sét thé Mäxïmüm Àttémpts för ïndïvïdüäl prößléms"
+" tö ünlïmïtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. #"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
@@ -3378,6 +3397,21 @@ msgid ""
 msgstr ""
 "Éntér trüé ör fälsé. Ìf trüé, vïdéö çäçhïng wïll ßé üséd för HTML5 vïdéös. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Show Reset Button for Problems"
+msgstr "Shöw Rését Büttön för Prößléms Ⱡ'σяєм #"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, problems default to displaying a 'Reset' "
+"button. This value may be overriden in each problem's settings. Existing "
+"problems whose reset setting have not been changed are affected."
+msgstr ""
+"Éntér trüé ör fälsé. Ìf trüé, prößléms défäült tö dïspläýïng ä 'Rését' "
+"ßüttön. Thïs välüé mäý ßé övérrïdén ïn éäçh prößlém's séttïngs. Éxïstïng "
+"prößléms whösé rését séttïng hävé nöt ßéén çhängéd äré äfféçtéd. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ #"
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
@@ -3947,6 +3981,9 @@ msgstr "Çöpýrïght #"
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Name"
 msgstr "Nämé Ⱡ'σяєм#"
 
@@ -4082,6 +4119,8 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/dashboard/support.py
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/billing_details.html
 msgid "Email Address"
 msgstr "Émäïl Àddréss Ⱡ'#"
 
@@ -4292,6 +4331,7 @@ msgstr "Löädéd çöürsé {course_name}<br/>Érrörs: Ⱡ'σяєм#"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Course Name"
 msgstr "Çöürsé Nämé Ⱡ#"
 
@@ -4417,6 +4457,38 @@ msgstr "Ûsér döés nöt éxïst. Ⱡ'σя#"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
 msgstr "Täsk ïs älréädý rünnïng. Ⱡ'σяє#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Could not read uploaded file."
+msgstr "Çöüld nöt réäd üplöädéd fïlé. Ⱡ'σяєм #"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Data in row #{row_num} must have exactly four columns: email, username, full"
+" name, and country"
+msgstr ""
+"Dätä ïn röw #{row_num} müst hävé éxäçtlý föür çölümns: émäïl, üsérnämé, füll"
+" nämé, änd çöüntrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Invalid email {email_address}."
+msgstr "Ìnvälïd émäïl {email_address}. Ⱡ'σ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"An account with email {email} exists but the provided username {username} is"
+" different. Enrolling anyway with {email}."
+msgstr ""
+"Àn äççöünt wïth émäïl {email} éxïsts ßüt thé prövïdéd üsérnämé {username} ïs"
+" dïfférént. Énröllïng änýwäý wïth {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Username {user} already exists."
+msgstr "Ûsérnämé {user} älréädý éxïsts. Ⱡ'σяєм #"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "File is not attached."
+msgstr "Fïlé ïs nöt ättäçhéd. Ⱡ'σя#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{0}' does not exist."
@@ -5370,6 +5442,14 @@ msgid "Order Payment Confirmation"
 msgstr "Ördér Päýmént Çönfïrmätïön Ⱡ'σяєм#"
 
 #: lms/djangoapps/shoppingcart/models.py
+msgid ""
+"Confirmation and Registration Codes for the following courses: "
+"{course_name_list}"
+msgstr ""
+"Çönfïrmätïön änd Régïsträtïön Çödés för thé föllöwïng çöürsés: "
+"{course_name_list} Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
 msgstr "Trýïng tö ädd ä dïfférént çürrénçý ïntö thé çärt Ⱡ'σяєм ιρѕυм #"
 
@@ -5384,6 +5464,10 @@ msgid ""
 msgstr ""
 "Pléäsé vïsït ýöür <a href=\"{dashboard_link}\">däshßöärd</a>  tö séé ýöür "
 "néw çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid "Enrollment codes for Course: {course_name}"
+msgstr "Énröllmént çödés för Çöürsé: {course_name} Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
@@ -5491,8 +5575,6 @@ msgstr "Tötäl Çöst Ⱡ#"
 
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Currency"
 msgstr "Çürrénçý #"
 
@@ -5500,8 +5582,6 @@ msgstr "Çürrénçý #"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: wiki/plugins/attachments/forms.py
@@ -5641,6 +5721,10 @@ msgid "Coupon '{0}' is not valid for any course in the shopping cart."
 msgstr ""
 "Çöüpön '{0}' ïs nöt välïd för äný çöürsé ïn thé shöppïng çärt. Ⱡ'σяєм ιρѕυм "
 "∂σłσя#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "success"
+msgstr "süççéss #"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
@@ -8091,7 +8175,6 @@ msgstr "&copy; 2014 {platform_name}, sömé rïghts résérvéd Ⱡ'σяєм ι�
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Password Reset"
 msgstr "Pässwörd Rését Ⱡ'#"
 
@@ -8880,6 +8963,7 @@ msgstr "Àddïtïönäl Pérsönäl Ìnförmätïön Ⱡ'σяєм ι#"
 
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "City"
 msgstr "Çïtý Ⱡ'σяєм#"
 
@@ -8889,6 +8973,7 @@ msgstr "éxämplé: Néw Ýörk Ⱡ'σ#"
 
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Country"
 msgstr "Çöüntrý #"
 
@@ -10289,6 +10374,8 @@ msgid "Day"
 msgstr "Däý Ⱡ'σя#"
 
 #: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Students"
 msgstr "Stüdénts #"
 
@@ -11360,6 +11447,38 @@ msgstr "Vïéw dïsçüssïön Ⱡ'#"
 msgid "Active Threads"
 msgstr "Àçtïvé Thréäds Ⱡ'#"
 
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "Welcome to {course_name}"
+msgstr "Wélçömé tö {course_name} Ⱡ'#"
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid ""
+"To get started, please visit https://{site_name}. The login information for "
+"your account follows."
+msgstr ""
+"Tö gét stärtéd, pléäsé vïsït https://{site_name}. Thé lögïn ïnförmätïön för "
+"ýöür äççöünt föllöws. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "email: {email}"
+msgstr "émäïl: {email} Ⱡ#"
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "password: {password}"
+msgstr "pässwörd: {password} Ⱡ'#"
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "It is recommended that you change your password."
+msgstr "Ìt ïs réçömméndéd thät ýöü çhängé ýöür pässwörd. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "Sincerely yours,"
+msgstr "Sïnçérélý ýöürs, Ⱡ'σ#"
+
+#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
+msgid "The {course_name} Team"
+msgstr "Thé {course_name} Téäm Ⱡ#"
+
 #: lms/templates/emails/activation_email.txt
 msgid "Thank you for signing up for {platform_name}."
 msgstr "Thänk ýöü för sïgnïng üp för {platform_name}. Ⱡ'σяєм ι#"
@@ -11389,6 +11508,8 @@ msgid "We hope you enjoy learning with {platform_name}!"
 msgstr "Wé höpé ýöü énjöý léärnïng wïth {platform_name}! Ⱡ'σяєм ιρ#"
 
 #: lms/templates/emails/activation_email.txt
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr "Thé {platform_name} Téäm Ⱡ#"
 
@@ -11478,6 +11599,157 @@ msgstr ""
 #: lms/templates/emails/add_beta_tester_email_subject.txt
 msgid "You have been invited to a beta test for {course_name}"
 msgstr "Ýöü hävé ßéén ïnvïtéd tö ä ßétä tést för {course_name} Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Hi {name},"
+msgstr "Hï {name}, #"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Thank you for your purchase of "
+msgstr "Thänk ýöü för ýöür pürçhäsé öf  Ⱡ'σяєм ι#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Your payment was successful."
+msgstr "Ýöür päýmént wäs süççéssfül. Ⱡ'σяєм #"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid ""
+"If you have billing questions, please read the FAQ ({faq_url}) or contact "
+"{billing_email}."
+msgstr ""
+"Ìf ýöü hävé ßïllïng qüéstïöns, pléäsé réäd thé FÀQ ({faq_url}) ör çöntäçt "
+"{billing_email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "If you have billing questions, please contact {billing_email}."
+msgstr ""
+"Ìf ýöü hävé ßïllïng qüéstïöns, pléäsé çöntäçt {billing_email}. Ⱡ'σяєм ιρѕυм "
+"∂#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"{order_placed_by} placed an order and mentioned your name as the "
+"Organization contact."
+msgstr ""
+"{order_placed_by} pläçéd än ördér änd méntïönéd ýöür nämé äs thé "
+"Örgänïzätïön çöntäçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"{order_placed_by} placed an order and mentioned your name as the additional "
+"receipt recipient."
+msgstr ""
+"{order_placed_by} pläçéd än ördér änd méntïönéd ýöür nämé äs thé äddïtïönäl "
+"réçéïpt réçïpïént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "The items in your order are:"
+msgstr "Thé ïtéms ïn ýöür ördér äré: Ⱡ'σяєм #"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Quantity - Description - Price"
+msgstr "Qüäntïtý - Désçrïptïön - Prïçé Ⱡ'σяєм #"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Total billed to credit/debit card: {currency_symbol}{total_cost}"
+msgstr ""
+"Tötäl ßïlléd tö çrédït/déßït çärd: {currency_symbol}{total_cost} Ⱡ'σяєм "
+"ιρѕυ#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Company Name:"
+msgstr "Çömpäný Nämé: Ⱡ'#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Purchase Order Number:"
+msgstr "Pürçhäsé Ördér Nümßér: Ⱡ'σяє#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Company Contact Name:"
+msgstr "Çömpäný Çöntäçt Nämé: Ⱡ'σя#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Company Contact Email:"
+msgstr "Çömpäný Çöntäçt Émäïl: Ⱡ'σяє#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Recipient Name:"
+msgstr "Réçïpïént Nämé: Ⱡ'#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Recipient Email:"
+msgstr "Réçïpïént Émäïl: Ⱡ'σ#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "#:"
+msgstr "#: Ⱡ'#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Order Number: {order_number}"
+msgstr "Ördér Nümßér: {order_number} Ⱡ'σ#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"A CSV file of your registration URLs is attached. Please distribute "
+"registration URLs to each student planning to enroll using the email "
+"template below."
+msgstr ""
+"À ÇSV fïlé öf ýöür régïsträtïön ÛRLs ïs ättäçhéd. Pléäsé dïstrïßüté "
+"régïsträtïön ÛRLs tö éäçh stüdént plännïng tö énröll üsïng thé émäïl "
+"témpläté ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
+msgid "Warm regards,"
+msgstr "Wärm régärds, Ⱡ'#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(1) Register for an account at <a href='https://{site_name}' "
+">https://{site_name}</a>."
+msgstr ""
+"(1) Régïstér för än äççöünt ät <a href='https://{site_name}' "
+">https://{site_name}</a>. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(2) Once registered, copy the redeem URL and paste it in your web browser."
+msgstr ""
+"(2) Önçé régïstéréd, çöpý thé rédéém ÛRL änd pästé ït ïn ýöür wéß ßröwsér. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(3) On the enrollment confirmation page, Click the 'Activate Enrollment "
+"Code' button. This will show the enrollment confirmation."
+msgstr ""
+"(3) Ön thé énröllmént çönfïrmätïön pägé, Çlïçk thé 'Àçtïväté Énröllmént "
+"Çödé' ßüttön. Thïs wïll shöw thé énröllmént çönfïrmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(4) You should be able to click on 'view course' button or see your course "
+"on your student dashboard at <a "
+"href='https://{dashboard_url}'>https://{dashboard_url}</a>"
+msgstr ""
+"(4) Ýöü shöüld ßé äßlé tö çlïçk ön 'vïéw çöürsé' ßüttön ör séé ýöür çöürsé "
+"ön ýöür stüdént däshßöärd ät <a "
+"href='https://{dashboard_url}'>https://{dashboard_url}</a> Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid ""
+"(5) Course materials will not be available until the course start date."
+msgstr ""
+"(5) Çöürsé mätérïäls wïll nöt ßé äväïläßlé üntïl thé çöürsé stärt däté. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -11632,45 +11904,8 @@ msgstr ""
 "{merchant_name}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/emails/order_confirmation_email.txt
-msgid ""
-"If you have billing questions, please read the FAQ ({faq_url}) or contact "
-"{billing_email}."
-msgstr ""
-"Ìf ýöü hävé ßïllïng qüéstïöns, pléäsé réäd thé FÀQ ({faq_url}) ör çöntäçt "
-"{billing_email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "If you have billing questions, please contact {billing_email}."
-msgstr ""
-"Ìf ýöü hävé ßïllïng qüéstïöns, pléäsé çöntäçt {billing_email}. Ⱡ'σяєм ιρѕυм "
-"∂#"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "-The {platform_name} Team"
-msgstr "-Thé {platform_name} Téäm Ⱡ'#"
-
-#: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
 msgstr "Ýöür ördér nümßér ïs: {order_number} Ⱡ'σяєм#"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "The items in your order are:"
-msgstr "Thé ïtéms ïn ýöür ördér äré: Ⱡ'σяєм #"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "Quantity - Description - Price"
-msgstr "Qüäntïtý - Désçrïptïön - Prïçé Ⱡ'σяєм #"
-
-#: lms/templates/emails/order_confirmation_email.txt
-msgid "Total billed to credit/debit card: {currency_symbol}{total_cost}"
-msgstr ""
-"Tötäl ßïlléd tö çrédït/déßït çärd: {currency_symbol}{total_cost} Ⱡ'σяєм "
-"ιρѕυ#"
-
-#: lms/templates/emails/order_confirmation_email.txt
-#: lms/templates/shoppingcart/receipt.html
-msgid "#:"
-msgstr "#: Ⱡ'#"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Thank you for your purchase of {course_name}!"
@@ -12009,6 +12244,7 @@ msgstr "Skïp Ⱡ'σяєм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Add Coupon"
 msgstr "Àdd Çöüpön Ⱡ#"
@@ -12050,6 +12286,8 @@ msgid "Honor"
 msgstr "Hönör Ⱡ'σяєм ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "Tötäl Ⱡ'σяєм ι#"
@@ -12317,8 +12555,12 @@ msgstr ""
 "ιρѕυм ∂σłσя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Download All e-Commerce Sales"
-msgstr "Döwnlöäd Àll é-Çömmérçé Sälés Ⱡ'σяєм #"
+msgid "Download All Invoice Sales"
+msgstr "Döwnlöäd Àll Ìnvöïçé Sälés Ⱡ'σяєм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download All Order Sales"
+msgstr "Döwnlöäd Àll Ördér Sälés Ⱡ'σяє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Enter the invoice number to invalidate or re-validate sale"
@@ -12537,6 +12779,7 @@ msgid "What is the company the seats were sold to?"
 msgstr "Whät ïs thé çömpäný thé séäts wéré söld tö? Ⱡ'σяєм ιρѕυм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/billing_details.html
 msgid "Organization Contact"
 msgstr "Örgänïzätïön Çöntäçt Ⱡ'σя#"
 
@@ -12737,6 +12980,27 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Enroll"
 msgstr "Énröll Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Register/Enroll Students"
+msgstr "Régïstér/Énröll Stüdénts Ⱡ'σяє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"To register and enroll a list of users in this course, choose a CSV file "
+"that contains the following columns in this exact order: email, username, "
+"name, and country. Please include one student per row and do not include any"
+" headers, footers, or blank lines."
+msgstr ""
+"Tö régïstér änd énröll ä lïst öf üsérs ïn thïs çöürsé, çhöösé ä ÇSV fïlé "
+"thät çöntäïns thé föllöwïng çölümns ïn thïs éxäçt ördér: émäïl, üsérnämé, "
+"nämé, änd çöüntrý. Pléäsé ïnçlüdé öné stüdént pér röw änd dö nöt ïnçlüdé äný"
+" héädérs, föötérs, ör ßlänk lïnés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Upload CSV"
+msgstr "Ûplöäd ÇSV Ⱡ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Beta Tester Addition"
@@ -13479,6 +13743,65 @@ msgstr ""
 "äddréss ýöü süßmïttéd. Ýöü shöüld ßé réçéïvïng ït shörtlý. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Billing Details"
+msgstr "Bïllïng Détäïls Ⱡ'#"
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid ""
+"You can proceed to payment at any point in time. Any additional information "
+"you provide will be included in your receipt."
+msgstr ""
+"Ýöü çän pröçééd tö päýmént ät äný pöïnt ïn tïmé. Àný äddïtïönäl ïnförmätïön "
+"ýöü prövïdé wïll ßé ïnçlüdéd ïn ýöür réçéïpt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Purchasing Organizational Details"
+msgstr "Pürçhäsïng Örgänïzätïönäl Détäïls Ⱡ'σяєм ι#"
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Purchasing organization"
+msgstr "Pürçhäsïng örgänïzätïön Ⱡ'σяє#"
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Purchase order number (if any)"
+msgstr "Pürçhäsé ördér nümßér (ïf äný) Ⱡ'σяєм #"
+
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/billing_details.html
+msgid "email@example.com"
+msgstr "émäïl@éxämplé.çöm Ⱡ'σ#"
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Additional Receipt Recipient"
+msgstr "Àddïtïönäl Réçéïpt Réçïpïént Ⱡ'σяєм #"
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid ""
+"If no additional billing details are populated the payment confirmation will"
+" be sent to the user making the purchase"
+msgstr ""
+"Ìf nö äddïtïönäl ßïllïng détäïls äré pöpülätéd thé päýmént çönfïrmätïön wïll"
+" ßé sént tö thé üsér mäkïng thé pürçhäsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: lms/templates/shoppingcart/billing_details.html
+msgid "Payment processing occurs on a separate secure site."
+msgstr "Päýmént pröçéssïng öççürs ön ä sépäräté séçüré sïté. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Your Shopping cart is currently empty."
+msgstr "Ýöür Shöppïng çärt ïs çürréntlý émptý. Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "View Courses"
+msgstr "Vïéw Çöürsés Ⱡ#"
+
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Data"
 msgstr "Döwnlöäd ÇSV Dätä Ⱡ'σ#"
@@ -13522,71 +13845,162 @@ msgstr "Päýmént Érrör Ⱡ'#"
 msgid "There was an error processing your order!"
 msgstr "Théré wäs än érrör pröçéssïng ýöür ördér! Ⱡ'σяєм ιρѕυ#"
 
-#: lms/templates/shoppingcart/list.html
-msgid "Your Shopping Cart"
-msgstr "Ýöür Shöppïng Çärt Ⱡ'σ#"
-
-#: lms/templates/shoppingcart/list.html
-msgid "Your selected items:"
-msgstr "Ýöür séléçtéd ïtéms: Ⱡ'σя#"
-
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Price"
-msgstr "Prïçé Ⱡ'σяєм ι#"
-
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Total Amount"
-msgstr "Tötäl Àmöünt Ⱡ#"
-
-#: lms/templates/shoppingcart/list.html
-msgid "You have selected no items for purchase."
-msgstr "Ýöü hävé séléçtéd nö ïtéms för pürçhäsé. Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Register for [Course Name] | Receipt (Order"
-msgstr "Régïstér för [Çöürsé Nämé] | Réçéïpt (Ördér Ⱡ'σяєм ιρѕυм#"
-
 #: lms/templates/shoppingcart/receipt.html
 msgid "Thank you for your Purchase!"
 msgstr "Thänk ýöü för ýöür Pürçhäsé! Ⱡ'σяєм #"
 
 #: lms/templates/shoppingcart/receipt.html
+msgid "View Dashboard"
+msgstr "Vïéw Däshßöärd Ⱡ'#"
+
+#: lms/templates/shoppingcart/receipt.html
 msgid ""
-"Please print this receipt page for your records. You should also have "
-"received a receipt in your email."
+"You have successfully been enrolled for <b>{appended_course_names}</b>. The "
+"following receipt has been emailed to "
+"<strong>{appended_recipient_emails}</strong>"
 msgstr ""
-"Pléäsé prïnt thïs réçéïpt pägé för ýöür réçörds. Ýöü shöüld älsö hävé "
-"réçéïvéd ä réçéïpt ïn ýöür émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+"Ýöü hävé süççéssfüllý ßéén énrölléd för <b>{appended_course_names}</b>. Thé "
+"föllöwïng réçéïpt häs ßéén émäïléd tö "
+"<strong>{appended_recipient_emails}</strong> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σ#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "{platform_name} ({site_name}) Electronic Receipt"
-msgstr "{platform_name} ({site_name}) Éléçtrönïç Réçéïpt Ⱡ'σяєм #"
+msgid ""
+"You have successfully purchased <b>{total_registration_codes} course "
+"registration codes</b> for <b>{appended_course_names}. </b>The following "
+"receipt has been emailed to <strong>{appended_recipient_emails}</strong>"
+msgstr ""
+"Ýöü hävé süççéssfüllý pürçhäséd <b>{total_registration_codes} çöürsé "
+"régïsträtïön çödés</b> för <b>{appended_course_names}. </b>Thé föllöwïng "
+"réçéïpt häs ßéén émäïléd tö <strong>{appended_recipient_emails}</strong> "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Order #"
-msgstr "Ördér # #"
+msgid ""
+"Please send each professional one of these unique registration codes to "
+"enroll into the course. The confirmation/receipt email you will receive has "
+"an example email template with directions for the individuals enrolling."
+msgstr ""
+"Pléäsé sénd éäçh pröféssïönäl öné öf thésé ünïqüé régïsträtïön çödés tö "
+"énröll ïntö thé çöürsé. Thé çönfïrmätïön/réçéïpt émäïl ýöü wïll réçéïvé häs "
+"än éxämplé émäïl témpläté wïth dïréçtïöns för thé ïndïvïdüäls énröllïng. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕ#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Date:"
-msgstr "Däté: Ⱡ'σяєм ι#"
+msgid "Enrollment Code"
+msgstr "Énröllmént Çödé Ⱡ'#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Items ordered:"
-msgstr "Ìtéms ördéréd: Ⱡ'#"
+msgid "Enrollment Link"
+msgstr "Énröllmént Lïnk Ⱡ'#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Qty"
-msgstr "Qtý Ⱡ'σя#"
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{course_name}"
+msgstr "{course_name} Ⱡ'σя#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "URL"
-msgstr "ÛRL Ⱡ'σя#"
+msgid "Invoice"
+msgstr "Ìnvöïçé #"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Unit Price"
-msgstr "Ûnït Prïçé Ⱡ#"
+msgid "Date of purchase"
+msgstr "Däté öf pürçhäsé Ⱡ'σ#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Print Receipt"
+msgstr "Prïnt Réçéïpt Ⱡ'#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Billed To Details"
+msgstr "Bïlléd Tö Détäïls Ⱡ'σ#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Company Name"
+msgstr "Çömpäný Nämé Ⱡ#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "{company_name}"
+msgstr "{company_name} Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Purchase Order Number"
+msgstr "Pürçhäsé Ördér Nümßér Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "{customer_reference_number}"
+msgstr "{customer_reference_number} Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Company Contact Name"
+msgstr "Çömpäný Çöntäçt Nämé Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "{company_contact_name}"
+msgstr "{company_contact_name} Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Company Contact Email"
+msgstr "Çömpäný Çöntäçt Émäïl Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Recipient Name"
+msgstr "Réçïpïént Nämé Ⱡ'#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "{recipient_name}"
+msgstr "{recipient_name} Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Recipient Email"
+msgstr "Réçïpïént Émäïl Ⱡ'#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Card Type"
+msgstr "Çärd Týpé #"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Credit Card Number"
+msgstr "Çrédït Çärd Nümßér Ⱡ'σ#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Address 1"
+msgstr "Àddréss 1 #"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Address 2"
+msgstr "Àddréss 2 #"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "State"
+msgstr "Stäté Ⱡ'σяєм ι#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Registration for"
+msgstr "Régïsträtïön för Ⱡ'σ#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "Course Dates"
+msgstr "Çöürsé Dätés Ⱡ#"
+
+#: lms/templates/shoppingcart/receipt.html
+msgid " {course_name} "
+msgstr " {course_name}  Ⱡ'σяєм ι#"
+
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/shopping_cart.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Price per student:"
+msgstr "Prïçé pér stüdént: Ⱡ'σ#"
+
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Discount Applied:"
+msgstr "Dïsçöünt Àpplïéd: Ⱡ'σ#"
 
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
@@ -13596,10 +14010,6 @@ msgid "Note: items with strikethough like <del>this</del> have been refunded."
 msgstr ""
 "Nöté: ïtéms wïth strïkéthöügh lïké <del>thïs</del> hävé ßéén réfündéd. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "Billed To:"
-msgstr "Bïlléd Tö: Ⱡ#"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "Confirm Enrollment"
@@ -13616,10 +14026,6 @@ msgstr "Çönfïrm ýöür énröllmént för: Ⱡ'σяєм #"
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "course dates"
 msgstr "çöürsé dätés Ⱡ#"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{course_name}"
-msgstr "{course_name} Ⱡ'σя#"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{start_date}"
@@ -13671,6 +14077,75 @@ msgstr ""
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "View Course &nbsp; &nbsp; &#x25b8;"
 msgstr "Vïéw Çöürsé &nbsp; &nbsp; &#x25b8; Ⱡ'σяє#"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Registration for:"
+msgstr "Régïsträtïön för: Ⱡ'σ#"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Course Dates:"
+msgstr "Çöürsé Dätés: Ⱡ'#"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Students:"
+msgstr "Stüdénts: #"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "code has been applied"
+msgstr "çödé häs ßéén äpplïéd Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "Total:"
+msgstr "Tötäl: Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid ""
+"After this purchase is complete, a receipt is generated with relative "
+"billing details and registration codes for students."
+msgstr ""
+"Àftér thïs pürçhäsé ïs çömplété, ä réçéïpt ïs générätéd wïth rélätïvé "
+"ßïllïng détäïls änd régïsträtïön çödés för stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєт#"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "After this purchase is complete,"
+msgstr "Àftér thïs pürçhäsé ïs çömplété, Ⱡ'σяєм ι#"
+
+#: lms/templates/shoppingcart/shopping_cart.html
+msgid "will be enrolled in this course."
+msgstr "wïll ßé énrölléd ïn thïs çöürsé. Ⱡ'σяєм ι#"
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Shopping cart"
+msgstr "Shöppïng çärt Ⱡ'#"
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "{platform_name} -  Shopping Cart"
+msgstr "{platform_name} -  Shöppïng Çärt Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/reverification_confirmation.html
+#: lms/templates/verify_student/show_requirements.html
+#: lms/templates/verify_student/verified.html
+msgid "Review"
+msgstr "Révïéw Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Payment"
+msgstr "Päýmént #"
+
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/reverification_confirmation.html
+#: lms/templates/verify_student/show_requirements.html
+#: lms/templates/verify_student/verified.html
+msgid "Confirmation"
+msgstr "Çönfïrmätïön Ⱡ#"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
@@ -13726,29 +14201,11 @@ msgid "Take ID Photo"
 msgstr "Täké ÌD Phötö Ⱡ'#"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
-msgid "Review"
-msgstr "Révïéw Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/show_requirements.html
 #: lms/templates/verify_student/verified.html
 msgid "Make Payment"
 msgstr "Mäké Päýmént Ⱡ#"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
-msgid "Confirmation"
-msgstr "Çönfïrmätïön Ⱡ#"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Congratulations! You are now verified on "
@@ -13980,7 +14437,6 @@ msgstr ""
 msgid "Student Account"
 msgstr "Stüdént Àççöünt Ⱡ'#"
 
-#: lms/templates/student_profile/index.html
 #: lms/templates/student_profile/index.html
 msgid "Student Profile"
 msgstr "Stüdént Pröfïlé Ⱡ'#"
@@ -16552,40 +17008,6 @@ msgstr ""
 "stüdénts' prößlém sçörés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσ#"
 
-#: cms/templates/import.html
-msgid "There was an error during the upload process."
-msgstr "Théré wäs än érrör dürïng thé üplöäd pröçéss. Ⱡ'σяєм ιρѕυм#"
-
-#: cms/templates/import.html
-msgid "There was an error while unpacking the file."
-msgstr "Théré wäs än érrör whïlé ünpäçkïng thé fïlé. Ⱡ'σяєм ιρѕυм#"
-
-#: cms/templates/import.html
-msgid "There was an error while verifying the file you submitted."
-msgstr ""
-"Théré wäs än érrör whïlé vérïfýïng thé fïlé ýöü süßmïttéd. Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
-
-#: cms/templates/import.html
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-"Théré wäs än érrör whïlé ïmpörtïng thé néw çöürsé tö öür dätäßäsé. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
-
-#: cms/templates/import.html
-msgid "Your import has failed."
-msgstr "Ýöür ïmpört häs fäïléd. Ⱡ'σяє#"
-
-#: cms/templates/import.html cms/templates/import.html
-msgid "Choose new file"
-msgstr "Çhöösé néw fïlé Ⱡ'#"
-
-#: cms/templates/import.html
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-"Ýöür ïmpört ïs ïn prögréss; nävïgätïng äwäý wïll äßört ït. Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
-
 #: cms/templates/index.html cms/templates/index.html
 #: cms/templates/widgets/header.html
 msgid "My Courses"
@@ -17434,14 +17856,6 @@ msgstr ""
 "єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρ#"
 
 #: cms/templates/settings_advanced.html
-msgid "Hide Deprecated Settings"
-msgstr "Hïdé Dépréçätéd Séttïngs Ⱡ'σяє#"
-
-#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
-msgid "Show Deprecated Settings"
-msgstr "Shöw Dépréçätéd Séttïngs Ⱡ'σяє#"
-
-#: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
 msgstr "Ýöür pölïçý çhängés hävé ßéén sävéd. Ⱡ'σяєм ιρ#"
 
@@ -17462,6 +17876,10 @@ msgid ""
 msgstr ""
 "<strong>Wärnïng</strong>: Dö nöt mödïfý thésé pölïçïés ünléss ýöü äré "
 "fämïlïär wïth théïr pürpösé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/settings_advanced.html
+msgid "Show Deprecated Settings"
+msgstr "Shöw Dépréçätéd Séttïngs Ⱡ'σяє#"
 
 #: cms/templates/settings_advanced.html
 msgid "What do advanced settings do?"
@@ -17579,12 +17997,6 @@ msgstr "Éxpänd ör Çölläpsé Ⱡ'σ#"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "Thïs ßlöçk çöntäïns mültïplé çömpönénts. Ⱡ'σяєм ιρѕυ#"
-
-#: cms/templates/textbooks.html
-msgid "You have unsaved changes. Do you really want to leave this page?"
-msgstr ""
-"Ýöü hävé ünsävéd çhängés. Dö ýöü réällý wänt tö léävé thïs pägé? Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
 
 #: cms/templates/textbooks.html
 msgid "New Textbook"
