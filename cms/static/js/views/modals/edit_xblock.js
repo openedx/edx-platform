@@ -149,7 +149,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                     data = editorView.getXModuleData();
                 event.preventDefault();
                 if (data) {
-                    ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+                    ViewUtils.runOperationShowingMessage(gettext('Saving…'),
                         function() {
                             return xblockInfo.save(data);
                         }).done(function() {

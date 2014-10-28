@@ -8,7 +8,7 @@ window.SplitTestAuthorView = function (runtime, element) {
             runtime.notify('save', {
                 state: 'start',
                 element: element,
-                message: gettext('Creating missing groups&hellip;')
+                message: gettext('Creating missing groups…')
             });
             $.post(runtime.handlerUrl(element, 'add_missing_groups')).done(function() {
                 runtime.notify('save', {
