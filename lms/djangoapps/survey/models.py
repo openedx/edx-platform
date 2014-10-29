@@ -46,7 +46,6 @@ class SurveyForm(TimeStampedModel):
         # now call the actual save method
         super(SurveyForm, self).save(*args, **kwargs)
 
-
     @classmethod
     def create(cls, name, form, update_if_exists=False):
         """
