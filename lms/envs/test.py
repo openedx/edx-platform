@@ -530,6 +530,7 @@ if FEATURES.get('STUDENT_PROGRESS', False) and "'progress'" not in INSTALLED_APP
     INSTALLED_APPS += ('progress',)
 
 ############# Organizations app #################
+FEATURES['ORGANIZATIONS_APP'] = True
 if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
     INSTALLED_APPS += ('organizations',)
 

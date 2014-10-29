@@ -68,6 +68,13 @@ class GenerateProgressEntriesTests(ModuleStoreTestCase):
             display_name="lab problem 1",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Lab"}
         )
+        self.problem4 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name="lab problem 2",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Lab"}
+        )
 
         # Create some users and enroll them
         self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(3)]
@@ -124,6 +131,15 @@ class GenerateProgressEntriesTests(ModuleStoreTestCase):
         user0_entry = StudentProgress.objects.get(user=self.users[0])
         self.assertEqual(user0_entry.completions, 3)
 
+        # The first user will be skipped this next time around because they already have a progress record
+        # and their completions have not changed, and we need to test this valid use case ('skipped')
+        # We also need to test the 'updated' use case, so we'll add a new completion record for the
+        # second user which will alter their count on this next cycle and kick off the update flow
+        completion, created = CourseModuleCompletion.objects.get_or_create(user=self.users[1],
+                                                                           course_id=self.course.id,
+                                                                           content_id=unicode(self.problem4.location),
+                                                                           stage=None)
+
         # Run the command across all users, but just for the specified course
         generate_progress_entries.Command().handle(course_ids=course_ids)
 
@@ -131,11 +147,11 @@ class GenerateProgressEntriesTests(ModuleStoreTestCase):
         current_entries = StudentProgress.objects.all()
         self.assertEqual(len(current_entries), 3)
         current_entries = StudentProgressHistory.objects.all()
-        self.assertEqual(len(current_entries), 3)
+        self.assertEqual(len(current_entries), 4)
         user0_entry = StudentProgress.objects.get(user=self.users[0])
         self.assertEqual(user0_entry.completions, 3)
         user1_entry = StudentProgress.objects.get(user=self.users[1])
-        self.assertEqual(user1_entry.completions, 3)
+        self.assertEqual(user1_entry.completions, 4)
         user2_entry = StudentProgress.objects.get(user=self.users[2])
         self.assertEqual(user2_entry.completions, 3)
 
