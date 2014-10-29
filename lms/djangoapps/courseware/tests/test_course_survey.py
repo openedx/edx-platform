@@ -65,7 +65,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
 
     def _assert_survey_redirect(self, course):
         """
-        Helper method that all know redirect points behaves as expected
+        Helper method to assert that all known redirect points do redirect as expected
         """
         for view_name in ['courseware', 'info', 'progress']:
             resp = self.client.get(
@@ -80,8 +80,11 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
             )
 
     def _assert_no_redirect(self, course):
+        """
+        Helper method to asswer that all known conditionally redirect points do
+        not redirect as expected
+        """
         for view_name in ['courseware', 'info', 'progress']:
-            print '*** view_name={}'.format(view_name)
             resp = self.client.get(
                 reverse(
                     view_name,
