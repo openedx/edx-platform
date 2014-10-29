@@ -63,33 +63,46 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         self.view_url = reverse('view_survey', args=[self.test_survey_name])
         self.postback_url = reverse('submit_answers', args=[self.test_survey_name])
 
+    def _assert_survey_redirect(self, course):
+        """
+        Helper method that all know redirect points behaves as expected
+        """
+        for view_name in ['courseware', 'info', 'progress']:
+            resp = self.client.get(
+                reverse(
+                    view_name,
+                    kwargs={'course_id': unicode(course.id)}
+                )
+            )
+            self.assertRedirects(
+                resp,
+                reverse('course_survey', kwargs={'course_id': unicode(course.id)})
+            )
+
+    def _assert_no_redirect(self, course):
+        for view_name in ['courseware', 'info', 'progress']:
+            print '*** view_name={}'.format(view_name)
+            resp = self.client.get(
+                reverse(
+                    view_name,
+                    kwargs={'course_id': unicode(course.id)}
+                )
+            )
+            print '*** resp={}'.format(resp)
+            self.assertEquals(resp.status_code, 200)
+
     def test_visiting_course_without_survey(self):
         """
         Verifies that going to the courseware which does not have a survey does
         not redirect to a survey
         """
-        resp = self.client.get(
-            reverse(
-                'courseware',
-                kwargs={'course_id': unicode(self.course_without_survey.id)}
-            )
-        )
-        self.assertEquals(resp.status_code, 200)
+        self._assert_no_redirect(self.course_without_survey)
 
     def test_visiting_course_with_survey_redirects(self):
         """
         Verifies that going to the courseware with an unanswered survey, redirects to the survey
         """
-        resp = self.client.get(
-            reverse(
-                'courseware',
-                kwargs={'course_id': unicode(self.course.id)}
-            )
-        )
-        self.assertRedirects(
-            resp,
-            reverse('course_survey', kwargs={'course_id': unicode(self.course.id)})
-        )
+        self._assert_survey_redirect(self.course)
 
     def test_visiting_course_with_existing_answers(self):
         """
@@ -101,26 +114,13 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         )
         self.assertEquals(resp.status_code, 200)
 
-        resp = self.client.get(
-            reverse(
-                'courseware',
-                kwargs={'course_id': unicode(self.course.id)}
-            )
-        )
-        self.assertEquals(resp.status_code, 200)
+        self._assert_no_redirect(self.course)
 
     def test_visiting_course_with_bogus_survey(self):
         """
         Verifies that going to the courseware with a required, but non-existing survey, does not redirect
         """
-
-        resp = self.client.get(
-            reverse(
-                'courseware',
-                kwargs={'course_id': unicode(self.course_with_bogus_survey.id)}
-            )
-        )
-        self.assertEquals(resp.status_code, 200)
+        self._assert_no_redirect(self.course_with_bogus_survey)
 
     def test_visiting_survey_with_bogus_survey_name(self):
         """
@@ -135,7 +135,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         )
         self.assertRedirects(
             resp,
-            reverse('courseware', kwargs={'course_id': self.course_with_bogus_survey.id.to_deprecated_string()})
+            reverse('info', kwargs={'course_id': unicode(self.course_with_bogus_survey.id)})
         )
 
     def test_visiting_survey_with_no_course_survey(self):
@@ -151,5 +151,5 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         )
         self.assertRedirects(
             resp,
-            reverse('courseware', kwargs={'course_id': unicode(self.course_without_survey.id)})
+            reverse('info', kwargs={'course_id': unicode(self.course_without_survey.id)})
         )

@@ -314,9 +314,8 @@ def _index_bulk_op(request, user, course_key, chapter, section, position):
 
     # check to see if there is a required survey that must be taken before
     # the user can access the course.
-    if survey.utils.is_survey_required_for_course(course):
-        if not survey.utils.has_answered_required_survey(course, user):
-            return redirect(reverse('course_survey', args=[unicode(course.id)]))
+    if survey.utils.must_answer_survey(course, user):
+        return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
     masq = setup_masquerade(request, staff_access)
 
@@ -581,6 +580,12 @@ def course_info(request, course_id):
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
+
+        # check to see if there is a required survey that must be taken before
+        # the user can access the course.
+        if survey.utils.must_answer_survey(course, request.user):
+            return redirect(reverse('course_survey', args=[unicode(course.id)]))
+
         staff_access = has_access(request.user, 'staff', course)
         masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
         reverifications = fetch_reverify_banner_info(request, course_key)
@@ -846,6 +851,12 @@ def _progress(request, course_key, student_id):
     Course staff are allowed to see the progress of students in their class.
     """
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
+
+    # check to see if there is a required survey that must be taken before
+    # the user can access the course.
+    if survey.utils.must_answer_survey(course, request.user):
+        return redirect(reverse('course_survey', args=[unicode(course.id)]))
+
     staff_access = has_access(request.user, 'staff', course)
 
     if student_id is None or student_id == request.user.id:
@@ -1082,7 +1093,7 @@ def course_survey(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
-    redirect_url = reverse('courseware', args=[course_id])
+    redirect_url = reverse('info', args=[course_id])
 
     # if there is no Survey associated with this course,
     # then redirect to the course instead

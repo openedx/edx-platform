@@ -17,11 +17,10 @@ def is_survey_required_for_course(course_descriptor):
         SurveyForm.get(course_descriptor.course_survey_name, throw_if_not_found=False)
 
 
-def has_answered_required_survey(course_descriptor, user):
+def must_answer_survey(course_descriptor, user):
     """
     Returns whether a user needs to answer a required course
     """
-
     if not is_survey_required_for_course(course_descriptor):
         return False
 
@@ -30,4 +29,4 @@ def has_answered_required_survey(course_descriptor, user):
     survey = SurveyForm.get(course_descriptor.course_survey_name)
 
     # survey is required and it exists, let's see if user has answered the survey
-    return SurveyAnswer.do_survey_answers_exist(survey, user)
+    return not SurveyAnswer.do_survey_answers_exist(survey, user)
