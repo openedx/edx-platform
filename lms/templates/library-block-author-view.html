@@ -1,0 +1,17 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+<div class="xblock-header-secondary">
+    % if library_status == LibraryStatus.OK:
+        <p>${_('This component will be replaced by {mode} {max_count} components from the {num_children} matching components from {lib_names}.').format(mode=mode, max_count=max_count, num_children=num_children, lib_names=', '.join(library_names))}</p>
+        % if update_status == UpdateStatus.NEEDED:
+            <p><strong>${_('This component is out of date.')}</strong> <a href="#" class="library-update-btn">↻ ${_('Update now with latest components from the library')}</a></p>
+        % elif update_status == UpdateStatus.UP_TO_DATE:
+            <p>${_(u'✓ Up to date.')}</p>
+        % endif
+    % elif library_status == LibraryStatus.NONE:
+        <p>${_('No library or filters configured. Press "Edit" to configure.')}</p>
+    % else:
+        <p>${_('Library is invalid, corrupt, or has been deleted.')}</p>
+    % endif
+</div>
