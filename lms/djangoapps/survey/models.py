@@ -3,6 +3,7 @@ Models to support Course Surveys feature
 """
 
 import logging
+from lxml import etree
 from collections import OrderedDict
 from django.db import models
 from student.models import User
@@ -91,8 +92,23 @@ class SurveyForm(TimeStampedModel):
         """
         Returns a list of defined field names for all answers in a survey. This can be
         helpful for reporting like features, i.e. adding headers to the reports
+        This is taken from the set of <input> fields inside the form.
         """
-        return SurveyAnswer.get_field_names(self)
+
+        names = []
+
+        # make sure the form is wrap in some outer single element
+        # otherwise lxml can't parse it
+        # NOTE: This wrapping doesn't change out ability to query it
+        tree = etree.fromstring('<div>{}</div>'.format(self.form))
+
+        input_fields = tree.findall('input') + tree.findall('select')
+
+        for input_field in input_fields:
+            if 'name' in input_field.keys() and input_field.attrib['name'] not in names:
+                names.append(input_field.attrib['name'])
+
+        return names
 
 
 class SurveyAnswer(TimeStampedModel):
@@ -168,17 +184,3 @@ class SurveyAnswer(TimeStampedModel):
             answer, __ = SurveyAnswer.objects.get_or_create(user=user, form=form, field_name=name)
             answer.field_value = value
             answer.save()
-
-    @classmethod
-    def get_field_names(cls, form):
-        """
-        Returns a list of unique field names for a given Survey.
-        This can be useful for formatting reports, e.g. putting table headers on each column
-        """
-        field_names = SurveyAnswer.objects.filter(form=form).values('field_name').distinct()
-
-        results = []
-        for name in field_names:
-            results.append(name['field_name'])
-
-        return results

@@ -89,20 +89,17 @@ def submit_answers(request, survey_name):
     # in a hidden form field
     redirect_url = answers['_redirect_url'] if '_redirect_url' in answers else reverse('dashboard')
 
-    # remove the CSRF token and redirect_url from the post-back dictionary,
-    # so that we don't store it in the database as these are hidden form fields
-    if 'csrfmiddlewaretoken' in answers:
-        del answers['csrfmiddlewaretoken']
-    if '_redirect_url' in answers:
-        del answers['_redirect_url']
+    allowed_field_names = survey.get_field_names()
 
     # scrub the answers to make sure nothing malicious from the user gets stored in
     # our database, e.g. JavaScript
+    filtered_answers = {}
     for answer_key in answers.keys():
-        scrubbed_key = escape(answer_key)
-        answers[scrubbed_key] = escape(answers[answer_key])
+        # only allow known input fields
+        if answer_key in allowed_field_names:
+            filtered_answers[answer_key] = escape(answers[answer_key])
 
-    survey.save_user_answers(request.user, answers)
+    survey.save_user_answers(request.user, filtered_answers)
 
     response_params = json.dumps({
         # The HTTP end-point for the payment processor.

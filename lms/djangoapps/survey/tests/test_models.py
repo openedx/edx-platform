@@ -28,8 +28,8 @@ class SurveyModelsTests(TestCase):
         self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
 
         self.test_survey_name = 'TestForm'
-        self.test_form = '<input></input>'
-        self.test_form_update = '<input>updated</input>'
+        self.test_form = '<input name="field1" /><input name="field2" /><select name="ddl"><option>1</option></select>'
+        self.test_form_update = '<input name="field1" />'
 
         self.student_answers = OrderedDict({
             'field1': 'value1',
@@ -186,4 +186,4 @@ class SurveyModelsTests(TestCase):
 
         names = survey.get_field_names()
 
-        self.assertEqual(sorted(names), ['field1', 'field2'])
+        self.assertEqual(sorted(names), ['ddl', 'field1', 'field2'])

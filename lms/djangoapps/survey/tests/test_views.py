@@ -30,11 +30,12 @@ class SurveyViewsTests(TestCase):
         self.student = User.objects.create_user('student', 'student@test.com', self.password)
 
         self.test_survey_name = 'TestSurvey'
-        self.test_form = '<input></input>'
+        self.test_form = '<input name="field1" /><input name="field2" /><select name="ddl"><option>1</option></select>'
 
         self.student_answers = OrderedDict({
             u'field1': u'value1',
             u'field2': u'value2',
+            u'ddl': u'1',
         })
 
         self.course = CourseFactory.create(
@@ -125,9 +126,10 @@ class SurveyViewsTests(TestCase):
         answers = self.survey.get_answers(self.student)
         self.assertEquals(answers[self.student.id], self.student_answers)
 
-    def test_strip_hidden_fields(self):
+    def test_strip_extra_fields(self):
         """
-        Verify that the two known hidden fields are not stored as survey results
+        Verify that any not expected field name in the post-back is not stored
+        in the database
         """
         data = dict.copy(self.student_answers)
 
@@ -149,7 +151,7 @@ class SurveyViewsTests(TestCase):
         """
         data = dict.copy(self.student_answers)
 
-        data['something_malicious'] = '<script type="javascript">alert("Deleting filesystem...")</script>'
+        data['field1'] = '<script type="javascript">alert("Deleting filesystem...")</script>'
 
         resp = self.client.post(
             self.postback_url,
@@ -159,7 +161,7 @@ class SurveyViewsTests(TestCase):
         answers = self.survey.get_answers(self.student)
         self.assertEqual(
             '&lt;script type=&quot;javascript&quot;&gt;alert(&quot;Deleting filesystem...&quot;)&lt;/script&gt;',
-            answers[self.student.id]['something_malicious']
+            answers[self.student.id]['field1']
         )
 
     def test_round_trip(self):
