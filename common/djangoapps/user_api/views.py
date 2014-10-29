@@ -76,10 +76,10 @@ class LoginSessionView(APIView):
         form_desc.add_field(
             "email",
             field_type="email",
-            label=_(u"E-mail"),
-            placeholder=_(u"example: username@domain.com"),
+            label=_(u"Email"),
+            placeholder=_(u"username@domain.com"),
             instructions=_(
-                u"This is the e-mail address you used to register with {platform}"
+                u"The email address you used to register with {platform}"
             ).format(platform=settings.PLATFORM_NAME),
             restrictions={
                 "min_length": account_api.EMAIL_MIN_LENGTH,
@@ -255,10 +255,10 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "email",
             field_type="email",
-            label=_(u"E-mail"),
-            placeholder=_(u"example: username@domain.com"),
+            label=_(u"Email"),
+            placeholder=_(u"username@domain.com"),
             instructions=_(
-                u"This is the e-mail address you used to register with {platform}"
+                u"The email address you want to use with {platform}"
             ).format(platform=settings.PLATFORM_NAME),
             restrictions={
                 "min_length": account_api.EMAIL_MIN_LENGTH,
@@ -271,7 +271,7 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "name",
             label=_(u"Full Name"),
-            instructions=_(u"Needed for any certificates you may earn"),
+            instructions=_(u"The name that will appear on your certificates"),
             restrictions={
                 "max_length": profile_api.FULL_NAME_MAX_LENGTH,
             },
@@ -281,8 +281,8 @@ class RegistrationView(APIView):
     def _add_username_field(self, form_desc, required=True):
         form_desc.add_field(
             "username",
-            label=_(u"Public Username"),
-            instructions=_(u"Will be shown in any discussions or forums you participate in (cannot be changed)"),
+            label=_(u"Username"),
+            instructions=_(u"The name that will identify you in your courses"),
             restrictions={
                 "min_length": account_api.USERNAME_MIN_LENGTH,
                 "max_length": account_api.USERNAME_MAX_LENGTH,
@@ -340,7 +340,7 @@ class RegistrationView(APIView):
     def _add_goals_field(self, form_desc, required=True):
         form_desc.add_field(
             "goals",
-            label=_("Please share with us your reasons for registering with edX"),
+            label=_("If you'd like, tell us why you're interested in edX."),
             field_type="textarea",
             required=required
         )
