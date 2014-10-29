@@ -206,3 +206,14 @@ class TestLibraries(MixedSplitTestCase):
             with patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: []):
                 result = library.render(AUTHOR_VIEW, context)
         self.assertIn(message, result.content)
+
+    def test_xblock_in_lib_have_published_version_returns_false(self):
+        library = LibraryFactory.create(modulestore=self.store)
+        block = ItemFactory.create(
+            category="html",
+            parent_location=library.location,
+            user_id=self.user_id,
+            publish_item=False,
+            modulestore=self.store,
+        )
+        self.assertFalse(self.store.has_published_version(block))
