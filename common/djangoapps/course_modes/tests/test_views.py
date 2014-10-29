@@ -32,41 +32,33 @@ class CourseModeViewTest(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password="edx")
 
     @ddt.data(
-        # is_active?, enrollment_mode, upgrade?, redirect?
-        (True, 'verified', True, False),   # User has an active verified enrollment and is trying to upgrade
-        (True, 'verified', False, True),   # User has an active verified enrollment and is not trying to upgrade
-        (True, 'honor', True, False),      # User has an active honor enrollment and is trying to upgrade
-        (True, 'honor', False, False),     # User has an active honor enrollment and is not trying to upgrade
-        (True, 'audit', True, False),      # User has an active audit enrollment and is trying to upgrade
-        (True, 'audit', False, False),     # User has an active audit enrollment and is not trying to upgrade
-        (False, 'verified', True, True),   # User has an inactive verified enrollment and is trying to upgrade
-        (False, 'verified', False, True),  # User has an inactive verified enrollment and is not trying to upgrade
-        (False, 'honor', True, True),      # User has an inactive honor enrollment and is trying to upgrade
-        (False, 'honor', False, True),     # User has an inactive honor enrollment and is not trying to upgrade
-        (False, 'audit', True, True),      # User has an inactive audit enrollment and is trying to upgrade
-        (False, 'audit', False, True),     # User has an inactive audit enrollment and is not trying to upgrade
+        # is_active?, enrollment_mode, redirect?
+        (True, 'verified', True),
+        (True, 'honor', False),
+        (True, 'audit', False),
+        (False, 'verified', False),
+        (False, 'honor', False),
+        (False, 'audit', False),
+        (False, None, False),
     )
     @ddt.unpack
-    def test_redirect_to_dashboard(self, is_active, enrollment_mode, upgrade, redirect):
+    def test_redirect_to_dashboard(self, is_active, enrollment_mode, redirect):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory(mode_slug=mode, course_id=self.course.id)
 
         # Enroll the user in the test course
-        CourseEnrollmentFactory(
-            is_active=is_active,
-            mode=enrollment_mode,
-            course_id=self.course.id,
-            user=self.user
-        )
+        if enrollment_mode is not None:
+            CourseEnrollmentFactory(
+                is_active=is_active,
+                mode=enrollment_mode,
+                course_id=self.course.id,
+                user=self.user
+            )
 
         # Configure whether we're upgrading or not
-        get_params = {}
-        if upgrade:
-            get_params = {'upgrade': True}
-
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-        response = self.client.get(url, get_params)
+        response = self.client.get(url)
 
         # Check whether we were correctly redirected
         if redirect:
@@ -74,7 +66,19 @@ class CourseModeViewTest(ModuleStoreTestCase):
         else:
             self.assertEquals(response.status_code, 200)
 
-    def test_redirect_to_dashboard_no_enrollment(self):
+    def test_upgrade_copy(self):
+        # Create the course modes
+        for mode in ('audit', 'honor', 'verified'):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url, {"upgrade": True})
+
+        # Verify that the upgrade copy is displayed instead
+        # of the usual text.
+        self.assertContains(response, "Upgrade Your Enrollment")
+
+    def test_no_enrollment(self):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
             CourseModeFactory(mode_slug=mode, course_id=self.course.id)
@@ -83,7 +87,7 @@ class CourseModeViewTest(ModuleStoreTestCase):
         url = reverse('course_modes_choose', args=[unicode(self.course.id)])
         response = self.client.get(url)
 
-        self.assertRedirects(response, reverse('dashboard'))
+        self.assertEquals(response.status_code, 200)
 
     @ddt.data(
         '',
@@ -121,7 +125,7 @@ class CourseModeViewTest(ModuleStoreTestCase):
         # TODO: Fix it so that response.templates works w/ mako templates, and then assert
         # that the right template rendered
 
-    def test_professional_registration(self):
+    def test_professional_enrollment(self):
         # The only course mode is professional ed
         CourseModeFactory(mode_slug='professional', course_id=self.course.id)
 

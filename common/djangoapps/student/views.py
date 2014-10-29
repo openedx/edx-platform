@@ -93,6 +93,7 @@ from util.password_policy_validators import (
 )
 
 from third_party_auth import pipeline, provider
+from student.helpers import auth_pipeline_urls, set_logged_in_cookie
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
 
@@ -352,13 +353,15 @@ def signin_user(request):
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
+    course_id = request.GET.get('course_id')
     context = {
-        'course_id': request.GET.get('course_id'),
+        'course_id': course_id,
         'enrollment_action': request.GET.get('enrollment_action'),
         # Bool injected into JS to submit form if we're inside a running third-
         # party auth pipeline; distinct from the actual instance of the running
         # pipeline, if any.
         'pipeline_running': 'true' if pipeline.running(request) else 'false',
+        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, course_id=course_id),
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
@@ -380,12 +383,15 @@ def register_user(request, extra_context=None):
         # and registration is disabled.
         return external_auth.views.redirect_with_get('root', request.GET)
 
+    course_id = request.GET.get('course_id')
+
     context = {
-        'course_id': request.GET.get('course_id'),
+        'course_id': course_id,
         'email': '',
         'enrollment_action': request.GET.get('enrollment_action'),
         'name': '',
         'running_pipeline': None,
+        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, course_id=course_id),
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
@@ -393,10 +399,6 @@ def register_user(request, extra_context=None):
         'selected_provider': '',
         'username': '',
     }
-
-    # We save this so, later on, we can determine what course motivated a user's signup
-    # if they actually complete the registration process
-    request.session['registration_course_id'] = context['course_id']
 
     if extra_context is not None:
         context.update(extra_context)
@@ -798,14 +800,9 @@ def change_enrollment(request, check_access=True):
 
         available_modes = CourseMode.modes_for_course_dict(course_id)
 
-        # Handle professional ed as a special case.
-        # If professional ed is included in the list of available modes,
-        # then do NOT automatically enroll the student (we want them to pay first!)
-        # By convention, professional ed should be the *only* available course mode,
-        # if it's included at all -- anything else is a misconfiguration.  But if someone
-        # messes up and adds an additional course mode, we err on the side of NOT
-        # accidentally giving away free courses.
-        if "professional" not in available_modes:
+        # Check that auto enrollment is allowed for this course
+        # (= the course is NOT behind a paywall)
+        if CourseMode.can_auto_enroll(course_id):
             # Enroll the user using the default mode (honor)
             # We're assuming that users of the course enrollment table
             # will NOT try to look up the course enrollment model
@@ -821,7 +818,7 @@ def change_enrollment(request, check_access=True):
         # then send the user to the choose your track page.
         # (In the case of professional ed, this will redirect to a page that
         # funnels users directly into the verification / payment flow)
-        if len(available_modes) > 1 or "professional" in available_modes:
+        if CourseMode.has_verified_mode(available_modes):
             return HttpResponse(
                 reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
             )
@@ -902,6 +899,7 @@ def accounts_login(request):
 
     context = {
         'pipeline_running': 'false',
+        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
         'platform_name': settings.PLATFORM_NAME,
     }
     return render_to_response('login.html', context)
@@ -1053,14 +1051,12 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             'username': username,
         })
 
-        # If the user entered the flow via a specific course page, we track that
-        registration_course_id = request.session.get('registration_course_id')
         analytics.track(
             user.id,
             "edx.bi.user.account.authenticated",
             {
                 'category': "conversion",
-                'label': registration_course_id,
+                'label': request.POST.get('course_id'),
                 'provider': None
             },
             context={
@@ -1069,7 +1065,6 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                 }
             }
         )
-        request.session['registration_course_id'] = None
 
     if user is not None and user.is_active:
         try:
@@ -1097,25 +1092,9 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             "redirect_url": redirect_url,
         })
 
-        # set the login cookie for the edx marketing site
-        # we want this cookie to be accessed via javascript
-        # so httponly is set to None
-
-        if request.session.get_expire_at_browser_close():
-            max_age = None
-            expires = None
-        else:
-            max_age = request.session.get_expiry_age()
-            expires_time = time.time() + max_age
-            expires = cookie_date(expires_time)
-
-        response.set_cookie(
-            settings.EDXMKTG_COOKIE_NAME, 'true', max_age=max_age,
-            expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-            path='/', secure=None, httponly=None,
-        )
-
-        return response
+        # Ensure that the external marketing site can
+        # detect that the user is logged in.
+        return set_logged_in_cookie(request, response)
 
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
         AUDIT_LOG.warning(u"Login failed - Account not active for user.id: {0}, resending activation".format(user.id))
@@ -1128,6 +1107,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         "success": False,
         "value": not_activated_msg,
     })  # TODO: this should be status code 400  # pylint: disable=fixme
+
 
 
 @ensure_csrf_cookie
@@ -1536,13 +1516,12 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
             provider_name = current_provider.NAME
 
-        registration_course_id = request.session.get('registration_course_id')
         analytics.track(
             user.id,
             "edx.bi.user.account.registered",
             {
                 'category': 'conversion',
-                'label': registration_course_id,
+                'label': request.POST.get('course_id'),
                 'provider': provider_name
             },
             context={
@@ -1551,7 +1530,6 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
                 }
             }
         )
-        request.session['registration_course_id'] = None
 
     create_comments_service_user(user)
 
