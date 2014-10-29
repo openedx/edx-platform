@@ -156,8 +156,8 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                         var error = gettext("File {filename} exceeds maximum size of {maxFileSizeInMBs} MB")
                                     .replace("{filename}", filename)
                                     .replace("{maxFileSizeInMBs}", self.maxFileSizeInMBs)
-                        
-                        // disable second part of message for any falsy value, 
+
+                        // disable second part of message for any falsy value,
                         // which can be null or an empty string
                         if(self.maxFileSizeRedirectUrl) {
                             var instructions = gettext("Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}")

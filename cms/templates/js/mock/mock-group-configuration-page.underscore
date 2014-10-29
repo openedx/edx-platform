@@ -20,7 +20,7 @@
         <section class="content">
             <article class="content-primary" role="main">
                 <div class="ui-loading">
-                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading...</span></p>
+                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
                 </div>
             </article>
             <aside class="content-supplementary" role="complementary"></aside>

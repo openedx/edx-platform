@@ -131,7 +131,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                ViewUtils.runOperationShowingMessage(gettext('Publishing&hellip;'),
+                ViewUtils.runOperationShowingMessage(gettext('Publishing'),
                     function () {
                         return xblockInfo.save({publish: 'make_public'}, {patch: true});
                     }).always(function() {
@@ -150,7 +150,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     gettext("Are you sure you want to revert to the last published version of the unit? You cannot undo this action."),
                     gettext("Discard Changes"),
                     function () {
-                        ViewUtils.runOperationShowingMessage(gettext('Discarding Changes&hellip;'),
+                        ViewUtils.runOperationShowingMessage(gettext('Discarding Changes'),
                             function () {
                                 return xblockInfo.save({publish: 'discard_changes'}, {patch: true});
                             }).always(function() {
@@ -193,20 +193,20 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
                 this.checkStaffLock(enableStaffLock);
                 if (enableStaffLock && !hasInheritedStaffLock) {
-                    ViewUtils.runOperationShowingMessage(gettext('Hiding from Students&hellip;'),
+                    ViewUtils.runOperationShowingMessage(gettext('Hiding from Students'),
                         _.bind(saveAndPublishStaffLock, self));
                 } else if (enableStaffLock && hasInheritedStaffLock) {
-                    ViewUtils.runOperationShowingMessage(gettext('Explicitly Hiding from Students&hellip;'),
+                    ViewUtils.runOperationShowingMessage(gettext('Explicitly Hiding from Students'),
                         _.bind(saveAndPublishStaffLock, self));
                 } else if (!enableStaffLock && hasInheritedStaffLock) {
-                    ViewUtils.runOperationShowingMessage(gettext('Inheriting Student Visibility&hellip;'),
+                    ViewUtils.runOperationShowingMessage(gettext('Inheriting Student Visibility'),
                         _.bind(saveAndPublishStaffLock, self));
                 } else {
                     ViewUtils.confirmThenRunOperation(gettext("Make Visible to Students"),
                         gettext("If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students. Do you want to proceed?"),
                         gettext("Make Visible to Students"),
                         function() {
-                            ViewUtils.runOperationShowingMessage(gettext('Making Visible to Students&hellip;'),
+                            ViewUtils.runOperationShowingMessage(gettext('Making Visible to Students'),
                                 _.bind(saveAndPublishStaffLock, self));
                         },
                         function() {
