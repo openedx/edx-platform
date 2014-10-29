@@ -1,7 +1,7 @@
 <form id="login" class="login-form">
     <div class="status already-authenticated-msg hidden" aria-hidden="true">
         <% if (currentProvider) { %>
-            <p class="message-copy">You've successfully logged into <%- currentProvider %>, but you need to link your account.  Please click "I am a new user" to create an edX account.</p>
+            <p class="message-copy">You've successfully logged into <%- currentProvider %>, but your <%- currentProvider %> account isn't linked with an edX account. To link your accounts, go to your edX dashboard.</p>
         <% } %>
     </div>
 
@@ -16,6 +16,6 @@
 
 <% _.each( providers, function( provider) { %>
     <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.loginUrl %>">
-        <span class="icon <%- provider.iconClass %>"></span>Sign in with <%- provider.name %>
+        <span class="icon <%- provider.iconClass %>"></span>Log in using <%- provider.name %>
     </button>
 <% }); %>

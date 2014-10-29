@@ -10,10 +10,10 @@ var edx = edx || {};
             validate: {
 
                 msg: {
-                    email: '<li>A properly formatted e-mail is required</li>',
-                    min: '<li><%= field %> must be a minimum of <%= count %> characters long</li>',
-                    max: '<li><%= field %> must be a maximum of <%= count %> characters long</li>',
-                    required: '<li><%= field %> field is required</li>',
+                    email: '<li>The email address you\'ve provided is invalid.</li>',
+                    min: '<li><%= field %> must have at least <%= count %> characters.</li>',
+                    max: '<li><%= field %> can only contain up to <%= count %> characters.</li>',
+                    required: '<li><%= field %> is required.</li>',
                     custom: '<li><%= content %></li>'
                 },
 

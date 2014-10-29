@@ -1,11 +1,11 @@
 <% if (currentProvider) { %>
     <div class="status" aria-hidden="false">
-        <p class="message-copy">You've successfully signed in with <%- currentProvider %>. We just need a little more information before you start learning with edX.</p>
+        <p class="message-copy">You've successfully logged into <%- currentProvider %>. We just need a little more information before you start learning with edX.</p>
     </div>
 <% } else {
     _.each( providers, function( provider) { %>
         <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.registerUrl %>">
-            <span class="icon <%- provider.iconClass %>"></span>Sign up with <%- provider.name %>
+            <span class="icon <%- provider.iconClass %>"></span>Register using <%- provider.name %>
         </button>
     <% });
 } %>
@@ -15,6 +15,7 @@
         <h4 class="message-title">An error occurred in your registration.</h4>
         <ul class="message-copy"></ul>
     </div>
+    <!-- PASSWORD FIELD DISPLAYS IN PLAIN TEXT -->
     <%= fields %>
-    <button class="action action-primary action-update js-register">Create My edX Account</button>
+    <button class="action action-primary action-update js-register">Register</button>
 </form>

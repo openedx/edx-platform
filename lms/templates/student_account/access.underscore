@@ -1,6 +1,6 @@
 <header class="js-login-register-header header">
     <h1 class="headline">Welcome!</h1>
-    <p class="tagline">Please log in to continue</p>
+    <p class="tagline">Log in or register to take courses from the world's best universities.</p>
 </header>
 
 <section class="form-type">
@@ -14,7 +14,7 @@
 <section class="form-type">
     <h2>
         <input type="radio" name="form" id="login-option" value="login" class="form-toggle" <% if ( mode === 'login' ) { %>checked<% } %>>
-        <label for="login-option" class="form-label">I am a returning user with an edX account</label>
+        <label for="login-option" class="form-label">I am a returning user</label>
     </h2>
     <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden" aria-hidden="true<% } %>"></div>
 </section>
