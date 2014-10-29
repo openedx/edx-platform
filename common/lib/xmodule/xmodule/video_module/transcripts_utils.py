@@ -602,7 +602,7 @@ class VideoTranscriptsMixin(object):
         elif self.sub:
             transcript_language = u'en'
         elif len(self.transcripts) > 0:
-            transcript_language = sorted(self.transcripts.keys())[0]
+            transcript_language = sorted(self.transcripts)[0]
         else:
             transcript_language = u'en'
         return transcript_language
