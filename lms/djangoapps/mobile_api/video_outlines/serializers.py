@@ -8,7 +8,6 @@ from courseware.access import has_access
 from edxval.api import (
     get_video_info_for_course_and_profile, ValInternalError
 )
-from xmodule.video_module import get_transcript_language
 
 
 class BlockOutline(object):
@@ -85,6 +84,15 @@ class BlockOutline(object):
         while stack:
             curr_block = stack.pop()
 
+            if curr_block.hide_from_toc:
+                # For now, if the 'hide_from_toc' setting is set on the block, do not traverse down
+                # the hierarchy.  The reason being is that these blocks may not have human-readable names
+                # to display on the mobile clients.
+                # Eventually, we'll need to figure out how we want these blocks to be displayed on the
+                # mobile clients.  As, they are still accessible in the browser, just not navigatable
+                # from the table-of-contents.
+                continue
+
             if curr_block.category in self.categories_to_outliner:
                 if not has_access(user, 'load', curr_block, course_key=self.course_id):
                     continue
@@ -93,20 +101,13 @@ class BlockOutline(object):
                 block_path = list(path(curr_block))
                 unit_url, section_url, parents = find_urls(curr_block)
 
-                # For now, if the 'hide_from_toc' setting is set on any of the block's ancestors,
-                # do not yield the block.  The reason being is that these ancestors may not have
-                # human-readable names to display on the mobile clients.
-                # Eventually, we'll need to figure out how we want these blocks to be displayed
-                # on the mobile clients.  As, theoretically, they are still accessible in the browser,
-                # just not navigatable from the table-of-contents.
-                if not any(parent.hide_from_toc for parent in parents):
-                    yield {
-                        "path": block_path,
-                        "named_path": [b["name"] for b in block_path[:-1]],
-                        "unit_url": unit_url,
-                        "section_url": section_url,
-                        "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)
-                    }
+                yield {
+                    "path": block_path,
+                    "named_path": [b["name"] for b in block_path[:-1]],
+                    "unit_url": unit_url,
+                    "section_url": section_url,
+                    "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)
+                }
 
             if curr_block.has_children:
                 for block in reversed(curr_block.get_children()):
@@ -155,7 +156,7 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
         "size": size,
         "name": video_descriptor.display_name,
         "transcripts": transcripts,
-        "language": get_transcript_language(video_descriptor),
+        "language": video_descriptor.get_default_transcript_language(),
         "category": video_descriptor.category,
         "id": unicode(video_descriptor.scope_ids.usage_id),
     }

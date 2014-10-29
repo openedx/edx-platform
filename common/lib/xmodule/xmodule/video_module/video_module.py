@@ -152,7 +152,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             transcript_language = u'en'
             languages = {'en': 'English'}
         else:
-            transcript_language = get_transcript_language(self)
+            transcript_language = self.get_default_transcript_language()
 
             native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
             languages = {
@@ -207,6 +207,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 if val_video_urls["youtube"]:
                     youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
             except edxval_api.ValInternalError:
+                # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
+                # course data is ported to a machine that does not have the VAL data. So for now, pass on this
+                # exception and fallback to whatever we find in the VideoDescriptor.
+                log.warning("Could not retrieve information from VAL for edx Video ID: %s.", self.edx_video_id)
                 pass
 
         # If there was no edx_video_id, or if there was no download specified
@@ -601,18 +605,3 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             field_data['download_track'] = True
 
         return field_data
-
-
-def get_transcript_language(video):
-    """
-    Returns the transcript language for the given video module.
-    """
-    if video.transcript_language in video.transcripts:
-        transcript_language = video.transcript_language
-    elif video.sub:
-        transcript_language = u'en'
-    elif len(video.transcripts) > 0:
-        transcript_language = sorted(video.transcripts.keys())[0]
-    else:
-        transcript_language = u'en'
-    return transcript_language
