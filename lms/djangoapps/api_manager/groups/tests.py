@@ -15,7 +15,8 @@ from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
-from api_manager.models import GroupRelationship, GroupProfile, Organization
+from api_manager.models import GroupRelationship, GroupProfile
+from organizations.models import Organization
 from projects.models import Project
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
