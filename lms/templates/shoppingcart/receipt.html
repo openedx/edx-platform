@@ -15,19 +15,16 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
 
 <%block name="custom_content">
 <div class="container">
-  <section class="notification">
-    <h2>${_("Thank you for your Purchase!")}</h2>
-    % if (len(shoppingcart_items) == 1 and order_type == 'personal') or receipt_has_donation_item:
-      % for inst in instructions:
-        <p>${inst}</p>
-      % endfor
-    % endif
-  </section>
   <section class="wrapper confirm-enrollment shopping-cart print">
     <div class="gray-bg">
       <div class="message-left">
         <% courses_url = reverse('courses') %>
-        % if order_type == 'personal':
+        % if receipt_has_donation_item:
+          <b>${_("Thank you for your Purchase!")}</b>
+          % for inst in instructions:
+            ${inst}
+          % endfor
+        % elif order_type == 'personal':
            ## in case of multiple courses in single self purchase scenario,
            ## we will show the button View Dashboard
           % if len(shoppingcart_items) > 1 :
