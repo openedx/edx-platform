@@ -70,12 +70,23 @@ class Command(BaseCommand):
 
             # For each user...
             for user in users:
+                status = 'skipped'
                 completions = CourseModuleCompletion.objects.filter(course_id=course.id, user_id=user.id)\
                     .exclude(cat_list).count()
-                progress, created = StudentProgress.objects.get_or_create(user=user,
-                                                                          course_id=course.id,
-                                                                          completions=completions)
-                log_msg = 'Progress entry created -- Course: {}, User: {}  (completions: {})'.format(course.id, user.id
+                try:
+                    existing_record = StudentProgress.objects.get(user=user, course_id=course.id)
+                    if existing_record.completions != completions:
+                        existing_record.completions = completions
+                        existing_record.save()
+                        status = 'updated'
+                except StudentProgress.DoesNotExist:
+                    new_record = StudentProgress.objects.create(
+                        user=user,
+                        course_id=course.id,
+                        completions=completions
+                    )
+                    status = 'created'
+                log_msg = 'Progress entry {} -- Course: {}, User: {}  (completions: {})'.format(status, course.id, user.id
                                                                                                      , completions)
                 print log_msg
                 log.info(log_msg)
