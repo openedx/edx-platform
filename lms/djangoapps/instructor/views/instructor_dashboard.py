@@ -365,6 +365,14 @@ def _section_analytics(course, access):
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
 
+    if settings.ANALYTICS_DASHBOARD_URL:
+        # Construct a URL to the external analytics dashboard
+        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+        dashboard_link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
+                                                                            settings.ANALYTICS_DASHBOARD_NAME)
+        message = _("Demographic data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
+        section_data['demographic_message'] = message
+
     return section_data
 
 
