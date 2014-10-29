@@ -340,7 +340,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 Add a clear and descriptive title to encourage participation.
             </span>
         </div>
-        <div class="post-field js-post-body editor" name="body" data-placeholder="Enter your question or comment…"></div>
+        <div class="post-field js-post-body editor" name="body" data-placeholder="Enter your question or comment"></div>
         <div class="post-options">
             <label class="post-option is-enabled">
                 <input type="checkbox" name="follow" class="post-option-input js-follow" checked>

@@ -120,7 +120,7 @@ define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
                 expect(@savingSpies.constructor).toHaveBeenCalled()
                 expect(@savingSpies.show).toHaveBeenCalled()
                 savingOptions = @savingSpies.constructor.mostRecentCall.args[0]
-                expect(savingOptions.title).toMatch("Saving...")
+                expect(savingOptions.title).toMatch("Saving")
                 expect(@model.get("locked")).toBeFalsy()
                 # return a success response
                 requests[0].respond(200)
