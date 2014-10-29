@@ -5,7 +5,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import InsufficientSpecificationError
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 )
@@ -411,7 +411,11 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         pass
 
     def _get_head(self, xblock, branch):
-        course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch)).structure
+        try:
+            course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch)).structure
+        except ItemNotFoundError:
+            # There is no published version xblock container, e.g. Library
+            return None
         return self._get_block_from_structure(course_structure, BlockKey.from_usage_key(xblock.location))
 
     def _get_version(self, block):

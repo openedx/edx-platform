@@ -112,6 +112,13 @@ urlpatterns += patterns(
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
+if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
+    LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
+    urlpatterns += (
+        url(r'^library/{}?$'.format(LIBRARY_KEY_PATTERN),
+            'contentstore.views.library_handler', name='library_handler'),
+    )
+
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
     urlpatterns += (url(
         r'^export_git/{}$'.format(
