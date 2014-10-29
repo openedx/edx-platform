@@ -16,7 +16,8 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
-from edxnotes.decorators import edxnotes
+from edxnotes_utils import edxnotes
+
 
 log = logging.getLogger("edx.courseware")
 
@@ -73,11 +74,17 @@ class HtmlModuleMixin(HtmlFields, XModule):
         return self.data
 
 
-class HtmlDescriptorMixin(HtmlFields, XmlDescriptor, EditingDescriptor):
+@edxnotes
+class HtmlModule(HtmlModuleMixin):
+    pass
+
+
+class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     """
     Module for putting raw html in a course
     """
     mako_template = "widgets/html-edit.html"
+    module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
 
@@ -235,15 +242,6 @@ class HtmlDescriptorMixin(HtmlFields, XmlDescriptor, EditingDescriptor):
         return non_editable_fields
 
 
-@edxnotes
-class HtmlModule(HtmlModuleMixin):
-    pass
-
-
-class HtmlDescriptor(HtmlDescriptorMixin):
-    module_class = HtmlModule
-
-
 class AboutFields(object):
     display_name = String(
         help=_("Display name for this module"),
@@ -266,7 +264,7 @@ class AboutModule(AboutFields, HtmlModuleMixin):
 
 
 @XBlock.tag("detached")
-class AboutDescriptor(AboutFields, HtmlDescriptorMixin):
+class AboutDescriptor(AboutFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
@@ -303,7 +301,7 @@ class StaticTabModule(StaticTabFields, HtmlModuleMixin):
 
 
 @XBlock.tag("detached")
-class StaticTabDescriptor(StaticTabFields, HtmlDescriptorMixin):
+class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
@@ -339,7 +337,7 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
 
 
 @XBlock.tag("detached")
-class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptorMixin):
+class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
