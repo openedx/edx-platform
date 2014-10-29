@@ -38,4 +38,4 @@
 
         return Logger;
     });
-}).call(this, RequireJS.define);
+}).call(this, define || RequireJS.define);

@@ -6,5 +6,5 @@
             var element = document.getElementById('edx-notes-wrapper-${uid}');
             Notes.factory(element, ${json.dumps(params)});
         });
-    }).call(this, RequireJS.require);
+    }).call(this, require || RequireJS.require);
 </script>

@@ -96,4 +96,4 @@
             factory: getAnnotator
         };
     });
-}).call(this, RequireJS.define, jQuery, _);
+}).call(this, define || RequireJS.define, jQuery, _);
