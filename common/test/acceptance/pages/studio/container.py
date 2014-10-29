@@ -6,7 +6,7 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
-from utils import click_css, confirm_prompt
+from .utils import click_css, confirm_prompt, type_in_codemirror
 
 
 class ContainerPage(PageObject):
@@ -364,6 +364,12 @@ class XBlockWrapper(PageObject):
         Click on Basic Tab.
         """
         self._click_button('basic_tab')
+
+    def set_codemirror_text(self, text, index=0):
+        """
+        Set the text of a CodeMirror editor that is part of this xblock's settings.
+        """
+        type_in_codemirror(self, index, text, find_prefix='$("{}").find'.format(self.editor_selector))
 
     def save_settings(self):
         """

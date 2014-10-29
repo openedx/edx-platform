@@ -28,6 +28,13 @@ class DashboardPage(PageObject):
     def has_processing_courses(self):
         return self.q(css='.courses-processing').present
 
+    @property
+    def page_subheader(self):
+        """
+        Get the text of the introductory copy seen below the Welcome header. ("Here are all of...")
+        """
+        return self.q(css='.content-primary .introduction .copy p').first.text[0]
+
     def create_rerun(self, display_name):
         """
         Clicks the create rerun link of the course specified by display_name.
@@ -40,3 +47,68 @@ class DashboardPage(PageObject):
         Clicks on the course with run given by run.
         """
         self.q(css='.course-run .value').filter(lambda el: el.text == run)[0].click()
+
+    def has_new_library_button(self):
+        """
+        (bool) is the "New Library" button present?
+        """
+        return self.q(css='.new-library-button').present
+
+    def click_new_library(self):
+        """
+        Click on the "New Library" button
+        """
+        self.q(css='.new-library-button').click()
+
+    def is_new_library_form_visible(self):
+        """
+        Is the new library form visisble?
+        """
+        return self.q(css='.wrapper-create-library').visible
+
+    def fill_new_library_form(self, display_name, org, number):
+        """
+        Fill out the form to create a new library.
+        Must have called click_new_library() first.
+        """
+        field = lambda fn: self.q(css='.wrapper-create-library #new-library-{}'.format(fn))
+        field('name').fill(display_name)
+        field('org').fill(org)
+        field('number').fill(number)
+
+    def is_new_library_form_valid(self):
+        """
+        IS the new library form ready to submit?
+        """
+        return (
+            self.q(css='.wrapper-create-library .new-library-save:not(.is-disabled)').present and
+            not self.q(css='.wrapper-create-library .wrap-error.is-shown').present
+        )
+
+    def submit_new_library_form(self):
+        """
+        Submit the new library form.
+        """
+        self.q(css='.wrapper-create-library .new-library-save').click()
+
+    def list_libraries(self):
+        """
+        List all the libraries found on the page's list of libraries.
+        """
+        self.q(css='#course-index-tabs .libraries-tab a').click()  # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
+        div2info = lambda element: {
+            'name': element.find_element_by_css_selector('.course-title').text,
+            'org': element.find_element_by_css_selector('.course-org .value').text,
+            'number': element.find_element_by_css_selector('.course-num .value').text,
+            'url': element.find_element_by_css_selector('a.library-link').get_attribute('href'),
+        }
+        return self.q(css='.libraries li.course-item').map(div2info).results
+
+    def has_library(self, **kwargs):
+        """
+        Does the page's list of libraries include a library matching kwargs?
+        """
+        for lib in self.list_libraries():
+            if all([lib[key] == kwargs[key] for key in kwargs]):
+                return True
+        return False

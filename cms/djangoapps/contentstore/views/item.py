@@ -47,6 +47,7 @@ from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locator import LibraryUsageLocator
 
 from .preview import get_available_xblock_services
 
@@ -695,7 +696,9 @@ def _get_module_info(xblock, rewrite_static_links=True):
             )
 
         # Pre-cache has changes for the entire course because we'll need it for the ancestor info
-        modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
+        # Except library blocks which don't [yet] use draft/publish
+        if not isinstance(xblock.location, LibraryUsageLocator):
+            modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
 
         # Note that children aren't being returned until we have a use case.
         return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
@@ -736,12 +739,16 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
         return None
 
+    is_library_block = isinstance(xblock.location, LibraryUsageLocator)
     is_xblock_unit = is_unit(xblock, parent_xblock)
-    # this should not be calculated for Sections and Subsections on Unit page
-    has_changes = modulestore().has_changes(xblock) if (is_xblock_unit or course_outline) else None
+    # this should not be calculated for Sections and Subsections on Unit page or for library blocks
+    has_changes = modulestore().has_changes(xblock) if (is_xblock_unit or course_outline) and not is_library_block else None
 
     if graders is None:
-        graders = CourseGradingModel.fetch(xblock.location.course_key).graders
+        if not is_library_block:
+            graders = CourseGradingModel.fetch(xblock.location.course_key).graders
+        else:
+            graders = []
 
     # Compute the child info first so it can be included in aggregate information for the parent
     should_visit_children = include_child_info and (course_outline and not is_xblock_unit or not course_outline)
@@ -761,7 +768,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
     else:
         visibility_state = None
-    published = modulestore().has_published_version(xblock)
+    published = modulestore().has_published_version(xblock) if not is_library_block else None
 
     xblock_info = {
         "id": unicode(xblock.location),
@@ -769,7 +776,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
-        "published_on": get_default_time_display(xblock.published_on) if xblock.published_on else None,
+        "published_on": get_default_time_display(xblock.published_on) if published and xblock.published_on else None,
         "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,

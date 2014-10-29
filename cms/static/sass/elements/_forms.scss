@@ -409,7 +409,6 @@ form {
 // ==================== 
 .wrapper-create-element {
   height: 0;
-  margin-bottom: $baseline;
   opacity: 0.0;
   pointer-events: none;
   overflow: hidden;
@@ -420,6 +419,7 @@ form {
 
   &.is-shown {
     height: auto; // define a specific height for the animating version of this UI to work properly
+    margin-bottom: $baseline;
     opacity: 1.0;
     pointer-events: auto;
   }

@@ -4,48 +4,21 @@
 define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
     function ($, _, gettext, ViewUtils) {
         return function (selectors, classes) {
-            var validateRequiredField, validateCourseItemEncoding, validateTotalCourseItemsLength, setNewCourseFieldInErr,
-                hasInvalidRequiredFields, createCourse, validateFilledFields, configureHandlers;
+            var validateTotalCourseItemsLength, setNewCourseFieldInErr, hasInvalidRequiredFields,
+                createCourse, validateFilledFields, configureHandlers;
 
-            validateRequiredField = function (msg) {
-                return msg.length === 0 ? gettext('Required field.') : '';
-            };
+            var validateRequiredField = ViewUtils.validateRequiredField;
+            var validateURLItemEncoding = ViewUtils.validateURLItemEncoding;
 
-            // Check that a course (org, number, run) doesn't use any special characters
-            validateCourseItemEncoding = function (item) {
-                var required = validateRequiredField(item);
-                if (required) {
-                    return required;
-                }
-                if ($(selectors.allowUnicode).val() === 'True') {
-                    if (/\s/g.test(item)) {
-                        return gettext('Please do not use any spaces in this field.');
-                    }
-                }
-                else {
-                    if (item !== encodeURIComponent(item)) {
-                        return gettext('Please do not use any spaces or special characters in this field.');
-                    }
-                }
-                return '';
-            };
+            var keyLengthViolationMessage = gettext('The combined length of the organization, course number, and course run fields cannot be more than <%=limit%> characters.');
 
-            // Ensure that org/course_num/run < 65 chars.
+            // Ensure that org, course_num and run passes checkTotalKeyLengthViolations
             validateTotalCourseItemsLength = function () {
-                var totalLength = _.reduce(
+                ViewUtils.checkTotalKeyLengthViolations(
+                    selectors, classes,
                     [selectors.org, selectors.number, selectors.run],
-                    function (sum, ele) {
-                        return sum + $(ele).val().length;
-                    }, 0
+                    keyLengthViolationMessage
                 );
-                if (totalLength > 65) {
-                    $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
-                    $(selectors.errorMessage).html('<p>' + gettext('The combined length of the organization, course number, and course run fields cannot be more than 65 characters.') + '</p>');
-                    $(selectors.save).addClass(classes.disabled);
-                }
-                else {
-                    $(selectors.errorWrapper).removeClass(classes.shown).addClass(classes.hiding);
-                }
             };
 
             setNewCourseFieldInErr = function (el, msg) {
@@ -117,7 +90,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                             if (event.keyCode === 9) {
                                 return;
                             }
-                            var error = validateCourseItemEncoding($ele.val());
+                            var error = validateURLItemEncoding($ele.val(), $(selectors.allowUnicode).val() === 'True');
                             setNewCourseFieldInErr($ele.parent(), error);
                             validateTotalCourseItemsLength();
                             if (!validateFilledFields()) {
@@ -138,8 +111,6 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
             };
 
             return {
-                validateRequiredField: validateRequiredField,
-                validateCourseItemEncoding: validateCourseItemEncoding,
                 validateTotalCourseItemsLength: validateTotalCourseItemsLength,
                 setNewCourseFieldInErr: setNewCourseFieldInErr,
                 hasInvalidRequiredFields: hasInvalidRequiredFields,

@@ -49,12 +49,12 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
 
             describe("Field validation", function () {
                 it("returns a message for an empty string", function () {
-                    var message = CreateCourseUtils.validateRequiredField('');
+                    var message = ViewUtils.validateRequiredField('');
                     expect(message).not.toBe('');
                 });
 
                 it("does not return a message for a non empty string", function () {
-                    var message = CreateCourseUtils.validateRequiredField('edX');
+                    var message = ViewUtils.validateRequiredField('edX');
                     expect(message).toBe('');
                 });
             });

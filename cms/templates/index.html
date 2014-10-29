@@ -24,6 +24,10 @@
           % if course_creator_status=='granted':
           <a href="#" class="button new-button new-course-button"><i class="icon fa fa-plus icon-inline"></i>
               ${_("New Course")}</a>
+            % if libraries_enabled:
+              <a href="#" class="button new-button new-library-button"><i class="icon-plus icon-inline"></i>
+              ${_("New Library")}</a>
+            % endif
           % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
           <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
           % endif
@@ -42,14 +46,26 @@
       <div class="introduction">
         <h2 class="title">${_("Welcome, {0}!").format(user.username)}</h2>
 
-        %if len(courses) > 0:
+        %if len(courses) > 0 or len(libraries) > 0:
         <div class="copy">
-          <p>${_("Here are all of the courses you currently have access to in {studio_name}:").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+          <p>
+            %if libraries_enabled:
+              ${_("Here are all of the courses and librariess you currently have access to in {studio_name}:").format(studio_name=settings.STUDIO_SHORT_NAME)}
+            %else:
+              ${_("Here are all of the courses you currently have access to in {studio_name}:").format(studio_name=settings.STUDIO_SHORT_NAME)}
+            %endif
+          </p>
         </div>
 
         %else:
         <div class="copy">
-          <p>${_("You currently aren't associated with any {studio_name} Courses.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+          <p>
+            %if libraries_enabled:
+              ${_("You currently aren't associated with any {studio_name} Courses and Libraries").format(studio_name=settings.STUDIO_SHORT_NAME)}
+            %else:
+              ${_("You currently aren't associated with any {studio_name} Courses.").format(studio_name=settings.STUDIO_SHORT_NAME)}
+            %endif
+          </p>
         </div>
         %endif
       </div>
@@ -72,12 +88,15 @@
               <ol class="list-input">
                 <li class="field text required" id="field-course-name">
                   <label for="new-course-name">${_("Course Name")}</label>
+                  ## Translators: This is an example name for a new course, seen when filling out the form to create a new course.
                   <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" aria-required="true" placeholder="${_('e.g. Introduction to Computer Science')}" />
                   <span class="tip">${_("The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
                 <li class="field text required" id="field-organization">
                   <label for="new-course-org">${_("Organization")}</label>
+                  ## Translators: This is an example for the name of the organization sponsoring a course, seen when filling out the form to create a new course. The organization name cannot contain spaces.
+                  ## Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed when user put no data into this field.
                   <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
                   <span class="tip">${_("The name of the organization sponsoring the course.")}  <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding"></span>
@@ -85,6 +104,7 @@
 
                 <li class="field text required" id="field-course-number">
                   <label for="new-course-number">${_("Course Number")}</label>
+                  ## Translators: This is an example for the number used to identify a course, seen when filling out the form to create a new course. The number here is short for "Computer Science 101". It can contain letters but cannot contain spaces.
                   <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" aria-required="true" placeholder="${_('e.g. CS101')}" />
                   <span class="tip">${_("The unique number that identifies your course within your organization.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
@@ -92,6 +112,7 @@
 
                 <li class="field text required" id="field-course-run">
                   <label for="new-course-run">${_("Course Run")}</label>
+                  ## Translators: This is an example for the "run" used to identify different instances of a course, seen when filling out the form to create a new course.
                   <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
                   <span class="tip">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
@@ -108,6 +129,58 @@
           </div>
         </form>
       </div>
+      
+        %if libraries_enabled:
+        <div class="wrapper-create-element wrapper-create-library">
+          <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
+            <div class="wrap-error">
+              <div id="library_creation_error" name="library_creation_error" class="message message-status message-status error" role="alert">
+              <p>${_("Please correct the highlighted fields below.")}</p>
+              </div>
+            </div>
+
+            <div class="wrapper-form">
+              <h3 class="title">${_("Create a New Library")}</h3>
+
+              <fieldset>
+                <legend class="sr">${_("Required Information to Create a New Library")}</legend>
+
+                <ol class="list-input">
+                  <li class="field text required" id="field-library-name">
+                    <label for="new-library-name">${_("Library Name")}</label>
+                    ## Translators: This is an example name for a new content library, seen when filling out the form to create a new library. (A library is a collection of content or problems.)
+                    <input class="new-library-name" id="new-library-name" type="text" name="new-library-name" aria-required="true" placeholder="${_('e.g. Computer Science Problems')}" />
+                    <span class="tip">${_("The public display name for your library.")}</span>
+                    <span class="tip tip-error is-hiding"></span>
+                  </li>
+                  <li class="field text required" id="field-organization">
+                    <label for="new-library-org">${_("Organization")}</label>
+                    <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" aria-required="true" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
+                    <span class="tip">${_("The name of the organization sponsoring the library.")}  <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
+                    <span class="tip tip-error is-hiding"></span>
+                  </li>
+
+                  <li class="field text required" id="field-library-number">
+                    <label for="new-library-number">${_("Library Code/Number")}</label>
+                    ## Translators: This is an example for the "number" used to identify a library, seen when filling out the form to create a new library. This example is short for "Computer Science Problems". The example number may contain letters but must not contain spaces.
+                    <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" aria-required="true" placeholder="${_('e.g. CSPROB')}" />
+                    <span class="tip">${_("The unique code that identifies this library.")} <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
+                    <span class="tip tip-error is-hiding"></span>
+                  </li>
+                </ol>
+
+              </fieldset>
+            </div>
+
+            <div class="actions">
+              <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
+              <input type="submit" value="${_('Create')}" class="action action-primary new-library-save" />
+              <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-library-cancel" />
+            </div>
+          </form>
+        </div>
+        % endif
+
       % endif
 
       <!-- STATE: processing courses -->
@@ -208,8 +281,15 @@
       </div>
       %endif
 
+      %if libraries_enabled:
+      <ul id="course-index-tabs">
+        <li class="courses-tab active"><a>${_("Courses")}</a></li>
+        <li class="libraries-tab"><a>${_("Libraries")}</a></li>
+      </ul>
+      %endif
+
       %if len(courses) > 0:
-      <div class="courses">
+      <div class="courses courses-tab active">
         <ul class="list-courses">
           %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
           <li class="course-item" data-course-key="${course_info['course_key'] | h}">
@@ -246,10 +326,7 @@
       </div>
 
       %else:
-      <div class="courses">
-      </div>
-
-      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices">
+      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices courses-tab active">
         <div class="notice-item">
           <div class="msg">
             <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
@@ -362,6 +439,41 @@
         </div>
       </div>
       % endif
+
+      %if len(libraries) > 0:
+      <div class="libraries libraries-tab">
+        <ul class="list-courses">
+          %for library_info in sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+          <li class="course-item">
+            <a class="library-link" href="${library_info['url']}">
+              <h3 class="course-title">${library_info['display_name']}</h3>
+
+              <div class="course-metadata">
+                <span class="course-org metadata-item">
+                  <span class="label">${_("Organization:")}</span> <span class="value">${library_info['org']}</span>
+                </span>
+                <span class="course-num metadata-item">
+                  <span class="label">${_("Course Number:")}</span>
+                  <span class="value">${library_info['number']}</span>
+                </span>
+              </div>
+            </a>
+          </li>
+          %endfor
+        </ul>
+      </div>
+
+      %else:
+      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices libraries-tab">
+        <div class="notice-item">
+          <div class="msg">
+            <div class="copy">
+              <p>${_("You don't have any content libraries yet.")}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      %endif
 
     </article>
     <aside class="content-supplementary" role="complementary">

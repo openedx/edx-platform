@@ -12,6 +12,7 @@ from .error import *
 from .helpers import *
 from .item import *
 from .import_export import *
+from .library import *
 from .preview import *
 from .public import *
 from .export_git import *
