@@ -92,36 +92,31 @@ Follow the on-screen text to enter the course and enrollment schedule.
 The Course Start Date
 ***********************************
 
-.. note:: The default **Course Start Date** is set far into the future, to
+.. note:: The default course start date is set far into the future, to
  **01/01/2030**. This is to ensure that your course does not start before
- you intend it to.  You must change the course start date to the date you want
+ you intend it to. You must change the course start date to the date you want
  students to begin using the course.
 
-Students see the course start date on their **Current Courses** dashboards and
-on the course summary page.
+Students see the course start date and time on their **Current Courses** dashboards and
+on the course summary page. 
 
-The following example shows the course start date on the course summary page:
+The following example shows the course start date and time on the course summary page:
 
 .. image:: ../Images/about-page-course-start.png
  :alt: An image of the course summary page, with the start date circled.
 
-.. note:: For courses on edX.org_, you must communicate the course start date to
- your edX Program Manager, to ensure the date is accurate on the course
+.. note:: For courses on edX.org_, you must communicate the course start date and time to
+ your edX Program Manager to ensure the date is accurate on the course
  summary page.
 
-In the dashboard, if the course has not yet started, students see the start
-date as in the following example:
+In the dashboard, students see the start dates and times for each of their
+courses, as in the following examples.
 
 .. image:: ../Images/dashboard-course-to-start.png
- :alt: An image of a course that has not started in the student dashboard, with
-     the start date circled.
+ :width: 600
+ :alt: An image of two courses in the student dashboard, with the start dates and times circled.
 
-If the course has started, students see the start date as in the following
-example:
-
-.. image:: ../Images/dashboard-course.png
- :alt: An image of a course listing in the student dashboard, with the start
-     date circled
+.. note:: If you do not specify a start time for your course, students see the default start time, 00:00 Coordinated Universal Time (UTC).
 
 
 
