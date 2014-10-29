@@ -65,8 +65,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.errortracker import null_error_tracker
 from opaque_keys.edx.locator import (
-    BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree,
-    LocalId,
+    BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
 )
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
@@ -190,8 +189,8 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if course_key is None:
             return self._bulk_ops_record_type()
 
-        if not isinstance(course_key, CourseLocator):
-            raise TypeError(u'{!r} is not a CourseLocator'.format(course_key))
+        if not isinstance(course_key, (CourseLocator, LibraryLocator)):
+            raise TypeError(u'{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
         # handle version_guid based retrieval locally
         if course_key.org is None or course_key.course is None or course_key.run is None:
             return self._active_bulk_ops.records[
@@ -207,8 +206,8 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         """
         Clear the record for this course
         """
-        if not isinstance(course_key, CourseLocator):
-            raise TypeError('{!r} is not a CourseLocator'.format(course_key))
+        if not isinstance(course_key, (CourseLocator, LibraryLocator)):
+            raise TypeError('{!r} is not a CourseLocator or LibraryLocator'.format(course_key))
 
         if course_key.org and course_key.course and course_key.run:
             del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
@@ -776,19 +775,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # add it in the envelope for the structure.
         return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
 
-    @autoretry_read()
-    def get_courses(self, branch, **kwargs):
-        '''
-        Returns a list of course descriptors matching any given qualifiers.
-
-        qualifiers should be a dict of keywords matching the db fields or any
-        legal query for mongo to use against the active_versions collection.
-
-        Note, this is to find the current head of the named branch type.
-        To get specific versions via guid use get_course.
-
-        :param branch: the branch for which to return courses.
-        '''
+    def _get_structures_for_branch(self, branch):
+        """
+        Internal generator for fetching lists of courses, libraries, etc.
+        """
         matching_indexes = self.find_matching_course_indexes(branch)
 
         # collect ids and then query for those
@@ -800,28 +790,72 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             id_version_map[version_guid] = course_index
 
         if not version_guids:
-            return []
+            return
 
-        matching_structures = self.find_structures_by_id(version_guids)
+        for entry in self.find_structures_by_id(version_guids):
+            yield entry, id_version_map[entry['_id']]
 
-        # get the blocks for each course index (s/b the root)
+    def _get_structures_for_branch_and_locator(self, branch, locator_factory, **kwargs):
+
+        """
+        Internal generator for fetching lists of courses, libraries, etc.
+        :param str branch: Branch to fetch structures from
+        :param type locator_factory: Factory to create locator from structure info and branch
+        """
         result = []
-        for entry in matching_structures:
-            course_info = id_version_map[entry['_id']]
-            envelope = CourseEnvelope(
-                CourseLocator(
-                    org=course_info['org'],
-                    course=course_info['course'],
-                    run=course_info['run'],
-                    branch=branch,
-                ),
-                entry
-            )
+        for entry, structure_info in self._get_structures_for_branch(branch):
+            locator = locator_factory(structure_info, branch)
+            envelope = CourseEnvelope(locator, entry)
             root = entry['root']
-            course_list = self._load_items(envelope, [root], 0, lazy=True, **kwargs)
-            if not isinstance(course_list[0], ErrorDescriptor):
-                result.append(course_list[0])
+            structures_list = self._load_items(envelope, [root], 0, lazy=True, **kwargs)
+            if not isinstance(structures_list[0], ErrorDescriptor):
+                result.append(structures_list[0])
         return result
+
+    def _create_course_locator(self, course_info, branch):
+        """
+        Creates course locator using course_info dict and branch
+        """
+        return CourseLocator(
+            org=course_info['org'],
+            course=course_info['course'],
+            run=course_info['run'],
+            branch=branch,
+        )
+
+    def _create_library_locator(self, library_info, branch):
+        """
+        Creates library locator using library_info dict and branch
+        """
+        return LibraryLocator(
+            org=library_info['org'],
+            library=library_info['course'],
+            branch=branch,
+        )
+
+    @autoretry_read()
+    def get_courses(self, branch, **kwargs):
+        """
+        Returns a list of course descriptors matching any given qualifiers.
+
+        qualifiers should be a dict of keywords matching the db fields or any
+        legal query for mongo to use against the active_versions collection.
+
+        Note, this is to find the current head of the named branch type.
+        To get specific versions via guid use get_course.
+
+        :param branch: the branch for which to return courses.
+        """
+        # get the blocks for each course index (s/b the root)
+        return self._get_structures_for_branch_and_locator(branch, self._create_course_locator, **kwargs)
+
+    def get_libraries(self, branch="library", **kwargs):
+        """
+        Returns a list of "library" root blocks matching any given qualifiers.
+
+        TODO: better way of identifying library index entry vs. course index entry.
+        """
+        return self._get_structures_for_branch_and_locator(branch, self._create_library_locator, **kwargs)
 
     def make_course_key(self, org, course, run):
         """
@@ -832,6 +866,15 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         return CourseLocator(org, course, run)
 
+    def _get_structure(self, structure_id, depth, **kwargs):
+        """
+        Gets Course or Library by locator
+        """
+        structure_entry = self._lookup_course(structure_id)
+        root = structure_entry.structure['root']
+        result = self._load_items(structure_entry, [root], depth, lazy=True, **kwargs)
+        return result[0]
+
     def get_course(self, course_id, depth=0, **kwargs):
         '''
         Gets the course descriptor for the course identified by the locator
@@ -839,11 +882,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if not isinstance(course_id, CourseLocator) or course_id.deprecated:
             # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
             raise ItemNotFoundError(course_id)
+        return self._get_structure(course_id, depth, **kwargs)
 
-        course_entry = self._lookup_course(course_id)
-        root = course_entry.structure['root']
-        result = self._load_items(course_entry, [root], depth, lazy=True, **kwargs)
-        return result[0]
+    def get_library(self, library_id, depth=0, **kwargs):
+        """
+        Gets the 'library' root block for the library identified by the locator
+        """
+        if not isinstance(library_id, LibraryLocator):
+            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+            raise ItemNotFoundError(library_id)
+        return self._get_structure(library_id, depth, **kwargs)
 
     def has_course(self, course_id, ignore_case=False, **kwargs):
         '''
@@ -1227,19 +1275,27 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         new_def_data = self._serialize_fields(old_definition['block_type'], new_def_data)
         if needs_saved():
-            # Do a deep copy so that we don't corrupt the cached version of the definition
-            new_definition = copy.deepcopy(old_definition)
-            new_definition['_id'] = ObjectId()
-            new_definition['fields'] = new_def_data
-            new_definition['edit_info']['edited_by'] = user_id
-            new_definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-            # previous version id
-            new_definition['edit_info']['previous_version'] = definition_locator.definition_id
-            new_definition['schema_version'] = self.SCHEMA_VERSION
-            self.update_definition(course_key, new_definition)
-            return DefinitionLocator(new_definition['block_type'], new_definition['_id']), True
+            definition_locator = self._update_definition_from_data(course_key, old_definition, new_def_data, user_id)
+            return definition_locator, True
         else:
             return definition_locator, False
+
+    def _update_definition_from_data(self, course_key, old_definition, new_def_data, user_id):
+        """
+        Update the persisted version of the given definition and return the
+        locator of the new definition. Does not check if data differs from the
+        previous version.
+        """
+        new_definition = copy.deepcopy(old_definition)
+        new_definition['_id'] = ObjectId()
+        new_definition['fields'] = new_def_data
+        new_definition['edit_info']['edited_by'] = user_id
+        new_definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+        # previous version id
+        new_definition['edit_info']['previous_version'] = old_definition['_id']
+        new_definition['schema_version'] = self.SCHEMA_VERSION
+        self.update_definition(course_key, new_definition)
+        return DefinitionLocator(new_definition['block_type'], new_definition['_id'])
 
     def _generate_block_key(self, course_blocks, category):
         """
@@ -1325,7 +1381,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # persist the definition if persisted != passed
             if (definition_locator is None or isinstance(definition_locator.definition_id, LocalId)):
                 definition_locator = self.create_definition_from_data(course_key, new_def_data, block_type, user_id)
-            elif new_def_data is not None:
+            elif new_def_data:
                 definition_locator, _ = self.update_definition_from_data(course_key, definition_locator, new_def_data, user_id)
 
             # copy the structure and modify the new one
@@ -1494,6 +1550,19 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         assert master_branch is not None
         # check course and run's uniqueness
         locator = CourseLocator(org=org, course=course, run=run, branch=master_branch)
+        return self._create_courselike(
+            locator, user_id, master_branch, fields, versions_dict,
+            search_targets, root_category, root_block_id, **kwargs
+        )
+
+    def _create_courselike(
+        self, locator, user_id, master_branch, fields=None,
+        versions_dict=None, search_targets=None, root_category='course',
+        root_block_id=None, **kwargs
+    ):
+        """
+        Internal code for creating a course or library
+        """
         index = self.get_course_index(locator)
         if index is not None:
             raise DuplicateCourseError(locator, index)
@@ -1508,20 +1577,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # if building a wholly new structure
         if versions_dict is None or master_branch not in versions_dict:
             # create new definition and structure
-            definition_id = ObjectId()
-            definition_entry = {
-                '_id': definition_id,
-                'block_type': root_category,
-                'fields': definition_fields,
-                'edit_info': {
-                    'edited_by': user_id,
-                    'edited_on': datetime.datetime.now(UTC),
-                    'previous_version': None,
-                    'original_version': definition_id,
-                },
-                'schema_version': self.SCHEMA_VERSION,
-            }
-            self.update_definition(locator, definition_entry)
+            definition_id = self.create_definition_from_data(locator, definition_fields, root_category, user_id).definition_id
 
             draft_structure = self._new_structure(
                 user_id,
@@ -1549,19 +1605,17 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             if block_fields is not None:
                 root_block['fields'].update(self._serialize_fields(root_category, block_fields))
             if definition_fields is not None:
-                definition = copy.deepcopy(self.get_definition(locator, root_block['definition']))
-                definition['fields'].update(definition_fields)
-                definition['edit_info']['previous_version'] = definition['_id']
-                definition['edit_info']['edited_by'] = user_id
-                definition['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-                definition['_id'] = ObjectId()
-                definition['schema_version'] = self.SCHEMA_VERSION
-                self.update_definition(locator, definition)
-                root_block['definition'] = definition['_id']
-                root_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-                root_block['edit_info']['edited_by'] = user_id
-                root_block['edit_info']['previous_version'] = root_block['edit_info'].get('update_version')
-                root_block['edit_info']['update_version'] = new_id
+                old_def = self.get_definition(locator, root_block['definition'])
+                new_fields = old_def['fields']
+                new_fields.update(definition_fields)
+                definition_id = self._update_definition_from_data(locator, old_def, new_fields, user_id).definition_id
+                root_block['definition'] = definition_id
+                root_block['edit_info'].update({
+                    'edited_on': datetime.datetime.now(UTC),
+                    'edited_by': user_id,
+                    'previous_version': root_block['edit_info'].get('update_version'),
+                    'update_version': new_id,
+                })
 
             versions_dict[master_branch] = new_id
         else:  # Pointing to an existing course structure
@@ -1574,9 +1628,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self.update_structure(locator, draft_structure)
             index_entry = {
                 '_id': ObjectId(),
-                'org': org,
-                'course': course,
-                'run': run,
+                'org': locator.org,
+                'course': locator.course,
+                'run': locator.run,
                 'edited_by': user_id,
                 'edited_on': datetime.datetime.now(UTC),
                 'versions': versions_dict,
@@ -1588,8 +1642,22 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self.insert_course_index(locator, index_entry)
 
             # expensive hack to persist default field values set in __init__ method (e.g., wiki_slug)
-            course = self.get_course(locator, **kwargs)
+            if isinstance(locator, LibraryLocator):
+                course = self.get_library(locator, **kwargs)
+            else:
+                course = self.get_course(locator, **kwargs)
             return self.update_item(course, user_id, **kwargs)
+
+    def create_library(self, org, library, user_id, fields, **kwargs):
+        """
+        Create a new library. Arguments are similar to create_course().
+        """
+        kwargs["fields"] = fields
+        kwargs["master_branch"] = kwargs.get("master_branch", ModuleStoreEnum.BranchName.library)
+        kwargs["root_category"] = kwargs.get("root_category", "library")
+        kwargs["root_block_id"] = kwargs.get("root_block_id", "library")
+        locator = LibraryLocator(org=org, library=library, branch=kwargs["master_branch"])
+        return self._create_courselike(locator, user_id, **kwargs)
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         """
@@ -1680,14 +1748,24 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 if index_entry is not None:
                     self._update_search_targets(index_entry, definition_fields)
                     self._update_search_targets(index_entry, settings)
-                    course_key = CourseLocator(
-                        org=index_entry['org'],
-                        course=index_entry['course'],
-                        run=index_entry['run'],
-                        branch=course_key.branch,
-                        version_guid=new_id
-                    )
+                    if isinstance(course_key, LibraryLocator):
+                        course_key = LibraryLocator(
+                            org=index_entry['org'],
+                            library=index_entry['course'],
+                            branch=course_key.branch,
+                            version_guid=new_id
+                        )
+                    else:
+                        course_key = CourseLocator(
+                            org=index_entry['org'],
+                            course=index_entry['course'],
+                            run=index_entry['run'],
+                            branch=course_key.branch,
+                            version_guid=new_id
+                        )
                     self._update_head(course_key, index_entry, course_key.branch, new_id)
+                elif isinstance(course_key, LibraryLocator):
+                    course_key = LibraryLocator(version_guid=new_id)
                 else:
                     course_key = CourseLocator(version_guid=new_id)
 
