@@ -28,9 +28,10 @@
         block = initFn(runtime, element) ? {}
       block.runtime = runtime
     else
-      elementTag = $('<div>').append($element.clone()).html();
-      console.log("Block #{elementTag} is missing data-runtime, data-runtime-version or data-init, and can't be initialized")
       block = {}
+      if runtime? or version? or initFnName?
+        elementTag = $('<div>').append($element.clone()).html();
+        console.log("Block #{elementTag} is missing data-runtime, data-runtime-version or data-init, and can't be initialized")
 
     block.element = element
     block.name = $element.data("name")
