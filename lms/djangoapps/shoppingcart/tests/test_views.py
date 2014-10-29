@@ -158,6 +158,33 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(billing_url, data)
         self.assertEqual(resp.status_code, 200)
 
+    def test_same_coupon_code_applied_on_multiple_items_in_the_cart(self):
+        """
+        test to check that that the same coupon code applied on multiple
+        items in the cart.
+        """
+        self.login_user()
+        # add first course to user cart
+        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        self.assertEqual(resp.status_code, 200)
+        # add and apply the coupon code to course in the cart
+        self.add_coupon(self.course_key, True, self.coupon_code)
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        # now add the same coupon code to the second course(testing_course)
+        self.add_coupon(self.testing_course.id, True, self.coupon_code)
+        #now add the second course to cart, the coupon code should be
+        # applied when adding the second course to the cart
+        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.testing_course.id.to_deprecated_string()]))
+        self.assertEqual(resp.status_code, 200)
+        #now check the user cart and see that the discount has been applied on both the courses
+        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        self.assertEqual(resp.status_code, 200)
+        #first course price is 40$ and the second course price is 20$
+        # after 10% discount on both the courses the total price will be 18+36 = 54
+        self.assertIn('54.00', resp.content)
+
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         self.login_user()
