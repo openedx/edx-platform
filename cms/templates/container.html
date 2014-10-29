@@ -18,13 +18,6 @@ from django.utils.translation import ugettext as _
 
 <%namespace name='static' file='static_content.html'/>
 
-<%!
-templates = ["basic-modal", "modal-button", "edit-xblock-modal",
-    "editor-mode-button", "upload-dialog", "image-modal",
-    "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
-    "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message"]
-%>
 <%block name="header_extras">
 % for template_name in templates:
 <script type="text/template" id="${template_name}-tpl">

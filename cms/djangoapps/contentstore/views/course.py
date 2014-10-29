@@ -38,6 +38,7 @@ from contentstore.utils import (
     add_extra_panel_tab,
     remove_extra_panel_tab,
     reverse_course_url,
+    reverse_library_url,
     reverse_usage_url,
     reverse_url,
     remove_all_instructors,
@@ -56,6 +57,7 @@ from .component import (
     ADVANCED_COMPONENT_TYPES,
 )
 from contentstore.tasks import rerun_course
+from .library import LIBRARIES_ENABLED
 from .item import create_xblock_info
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
@@ -341,6 +343,14 @@ def _accessible_courses_list_from_groups(request):
     return courses_list.values(), in_process_course_actions
 
 
+def _accessible_libraries_list(user):
+    """
+    List all libraries available to the logged in user by iterating through all libraries
+    """
+    # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
+    return [lib for lib in modulestore().get_libraries() if has_course_author_access(user, lib.location)]
+
+
 @login_required
 @ensure_csrf_cookie
 def course_listing(request):
@@ -359,6 +369,8 @@ def course_listing(request):
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
             courses, in_process_course_actions = _accessible_courses_list(request)
+
+    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
 
     def format_course_for_view(course):
         """
@@ -396,6 +408,18 @@ def course_listing(request):
             ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
+    def format_library_for_view(library):
+        """
+        Return a dict of the data which the view requires for each library
+        """
+        return {
+            'display_name': library.display_name,
+            'library_key': unicode(library.location.library_key),
+            'url': reverse_library_url('library_handler', unicode(library.location.library_key)),
+            'org': library.display_org_with_default,
+            'number': library.display_number_with_default,
+        }
+
     # remove any courses in courses that are also in the in_process_course_actions list
     in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
     courses = [
@@ -409,6 +433,8 @@ def course_listing(request):
     return render_to_response('index.html', {
         'courses': courses,
         'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'libraries': [format_library_for_view(lib) for lib in libraries],
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),

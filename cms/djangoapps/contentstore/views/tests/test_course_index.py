@@ -6,7 +6,7 @@ import lxml
 import datetime
 
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, add_instructor
+from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor
 from student.auth import has_course_author_access
 from contentstore.views.course import course_outline_initial_state
 from contentstore.views.item import create_xblock_info, VisibilityState
@@ -14,7 +14,7 @@ from course_action_state.models import CourseRerunState
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from course_action_state.managers import CourseRerunUIStateManager
@@ -60,6 +60,27 @@ class TestCourseIndex(CourseTestCase):
             self.assertEqual(outline_link.get("href"), link.get("href"))
             course_menu_link = outline_parsed.find_class('nav-course-courseware-outline')[0]
             self.assertEqual(course_menu_link.find("a").get("href"), link.get("href"))
+
+    def test_libraries_on_course_index(self):
+        """
+        Test getting the list of libraries from the course listing page
+        """
+        # Add a library:
+        lib1 = LibraryFactory.create()
+
+        index_url = '/course/'
+        index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
+        parsed_html = lxml.html.fromstring(index_response.content)
+        library_link_elements = parsed_html.find_class('library-link')
+        self.assertEqual(len(library_link_elements), 1)
+        link = library_link_elements[0]
+        self.assertEqual(
+            link.get("href"),
+            reverse_library_url('library_handler', lib1.location.library_key),
+        )
+        # now test that url
+        outline_response = self.client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
+        self.assertEqual(outline_response.status_code, 200)
 
     def test_is_staff_access(self):
         """

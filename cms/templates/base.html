@@ -21,6 +21,8 @@
         % if context_course:
         <% ctx_loc = context_course.location %>
         ${context_course.display_name_with_default | h} |
+        % elif context_library:
+        ${context_library.display_name_with_default | h} |
         % endif
         ${settings.STUDIO_NAME}
     </title>

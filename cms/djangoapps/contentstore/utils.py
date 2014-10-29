@@ -296,6 +296,13 @@ def reverse_course_url(handler_name, course_key, kwargs=None):
     return reverse_url(handler_name, 'course_key_string', course_key, kwargs)
 
 
+def reverse_library_url(handler_name, library_key, kwargs=None):
+    """
+    Creates the URL for handlers that use library_keys as URL parameters.
+    """
+    return reverse_url(handler_name, 'library_key_string', library_key, kwargs)
+
+
 def reverse_usage_url(handler_name, usage_key, kwargs=None):
     """
     Creates the URL for handlers that use usage_keys as URL parameters.

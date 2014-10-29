@@ -24,7 +24,8 @@ from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
 from opaque_keys.edx.keys import UsageKey, CourseKey
@@ -1418,6 +1419,54 @@ class TestXBlockInfo(ItemTest):
             self.assertEqual(xblock_info['edited_by'], 'testuser')
         else:
             self.assertIsNone(xblock_info.get('edited_by', None))
+
+
+class TestLibraryXBlockInfo(ModuleStoreTestCase):
+    """
+    Unit tests for XBlock Info for XBlocks in a content library
+    """
+    def setUp(self):
+        super(TestLibraryXBlockInfo, self).setUp()
+        user_id = self.user.id
+        self.library = LibraryFactory.create()
+        self.top_level_html = ItemFactory.create(
+            parent_location=self.library.location, category='html', user_id=user_id, publish_item=False
+        )
+        self.vertical = ItemFactory.create(
+            parent_location=self.library.location, category='vertical', user_id=user_id, publish_item=False
+        )
+        self.child_html = ItemFactory.create(
+            parent_location=self.vertical.location, category='html', display_name='Test HTML Child Block', user_id=user_id, publish_item=False
+        )
+
+    def test_lib_xblock_info(self):
+        html_block = modulestore().get_item(self.top_level_html.location)
+        xblock_info = create_xblock_info(html_block)
+        self.validate_component_xblock_info(xblock_info, html_block)
+        self.assertIsNone(xblock_info.get('child_info', None))
+
+    def test_lib_child_xblock_info(self):
+        html_block = modulestore().get_item(self.child_html.location)
+        xblock_info = create_xblock_info(html_block, include_ancestor_info=True, include_child_info=True)
+        self.validate_component_xblock_info(xblock_info, html_block)
+        self.assertIsNone(xblock_info.get('child_info', None))
+        ancestors = xblock_info['ancestor_info']['ancestors']
+        self.assertEqual(len(ancestors), 2)
+        self.assertEqual(ancestors[0]['category'], 'vertical')
+        self.assertEqual(ancestors[0]['id'], unicode(self.vertical.location))
+        self.assertEqual(ancestors[1]['category'], 'library')
+
+    def validate_component_xblock_info(self, xblock_info, original_block):
+        """
+        Validate that the xblock info is correct for the test component.
+        """
+        self.assertEqual(xblock_info['category'], original_block.category)
+        self.assertEqual(xblock_info['id'], unicode(original_block.location))
+        self.assertEqual(xblock_info['display_name'], original_block.display_name)
+        self.assertIsNone(xblock_info.get('has_changes', None))
+        self.assertIsNone(xblock_info.get('published', None))
+        self.assertIsNone(xblock_info.get('published_on', None))
+        self.assertIsNone(xblock_info.get('graders', None))
 
 
 class TestXBlockPublishingInfo(ItemTest):
