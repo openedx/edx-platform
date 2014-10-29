@@ -430,6 +430,7 @@ def course_listing(request):
     return render_to_response('index.html', {
         'courses': courses,
         'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
         'libraries': [format_library_for_view(lib) for lib in libraries],
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
