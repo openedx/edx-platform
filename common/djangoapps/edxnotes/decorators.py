@@ -3,10 +3,8 @@ Decorators related to edXNotes.
 """
 from edxnotes.api import (
     get_prefix,
-    get_token_url,
     get_user_id,
     generate_uid,
-    generate_token,
     get_usage_id,
     get_course_id,
 )
@@ -32,9 +30,7 @@ def edxnotes(cls):
                     # Use camelCase to name keys.
                     'usageId': get_usage_id(),
                     'courseId': get_course_id(),
-                    'token': generate_token(),
                     'prefix': get_prefix(),
-                    'tokenUrl': get_token_url(),
                     'user': get_user_id(),
                 },
             })

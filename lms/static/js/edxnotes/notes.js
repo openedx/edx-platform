@@ -19,8 +19,6 @@
         /**
          * Returns options for the annotator.
          * @param {jQuery Element} The container element.
-         * @param {String} params.token An auth token.
-         * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
          * @param {String} params.usageId Usage Id of the component.
@@ -30,10 +28,6 @@
         getOptions = function (element, params) {
             var usageId = params.usageId || getUsageId(element);
             return {
-                auth: {
-                    token: params.token,
-                    tokenUrl: params.tokenUrl
-                },
                 store: {
                     prefix: params.prefix,
                     annotationData: {
@@ -66,8 +60,6 @@
         /**
          * Factory method that returns Annotator.js instantiates.
          * @param {DOM Element} element The container element.
-         * @param {String} params.token An auth token.
-         * @param {String} params.tokenUrl The URL on the local server to request an authentication token.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
          * @param {String} params.usageId Usage Id of the component.
@@ -78,7 +70,7 @@
             var el = $(element),
                 options = getOptions(el, params),
                 annotator = new Annotator(element, options),
-                plugins = [/*'Auth', */'Store'];
+                plugins = ['Store'];
 
             el.data('annotator', annotator);
             setupPlugins(annotator, plugins, options);
