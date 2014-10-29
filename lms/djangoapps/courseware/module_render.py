@@ -401,6 +401,9 @@ def get_module_system_for_user(user, field_data_cache,
             log.error(err_msg)
             raise LmsModuleRenderError(err_msg)
 
+        if module._bound_student == real_user:  # pylint: disable=protected-access
+            return
+
         field_data_cache_real_user = FieldDataCache.cache_for_descriptor_descendents(
             course_id,
             real_user,
@@ -429,6 +432,7 @@ def get_module_system_for_user(user, field_data_cache,
         module.descriptor.scope_ids = (
             module.descriptor.scope_ids._replace(user_id=real_user.id)  # pylint: disable=protected-access
         )
+        module._bound_student = real_user  # pylint: disable=protected-access
         module.scope_ids = module.descriptor.scope_ids  # this is needed b/c NamedTuples are immutable
         # now bind the module to the new ModuleSystem instance and vice-versa
         module.runtime = inner_system
@@ -593,6 +597,9 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         if not has_access(user, 'load', descriptor, course_id):
             return None
 
+    if descriptor._bound_student == user:  # pylint: disable=protected-access
+        return descriptor
+
     (system, student_data) = get_module_system_for_user(
         user=user,
         field_data_cache=field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
@@ -610,6 +617,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access
     descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
+    descriptor._bound_student = user   # pylint: disable=protected-access
     return descriptor
 
 
