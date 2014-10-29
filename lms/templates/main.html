@@ -72,22 +72,13 @@
 
   <script>
     window.baseUrl = "${settings.STATIC_URL}";
-    RequireJS.requirejs.config({
-        baseUrl: baseUrl,
-        waitSeconds: 60,
-        paths: {
-          'annotator_1.2.9': 'js/vendor/edxnotes/annotator-full.min'
-        },
-        map: {
-          'js/edxnotes/notes': {
-            'annotator': 'annotator_1.2.9'
-          },
-          'js/edxnotes/plugins/accessibility': {
-            'annotator': 'annotator_1.2.9'
-          }
-        }
-    });
+    (function (require) {
+      require.config({
+          baseUrl: baseUrl
+      });
+    }).call(this, require || RequireJS.require);
   </script>
+  <script type="text/javascript" src="${static.url("require-config.js")}"></script>
 
   <%block name="headextra"/>
 

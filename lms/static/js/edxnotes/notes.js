@@ -1,7 +1,12 @@
 (function (define, $, _, undefined) {
     'use strict';
-    define(['annotator', 'js/edxnotes/plugins/accessibility'], function (Annotator) {
-        var getUsageId, getOptions, setupPlugins, getAnnotator;
+    define([
+        'annotator', 'js/edxnotes/logger', 'js/edxnotes/shim'
+    ], function (Annotator, Logger) {
+        var LOGGER_MODE = 1,
+            logger = new Logger(LOGGER_MODE),
+            getUsageId, getOptions, setupPlugins, getAnnotator;
+
         /**
          * Returns Usage id for the component.
          * @param {jQuery Element} The container element.
@@ -77,6 +82,13 @@
 
             el.data('annotator', annotator);
             setupPlugins(annotator, plugins, options);
+            logger.log({
+                'constructor': Annotator,
+                'element': element,
+                'options': options,
+                'annotator': annotator,
+                'usageId': getUsageId(el)
+            });
             return annotator;
         };
 

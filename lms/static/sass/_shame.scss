@@ -247,6 +247,7 @@ footer .references {
 // ====================
 
 // modal semantic button resetting - overriding the poorly scoped button mixin styling
+.annotator-adder button,
 .close-modal, button.close-modal {
   @extend %ui-reset-button;
 

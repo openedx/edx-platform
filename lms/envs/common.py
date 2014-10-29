@@ -1135,7 +1135,7 @@ PIPELINE_CSS = {
             'js/vendor/ova/catch/css/main.css'
         ],
         'output_filename': 'css/lms-style-xmodule-annotations.css',
-    }
+    },
 }
 
 
@@ -1248,7 +1248,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "common_static",
 )
 
-PIPELINE_UGLIFYJS_BINARY='node_modules/.bin/uglifyjs'
+PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
