@@ -279,3 +279,14 @@ footer .references {
 .course-content .discussion-post.edit-post-form .topic-submenu {
   list-style: none;
 }
+
+// poor definition/scope on a elements inside .xmodule_display.xmodule_HtmlModule element - override needed for annotator.js
+.annotator-wrapper .annotator-editor .annotator-widget .annotator-controls a {
+  color: rgb(54, 54, 54);
+
+  &.annotator-focus,
+  &:hover,
+  &:focus {
+    color: rgb(255, 255, 255);
+  }
+}
