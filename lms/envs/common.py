@@ -268,10 +268,6 @@ FEATURES = {
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
 
-    # Analytics Data API (for active student count)
-    # Default to false here b/c dev environments won't have the api, will override in aws.py
-    'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
-
     # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
     # False to not redirect the user
@@ -1833,7 +1829,7 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
-### Analytics data api settings
+### Analytics Data API + Dashboard (Insights) settings
 ANALYTICS_DATA_URL = ""
 ANALYTICS_DATA_TOKEN = ""
 ANALYTICS_DASHBOARD_URL = ""

@@ -37,10 +37,6 @@ FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't r
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
 
-ANALYTICS_DATA_URL = "http://127.0.0.1:8080"
-ANALYTICS_DATA_TOKEN = ""
-FEATURES['ENABLE_ANALYTICS_ACTIVE_COUNT'] = False
-
 # Set this to the dashboard URL in order to display the link from the
 # dashboard to the Analytics Dashboard.
 ANALYTICS_DASHBOARD_URL = None
