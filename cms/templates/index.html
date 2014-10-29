@@ -356,6 +356,36 @@
       </div>
       % endif
 
+      %if libraries:
+      <div class="copy">
+        <h1>Content Libraries</h1>
+        <p>${_("Warning: Content Libraries are currently a beta feature, and may be subject to backwards-incompatible changes.")}</p>
+        <p>${_("Here are all of the libraries you currently have access to in Studio:")}</p>
+      </div>
+
+      <div class="courses">
+        <ul class="list-courses">
+          %for library_info in sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+          <li class="course-item">
+            <a class="library-link" href="${library_info['url']}">
+              <h3 class="course-title">${library_info['display_name']}</h3>
+
+              <div class="course-metadata">
+                <span class="course-org metadata-item">
+                  <span class="label">${_("Organization:")}</span> <span class="value">${library_info['org']}</span>
+                </span>
+                <span class="course-num metadata-item">
+                  <span class="label">${_("Course Number:")}</span>
+                  <span class="value">${library_info['number']}</span>
+                </span>
+              </div>
+            </a>
+          </li>
+          %endfor
+        </ul>
+      </div>
+      %endif
+
     </article>
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
