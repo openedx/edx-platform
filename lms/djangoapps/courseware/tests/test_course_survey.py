@@ -26,7 +26,7 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         super(SurveyViewsTests, self).setUp()
 
         self.test_survey_name = 'TestSurvey'
-        self.test_form = '<input></input>'
+        self.test_form = '<input name="field1"></input>'
 
         self.survey = SurveyForm.create(self.test_survey_name, self.test_form)
 
@@ -91,7 +91,6 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
                     kwargs={'course_id': unicode(course.id)}
                 )
             )
-            print '*** resp={}'.format(resp)
             self.assertEquals(resp.status_code, 200)
 
     def test_visiting_course_without_survey(self):
