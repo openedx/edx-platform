@@ -289,7 +289,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
 
                 };
                 saving = new NotificationView.Mini({
-                    title: gettext('Saving…')
+                    title: gettext('Saving')
                 });
                 saving.show();
                 element.addClass('was-dropped');

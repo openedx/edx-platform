@@ -25,7 +25,7 @@ define(["backbone", "gettext", "js/views/feedback_notification", "js/utils/modul
         showNotification: function() {
             if(!this.msg) {
                 this.msg = new NotificationView.Mini({
-                    title: gettext("Saving…")
+                    title: gettext("Saving")
                 });
             }
             this.msg.show();

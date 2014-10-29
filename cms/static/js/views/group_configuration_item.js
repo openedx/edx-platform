@@ -41,7 +41,7 @@ define([
                 gettext('Delete'),
                 function() {
                     return ViewUtils.runOperationShowingMessage(
-                        gettext('Deleting…'),
+                        gettext('Deleting'),
                         function () {
                             return self.model.destroy({ wait: true });
                         }

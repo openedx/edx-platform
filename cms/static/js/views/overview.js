@@ -75,7 +75,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             });
 
             var saving = new NotificationView.Mini({
-                title: gettext("Saving…")
+                title: gettext("Saving")
             });
             saving.show();
             // call into server to commit the new order

@@ -56,7 +56,7 @@ define(["js/views/baseview", "codemirror", "js/views/feedback_notification", "js
             if ($('.CodeMirror-lines').find('.cm-error').length == 0){
                 this.model.set('data', this.$codeMirror.getValue());
                 var saving = new NotificationView.Mini({
-                    title: gettext('Saving…')
+                    title: gettext('Saving')
                 });
                 saving.show();
                 this.model.save({}, {

@@ -113,7 +113,7 @@ function(BaseView, _, $, gettext, GroupEdit, ViewUtils) {
             }
 
             ViewUtils.runOperationShowingMessage(
-                gettext('Saving…'),
+                gettext('Saving'),
                 function () {
                     var dfd = $.Deferred();
 

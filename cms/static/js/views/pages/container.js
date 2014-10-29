@@ -190,7 +190,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 // for xblocks that can't be replaced inline, the entire parent will be refreshed.
                 var self = this,
                     parent = xblockElement.parent();
-                ViewUtils.runOperationShowingMessage(gettext('Duplicating…'),
+                ViewUtils.runOperationShowingMessage(gettext('Duplicating'),
                     function() {
                         var scrollOffset = ViewUtils.getScrollOffset(xblockElement),
                             placeholderElement = self.createPlaceholderElement().insertAfter(xblockElement),

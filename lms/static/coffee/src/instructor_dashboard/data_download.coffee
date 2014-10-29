@@ -67,7 +67,7 @@ class DataDownload
 
       # Dynamically generate slickgrid table for displaying student profile information
       @clear_display()
-      @$download_display_table.text gettext('Loading...')
+      @$download_display_table.text gettext('Loading')
 
       # fetch user list
       $.ajax
