@@ -260,7 +260,10 @@
                 exports: 'NotificationView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
-
+            'js/student_account/enrollment_interface': {
+                exports: 'js/student_account/enrollment_interface',
+                deps: ['jquery', 'underscore', 'gettext']
+            },
             // Student account registration/login
             // Loaded explicitly until these are converted to RequireJS
             'js/student_account/views/FormView': {
@@ -310,7 +313,7 @@
                     'js/student_account/views/RegisterView',
                     'underscore.string'
                 ]
-            },
+            }
         },
     });
 
@@ -327,6 +330,7 @@
         'lms/include/js/spec/student_account/login_spec.js',
         'lms/include/js/spec/student_account/register_spec.js',
         'lms/include/js/spec/student_account/password_reset_spec.js',
+        'lms/include/js/spec/student_account/enrollment_interface_spec.js',
         'lms/include/js/spec/student_profile/profile.js',
     ]);
 

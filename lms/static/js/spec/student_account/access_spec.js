@@ -1,5 +1,5 @@
 define(['js/common_helpers/template_helpers', 'js/student_account/views/AccessView'],
-    function(TemplateHelpers) {
+    function(TemplateHelpers, AccessView) {
         describe('edx.student.account.AccessView', function() {
             'use strict';
 
