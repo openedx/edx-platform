@@ -367,7 +367,10 @@ def _get_course_data(request, course_key, course_descriptor, depth=0):
     base_uri_without_qs = generate_base_uri(request, True)
     if unicode(course_descriptor.id) not in base_uri_without_qs:
         base_uri_without_qs = '{}/{}'.format(base_uri_without_qs, unicode(course_descriptor.id))
-    data['course_image_url'] = course_image_url(course_descriptor)
+    image_url = ''
+    if hasattr(course_descriptor, 'course_image') and course_descriptor.course_image:
+        image_url = course_image_url(course_descriptor)
+    data['course_image_url'] = image_url
     data['resources'] = []
     resource_uri = '{}/content/'.format(base_uri_without_qs)
     data['resources'].append({'uri': resource_uri})
@@ -837,6 +840,11 @@ class CoursesOverview(SecureAPIView):
             response_data['sections'] = _parse_overview_html(existing_content)
         else:
             response_data['overview_html'] = existing_content
+        image_url = ''
+        if hasattr(course_descriptor, 'course_image') and course_descriptor.course_image:
+            image_url = course_image_url(course_descriptor)
+        response_data['course_image_url'] = image_url
+        response_data['course_video'] = get_course_about_section(course_descriptor, 'video')
         return Response(response_data, status=status.HTTP_200_OK)
 
 
