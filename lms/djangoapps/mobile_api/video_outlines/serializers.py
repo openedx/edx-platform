@@ -40,7 +40,8 @@ class BlockOutline(object):
                 block = child_to_parent[block]
                 if block is not self.start_block:
                     block_path.append({
-                        'name': block.display_name,
+                        # to be consistent with other edx-platform clients, return the defaulted display name
+                        'name': block.display_name_with_default,
                         'category': block.category,
                     })
             return reversed(block_path)
@@ -76,12 +77,21 @@ class BlockOutline(object):
                 kwargs=kwargs,
                 request=self.request,
             )
-            return unit_url, section_url
+            return unit_url, section_url, block_path
 
         user = self.request.user
 
         while stack:
             curr_block = stack.pop()
+
+            if curr_block.hide_from_toc:
+                # For now, if the 'hide_from_toc' setting is set on the block, do not traverse down
+                # the hierarchy.  The reason being is that these blocks may not have human-readable names
+                # to display on the mobile clients.
+                # Eventually, we'll need to figure out how we want these blocks to be displayed on the
+                # mobile clients.  As, they are still accessible in the browser, just not navigatable
+                # from the table-of-contents.
+                continue
 
             if curr_block.category in self.categories_to_outliner:
                 if not has_access(user, 'load', curr_block, course_key=self.course_id):
@@ -89,7 +99,8 @@ class BlockOutline(object):
 
                 summary_fn = self.categories_to_outliner[curr_block.category]
                 block_path = list(path(curr_block))
-                unit_url, section_url = find_urls(curr_block)
+                unit_url, section_url, _ = find_urls(curr_block)
+
                 yield {
                     "path": block_path,
                     "named_path": [b["name"] for b in block_path[:-1]],
@@ -145,7 +156,7 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
         "size": size,
         "name": video_descriptor.display_name,
         "transcripts": transcripts,
-        "language": video_descriptor.transcript_language,
+        "language": video_descriptor.get_default_transcript_language(),
         "category": video_descriptor.category,
         "id": unicode(video_descriptor.scope_ids.usage_id),
     }

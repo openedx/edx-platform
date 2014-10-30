@@ -4,6 +4,7 @@ Tests for users API
 from rest_framework.test import APITestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.django import modulestore
 from courseware.tests.factories import UserFactory
 from django.core.urlresolvers import reverse
 from mobile_api.users.serializers import CourseEnrollmentSerializer
@@ -93,3 +94,16 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=E1101
         self.assertEqual(serialized['course']['video_outline'], None)
         self.assertEqual(serialized['course']['name'], self.course.display_name)
+        self.assertEqual(serialized['course']['number'], self.course.id.course)
+        self.assertEqual(serialized['course']['org'], self.course.id.org)
+
+    def test_course_serializer_with_display_overrides(self):
+        self.course.display_coursenumber = "overridden_number"
+        self.course.display_organization = "overridden_org"
+        modulestore().update_item(self.course, self.user.id)
+
+        self.client.login(username=self.username, password=self.password)
+        self._enroll()
+        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=E1101
+        self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
+        self.assertEqual(serialized['course']['org'], self.course.display_organization)
