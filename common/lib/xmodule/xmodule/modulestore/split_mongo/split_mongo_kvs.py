@@ -19,17 +19,20 @@ class SplitMongoKVS(InheritanceKeyValueStore):
     """
 
     @contract(parent="BlockUsageLocator | None")
-    def __init__(self, definition, initial_values, parent, field_decorator=None):
+    def __init__(self, definition, initial_values, default_values, parent, field_decorator=None):
         """
 
         :param definition: either a lazyloader or definition id for the definition
         :param initial_values: a dictionary of the locally set values
+        :param default_values: any Scope.settings field defaults that are set locally
+            (copied from a template block with copy_from_template)
         """
         # deepcopy so that manipulations of fields does not pollute the source
         super(SplitMongoKVS, self).__init__(copy.deepcopy(initial_values))
         self._definition = definition  # either a DefinitionLazyLoader or the db id of the definition.
         # if the db id, then the definition is presumed to be loaded into _fields
 
+        self._defaults = default_values
         # a decorator function for field values (to be called when a field is accessed)
         if field_decorator is None:
             self.field_decorator = lambda x: x
@@ -109,6 +112,16 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         # it's not clear whether inherited values should return True. Right now they don't
         # if someone changes it so that they do, then change any tests of field.name in xx._field_data
         return key.field_name in self._fields
+
+    def default(self, key):
+        """
+        Check to see if the default should be from the template's defaults (if any)
+        rather than the global default or inheritance.
+        """
+        if self._defaults and key.field_name in self._defaults:
+            return self._defaults[key.field_name]
+        # If not, try inheriting from a parent, then use the XBlock type's normal default value:
+        return super(SplitMongoKVS, self).default(key)
 
     def _load_definition(self):
         """
