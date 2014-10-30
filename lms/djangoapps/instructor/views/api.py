@@ -63,6 +63,7 @@ import instructor_analytics.csvs
 import csv
 from user_api.models import UserPreference
 from instructor.views import INVOICE_KEY
+from instructor.utils import collect_ora2_data
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
@@ -1447,6 +1448,18 @@ def list_forum_members(request, course_id):
     }
     return JsonResponse(response_payload)
 
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_ora2_responses(request, course_id):
+    """
+    Collects all of a course's ora2 responses and returns a .csv for download
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    header, rows = collect_ora2_data(course_id)
+    file_name = ("%s-ora2.csv" % course_id).replace("/","-")
+
+    return instructor_analytics.csvs.create_csv_response(file_name, header, rows)
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

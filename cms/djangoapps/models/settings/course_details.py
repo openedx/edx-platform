@@ -25,6 +25,7 @@ class CourseDetails(object):
         self.syllabus = None  # a pdf file asset
         self.short_description = ""
         self.overview = ""  # html to render as the overview
+        self.about_sidebar_html = "" # html to render as the about_sidebar_html
         self.pre_enrollment_email = render_to_string('emails/default_pre_enrollment_message.txt', {})
         self.post_enrollment_email = render_to_string('emails/default_post_enrollment_message.txt', {})
         self.pre_enrollment_email_subject = "Thanks for Enrolling in {}".format(self.course_id)
@@ -68,6 +69,13 @@ class CourseDetails(object):
             course_details.overview = modulestore().get_item(temploc).data
         except ItemNotFoundError:
             pass
+
+        temploc = course_key.make_usage_key('about', 'about_sidebar_html')
+        try:
+            course_details.about_sidebar_html = modulestore().get_item(temploc).data
+        except ItemNotFoundError:
+            pass
+
         temploc = course_key.make_usage_key('about', 'pre_enrollment_email_subject')
         try:
             course_details.pre_enrollment_email_subject = modulestore().get_item(temploc).data
@@ -193,7 +201,7 @@ class CourseDetails(object):
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-        for about_type in ['syllabus', 'overview', 'effort', 'short_description', 
+        for about_type in ['syllabus', 'overview', 'about_sidebar_html', 'effort', 'short_description', 
                            'pre_enrollment_email', 'post_enrollment_email', 'pre_enrollment_email_subject', 
                            'post_enrollment_email_subject']:
             cls.update_about_item(course_key, about_type, jsondict[about_type], descriptor, user)

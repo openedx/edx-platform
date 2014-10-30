@@ -23,6 +23,7 @@ from xmodule.video_module.transcripts_utils import (
                                     GetTranscriptsFromYouTubeException,
                                     TranscriptsRequestValidationException,
                                     download_youtube_subs)
+from xmodule.video_module import manage_video_subtitles_save
 
 from ..transcripts_ajax import get_transcripts_presence
 from ..course import _get_course_module
@@ -87,6 +88,10 @@ def json_update_videos(request, locations):
             #update transcripts
             item = modulestore().get_item(key)
             download_youtube_subs(item.youtube_id_1_0, item, settings)
+
+            # Once transcripts downloaded, show subs are present from youtube
+            item.sub = item.youtube_id_1_0
+            manage_video_subtitles_save(item, request.user)
 
             #get new status
             videos = {'youtube': item.youtube_id_1_0}

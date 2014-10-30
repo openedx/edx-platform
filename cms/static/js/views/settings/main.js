@@ -12,6 +12,7 @@ var DetailsView = ValidatingView.extend({
         "change textarea" : "updateModel",
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
+        'focus #course-about-sidebar-html' : "codeMirrorize",
         'click #enable-enrollment-email' : "toggleEnrollmentEmails",
         'focus #pre-enrollment-email' : "codeMirrorize",
         'focus #post-enrollment-email' : "codeMirrorize",
@@ -76,6 +77,9 @@ var DetailsView = ValidatingView.extend({
 
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
+        
+        this.$el.find('#' + this.fieldToSelectorMap['about_sidebar_html']).val(this.model.get('about_sidebar_html'));
+        this.codeMirrorize(null, $('#course-about-sidebar-html')[0]);
 
         this.pre_enrollment_email_subject_elem.val(this.model.get('pre_enrollment_email_subject'));
         this.post_enrollment_email_subject_elem.val(this.model.get('post_enrollment_email_subject'));
@@ -117,6 +121,7 @@ var DetailsView = ValidatingView.extend({
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
         'overview' : 'course-overview',
+        'about_sidebar_html' : 'course-about-sidebar-html',
         'pre_enrollment_email' : 'pre-enrollment-email',
         'post_enrollment_email' : 'post-enrollment-email',
         'short_description' : 'course-short-description',
