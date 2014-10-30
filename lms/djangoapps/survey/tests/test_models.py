@@ -8,7 +8,8 @@ from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
 
-from survey.exceptions import SurveyFormNotFound, SurveyFormNameAlreadyExists, SurveyFormMalformed
+from survey.exceptions import SurveyFormNotFound, SurveyFormNameAlreadyExists
+from django.core.exceptions import ValidationError
 from survey.models import SurveyForm
 
 
@@ -28,7 +29,7 @@ class SurveyModelsTests(TestCase):
         self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
 
         self.test_survey_name = 'TestForm'
-        self.test_form = '<input name="field1" /><input name="field2" /><select name="ddl"><option>1</option></select>'
+        self.test_form = '<li><input name="field1" /></li><li><input name="field2" /></li><li><select name="ddl"><option>1</option></select></li>'
         self.test_form_update = '<input name="field1" />'
 
         self.student_answers = OrderedDict({
@@ -86,7 +87,7 @@ class SurveyModelsTests(TestCase):
         Make sure that if a SurveyForm is saved with unparseable html
         an exception is thrown
         """
-        with self.assertRaises(SurveyFormMalformed):
+        with self.assertRaises(ValidationError):
             SurveyForm.create('badform', '<input name="oops" /><<<>')
 
     def test_create_form_with_no_fields(self):
@@ -94,10 +95,10 @@ class SurveyModelsTests(TestCase):
         Make sure that if a SurveyForm is saved without any named fields
         an exception is thrown
         """
-        with self.assertRaises(SurveyFormMalformed):
+        with self.assertRaises(ValidationError):
             SurveyForm.create('badform', '<p>no input fields here</p>')
 
-        with self.assertRaises(SurveyFormMalformed):
+        with self.assertRaises(ValidationError):
             SurveyForm.create('badform', '<input id="input_without_name" />')
 
     def test_create_form_already_exists(self):

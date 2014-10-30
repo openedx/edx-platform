@@ -16,10 +16,3 @@ class SurveyFormNameAlreadyExists(Exception):
     """
     pass
 
-
-class SurveyFormMalformed(Exception):
-    """
-    Thrown when a SurveyForm is either not parseable HTML or
-    does not contain at least one input field
-    """
-    pass

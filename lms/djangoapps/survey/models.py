@@ -7,10 +7,11 @@ from lxml import etree
 from collections import OrderedDict
 from django.db import models
 from student.models import User
+from django.core.exceptions import ValidationError
 
 from model_utils.models import TimeStampedModel
 
-from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound, SurveyFormMalformed
+from survey.exceptions import SurveyFormNameAlreadyExists, SurveyFormNotFound
 
 log = logging.getLogger("edx.survey")
 
@@ -33,18 +34,25 @@ class SurveyForm(TimeStampedModel):
         Override save method so we can validate that the form HTML is
         actually parseable
         """
-        # just call this method. This will throw an exception if we cannot parse it
-        try:
-            fields = self.get_field_names()
-        except Exception as ex:
-            log.exception("Cannot parse SurveyForm html: {}".format(ex))
-            raise SurveyFormMalformed("Cannot parse SurveyForm as HTML")
 
-        if not len(fields):
-            raise SurveyFormMalformed("SurveyForms must contain at least one form input field")
+        self.validate_form_html(self.form)
 
         # now call the actual save method
         super(SurveyForm, self).save(*args, **kwargs)
+
+    @classmethod
+    def validate_form_html(cls, html):
+        """
+        Makes sure that the html that is contained in the form field is valid
+        """
+        try:
+            fields = cls.get_field_names_from_html(html)
+        except Exception as ex:
+            log.exception("Cannot parse SurveyForm html: {}".format(ex))
+            raise ValidationError("Cannot parse SurveyForm as HTML: {}".format(ex))
+
+        if not len(fields):
+            raise ValidationError("SurveyForms must contain at least one form input field")
 
     @classmethod
     def create(cls, name, form, update_if_exists=False):
@@ -113,21 +121,27 @@ class SurveyForm(TimeStampedModel):
         This is taken from the set of <input> fields inside the form.
         """
 
+        return SurveyForm.get_field_names_from_html(self.form)
+
+    @classmethod
+    def get_field_names_from_html(cls, html):
+        """
+        Returns a list of defined field names from a block of HTML
+        """
         names = []
 
         # make sure the form is wrap in some outer single element
         # otherwise lxml can't parse it
         # NOTE: This wrapping doesn't change the ability to query it
-        tree = etree.fromstring('<div>{}</div>'.format(self.form))
+        tree = etree.fromstring(u'<div>{}</div>'.format(html))
 
-        input_fields = tree.findall('input') + tree.findall('select')
+        input_fields = tree.findall('.//input') + tree.findall('.//select')
 
         for input_field in input_fields:
             if 'name' in input_field.keys() and input_field.attrib['name'] not in names:
                 names.append(input_field.attrib['name'])
 
         return names
-
 
 class SurveyAnswer(TimeStampedModel):
     """
