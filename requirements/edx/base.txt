@@ -44,6 +44,7 @@ git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
 GitPython==0.3.2.RC1
 glob2==0.3
 gunicorn==0.17.4
+httpretty==0.8.3
 lazy==1.1
 lxml==3.3.6
 mako==0.9.1
