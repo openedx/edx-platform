@@ -79,6 +79,12 @@ class SurveyModelsTests(TestCase):
         )
         self.assertFalse(is_survey_required_for_course(course))
 
+        course = CourseFactory.create(
+            course_survey_required=False,
+            course_survey_name="NonExisting"
+        )
+        self.assertFalse(is_survey_required_for_course(course))
+
     def test_user_not_yet_answered_required_survey(self):
         """
         Assert that a new course which has a required survey but user has not answered it yet
