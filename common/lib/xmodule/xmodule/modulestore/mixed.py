@@ -677,6 +677,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.import_xblock(user_id, course_key, block_type, block_id, fields, runtime)
 
     @strip_key
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+        """
+        See :py:meth `SplitMongoModuleStore.copy_from_template`
+        """
+        store = self._verify_modulestore_support(dest_key.course_key, 'copy_from_template')
+        return store.copy_from_template(source_keys, dest_key, user_id)
+
+    @strip_key
     def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
         """
         Update the xblock persisted to be the same as the given for all types of fields

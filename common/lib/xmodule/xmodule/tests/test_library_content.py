@@ -117,7 +117,8 @@ class TestLibraries(MixedSplitTestCase):
         # is updated, but the way we do it through a factory doesn't do that.
         self.assertEqual(len(self.lc_block.children), 0)
         # Update the LibraryContent module:
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
         # Check that all blocks from the library are now children of the block:
         self.assertEqual(len(self.lc_block.children), len(self.lib_blocks))
 
@@ -125,7 +126,7 @@ class TestLibraries(MixedSplitTestCase):
         """
         Test that each student sees only one block as a child of the LibraryContent block.
         """
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_module(self.lc_block)
         # Make sure the runtime knows that the block's children vary per-user:

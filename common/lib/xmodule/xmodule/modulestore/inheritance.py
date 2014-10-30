@@ -283,6 +283,8 @@ class InheritanceKeyValueStore(KeyValueStore):
 
     def default(self, key):
         """
-        Check to see if the default should be from inheritance rather than from the field's global default
+        Check to see if the default should be from inheritance. If not
+        inheriting, this will raise KeyError which will cause the caller to use
+        the field's global default.
         """
         return self.inherited_settings[key.field_name]

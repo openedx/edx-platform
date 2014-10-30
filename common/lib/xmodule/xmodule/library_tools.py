@@ -1,10 +1,8 @@
 """
 XBlock runtime services for LibraryContentModule
 """
-import hashlib
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
-from xblock.fields import Scope
 from xmodule.library_content_module import LibraryVersionReference, ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.capa_module import CapaDescriptor
@@ -60,7 +58,7 @@ class LibraryToolsService(object):
         assert isinstance(descriptor, CapaDescriptor)
         return capa_type in descriptor.problem_types
 
-    def update_children(self, dest_block, user_id, user_perms=None, update_db=True):
+    def update_children(self, dest_block, user_id, user_perms=None):
         """
         This method is to be used when any of the libraries that a LibraryContentModule
         references have been updated. It will re-fetch all matching blocks from
@@ -71,82 +69,28 @@ class LibraryToolsService(object):
         This method will update dest_block's 'source_libraries' field to store
         the version number of the libraries used, so we easily determine if
         dest_block is up to date or not.
-
-        If update_db is True (default), this will explicitly persist the changes
-        to the modulestore by calling update_item(). Only set update_db False if
-        you know for sure that dest_block is about to be saved to the modulestore
-        anyways. Otherwise, orphaned blocks may be created.
         """
-        root_children = []
         if user_perms and not user_perms.can_write(dest_block.location.course_key):
             raise PermissionDenied()
 
+        new_libraries = []
+        source_blocks = []
+        for library_key, __ in dest_block.source_libraries:
+            library = self._get_library(library_key)
+            if library is None:
+                raise ValueError("Required library not found.")
+            if user_perms and not user_perms.can_read(library_key):
+                raise PermissionDenied()
+            filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)
+            if filter_children:
+                # Apply simple filtering based on CAPA problem types:
+                source_blocks.extend([key for key in library.children if self._filter_child(key, dest_block.capa_type)])
+            else:
+                source_blocks.extend(library.children)
+            new_libraries.append(LibraryVersionReference(library_key, library.location.library_key.version_guid))
+
         with self.store.bulk_operations(dest_block.location.course_key):
-            # Currently, ALL children are essentially deleted and then re-added
-            # in a way that preserves their block_ids (and thus should preserve
-            # student data, grades, analytics, etc.)
-            # Once course-level field overrides are implemented, this will
-            # change to a more conservative implementation.
-
-            # First, load and validate the source_libraries:
-            libraries = []
-            for library_key, old_version in dest_block.source_libraries:  # pylint: disable=unused-variable
-                library = self._get_library(library_key)
-                if library is None:
-                    raise ValueError("Required library not found.")
-                if user_perms and not user_perms.can_read(library_key):
-                    raise PermissionDenied()
-                libraries.append((library_key, library))
-
-            # Next, delete all our existing children to avoid block_id conflicts when we add them:
-            for child in dest_block.children:
-                self.store.delete_item(child, user_id)
-
-            # Now add all matching children, and record the library version we use:
-            new_libraries = []
-            for library_key, library in libraries:
-
-                def copy_children_recursively(from_block, filter_problem_type=False):
-                    """
-                    Internal method to copy blocks from the library recursively
-                    """
-                    new_children = []
-                    if filter_problem_type:
-                        filtered_children = [key for key in from_block.children if self._filter_child(key, dest_block.capa_type)]
-                    else:
-                        filtered_children = from_block.children
-                    for child_key in filtered_children:
-                        child = self.store.get_item(child_key, depth=None)
-                        # We compute a block_id for each matching child block found in the library.
-                        # block_ids are unique within any branch, but are not unique per-course or globally.
-                        # We need our block_ids to be consistent when content in the library is updated, so
-                        # we compute block_id as a hash of three pieces of data:
-                        unique_data = "{}:{}:{}".format(
-                            dest_block.location.block_id,  # Must not clash with other usages of the same library in this course
-                            unicode(library_key.for_version(None)).encode("utf-8"),  # The block ID below is only unique within a library, so we need this too
-                            child_key.block_id,  # Child block ID. Should not change even if the block is edited.
-                        )
-                        child_block_id = hashlib.sha1(unique_data).hexdigest()[:20]
-                        fields = {}
-                        for field in child.fields.itervalues():
-                            if field.scope == Scope.settings and field.is_set_on(child):
-                                fields[field.name] = field.read_from(child)
-                        if child.has_children:
-                            fields['children'] = copy_children_recursively(from_block=child)
-                        new_child_info = self.store.create_item(
-                            user_id,
-                            dest_block.location.course_key,
-                            child_key.block_type,
-                            block_id=child_block_id,
-                            definition_locator=child.definition_locator,
-                            runtime=dest_block.system,
-                            fields=fields,
-                        )
-                        new_children.append(new_child_info.location)
-                    return new_children
-                root_children.extend(copy_children_recursively(from_block=library, filter_problem_type=True))
-                new_libraries.append(LibraryVersionReference(library_key, library.location.library_key.version_guid))
             dest_block.source_libraries = new_libraries
-            dest_block.children = root_children
-            if update_db:
-                self.store.update_item(dest_block, user_id)
+            self.store.update_item(dest_block, user_id)
+            dest_block.children = self.store.copy_from_template(source_blocks, dest_block.location, user_id)
+            # ^-- copy_from_template updates the children in the DB but we must also set .children here to avoid overwriting the DB again
