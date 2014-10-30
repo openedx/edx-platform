@@ -69,7 +69,14 @@ define(["js/views/baseview", "underscore"], function(BaseView, _) {
             if (!this.template) return;
 
             this.setValueInEditor(this.model.getDisplayValue());
-
+            
+            if (this.model.get('display_name').indexOf('Display Name') >= 0 ) {
+            	if ($.trim(this.model.getDisplayValue()) == '' && this.$el.find("input:eq(0)").is(":focus") == false) {
+            		var original_value = $.trim(this.model.original_value || '');
+            		original_value != '' ? this.model.setValue(original_value) : this.clear();
+            		}
+            	}
+            
             if (this.model.isExplicitlySet()) {
                 this.showClearButton();
             }

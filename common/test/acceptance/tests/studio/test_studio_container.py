@@ -262,15 +262,16 @@ class EditContainerTest(NestedVerticalTest):
     Tests of editing a container.
     """
 
-    def modify_display_name_and_verify(self, component):
+    def modify_display_name_and_verify(self, component, modified_name='modified', original_value=None):
         """
         Helper method for changing a display name.
         """
-        modified_name = 'modified'
         self.assertNotEqual(component.name, modified_name)
         component.edit()
         component_editor = ComponentEditorView(self.browser, component.locator)
         component_editor.set_field_value_and_save('Display Name', modified_name)
+        if original_value:
+            modified_name = original_value
         self.assertEqual(component.name, modified_name)
 
     def test_edit_container_on_unit_page(self):
@@ -287,8 +288,18 @@ class EditContainerTest(NestedVerticalTest):
         """
         container = self.go_to_nested_container_page()
         self.modify_display_name_and_verify(container)
-
-
+        
+    def test_display_name_with_empty_string(self):
+        """
+        Test the Display Name if it is empty then it will filled with 
+        original value
+        """
+        unit = self.go_to_unit_page()
+        component = unit.xblocks[1]
+        empty_string = '  '
+        self.modify_display_name_and_verify(component, modified_name=empty_string, original_value=component.name)
+        
+    
 @attr('shard_1')
 class UnitPublishingTest(ContainerBase):
     """
