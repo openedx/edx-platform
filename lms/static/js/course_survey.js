@@ -10,7 +10,7 @@ $(function() {
         $("label").parent().removeClass("is-focused");
     });
 
-    $('.status.message.submission-error').css("display", "none");
+    $('.status.message.submission-error').addClass("is-hidden");
 
     toggleSubmitButton(true);
 
@@ -31,7 +31,7 @@ $(function() {
                     if (val.trim().length === 0) {
                         var field_label = $(this).parent().find("label");
                         $(this).parent().addClass('field-error');
-                        $('.status.message.submission-error .message-copy').append("<li>"+field_label.text()+"</li>");
+                        $('.status.message.submission-error .message-copy').append("<li class='error-item'>"+field_label.text()+"</li>");
                         cancel_submit = true;
                     }
                 } else if (typeof(val) === "object") {
@@ -39,7 +39,7 @@ $(function() {
                     if (val === null || val.length === 0 || val[0] === "") {
                         var field_label = $(this).parent().find("label");
                         $(this).parent().addClass('field-error');
-                        $('.status.message.submission-error .message-copy').append("<li>"+field_label.text()+"</li>");
+                        $('.status.message.submission-error .message-copy').append("<li class='error-item'>"+field_label.text()+"</li>");
                         cancel_submit = true;
                     }
                 }
@@ -48,7 +48,7 @@ $(function() {
 
         if (cancel_submit) {
           $('.status.message.submission-error').
-            css("display", "block").
+            removeClass("is-hidden").
             focus();
           $("html, body").animate({ scrollTop: 0 }, "fast");
           return false;
