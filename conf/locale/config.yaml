@@ -134,6 +134,7 @@ generate_merge:
         - django-studio.po
         - mako.po
         - mako-studio.po
+        - edraak-platform-theme.po
         - messages.po
         - wiki.po
     djangojs.po:
