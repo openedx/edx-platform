@@ -1,5 +1,8 @@
 // Open edX: LMS footer
 // ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 rgba(0,0,0, 0.1);
   border-top: 1px solid tint($m-gray,50%);
@@ -354,6 +357,7 @@ $edx-footer-bg-color: rgb(252,252,252);
 
   .footer-nav-title {
     @extend %edx-footer-title;
+    font-size: 13px;
   }
 
   .footer-nav-links {
@@ -370,16 +374,19 @@ $edx-footer-bg-color: rgb(252,252,252);
     @extend %edx-footer-reset;
     @extend %edx-footer-section;
     width: flex-grid(3,12);
+
   }
 
   .footer-follow-title {
     @extend %edx-footer-title;
+    font-size: 13px;
   }
 
   .footer-follow-links {
 
     a {
       @extend %edx-footer-link;
+      line-height: 34px;
 
       .icon, .copy {
         display: inline-block;
@@ -396,6 +403,39 @@ $edx-footer-bg-color: rgb(252,252,252);
       .copy {
         // NOTE: needed for poor LMS span styling
         color: inherit;
+      }
+    }
+  }
+
+  &.rwd {
+    @include box-sizing(border-box);
+    @include outer-container;
+    $grid-columns: 4;
+
+    &.wrapper-footer footer {
+      min-width: 0;
+    }
+
+    .footer-about,
+    .footer-nav,
+    .footer-follow {
+      @include span-columns(4);
+    }
+
+    @include media( $tablet ) {
+      /*$grid-columns: 8;*/
+    }
+
+    @include media( $desktop ) {
+      $grid-columns: 12;
+
+      .footer-about {
+        @include span-columns(6);
+      }
+
+      .footer-nav,
+      .footer-follow {
+        @include span-columns(3);
       }
     }
   }
