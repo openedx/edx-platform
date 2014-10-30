@@ -20,7 +20,7 @@ def is_survey_required_for_course(course_descriptor):
 
 def must_answer_survey(course_descriptor, user):
     """
-    Returns whether a user needs to answer a required course
+    Returns whether a user needs to answer a required survey
     """
     if not is_survey_required_for_course(course_descriptor):
         return False

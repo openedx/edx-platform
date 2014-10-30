@@ -76,19 +76,6 @@ class SurveyViewsTests(TestCase):
         # is the SurveyForm html present in the HTML response?
         self.assertIn(self.test_form, resp.content)
 
-    def test_survey_with_existing_data(self):
-        """
-        Asserts that if the user already supplied answers, then those answers will appear
-        as JavaScript data in the response
-        """
-        self.survey.save_user_answers(self.student, self.student_answers)
-
-        resp = self.client.get(self.view_url)
-        self.assertEquals(resp.status_code, 200)
-
-        # is the existing data present in the HTML response?
-        self.assertIn('"field1": "value1"', resp.content)
-
     def test_unautneticated_survey_postback(self):
         """
         Asserts that an anonymous user cannot answer a survey
@@ -163,19 +150,3 @@ class SurveyViewsTests(TestCase):
             '&lt;script type=&quot;javascript&quot;&gt;alert(&quot;Deleting filesystem...&quot;)&lt;/script&gt;',
             answers[self.student.id]['field1']
         )
-
-    def test_round_trip(self):
-        """
-        First submit answers to a survey then reload survey to verify that expected data is in the survey
-        """
-        resp = self.client.post(
-            self.postback_url,
-            self.student_answers
-        )
-        self.assertEquals(resp.status_code, 200)
-
-        resp = self.client.get(self.view_url)
-        self.assertEquals(resp.status_code, 200)
-
-        # is the existing data present in the HTML response?
-        self.assertIn('"field1": "value1"', resp.content)

@@ -12,9 +12,6 @@
 <%block name="bodyclass">view-survey</%block>
 
 <%block name="js_extra">
-  <script type="text/javascript">
-    var existing_data = ${existing_data_json};
-  </script>
   <script type="text/javascript" src="/static/js/course_survey.js"></script>
 </%block>
 
@@ -32,11 +29,11 @@
           </h4>
           <h3 class="title">${_("Pre-Course Survey")}</h3>
         </div>
-      % endif
 
-      <p class="instructions">
-        ${_("You can begin your course as soon as you complete the following form. Required fields are marked with an asterisk (*).")}
-      </p>
+        <p class="instructions">
+          ${_("You can begin your course as soon as you complete the following form. Required fields are marked with an asterisk (*).")}
+        </p>
+      % endif
 
       <div role="alert" class="status message submission-error" tabindex="-1">
         <h3 class="message-title">${_("You are missing the following required fields:")} </h3>
@@ -47,11 +44,7 @@
 
       <div class="form-actions">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_('Submit')}</button>
-        % if not is_required:
-          <a class="action action-cancel" href='${skip_redirect_url}'>${_("Cancel")}</a>
-        % else:
-          <a class="action action-cancel" href='${dashboard_redirect_url}'>${_("Cancel and Return to Dashboard")}</a>
-        % endif
+        <a class="action action-cancel" href='${dashboard_redirect_url}'>${_("Cancel and Return to Dashboard")}</a>
       </div>
     </form>
   </section>

@@ -3,12 +3,6 @@ $(function() {
     // adding js class for styling with accessibility in mind
     $('body').addClass('js');
 
-    // new window/tab opening
-    $('a[rel="external"], a[class="new-vp"]').click( function() {
-        window.open( $(this).attr('href') );
-        return false;
-    });
-
     // form field label styling on focus
     $("form :input").focus(function() {
         $("label[for='" + this.id + "']").parent().addClass("is-focused");
@@ -34,7 +28,7 @@ $(function() {
             if (typeof $(this).attr("required") !== typeof undefined) {
                 var val = $(this).val();
                 if (typeof(val) === "string") {
-                    if (val.trim().length == 0) {
+                    if (val.trim().length === 0) {
                         var field_label = $(this).parent().find("label");
                         $(this).parent().addClass('field-error');
                         $('.status.message.submission-error .message-copy').append("<li>"+field_label.text()+"</li>");
@@ -77,7 +71,7 @@ $(function() {
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
         $('.status.message.submission-error .message-copy').
-            html("There has been an error processing your survey.").
+            html(gettext("There has been an error processing your survey.")).
             stop().
             css("display", "block");
     });
