@@ -19,7 +19,7 @@ nav.course-material {
     @include margin-left(10px);
 
     li {
-      float: $left;
+      @include float(left);
       list-style: none;
       margin-right: 6px;
 
