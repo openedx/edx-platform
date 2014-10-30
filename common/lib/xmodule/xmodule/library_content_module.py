@@ -323,7 +323,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     js_module_name = "VerticalDescriptor"
 
     @XBlock.handler
-    def refresh_children(self, request=None, suffix=None, update_db=True):  # pylint: disable=unused-argument
+    def refresh_children(self, request=None, suffix=None):  # pylint: disable=unused-argument
         """
         Refresh children:
         This method is to be used when any of the libraries that this block
@@ -335,15 +335,12 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         This method will update this block's 'source_libraries' field to store
         the version number of the libraries used, so we easily determine if
         this block is up to date or not.
-
-        If update_db is True (default), this will explicitly persist the changes
-        to the modulestore by calling update_item()
         """
         lib_tools = self.runtime.service(self, 'library_tools')
         user_service = self.runtime.service(self, 'user')
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         user_id = user_service.user_id if user_service else None  # May be None when creating bok choy test fixtures
-        lib_tools.update_children(self, user_id, user_perms, update_db)
+        lib_tools.update_children(self, user_id, user_perms)
         return Response()
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
@@ -451,7 +448,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         if (set(old_source_libraries) != set(self.source_libraries) or
                 old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
             try:
-                self.refresh_children(None, None, update_db=False)  # update_db=False since update_item() is about to be called anyways
+                self.refresh_children()
             except ValueError:
                 pass  # The validation area will display an error message, no need to do anything now.
 
