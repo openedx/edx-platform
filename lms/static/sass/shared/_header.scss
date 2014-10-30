@@ -338,7 +338,6 @@ header.global-new {
   @include box-sizing(border-box);
 
   position: relative;
-  /*height: ($baseline*3.75);*/
   width: 100%;
   border-bottom: 4px solid $courseware-border-bottom-color;
   box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
@@ -348,9 +347,9 @@ header.global-new {
     @include clearfix();
     @include box-sizing(border-box);
     width: grid-width(12);
-    height: 74px; /*($baseline*2);*/
+    height: 74px;
     margin: 0 auto;
-    padding: 17px 0; /*($baseline/2);*/
+    padding: 17px 0;
   }
 
   h1.logo {
@@ -581,14 +580,15 @@ header.global-new {
 
       a {
         display:block;
-        padding: 3px 10px; /*($baseline/4);*/
+        padding: 3px 10px;
         font-size: 18px;
         line-height: 24px;
         font-weight: 500;
         font-family: $header-sans-serif;
         color: $courseware-navigation-color;
 
-        &:hover, &:focus{
+        &:hover,
+        &:focus {
           text-decoration: none;
           color: $courseware-hover-color;
         }
@@ -606,11 +606,9 @@ header.global-new {
 
     div {
       display: inline-block;
-      /*margin: 0 21px 0 0;*/
       text-transform: uppercase;
       letter-spacing: 0!important;
       position: relative;
-      /*vertical-align: middle;*/
 
       &:last-child {
         margin-right: 10px;
@@ -618,7 +616,6 @@ header.global-new {
 
       a {
         &.nav-courseware-button {
-          /*padding: 5px 45px 5px 45px;*/
           border: 3px solid $courseware-button-border-color;
           border-radius: 5px;
           margin-top: -22px;
@@ -645,7 +642,7 @@ header.global-new {
       display: inline;
       float: left;
       text-decoration: none;
-      color: #9a9b9e;
+      color: $m-gray;
       margin-toP: 9px;
       font-size: 18px;
 
@@ -691,7 +688,7 @@ header.global-new {
       left: calc( 50% - 160px );
       z-index: 1000;
       width: 320px;
-      background: #126f9a;
+      background: $m-blue-d3;
 
       &.show {
         display: inline;
@@ -701,11 +698,17 @@ header.global-new {
         color: white;
         padding: 10px;
         font-weight: 300;
+
+        &:hover,
+        &:focus {
+          background: $m-blue-d5;
+          color: white;
+        }
       }
 
       li {
         display: block;
-        border-bottom: 1px solid #009ee7;
+        border-bottom: 1px solid $m-blue-d5;
       }
     }
 
@@ -718,7 +721,6 @@ header.global-new {
     }
 
     @include media( $desktop ) {
-      /*$grid-columns: 12;*/
       nav {
         width: 100%;
       }
@@ -752,6 +754,12 @@ header.global-new {
           color: $courseware-navigation-color;
           padding: 3px 10px;
           font-weight: 500;
+
+          &:hover,
+          &:focus {
+            background: inherit;
+            color: $courseware-hover-color;
+          }
         }
 
         li {
