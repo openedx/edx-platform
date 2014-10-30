@@ -34,7 +34,7 @@ from django.utils.translation import ugettext as _
       </div>
       <div class="data-input">
         <h3>${_('Registration for:')} <span class="pull-right">${_('Course Dates:')}</span></h3>
-        <h1>${ course.display_name }<span class="pull-right">${course.start_datetime_text()} -  ${course.end_datetime_text()}</span></h1>
+        <h1>${ course.display_name }</h1><span class="pull-right">${course.start_datetime_text()} -  ${course.end_datetime_text()}</span>
         <hr />
         <div class="three-col">
             <div class="col-1">
@@ -58,7 +58,7 @@ from django.utils.translation import ugettext as _
             </div>
               </div>
 
-            <div class="col-3 no-width">
+            <div class="col-3">
                <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon-remove-sign"></i></a>
             </div>
         </div>
@@ -82,7 +82,7 @@ from django.utils.translation import ugettext as _
               <input type="submit" value="Reset" class="blue-border" id="submit-reset-redemption">
            </div>
             %endif
-              <span class="pull-right">${_('Total:')} <b id="total-amount">$${"{0:0.2f}".format(amount)} USD</b></span>
+              <span class="pull-right">${_('TOTAL:')} <b id="total-amount">$${"{0:0.2f}".format(amount)} USD</b></span>
           </div>
       </div>
       <div class="col-two">
