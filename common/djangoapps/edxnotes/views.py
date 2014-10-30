@@ -10,34 +10,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxnotes.api import EdxNotes
 
 
-# $.ajax({
-#     type: 'POST',
-#     data: JSON.stringify({'text': 'aaa'}),
-#     url: 'http://localhost:8000/api/edxnotes/annotations/',
-#     dataType:   "json",
-#     contentType: "application/json; charset=utf-8",
-#     success: function () {console.log(arguments)}
-# })
-
-# $.ajax({
-#     type: 'GET|DELETE|PUT',
-#     data: JSON.stringify({'text': 'aaa'}),
-#     url: 'http://localhost:8000/api/edxnotes/annotations/1',
-#     dataType:   "json",
-#     contentType: "application/json; charset=utf-8",
-#     success: function () {console.log(arguments)}
-# })
-
-# $.ajax({
-#     type: 'GET',
-#     data: JSON.stringify({'text': 'aaa'}),
-#     url: 'http://localhost:8000/api/edxnotes/search',
-#     dataType:   "json",
-#     contentType: "application/json; charset=utf-8",
-#     success: function () {console.log(arguments)}
-# })
-
-
 @require_http_methods(("DELETE", "GET", "PUT", "PATCH", "POST"))
 @login_required
 @expect_json
