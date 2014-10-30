@@ -654,12 +654,14 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data['overview_html'], self.overview.data)
+        self.assertIn(self.course.course_image, response.data['course_image_url'])
 
     def test_courses_overview_get_parsed(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/overview?parse=true'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
+        self.assertIn(self.course.course_image, response.data['course_image_url'])
         sections = response.data['sections']
         self.assertEqual(len(sections), 5)
         self.assertIsNotNone(self._find_item_by_class(sections, 'about'))
