@@ -19,7 +19,7 @@ Feature: LMS.Answer problems
         | multiple choice   |
         | checkbox          |
         | radio             |
-        | string            |
+        #| string            |
         | numerical         |
         | formula           |
         | script            |
@@ -41,7 +41,7 @@ Feature: LMS.Answer problems
         | multiple choice   |
         | checkbox          |
         | radio             |
-        | string            |
+        #| string            |
         | numerical         |
         | formula           |
         | script            |
@@ -62,7 +62,7 @@ Feature: LMS.Answer problems
         | multiple choice   |
         | checkbox          |
         | radio             |
-        | string            |
+        #| string            |
         | numerical         |
         | formula           |
         | script            |
@@ -88,8 +88,8 @@ Feature: LMS.Answer problems
         | checkbox          | incorrect     | always        |
         | radio             | correct       | always        |
         | radio             | incorrect     | always        |
-        | string            | correct       | always        |
-        | string            | incorrect     | always        |
+        #| string            | correct       | always        |
+        #| string            | incorrect     | always        |
         | numerical         | correct       | always        |
         | numerical         | incorrect     | always        |
         | formula           | correct       | always        |
@@ -113,11 +113,10 @@ Feature: LMS.Answer problems
         Examples:
         | ProblemType       | Correctness   | Randomization   |
         | drop down         | incorrect     | never           |
-        | drop down         | incorrect     | never           |
         | multiple choice   | incorrect     | never           |
         | checkbox          | incorrect     | never           |
         | radio             | incorrect     | never           |
-        | string            | incorrect     | never           |
+        #| string            | incorrect     | never           |
         | numerical         | incorrect     | never           |
         | formula           | incorrect     | never           |
         | script            | incorrect     | never           |
@@ -136,7 +135,7 @@ Feature: LMS.Answer problems
         | multiple choice   | correct       | never           |
         | checkbox          | correct       | never           |
         | radio             | correct       | never           |
-        | string            | correct       | never           |
+        #| string            | correct       | never           |
         | numerical         | correct       | never           |
         | formula           | correct       | never           |
         | script            | correct       | never           |
@@ -200,8 +199,8 @@ Feature: LMS.Answer problems
         | checkbox          | incorrect     | 1 point possible    | 1 point possible   |
         | radio             | correct       | 1/1 point           | 1 point possible   |
         | radio             | incorrect     | 1 point possible    | 1 point possible   |
-        | string            | correct       | 1/1 point           | 1 point possible   |
-        | string            | incorrect     | 1 point possible    | 1 point possible   |
+        #| string            | correct       | 1/1 point           | 1 point possible   |
+        #| string            | incorrect     | 1 point possible    | 1 point possible   |
         | numerical         | correct       | 1/1 point           | 1 point possible   |
         | numerical         | incorrect     | 1 point possible    | 1 point possible   |
         | formula           | correct       | 1/1 point           | 1 point possible   |
@@ -228,8 +227,8 @@ Feature: LMS.Answer problems
         | checkbox          | incorrect     | 1 point possible    | 1 point possible   | never         |
         | radio             | correct       | 1/1 point           | 1 point possible   | never         |
         | radio             | incorrect     | 1 point possible    | 1 point possible   | never         |
-        | string            | correct       | 1/1 point           | 1 point possible   | never         |
-        | string            | incorrect     | 1 point possible    | 1 point possible   | never         |
+        #| string            | correct       | 1/1 point           | 1 point possible   | never         |
+        #| string            | incorrect     | 1 point possible    | 1 point possible   | never         |
         | numerical         | correct       | 1/1 point           | 1 point possible   | never         |
         | numerical         | incorrect     | 1 point possible    | 1 point possible   | never         |
         | formula           | correct       | 1/1 point           | 1 point possible   | never         |
@@ -250,7 +249,7 @@ Feature: LMS.Answer problems
         | multiple choice   | 1 point possible   |
         | checkbox          | 1 point possible   |
         | radio             | 1 point possible   |
-        | string            | 1 point possible   |
+        #| string            | 1 point possible   |
         | numerical         | 1 point possible   |
         | formula           | 1 point possible   |
         | script            | 2 points possible  |
@@ -271,8 +270,8 @@ Feature: LMS.Answer problems
         | drop down       | incorrect          | correct          |
         | checkbox        | correct            | incorrect        |
         | checkbox        | incorrect          | correct          |
-        | string          | correct            | incorrect        |
-        | string          | incorrect          | correct          |
+        #| string          | correct            | incorrect        |
+        #| string          | incorrect          | correct          |
         | numerical       | correct            | incorrect        |
         | numerical       | incorrect          | correct          |
         | formula         | correct            | incorrect        |
@@ -314,7 +313,7 @@ Feature: LMS.Answer problems
         | multiple choice   |
         | checkbox          |
         | radio             |
-        | string            |
+        #| string            |
         | numerical         |
         | formula           |
         | script            |
