@@ -1,4 +1,4 @@
-(function (define, $, _, undefined) {
+;(function (define, $, _, undefined) {
     'use strict';
     define([
         'annotator', 'js/edxnotes/logger', 'js/edxnotes/shim'

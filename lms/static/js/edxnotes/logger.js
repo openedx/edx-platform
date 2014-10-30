@@ -1,5 +1,6 @@
 ;(function (define) {
     define([], function () {
+        'use strict';
         var Logger = function (id, mode) {
             this.id = id;
             this._history = [];
