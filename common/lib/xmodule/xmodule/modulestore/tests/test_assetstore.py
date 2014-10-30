@@ -12,7 +12,7 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
-    MODULESTORE_SETUPS, MongoContentstoreBuilder,
+    MODULESTORE_SETUPS, MongoContentstoreBuilder, XmlModulestoreBuilder, MixedModulestoreBuilder
 )
 
 
@@ -392,3 +392,21 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
 
     def test_copy_all_assets(self):
         pass
+
+    @ddt.data(XmlModulestoreBuilder(), MixedModulestoreBuilder([('xml', XmlModulestoreBuilder())]))
+    def test_xml_not_yet_implemented(self, storebuilder):
+        """
+        Test coverage which shows that for now xml read operations are not implemented
+        """
+        with storebuilder.build(None) as store:
+            course_key = store.make_course_key("org", "course", "run")
+            asset_key = course_key.make_asset_key('asset', 'foo.jpg')
+            for method in ['_find_asset_info', 'find_asset_metadata', 'find_asset_thumbnail_metadata']:
+                with self.assertRaises(NotImplementedError):
+                    getattr(store, method)(asset_key)
+            with self.assertRaises(NotImplementedError):
+                # pylint: disable=protected-access
+                store._find_course_asset(course_key, asset_key.block_id)
+            for method in ['_get_all_asset_metadata', 'get_all_asset_metadata', 'get_all_asset_thumbnail_metadata']:
+                with self.assertRaises(NotImplementedError):
+                    getattr(store, method)(course_key)
