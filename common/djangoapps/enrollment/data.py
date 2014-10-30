@@ -73,7 +73,7 @@ def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
     course_key = CourseKey.from_string(course_id)
     student = User.objects.get(username=student_id)
     if not CourseEnrollment.is_enrolled(student, course_key):
-        enrollment = CourseEnrollment.enroll(student, course_key)
+        enrollment = CourseEnrollment.enroll(student, course_key, check_access=True)
     else:
         enrollment = CourseEnrollment.objects.get(user=student, course_id=course_key)
 

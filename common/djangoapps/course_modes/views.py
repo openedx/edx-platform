@@ -26,10 +26,10 @@ class ChooseModeView(View):
 
     When a get request is used, shows the selection page.
 
-    When a post request is used, assumes that it is a form submission 
+    When a post request is used, assumes that it is a form submission
     from the selection page, parses the response, and then sends user
     to the next step in the flow.
-    
+
     """
 
     @method_decorator(login_required)
@@ -50,7 +50,7 @@ class ChooseModeView(View):
         """
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
-        
+
         upgrade = request.GET.get('upgrade', False)
         request.session['attempting_upgrade'] = upgrade
 
