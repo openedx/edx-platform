@@ -250,6 +250,14 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         # check for about content
         self.verify_content_existence(self.store, root_dir, course_id, 'about', 'about', '.html')
 
+        # assert that there is an html and video directory in drafts:
+        draft_dir = OSFS(root_dir / 'test_export/drafts')
+        self.assertTrue(draft_dir.exists('html'))
+        self.assertTrue(draft_dir.exists('video'))
+        # and assert that they contain the created modules
+        self.assertIn(self.DRAFT_HTML + ".xml", draft_dir.listdir('html'))
+        self.assertIn(self.DRAFT_VIDEO + ".xml", draft_dir.listdir('video'))
+
         # check for grading_policy.json
         filesystem = OSFS(root_dir / 'test_export/policies/2012_Fall')
         self.assertTrue(filesystem.exists('grading_policy.json'))
@@ -302,6 +310,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
             """Verifies all temporary attributes added during export are removed"""
             self.assertNotIn('index_in_children_list', attributes)
             self.assertNotIn('parent_sequential_url', attributes)
+            self.assertNotIn('parent_url', attributes)
 
         vertical = self.store.get_item(course_id.make_usage_key('vertical', self.TEST_VERTICAL))
         verify_export_attrs_removed(vertical.xml_attributes)

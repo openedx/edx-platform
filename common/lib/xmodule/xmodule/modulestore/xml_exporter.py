@@ -9,6 +9,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
 from fs.osfs import OSFS
 from json import dumps
 import json
@@ -109,36 +110,55 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
         #### DRAFTS ####
         # xml backed courses don't support drafts!
         if course.runtime.modulestore.get_modulestore_type() != ModuleStoreEnum.Type.xml:
-            # NOTE: this code assumes that verticals are the top most draftable container
-            # should we change the application, then this assumption will no longer be valid
             # NOTE: we need to explicitly implement the logic for setting the vertical's parent
             # and index here since the XML modulestore cannot load draft modules
             with modulestore.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
-                draft_verticals = modulestore.get_items(
+                draft_modules = modulestore.get_items(
                     course_key,
-                    qualifiers={'category': 'vertical'},
+                    qualifiers={'category': {'$nin': DIRECT_ONLY_CATEGORIES}},
                     revision=ModuleStoreEnum.RevisionOption.draft_only
                 )
 
-                if len(draft_verticals) > 0:
+                if draft_modules:
                     draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
-                    for draft_vertical in draft_verticals:
+
+                    # accumulate tuples of draft_modules and their parents in
+                    # this list:
+                    draft_node_list = []
+
+                    for draft_module in draft_modules:
                         parent_loc = modulestore.get_parent_location(
-                            draft_vertical.location,
+                            draft_module.location,
                             revision=ModuleStoreEnum.RevisionOption.draft_preferred
                         )
                         # Don't try to export orphaned items.
                         if parent_loc is not None:
                             logging.debug('parent_loc = {0}'.format(parent_loc))
-                            if parent_loc.category in DIRECT_ONLY_CATEGORIES:
-                                draft_vertical.xml_attributes['parent_sequential_url'] = parent_loc.to_deprecated_string()
-                                sequential = modulestore.get_item(parent_loc)
-                                index = sequential.children.index(draft_vertical.location)
-                                draft_vertical.xml_attributes['index_in_children_list'] = str(index)
-                            draft_vertical.runtime.export_fs = draft_course_dir
-                            adapt_references(draft_vertical, xml_centric_course_key, draft_course_dir)
-                            node = lxml.etree.Element('unknown')
-                            draft_vertical.add_xml_to_node(node)
+                            draft_node = draft_node_constructor(
+                                draft_module,
+                                location=draft_module.location,
+                                url=draft_module.location.to_deprecated_string(),
+                                parent_location=parent_loc,
+                                parent_url=parent_loc.to_deprecated_string(),
+                            )
+
+                            draft_node_list.append(draft_node)
+
+                    for draft_node in get_draft_subtree_roots(draft_node_list):
+                        # only export the roots of the draft subtrees
+                        # since export_from_xml (called by `add_xml_to_node`)
+                        # exports a whole tree
+
+                        draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
+                        parent = modulestore.get_item(draft_node.parent_location)
+                        index = parent.children.index(draft_node.module.location)
+                        draft_node.module.xml_attributes['index_in_children_list'] = str(index)
+
+                        draft_node.module.runtime.export_fs = draft_course_dir
+                        adapt_references(draft_node.module, xml_centric_course_key, draft_course_dir)
+                        node = lxml.etree.Element('unknown')
+
+                        draft_node.module.add_xml_to_node(node)
 
 
 def adapt_references(subtree, destination_course_key, export_fs):
