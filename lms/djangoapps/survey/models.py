@@ -143,6 +143,7 @@ class SurveyForm(TimeStampedModel):
 
         return names
 
+
 class SurveyAnswer(TimeStampedModel):
     """
     Model for the answers that a user gives for a particular form in a course

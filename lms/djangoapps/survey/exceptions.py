@@ -15,4 +15,3 @@ class SurveyFormNameAlreadyExists(Exception):
     Thrown when a SurveyForm is created but that name already exists
     """
     pass
-

@@ -20,6 +20,7 @@ class SurveyFormAdminForm(forms.ModelForm):  # pylint: disable=R0924
         SurveyForm.validate_form_html(form)
         return form
 
+
 class SurveyFormAdmin(admin.ModelAdmin):
     """Admin for SurveyForm"""
     form = SurveyFormAdminForm
