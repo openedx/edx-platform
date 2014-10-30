@@ -230,3 +230,20 @@ class OfflineComputedGradeLog(models.Model):
 
     def __unicode__(self):
         return "[OCGLog] %s: %s" % (self.course_id.to_deprecated_string(), self.created)  # pylint: disable=no-member
+
+
+class StudentFieldOverride(models.Model):
+    """
+    Holds the value of a specific field overriden for a student.  This is used
+    by the code in the `courseware.student_field_overrides` module to provide
+    overrides of xblock fields on a per user basis.
+    """
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    location = LocationKeyField(max_length=255, db_index=True)
+    student = models.ForeignKey(User, db_index=True)
+
+    class Meta:   # pylint: disable=missing-docstring
+        unique_together = (('course_id', 'location', 'student'),)
+
+    field = models.CharField(max_length=255)
+    value = models.TextField(default='null')

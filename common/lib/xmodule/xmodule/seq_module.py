@@ -36,14 +36,6 @@ class SequenceFields(object):
         help=_("Enter the date by which problems are due."),
         scope=Scope.settings,
     )
-    extended_due = Date(
-        help="Date that this problem is due by for a particular student. This "
-             "can be set by an instructor, and will override the global due "
-             "date if it is set to a date that is later than the global due "
-             "date.",
-        default=None,
-        scope=Scope.user_state,
-    )
 
     # Entrance Exam flag -- see cms/contentstore/views/entrance_exam.py for usage
     is_entrance_exam = Boolean(

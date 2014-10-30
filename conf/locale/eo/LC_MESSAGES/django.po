@@ -1556,19 +1556,6 @@ msgstr "Däté thät thïs prößlém ïs düé ßý Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"Date that this problem is due by for a particular student. This can be set "
-"by an instructor, and will override the global due date if it is set to a "
-"date that is later than the global due date."
-msgstr ""
-"Däté thät thïs prößlém ïs düé ßý för ä pärtïçülär stüdént. Thïs çän ßé sét "
-"ßý än ïnstrüçtör, änd wïll övérrïdé thé glößäl düé däté ïf ït ïs sét tö ä "
-"däté thät ïs lätér thän thé glößäl düé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє#"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr ""
 "Àmöünt öf tïmé äftér thé düé däté thät süßmïssïöns wïll ßé äççéptéd Ⱡ'σяєм "
@@ -11919,6 +11906,19 @@ msgstr "änd çhöösé ýöür stüdént träçk Ⱡ'σяєм #"
 #: lms/templates/courseware/mktg_course_about.html
 msgid "and proceed to verification"
 msgstr "änd pröçééd tö vérïfïçätïön Ⱡ'σяєм#"
+
+#. Translators: This line appears next a checkbox which users can leave
+#. checked
+#. or uncheck in order
+#. to indicate whether they want to receive emails from the organization
+#. offering the course.
+#: lms/templates/courseware/mktg_course_about.html
+msgid ""
+"I would like to receive email about other {organization_full_name} programs "
+"and offers."
+msgstr ""
+"Ì wöüld lïké tö réçéïvé émäïl äßöüt öthér {organization_full_name} prögräms "
+"änd öfférs. Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Enrollment Is Closed"

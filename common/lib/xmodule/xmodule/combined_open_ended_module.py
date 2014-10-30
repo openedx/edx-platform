@@ -23,7 +23,6 @@ V1_SETTINGS_ATTRIBUTES = [
     "accept_file_upload",
     "skip_spelling_checks",
     "due",
-    "extended_due",
     "graceperiod",
     "weight",
     "min_to_calibrate",
@@ -257,16 +256,6 @@ class CombinedOpenEndedFields(object):
     due = Date(
         help=_("Date that this problem is due by"),
         scope=Scope.settings
-    )
-    extended_due = Date(
-        help=_(
-            "Date that this problem is due by for a particular student. This "
-            "can be set by an instructor, and will override the global due "
-            "date if it is set to a date that is later than the global due "
-            "date."
-        ),
-        default=None,
-        scope=Scope.user_state,
     )
     graceperiod = Timedelta(
         help=_("Amount of time after the due date that submissions will be accepted"),

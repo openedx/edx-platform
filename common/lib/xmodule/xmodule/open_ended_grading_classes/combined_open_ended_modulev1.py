@@ -8,7 +8,6 @@ from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
 from xmodule.open_ended_grading_classes import self_assessment_module
 from xmodule.open_ended_grading_classes import open_ended_module
-from xmodule.util.duedate import get_extended_due_date
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
@@ -150,7 +149,7 @@ class CombinedOpenEndedV1Module(object):
             'peer_grade_finished_submissions_when_none_pending', False
         )
 
-        due_date = get_extended_due_date(instance_state)
+        due_date = instance_state.get('due', None)
         grace_period_string = instance_state.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(due_date, grace_period_string)

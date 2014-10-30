@@ -430,13 +430,6 @@ class CapaModuleTest(unittest.TestCase):
                                     due=self.yesterday_str)
         self.assertTrue(module.closed())
 
-    def test_due_date_extension(self):
-
-        module = CapaFactory.create(
-            max_attempts="1", attempts="0", due=self.yesterday_str,
-            extended_due=self.tomorrow_str)
-        self.assertFalse(module.closed())
-
     def test_parse_get_params(self):
 
         # Valid GET param dict
@@ -1742,7 +1735,7 @@ class TestProblemCheckTracking(unittest.TestCase):
         self.maxDiff = None
 
     def test_choice_answer_text(self):
-        factory = self.capa_factory_for_problem_xml("""\
+        xml = """\
             <problem display_name="Multiple Choice Questions">
               <p>What color is the open ocean on a sunny day?</p>
               <optionresponse>
@@ -1767,7 +1760,11 @@ class TestProblemCheckTracking(unittest.TestCase):
                 </checkboxgroup>
               </choiceresponse>
             </problem>
-            """)
+            """
+
+        # Whitespace screws up comparisons
+        xml = ''.join(line.strip() for line in xml.split('\n'))
+        factory = self.capa_factory_for_problem_xml(xml)
         module = factory.create()
 
         answer_input_dict = {
