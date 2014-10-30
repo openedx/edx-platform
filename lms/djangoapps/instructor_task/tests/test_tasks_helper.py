@@ -4,13 +4,9 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 Tests that CSV grade report generation works with unicode emails.
 
 """
-import os
-import shutil
-
 import ddt
 from mock import Mock, patch
 
-from django.conf import settings
 from django.test.testcases import TestCase
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -20,30 +16,17 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import upload_grades_csv, upload_students_csv
+from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 
 
-class TestReport(ModuleStoreTestCase):
+@ddt.ddt
+class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
-    Base class for testing CSV download tasks.
+    Tests that CSV grade report generation works.
     """
     def setUp(self):
         self.course = CourseFactory.create()
 
-    def tearDown(self):
-        if os.path.exists(settings.GRADES_DOWNLOAD['ROOT_PATH']):
-            shutil.rmtree(settings.GRADES_DOWNLOAD['ROOT_PATH'])
-
-    def create_student(self, username, email):
-        student = UserFactory.create(username=username, email=email)
-        CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
-        return student
-
-
-@ddt.ddt
-class TestInstructorGradeReport(TestReport):
-    """
-    Tests that CSV grade report generation works.
-    """
     @ddt.data([u'student@example.com', u'ni\xf1o@example.com'])
     def test_unicode_emails(self, emails):
         """
@@ -79,10 +62,13 @@ class TestInstructorGradeReport(TestReport):
 
 
 @ddt.ddt
-class TestStudentReport(TestReport):
+class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that CSV student profile report generation works.
     """
+    def setUp(self):
+        self.course = CourseFactory.create()
+
     def test_success(self):
         self.create_student('student', 'student@example.com')
         task_input = {'features': []}
