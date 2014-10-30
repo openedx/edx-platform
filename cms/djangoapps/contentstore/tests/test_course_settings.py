@@ -84,6 +84,11 @@ class CourseDetailsTestCase(CourseTestCase):
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).short_description,
             jsondetails.short_description, "After set short_description"
         )
+        jsondetails.about_sidebar_html = "About Sidebar HTML"
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).about_sidebar_html,
+            jsondetails.about_sidebar_html, "After set about_sidebar_html"
+        )
         jsondetails.overview = "Overview"
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).overview,
@@ -129,6 +134,7 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Image")
             self.assertContains(response, "Course Short Description")
+            self.assertNotContains(response, "Course About Sidebar HTML")
             self.assertNotContains(response, "Course Overview")
             self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
@@ -159,6 +165,7 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Image")
             self.assertContains(response, "Course Short Description")
+            self.assertContains(response, "Course About Sidebar HTML")
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
@@ -205,6 +212,7 @@ class CourseDetailsViewTest(CourseTestCase):
 
         self.alter_field(url, details, 'enrollment_end', datetime.datetime(2012, 11, 15, 1, 30, tzinfo=utc))
         self.alter_field(url, details, 'short_description', "Short Description")
+        self.alter_field(url, details, 'about_sidebar_html', "About Sidebar HTML")
         self.alter_field(url, details, 'overview', "Overview")
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
@@ -219,6 +227,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.compare_date_fields(details, encoded, context, 'enrollment_start')
         self.compare_date_fields(details, encoded, context, 'enrollment_end')
         self.assertEqual(details['short_description'], encoded['short_description'], context + " short_description not ==")
+        self.assertEqual(details['about_sidebar_html'], encoded['about_sidebar_html'], context + " about_sidebar_html not ==")
         self.assertEqual(details['overview'], encoded['overview'], context + " overviews not ==")
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
