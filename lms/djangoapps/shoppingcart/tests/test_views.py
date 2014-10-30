@@ -347,6 +347,18 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Code '{0}' is not valid for any course in the shopping cart.".format(self.reg_code), resp.content)
 
+    def test_cart_item_qty_greater_than_1_against_valid_reg_code(self):
+        course_key = self.course_key.to_deprecated_string()
+        self.add_reg_code(course_key)
+        item = self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': 4})
+        self.assertEqual(resp.status_code, 200)
+        # now update the cart item quantity and then apply the registration code
+        # it will raise an exception
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        self.assertEqual(resp.status_code, 404)
+        self.assertIn("Cart item quantity should not be greater than 1 when applying registration code", resp.content)
+
     def test_course_discount_for_valid_active_coupon_code(self):
 
         self.add_coupon(self.course_key, True, self.coupon_code)

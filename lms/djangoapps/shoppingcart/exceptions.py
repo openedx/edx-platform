@@ -40,6 +40,10 @@ class RegCodeAlreadyExistException(InvalidCartItem):
     pass
 
 
+class ItemNotAllowedToRedeemRegCodeException(InvalidCartItem):
+    pass
+
+
 class ItemDoesNotExistAgainstRegCodeException(InvalidCartItem):
     pass
 
