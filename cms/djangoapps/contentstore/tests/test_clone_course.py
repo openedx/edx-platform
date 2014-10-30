@@ -11,6 +11,8 @@ from course_action_state.models import CourseRerunState
 from course_action_state.managers import CourseRerunUIStateManager
 from mock import patch, Mock
 
+from ma import ia, sa
+
 
 class CloneCourseTest(CourseTestCase):
     """
