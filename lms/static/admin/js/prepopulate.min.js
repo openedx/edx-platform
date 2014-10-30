@@ -1,1 +1,0 @@
-(function(a){a.fn.prepopulate=function(d,e){return this.each(function(){var b=a(this);b.data("_changed",!1);b.change(function(){b.data("_changed",!0)});var c=function(){if(!0!=b.data("_changed")){var c=[];a.each(d,function(b,d){0<a(d).val().length&&c.push(a(d).val())});b.val(URLify(c.join(" "),e))}};a(d.join(",")).keyup(c).change(c).focus(c)})}})(django.jQuery);
