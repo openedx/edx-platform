@@ -93,6 +93,26 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             # version_agnostic b/c of above assumption in docstring
             self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+        """
+        See :py:meth `SplitMongoModuleStore.copy_from_template`
+        """
+        source_keys = [self._map_revision_to_branch(key) for key in source_keys]
+        dest_key = self._map_revision_to_branch(dest_key)
+        new_keys = super(DraftVersioningModuleStore, self).copy_from_template(source_keys, dest_key, user_id)
+        if dest_key.branch == ModuleStoreEnum.BranchName.draft:
+            # Check if any of new_keys or their descendants need to be auto-published.
+            # We don't use _auto_publish_no_children since children may need to be published.
+            with self.bulk_operations(dest_key.course_key):
+                keys_to_check = list(new_keys)
+                while keys_to_check:
+                    usage_key = keys_to_check.pop()
+                    if usage_key.category in DIRECT_ONLY_CATEGORIES:
+                        self.publish(usage_key.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
+                        children = getattr(self.get_item(usage_key, **kwargs), "children", [])
+                        keys_to_check.extend(children)  # e.g. if usage_key is a chapter, it may have an auto-publish sequential child
+        return new_keys
+
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         old_descriptor_locn = descriptor.location
         descriptor.location = self._map_revision_to_branch(old_descriptor_locn)

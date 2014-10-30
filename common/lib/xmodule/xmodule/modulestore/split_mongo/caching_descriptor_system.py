@@ -169,16 +169,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         if block_key is None:
             block_key = BlockKey(json_data['block_type'], LocalId())
 
+        convert_fields = lambda field: self.modulestore.convert_references_to_keys(
+            course_key, class_, field, self.course_entry.structure['blocks'],
+        )
+
         if definition_id is not None and not json_data.get('definition_loaded', False):
             definition_loader = DefinitionLazyLoader(
                 self.modulestore,
                 course_key,
                 block_key.type,
                 definition_id,
-                lambda fields: self.modulestore.convert_references_to_keys(
-                    course_key, self.load_block_type(block_key.type),
-                    fields, self.course_entry.structure['blocks'],
-                )
+                convert_fields,
             )
         else:
             definition_loader = None
@@ -193,9 +194,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             block_id=block_key.id,
         )
 
-        converted_fields = self.modulestore.convert_references_to_keys(
-            block_locator.course_key, class_, json_data.get('fields', {}), self.course_entry.structure['blocks'],
-        )
+        converted_fields = convert_fields(json_data.get('fields', {}))
+        converted_defaults = convert_fields(json_data.get('defaults', {}))
         if block_key in self._parent_map:
             parent_key = self._parent_map[block_key]
             parent = course_key.make_usage_key(parent_key.type, parent_key.id)
@@ -204,6 +204,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         kvs = SplitMongoKVS(
             definition_loader,
             converted_fields,
+            converted_defaults,
             parent=parent,
             field_decorator=kwargs.get('field_decorator')
         )

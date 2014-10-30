@@ -683,3 +683,130 @@ class TestLibraryAccess(LibraryTestCase):
         self._bind_module(lc_block, user=self.non_staff_user)  # We must use the CMS's module system in order to get permissions checks.
         lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
+
+
+class TestOverrides(LibraryTestCase):
+    """
+    Test that overriding block Scope.settings fields from a library in a specific course works
+    """
+    def setUp(self):
+        super(TestOverrides, self).setUp()
+        self.original_display_name = "A Problem Block"
+        self.original_weight = 1
+
+        # Create a problem block in the library:
+        self.problem = ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            display_name=self.original_display_name,  # display_name is a Scope.settings field
+            weight=self.original_weight,  # weight is also a Scope.settings field
+            user_id=self.user.id,
+            publish_item=False,
+        )
+
+        # Also create a course:
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            self.course = CourseFactory.create()
+
+        # Add a LibraryContent block to the course:
+        self.lc_block = self._add_library_content_block(self.course, self.lib_key)
+        self.lc_block = self._refresh_children(self.lc_block)
+        self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
+
+    def test_overrides(self):
+        """
+        Test that we can override Scope.settings values in a course.
+        """
+        new_display_name = "Modified Problem Title"
+        new_weight = 10
+        self.problem_in_course.display_name = new_display_name
+        self.problem_in_course.weight = new_weight
+        modulestore().update_item(self.problem_in_course, self.user.id)
+
+        # Add a second LibraryContent block to the course, with no override:
+        lc_block2 = self._add_library_content_block(self.course, self.lib_key)
+        lc_block2 = self._refresh_children(lc_block2)
+        # Re-load the two problem blocks - one with and one without an override:
+        self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
+        problem2_in_course = modulestore().get_item(lc_block2.children[0])
+
+        self.assertEqual(self.problem_in_course.display_name, new_display_name)
+        self.assertEqual(self.problem_in_course.weight, new_weight)
+
+        self.assertEqual(problem2_in_course.display_name, self.original_display_name)
+        self.assertEqual(problem2_in_course.weight, self.original_weight)
+
+    def test_reset_override(self):
+        """
+        If we override a setting and then reset it, we should get the library value.
+        """
+        new_display_name = "Modified Problem Title"
+        new_weight = 10
+        self.problem_in_course.display_name = new_display_name
+        self.problem_in_course.weight = new_weight
+        modulestore().update_item(self.problem_in_course, self.user.id)
+        self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
+
+        self.assertEqual(self.problem_in_course.display_name, new_display_name)
+        self.assertEqual(self.problem_in_course.weight, new_weight)
+
+        # Reset:
+        for field_name in ["display_name", "weight"]:
+            self.problem_in_course.fields[field_name].delete_from(self.problem_in_course)
+
+        # Save, reload, and verify:
+        modulestore().update_item(self.problem_in_course, self.user.id)
+        self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
+
+        self.assertEqual(self.problem_in_course.display_name, self.original_display_name)
+        self.assertEqual(self.problem_in_course.weight, self.original_weight)
+
+    def test_consistent_definitions(self):
+        """
+        Make sure that the new child of the LibraryContent block
+        shares its definition with the original (self.problem).
+
+        This test is specific to split mongo.
+        """
+        definition_id = self.problem.definition_locator.definition_id
+        self.assertEqual(self.problem_in_course.definition_locator.definition_id, definition_id)
+
+        # Now even if we change some Scope.settings fields and refresh, the definition should be unchanged
+        self.problem.weight = 20
+        self.problem.display_name = "NEW"
+        modulestore().update_item(self.problem, self.user.id)
+        self.lc_block = self._refresh_children(self.lc_block)
+        self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
+
+        self.assertEqual(self.problem.definition_locator.definition_id, definition_id)
+        self.assertEqual(self.problem_in_course.definition_locator.definition_id, definition_id)
+
+    def test_persistent_overrides(self):
+        """
+        Test that when we override Scope.settings values in a course,
+        the override values persist even when the block is refreshed
+        with updated blocks from the library.
+        """
+        new_display_name = "Modified Problem Title"
+        new_weight = 15
+        self.problem_in_course.display_name = new_display_name
+        self.problem_in_course.weight = new_weight
+
+        modulestore().update_item(self.problem_in_course, self.user.id)
+        self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
+        self.assertEqual(self.problem_in_course.display_name, new_display_name)
+        self.assertEqual(self.problem_in_course.weight, new_weight)
+
+        # Change the settings in the library version:
+        self.problem.display_name = "X"
+        self.problem.weight = 99
+        new_data_value = "<problem><p>We change the data as well to check that non-overriden fields do get updated.</p></problem>"
+        self.problem.data = new_data_value
+        modulestore().update_item(self.problem, self.user.id)
+
+        self.lc_block = self._refresh_children(self.lc_block)
+        self.problem_in_course = modulestore().get_item(self.problem_in_course.location)
+
+        self.assertEqual(self.problem_in_course.display_name, new_display_name)
+        self.assertEqual(self.problem_in_course.weight, new_weight)
+        self.assertEqual(self.problem_in_course.data, new_data_value)
