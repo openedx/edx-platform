@@ -73,23 +73,39 @@ class LoginSessionView(APIView):
         """
         form_desc = FormDescription("post", reverse("user_api_login_session"))
 
+        # Translators: This label appears above a field on the login form
+        # meant to hold the user's email address.
+        email_label = _(u"Email")
+
+        # Translators: This example email address is used as a placeholder in
+        # a field on the login form meant to hold the user's email address.
+        email_placeholder = _(u"username@domain.com")
+
+        # Translators: These instructions appear on the login form, immediately
+        # below a field meant to hold the user's email address.
+        email_instructions = _(
+            u"The email address you used to register with {platform_name}"
+        ).format(platform_name=settings.PLATFORM_NAME)
+
         form_desc.add_field(
             "email",
             field_type="email",
-            label=_(u"Email"),
-            placeholder=_(u"username@domain.com"),
-            instructions=_(
-                u"The email address you used to register with {platform}"
-            ).format(platform=settings.PLATFORM_NAME),
+            label=email_label,
+            placeholder=email_placeholder,
+            instructions=email_instructions,
             restrictions={
                 "min_length": account_api.EMAIL_MIN_LENGTH,
                 "max_length": account_api.EMAIL_MAX_LENGTH,
             }
         )
 
+        # Translators: This label appears above a field on the login form
+        # meant to hold the user's password.
+        password_label = _(u"Password")
+
         form_desc.add_field(
             "password",
-            label=_(u"Password"),
+            label=password_label,
             field_type="password",
             restrictions={
                 "min_length": account_api.PASSWORD_MIN_LENGTH,
@@ -97,10 +113,15 @@ class LoginSessionView(APIView):
             }
         )
 
+        # Translators: This phrase appears next to a checkbox on the login form
+        # which the user can check in order to remain logged in after their
+        # session ends.
+        remember_label = _(u"Remember me")
+
         form_desc.add_field(
             "remember",
             field_type="checkbox",
-            label=_("Remember me"),
+            label=remember_label,
             default=False,
             required=False,
         )
@@ -252,14 +273,26 @@ class RegistrationView(APIView):
         return shim_student_view(create_account)(request)
 
     def _add_email_field(self, form_desc, required=True):
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's email address.
+        email_label = _(u"Email")
+
+        # Translators: This example email address is used as a placeholder in
+        # a field on the registration form meant to hold the user's email address.
+        email_placeholder = _(u"username@domain.com")
+
+        # Translators: These instructions appear on the registration form, immediately
+        # below a field meant to hold the user's email address.
+        email_instructions = _(
+            u"The email address you used to register with {platform_name}"
+        ).format(platform_name=settings.PLATFORM_NAME)
+
         form_desc.add_field(
             "email",
             field_type="email",
-            label=_(u"Email"),
-            placeholder=_(u"username@domain.com"),
-            instructions=_(
-                u"The email address you want to use with {platform}"
-            ).format(platform=settings.PLATFORM_NAME),
+            label=email_label,
+            placeholder=email_placeholder,
+            instructions=email_instructions,
             restrictions={
                 "min_length": account_api.EMAIL_MIN_LENGTH,
                 "max_length": account_api.EMAIL_MAX_LENGTH,
@@ -268,10 +301,18 @@ class RegistrationView(APIView):
         )
 
     def _add_name_field(self, form_desc, required=True):
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's full name.
+        name_label = _(u"Full Name")
+
+        # Translators: These instructions appear on the registration form, immediately
+        # below a field meant to hold the user's full name.
+        name_instructions = _(u"The name that will appear on your certificates")
+
         form_desc.add_field(
             "name",
-            label=_(u"Full Name"),
-            instructions=_(u"The name that will appear on your certificates"),
+            label=name_label,
+            instructions=name_instructions,
             restrictions={
                 "max_length": profile_api.FULL_NAME_MAX_LENGTH,
             },
@@ -279,10 +320,20 @@ class RegistrationView(APIView):
         )
 
     def _add_username_field(self, form_desc, required=True):
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's public username.
+        username_label = _(u"Username")
+
+        # Translators: These instructions appear on the registration form, immediately
+        # below a field meant to hold the user's public username.
+        username_instructions = _(
+            u"The name that will identify you in your courses"
+        )
+
         form_desc.add_field(
             "username",
-            label=_(u"Username"),
-            instructions=_(u"The name that will identify you in your courses"),
+            label=username_label,
+            instructions=username_instructions,
             restrictions={
                 "min_length": account_api.USERNAME_MIN_LENGTH,
                 "max_length": account_api.USERNAME_MAX_LENGTH,
@@ -291,9 +342,14 @@ class RegistrationView(APIView):
         )
 
     def _add_password_field(self, form_desc, required=True):
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's password.
+        password_label = _(u"Password")
+
         form_desc.add_field(
             "password",
-            label=_(u"Password"),
+            label=password_label,
+            field_type="password",
             restrictions={
                 "min_length": account_api.PASSWORD_MIN_LENGTH,
                 "max_length": account_api.PASSWORD_MAX_LENGTH,
@@ -302,57 +358,87 @@ class RegistrationView(APIView):
         )
 
     def _add_level_of_education_field(self, form_desc, required=True):
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's highest completed level of education.
+        education_level_label = _(u"Highest Level of Education Completed")
+
         form_desc.add_field(
             "level_of_education",
-            label=_("Highest Level of Education Completed"),
+            label=education_level_label,
             field_type="select",
             options=self._options_with_default(UserProfile.LEVEL_OF_EDUCATION_CHOICES),
             required=required
         )
 
     def _add_gender_field(self, form_desc, required=True):
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's gender.
+        gender_label = _(u"Gender")
+
         form_desc.add_field(
             "gender",
-            label=_("Gender"),
+            label=gender_label,
             field_type="select",
             options=self._options_with_default(UserProfile.GENDER_CHOICES),
             required=required
         )
 
     def _add_year_of_birth_field(self, form_desc, required=True):
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the user's year of birth.
+        yob_label = _(u"Year of Birth")
+
         options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
         form_desc.add_field(
             "year_of_birth",
-            label=_("Year of Birth"),
+            label=yob_label,
             field_type="select",
             options=self._options_with_default(options),
             required=required
         )
 
     def _add_mailing_address_field(self, form_desc, required=True):
+        # Translators: This label appears above a field on the registration form
+        # meant to hold the user's mailing address.
+        mailing_address_label = _(u"Mailing Address")
+
         form_desc.add_field(
             "mailing_address",
-            label=_("Mailing Address"),
+            label=mailing_address_label,
             field_type="textarea",
             required=required
         )
 
     def _add_goals_field(self, form_desc, required=True):
+        # Translators: This phrase appears above a field on the registration form
+        # meant to hold the user's reasons for registering with edX.
+        goals_label = _(
+            u"If you'd like, tell us why you're interested in {platform_name}"
+        ).format(platform_name=settings.PLATFORM_NAME)
+
         form_desc.add_field(
             "goals",
-            label=_("If you'd like, tell us why you're interested in edX."),
+            label=goals_label,
             field_type="textarea",
             required=required
         )
 
     def _add_city_field(self, form_desc, required=True):
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the city in which they live.
+        city_label = _(u"City")
+
         form_desc.add_field(
             "city",
-            label=_("City"),
+            label=city_label,
             required=required
         )
 
     def _add_country_field(self, form_desc, required=True):
+        # Translators: This label appears above a dropdown menu on the registration
+        # form used to select the country in which the user lives.
+        country_label = _(u"Country")
+
         sorted_countries = sorted(
             countries.countries, key=lambda(__, name): unicode(name)
         )
@@ -362,7 +448,7 @@ class RegistrationView(APIView):
         ]
         form_desc.add_field(
             "country",
-            label=_("Country"),
+            label=country_label,
             field_type="select",
             options=self._options_with_default(options),
             required=required
@@ -375,7 +461,8 @@ class RegistrationView(APIView):
 
         # Combine terms of service and honor code checkboxes
         else:
-            # Translators: This is a legal document users must agree to in order to register a new account.
+            # Translators: This is a legal document users must agree to
+            # in order to register a new account.
             terms_text = _(u"Terms of Service and Honor Code")
 
         terms_link = u"<a href=\"{url}\">{terms_text}</a>".format(
@@ -383,11 +470,17 @@ class RegistrationView(APIView):
             terms_text=terms_text
         )
 
-        # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
-        label = _(u"I agree to the {terms_of_service}").format(terms_of_service=terms_link)
+        # Translators: "Terms of Service" is a legal document users must agree to
+        # in order to register a new account.
+        label = _(
+            u"I agree to the {terms_of_service}"
+        ).format(terms_of_service=terms_link)
 
-        # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
-        error_msg = _(u"You must agree to the {terms_of_service}").format(terms_of_service=terms_link)
+        # Translators: "Terms of Service" is a legal document users must agree to
+        # in order to register a new account.
+        error_msg = _(
+            u"You must agree to the {terms_of_service}"
+        ).format(terms_of_service=terms_link)
 
         form_desc.add_field(
             "honor_code",
@@ -401,17 +494,20 @@ class RegistrationView(APIView):
         )
 
     def _add_terms_of_service_field(self, form_desc, required=True):
-        # Translators: This is a legal document users must agree to in order to register a new account.
+        # Translators: This is a legal document users must agree to
+        # in order to register a new account.
         terms_text = _(u"Terms of Service")
         terms_link = u"<a href=\"{url}\">{terms_text}</a>".format(
             url=marketing_link("TOS"),
             terms_text=terms_text
         )
 
-        # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
+        # Translators: "Terms of service" is a legal document users must agree to
+        # in order to register a new account.
         label = _(u"I agree to the {terms_of_service}").format(terms_of_service=terms_link)
 
-        # Translators: "Terms of service" is a legal document users must agree to in order to register a new account.
+        # Translators: "Terms of service" is a legal document users must agree to
+        # in order to register a new account.
         error_msg = _("You must agree to the {terms_of_service}").format(terms_of_service=terms_link)
 
         form_desc.add_field(
@@ -477,6 +573,60 @@ class RegistrationView(APIView):
                     instructions="",
                     restrictions={}
                 )
+
+class PasswordResetView(APIView):
+    """HTTP end-point for GETting a description of the password reset form. """
+
+    # This end-point is available to anonymous users,
+    # so do not require authentication.
+    authentication_classes = []
+
+    def get(self, request):
+        """Return a description of the password reset form.
+
+        This decouples clients from the API definition:
+        if the API decides to modify the form, clients won't need
+        to be updated.
+
+        See `user_api.helpers.FormDescription` for examples
+        of the JSON-encoded form description.
+
+        Arguments:
+            request (HttpRequest)
+
+        Returns:
+            HttpResponse
+
+        """
+        form_desc = FormDescription("post", reverse("password_change_request"))
+
+        # Translators: This label appears above a field on the password reset
+        # form meant to hold the user's email address.
+        email_label = _(u"Email")
+
+        # Translators: This example email address is used as a placeholder in
+        # a field on the password reset form meant to hold the user's email address.
+        email_placeholder = _(u"username@domain.com")
+
+        # Translators: These instructions appear on the password reset form,
+        # immediately below a field meant to hold the user's email address.
+        email_instructions = _(
+            u"The email address you used to register with {platform_name}"
+        ).format(platform_name=settings.PLATFORM_NAME)
+
+        form_desc.add_field(
+            "email",
+            field_type="email",
+            label=email_label,
+            placeholder=email_placeholder,
+            instructions=email_instructions,
+            restrictions={
+                "min_length": account_api.EMAIL_MIN_LENGTH,
+                "max_length": account_api.EMAIL_MAX_LENGTH,
+            }
+        )
+
+        return HttpResponse(form_desc.to_json(), content_type="application/json")
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):

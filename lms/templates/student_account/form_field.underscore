@@ -7,7 +7,7 @@
     <% } %>
 
     <% if( form === 'login' && name === 'password' ) { %>
-        <a href="#" class="forgot-password field-link">Forgot password?</a>
+        <a href="#" class="forgot-password field-link"><%- gettext("Forgot password?") %></a>
     <% } %>
 
     <% if ( type === 'select' ) { %>

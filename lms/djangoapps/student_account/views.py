@@ -69,6 +69,7 @@ def login_and_registration_form(request, initial_mode="login"):
         'disable_courseware_js': True,
         'initial_mode': initial_mode,
         'third_party_auth': json.dumps(_third_party_auth_context(request)),
+        'platform_name': settings.PLATFORM_NAME,
     }
 
     return render_to_response('student_account/login_and_register.html', context)

@@ -43,24 +43,6 @@ var edx = edx || {};
 
             this.element.hide( $el.find('#password-reset-form') );
             this.element.show( $el.find('.js-reset-success') );
-        },
-
-        submitForm: function( event ) {
-            var data = this.getFormData();
-
-            event.preventDefault();
-
-            if ( !_.compact(this.errors).length ) {
-                this.model.set( data );
-                this.model.save();
-                this.toggleErrorMsg( false );
-            } else {
-                this.toggleErrorMsg( true );
-            }
-        },
-
-        validate: function( $el ) {
-            return edx.utils.validate( $el );
         }
     });
 

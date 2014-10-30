@@ -44,7 +44,7 @@ var edx = edx || {};
          * default init steps
          */
         preRender: function( data ) {
-            /* custom code goes here */
+            /* Custom code goes here */
             return data;
         },
 
@@ -89,7 +89,7 @@ var edx = edx || {};
             this.render( html.join('') );
         },
 
-        /* Helper method ot toggle display
+        /* Helper method to toggle display
          * including accessibility considerations
          */
         element: {
@@ -143,7 +143,7 @@ var edx = edx || {};
                 key = $el.attr('name') || false;
 
                 if ( key ) {
-                    test = this.validate( elements[i], this.formType );
+                    test = this.validate( elements[i] );
 
                     if ( test.isValid ) {
                         obj[key] = $el.attr('type') === 'checkbox' ? $el.is(':checked') : $el.val();
@@ -204,8 +204,9 @@ var edx = edx || {};
                 this.element.hide( this.$errors );
             }
         },
-        validate: function( $el, form ) {
-            return edx.utils.validate( $el, form );
+
+        validate: function( $el ) {
+            return edx.utils.validate( $el );
         }
     });
 
