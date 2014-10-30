@@ -3,9 +3,7 @@
     define([
         'annotator', 'js/edxnotes/logger', 'js/edxnotes/shim'
     ], function (Annotator, Logger) {
-        var LOGGER_MODE = 1,
-            logger = new Logger(LOGGER_MODE),
-            getUsageId, getOptions, setupPlugins, getAnnotator;
+        var getUsageId, getOptions, setupPlugins, getAnnotator;
 
         /**
          * Returns Usage id for the component.
@@ -70,16 +68,17 @@
             var el = $(element),
                 options = getOptions(el, params),
                 annotator = new Annotator(element, options),
-                plugins = ['Store'];
+                plugins = ['Store'],
+                logger = new Logger(element.id, params.debug);
 
+            annotator.logger = logger;
             el.data('annotator', annotator);
             setupPlugins(annotator, plugins, options);
             logger.log({
                 'constructor': Annotator,
                 'element': element,
                 'options': options,
-                'annotator': annotator,
-                'usageId': getUsageId(el)
+                'annotator': annotator
             });
             return annotator;
         };

@@ -1,30 +1,6 @@
 import datetime
 from uuid import uuid4
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from firebase_token_generator import create_token
-
-from .notes_list import LIST
-
-
-FORMAT = {
-    "id": "39fc339cf058bd22176771b3e3187329",  # unique id (added by backend)
-    "annotator_schema_version": "v1.0",        # schema version: default v1.0
-    "created": "2011-05-24T18:52:08.036814",   # created datetime in iso8601 format (added by backend)
-    "updated": "2011-05-26T12:17:05.012544",   # updated datetime in iso8601 format (added by backend)
-    "text": "A note I wrote",                  # content of annotation
-    "quote": "the text that was annotated",    # the annotated text (added by frontend)
-    "ranges": [                                # list of ranges covered by annotation (usually only one entry)
-        {
-            "start": "/p[1]",                  # (relative) XPath to start element
-            "end": "/p[1]",                    # (relative) XPath to end element
-            "startOffset": 52,                 # character offset within start element
-            "endOffset": 54                    # character offset within end element
-        }
-    ],
-    "user": "user",                            # user id of annotation owner (can also be an object with an 'id' property)
-    "usage_id": "usage_id",                    # usage id of a component (added by frontend)
-    "course_id": "course_id",                  # course id
-}
 
 
 # Replace these with your details
@@ -95,10 +71,6 @@ def get_prefix():
     return '/edxnotes/api'
 
 
-def get_token_url():
-    return '/edxnotes/token'
-
-
 def get_user_id():
     return 'edx_user'
 
@@ -115,13 +87,44 @@ def generate_uid():
     return uuid4().int
 
 
-def generate_token():
-    """
-    Generetes token.
-    """
-    return create_token(CONSUMER_SECRET, {
-        'consumerKey': 'consumerKey',
-        'userId': 'edx_user',
-        'issuedAt': _now().isoformat() + 'Z',
-        'ttl': DEFAULT_TTL,
-    })
+LIST = [
+    {
+        "id": "39fc339cf058bd22176771b3e3187329",  # unique id (added by backend)
+        "annotator_schema_version": "v1.0",        # schema version: default v1.0
+        "created": "2011-05-24T18:52:08.036814",   # created datetime in iso8601 format (added by backend)
+        "updated": "2011-05-26T12:17:05.012544",   # updated datetime in iso8601 format (added by backend)
+        "text": "A note I wrote",                  # content of annotation
+        "quote": "the basics",                     # the annotated text (added by frontend)
+        "ranges": [                                # list of ranges covered by annotation (usually only one entry)
+            {
+                "start": "/p[1]",                  # (relative) XPath to start element
+                "end": "/p[1]",                    # (relative) XPath to end element
+                "startOffset": 81,                 # character offset within start element
+                "endOffset": 91                    # character offset within end element
+            }
+        ],
+        "user": "user",                           # user id of annotation owner (can also be an object with an 'id' property)
+        "usage_id": "usage_id",                    # usage id of a component (added by frontend)
+        "course_id": "course_id",                  # course id
+    },
+    {
+        "id": "39fc339cf058bd22176771b3e3187330",  # unique id (added by backend)
+        "annotator_schema_version": "v1.0",        # schema version: default v1.0
+        "created": "2014-05-24T18:52:08.036814",   # created datetime in iso8601 format (added by backend)
+        "updated": "2014-05-26T12:17:05.012544",   # updated datetime in iso8601 format (added by backend)
+        "text": "Test note",                  # content of annotation
+        "quote": "We",    # the annotated text (added by frontend)
+        "ranges": [                                # list of ranges covered by annotation (usually only one entry)
+            {
+                "start": "/p[1]",                  # (relative) XPath to start element
+                "end": "/p[1]",                    # (relative) XPath to end element
+                "startOffset": 52,                 # character offset within start element
+                "endOffset": 54                    # character offset within end element
+            }
+        ],
+        "user": "edx_user",                        # user id of annotation owner (can also be an object with an 'id' property)
+        "usage_id": "usage_id",                    # usage id of a component (added by frontend)
+        "course_id": "course_id",                  # course id
+    }
+
+]

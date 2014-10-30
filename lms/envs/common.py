@@ -1099,7 +1099,7 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-            'css/vendor/edxnotes/annotator.min',
+            'css/vendor/edxnotes/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },
@@ -1107,7 +1107,6 @@ PIPELINE_CSS = {
         'source_filenames': [
             'sass/course.css',
             'xmodule/modules.css',
-            'css/vendor/ova/annotator.css',
         ],
         'output_filename': 'css/lms-style-course.css',
     },
@@ -1115,7 +1114,6 @@ PIPELINE_CSS = {
         'source_filenames': [
             'sass/course-rtl.css',
             'xmodule/modules.css',
-            'css/vendor/ova/annotator.css',
         ],
         'output_filename': 'css/lms-style-course-rtl.css',
     },

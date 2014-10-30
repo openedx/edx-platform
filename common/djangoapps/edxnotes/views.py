@@ -7,7 +7,6 @@ from django.http import HttpResponseBadRequest, Http404
 from django.core.urlresolvers import reverse
 from util.json_request import expect_json, JsonResponse
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from edxnotes.exceptions import EdxNotesError
 from edxnotes.api import EdxNotes
 
 

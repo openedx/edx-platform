@@ -1,6 +1,7 @@
 ;(function (define) {
     define([], function () {
-        var Logger = function (mode) {
+        var Logger = function (id, mode) {
+            this.id = id;
             this._history = [];
             // 0 - silent;
             // 1 - show logs;
@@ -9,12 +10,12 @@
 
         Logger.prototype._log = function (logType, args) {
             this.updateHistory.apply(this, arguments);
+            // Adds ID at the first place
+            Array.prototype.unshift.call(args, this.id);
             if (this.logLevel && console && console[logType]) {
                 if (console[logType].apply){
-                    // Do this for normal browsers
                     console[logType].apply(console, args);
-                } else {
-                    // Do this for IE
+                } else { // Do this for IE
                     console[logType](args.join(' '));
                 }
             }

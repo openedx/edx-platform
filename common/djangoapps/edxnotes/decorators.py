@@ -9,6 +9,7 @@ from edxnotes.api import (
     get_course_id,
 )
 from edxmako.shortcuts import render_to_string
+from django.conf import settings
 
 
 def edxnotes(cls):
@@ -18,8 +19,7 @@ def edxnotes(cls):
     original_get_html = cls.get_html
 
     def get_html(self, *args, **kargs):
-        # edXNotes should be enabled in Studio, that's why just return
-        # original method.
+        # edXNotes must be disabled in Studio, returns original method in this case.
         if getattr(self.system, 'is_author_mode', False):
             return original_get_html(self, *args, **kargs)
         else:
@@ -32,6 +32,7 @@ def edxnotes(cls):
                     'courseId': get_course_id(),
                     'prefix': get_prefix(),
                     'user': get_user_id(),
+                    'debug': settings.DEBUG,
                 },
             })
 
