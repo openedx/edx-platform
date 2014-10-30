@@ -81,7 +81,7 @@ class SurveyModelsTests(TestCase):
 
         course = CourseFactory.create(
             course_survey_required=False,
-            course_survey_name="NonExisting"
+            course_survey_name=self.test_survey_name
         )
         self.assertFalse(is_survey_required_for_course(course))
 
