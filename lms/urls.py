@@ -78,6 +78,8 @@ urlpatterns = ('',  # nopep8
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
+        # Video Abstraction Layer used to allow video teams to manage video assets
+        # independently of courseware. https://github.com/edx/edx-val
         url(r'^api/val/v0/', include('edxval.urls')),
     )
 
@@ -258,6 +260,10 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.course_info', name="info"),
         url(r'^courses/{}/syllabus$'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.syllabus', name="syllabus"),   # TODO arjun remove when custom tabs in place, see courseware/courses.py
+
+        #Survey associated with a course
+        url(r'^courses/{}/survey$'.format(settings.COURSE_ID_PATTERN),
+            'courseware.views.course_survey', name="course_survey"),
 
         url(r'^courses/{}/book/(?P<book_index>\d+)/$'.format(settings.COURSE_ID_PATTERN),
             'staticbook.views.index', name="book"),
@@ -446,6 +452,10 @@ urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
+# Survey Djangoapp
+urlpatterns += (
+    url(r'^survey/', include('survey.urls')),
+)
 
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (

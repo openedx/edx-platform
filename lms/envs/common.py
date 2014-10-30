@@ -277,10 +277,6 @@ FEATURES = {
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
 
-    # Video Abstraction Layer used to allow video teams to manage video assets
-    # independently of courseware. https://github.com/edx/edx-val
-    'ENABLE_VIDEO_ABSTRACTION_LAYER_API': False,
-
     # Enable the new dashboard, account, and profile pages
     'ENABLE_NEW_DASHBOARD': False,
 
@@ -1478,6 +1474,9 @@ INSTALLED_APPS = (
 
     # edX Mobile API
     'mobile_api',
+
+    # Surveys
+    'survey',
 )
 
 ######################### MARKETING SITE ###############################
