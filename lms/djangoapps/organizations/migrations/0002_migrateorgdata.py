@@ -1,25 +1,67 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
+
 from south.db import db
 from south.v2 import SchemaMigration
-from django.db import models
+from django.db import connection, models, transaction
+
+from organizations.models import Organization
+
+log = logging.getLogger(__name__)
 
 
 class Migration(SchemaMigration):
 
+    def print_message(self, msg):
+        print msg
+        log.info(msg)
+
     def forwards(self, orm):
-        # Deleting model 'Organization'
-        db.delete_table('api_manager_organization')
+        if not db.dry_run:
+            existing_entries = Organization.objects.all().count()
+            self.print_message('EXISTING ENTRIES: {}'.format(existing_entries))
+            if existing_entries == 0:
+                try:
+                    cursor = connection.cursor()
+                    cursor.execute('INSERT INTO organizations_organization SELECT * from api_manager_organization')
+                    log_msg = 'organizations entries moved from api_manager to organizations app'
+                    self.print_message(log_msg)
 
-        # Removing M2M table for field users on 'Organization'
-        db.delete_table('api_manager_organization_users')
+                    cursor.execute('INSERT INTO organizations_organization_workgroups '
+                                   'SELECT * from api_manager_organization_workgroups')
+                    log_msg = 'organization_workgroups entries moved from api_manager to organizations app'
+                    self.print_message(log_msg)
 
-        # Removing M2M table for field groups on 'Organization'
-        db.delete_table('api_manager_organization_groups')
+                    cursor.execute('INSERT INTO organizations_organization_users '
+                                   'SELECT * from api_manager_organization_users')
+                    log_msg = 'organization_users entries moved from api_manager to organizations app'
+                    self.print_message(log_msg)
 
-        # Removing M2M table for field workgroups on 'Organization'
-        db.delete_table('api_manager_organization_workgroups')
+                    cursor.execute('INSERT INTO organizations_organization_groups '
+                                   'SELECT * from api_manager_organization_groups')
+                    log_msg = 'organization_groups entries moved from api_manager to organizations app'
+                    self.print_message(log_msg)
+                    transaction.commit()
 
+                    # Deleting model 'Organization'
+                    db.delete_table('api_manager_organization')
+
+                    # Removing M2M table for field users on 'Organization'
+                    db.delete_table('api_manager_organization_users')
+
+                    # Removing M2M table for field groups on 'Organization'
+                    db.delete_table('api_manager_organization_groups')
+
+                    # Removing M2M table for field workgroups on 'Organization'
+                    db.delete_table('api_manager_organization_workgroups')
+
+                except Exception as e:
+                    log_msg = e.message
+                    self.print_message(log_msg)
+            else:
+                log_msg = 'oroganizations_organization is not empty. You might have already filled it.'
+                self.print_message(log_msg)
 
     def backwards(self, orm):
         # Adding model 'Organization'
@@ -59,7 +101,6 @@ class Migration(SchemaMigration):
             ('workgroup', models.ForeignKey(orm['projects.workgroup'], null=False))
         ))
         db.create_unique('api_manager_organization_workgroups', ['organization_id', 'workgroup_id'])
-
 
     models = {
         'api_manager.coursecontentgrouprelationship': {
