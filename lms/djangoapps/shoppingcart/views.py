@@ -130,9 +130,10 @@ def update_user_cart(request):
 
         item.qty = qty
         item.save()
-        item.order.update_order_type()
+        old_to_new_id_map = item.order.update_order_type()
         total_cost = item.order.total_cost
-        return JsonResponse({"total_cost": total_cost}, 200)
+
+        return JsonResponse({"total_cost": total_cost, "oldToNewIdMap": old_to_new_id_map}, 200)
 
     return HttpResponseBadRequest('Order item not found in request.')
 
