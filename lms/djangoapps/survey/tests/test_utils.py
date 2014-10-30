@@ -30,6 +30,10 @@ class SurveyModelsTests(TestCase):
         self.student = User.objects.create_user('student', 'student@test.com', self.password)
         self.student2 = User.objects.create_user('student2', 'student2@test.com', self.password)
 
+        self.staff = User.objects.create_user('staff', 'staff@test.com', self.password)
+        self.staff.is_staff = True
+        self.staff.save()
+
         self.test_survey_name = 'TestSurvey'
         self.test_form = '<input name="foo"></input>'
 
@@ -98,3 +102,9 @@ class SurveyModelsTests(TestCase):
         """
         self.survey.save_user_answers(self.student, self.student_answers)
         self.assertFalse(must_answer_survey(self.course, self.student))
+
+    def test_staff_must_answer_survey(self):
+        """
+        Assert that someone with staff level permissions does not have to answer the survey
+        """
+        self.assertFalse(must_answer_survey(self.course, self.staff))
