@@ -262,6 +262,47 @@
 
         .item-title {
           @extend %cont-text-wrap;
+
+          a {
+            color: $blue;
+
+            &:hover {
+              color: $orange-d1;
+            }
+          }
+        }
+
+        // CASE: is current item being edited/viewed
+        .is-current {
+          background: $gray-l4;
+
+          .unit-title a {
+            @extend %ui-disabled;
+            @extend %t-strong;
+            color: $color-heading-base;
+          }
+        }
+
+        // typographical overrides (based off of outline-simple)
+        .section-header, .subsection-header {
+          line-height: 0;
+          margin-bottom: ($baseline/2);
+        }
+
+        .section-header {
+          border-bottom: 1px solid $gray-l4;
+          padding-bottom: ($baseline/2);
+        }
+
+        // subsections overrides (based off of outline-simple)
+        .outline-subsection {
+          border: none;
+          padding: 0;
+        }
+
+        // units overrides (based off of outline-simple)
+        .outline-unit {
+          padding: 3px 6px;
         }
       }
     }
