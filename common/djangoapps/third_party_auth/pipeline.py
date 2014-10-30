@@ -66,6 +66,7 @@ from eventtracking import tracker
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from social.apps.django_app.default import models
 from social.exceptions import AuthException
@@ -109,11 +110,13 @@ AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_PROFILE = 'profile'
 AUTH_ENTRY_REGISTER = 'register'
+AUTH_ENTRY_API = 'api'
 _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_DASHBOARD,
     AUTH_ENTRY_LOGIN,
     AUTH_ENTRY_PROFILE,
-    AUTH_ENTRY_REGISTER
+    AUTH_ENTRY_REGISTER,
+    AUTH_ENTRY_API,
 ])
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
 _PASSWORD_CHARSET = string.letters + string.digits
@@ -396,15 +399,33 @@ def parse_query_params(strategy, response, *args, **kwargs):
         'is_register': auth_entry == AUTH_ENTRY_REGISTER,
         # Whether the auth pipeline entered from /profile.
         'is_profile': auth_entry == AUTH_ENTRY_PROFILE,
+        # Whether the auth pipeline entered from an API
+        'is_api': auth_entry == AUTH_ENTRY_API,
     }
 
 
 @partial.partial
-def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboard=None, is_login=None, is_profile=None, is_register=None, user=None, *args, **kwargs):
-    """Dispatches user to views outside the pipeline if necessary."""
+def ensure_user_information(
+    strategy,
+    details,
+    response,
+    uid,
+    is_dashboard=None,
+    is_login=None,
+    is_profile=None,
+    is_register=None,
+    is_api=None,
+    user=None,
+    *args,
+    **kwargs
+):
+    """
+    Ensure that we have the necessary information about a user (either an
+    existing account or registration data) to proceed with the pipeline.
+    """
 
     # We're deliberately verbose here to make it clear what the intended
-    # dispatch behavior is for the four pipeline entry points, given the
+    # dispatch behavior is for the various pipeline entry points, given the
     # current state of the pipeline. Keep in mind the pipeline is re-entrant
     # and values will change on repeated invocations (for example, the first
     # time through the login flow the user will be None so we dispatch to the
@@ -418,6 +439,11 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
     user_inactive = user and not user.is_active
     user_unset = user is None
     dispatch_to_login = is_login and (user_unset or user_inactive)
+    reject_api_request = is_api and (user_unset or user_inactive)
+
+    if reject_api_request:
+        # Content doesn't matter; we just want to exit the pipeline
+        return HttpResponseBadRequest()
 
     if is_dashboard or is_profile:
         return
@@ -430,7 +456,7 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
 
 
 @partial.partial
-def set_logged_in_cookie(backend=None, user=None, request=None, *args, **kwargs):
+def set_logged_in_cookie(backend=None, user=None, request=None, is_api=None, *args, **kwargs):
     """This pipeline step sets the "logged in" cookie for authenticated users.
 
     Some installations have a marketing site front-end separate from
@@ -455,7 +481,7 @@ def set_logged_in_cookie(backend=None, user=None, request=None, *args, **kwargs)
     to the next pipeline step.
 
     """
-    if user is not None and user.is_authenticated():
+    if user is not None and user.is_authenticated() and not is_api:
         if request is not None:
             # Check that the cookie isn't already set.
             # This ensures that we allow the user to continue to the next
