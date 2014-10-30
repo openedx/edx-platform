@@ -12,7 +12,9 @@
 <%block name="bodyclass">view-survey</%block>
 
 <%block name="js_extra">
-  var existing_data = ${existing_data_json};
+  <script type="text/javascript">
+    var existing_data = ${existing_data_json};
+  </script>
   <script type="text/javascript" src="/static/js/course_survey.js"></script>
 </%block>
 
