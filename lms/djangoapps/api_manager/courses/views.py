@@ -38,7 +38,7 @@ from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, Co
 from xmodule.modulestore.django import modulestore
 
 from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
-    course_exists, get_modulestore, get_course_descriptor
+    course_exists, get_modulestore, get_course_descriptor, get_aggregate_exclusion_user_ids
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
@@ -321,27 +321,6 @@ def _manage_role(course_descriptor, user, role, action):
             queryset = queryset.filter(course_id=course_descriptor.id)
             if len(queryset) == 0:
                 update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
-
-
-def _get_aggregate_exclusion_user_ids(course_key):
-    """
-    This helper method will return the list of user ids that are marked in roles
-    that can be excluded from certain aggregate queries. The list of roles to exclude
-    can be defined in a AGGREGATION_EXCLUDE_ROLES settings variable
-    """
-
-    exclude_user_ids = set()
-    exclude_role_list = getattr(settings, 'AGGREGATION_EXCLUDE_ROLES', [CourseObserverRole.ROLE])
-
-    for role in exclude_role_list:
-        users = CourseRole(role, course_key).users_with_role()
-        user_ids = set()
-        for user in users:
-            user_ids.add(user.id)
-
-        exclude_user_ids = exclude_user_ids.union(user_ids)
-
-    return exclude_user_ids
 
 
 def _get_course_data(request, course_key, course_descriptor, depth=0):
@@ -1459,7 +1438,7 @@ class CoursesMetricsGradesList(SecureListAPIView):
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
-        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        exclude_users = get_aggregate_exclusion_user_ids(course_key)
         queryset = StudentGradebook.objects.filter(course_id__exact=course_key,
                                                    user__is_active=True,
                                                    user__courseenrollment__is_active=True,
@@ -1533,7 +1512,7 @@ class CoursesMetrics(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_descriptor, course_key, course_content = get_course(request, request.user, course_id)
         slash_course_id = get_course_key(course_id, slashseparated=True)
-        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        exclude_users = get_aggregate_exclusion_user_ids(course_key)
         users_enrolled_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         organization = request.QUERY_PARAMS.get('organization', None)
         org_ids = None
@@ -1599,7 +1578,7 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         start_dt = parse_datetime(start)
         end_dt = parse_datetime(end)
         course_key = get_course_key(course_id)
-        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        exclude_users = get_aggregate_exclusion_user_ids(course_key)
         grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
         grades_qs = StudentGradebook.objects.filter(course_id__exact=course_key, user__is_active=True,
                                                     user__courseenrollment__is_active=True,
@@ -1695,7 +1674,7 @@ class CoursesMetricsGradesLeadersList(SecureListAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
         # Users having certain roles (such as an Observer) are excluded from aggregations
-        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        exclude_users = get_aggregate_exclusion_user_ids(course_key)
         leaderboard_data = StudentGradebook.generate_leaderboard(course_key, user_id=user_id, count=count, exclude_users=exclude_users)
         serializer = CourseLeadersSerializer(leaderboard_data['queryset'], many=True)
         data['leaders'] = serializer.data  # pylint: disable=E1101
@@ -1743,7 +1722,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
         total_possible_completions = float(len(get_course_leaf_nodes(course_key)))
-        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        exclude_users = get_aggregate_exclusion_user_ids(course_key)
         orgs_filter = self.request.QUERY_PARAMS.get('organizations', None)
         if orgs_filter:
             upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
@@ -1815,7 +1794,7 @@ class CoursesMetricsSocial(SecureListAPIView):
             course_key = get_course_key(course_id)
             # remove any excluded users from the aggregate
 
-            exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+            exclude_users = get_aggregate_exclusion_user_ids(course_key)
 
             for user_id in exclude_users:
                 if str(user_id) in data:
@@ -1863,7 +1842,7 @@ class CoursesMetricsCities(SecureListAPIView):
         if not course_exists(self.request, self.request.user, course_id):
             raise Http404
         course_key = get_course_key(course_id)
-        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        exclude_users = get_aggregate_exclusion_user_ids(course_key)
         queryset = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         if city:
             city = city.split(',')[:upper_bound]

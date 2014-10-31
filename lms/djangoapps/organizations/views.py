@@ -4,13 +4,13 @@
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, F
+from django.db.models import Sum, F, Count
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api_manager.courseware_access import get_course_key
+from api_manager.courseware_access import get_course_key, get_aggregate_exclusion_user_ids
 from organizations.models import Organization
 from api_manager.users.serializers import UserSerializer
 from api_manager.groups.serializers import GroupSerializer
@@ -39,18 +39,29 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         org_user_grades = StudentGradebook.objects.filter(user__organizations=pk, user__is_active=True,
                                                           user__courseenrollment__is_active=True)
         courses_filter = request.QUERY_PARAMS.get('courses', None)
+        courses = []
         if courses_filter:
             upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
             courses_filter = courses_filter.split(",")[:upper_bound]
-            courses = []
             for course_string in courses_filter:
                 courses.append(get_course_key(course_string))
             org_user_grades = org_user_grades.filter(course_id__in=courses,
                                                      user__courseenrollment__course_id__in=courses)
 
-        users_grade_average = org_user_grades.aggregate(Avg('grade'))
-        if users_grade_average['grade__avg']:
-            grade_avg = float('{0:.3f}'.format(float(users_grade_average['grade__avg'])))
+        users_grade_sum = org_user_grades.aggregate(Sum('grade'))
+        if users_grade_sum['grade__sum']:
+            exclude_users = set()
+            for course_key in courses:
+                exclude_users.union(get_aggregate_exclusion_user_ids(course_key))
+            users_enrolled_qs = CourseEnrollment.objects.filter(user__is_active=True, is_active=True,
+                                                                user__organizations=pk)\
+                .exclude(user_id__in=exclude_users)
+            if courses:
+                users_enrolled_qs = users_enrolled_qs.filter(course_id__in=courses)
+            users_enrolled = users_enrolled_qs.aggregate(Count('user', distinct=True))
+            total_users = users_enrolled['user__count']
+            if total_users:
+                grade_avg = float('{0:.3f}'.format(float(users_grade_sum['grade__sum']) / total_users))
         response_data['users_grade_average'] = grade_avg
 
         users_grade_complete_count = org_user_grades\

@@ -441,24 +441,29 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         response = self.do_get(metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_complete_count'], 6)
+        self.assertEqual(response.data['users_grade_average'], 0.751)
+
 
         courses = {'courses': unicode(course1.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
         response = self.do_get(filtered_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_complete_count'], 2)
+        self.assertEqual(response.data['users_grade_average'], 0.845)
 
         courses = {'courses': unicode(course2.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
         response = self.do_get(filtered_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_complete_count'], 4)
+        self.assertEqual(response.data['users_grade_average'], 0.688)
 
         courses = {'courses': '{},{}'.format(course1.id, course2.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
         response = self.do_get(filtered_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_grade_complete_count'], 6)
+        self.assertEqual(response.data['users_grade_average'], 0.758)
 
         courses = {'courses': '{}'.format(self.course.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
