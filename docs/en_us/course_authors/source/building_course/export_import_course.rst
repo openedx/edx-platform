@@ -33,6 +33,12 @@ the following course data:
 * Course assets
 * Course settings
  
+.. warning::
+
+	When you export a course, be aware that information such as MATLAB API keys,
+	LTI passports, annotation secret token strings, and annotation storage URLs
+	are included in the exported data. If you share your exported files, you may
+	also be sharing sensitive or license-specific information.
 
 The following data is not exported with your course:
  
