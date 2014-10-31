@@ -804,6 +804,10 @@ def get_sale_order_records(request, course_id):  # pylint: disable=W0613, W0621
         ('bill_to_postalcode', 'Postal Code'),
         ('bill_to_country', 'Country'),
         ('order_type', 'Order Type'),
+        ('status', 'Order Item Status'),
+        ('coupon_code', 'Coupon Code'),
+        ('unit_cost', 'Unit Price'),
+        ('list_price', 'List Price'),
         ('codes', 'Registration Codes'),
         ('course_id', 'Course Id')
     ]
@@ -873,34 +877,6 @@ def re_validate_invoice(obj_invoice):
     obj_invoice.save()
     message = _('The registration codes for invoice {0} have been re-activated.').format(obj_invoice.id)
     return JsonResponse({'message': message})
-
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
-def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=W0613, W0621
-    """
-    return the summary of all purchased transactions for a particular course
-    """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    query_features = [
-        'id', 'username', 'email', 'course_id', 'list_price', 'coupon_code',
-        'unit_cost', 'purchase_time', 'orderitem_id',
-        'order_id',
-    ]
-
-    student_data = instructor_analytics.basic.purchase_transactions(course_id, query_features)
-
-    if not csv:
-        response_payload = {
-            'course_id': course_id.to_deprecated_string(),
-            'students': student_data,
-            'queried_features': query_features
-        }
-        return JsonResponse(response_payload)
-    else:
-        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("e-commerce_purchase_transactions.csv", header, datarows)
 
 
 @ensure_csrf_cookie
@@ -1003,7 +979,11 @@ def save_registration_code(user, course_id, invoice=None, order=None):
         return save_registration_code(user, course_id, invoice, order)
 
     course_registration = CourseRegistrationCode(
-        code=code, course_id=course_id.to_deprecated_string(), created_by=user, invoice=invoice, order=order
+        code=code,
+        course_id=course_id.to_deprecated_string(),
+        created_by=user,
+        invoice=invoice,
+        order=order
     )
     try:
         course_registration.save()
@@ -1100,11 +1080,22 @@ def generate_registration_codes(request, course_id):
 
     UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
-        total_amount=sale_price, company_name=company_name, company_contact_email=company_contact_email,
-        company_contact_name=company_contact_name, course_id=course_id, recipient_name=recipient_name,
-        recipient_email=recipient_email, address_line_1=address_line_1, address_line_2=address_line_2,
-        address_line_3=address_line_3, city=city, state=state, zip=zip_code, country=country,
-        internal_reference=internal_reference, customer_reference_number=customer_reference_number
+        total_amount=sale_price,
+        company_name=company_name,
+        company_contact_email=company_contact_email,
+        company_contact_name=company_contact_name,
+        course_id=course_id,
+        recipient_name=recipient_name,
+        recipient_email=recipient_email,
+        address_line_1=address_line_1,
+        address_line_2=address_line_2,
+        address_line_3=address_line_3,
+        city=city,
+        state=state,
+        zip=zip_code,
+        country=country,
+        internal_reference=internal_reference,
+        customer_reference_number=customer_reference_number
     )
     registration_codes = []
     for _ in range(course_code_number):  # pylint: disable=W0621

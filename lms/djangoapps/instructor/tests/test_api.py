@@ -48,7 +48,7 @@ from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import (
-    RegistrationCodeRedemption, Order,
+    RegistrationCodeRedemption, Order, CouponRedemption,
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode
 )
 from course_modes.models import CourseMode
@@ -1680,30 +1680,43 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         response = self.assert_request_status_code(400, url, method="POST", data=data)
         self.assertIn("invoice_number must be an integer, {value} provided".format(value=data['invoice_number']), response.content)
 
-    def test_get_ecommerce_purchase_features_csv(self):
-        """
-        Test that the response from get_purchase_transaction is in csv format.
-        """
-        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
-        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url + '/csv', {})
-        self.assertEqual(response['Content-Type'], 'text/csv')
-
     def test_get_sale_order_records_features_csv(self):
         """
         Test that the response from get_sale_order_records is in csv format.
         """
+        # add the coupon code for the course
+        coupon = Coupon(
+            code='test_code', description='test_description', course_id=self.course.id,
+            percentage_discount='10', created_by=self.instructor, is_active=True
+        )
+        coupon.save()
         self.cart.order_type = 'business'
         self.cart.save()
         self.cart.add_billing_details(company_name='Test Company', company_contact_name='Test',
                                       company_contact_email='test@123', recipient_name='R1',
                                       recipient_email='', customer_reference_number='PO#23')
-        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+
+        paid_course_reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        # update the quantity of the cart item paid_course_reg_item
+        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': paid_course_reg_item.id, 'qty': '4'})
+        self.assertEqual(resp.status_code, 200)
+        # apply the coupon code to the item in the cart
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': coupon.code})
+        self.assertEqual(resp.status_code, 200)
         self.cart.purchase()
+        # get the updated item
+        item = self.cart.orderitem_set.all().select_subclasses()[0]
+        # get the redeemed coupon information
+        coupon_redemption = CouponRedemption.objects.select_related('coupon').filter(order=self.cart)
+
         sale_order_url = reverse('get_sale_order_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(sale_order_url)
         self.assertEqual(response['Content-Type'], 'text/csv')
+        self.assertIn('36', response.content.split('\r\n')[1])
+        self.assertIn(str(item.unit_cost), response.content.split('\r\n')[1],)
+        self.assertIn(str(item.list_price), response.content.split('\r\n')[1],)
+        self.assertIn(item.status, response.content.split('\r\n')[1],)
+        self.assertIn(coupon_redemption[0].coupon.code, response.content.split('\r\n')[1],)
 
     def test_get_sale_records_features_csv(self):
         """
@@ -1813,64 +1826,6 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(res['course_id'], invoice.course_id.to_deprecated_string())
         self.assertEqual(res['total_used_codes'], used_codes)
         self.assertEqual(res['total_codes'], 5)
-
-    def test_get_ecommerce_purchase_features_with_coupon_info(self):
-        """
-        Test that some minimum of information is formatted
-        correctly in the response to get_purchase_transaction.
-        """
-        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
-        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
-
-        # using coupon code
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
-        self.assertEqual(resp.status_code, 200)
-        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-        response = self.client.get(url, {})
-        res_json = json.loads(response.content)
-        self.assertIn('students', res_json)
-
-        for res in res_json['students']:
-            self.validate_purchased_transaction_response(res, self.cart, self.instructor, self.coupon_code)
-
-    def test_get_ecommerce_purchases_features_without_coupon_info(self):
-        """
-        Test that some minimum of information is formatted
-        correctly in the response to get_purchase_transaction.
-        """
-        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
-
-        carts, instructors = ([] for i in range(2))
-
-        # purchasing the course by different users
-        for _ in xrange(3):
-            test_instructor = InstructorFactory(course_key=self.course.id)
-            self.client.login(username=test_instructor.username, password='test')
-            cart = Order.get_cart_for_user(test_instructor)
-            carts.append(cart)
-            instructors.append(test_instructor)
-            PaidCourseRegistration.add_to_order(cart, self.course.id)
-            cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
-
-        response = self.client.get(url, {})
-        res_json = json.loads(response.content)
-        self.assertIn('students', res_json)
-        for res, i in zip(res_json['students'], xrange(3)):
-            self.validate_purchased_transaction_response(res, carts[i], instructors[i], 'None')
-
-    def validate_purchased_transaction_response(self, res, cart, user, code):
-        """
-        validate purchased transactions attribute values with the response object
-        """
-        item = cart.orderitem_set.all().select_subclasses()[0]
-
-        self.assertEqual(res['coupon_code'], code)
-        self.assertEqual(res['username'], user.username)
-        self.assertEqual(res['email'], user.email)
-        self.assertEqual(res['list_price'], item.list_price)
-        self.assertEqual(res['unit_cost'], item.unit_cost)
-        self.assertEqual(res['order_id'], cart.id)
-        self.assertEqual(res['orderitem_id'], item.id)
 
     def test_get_students_features(self):
         """
