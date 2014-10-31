@@ -5,6 +5,7 @@ Classes representing asset & asset thumbnail metadata.
 from datetime import datetime
 import pytz
 from contracts import contract, new_contract
+from bisect import bisect_left, bisect_right
 from opaque_keys.edx.keys import CourseKey, AssetKey
 
 new_contract('AssetKey', AssetKey)
@@ -33,8 +34,8 @@ class AssetMetadata(object):
     # All AssetMetadata objects should have AssetLocators with this type.
     ASSET_TYPE = 'asset'
 
-    @contract(asset_id='AssetKey', basename='basestring | None', internal_name='str | None', locked='bool | None', contenttype='basestring | None',
-              md5='str | None', curr_version='str | None', prev_version='str | None', edited_by='int | None', edited_on='datetime | None')
+    @contract(asset_id='AssetKey', basename='basestring|None', internal_name='basestring|None', locked='bool|None', contenttype='basestring|None',
+              md5='basestring|None', curr_version='basestring|None', prev_version='basestring|None', edited_by='int|None', edited_on='datetime|None')
     def __init__(self, asset_id,
                  basename=None, internal_name=None,
                  locked=None, contenttype=None, md5=None,
@@ -99,12 +100,10 @@ class AssetMetadata(object):
             'locked': self.locked,
             'contenttype': self.contenttype,
             'md5': self.md5,
-            'edit_info': {
-                'curr_version': self.curr_version,
-                'prev_version': self.prev_version,
-                'edited_by': self.edited_by,
-                'edited_on': self.edited_on
-            }
+            'curr_version': self.curr_version,
+            'prev_version': self.prev_version,
+            'edited_by': self.edited_by,
+            'edited_on': self.edited_on
         }
 
     @contract(asset_doc='dict | None')
@@ -121,11 +120,10 @@ class AssetMetadata(object):
         self.locked = asset_doc['locked']
         self.contenttype = asset_doc['contenttype']
         self.md5 = asset_doc['md5']
-        edit_info = asset_doc['edit_info']
-        self.curr_version = edit_info['curr_version']
-        self.prev_version = edit_info['prev_version']
-        self.edited_by = edit_info['edited_by']
-        self.edited_on = edit_info['edited_on']
+        self.curr_version = asset_doc['curr_version']
+        self.prev_version = asset_doc['prev_version']
+        self.edited_by = asset_doc['edited_by']
+        self.edited_on = asset_doc['edited_on']
 
 
 class AssetThumbnailMetadata(object):

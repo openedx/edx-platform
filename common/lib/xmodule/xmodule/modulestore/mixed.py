@@ -370,7 +370,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.find_asset_thumbnail_metadata(asset_key, **kwargs)
 
     @strip_key
-    @contract(course_key='CourseKey', start=int, maxresults=int, sort='list | None')
+    @contract(course_key='CourseKey', start=int, maxresults=int, sort='tuple|None')
     def get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, **kwargs):
         """
         Returns a list of static assets for a course.
