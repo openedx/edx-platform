@@ -25,6 +25,8 @@ log = logging.getLogger(__name__)
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
 
 @ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -47,7 +49,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         import_from_xml(
-            modulestore(), self.user.id, 'common/test/data/', ['toy'],
+            modulestore(), self.user.id, TEST_DATA_DIR, ['toy'],
             static_content_store=self.contentstore, verbose=True
         )
 

@@ -14,11 +14,10 @@ from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, \
 from django_comment_client.utils import has_forum_access
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from student.roles import CourseStaffRole
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 FORUM_ROLES = [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
@@ -33,18 +32,14 @@ def action_name(operation, rolename):
         return '{0} forum {1}'.format(operation, FORUM_ADMIN_ACTION_SUFFIX[rolename])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check for change in forum admin role memberships
     '''
 
     def setUp(self):
-        clear_existing_modulestores()
-        courses = modulestore().get_courses()
-
-        self.course_id = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
-        self.toy = modulestore().get_course(self.course_id)
+        self.toy = CourseFactory.create(org='edX', course='toy', display_name='2012_Fall')
 
         # Create two accounts
         self.student = 'view@test.com'

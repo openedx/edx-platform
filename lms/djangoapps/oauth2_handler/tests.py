@@ -1,6 +1,5 @@
 # pylint: disable=missing-docstring
 from django.test.utils import override_settings
-from django.test import TestCase
 
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from lang_pref import LANGUAGE_KEY
@@ -14,9 +13,11 @@ from user_api.models import UserPreference
 # Will also run default tests for IDTokens and UserInfo
 from oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
 
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class BaseTestMixin(TestCase):
+class BaseTestMixin(ModuleStoreTestCase):
     profile = None
 
     def setUp(self):

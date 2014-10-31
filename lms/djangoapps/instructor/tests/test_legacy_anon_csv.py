@@ -16,17 +16,16 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 import instructor.views.legacy
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from mock import Mock, patch
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check for download of csv
@@ -34,8 +33,8 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
 
     # Note -- I copied this setUp from a similar test
     def setUp(self):
-        clear_existing_modulestores()
-        self.toy = modulestore().get_course(SlashSeparatedCourseKey("edX", "toy", "2012_Fall"))
+        # clear_existing_modulestores()
+        self.toy = CourseFactory.create(org='edX', course='toy', display_name='2012_Fall')
 
         # Create two accounts
         self.student = 'view@test.com'

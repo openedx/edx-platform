@@ -24,8 +24,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_from_xml
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.conf import settings
 
-DATA_DIR = 'common/test/data/'
+DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 TEST_COURSE_ID = 'edX/simple/2012_Fall'
 

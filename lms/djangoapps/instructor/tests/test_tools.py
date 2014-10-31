@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 from django.utils.timezone import utc
 
 from courseware.models import StudentModule
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -97,7 +97,7 @@ class TestParseDatetime(unittest.TestCase):
             tools.parse_datetime('foo')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestFindUnit(ModuleStoreTestCase):
     """
     Test the find_unit function.
@@ -130,7 +130,7 @@ class TestFindUnit(ModuleStoreTestCase):
             tools.find_unit(self.course, url)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGetUnitsWithDueDate(ModuleStoreTestCase):
     """
     Test the get_units_with_due_date function.
@@ -178,7 +178,7 @@ class TestTitleOrUrl(unittest.TestCase):
         self.assertEquals(tools.title_or_url(unit), 'test:hello')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestSetDueDateExtension(ModuleStoreTestCase):
     """
     Test the set_due_date_extensions function.
@@ -252,7 +252,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.assertEqual(self.extended_due(self.homework), None)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestDataDumps(ModuleStoreTestCase):
     """
     Test data dumps for reporting.

@@ -24,6 +24,8 @@ from uuid import uuid4
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
 
 @ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -48,7 +50,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         import_from_xml(
             module_store,
             self.user.id,
-            'common/test/data/',
+            TEST_DATA_DIR,
             ['test_import_course'],
             static_content_store=content_store,
             do_import_static=False,
@@ -70,7 +72,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         course_items = import_from_xml(
             module_store,
             self.user.id,
-            'common/test/data',
+            TEST_DATA_DIR,
             ['test_import_course_2'],
             target_course_id=course.id,
             verbose=True,
@@ -86,7 +88,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         import_from_xml(
             module_store,
             self.user.id,
-            'common/test/data/',
+            TEST_DATA_DIR,
             ['2014_Uni'],
             target_course_id=course_id
         )
@@ -131,7 +133,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         module_store = modulestore()
-        import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
+        import_from_xml(module_store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
 
         course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
@@ -142,7 +144,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_no_static_link_rewrites_on_import(self):
         module_store = modulestore()
-        courses = import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
+        courses = import_from_xml(module_store, self.user.id, TEST_DATA_DIR, ['toy'], do_import_static=False, verbose=True)
         course_key = courses[0].id
 
         handouts = module_store.get_item(course_key.make_usage_key('course_info', 'handouts'))
@@ -183,7 +185,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         import_from_xml(
             module_store,
             self.user.id,
-            'common/test/data/',
+            TEST_DATA_DIR,
             ['conditional'],
             target_course_id=target_course_id
         )
@@ -213,7 +215,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         import_from_xml(
             module_store,
             self.user.id,
-            'common/test/data/',
+            TEST_DATA_DIR,
             ['open_ended'],
             target_course_id=target_course_id
         )
@@ -254,7 +256,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         import_from_xml(
             module_store,
             self.user.id,
-            'common/test/data/',
+            TEST_DATA_DIR,
             [source_course_name],
             target_course_id=target_course_id
         )

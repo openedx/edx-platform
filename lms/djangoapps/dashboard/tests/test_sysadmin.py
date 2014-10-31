@@ -19,7 +19,7 @@ from django.utils.timezone import utc as UTC
 from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 
 from student.roles import CourseStaffRole, GlobalStaff
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_DIR
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
@@ -30,6 +30,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+
+from xmodule.modulestore.tests.django_utils import xml_store_config
+TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, ['empty'])
 
 
 TEST_MONGODB_LOG = {

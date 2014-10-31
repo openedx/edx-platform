@@ -10,7 +10,7 @@ import requests
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -46,7 +46,7 @@ HTML_BOOK = {
 }
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class StaticBookTest(ModuleStoreTestCase):
     """
     Helpers for the static book tests.

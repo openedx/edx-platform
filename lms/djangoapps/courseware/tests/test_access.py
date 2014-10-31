@@ -5,17 +5,15 @@ import mock
 from mock import Mock
 
 from django.test import TestCase
-from django.test.utils import override_settings
 
 from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 import pytz
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+# pylint: disable=C0111
 
-# pylint: disable=protected-access
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
 class AccessTestCase(TestCase):
     """
     Tests for the various access controls on the student dashboard

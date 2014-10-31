@@ -13,7 +13,7 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from mock import patch
 
@@ -110,7 +110,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         self.assertFalse(self.email_link in response.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestNewInstructorDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard

@@ -9,7 +9,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from django.test.utils import override_settings
 from courseware.tests.factories import InstructorFactory, StaffFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from wiki.models import URLPath
 from course_wiki.views import get_or_create_root
@@ -17,7 +17,7 @@ from course_wiki.utils import user_is_article_course_staff, course_wiki_slug
 from course_wiki import settings
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestWikiAccessBase(ModuleStoreTestCase):
     """Base class for testing wiki access."""
     def setUp(self):
@@ -53,7 +53,6 @@ class TestWikiAccessBase(ModuleStoreTestCase):
         ]
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestWikiAccess(TestWikiAccessBase):
     """Test wiki access for course staff."""
     def setUp(self):
@@ -114,7 +113,6 @@ class TestWikiAccess(TestWikiAccessBase):
             self.assertFalse(user_is_article_course_staff(course_staff, self.wiki_310b.article))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestWikiAccessForStudent(TestWikiAccessBase):
     """Test access for students."""
     def setUp(self):
@@ -130,7 +128,6 @@ class TestWikiAccessForStudent(TestWikiAccessBase):
             self.assertFalse(user_is_article_course_staff(self.student, page.article))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
     """Test staff has access if course number is numerical and wiki slug has an underscore appended."""
     def setUp(self):
@@ -150,7 +147,6 @@ class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
                 self.assertTrue(user_is_article_course_staff(course_staff, page.article))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestWikiAccessForOldFormatCourseStaffGroups(TestWikiAccessBase):
     """Test staff has access if course group has old format."""
     def setUp(self):

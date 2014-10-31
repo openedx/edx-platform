@@ -25,7 +25,7 @@ from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
 
 from instructor_task.api_helper import encode_problem_and_student_input
 from instructor_task.models import PROGRESS, QUEUING
@@ -99,7 +99,7 @@ class InstructorTaskTestCase(TestCase):
         return self._create_entry(task_state=task_state, task_output=progress, student=student)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Base test class for InstructorTask-related tests that require
@@ -184,7 +184,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         return request
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
     """
     Base test class for InstructorTask-related tests that require
