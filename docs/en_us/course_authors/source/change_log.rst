@@ -13,8 +13,12 @@ October, 2014
 
    * - Date
      - Change
+   * - 10/31/14
+     - Added warning in :ref:`Export a Course` about sensitive or license-
+       specific information that is included when you export a course.
    * - 10/30/14
-     - Added :ref:`email template<Verified Registration Reminder>` for reminding students of last day to register for verified certificates.
+     - Added :ref:`email template<Verified Registration Reminder>` for 
+       reminding students of last day to register for verified certificates.
    * - 10/29/14
      - Added information about course start time visibility to :ref:`The Course Start Date`.
    * - 10/28/14
