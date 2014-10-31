@@ -146,12 +146,7 @@ def run_quality(options):
     # If pep8 reports exist, use those
     # Otherwise, `diff-quality` will call pep8 itself
 
-    pep8_files = []
-    for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
-        for f in files:
-            if f == "pep8.report":
-                pep8_files.append(os.path.join(subdir, f))
-
+    pep8_files = get_violations_reports("pep8")
     pep8_reports = u' '.join(pep8_files)
 
     try:
@@ -173,12 +168,7 @@ def run_quality(options):
     # If pylint reports exist, use those
     # Otherwise, `diff-quality` will call pylint itself
 
-    pylint_files = []
-    for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
-        for f in files:
-            if f == "pylint.report":
-                pylint_files.append(os.path.join(subdir, f))
-
+    pylint_files = get_violations_reports("pylint")
     pylint_reports = u' '.join(pylint_files)
 
     pythonpath_prefix = (
@@ -217,3 +207,15 @@ def is_percentage_failure(error_message):
         return False
     else:
         return True
+
+
+def get_violations_reports(violations_type):
+    """
+    Finds violations reports files by naming convention (e.g., all "pep8.report" files)
+    """
+    violations_files = []
+    for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
+        for f in files:
+            if f == "{violations_type}.report".format(violations_type=violations_type):
+                violations_files.append(os.path.join(subdir, f))
+    return violations_files
