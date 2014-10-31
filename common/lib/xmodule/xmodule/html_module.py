@@ -16,7 +16,7 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
-from edxnotes_utils import edxnotes
+from xmodule.edxnotes_utils import edxnotes
 
 
 log = logging.getLogger("edx.courseware")
