@@ -539,11 +539,17 @@ def css_fill(css_selector, text, index=0):
     # self._element.clear() followed by self._element.send_keys(value)
     #
     # As a workaround, wait for the element to be visible, then use JS to set its value.
+    # Make sure to trigger the change event so that the page's JS will be triggered.
     retry_on_exception(lambda: css_find(css_selector)[index] is not None)
-    world.browser.driver.execute_script('window.jQuery("{css_selector}").val("{text}");'.format(
+
+    script = """
+    window.$("{css_selector}").focus();
+    window.$("{css_selector}").val("{text}");
+    window.$("{css_selector}").change();""".format(
         css_selector=css_selector,
         text=text
-        ))
+    )
+    world.browser.driver.execute_script(script)
 
     wait_for(lambda _: css_has_value(css_selector, text, index=index))
     return True
