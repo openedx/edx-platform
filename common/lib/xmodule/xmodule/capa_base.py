@@ -811,7 +811,10 @@ class CapaMixin(CapaFields):
         new_answers = dict()
         for answer_id in answers:
             try:
-                new_answer = {answer_id: self.runtime.replace_urls(answers[answer_id])}
+                answer_content = self.runtime.replace_urls(answers[answer_id])
+                if self.runtime.replace_jump_to_id_urls:
+                    answer_content = self.runtime.replace_jump_to_id_urls(answer_content)
+                new_answer = {answer_id: answer_content}
             except TypeError:
                 log.debug(u'Unable to perform URL substitution on answers[%s]: %s',
                           answer_id, answers[answer_id])
