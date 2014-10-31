@@ -94,6 +94,7 @@ class ChooseModeView(View):
             "error": error,
             "upgrade": upgrade,
             "can_audit": "audit" in modes,
+            "responsive": True
         }
         if "verified" in modes:
             context["suggested_prices"] = [
