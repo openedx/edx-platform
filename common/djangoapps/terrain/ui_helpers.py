@@ -526,23 +526,7 @@ def css_fill(css_selector, text, index=0):
     Then for synchronization purposes, wait for the value on the page.
     """
     wait_for_visible(css_selector, index=index)
-
-    # HACK:
-    # At some point, in devstack strings were no longer being filled into fields
-    # correctly under our original implementation which used splinter's fill method.
-    # Instead everything after certain letters (E.g. e and r) was getting truncated.
-    #
-    # Note that troubleshooting showed that this happened both with the splinter "fill"
-    # method, and directly with its underlying selenium implementation which is
-    # self._element.clear() followed by self._element.send_keys(value)
-    #
-    # As a workaround, wait for the element to be visible, then use JS to set its value.
-    retry_on_exception(lambda: css_find(css_selector)[index] is not None)
-    world.browser.driver.execute_script('window.jQuery("{css_selector}").val("{text}");'.format(
-        css_selector=css_selector,
-        text=text
-        ))
-
+    retry_on_exception(lambda: css_find(css_selector)[index].fill(text))
     wait_for(lambda _: css_has_value(css_selector, text, index=index))
     return True
 
