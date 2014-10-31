@@ -288,18 +288,18 @@ class EditContainerTest(NestedVerticalTest):
         """
         container = self.go_to_nested_container_page()
         self.modify_display_name_and_verify(container)
-        
+
     def test_display_name_with_empty_string(self):
         """
-        Test the Display Name if it is empty then it will filled with 
+        Test the Display Name if it is empty then it will filled with
         original value
         """
         unit = self.go_to_unit_page()
         component = unit.xblocks[1]
         empty_string = '  '
         self.modify_display_name_and_verify(component, modified_name=empty_string, original_value=component.name)
-        
-    
+
+
 @attr('shard_1')
 class UnitPublishingTest(ContainerBase):
     """
