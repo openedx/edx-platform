@@ -281,7 +281,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             handleAddEvent: function(event) {
                 var self = this,
-                    target = $(event.target),
+                    target = $(event.currentTarget),
                     category = target.data('category');
                 event.preventDefault();
                 XBlockViewUtils.addXBlock(target).done(function(locator) {

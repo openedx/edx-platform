@@ -1005,6 +1005,19 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertEqual(len(self.course_outline_page.sections()), 1)
         self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
 
+    def test_create_new_section_from_bottom_button_plus_icon(self):
+        """
+        Scenario: Create new section from button plus icon at bottom of page
+            Given that I am on the course outline
+            When I click the plus icon in "+ Add section" button at the bottom of the page
+            Then I see a new section added to the bottom of the page
+            And the display name is in its editable form.
+        """
+        self.course_outline_page.visit()
+        self.course_outline_page.add_section_from_bottom_button(click_child_icon=True)
+        self.assertEqual(len(self.course_outline_page.sections()), 1)
+        self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
+
     def test_create_new_subsection(self):
         """
         Scenario: Create new subsection
