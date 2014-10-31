@@ -1,6 +1,7 @@
 <%inherit file="shopping_cart_flow.html" />
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from microsite_configuration import microsite %>
 <%!
 from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
 %>
@@ -356,6 +357,8 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
         <span class="pull-right">${_("Total")}: <b>$${"{0:0.2f}".format(order.total_cost)} USD</b></span>
       </div>
     </div>
+    ## Allow for a microsite to be able to insert additional text at the bottom of the page
+    <%include file="${microsite.get_template_path('receipt_custom_region.html')}" />
   </section>
 </div>
 </%block>
