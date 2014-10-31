@@ -559,6 +559,22 @@ class CourseFields(object):
                               default=False,
                               scope=Scope.settings)
 
+    course_survey_name = String(
+        display_name=_("Pre-Course Survey Name"),
+        help=_("Name of SurveyForm to display as a pre-course survey to the user."),
+        default=None,
+        scope=Scope.settings,
+        deprecated=True
+    )
+
+    course_survey_required = Boolean(
+        display_name=_("Pre-Course Survey Required"),
+        help=_("Specify whether students must complete a survey before they can view your course content. If you set this value to true, you must add a name for the survey to the Course Survey Name setting above."),
+        default=False,
+        scope=Scope.settings,
+        deprecated=True
+    )
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
 
