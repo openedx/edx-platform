@@ -25,6 +25,8 @@ from path import path
 from datetime import datetime
 from pytz import UTC
 from contracts import contract, new_contract
+from operator import itemgetter
+from sortedcontainers import SortedListWithKey
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -1493,7 +1495,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         course_assets, asset_idx = self._find_course_asset(course_key, asset_metadata.asset_id.path, thumbnail)
         info = 'thumbnails' if thumbnail else 'assets'
-        all_assets = course_assets[info]
+        all_assets = SortedListWithKey([], key=itemgetter('filename'))
+        # Assets should be pre-sorted, so add them efficiently without sorting.
+        # extend() will raise a ValueError if the passed-in list is not sorted.
+        all_assets.extend(course_assets[info])
 
         # Set the edited information for assets only - not thumbnails.
         if not thumbnail:
@@ -1502,15 +1507,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Translate metadata to Mongo format.
         metadata_to_insert = asset_metadata.to_mongo()
         if asset_idx is None:
-            # Append new metadata.
-            # Future optimization: Insert in order & binary search to retrieve.
-            all_assets.append(metadata_to_insert)
+            # Add new metadata sorted into the list.
+            all_assets.add(metadata_to_insert)
         else:
             # Replace existing metadata.
-            all_assets[asset_idx] = metadata_to_insert
+            all_assets.pop(asset_idx)
+            all_assets.insert(asset_idx, metadata_to_insert)
 
         # Update the document.
-        self.asset_collection.update({'_id': course_assets['_id']}, {'$set': {info: all_assets}})
+        self.asset_collection.update({'_id': course_assets['_id']}, {'$set': {info: all_assets.as_list()}})
         return True
 
     @contract(asset_key='AssetKey', attr_dict=dict)

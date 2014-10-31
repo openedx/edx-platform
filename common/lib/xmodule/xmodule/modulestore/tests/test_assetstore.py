@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 import unittest
 import ddt
+from time import sleep
 
 from xmodule.assetstore import AssetMetadata, AssetThumbnailMetadata
 from xmodule.modulestore import ModuleStoreEnum
@@ -79,12 +80,23 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         asset6_vals = ('asset.txt', 'JJJCCC747858', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49')
         asset6 = dict(zip(asset_fields[1:], asset6_vals[1:]))
 
+        # More assets.
+        asset7_vals = ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, ModuleStoreEnum.UserID.test * 7, datetime.now(pytz.utc), '1.1', '1.01')
+        asset8_vals = ('weather_patterns.bmp', '928SJXX2EB', 'science', False, ModuleStoreEnum.UserID.test * 8, datetime.now(pytz.utc), '52', '51')
+        asset9_vals = ('demo.swf', 'DFDFGGGG14', 'demos/easy', False, ModuleStoreEnum.UserID.test * 9, datetime.now(pytz.utc), '5', '4')
+        asset7 = dict(zip(asset_fields[1:], asset7_vals[1:]))
+        asset8 = dict(zip(asset_fields[1:], asset8_vals[1:]))
+        asset9 = dict(zip(asset_fields[1:], asset9_vals[1:]))
+
         asset1_key = course1_key.make_asset_key('asset', asset1_vals[0])
         asset2_key = course1_key.make_asset_key('asset', asset2_vals[0])
         asset3_key = course2_key.make_asset_key('asset', asset3_vals[0])
         asset4_key = course2_key.make_asset_key('asset', asset4_vals[0])
         asset5_key = course2_key.make_asset_key('asset', asset5_vals[0])
         asset6_key = course2_key.make_asset_key('asset', asset6_vals[0])
+        asset7_key = course2_key.make_asset_key('asset', asset7_vals[0])
+        asset8_key = course2_key.make_asset_key('asset', asset8_vals[0])
+        asset9_key = course2_key.make_asset_key('asset', asset9_vals[0])
 
         asset1_md = AssetMetadata(asset1_key, **asset1)
         asset2_md = AssetMetadata(asset2_key, **asset2)
@@ -92,13 +104,26 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         asset4_md = AssetMetadata(asset4_key, **asset4)
         asset5_md = AssetMetadata(asset5_key, **non_existent_asset)
         asset6_md = AssetMetadata(asset6_key, **asset6)
+        asset7_md = AssetMetadata(asset7_key, **asset7)
+        asset8_md = AssetMetadata(asset8_key, **asset8)
+        asset9_md = AssetMetadata(asset9_key, **asset9)
 
         if store is not None:
+            # Sleeps are to ensure that edited_on order is correct.
             store.save_asset_metadata(course1_key, asset1_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_metadata(course1_key, asset2_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_metadata(course2_key, asset3_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_metadata(course2_key, asset4_md, ModuleStoreEnum.UserID.test)
+            sleep(0.0001)
+            store.save_asset_metadata(course1_key, asset2_md, ModuleStoreEnum.UserID.test * 2)
+            sleep(0.0001)
+            store.save_asset_metadata(course2_key, asset3_md, ModuleStoreEnum.UserID.test * 3)
+            sleep(0.0001)
+            store.save_asset_metadata(course2_key, asset4_md, ModuleStoreEnum.UserID.test * 4)
+            sleep(0.0001)
             # 5 & 6 are not saved on purpose!
+            store.save_asset_metadata(course2_key, asset7_md, ModuleStoreEnum.UserID.test * 7)
+            sleep(0.0001)
+            store.save_asset_metadata(course2_key, asset8_md, ModuleStoreEnum.UserID.test * 8)
+            sleep(0.0001)
+            store.save_asset_metadata(course2_key, asset9_md, ModuleStoreEnum.UserID.test * 9)
 
         return (asset1_md, asset2_md, asset3_md, asset4_md, asset5_md, asset6_md)
 
@@ -387,8 +412,67 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 store.delete_all_asset_metadata(course.id, ModuleStoreEnum.UserID.test)
                 self.assertEquals(len(store.get_all_asset_thumbnail_metadata(course.id)), 0)
 
-    def test_get_all_assets_with_paging(self):
-        pass
+    @ddt.data(*MODULESTORE_SETUPS)
+    def test_get_all_assets_with_paging(self, storebuilder):
+        """
+        Save multiple metadata in each store and retrieve it singularly, as all assets, and after deleting all.
+        """
+        # Temporarily only perform this test for Old Mongo - not Split.
+        if not isinstance(storebuilder, MongoModulestoreBuilder):
+            raise unittest.SkipTest
+        with MongoContentstoreBuilder().build() as contentstore:
+            with storebuilder.build(contentstore) as store:
+                course1 = CourseFactory.create(modulestore=store)
+                course2 = CourseFactory.create(modulestore=store)
+                self.setup_assets(course1.id, course2.id, store)
+
+                expected_sorts_by_2 = (
+                    (
+                        ('displayname', 'ascending'),
+                        ('code.tgz', 'demo.swf', 'dog.png', 'roman_history.pdf', 'weather_patterns.bmp'),
+                        (2, 2, 1)
+                    ),
+                    (
+                        ('displayname', 'descending'),
+                        ('weather_patterns.bmp', 'roman_history.pdf', 'dog.png', 'demo.swf', 'code.tgz'),
+                        (2, 2, 1)
+                    ),
+                    (
+                        ('uploadDate', 'ascending'),
+                        ('code.tgz', 'dog.png', 'roman_history.pdf', 'weather_patterns.bmp', 'demo.swf'),
+                        (2, 2, 1)
+                    ),
+                    (
+                        ('uploadDate', 'descending'),
+                        ('demo.swf', 'weather_patterns.bmp', 'roman_history.pdf', 'dog.png', 'code.tgz'),
+                        (2, 2, 1)
+                    ),
+                )
+                # First, with paging across all sorts.
+                for sort_test in expected_sorts_by_2:
+                    for i in xrange(3):
+                        asset_page = store.get_all_asset_metadata(course2.id, start=2 * i, maxresults=2, sort=sort_test[0])
+                        self.assertEquals(len(asset_page), sort_test[2][i])
+                        self.assertEquals(asset_page[0].asset_id.path, sort_test[1][2 * i])
+                        if sort_test[2][i] == 2:
+                            self.assertEquals(asset_page[1].asset_id.path, sort_test[1][(2 * i) + 1])
+
+                # Now fetch everything.
+                asset_page = store.get_all_asset_metadata(course2.id, start=0, sort=('displayname', 'ascending'))
+                self.assertEquals(len(asset_page), 5)
+                self.assertEquals(asset_page[0].asset_id.path, 'code.tgz')
+                self.assertEquals(asset_page[1].asset_id.path, 'demo.swf')
+                self.assertEquals(asset_page[2].asset_id.path, 'dog.png')
+                self.assertEquals(asset_page[3].asset_id.path, 'roman_history.pdf')
+                self.assertEquals(asset_page[4].asset_id.path, 'weather_patterns.bmp')
+
+                # Some odd conditions.
+                asset_page = store.get_all_asset_metadata(course2.id, start=100, sort=('displayname', 'ascending'))
+                self.assertEquals(len(asset_page), 0)
+                asset_page = store.get_all_asset_metadata(course2.id, start=3, maxresults=0, sort=('displayname', 'ascending'))
+                self.assertEquals(len(asset_page), 0)
+                asset_page = store.get_all_asset_metadata(course2.id, start=3, maxresults=-12345, sort=('displayname', 'descending'))
+                self.assertEquals(len(asset_page), 2)
 
     def test_copy_all_assets(self):
         pass
