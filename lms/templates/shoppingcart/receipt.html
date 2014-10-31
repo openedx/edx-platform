@@ -30,14 +30,8 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
         % if order_type == 'personal':
            ## in case of multiple courses in single self purchase scenario,
            ## we will show the button View Dashboard
-          % if len(shoppingcart_items) > 1 :
-            <% dashboard_url = reverse('dashboard') %>
-            <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
-          % elif shoppingcart_items and shoppingcart_items[0][1]:
-            <% course = shoppingcart_items[0][1] %>
-            <% course_info_url = reverse('info', kwargs={'course_id': course.id.to_deprecated_string()}) %>
-            <a href="${course_info_url}" class="blue pull-right">${_("View Course")} <i class="icon-caret-right"></i></a>
-          %endif
+          <% dashboard_url = reverse('dashboard') %>
+          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
           ${_("You have successfully been enrolled for <b>{appended_course_names}</b>. The following receipt has been emailed to"
           " <strong>{appended_recipient_emails}</strong>").format(appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails)}
         % elif order_type == 'business':
