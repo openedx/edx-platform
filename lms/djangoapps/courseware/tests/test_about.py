@@ -257,3 +257,29 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
 
         # Check that registration button is not present
         self.assertNotIn(REG_STR, resp.content)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
+    """
+    This test case will check the About page for the content in the HTML sidebar.
+    """
+    def setUp(self):
+        super(AboutSidebarHTMLTestCase, self).setUp()
+        self.course = CourseFactory.create()
+
+    def test_html_sidebar_empty(self):
+        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn("About Sidebar HTML Heading", resp.content)
+
+    def test_html_sidebar_has_content(self):
+        ItemFactory.create(
+            category="about", parent_location=self.course.location,
+            data="About Sidebar HTML Heading", display_name="about_sidebar_html"
+        )
+        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("About Sidebar HTML Heading", resp.content)

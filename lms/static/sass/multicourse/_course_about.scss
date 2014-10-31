@@ -399,7 +399,7 @@
 
       &.course-summary {
         padding: 16px 20px 30px;
-        margin-bottom: 220px;
+        margin-bottom: 50px;
         border-top: none;
       }
 
@@ -424,6 +424,11 @@
           padding-left: 29px;
           background: url('../images/link-icon.png') left center no-repeat;
         }
+      }
+      
+      &.about-sidebar-html {
+        box-shadow: none;
+        border: none;
       }
     }
 

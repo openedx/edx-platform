@@ -86,4 +86,8 @@ urlpatterns = patterns('',  # nopep8
     # spoc gradebook
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
+
+    # Collect ora2 data
+    url(r'get_ora2_responses',
+        'instructor.views.api.get_ora2_responses', name="get_ora2_responses"),
 )
