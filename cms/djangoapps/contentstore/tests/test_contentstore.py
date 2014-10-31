@@ -56,6 +56,8 @@ from xmodule.contentstore.content import StaticContent
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreTestCase(CourseTestCase):
@@ -69,7 +71,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     Tests which legitimately need to import a course
     """
     def test_no_static_link_rewrites_on_import(self):
-        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
         course = course_items[0]
 
         handouts_usage_key = course.id.make_usage_key('course_info', 'handouts')
@@ -81,7 +83,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         self.assertIn('/static/', handouts.data)
 
     def test_xlint_fails(self):
-        err_cnt = perform_xlint('common/test/data', ['toy'])
+        err_cnt = perform_xlint(TEST_DATA_DIR, ['toy'])
         self.assertGreater(err_cnt, 0)
 
     def test_about_overrides(self):
@@ -90,7 +92,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         e.g. /about/Fall_2012/effort.html
         while there is a base definition in /about/effort.html
         '''
-        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_key = course_items[0].id
         effort = self.store.get_item(course_key.make_usage_key('about', 'effort'))
         self.assertEqual(effort.data, '6 hours')
@@ -105,7 +107,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         '''
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store, verbose=True)
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store, verbose=True)
 
         course = self.store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
@@ -153,7 +155,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         Test that course info updates are imported and exported with all content fields ('data', 'items')
         """
         content_store = contentstore()
-        data_dir = "common/test/data/"
+        data_dir = TEST_DATA_DIR
         courses = import_from_xml(
             self.store, self.user.id, data_dir, ['course_info_updates'],
             static_content_store=content_store, verbose=True,
@@ -166,7 +168,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         self.assertIsNotNone(course_updates)
 
         # check that course which is imported has files 'updates.html' and 'updates.items.json'
-        filesystem = OSFS(data_dir + 'course_info_updates/info')
+        filesystem = OSFS(data_dir + '/course_info_updates/info')
         self.assertTrue(filesystem.exists('updates.html'))
         self.assertTrue(filesystem.exists('updates.items.json'))
 
@@ -204,7 +206,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     def test_rewrite_nonportable_links_on_import(self):
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store)
 
         # first check a static asset link
         course_key = SlashSeparatedCourseKey('edX', 'toy', 'run')
@@ -314,7 +316,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     def test_export_course_with_metadata_only_video(self):
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # create a new video module and add it as a child to a vertical
@@ -343,7 +345,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['word_cloud'])
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['word_cloud'])
         course_id = SlashSeparatedCourseKey('HarvardX', 'ER22x', '2013_Spring')
 
         verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
@@ -370,7 +372,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
@@ -401,7 +403,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
 
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
@@ -423,7 +425,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     def test_export_course_without_content_store(self):
         # Create toy course
 
-        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_id = course_items[0].id
 
         root_dir = path(mkdtemp_clean())
@@ -1212,7 +1214,7 @@ class ContentStoreTest(ContentStoreTestCase):
             )
             self.assertEqual(resp.status_code, 200)
 
-        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['simple'])
         course_key = course_items[0].id
 
         resp = self._show_course_overview(course_key)
@@ -1259,7 +1261,7 @@ class ContentStoreTest(ContentStoreTestCase):
         target_course_id = _get_course_id(self.course_data)
         _create_course(self, target_course_id, self.course_data)
 
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], target_course_id=target_course_id)
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_course_id=target_course_id)
 
         modules = self.store.get_items(target_course_id)
 
@@ -1294,7 +1296,7 @@ class ContentStoreTest(ContentStoreTestCase):
         course_module.save()
 
         # Import a course with wiki_slug == location.course
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], target_course_id=target_course_id)
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_course_id=target_course_id)
         course_module = self.store.get_course(target_course_id)
         self.assertEquals(course_module.wiki_slug, 'toy')
 
@@ -1309,17 +1311,17 @@ class ContentStoreTest(ContentStoreTestCase):
         _create_course(self, target_course_id, course_data)
 
         # Import a course with wiki_slug == location.course
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], target_course_id=target_course_id)
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_course_id=target_course_id)
         course_module = self.store.get_course(target_course_id)
         self.assertEquals(course_module.wiki_slug, 'MITx.111.2013_Spring')
 
         # Now try importing a course with wiki_slug == '{0}.{1}.{2}'.format(location.org, location.course, location.run)
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['two_toys'], target_course_id=target_course_id)
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['two_toys'], target_course_id=target_course_id)
         course_module = self.store.get_course(target_course_id)
         self.assertEquals(course_module.wiki_slug, 'MITx.111.2013_Spring')
 
     def test_import_metadata_with_attempts_empty_string(self):
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['simple'])
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['simple'])
         did_load_item = False
         try:
             course_key = SlashSeparatedCourseKey('edX', 'simple', 'problem')
@@ -1341,7 +1343,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
     def test_metadata_inheritance(self):
-        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
 
         course = course_items[0]
         verticals = self.store.get_items(course.id, qualifiers={'category': 'vertical'})
@@ -1410,7 +1412,7 @@ class ContentStoreTest(ContentStoreTestCase):
         courses = import_from_xml(
             self.store,
             self.user.id,
-            'common/test/data/',
+            TEST_DATA_DIR,
             ['conditional_and_poll'],
             static_content_store=content_store
         )

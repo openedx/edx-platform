@@ -18,6 +18,9 @@ from student.models import Registration
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from contentstore.utils import reverse_url
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from django.conf import settings
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 def parse_json(response):
@@ -135,7 +138,7 @@ class CourseTestCase(ModuleStoreTestCase):
         Imports the test toy course and populates it with additional test data
         """
         content_store = contentstore()
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store)
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # create an Orphan
