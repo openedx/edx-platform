@@ -88,44 +88,45 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         asset8 = dict(zip(asset_fields[1:], asset8_vals[1:]))
         asset9 = dict(zip(asset_fields[1:], asset9_vals[1:]))
 
-        asset1_key = course1_key.make_asset_key('asset', asset1_vals[0])
-        asset2_key = course1_key.make_asset_key('asset', asset2_vals[0])
-        asset3_key = course2_key.make_asset_key('asset', asset3_vals[0])
-        asset4_key = course2_key.make_asset_key('asset', asset4_vals[0])
-        asset5_key = course2_key.make_asset_key('asset', asset5_vals[0])
-        asset6_key = course2_key.make_asset_key('asset', asset6_vals[0])
-        asset7_key = course2_key.make_asset_key('asset', asset7_vals[0])
-        asset8_key = course2_key.make_asset_key('asset', asset8_vals[0])
-        asset9_key = course2_key.make_asset_key('asset', asset9_vals[0])
-
-        asset1_md = AssetMetadata(asset1_key, **asset1)
-        asset2_md = AssetMetadata(asset2_key, **asset2)
-        asset3_md = AssetMetadata(asset3_key, **asset3)
-        asset4_md = AssetMetadata(asset4_key, **asset4)
-        asset5_md = AssetMetadata(asset5_key, **non_existent_asset)
-        asset6_md = AssetMetadata(asset6_key, **asset6)
-        asset7_md = AssetMetadata(asset7_key, **asset7)
-        asset8_md = AssetMetadata(asset8_key, **asset8)
-        asset9_md = AssetMetadata(asset9_key, **asset9)
+        if course1_key:
+            asset1_key = course1_key.make_asset_key('asset', asset1_vals[0])
+            asset2_key = course1_key.make_asset_key('asset', asset2_vals[0])
+            asset1_md = AssetMetadata(asset1_key, **asset1)
+            asset2_md = AssetMetadata(asset2_key, **asset2)
+        if course2_key:
+            asset3_key = course2_key.make_asset_key('asset', asset3_vals[0])
+            asset4_key = course2_key.make_asset_key('asset', asset4_vals[0])
+            asset5_key = course2_key.make_asset_key('asset', asset5_vals[0])
+            asset6_key = course2_key.make_asset_key('asset', asset6_vals[0])
+            asset7_key = course2_key.make_asset_key('asset', asset7_vals[0])
+            asset8_key = course2_key.make_asset_key('asset', asset8_vals[0])
+            asset9_key = course2_key.make_asset_key('asset', asset9_vals[0])
+            asset3_md = AssetMetadata(asset3_key, **asset3)
+            asset4_md = AssetMetadata(asset4_key, **asset4)
+            asset5_md = AssetMetadata(asset5_key, **non_existent_asset)  # pylint: disable=W0612
+            asset6_md = AssetMetadata(asset6_key, **asset6)  # pylint: disable=W0612
+            asset7_md = AssetMetadata(asset7_key, **asset7)
+            asset8_md = AssetMetadata(asset8_key, **asset8)
+            asset9_md = AssetMetadata(asset9_key, **asset9)
 
         if store is not None:
             # Sleeps are to ensure that edited_on order is correct.
-            store.save_asset_metadata(course1_key, asset1_md, ModuleStoreEnum.UserID.test)
-            sleep(0.0001)
-            store.save_asset_metadata(course1_key, asset2_md, ModuleStoreEnum.UserID.test * 2)
-            sleep(0.0001)
-            store.save_asset_metadata(course2_key, asset3_md, ModuleStoreEnum.UserID.test * 3)
-            sleep(0.0001)
-            store.save_asset_metadata(course2_key, asset4_md, ModuleStoreEnum.UserID.test * 4)
-            sleep(0.0001)
-            # 5 & 6 are not saved on purpose!
-            store.save_asset_metadata(course2_key, asset7_md, ModuleStoreEnum.UserID.test * 7)
-            sleep(0.0001)
-            store.save_asset_metadata(course2_key, asset8_md, ModuleStoreEnum.UserID.test * 8)
-            sleep(0.0001)
-            store.save_asset_metadata(course2_key, asset9_md, ModuleStoreEnum.UserID.test * 9)
-
-        return (asset1_md, asset2_md, asset3_md, asset4_md, asset5_md, asset6_md)
+            if course1_key:
+                store.save_asset_metadata(course1_key, asset1_md, ModuleStoreEnum.UserID.test)
+                sleep(0.0001)
+                store.save_asset_metadata(course1_key, asset2_md, ModuleStoreEnum.UserID.test * 2)
+                sleep(0.0001)
+            if course2_key:
+                store.save_asset_metadata(course2_key, asset3_md, ModuleStoreEnum.UserID.test * 3)
+                sleep(0.0001)
+                store.save_asset_metadata(course2_key, asset4_md, ModuleStoreEnum.UserID.test * 4)
+                sleep(0.0001)
+                # 5 & 6 are not saved on purpose!
+                store.save_asset_metadata(course2_key, asset7_md, ModuleStoreEnum.UserID.test * 7)
+                sleep(0.0001)
+                store.save_asset_metadata(course2_key, asset8_md, ModuleStoreEnum.UserID.test * 8)
+                sleep(0.0001)
+                store.save_asset_metadata(course2_key, asset9_md, ModuleStoreEnum.UserID.test * 9)
 
     def setup_thumbnails(self, course1_key, course2_key, store=None):
         """
@@ -148,28 +149,29 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         thumbnail6_vals = ('asset.txt', 'JJJCCC747858')
         thumbnail6 = dict(zip(thumbnail_fields[1:], thumbnail6_vals[1:]))
 
-        thumb1_key = course1_key.make_asset_key('thumbnail', thumbnail1_vals[0])
-        thumb2_key = course1_key.make_asset_key('thumbnail', thumbnail2_vals[0])
-        thumb3_key = course2_key.make_asset_key('thumbnail', thumbnail3_vals[0])
-        thumb4_key = course2_key.make_asset_key('thumbnail', thumbnail4_vals[0])
-        thumb5_key = course2_key.make_asset_key('thumbnail', thumbnail5_vals[0])
-        thumb6_key = course2_key.make_asset_key('thumbnail', thumbnail6_vals[0])
-
-        thumb1_md = AssetThumbnailMetadata(thumb1_key, **thumbnail1)
-        thumb2_md = AssetThumbnailMetadata(thumb2_key, **thumbnail2)
-        thumb3_md = AssetThumbnailMetadata(thumb3_key, **thumbnail3)
-        thumb4_md = AssetThumbnailMetadata(thumb4_key, **thumbnail4)
-        thumb5_md = AssetThumbnailMetadata(thumb5_key, **non_existent_thumbnail)
-        thumb6_md = AssetThumbnailMetadata(thumb6_key, **thumbnail6)
+        if course1_key:
+            thumb1_key = course1_key.make_asset_key('thumbnail', thumbnail1_vals[0])
+            thumb2_key = course1_key.make_asset_key('thumbnail', thumbnail2_vals[0])
+            thumb1_md = AssetThumbnailMetadata(thumb1_key, **thumbnail1)
+            thumb2_md = AssetThumbnailMetadata(thumb2_key, **thumbnail2)
+        if course2_key:
+            thumb3_key = course2_key.make_asset_key('thumbnail', thumbnail3_vals[0])
+            thumb4_key = course2_key.make_asset_key('thumbnail', thumbnail4_vals[0])
+            thumb5_key = course2_key.make_asset_key('thumbnail', thumbnail5_vals[0])
+            thumb6_key = course2_key.make_asset_key('thumbnail', thumbnail6_vals[0])
+            thumb3_md = AssetThumbnailMetadata(thumb3_key, **thumbnail3)
+            thumb4_md = AssetThumbnailMetadata(thumb4_key, **thumbnail4)
+            thumb5_md = AssetThumbnailMetadata(thumb5_key, **non_existent_thumbnail)  # pylint: disable=W0612
+            thumb6_md = AssetThumbnailMetadata(thumb6_key, **thumbnail6)  # pylint: disable=W0612
 
         if store is not None:
-            store.save_asset_thumbnail_metadata(course1_key, thumb1_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_thumbnail_metadata(course1_key, thumb2_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_thumbnail_metadata(course2_key, thumb3_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_thumbnail_metadata(course2_key, thumb4_md, ModuleStoreEnum.UserID.test)
-            # thumb5 and thumb6 are not saved on purpose!
-
-        return (thumb1_md, thumb2_md, thumb3_md, thumb4_md, thumb5_md, thumb6_md)
+            if course1_key:
+                store.save_asset_thumbnail_metadata(course1_key, thumb1_md, ModuleStoreEnum.UserID.test)
+                store.save_asset_thumbnail_metadata(course1_key, thumb2_md, ModuleStoreEnum.UserID.test)
+            if course2_key:
+                store.save_asset_thumbnail_metadata(course2_key, thumb3_md, ModuleStoreEnum.UserID.test)
+                store.save_asset_thumbnail_metadata(course2_key, thumb4_md, ModuleStoreEnum.UserID.test)
+                # thumb5 and thumb6 are not saved on purpose!
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_save_one_and_confirm(self, storebuilder):
@@ -467,15 +469,12 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 self.assertEquals(asset_page[4].asset_id.path, 'weather_patterns.bmp')
 
                 # Some odd conditions.
-                asset_page = store.get_all_asset_metadata(course2.id, start=100, sort=('displayname', 'ascending'))
+                asset_page = store.get_all_asset_metadata(course2.id, start=100, sort=('uploadDate', 'ascending'))
                 self.assertEquals(len(asset_page), 0)
                 asset_page = store.get_all_asset_metadata(course2.id, start=3, maxresults=0, sort=('displayname', 'ascending'))
                 self.assertEquals(len(asset_page), 0)
                 asset_page = store.get_all_asset_metadata(course2.id, start=3, maxresults=-12345, sort=('displayname', 'descending'))
                 self.assertEquals(len(asset_page), 2)
-
-    def test_copy_all_assets(self):
-        pass
 
     @ddt.data(XmlModulestoreBuilder(), MixedModulestoreBuilder([('xml', XmlModulestoreBuilder())]))
     def test_xml_not_yet_implemented(self, storebuilder):
@@ -494,3 +493,30 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
             for method in ['_get_all_asset_metadata', 'get_all_asset_metadata', 'get_all_asset_thumbnail_metadata']:
                 with self.assertRaises(NotImplementedError):
                     getattr(store, method)(course_key)
+
+    @ddt.data(*MODULESTORE_SETUPS)
+    def test_copy_all_assets(self, storebuilder):
+        """
+        Create a course with assets and such, copy it all to another course, and check on it.
+        """
+        with MongoContentstoreBuilder().build() as contentstore:
+            with storebuilder.build(contentstore) as store:
+                course1 = CourseFactory.create(modulestore=store)
+                course2 = CourseFactory.create(modulestore=store)
+                self.setup_assets(course1.id, None, store)
+                self.setup_thumbnails(course1.id, None, store)
+                self.assertEquals(len(store.get_all_asset_metadata(course1.id)), 2)
+                self.assertEquals(len(store.get_all_asset_thumbnail_metadata(course1.id)), 2)
+                self.assertEquals(len(store.get_all_asset_metadata(course2.id)), 0)
+                self.assertEquals(len(store.get_all_asset_thumbnail_metadata(course2.id)), 0)
+                store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 101)
+                self.assertEquals(len(store.get_all_asset_metadata(course1.id)), 2)
+                self.assertEquals(len(store.get_all_asset_thumbnail_metadata(course1.id)), 2)
+                all_assets = store.get_all_asset_metadata(course2.id, sort=('displayname', 'ascending'))
+                self.assertEquals(len(all_assets), 2)
+                self.assertEquals(all_assets[0].asset_id.path, 'pic1.jpg')
+                self.assertEquals(all_assets[1].asset_id.path, 'shout.ogg')
+                all_thumbnails = store.get_all_asset_thumbnail_metadata(course2.id, sort=('uploadDate', 'descending'))
+                self.assertEquals(len(all_thumbnails), 2)
+                self.assertEquals(all_thumbnails[0].asset_id.path, 'kitten_thumb.jpg')
+                self.assertEquals(all_thumbnails[1].asset_id.path, 'cat_thumb.jpg')
