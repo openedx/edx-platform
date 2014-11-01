@@ -262,8 +262,15 @@
       </div>
       %endif
 
+      %if libraries_enabled:
+      <ul id="course-index-tabs">
+        <li class="courses-tab active"><a>${_("Courses")}</a></li>
+        <li class="libraries-tab"><a>${_("Libraries")}</a></li>
+      </ul>
+      %endif
+
       %if len(courses) > 0:
-      <div class="courses">
+      <div class="courses courses-tab active">
         <ul class="list-courses">
           %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
           <li class="course-item" data-course-key="${course_info['course_key'] | h}">
@@ -300,10 +307,7 @@
       </div>
 
       %else:
-      <div class="courses">
-      </div>
-
-      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices">
+      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices courses-tab active">
         <div class="notice-item">
           <div class="msg">
             <h3 class="title">${_("Are you staff on an existing Studio course?")}</h3>
@@ -410,14 +414,8 @@
       </div>
       % endif
 
-      %if libraries:
-      <div class="copy">
-        <h1>Content Libraries</h1>
-        <p>${_("Warning: Content Libraries are currently a beta feature, and may be subject to backwards-incompatible changes.")}</p>
-        <p>${_("Here are all of the libraries you currently have access to in Studio:")}</p>
-      </div>
-
-      <div class="courses">
+      %if len(libraries) > 0:
+      <div class="libraries libraries-tab">
         <ul class="list-courses">
           %for library_info in sorted(libraries, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
           <li class="course-item">
@@ -437,6 +435,17 @@
           </li>
           %endfor
         </ul>
+      </div>
+
+      %else:
+      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices libraries-tab">
+        <div class="notice-item">
+          <div class="msg">
+            <div class="copy">
+              <p>${_('You don\'t have any content libraries yet.')}</p>
+            </div>
+          </div>
+        </div>
       </div>
       %endif
 
