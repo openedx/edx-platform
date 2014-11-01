@@ -1,4 +1,6 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from util.markup import HTML, ugettext as _
+%>
 <%inherit file="base.html" />
 <%block name="title">${_("Studio Server Error")}</%block>
 <%block name="bodyclass">view-util util-500</%block>
@@ -7,14 +9,14 @@
 <div class="wrapper-content wrapper">
   <section class="content">
     <header>
-      <h1 class="title title-1">${_("The <em>Studio</em> servers encountered an error")}</h1>
+        <h1 class="title title-1">${_("The {em_start}Studio{em_end} servers encountered an error").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</h1>
     </header>
     <article class="content-primary" role="main">
       <p>
         ${_("An error occurred in Studio and the page could not be loaded. Please try again in a few moments.")}
         ${_("We've logged the error and our staff is currently working to resolve this error as soon as possible.")}
-        ${_('If the problem persists, please email us at {email_link}.').format(
-              email_link=u'<a href="mailto:{email_address}">{email_address}</a>'.format(
+        ${_("If the problem persists, please email us at {email_link}.").format(
+              email_link=HTML(u'<a href="mailto:{email_address}">{email_address}</a>').format(
                   email_address=settings.TECH_SUPPORT_EMAIL,
               )
           )}
