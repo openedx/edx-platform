@@ -106,7 +106,7 @@ class AssetMetadata(object):
             'edited_on': self.edited_on
         }
 
-    @contract(asset_doc='dict | None')
+    @contract(asset_doc='dict|None')
     def from_mongo(self, asset_doc):
         """
         Fill in all metadata fields from a MongoDB document.
@@ -134,7 +134,7 @@ class AssetThumbnailMetadata(object):
     # All AssetThumbnailMetadata objects should have AssetLocators with this type.
     ASSET_TYPE = 'thumbnail'
 
-    @contract(asset_id='AssetKey', internal_name='str | unicode | None')
+    @contract(asset_id='AssetKey', internal_name='basestring|None')
     def __init__(self, asset_id, internal_name=None, field_decorator=None):
         """
         Construct a AssetThumbnailMetadata object.
@@ -160,7 +160,7 @@ class AssetThumbnailMetadata(object):
             'internal_name': self.internal_name
         }
 
-    @contract(thumbnail_doc='dict | None')
+    @contract(thumbnail_doc='dict|None')
     def from_mongo(self, thumbnail_doc):
         """
         Fill in all metadata fields from a MongoDB document.
