@@ -152,6 +152,14 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             CreateLibraryUtils.configureHandlers();
         };
 
+        var showTab = function(tab) {
+          return function(e) {
+            e.preventDefault();
+            $('.courses-tab').toggleClass('active', tab === 'courses');
+            $('.libraries-tab').toggleClass('active', tab === 'libraries');
+          }
+        };
+
         var onReady = function () {
             $('.new-course-button').bind('click', addNewCourse);
             $('.new-library-button').bind('click', addNewLibrary);
@@ -159,6 +167,8 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
                 ViewUtils.reload();
             }));
             $('.action-reload').bind('click', ViewUtils.reload);
+            $('#course-index-tabs .courses-tab').bind('click', showTab('courses'));
+            $('#course-index-tabs .libraries-tab').bind('click', showTab('libraries'));
         };
 
         domReady(onReady);
