@@ -2,13 +2,19 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
         "js/views/utils/view_utils"],
     function ($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         describe("Course listing page", function () {
-            var mockIndexPageHTML = readFixtures('mock/mock-index-page.underscore'), fillInFields;
+            var mockIndexPageHTML = readFixtures('mock/mock-index-page.underscore');
 
             var fillInFields = function (org, number, run, name) {
                 $('.new-course-org').val(org);
                 $('.new-course-number').val(number);
                 $('.new-course-run').val(run);
                 $('.new-course-name').val(name);
+            };
+
+            var fillInLibraryFields = function(org, number, name) {
+                $('.new-library-org').val(org).keyup();
+                $('.new-library-number').val(number).keyup();
+                $('.new-library-name').val(name).keyup();
             };
 
             beforeEach(function () {
@@ -57,9 +63,39 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
                 AjaxHelpers.respondWithJson(requests, {
                     ErrMsg: 'error message'
                 });
-                expect($('.wrap-error')).toHaveClass('is-shown');
+                expect($('.create-course .wrap-error')).toHaveClass('is-shown');
                 expect($('#course_creation_error')).toContainText('error message');
                 expect($('.new-course-save')).toHaveClass('is-disabled');
+            });
+
+            it("saves new libraries", function () {
+                var requests = AjaxHelpers.requests(this);
+                var redirectSpy = spyOn(ViewUtils, 'redirect');
+                $('.new-library-button').click();
+                fillInLibraryFields('DemoX', 'DM101', 'Demo library');
+                $('.new-library-save').click();
+                AjaxHelpers.expectJsonRequest(requests, 'POST', '/library/', {
+                    org: 'DemoX',
+                    number: 'DM101',
+                    display_name: 'Demo library'
+                });
+                AjaxHelpers.respondWithJson(requests, {
+                    url: 'dummy_test_url'
+                });
+                expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
+            });
+
+            it("displays an error when saving a library fails", function () {
+                var requests = AjaxHelpers.requests(this);
+                $('.new-library-button').click();
+                fillInLibraryFields('DemoX', 'DM101', 'Demo library');
+                $('.new-library-save').click();
+                AjaxHelpers.respondWithJson(requests, {
+                    ErrMsg: 'error message'
+                });
+                expect($('.create-library .wrap-error')).toHaveClass('is-shown');
+                expect($('#library_creation_error')).toContainText('error message');
+                expect($('.new-library-save')).toHaveClass('is-disabled');
             });
         });
     });
