@@ -10,6 +10,7 @@ from mock import patch
 from bs4 import BeautifulSoup
 from django.utils import translation
 
+
 class TestSortedCountryList(TestCase):
     """
     Test that country list is always sorted alphabetically
@@ -48,7 +49,7 @@ class TestSortedCountryList(TestCase):
         self.assertLess(options[1].text, options[10].text)
 
     @patch.dict(settings.REGISTRATION_EXTRA_FIELDS, {'country': 'required'})
-    def test_country_sorting_french (self):
+    def test_country_sorting_french(self):
         """
         Test that country list is always sorted alphabetically in French
         """
@@ -73,7 +74,8 @@ class TestSortedCountryList(TestCase):
             self.assertLess(af_index, us_index)
             # testing two option elements to be in alphabetical order
             self.assertLess(options[1].text, options[10].text)
-        
+
+
 class TestExtraRegistrationVariables(TestCase):
     """
     Test that extra registration variables are properly checked according to settings

@@ -6,12 +6,13 @@ import settings
 
 class User(models.Model):
 
-    accessible_fields = ['username', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
-                         'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
-                         'group_id', 'subscribed_thread_ids', 'subscribed_commentable_ids',
-                         'subscribed_course_ids', 'threads_count', 'comments_count',
-                         'default_sort_key'
-                        ]
+    accessible_fields = [
+        'username', 'follower_ids', 'upvoted_ids', 'downvoted_ids',
+        'id', 'external_id', 'subscribed_user_ids', 'children', 'course_id',
+        'group_id', 'subscribed_thread_ids', 'subscribed_commentable_ids',
+        'subscribed_course_ids', 'threads_count', 'comments_count',
+        'default_sort_key'
+    ]
 
     updatable_fields = ['username', 'external_id', 'default_sort_key']
     initializable_fields = updatable_fields
@@ -218,4 +219,3 @@ def _url_for_user_social_stats(user_id, end_date=None):
 
 def _url_for_course_social_stats(end_date=None):
     return "{prefix}/users/*/social_stats".format(prefix=settings.PREFIX)
-

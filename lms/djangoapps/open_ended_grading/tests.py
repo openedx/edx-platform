@@ -68,35 +68,35 @@ class StudentProblemListMockQuery(object):
         @returns: grading status message dictionary.
         """
         return {
-                "version": 1,
-                "problem_list": [
-                    {
-                        "problem_name": "Test1",
-                        "grader_type": "IN",
-                        "eta_available": True,
-                        "state": "Finished",
-                        "eta": 259200,
-                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion1Attempt"
-                    },
-                    {
-                        "problem_name": "Test2",
-                        "grader_type": "NA",
-                        "eta_available": True,
-                        "state": "Waiting to be Graded",
-                        "eta": 259200,
-                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion"
-                    },
-                    {
-                        "problem_name": "Test3",
-                        "grader_type": "PE",
-                        "eta_available": True,
-                        "state": "Waiting to be Graded",
-                        "eta": 259200,
-                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion454"
-                    },
-                ],
-                "success": True
-            }
+            "version": 1,
+            "problem_list": [
+                {
+                    "problem_name": "Test1",
+                    "grader_type": "IN",
+                    "eta_available": True,
+                    "state": "Finished",
+                    "eta": 259200,
+                    "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion1Attempt"
+                },
+                {
+                    "problem_name": "Test2",
+                    "grader_type": "NA",
+                    "eta_available": True,
+                    "state": "Waiting to be Graded",
+                    "eta": 259200,
+                    "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion"
+                },
+                {
+                    "problem_name": "Test3",
+                    "grader_type": "PE",
+                    "eta_available": True,
+                    "state": "Waiting to be Graded",
+                    "eta": 259200,
+                    "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion454"
+                },
+            ],
+            "success": True
+        }
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -273,7 +273,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.location_string = self.course_id.make_usage_key('html', 'TestLocation').to_deprecated_string()
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
+        field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category': 'peergrading'})
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = LmsModuleSystem(
             static_url=settings.STATIC_URL,
@@ -321,7 +321,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'feedback': 'feedback',
             'submission_flagged': 'false',
             'answer_unknown': 'false',
-            'rubric_scores_complete' : 'true'
+            'rubric_scores_complete': 'true'
         }
 
         qdict = MagicMock()

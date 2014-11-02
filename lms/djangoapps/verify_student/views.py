@@ -46,6 +46,7 @@ EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW = 'edx.course.enrollment.reverif
 EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY = 'edx.course.enrollment.reverify.submitted'
 EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE = 'edx.course.enrollment.reverify.reviewed'
 
+
 class VerifyView(View):
 
     @method_decorator(login_required)
@@ -133,7 +134,6 @@ class VerifiedView(View):
         course_id = CourseKey.from_string(course_id)
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == ('verified', True):
             return redirect(reverse('dashboard'))
-
 
         modes_dict = CourseMode.modes_for_course_dict(course_id)
 
@@ -335,8 +335,10 @@ def show_requirements(request, course_id):
         return redirect(reverse('dashboard'))
     if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         return redirect(
-            reverse('verify_student_verified',
-            kwargs={'course_id': course_id.to_deprecated_string()}) + "?upgrade={}".format(upgrade)
+            reverse(
+                'verify_student_verified',
+                kwargs={'course_id': course_id.to_deprecated_string()}
+            ) + "?upgrade={}".format(upgrade)
         )
 
     upgrade = request.GET.get('upgrade', False)
@@ -521,7 +523,6 @@ def toggle_failed_banner_off(request):
     user_id = request.user.id
     SoftwareSecurePhotoVerification.display_off(user_id)
     return HttpResponse('Success')
-
 
 
 @login_required

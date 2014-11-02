@@ -21,6 +21,7 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
     """Form providing validation of CourseEmail templates."""
 
     name = forms.CharField(required=False)
+
     class Meta:  # pylint: disable=C0111
         model = CourseEmailTemplate
         fields = ('html_template', 'plain_template', 'name')

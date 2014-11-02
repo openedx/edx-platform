@@ -61,6 +61,7 @@ ALERT_DICT = {
     'Flagged Submissions': _("Submissions have been flagged for review"),
 }
 
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
     """
@@ -133,6 +134,7 @@ def peer_grading(request, course_id):
 
     return HttpResponseRedirect(problem_url)
 
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def student_problem_list(request, course_id):
     """
@@ -175,9 +177,10 @@ def student_problem_list(request, course_id):
         'error_text': error_text,
         # Checked above
         'staff_access': False,
-        }
+    }
 
     return render_to_response('open_ended_problems/open_ended_problems.html', context)
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def flagged_problem_list(request, course_id):
@@ -336,4 +339,4 @@ def take_action_on_flags(request, course_id):
             'success': False,
             'error': STAFF_ERROR_MESSAGE
         }
-        return HttpResponse(json.dumps(response),mimetype="application/json")
+        return HttpResponse(json.dumps(response), mimetype="application/json")

@@ -5,6 +5,7 @@ from django.conf import settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from microsite_configuration import microsite
 
+
 def get_visible_courses():
     """
     Return the set of CourseDescriptors that should be visible in this branded instance

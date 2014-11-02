@@ -79,7 +79,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           certified.
         * is_active: Whether the course is currently active; true or false.
         * course: A collection of data about the course:
-        
+
           * course_about: The URI to get the data for the course About page.
           * course_updates: The URI to get data for course updates.
           * number: The course number.

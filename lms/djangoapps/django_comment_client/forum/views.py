@@ -41,6 +41,7 @@ def _attr_safe_json(obj):
     """
     return saxutils.escape(json.dumps(obj), {'"': '&quot;'})
 
+
 @newrelic.agent.function_trace()
 def make_course_settings(course):
     """
@@ -57,6 +58,7 @@ def make_course_settings(course):
     }
 
     return obj
+
 
 @newrelic.agent.function_trace()
 def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PAGE):
@@ -190,6 +192,7 @@ def inline_discussion(request, course_id, discussion_id):
         'roles': utils.get_role_ids(course_key),
         'course_settings': make_course_settings(course)
     })
+
 
 @login_required
 def forum_form_discussion(request, course_id):
@@ -350,6 +353,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'cohorted_commentables': (get_cohorted_commentables(course_id))
         }
         return render_to_response('discussion/index.html', context)
+
 
 @require_GET
 @login_required

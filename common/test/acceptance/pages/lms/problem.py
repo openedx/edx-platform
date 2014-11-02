@@ -46,5 +46,3 @@ class ProblemPage(PageObject):
         Is there a "correct" status showing?
         """
         return self.q(css="div.problem div.capa_inputtype.textline div.correct p.status").is_present()
-
-

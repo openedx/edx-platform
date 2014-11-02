@@ -16,6 +16,7 @@ from django.conf import settings
 from mako.template import Template
 import textwrap
 
+
 class Command(NoArgsCommand):
     """
     Basic management command to preprocess asset template files.
@@ -45,7 +46,6 @@ class Command(NoArgsCommand):
                         self.__preprocess(os.path.join(root, filename),
                                           os.path.join(root, outfile))
 
-
     def __context(self):
         """
         Return a dict that contains all of the available context
@@ -55,9 +55,8 @@ class Command(NoArgsCommand):
         # TODO: do this with the django-settings-context-processor
         return {
             "FEATURES": settings.FEATURES,
-            "THEME_NAME" : getattr(settings, "THEME_NAME", None),
+            "THEME_NAME": getattr(settings, "THEME_NAME", None),
         }
-
 
     def __preprocess(self, infile, outfile):
         """
@@ -73,4 +72,3 @@ class Command(NoArgsCommand):
              */
             """ % infile))
             _outfile.write(Template(filename=str(infile)).render(env=self.__context()))
-

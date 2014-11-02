@@ -104,7 +104,7 @@ class VideoTranscripts(generics.RetrieveAPIView):
     **Example request**:
 
         GET /api/mobile/v0.5/video_outlines/transcripts/{organization}/{course_number}/{course_run}/{video ID}/{language code}
-    
+
     **Response Values**
 
         An HttpResponse with an SRT file download.
