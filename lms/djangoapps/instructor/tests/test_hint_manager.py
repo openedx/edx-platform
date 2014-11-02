@@ -28,19 +28,25 @@ class HintManagerTest(ModuleStoreTestCase):
         self.c.login(username='robot', password='test')
         self.course_id = self.course.id
         self.problem_id = self.course_id.make_usage_key('crowdsource_hinter', 'crowdsource_hinter_001')
-        UserStateSummaryFactory.create(field_name='hints',
-                              usage_id=self.problem_id,
-                              value=json.dumps({'1.0': {'1': ['Hint 1', 2],
-                                                        '3': ['Hint 3', 12]},
-                                                '2.0': {'4': ['Hint 4', 3]}
-                                                }))
-        UserStateSummaryFactory.create(field_name='mod_queue',
-                              usage_id=self.problem_id,
-                              value=json.dumps({'2.0': {'2': ['Hint 2', 1]}}))
+        UserStateSummaryFactory.create(
+            field_name='hints',
+            usage_id=self.problem_id,
+            value=json.dumps({
+                '1.0': {'1': ['Hint 1', 2], '3': ['Hint 3', 12]},
+                '2.0': {'4': ['Hint 4', 3]}
+            })
+        )
+        UserStateSummaryFactory.create(
+            field_name='mod_queue',
+            usage_id=self.problem_id,
+            value=json.dumps({'2.0': {'2': ['Hint 2', 1]}})
+        )
 
-        UserStateSummaryFactory.create(field_name='hint_pk',
-                              usage_id=self.problem_id,
-                              value=5)
+        UserStateSummaryFactory.create(
+            field_name='hint_pk',
+            usage_id=self.problem_id,
+            value=5
+        )
         # Mock out location_to_problem_name, which ordinarily accesses the modulestore.
         # (I can't figure out how to get fake structures into the modulestore.)
         view.location_to_problem_name = lambda course_id, loc: "Test problem"

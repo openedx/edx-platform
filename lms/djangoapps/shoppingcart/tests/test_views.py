@@ -49,6 +49,7 @@ def mock_render_purchase_form_html(*args, **kwargs):
 
 form_mock = Mock(side_effect=mock_render_purchase_form_html)
 
+
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
 
@@ -633,7 +634,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
 
-
     @patch('shoppingcart.views.render_purchase_form_html', form_mock)
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_cart(self):
@@ -911,11 +911,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-
         ((template, context), _) = render_mock.call_args
 
         # When we come from the upgrade flow, we get these context variables
-
 
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
@@ -1166,7 +1164,6 @@ class DonationViewTest(ModuleStoreTestCase):
             reverse("donation"), {"amount": self.DONATION_AMOUNT}
         )
         self.assertEqual(response.status_code, 405)
-
 
     def test_donations_disabled(self):
         config = DonationConfiguration.current()

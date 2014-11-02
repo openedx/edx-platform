@@ -41,10 +41,12 @@ class PollFields(object):
 class PollModule(PollFields, XModule):
     """Poll Module"""
     js = {
-      'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-      'js': [resource_string(__name__, 'js/src/poll/poll.js'),
-             resource_string(__name__, 'js/src/poll/poll_main.js')]
-         }
+        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
+        'js': [
+            resource_string(__name__, 'js/src/poll/poll.js'),
+            resource_string(__name__, 'js/src/poll/poll_main.js')
+        ]
+    }
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
 
@@ -94,11 +96,11 @@ class PollModule(PollFields, XModule):
     def get_html(self):
         """Renders parameters to template."""
         params = {
-                  'element_id': self.location.html_id(),
-                  'element_class': self.location.category,
-                  'ajax_url': self.system.ajax_url,
-                  'configuration_json': self.dump_poll(),
-                  }
+            'element_id': self.location.html_id(),
+            'element_class': self.location.category,
+            'ajax_url': self.system.ajax_url,
+            'configuration_json': self.dump_poll(),
+        }
         self.content = self.system.render_template('poll.html', params)
         return self.content
 
@@ -127,13 +129,15 @@ class PollModule(PollFields, XModule):
             answers_to_json[answer['id']] = cgi.escape(answer['text'])
         self.poll_answers = temp_poll_answers
 
-        return json.dumps({'answers': answers_to_json,
+        return json.dumps({
+            'answers': answers_to_json,
             'question': cgi.escape(self.question),
             # to show answered poll after reload:
             'poll_answer': self.poll_answer,
             'poll_answers': self.poll_answers if self.voted else {},
             'total': sum(self.poll_answers.values()) if self.voted else 0,
-            'reset': str(self.descriptor.xml_attributes.get('reset', 'true')).lower()})
+            'reset': str(self.descriptor.xml_attributes.get('reset', 'true')).lower()
+        })
 
 
 class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):

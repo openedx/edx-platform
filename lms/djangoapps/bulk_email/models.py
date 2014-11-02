@@ -130,6 +130,7 @@ class CourseEmail(Email):
         """
         return CourseEmailTemplate.get_template(name=self.template_name)
 
+
 class Optout(models.Model):
     """
     Stores users that have opted out of receiving emails from a course.

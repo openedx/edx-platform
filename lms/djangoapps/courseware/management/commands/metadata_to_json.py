@@ -21,9 +21,11 @@ def import_course(course_dir, verbose=True):
 
     # No default class--want to complain if it doesn't find plugins for any
     # module.
-    modulestore = XMLModuleStore(data_dir,
-                   default_class=None,
-                   course_dirs=course_dirs)
+    modulestore = XMLModuleStore(
+        data_dir,
+        default_class=None,
+        course_dirs=course_dirs
+    )
 
     def str_of_err(tpl):
         (msg, exc_str) = tpl
@@ -89,6 +91,7 @@ Usage: metadata_to_json PATH-TO-COURSE-DIR OUTPUT-PATH
 
 if OUTPUT-PATH isn't given, print to stdout.
 """
+
     def handle(self, *args, **options):
         n = len(args)
         if n < 1 or n > 2:
