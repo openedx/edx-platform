@@ -341,47 +341,63 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         this block is up to date or not.
         """
         user_id = self.runtime.service(self, 'user').user_id
-        new_children = []
+        root_children = []
 
         store = self.system.modulestore
         with store.bulk_operations(self.location.course_key):
-            # Currently, ALL children are deleted and then re-added in a way
-            # that preserves their block_ids (and thus should preserve student
-            # data, grades, analytics, etc.)
+            # Currently, ALL children are essentially deleted and then re-added
+            # in a way that preserves their block_ids (and thus should preserve
+            # student data, grades, analytics, etc.)
             # Once course-level field overrides are implemented, this will
             # change to a more conservative implementation.
 
-            # First, delete all our existing children:
+            # First, delete all our existing children to avoid block_id conflicts when we add them:
             for child in self.children:  # pylint: disable=access-member-before-definition
                 store.delete_item(child, user_id)
+
             # Now add all matching children, and record the library version we use:
             new_libraries = []
             for library_key, old_version in self.source_libraries:  # pylint: disable=unused-variable
                 library = _get_library(self.system.modulestore, library_key)  # pylint: disable=protected-access
-                for child_key in library.children:
-                    child = store.get_item(child_key, depth=9)
-                    # We compute a block_id for each matching child block found in the library.
-                    # block_ids are unique within any branch, but are not unique per-course or globally.
-                    # We need our block_ids to be consistent when content in the library is updated, so
-                    # we compute block_id as a hash of three pieces of data:
-                    unique_data = "{}:{}:{}".format(
-                        self.location.block_id,  # Must not clash with other usages of the same library in this course
-                        unicode(library_key.for_version(None)).encode("utf-8"),  # The block ID below is only unique within a library, so we need this too
-                        child_key.block_id,  # Child block ID. Should not change even if the block is edited.
-                    )
-                    child_block_id = hashlib.sha1(unique_data).hexdigest()[:20]
-                    new_child_info = store.create_item(
-                        user_id,
-                        self.location.course_key,
-                        child_key.block_type,
-                        block_id=child_block_id,
-                        definition_locator=child.definition_locator,
-                        runtime=self.system,
-                    )
-                    new_children.append(new_child_info.location)
+
+                def copy_children_recursively(from_block):
+                    """
+                    Internal method to copy blocks from the library recursively
+                    """
+                    new_children = []
+                    for child_key in from_block.children:
+                        child = store.get_item(child_key, depth=9)
+                        # We compute a block_id for each matching child block found in the library.
+                        # block_ids are unique within any branch, but are not unique per-course or globally.
+                        # We need our block_ids to be consistent when content in the library is updated, so
+                        # we compute block_id as a hash of three pieces of data:
+                        unique_data = "{}:{}:{}".format(
+                            self.location.block_id,  # Must not clash with other usages of the same library in this course
+                            unicode(library_key.for_version(None)).encode("utf-8"),  # The block ID below is only unique within a library, so we need this too
+                            child_key.block_id,  # Child block ID. Should not change even if the block is edited.
+                        )
+                        child_block_id = hashlib.sha1(unique_data).hexdigest()[:20]
+                        fields = {}
+                        for field in child.fields.itervalues():
+                            if field.scope == Scope.settings and field.is_set_on(child):
+                                fields[field.name] = field.read_from(child)
+                        if child.has_children:
+                            fields['children'] = copy_children_recursively(from_block=child)
+                        new_child_info = store.create_item(
+                            user_id,
+                            self.location.course_key,
+                            child_key.block_type,
+                            block_id=child_block_id,
+                            definition_locator=child.definition_locator,
+                            runtime=self.system,
+                            fields=fields,
+                        )
+                        new_children.append(new_child_info.location)
+                    return new_children
+                root_children.extend(copy_children_recursively(from_block=library))
                 new_libraries.append(LibraryVersionReference(library_key, library.location.library_key.version_guid))
             self.source_libraries = new_libraries
-            self.children = new_children  # pylint: disable=attribute-defined-outside-init
+            self.children = root_children  # pylint: disable=attribute-defined-outside-init
             self.system.modulestore.update_item(self, user_id)
         return Response()
 
