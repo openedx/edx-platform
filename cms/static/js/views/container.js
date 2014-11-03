@@ -123,6 +123,10 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                 });
             },
 
+            acknowledgeXBlockDeletion: function(locator){
+                this.notifyRuntime('deleted-child', locator);
+            },
+
             refresh: function() {
                 var sortableInitializedClass = this.makeRequestSpecificSelector('.reorderable-container.ui-sortable');
                 this.$(sortableInitializedClass).sortable('refresh');

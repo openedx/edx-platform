@@ -3,10 +3,10 @@
  * This page allows the user to understand and manipulate the xblock and its children.
  */
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/view_utils",
-        "js/views/container", "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock",
+        "js/views/container", "js/views/library_container", "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock",
         "js/models/xblock_info", "js/views/xblock_string_field_editor", "js/views/pages/container_subviews",
         "js/views/unit_outline", "js/views/utils/xblock_utils"],
-    function ($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
+    function ($, _, gettext, BasePage, ViewUtils, ContainerView, PagedContainerView, XBlockView, AddXBlockComponent,
               EditXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews, UnitOutlineView,
               XBlockUtils) {
         'use strict';
@@ -27,6 +27,10 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             initialize: function(options) {
                 BasePage.prototype.initialize.call(this, options);
+                this.enable_paging = options.enable_paging || false;
+                if (this.enable_paging) {
+                    this.page_size = options.page_size || 10;
+                }
                 this.nameEditor = new XBlockStringFieldEditor({
                     el: this.$('.wrapper-xblock-field'),
                     model: this.model
@@ -35,11 +39,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 if (this.options.action === 'new') {
                     this.nameEditor.$('.xblock-field-value-edit').click();
                 }
-                this.xblockView = new ContainerView({
-                    el: this.$('.wrapper-xblock'),
-                    model: this.model,
-                    view: this.view
-                });
+                this.xblockView = this.getXBlockView();
                 this.messageView = new ContainerSubviews.MessageView({
                     el: this.$('.container-message'),
                     model: this.model
@@ -75,6 +75,28 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 }
             },
 
+            getXBlockView: function(){
+                var self = this,
+                    parameters = {
+                        el: this.$('.wrapper-xblock'),
+                        model: this.model,
+                        view: this.view
+                    };
+
+                if (this.enable_paging) {
+                    parameters = _.extend(parameters, {
+                        page_size: this.page_size,
+                        page_reload_callback: function($element) {
+                            self.renderAddXBlockComponents();
+                        }
+                    });
+                    return new PagedContainerView(parameters);
+                }
+                else {
+                    return new ContainerView(parameters);
+                }
+            },
+
             render: function(options) {
                 var self = this,
                     xblockView = this.xblockView,
@@ -106,7 +128,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
                         // Re-enable Backbone events for any updated DOM elements
                         self.delegateEvents();
-                    }
+                    },
+                    block_added: options && options.block_added
                 });
             },
 
@@ -144,7 +167,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
                 modal.edit(xblockElement, this.model, {
                     refresh: function() {
-                        self.refreshXBlock(xblockElement);
+                        self.refreshXBlock(xblockElement, false);
                     }
                 });
             },
@@ -226,7 +249,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
                 // Inform the runtime that the child has been deleted in case
                 // other views are listening to deletion events.
-                xblockView.notifyRuntime('deleted-child', parent.data('locator'));
+                xblockView.acknowledgeXBlockDeletion(parent.data('locator'));
 
                 // Update publish and last modified information from the server.
                 this.model.fetch();
@@ -235,7 +258,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             onNewXBlock: function(xblockElement, scrollOffset, data) {
                 ViewUtils.setScrollOffset(xblockElement, scrollOffset);
                 xblockElement.data('locator', data.locator);
-                return this.refreshXBlock(xblockElement);
+                return this.refreshXBlock(xblockElement, true);
             },
 
             /**
@@ -243,17 +266,18 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
              * reorderable container then the element will be refreshed inline. If not, then the
              * parent container will be refreshed instead.
              * @param element An element representing the xblock to be refreshed.
+             * @param block_added Flag to indicate that new block has been just added.
              */
-            refreshXBlock: function(element) {
+            refreshXBlock: function(element, block_added) {
                 var xblockElement = this.findXBlockElement(element),
                     parentElement = xblockElement.parent(),
                     rootLocator = this.xblockView.model.id;
                 if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
-                    this.render({refresh: true});
+                    this.render({refresh: true, block_added: block_added});
                 } else if (parentElement.hasClass('reorderable-container')) {
                     this.refreshChildXBlock(xblockElement);
                 } else {
-                    this.refreshXBlock(this.findXBlockElement(parentElement));
+                    this.refreshXBlock(this.findXBlockElement(parentElement), block_added);
                 }
             },
 

@@ -103,6 +103,37 @@
     }
   }
 
+  .container-paging-header {
+    .meta-wrap {
+      margin: $baseline $baseline/2;
+    }
+    .meta {
+      @extend %t-copy-sub2;
+      display: inline-block;
+      vertical-align: top;
+      width: flex-grid(9, 12);
+      color: $gray-l1;
+
+      .count-current-shown,
+      .count-total,
+      .sort-order {
+        @extend %t-strong;
+      }
+    }
+
+    .pagination {
+      @extend %pagination;
+    }
+  }
+
+  .container-paging-footer {
+    .pagination {
+      @extend %pagination;
+    }
+  }
+
+
+
   // ====================
 
   //UI: default internal xblock content styles

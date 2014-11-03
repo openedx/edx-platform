@@ -155,7 +155,6 @@ class VideoStudentViewHandlers(object):
 
         if transcript_name:
             # Get the asset path for course
-            asset_path = None
             course = self.descriptor.runtime.modulestore.get_course(self.course_id)
             if course.static_asset_path:
                 asset_path = course.static_asset_path
