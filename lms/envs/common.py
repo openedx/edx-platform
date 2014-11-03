@@ -506,6 +506,9 @@ EVENT_TRACKING_BACKENDS = {
 EVENT_TRACKING_PROCESSORS = [
     {
         'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
+    },
+    {
+        'ENGINE': 'track.shim.VideoEventProcessor'
     }
 ]
 
@@ -524,8 +527,11 @@ if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     })
 
 TRACKING_SEGMENTIO_WEBHOOK_SECRET = None
-TRACKING_SEGMENTIO_ALLOWED_ACTIONS = ['Track', 'Screen']
-TRACKING_SEGMENTIO_ALLOWED_CHANNELS = ['mobile']
+TRACKING_SEGMENTIO_ALLOWED_TYPES = ['track']
+TRACKING_SEGMENTIO_SOURCE_MAP = {
+    'analytics-android': 'mobile',
+    'analytics-ios': 'mobile',
+}
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
