@@ -3,6 +3,7 @@ Content library unit tests that require the CMS runtime.
 """
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from contentstore.utils import reverse_usage_url
+from contentstore.views.tests.test_library import LIBRARY_REST_URL
 from fs.memoryfs import MemoryFS
 from xmodule.library_content_module import LibraryVersionReference
 from xmodule.modulestore import ModuleStoreEnum
@@ -50,7 +51,7 @@ class TestLibraries(ModuleStoreTestCase):
         """
         Helper method used to create a library. Uses the REST API.
         """
-        response = self.client.ajax_post('/library/', {
+        response = self.client.ajax_post(LIBRARY_REST_URL, {
             'org': org,
             'library': library,
             'display_name': display_name,
@@ -99,7 +100,7 @@ class TestLibraries(ModuleStoreTestCase):
     @ddt.unpack
     def test_max_items(self, num_to_create, num_to_select, num_expected):
         """
-        Test that overriding blocks from a library in a specific course works
+        Test the 'max_count' property of LibraryContent blocks.
         """
         for _ in range(0, num_to_create):
             ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
@@ -150,7 +151,6 @@ class TestLibraries(ModuleStoreTestCase):
             for child_key in block.children:
                 if child_key.block_id == block_ids[0]:
                     return modulestore().get_item(child_key)
-            return None
 
         # bind the module for a student:
         lc_block.bind_for_student(module_system, lc_block._field_data)  # pylint: disable=protected-access
