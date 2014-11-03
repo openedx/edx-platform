@@ -1,1 +1,0 @@
-.. include:: ../../../shared/exercises_tools/external_graders.rst
