@@ -50,6 +50,7 @@
 # edgarapmelo <edgarapmelo@gmail.com>, 2014
 # aivuk <e@vaz.io>, 2014
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
+# Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
@@ -86,8 +87,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-27 10:49-0400\n"
-"PO-Revision-Date: 2014-10-08 18:08+0000\n"
+"POT-Creation-Date: 2014-11-03 13:19-0500\n"
+"PO-Revision-Date: 2014-10-31 11:51+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -3077,6 +3078,10 @@ msgstr "Cabeçalho"
 msgid "You have been logged out of your edX account. "
 msgstr ""
 
+#: lms/static/js/course_survey.js
+msgid "There has been an error processing your survey."
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr "Ocorreu um erro desconhecido."
@@ -3384,10 +3389,6 @@ msgstr ""
 #: cms/static/js/factories/import.js cms/static/js/factories/import.js
 #: cms/static/js/views/import.js cms/static/js/views/import.js.c
 msgid "Choose new file"
-msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "Your import is in progress; navigating away will abort it."
 msgstr ""
 
 #: cms/static/js/factories/manage_users.js

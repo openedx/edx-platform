@@ -65,8 +65,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-27 10:50-0400\n"
-"PO-Revision-Date: 2014-10-25 16:10+0000\n"
+"POT-Creation-Date: 2014-11-03 13:20-0500\n"
+"PO-Revision-Date: 2014-10-27 15:11+0000\n"
 "Last-Translator: Gil <gedwarp@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
@@ -127,14 +127,6 @@ msgstr ""
 
 #: common/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
-msgstr ""
-
-#: common/djangoapps/course_groups/views.py
-msgid "Requested page must be numeric"
-msgstr ""
-
-#: common/djangoapps/course_groups/views.py
-msgid "Requested page must be greater than zero"
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -2228,6 +2220,25 @@ msgid "Invitation Only"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Pre-Course Survey Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Name of SurveyForm to display as a pre-course survey to the user."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Pre-Course Survey Required"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Specify whether students must complete a survey before they can view your "
+"course content. If you set this value to true, you must add a name for the "
+"survey to the Course Survey Name setting above."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr ""
 
@@ -2944,9 +2955,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, problems default to displaying a 'Reset' "
-"button. This value may be overriden in each problem's settings. Existing "
-"problems whose reset setting have not been changed are affected."
+"Enter true or false. If true, problems in the course default to always "
+"displaying a 'Reset' button. You can override this in each problem's "
+"settings. All existing problems are affected when this course-wide setting "
+"is changed."
 msgstr ""
 
 #. Translators: "Self" is used to denote an openended response that is self-
@@ -4099,6 +4111,10 @@ msgstr "데이터 다운로드"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "분석"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Demographic data is now available in {dashboard_link}."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/courseware/instructor_dashboard.html
@@ -6499,16 +6515,16 @@ msgid "Help"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration for {} | Choose Your Track"
+msgid "Upgrade Your Enrollment for {} | Choose Your Track"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Register for {} | Choose Your Track"
-msgstr "{}에 등록 | 트랙을 선택하십시요"
+msgid "Enroll In {} | Choose Your Track"
+msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Sorry, there was an error when trying to register you"
-msgstr "죄송합니다. 등록 시도하는데 오류가 있었습니다."
+msgid "Sorry, there was an error when trying to enroll you"
+msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "Now choose your course track:"
@@ -6544,7 +6560,7 @@ msgid "):"
 msgstr "):"
 
 #: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration"
+msgid "Upgrade Your Enrollment"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -7136,6 +7152,7 @@ msgstr "오류메세지, 문제 발생으로 가는 단계 등을 포함하세�
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
 msgid "Submit"
 msgstr "제출"
 
@@ -9438,7 +9455,6 @@ msgstr "저장된 강좌 보기"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "View Course"
 msgstr "강좌 보기"
 
@@ -11240,18 +11256,6 @@ msgid "Send me a copy of the invoice"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Active Students"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid ""
-"The count of students who interacted at least once by opening pages, playing"
-" videos, posting in discussions, submitting problems, or completing other "
-"activities. The date range includes all activities from midnight on the "
-"start date (inclusive) though midnight on the end date (exclusive)."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Score Distribution"
 msgstr ""
 
@@ -12601,6 +12605,49 @@ msgstr ""
 msgid "Student Profile"
 msgstr ""
 
+#: lms/templates/survey/survey.html
+msgid "User Survey"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "Pre-Course Survey"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid ""
+"You can begin your course as soon as you complete the following form. "
+"Required fields are marked with an asterisk (*)."
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "You are missing the following required fields:"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "Cancel and Return to Dashboard"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "Why do I need to complete this information?"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid ""
+"We use the information you provide to improve our course for both current "
+"and future students. The more we know about your specific needs, the better "
+"we can make your course experience."
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "Who can I contact if I have questions?"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid ""
+"If you have any questions about this course or this form, you can contact <a"
+" href=\"{mail_to_link}\"\">{mail_to_link}</a>."
+msgstr ""
+
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Edit Your Name"
 msgstr "이름 편집"
@@ -12656,7 +12703,7 @@ msgid ""
 msgstr "인증서 {a_end}에 대해 자주 묻는 질문 코멘트를 보기 위해서는 {a_start} FAQ를 읽어 보시기 바랍니다."
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are upgrading your registration for"
+msgid "You are upgrading your enrollment for"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
@@ -12668,7 +12715,7 @@ msgid "You are registering for"
 msgstr "를 위한 등록"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Congrats! You are now registered to audit"
+msgid "Congrats! You are now enrolled in the audit track"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
