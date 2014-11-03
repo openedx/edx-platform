@@ -22,8 +22,12 @@ from django.utils.translation import ugettext as _
 <%block name="requirejs">
     require(["js/factories/library"], function(LibraryFactory) {
         LibraryFactory(
-            ${component_templates | n},
-            ${json.dumps(xblock_info) | n}
+            ${component_templates | n}, ${json.dumps(xblock_info) | n},
+            {
+                isUnitPage: false,
+                enable_paging: true,
+                page_size: 10
+            }
         );
     });
 </%block>
