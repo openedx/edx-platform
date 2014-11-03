@@ -31,7 +31,10 @@ from django.utils.translation import ugettext as _
     require(["js/factories/container"], function(ContainerFactory) {
         ContainerFactory(
             ${component_templates | n}, ${json.dumps(xblock_info) | n},
-            "${action}", ${json.dumps(is_unit_page)}
+            "${action}",
+            {
+                isUnitPage: ${json.dumps(is_unit_page)}
+            }
         );
     });
 </%block>

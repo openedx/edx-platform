@@ -237,12 +237,28 @@ def xblock_view_handler(request, usage_key_string, view_name):
             if view_name == 'reorderable_container_child_preview':
                 reorderable_items.add(xblock.location)
 
+            paging = None
+            try:
+                if request.REQUEST.get('enable_paging', 'false') == 'true':
+                    paging = {
+                        'page_number': int(request.REQUEST.get('page_number', 0)),
+                        'page_size': int(request.REQUEST.get('page_size', 0)),
+                    }
+            except ValueError:
+                log.exception(
+                    "Couldn't parse paging parameters: enable_paging: %s, page_number: %s, page_size: %s",
+                    request.REQUEST.get('enable_paging', 'false'),
+                    request.REQUEST.get('page_number', 0),
+                    request.REQUEST.get('page_size', 0)
+                )
+
             # Set up the context to be passed to each XBlock's render method.
             context = {
                 'is_pages_view': is_pages_view,     # This setting disables the recursive wrapping of xblocks
                 'is_unit_page': is_unit(xblock),
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
-                'reorderable_items': reorderable_items
+                'reorderable_items': reorderable_items,
+                'paging': paging
             }
 
             fragment = get_preview_fragment(request, xblock, context)
