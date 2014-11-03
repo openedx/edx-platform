@@ -36,7 +36,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-27 10:49-0400\n"
+"POT-Creation-Date: 2014-11-03 13:19-0500\n"
 "PO-Revision-Date: 2014-10-13 15:01+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Portugal) (http://www.transifex.com/projects/p/edx-platform/language/pt_PT/)\n"
@@ -2956,6 +2956,10 @@ msgstr ""
 msgid "You have been logged out of your edX account. "
 msgstr ""
 
+#: lms/static/js/course_survey.js
+msgid "There has been an error processing your survey."
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr ""
@@ -3268,10 +3272,6 @@ msgstr ""
 #: cms/static/js/views/import.js cms/static/js/views/import.js.c
 msgid "Choose new file"
 msgstr "Escolha um novo ficheiro"
-
-#: cms/static/js/factories/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 msgid "A valid email address is required"
