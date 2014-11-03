@@ -602,12 +602,14 @@ class LoginSessionViewTest(ApiTestCase):
                 "defaultValue": "",
                 "type": "email",
                 "required": True,
-                "label": "E-mail",
-                "placeholder": "example: username@domain.com",
-                "instructions": "This is the e-mail address you used to register with edX",
+                "label": "Email",
+                "placeholder": "username@domain.com",
+                "instructions": "The email address you used to register with {platform_name}".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 "restrictions": {
-                    "min_length": 3,
-                    "max_length": 254
+                    "min_length": account_api.EMAIL_MIN_LENGTH,
+                    "max_length": account_api.EMAIL_MAX_LENGTH
                 },
                 "errorMessages": {},
             },
@@ -620,8 +622,8 @@ class LoginSessionViewTest(ApiTestCase):
                 "placeholder": "",
                 "instructions": "",
                 "restrictions": {
-                    "min_length": 2,
-                    "max_length": 75
+                    "min_length": account_api.PASSWORD_MIN_LENGTH,
+                    "max_length": account_api.PASSWORD_MAX_LENGTH
                 },
                 "errorMessages": {},
             },
@@ -718,6 +720,67 @@ class LoginSessionViewTest(ApiTestCase):
 
         # Missing both email and password
         response = self.client.post(self.url, {})
+        #COMEBACK
+
+
+@ddt.ddt
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class PasswordResetViewTest(ApiTestCase):
+    """Tests of the user API's password reset endpoint. """
+
+    USERNAME = "bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "password"
+
+    def setUp(self):
+        super(PasswordResetViewTest, self).setUp()
+        self.url = reverse("user_api_password_reset")
+
+    @ddt.data("get", "post")
+    def test_auth_disabled(self, method):
+        self.assertAuthDisabled(method, self.url)
+
+    def test_allowed_methods(self):
+        self.assertAllowedMethods(self.url, ["GET", "HEAD", "OPTIONS"])
+
+    def test_put_not_allowed(self):
+        response = self.client.put(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_delete_not_allowed(self):
+        response = self.client.delete(self.url)
+        self.assertHttpMethodNotAllowed(response)
+
+    def test_patch_not_allowed(self):
+        raise SkipTest("Django 1.4's test client does not support patch")
+
+    def test_password_reset_form(self):
+        # Retrieve the password reset form
+        response = self.client.get(self.url, content_type="application/json")
+        self.assertHttpOK(response)
+
+        # Verify that the form description matches what we expect
+        form_desc = json.loads(response.content)
+        self.assertEqual(form_desc["method"], "post")
+        self.assertEqual(form_desc["submit_url"], reverse("password_change_request"))
+        self.assertEqual(form_desc["fields"], [
+            {
+                "name": "email",
+                "defaultValue": "",
+                "type": "email",
+                "required": True,
+                "label": "Email",
+                "placeholder": "username@domain.com",
+                "instructions": "The email address you used to register with {platform_name}".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
+                "restrictions": {
+                    "min_length": account_api.EMAIL_MIN_LENGTH,
+                    "max_length": account_api.EMAIL_MAX_LENGTH
+                },
+                "errorMessages": {},
+            }
+        ])
 
 
 @ddt.ddt
@@ -767,12 +830,14 @@ class RegistrationViewTest(ApiTestCase):
                 u"name": u"email",
                 u"type": u"email",
                 u"required": True,
-                u"label": u"E-mail",
-                u"placeholder": u"example: username@domain.com",
-                u"instructions": u"This is the e-mail address you used to register with edX",
+                u"label": u"Email",
+                u"placeholder": u"username@domain.com",
+                u"instructions": u"The email address you used to register with {platform_name}".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 u"restrictions": {
-                    u"min_length": 3,
-                    u"max_length": 254
+                    "min_length": account_api.EMAIL_MIN_LENGTH,
+                    "max_length": account_api.EMAIL_MAX_LENGTH
                 },
             }
         )
@@ -784,9 +849,9 @@ class RegistrationViewTest(ApiTestCase):
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Full Name",
-                u"instructions": u"Needed for any certificates you may earn",
+                u"instructions": u"The name that will appear on your certificates",
                 u"restrictions": {
-                    "max_length": 255,
+                    "max_length": profile_api.FULL_NAME_MAX_LENGTH,
                 },
             }
         )
@@ -797,11 +862,11 @@ class RegistrationViewTest(ApiTestCase):
                 u"name": u"username",
                 u"type": u"text",
                 u"required": True,
-                u"label": u"Public Username",
-                u"instructions": u"Will be shown in any discussions or forums you participate in (cannot be changed)",
+                u"label": u"Username",
+                u"instructions": u"The name that will identify you in your courses",
                 u"restrictions": {
-                    u"min_length": 2,
-                    u"max_length": 30,
+                    "min_length": account_api.USERNAME_MIN_LENGTH,
+                    "max_length": account_api.USERNAME_MAX_LENGTH
                 },
             }
         )
@@ -810,12 +875,12 @@ class RegistrationViewTest(ApiTestCase):
             no_extra_fields_setting,
             {
                 u"name": u"password",
-                u"type": u"text",
+                u"type": u"password",
                 u"required": True,
                 u"label": u"Password",
                 u"restrictions": {
-                    u"min_length": 2,
-                    u"max_length": 75
+                    "min_length": account_api.PASSWORD_MIN_LENGTH,
+                    "max_length": account_api.PASSWORD_MAX_LENGTH
                 },
             }
         )
@@ -846,12 +911,14 @@ class RegistrationViewTest(ApiTestCase):
                     u"defaultValue": u"bob@example.com",
                     u"type": u"email",
                     u"required": True,
-                    u"label": u"E-mail",
-                    u"placeholder": u"example: username@domain.com",
-                    u"instructions": u"This is the e-mail address you used to register with edX",
+                    u"label": u"Email",
+                    u"placeholder": u"username@domain.com",
+                    "instructions": "The email address you used to register with {platform_name}".format(
+                        platform_name=settings.PLATFORM_NAME
+                    ),
                     u"restrictions": {
-                        u"min_length": 3,
-                        u"max_length": 254
+                        "min_length": account_api.EMAIL_MIN_LENGTH,
+                        "max_length": account_api.EMAIL_MAX_LENGTH
                     },
                 }
             )
@@ -865,9 +932,9 @@ class RegistrationViewTest(ApiTestCase):
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Full Name",
-                    u"instructions": u"Needed for any certificates you may earn",
+                    u"instructions": u"The name that will appear on your certificates",
                     u"restrictions": {
-                        "max_length": 255,
+                        "max_length": profile_api.FULL_NAME_MAX_LENGTH
                     }
                 }
             )
@@ -880,12 +947,12 @@ class RegistrationViewTest(ApiTestCase):
                     u"defaultValue": u"Bob123",
                     u"type": u"text",
                     u"required": True,
-                    u"label": u"Public Username",
+                    u"label": u"Username",
                     u"placeholder": u"",
-                    u"instructions": u"Will be shown in any discussions or forums you participate in (cannot be changed)",
+                    u"instructions": u"The name that will identify you in your courses",
                     u"restrictions": {
-                        u"min_length": 2,
-                        u"max_length": 30,
+                        "min_length": account_api.USERNAME_MIN_LENGTH,
+                        "max_length": account_api.USERNAME_MAX_LENGTH
                     }
                 }
             )
@@ -967,7 +1034,9 @@ class RegistrationViewTest(ApiTestCase):
                 "name": "goals",
                 "type": "textarea",
                 "required": False,
-                "label": "Please share with us your reasons for registering with edX",
+                "label": "If you'd like, tell us why you're interested in {platform_name}".format(
+                    platform_name=settings.PLATFORM_NAME
+                )
             }
         )
 
