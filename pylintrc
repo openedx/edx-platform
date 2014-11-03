@@ -41,8 +41,7 @@ disable=
 # W0142: Used * or ** magic
 # R0921: Abstract class not referenced
 # R0922: Abstract class is only referenced 1 times
-# W0511: TODO comments
-    I0011,C0301,W0141,W0142,R0921,R0922,W0511,
+    I0011,C0301,W0141,W0142,R0921,R0922,
 
 # Django makes classes that trigger these
 # W0232: Class has no __init__ method
