@@ -3,18 +3,37 @@
 <header class="page-header">
     <h2 class="title">
         <span class="wrapper-sts">
+            <% organization = '<span class="sts-course-org">' + course_org + '</span>' %>
+            <% course_name = '<span class="sts-course-number">' + course_num + '</span> <span class="sts-course-name">' + 'course_name' + '</span>' %>
             % if upgrade:
-                <span class="sts-label">${_("You are upgrading your enrollment for")}</span>
+                <span class="sts-label">
+                    ${_("You are upgrading your enrollment for {organization}'s {course_name}").format(
+                        organization=organization,
+                        course_name=course_name
+                    )}
+                </span>
             % elif reverify:
-                <span class="sts-label">${_("You are re-verifying for")}</span>
+                <span class="sts-label">
+                    ${_("You are re-verifying for {organization}'s {course_name}").format(
+                        organization=organization,
+                        course_name=course_name
+                    )}
+                </span>
             % elif modes_dict and "professional" in modes_dict:
-                <span class="sts-label">${_("You are registering for")}</span>
+                <span class="sts-label">
+                    ${_("You are enrolling in {organization}'s {course_name}").format(
+                        organization=organization,
+                        course_name=course_name
+                    )}
+                </span>
             % else:
-                <span class="sts-label">${_("Congrats! You are now enrolled in the audit track")}</span>
+                <span class="sts-label">
+                    ${_("Congrats! You are now enrolled in {organization}'s {course_name}").format(
+                        organization=organization,
+                        course_name=course_name
+                    )}
+                </span>
             % endif
-                <span class="sts-course-org">${course_org}'s</span>
-                <span class="sts-course-number">${course_num}</span>
-                <span class="sts-course-name">${course_name}</span>
         </span>
 
         % if modes_dict and "professional" in modes_dict:
@@ -27,11 +46,20 @@
             <span class="sts-track">
                 <span class="sts-track-value">
                     % if upgrade:
-                        <span class="context">${_("Upgrading to:")}</span> ${_("Verified")}
+                        ${_("{span_start}Upgrading to:{span_end} Verified").format(
+                            span_start='<span class="context">',
+                            span_end='</span>'
+                        )}
                     % elif reverify:
-                        <span class="context">${_("Re-verifying for:")}</span> ${_("Verified")}
+                        ${_("{span_start}Re-verifying for:{span_end} Verified").format(
+                            span_start='<span class="context">',
+                            span_end='</span>'
+                        )}
                     % else:
-                        <span class="context">${_("Registering as: ")}</span> ${_("Verified")}
+                        ${_("{span_start}Enrolling as:{span_end} Verified").format(
+                            span_start='<span class="context">',
+                            span_end='</span>'
+                        )}
                     % endif
                 </span>
             </span>
