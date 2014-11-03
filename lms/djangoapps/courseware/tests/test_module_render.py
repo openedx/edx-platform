@@ -32,14 +32,17 @@ from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
 from courseware.tests.tests import LoginEnrollmentTestCase
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 
 from student.models import anonymous_id_for_user
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule.modulestore import ModuleStoreEnum
+
+from xmodule.modulestore.tests.django_utils import mixed_store_config
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
 
 
 class PureXBlock(XBlock):
@@ -681,7 +684,7 @@ class MixedViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class XmlViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in an xml backed course."""
 

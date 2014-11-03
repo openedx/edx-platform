@@ -26,7 +26,6 @@ from xmodule.tests import test_util_open_ended
 
 from courseware.tests import factories
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.runtime import LmsModuleSystem
 from student.roles import CourseStaffRole
 from edxmako.shortcuts import render_to_string
@@ -36,6 +35,14 @@ from student.models import unique_id_for_user
 from open_ended_grading import staff_grading_service, views, utils
 
 log = logging.getLogger(__name__)
+
+
+from xmodule.modulestore.tests.django_utils import mixed_store_config
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_MAPPING = {'edX/toy/2012_Fall': 'xml',
+                'edX/open_ended_nopath/2012_Fall': 'xml',
+                'edX/open_ended/2012_Fall': 'xml', }
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
 
 
 class EmptyStaffGradingService(object):

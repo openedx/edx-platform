@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_DIR, \
     TEST_DATA_MONGO_MODULESTORE, \
-    TEST_DATA_MIXED_MODULESTORE
+    TEST_DATA_MIXED_MODULESTORE, TEST_DATA_DIR
 from lms.lib.xblock.field_data import LmsFieldData
 
 
