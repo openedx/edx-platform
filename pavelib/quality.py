@@ -30,7 +30,9 @@ def run_pylint(options):
         # This makes the folder if it doesn't already exist.
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
-        flags = '-E' if errors else ''
+        flags = ["--disable=fixme"]
+        if errors:
+            flags.append("--errors-only")
 
         apps = [system]
 
@@ -51,7 +53,7 @@ def run_pylint(options):
             "{pythonpath_prefix} pylint {flags} -f parseable {apps} | "
             "tee {report_dir}/pylint.report".format(
                 pythonpath_prefix=pythonpath_prefix,
-                flags=flags,
+                flags=" ".join(flags),
                 apps=apps_list,
                 report_dir=report_dir
             )
