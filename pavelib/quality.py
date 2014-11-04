@@ -30,7 +30,7 @@ def run_pylint(options):
         # This makes the folder if it doesn't already exist.
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
-        flags = ["--disable=fixme"]
+        flags = []
         if errors:
             flags.append("--errors-only")
 
@@ -180,12 +180,15 @@ def run_quality(options):
 
     try:
         sh(
-            "{pythonpath_prefix} diff-quality --violations=pylint {pylint_reports} {percentage_string} "
-            "--html-report {dquality_dir}/diff_quality_pylint.html".format(
+            "{pythonpath_prefix} diff-quality --violations=pylint "
+            "{pylint_reports} {percentage_string} "
+            "--html-report {dquality_dir}/diff_quality_pylint.html "
+            "--options='{pylint_options}'".format(
                 pythonpath_prefix=pythonpath_prefix,
                 pylint_reports=pylint_reports,
                 percentage_string=percentage_string,
-                dquality_dir=dquality_dir
+                dquality_dir=dquality_dir,
+                pylint_options="--disable=fixme",
             )
         )
     except BuildFailure, error_message:
