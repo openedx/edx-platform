@@ -19,13 +19,16 @@ def edxnotes(cls):
     """
     original_get_html = cls.get_html
 
-    def get_html(self, *args, **kargs):
+    def get_html(self, *args, **kwargs):
         # edXNotes must be disabled in Studio, returns original method in this case.
         if getattr(self.system, 'is_author_mode', False):
-            return original_get_html(self, *args, **kargs)
+            return original_get_html(self, *args, **kwargs)
+        # edXNotes platform-specific feature flag.
+        elif not settings.FEATURES.get('ENABLE_EDXNOTES'):
+            return original_get_html(self, *args, **kwargs)
         else:
             return render_to_string('edxnotes_wrapper.html', {
-                'content': original_get_html(self, *args, **kargs),
+                'content': original_get_html(self, *args, **kwargs),
                 'uid': generate_uid(),
                 'params': {
                     # Use camelCase to name keys.
