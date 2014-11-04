@@ -57,10 +57,10 @@
         width: 100%;
         padding-top: 35px;
         padding-bottom: 35px;
+        overflow: hidden;
 
         .headline {
             @include box-sizing(border-box);
-            @include span-columns(4);
             @include font-size(35);
             padding: 0 10px;
             font-family: $sans-serif;
@@ -72,7 +72,6 @@
 
         .tagline {
             @include box-sizing(border-box);
-            @include span-columns(4);
             @include font-size(24);
             padding: 0 10px;
             font-family: $sans-serif;
@@ -159,6 +158,10 @@
             &.error {
                 color: $red;
             }
+
+            a {
+                font-family: $sans-serif;
+            }
         }
 
         .field-link {
@@ -228,6 +231,7 @@
         @extend %m-btn-primary;
         width: 100%;
         text-transform: none;
+        color: white;
     }
 
     .login-provider {
@@ -345,8 +349,8 @@
             float: left;
         }
 
-        .headline,
-        .tagline,
+        .header .headline,
+        .header .tagline,
         .form-type {
             @include span-columns(6);
             @include shift(1);
@@ -379,8 +383,8 @@
             float: left;
         }
 
-        .headline,
-        .tagline,
+        .header .headline,
+        .header .tagline,
         .form-type {
             width: 600px;
             margin-left: calc( 50% - 300px );
@@ -394,7 +398,7 @@
         .form-field {
             &.select-level_of_education {
                 @extend %inline-form-field-desktop;
-                width: 290px;
+                width: 300px;
                 margin-right: 20px;
             }
 
