@@ -100,6 +100,13 @@ class ModuleStoreEnum(object):
         # user ID to use for tests that do not have a django user available
         test = -3
 
+    class SortOrder(object):
+        """
+        Values for sorting asset metadata.
+        """
+        ascending = 1
+        descending = 2
+
 
 class BulkOpsRecord(object):
     """
@@ -364,19 +371,19 @@ class ModuleStoreAssetInterface(object):
         """
         return self._find_asset_info(asset_key, thumbnail=True, **kwargs)
 
-    @contract(course_key='CourseKey', start='int|None', maxresults='int|None', sort='tuple(str,str)|None', get_thumbnails='bool')
-    def _get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, get_thumbnails=False, **kwargs):
+    @contract(course_key='CourseKey', start='int|None', maxresults='int|None',
+              sort='tuple(str,(int,>=1,<=2))|None', get_thumbnails='bool')
+    def _get_all_asset_metadata(self, course_key, start=0, maxresults=-1,
+                                sort=('displayname', ModuleStoreEnum.SortOrder.ascending),
+                                get_thumbnails=False, **kwargs):
         """
-        Returns a list of static asset (or thumbnail) metadata for a course.
-
-        Args:
             course_key (CourseKey): course identifier
             start (int): optional - start at this asset number. Zero-based!
             maxresults (int): optional - return at most this many, -1 means no limit
             sort (array): optional - None means no sort
                 (sort_by (str), sort_order (str))
                 sort_by - one of 'uploadDate' or 'displayname'
-                sort_order - one of 'ascending' or 'descending'
+                sort_order - one of SortOrder.ascending or SortOrder.descending
             get_thumbnails (bool): True if getting thumbnail metadata, else getting asset metadata
 
         Returns:
@@ -388,14 +395,14 @@ class ModuleStoreAssetInterface(object):
             # to distinguish zero assets from "not able to retrieve assets".
             return None
 
-        # Determine the proper sort - with defaults of ('displayname', 'ascending').
+        # Determine the proper sort - with defaults of ('displayname', SortOrder.ascending).
         sort_field = 'filename'
-        sort_order = 'ascending'
+        sort_order = ModuleStoreEnum.SortOrder.ascending
         if sort:
             if sort[0] == 'uploadDate' and not get_thumbnails:
                 sort_field = 'edited_on'
-            if sort[1] == 'descending':
-                sort_order = 'descending'
+            if sort[1] == ModuleStoreEnum.SortOrder.descending:
+                sort_order = ModuleStoreEnum.SortOrder.descending
 
         info = 'thumbnails' if get_thumbnails else 'assets'
         all_assets = SortedListWithKey(course_assets.get(info, []), key=itemgetter(sort_field))
@@ -408,14 +415,14 @@ class ModuleStoreAssetInterface(object):
             end_idx = num_assets
 
         step_incr = 1
-        if sort_order == 'descending':
+        if sort_order == ModuleStoreEnum.SortOrder.descending:
             # Flip the indices and iterate backwards.
             step_incr = -1
             start_idx = (num_assets - 1) - start_idx
             end_idx = (num_assets - 1) - end_idx
 
         ret_assets = []
-        for idx in range(start_idx, end_idx, step_incr):
+        for idx in xrange(start_idx, end_idx, step_incr):
             asset = all_assets[idx]
             if get_thumbnails:
                 thumb = AssetThumbnailMetadata(
@@ -441,7 +448,7 @@ class ModuleStoreAssetInterface(object):
                 ret_assets.append(new_asset)
         return ret_assets
 
-    @contract(course_key='CourseKey', start='int|None', maxresults='int|None', sort='tuple(str,str)|None')
+    @contract(course_key='CourseKey', start='int|None', maxresults='int|None', sort='tuple(str,int)|None')
     def get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, **kwargs):
         """
         Returns a list of static assets for a course.
@@ -454,7 +461,7 @@ class ModuleStoreAssetInterface(object):
             sort (array): optional - None means no sort
                 (sort_by (str), sort_order (str))
                 sort_by - one of 'uploadDate' or 'displayname'
-                sort_order - one of 'ascending' or 'descending'
+                sort_order - one of SortOrder.ascending or SortOrder.descending
 
         Returns:
             List of AssetMetadata objects.

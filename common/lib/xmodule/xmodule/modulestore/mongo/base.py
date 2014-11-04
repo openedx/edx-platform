@@ -1511,8 +1511,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             all_assets.add(metadata_to_insert)
         else:
             # Replace existing metadata.
-            all_assets.pop(asset_idx)
-            all_assets.insert(asset_idx, metadata_to_insert)
+            all_assets[asset_idx] = metadata_to_insert
 
         # Update the document.
         self.asset_collection.update({'_id': course_assets['_id']}, {'$set': {info: all_assets.as_list()}})
