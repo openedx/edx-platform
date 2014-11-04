@@ -2,6 +2,7 @@
 Module rendering
 """
 
+from __future__ import absolute_import
 import hashlib
 import json
 import logging
@@ -80,6 +81,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from .field_overrides import OverrideFieldData
+from progress.models import CourseModuleCompletion
 
 log = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from api_manager import models as api_models
+from progress.models import CourseModuleCompletion
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         log.warning('Migrating Course Module Completions Stage Field...')
-        course_module_completions = api_models.CourseModuleCompletion.objects.all()
+        course_module_completions = CourseModuleCompletion.objects.all()
         for cmc in course_module_completions:
             if cmc.stage is not None:
                 cmc.stage = cmc.stage.replace("i4x://", "")
