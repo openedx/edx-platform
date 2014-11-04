@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%page args="section_data"/>
 <%! from microsite_configuration import microsite %>
 
@@ -42,8 +42,8 @@
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
       <p>
-	${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
-	${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+      ${_("If this option is {em_start}checked{em_end}, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME, em_start=HTML("<em>"), em_end=HTML("</em>"))}
+      ${_("If this option is left {em_start}unchecked{em_end}, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME, em_start=HTML("<em>"), em_end=HTML("</em>"))}
 	<br /><br />
 	${_("Checking this box has no effect if 'Unenroll' is selected.")}
       </p>
@@ -56,7 +56,7 @@
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
       <p>
-	${_("If this option is <em>checked</em>, users will receive an email notification.")}
+      ${_("If this option is {em_start}checked{em_end}, users will receive an email notification.").format(em_start=HTML("<em>"), em_end=HTML("</em>"))}
       </p>
     </div>
   </div>
@@ -113,7 +113,7 @@
     <div class="hint auto-enroll-beta-hint">
       <span class="hint-caret"></span>
       <p>
-	${_("If this option is <em>checked</em>, users who have not enrolled in your course will be automatically enrolled.")}
+	${_("If this option is {em_start}checked{em_end}, users who have not enrolled in your course will be automatically enrolled.").format(em_start=HTML("<em>"), em_end=HTML("</em>"))}
 	<br /><br />
 	${_("Checking this box has no effect if 'Remove beta testers' is selected.")}
       </p>
@@ -125,7 +125,7 @@
     <label for="email-students-beta">${_("Notify users by email")}</label>
     <div class="hint email-students-beta-hint">
       <span class="hint-caret"></span>
-      <p> ${_("If this option is <em>checked</em>, users will receive an email notification.")}</p>
+      <p> ${_("If this option is {em_start}checked{em_end}, users will receive an email notification.").format(em_start=HTML("<em>"), em_end=HTML("</em>"))}</p>
     </div>
   </div>
 
