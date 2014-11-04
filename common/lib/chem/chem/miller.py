@@ -96,9 +96,11 @@ def sub_miller(segments):
     '''
     fracts = [segment_to_fraction(segment) for segment in segments]
     common_denominator = reduce(lcm, [fract.denominator for fract in fracts])
-    miller = ([fract.numerator * math.fabs(common_denominator) /
-                                fract.denominator for fract in fracts])
-    return'(' + ','.join(map(str, map(decimal.Decimal, miller))) + ')'
+    miller_indices = ([
+        fract.numerator * math.fabs(common_denominator) / fract.denominator
+        for fract in fracts
+    ])
+    return'(' + ','.join(map(str, map(decimal.Decimal, miller_indices))) + ')'
 
 
 def miller(points):
@@ -145,19 +147,22 @@ def miller(points):
     O = np.array([0, 0, 0])
     P = points[0]  # point of plane
     Ccs = map(np.array, [[1.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0]])
-    segments = ([np.dot(P - O, N) / np.dot(ort, N) if np.dot(ort, N) != 0 else
-                                            np.nan for ort in Ccs])
+    segments = ([
+        np.dot(P - O, N) / np.dot(ort, N) if np.dot(ort, N) != 0
+        else np.nan for ort in Ccs
+    ])
     if any(x == 0 for x in segments):  # Plane goes through origin.
-        vertices = [  # top:
-                    np.array([1.0, 1.0, 1.0]),
-                    np.array([0.0, 0.0, 1.0]),
-                    np.array([1.0, 0.0, 1.0]),
-                    np.array([0.0, 1.0, 1.0]),
-                    # bottom, except 0,0,0:
-                    np.array([1.0, 0.0, 0.0]),
-                    np.array([0.0, 1.0, 0.0]),
-                    np.array([1.0, 1.0, 1.0]),
-                ]
+        vertices = [
+            # top:
+            np.array([1.0, 1.0, 1.0]),
+            np.array([0.0, 0.0, 1.0]),
+            np.array([1.0, 0.0, 1.0]),
+            np.array([0.0, 1.0, 1.0]),
+            # bottom, except 0,0,0:
+            np.array([1.0, 0.0, 0.0]),
+            np.array([0.0, 1.0, 0.0]),
+            np.array([1.0, 1.0, 1.0]),
+        ]
         for vertex in vertices:
             if np.dot(vertex - O, N) != 0:  # vertex not in plane
                 new_origin = vertex

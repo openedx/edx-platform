@@ -253,7 +253,6 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
         self.assertTrue(result)
 
-
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):
         # Log the user out
@@ -277,7 +276,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
         # Create a second user, but do not activate it
         account_api.create_account(self.ALTERNATE_USERNAME, self.OLD_PASSWORD, self.NEW_EMAIL)
-        
+
         # Send the view the email address tied to the inactive user
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 400)
@@ -285,7 +284,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
     def test_password_change_no_user(self):
         # Log out the user created during test setup
         self.client.logout()
-        
+
         # Send the view an email address not tied to any user
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 400)
@@ -299,7 +298,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         # Make many consecutive bad requests in an attempt to trigger the rate limiter
         for attempt in xrange(self.INVALID_ATTEMPTS):
             self._change_password(email=self.NEW_EMAIL)
-        
+
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 403)
 

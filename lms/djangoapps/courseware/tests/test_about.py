@@ -46,7 +46,7 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # Check that registration button is present
         self.assertIn(REG_STR, resp.content)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})    
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_logged_in_marketing(self):
         self.setup_user()
         url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
