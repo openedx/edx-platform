@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.template import RequestContext %>
 <%! import third_party_auth %>
 <%! from third_party_auth import pipeline %>
@@ -227,7 +227,7 @@
 
     <header>
       <h2 id="email-settings-title">
-        ${_("Email Settings for {course_number}").format(course_number='<span id="email_settings_course_number"></span>') | n}
+        ${_("Email Settings for {course_number}").format(course_number=HTML('<span id="email_settings_course_number"></span>'))}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}

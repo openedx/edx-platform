@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "register" %></%def>
 <%! from django.core.urlresolvers import reverse %>
@@ -62,7 +62,10 @@
             <li class="field checkbox required" id="field-tos">
               <input id="tos" name="terms_of_service" type="checkbox" value="true" />
               <label for="tos">
-                ${_("I agree to the {a_start} Terms of Service {a_end}").format(a_start='<a data-rel="edx.org" href="{}">'.format(marketing_link('TOS')), a_end="</a>") | n}
+                ${_("I agree to the {a_start} Terms of Service {a_end}").format(
+                    a_start=HTML('<a data-rel="edx.org" href="{}">').format(marketing_link('TOS')),
+                    a_end=HTML("</a>"),
+                    )}
               </label>
             </li>
           </ol>

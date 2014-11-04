@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='../../../static_content.html'/>
 
@@ -27,7 +27,7 @@
         <img src="${static.url('images/about_1.jpg')}">
       </div>
       <article>
-      <h2>${_('About {span_start}{edX}{span_end}'.format(span_start='<span class="edx">', span_end='</span>', edX="edX"))}</h2>
+      <h2>${_('About {span_start}{edX}{span_end}'.format(span_start=HTML('<span class="edx">'), span_end=HTML('</span>'), edX="edX"))}</h2>
         <p>${_("Open edX is a not-for-profit enterprise of its founding partners {harvard_university} and the {massachusetts_institute_of_technology} that features learning designed specifically for interactive study via the web. Based on a long history of collaboration and their shared educational missions, the founders are creating a new online-learning experience with online courses that reflect their disciplinary breadth.  Along with offering online courses, the institutions will use {edX} to research how students learn and how technology can transform learning&ndash;both on-campus and worldwide. Anant Agarwal, former Director of {MIT}'s Computer Science and Artificial Intelligence Laboratory, serves as the first president of {edX}. {EdX}'s goals combine the desire to reach out to students of all ages, means, and nations, and to deliver these teachings from a faculty who reflect the diversity of its audience. {EdX} is based in Cambridge, Massachusetts and is governed by {MIT} and {Harvard}.").format(edX="edX", EdX="EdX", harvard_university="Harvard University", Harvard="Harvard", MIT="MIT", massachusetts_institute_of_technology="Massachusetts Institute of Technology")}</p>
       </article>
       <hr class="fade-right-hr-divider">

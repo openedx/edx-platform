@@ -11,7 +11,7 @@ else:
 import json
 
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
-from django.utils.translation import ugettext as _
+from util.markup import HTML, ugettext as _
 from django.utils.html import escapejs
 %>
 <%block name="title">${xblock.display_name_with_default} ${xblock_type_display_name(xblock)}</%block>
@@ -111,10 +111,10 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
                 % if not is_unit_page:
                     <div class="bit">
                         <h3 class="title-3">${_("Adding components")}</h3>
-                        <p>${_("Select a component type under {em_start}Add New Component{em_end}. Then select a template.").format(em_start='<strong>', em_end="</strong>")}</p>
+                        <p>${_("Select a component type under {em_start}Add New Component{em_end}. Then select a template.").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
                         <p>${_("The new component is added at the bottom of the page or group. You can then edit and move the component.")}</p>
                         <h3 class="title-3">${_("Editing components")}</h3>
-                        <p>${_("Click the {em_start}Edit{em_end} icon in a component to edit its content.").format(em_start='<strong>', em_end="</strong>")}</p>
+                        <p>${_("Click the {em_start}Edit{em_end} icon in a component to edit its content.").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
                         <h3 class="title-3">${_("Reorganizing components")}</h3>
                         <p>${_("Drag components to new locations within this component.")}</p>
                         <p>${_("For content experiments, you can drag components to other groups.")}</p>

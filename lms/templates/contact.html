@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
 
@@ -28,12 +28,12 @@
 	'discussion on our {fb_link_start}facebook page{fb_link_end}. Though we may '
 	'not have a chance to respond to every email, we take all feedback into consideration.').format(
             platform_name=settings.PLATFORM_NAME,
-            contact_email=u'<a href="mailto:{email}">{email}</a>'.format(email=settings.CONTACT_EMAIL),
-            faq_link_start=u'<a href="{url}">'.format(url=reverse('faq_edx')),
-            faq_link_end='</a>',
-            fb_link_start='<a href="{url}">'.format(url=settings.PLATFORM_FACEBOOK_ACCOUNT),
-            fb_link_end='</a>'
-	) | n}
+            contact_email=HTML(u'<a href="mailto:{email}">{email}</a>').format(email=settings.CONTACT_EMAIL),
+            faq_link_start=HTML(u'<a href="{url}">').format(url=reverse('faq_edx')),
+            faq_link_end=HTML('</a>'),
+            fb_link_start=HTML('<a href="{url}">').format(url=settings.PLATFORM_FACEBOOK_ACCOUNT),
+            fb_link_end=HTML('</a>'),
+	)}
       </p>
 
       <h2>${_("Technical Inquiries and Feedback")}</h2>
@@ -44,18 +44,18 @@
 	'please make sure you are using a current version of Firefox or Chrome, and include '
 	'browser and version in your e-mail, as well as screenshots or other pertinent details. '
 	'If you find a bug or other issues, you can reach us at the following: {bugs_email}.').format(
-            tech_email=u'<a href="mailto:{0}">{0}</a>'.format(settings.TECH_SUPPORT_EMAIL),
-            bug_email=u'<a href="mailto:{0}">{0}</a>'.format(settings.BUGS_EMAIL),
+            tech_email=HTML(u'<a href="mailto:{0}">{0}</a>').format(settings.TECH_SUPPORT_EMAIL),
+            bug_email=HTML(u'<a href="mailto:{0}">{0}</a>').format(settings.BUGS_EMAIL),
             platform_name=settings.PLATFORM_NAME
-	) | n}
+	)}
       </p>
 
       <h2>${_("Media")}</h2>
       <p>${_('Please visit our {link_start}media/press page{link_end} for more information. For any media or press inquiries, please email {email}.').format(
-        link_start=u'<a href="{url}">'.format(url=reverse('faq_edx')),
-        link_end='</a>',
-        email=u'<a href="mailto:{email}">{email}/a>'.format(email=settings.PRESS_EMAIL),
-        ) | n}</p>
+        link_start=HTML(u'<a href="{url}">').format(url=reverse('faq_edx')),
+        link_end=HTML('</a>'),
+        email=HTML(u'<a href="mailto:{email}">{email}</a>').format(email=settings.PRESS_EMAIL),
+        )}</p>
 
       <h2>${_("Universities")}</h2>
       <p>

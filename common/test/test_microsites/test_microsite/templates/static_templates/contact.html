@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -25,11 +25,11 @@
       <h2>${_("General Inquiries and Feedback")}</h2>
       <p>${_('If you have a general question about {platform_name} please email {email}. To see if your question has already been answered, visit our {faq_link_start}FAQ page{faq_link_end}. You can also join the discussion on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a chance to respond to every email, we take all feedback into consideration.').format(
           platform_name=settings.PLATFORM_NAME,
-          email='<a href="mailto:{contact_email}">{contact_email}</a>'.format(contact_email=settings.CONTACT_EMAIL),
-          faq_link_start='<a href="{url}">'.format(url=reverse('faq_edx')),
-          faq_link_end='</a>',
-          fb_link_start='<a href="http://www.facebook.com/EdxOnline">',
-          fb_link_end='</a>'
+          email=HTML('<a href="mailto:{contact_email}">{contact_email}</a>').format(contact_email=settings.CONTACT_EMAIL),
+          faq_link_start=HTML('<a href="{url}">').format(url=reverse('faq_edx')),
+          faq_link_end=HTML('</a>'),
+          fb_link_start=HTML('<a href="http://www.facebook.com/EdxOnline">'),
+          fb_link_end=HTML('</a>'),
         )}</p>
 
       <h2>${_("Technical Inquiries and Feedback")}</h2>

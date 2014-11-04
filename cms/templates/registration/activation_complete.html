@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../base.html" />
 
@@ -21,9 +21,9 @@
       %endif
 
       %if user_logged_in:
-        ${_("Visit your {link_start}dashboard{link_end} to see your courses.").format(link_start='<a href="/">', link_end='</a>') | n}
+        ${_("Visit your {link_start}dashboard{link_end} to see your courses.").format(link_start=HTML('<a href="/">'), link_end=HTML('</a>'))}
       %else:
-        ${_("You can now {link_start}login{link_end}.").format(link_start='<a href="{url}">'.format(url=reverse('login')), link_end='</a>') | n}
+        ${_("You can now {link_start}login{link_end}.").format(link_start=HTML('<a href="{url}">').format(url=reverse('login')), link_end=HTML('</a>'))}
       %endif
     </p>
   </section>

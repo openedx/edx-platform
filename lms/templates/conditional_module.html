@@ -9,7 +9,7 @@ def _message(reqm, message):
         url_name = reqm.display_name_with_default))
 %>
 % if message:
-	% for reqm in module.required_modules:
-		<p class="conditional-message">${_message(reqm, message)}</p>
-	% endfor
+    % for reqm in module.required_modules:
+        <p class="conditional-message">${_message(reqm, message)}</p>
+    % endfor
 % endif

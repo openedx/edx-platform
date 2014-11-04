@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from datetime import datetime %>
@@ -29,7 +29,7 @@
     <header>
       <h2>
 	${_('{platform_name} Help').format(
-	    platform_name=u'<span class="edx">{}</span>'.format(platform_name)
+	    platform_name=HTML(u'<span class="edx">{}</span>').format(platform_name)
 	)}
       </h2>
       <hr>
@@ -41,22 +41,26 @@
 %>
 
 % if discussion_link:
-    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
-      link_start='<a href="{url}" target="_blank">'.format(url=discussion_link),
-      link_end='</a>',
+<p>${_('For {em_start}questions on course lectures, homework, tools, or materials for this course{em_end}, post in the {link_start}course discussion forum{link_end}.').format(
+      em_start=HTML('<strong>'),
+      em_end=HTML('</strong>'),
+      link_start=HTML('<a href="{url}" target="_blank">').format(url=discussion_link),
+      link_end=HTML('</a>'),
       )}
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
-        link_start='<a href="{url}" target="_blank">'.format(
-          url=marketing_link('FAQ')
-        ),
-        link_end='</a>',
+<p>${_('Have {em_start}general questions about {platform_name}{em_end}? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
+        em_start=HTML('<strong>'),
+        em_end=HTML('</strong>'),
+        link_start=HTML('<a href="{url}" target="_blank">').format(url=marketing_link('FAQ')),
+        link_end=HTML('</a>'),
         platform_name=platform_name)}
       </p>
 
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(
+      <p>${_('Have a {em_start}question about something specific{em_end}? You can contact the {platform_name} general support team directly:').format(
+        em_start=HTML('<strong>'),
+        em_end=HTML('</strong>'),
         platform_name=platform_name
       )}</p>
     <hr>
@@ -139,8 +143,8 @@
     ).format(
         open_time=open_time,
         close_time=close_time,
-        link_start='<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">'.format(marketing_link('FAQ')),
-        link_end='</a>'
+        link_start=HTML('<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">').format(marketing_link('FAQ')),
+        link_end=HTML('</a>')
     )}
     </p>
   </div>

@@ -2,7 +2,7 @@
 <%def name="online_help_token()"><% return "import" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.utils.translation import ugettext as _
+  from util.markup import HTML, ugettext as _
 %>
 <%block name="title">${_("Course Import")}</%block>
 <%block name="bodyclass">is-signedin course tools view-import</%block>
@@ -22,7 +22,7 @@
     <article class="content-primary" role="main">
 
       <div class="introduction">
-          <p>${_("Be sure you want to import a course before continuing. Content of the imported course replaces all the content of this course. {em_start}You cannot undo a course import{em_end}. We recommend that you first export the current course, so you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>") | n}</p>
+          <p>${_("Be sure you want to import a course before continuing. Content of the imported course replaces all the content of this course. {em_start}You cannot undo a course import{em_end}. We recommend that you first export the current course, so you have a backup copy of it.").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
           ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
           <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
           <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>

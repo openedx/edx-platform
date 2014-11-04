@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
@@ -68,8 +68,9 @@
         perms_error = _('The currently logged-in user account does not have permission to enroll in this course. '
                         'You may need to {start_logout_tag}log out{end_tag} then try the register button again. '
                         'Please visit the {start_help_tag}help page{end_tag} for a possible solution.').format(
-                          start_help_tag="<a href='{url}'>".format(url=marketing_link('FAQ')), end_tag='</a>',
-                          start_logout_tag="<a href='{url}'>".format(url=reverse('logout'))
+                          start_help_tag=HTML("<a href='{url}'>").format(url=marketing_link('FAQ')),
+                          start_logout_tag=HTML("<a href='{url}'>").format(url=reverse('logout')),
+                          end_tag=HTML("</a>"),
                           )
       %>
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
@@ -144,7 +145,10 @@
 
         %elif in_cart:
           <span class="add-to-cart">
-            ${_('This course is in your <a href="{cart_link}">cart</a>.').format(cart_link=cart_link)}
+              ${_('This course is in your {link_start}cart{link_end}.').format(
+                    link_start=HTML('<a href="{}">').format(cart_link),
+                    link_end=HTML('</a>'),
+                    )}
           </span>
         % elif is_course_full:
           <span class="register disabled">
@@ -271,13 +275,13 @@
                 ).replace(u" ", u"%20")
               %>
               <a href="${tweet_action}" class="share">
-                <i class="icon icon-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
+                <i class="icon icon-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
               </a>
               <a href="${facebook_link}" class="share">
-                <i class="icon icon-thumbs-up"></i><span class="sr">Post a Facebook message to say you've registered for this course</span>
+                <i class="icon icon-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've registered for this course")}</span>
               </a>
               <a href="${email_subject}" class="share">
-                <i class="icon icon-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
+                <i class="icon icon-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
               </a>
             % endif
           </div>

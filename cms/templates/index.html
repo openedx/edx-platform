@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "home" %></%def>
@@ -150,8 +150,8 @@
 
               <div class="status-message">
                 <p class="copy">${_('The new course will be added to your course list in 5-10 minutes. Return to this page or {link_start}refresh it{link_end} to update the course list. The new course will need some manual configuration.').format(
-                    link_start='<a href="#" class="action-reload">',
-                    link_end='</a>',
+                    link_start=HTML('<a href="#" class="action-reload">'),
+                    link_end=HTML('</a>'),
                   )}</p>
               </div>
             </li>
@@ -377,8 +377,8 @@
       <div class="bit">
         <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3>
         <p>${_("In order to create courses in Studio, you must {link_start}contact edX staff to help you create a course{link_end}.").format(
-            link_start='<a href="mailto:{email}">'.format(email=settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')),
-            link_end="</a>",
+            link_start=HTML('<a href="mailto:{email}">').format(email=settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')),
+            link_end=HTML("</a>"),
           )}</p>
       </div>
       % endif
@@ -393,10 +393,10 @@
       <div class="bit">
         <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3>
         <p>${_("Your request to author courses in Studio has been denied. Please {link_start}contact edX Staff with further questions{link_end}.").format(
-            link_start='<a href="{url}" class="show-tender">'.format(
+            link_start=HTML('<a href="{url}" class="show-tender">').format(
               url="http://help.edge.edx.org/discussion/new",
             ),
-            link_end="</a>",
+            link_end=HTML("</a>"),
           )}</p>
       </div>
 

@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -21,7 +21,7 @@
         <h2>${_("Organization")}</h2>
         <article class="response">
           <h3>${_("What is {edX}?").format(edX="edX")}</h3>
-          <p>${_('{EdX} is a not-for-profit enterprise of its founding partners, the {MIT_long} ({MIT}) and {harvard_u} that offers online learning to on-campus students and to millions of people around the world. To do so, {edX} is building an open-source online learning platform and hosts an online web portal at <a href=\"http://www.edx.org\">www.edx.org</a> for online education.').format(EdX="EdX", edX="edX", MIT_long="Massachusetts Institute of Technology", MIT="MIT", harvard_u="Harvard University")}</p>
+          <p>${_('{EdX} is a not-for-profit enterprise of its founding partners, the {MIT_long} ({MIT}) and {harvard_u} that offers online learning to on-campus students and to millions of people around the world. To do so, {edX} is building an open-source online learning platform and hosts an online web portal at {edx_link} for online education.').format(EdX="EdX", edX="edX", MIT_long="Massachusetts Institute of Technology", MIT="MIT", harvard_u="Harvard University", edx_link=HTML("<a href=\"http://www.edx.org\">www.edx.org</a>"))}</p>
           <p>${_("{EdX} currently offers {HarvardX}, {MITx} and {BerkeleyX} classes online for free. Beginning in fall 2013, {edX} will offer {WellesleyX} , {GeorgetownX} and the {UTexas} classes online for free. The {UT} System includes nine universities and six health institutions. In 2014, {edX} will further expand its consortium, including several international schools, when it begins offering courses from {EPFL}, {McGill}, {Toronto}, {ANU}, {Delft}, and {Rice}.  The {edX} institutions aim to extend their collective reach to build a global community of online students. Along with offering online courses, the three universities undertake research on how students learn and how technology can transform learning both on-campus and online throughout the world.").format(
               EdX="EdX",
               edX="edX",
@@ -87,7 +87,7 @@
         </article>
         <article class="response">
           <h3>${_("What will the scope of the online courses be? How many? Which faculty?")}</h3>
-          <p>${_('Our goal is to offer a wide variety of courses across disciplines. There are currently {link_start}fifteen{link_end} offered on the {edX} platform.').format(link_start='<a href="/courses">', link_end='</a>', edX="edX")}</p>
+          <p>${_('Our goal is to offer a wide variety of courses across disciplines. There are currently {link_start}fifteen{link_end} offered on the {edX} platform.').format(link_start=HTML('<a href="/courses">'), link_end=HTML('</a>'), edX="edX")}</p>
         </article>
         <article class="response">
           <h3>${_("Who is the learner? Domestic or international? Age range?")}</h3>
@@ -103,11 +103,11 @@
         </article>
         <article class="response">
           <h3>${_("How may I apply to study with {edX}?").format(edX="edX")}</h3>
-          <p>${_('Simply complete the online {link_start}signup form{link_end}.  Enrolling will create your unique student record in the {edX} database, allow you to register for classes, and to receive a certificate on successful completion.').format(link_start='<a href="#signup-modal" rel="leanModal">', link_end='</a>', edX="edX")}</p>
+          <p>${_('Simply complete the online {link_start}signup form{link_end}.  Enrolling will create your unique student record in the {edX} database, allow you to register for classes, and to receive a certificate on successful completion.').format(link_start=HTML('<a href="#signup-modal" rel="leanModal">'), link_end=HTML('</a>'), edX="edX")}</p>
         </article>
         <article class="response">
           <h3>${_("How may another university participate in {edX}? ").format(edX="edX")}</h3>
-          <p>${_('If you are from a university interested in discussing {edX}, please email {email}').format(email='<a href="mailto:university@edx.org">university@edx.org</a>', edX="edX")}</p>
+          <p>${_('If you are from a university interested in discussing {edX}, please email {email}').format(email=HTML('<a href="mailto:university@edx.org">university@edx.org</a>'), edX="edX")}</p>
         </article>
       </section>
 

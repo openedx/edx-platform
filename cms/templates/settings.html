@@ -5,7 +5,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.utils.translation import ugettext as _
+  from util.markup import HTML, ugettext as _
   from contentstore import utils
   import urllib
 %>
@@ -231,7 +231,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     </span>
 
                     <span class="msg msg-help">
-                    ${_("You can manage this image along with all of your other <a href='{}'>files &amp; uploads</a>").format(upload_asset_url) | n}
+                    ${_("You can manage this image along with all of your other {link_start}files & uploads{link_end}").format(
+                        link_start=HTML("<a href='{}'>").format(upload_asset_url),
+                        link_end=HTML("</a>"),
+                        )}
                     </span>
 
                     % else:

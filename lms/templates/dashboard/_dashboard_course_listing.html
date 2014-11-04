@@ -1,6 +1,6 @@
 <%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked" />
 
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
@@ -112,7 +112,13 @@
             </div>
 
             <div class="wrapper-extended">
-                <p class="message-copy">${_("You can still sign up for an ID verified {cert_name_long} for this course. If you plan to complete the whole course, it is a great way to recognize your achievement. {link_start}Learn more about the verified {cert_name_long}{link_end}.").format(link_start='<a href="{}">'.format(marketing_link('WHAT_IS_VERIFIED_CERT')), link_end="</a>", cert_name_long=cert_name_long) | n}</p>
+                <p class="message-copy">${_("You can still sign up for an ID verified {cert_name_long} for this course. "
+                        "If you plan to complete the whole course, it is a great way to recognize your achievement. "
+                        "{link_start}Learn more about the verified {cert_name_long}{link_end}.").format(
+                            link_start=HTML('<a href="{}">').format(marketing_link('WHAT_IS_VERIFIED_CERT')),
+                            link_end=HTML('</a>'),
+                            cert_name_long=cert_name_long,
+                            )}</p>
 
               <ul class="actions message-actions">
                 <li class="action-item">

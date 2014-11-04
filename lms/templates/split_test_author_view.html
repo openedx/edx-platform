@@ -1,5 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from markupsafe import escape %>
+<%! from util.markup import HTML, ugettext as _ %>
 
 <%
 split_test = context.get('split_test')
@@ -13,8 +12,8 @@ show_link = group_configuration_url is not None
         <p>
             <span class="message-text">
                 ${_("This content experiment uses group configuration '{group_configuration_name}'.").format(
-                    group_configuration_name="<a href='{}'>{}</a>".format(group_configuration_url, escape(user_partition.name)) if show_link else user_partition.name
-                ) | n}
+                    group_configuration_name=HTML("<a href='{}'>{}</a>").format(group_configuration_url, user_partition.name) if show_link else user_partition.name
+                )}
             </span>
         </p>
     </div>

@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 % if reverifications["must_reverify"]:
   % if len(reverifications["must_reverify"]) > 1:
@@ -15,7 +15,7 @@
               % for item in reverifications["must_reverify"]:
                 <li class="item">
                   ${_('{course_name}: Re-verify by {date}').format(
-		      course_name=u"<strong>{0}</strong>".format(item.course_name),
+		      course_name=HTML(u"<strong>{0}</strong>").format(item.course_name),
 		      date=item.date
 		  )}
                 </li>
@@ -41,7 +41,7 @@
           <div class="copy">
             <p class='activation-message'>
               ${_('To continue in the ID Verified track in {course_name}, you need to re-verify your identity by {date}.').format(
-	          course_name=u"<strong>{}</strong>".format(item.course_name),
+	          course_name=HTML(u"<strong>{}</strong>").format(item.course_name),
 	          date=item.date
 	      )}
             </p>
@@ -69,8 +69,8 @@
         <div class="copy">
           <p class='activation-message'>
             ${_('Your re-verification for {course_name} failed and you are no longer eligible for a Verified Certificate.  If you think this is in error, please contact us at {email}.').format(
-	        course_name=u"<strong>{}</strong>".format(item.course_name),
-	        email=u'<a class="contact-link" href="mailto:{email}">{email}</a>'.format(
+	        course_name=HTML(u"<strong>{}</strong>").format(item.course_name),
+	        email=HTML(u'<a class="contact-link" href="mailto:{email}">{email}</a>').format(
                     email=billing_email
 	        )
 	    )}

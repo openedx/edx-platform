@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from courseware.courses import get_course_info_section %>
 
 <%inherit file="../main.html" />
@@ -21,8 +21,8 @@
         <div class="copy">
           <p class='enroll-message'>
             ${_(u"You are not currently enrolled in this course. Sign up for it {link_start}here{link_end}!").format(
-            link_start=u"<a href={}>".format(url_to_enroll),
-            link_end=u"</a>"
+                link_start=HTML(u"<a href={}>").format(url_to_enroll),
+                link_end=HTML(u"</a>"),
             )}
           </p>
         </div>

@@ -3,7 +3,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! import third_party_auth %>
 <%! from third_party_auth import provider, pipeline %>
 
@@ -160,7 +160,11 @@
       </div>
 
       <p class="instructions sr">
-        ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=platform_name)}
+      ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by {em_start}bold text and an asterisk (*){em_end}.').format(
+            em_start=HTML('<strong class="indicator">'),
+            em_end=HTML('</strong>'),
+            platform_name=platform_name,
+            )}
       </p>
 
       <div class="group group-form group-form-requiredinformation">
