@@ -18,16 +18,18 @@ def edxnotes(cls):
     """
     original_get_html = cls.get_html
 
-    def get_html(self, *args, **kargs):
+    def get_html(self, *args, **kwargs):
         """
         Returns raw html for the component.
         """
-        # edXNotes must be disabled in Studio, returns original method in this case.
-        if getattr(self.system, 'is_author_mode', False):
-            return original_get_html(self, *args, **kargs)
+        is_studio = getattr(self.system, 'is_author_mode', False)
+
+        # Must be disabled in Studio or depend on the feature flag.
+        if is_studio or not settings.FEATURES.get('ENABLE_EDXNOTES'):
+            return original_get_html(self, *args, **kwargs)
         else:
             return render_to_string('edxnotes_wrapper.html', {
-                'content': original_get_html(self, *args, **kargs),
+                'content': original_get_html(self, *args, **kwargs),
                 'uid': generate_uid(),
                 'params': {
                     # Use camelCase to name keys.
