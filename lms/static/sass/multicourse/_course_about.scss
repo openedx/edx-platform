@@ -532,23 +532,13 @@
     .important-dates {
       list-style: none;
       margin: 0px;
-      padding: 0 ($baseline/2);
+      padding: 0px;
 
-      li {
+      .important-dates-item {
         @include clearfix;
         border-bottom: 1px dotted $border-color-2;
         margin-bottom: $baseline;
         padding-bottom: ($baseline/2);
-
-        &.prerequisites {
-          border: 1px solid $border-color-2;
-          margin: 0 -($baseline/2) 0;
-          padding: ($baseline/2);
-
-          p {
-            margin-right: ($baseline/2);
-          }
-        }
 
         &:hover, &:focus {
           .icon {
@@ -556,7 +546,7 @@
           }
         }
 
-        p {
+        .important-dates-item-title {
           color: $lighter-base-font-color;
           float: left;
           font-family: $sans-serif;
@@ -569,7 +559,7 @@
             opacity: .6;
         }
 
-        span {
+        .important-dates-item-text {
           float: right;
           font-weight: 700;
         }
