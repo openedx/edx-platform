@@ -37,8 +37,9 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             "created": "2014-10-31T10:05:00.000000",
             "updated": "2014-10-31T10:50:00.101010",
             "user": "dummy-user-id",
-            "username": "dummy-username",
+            "usage_id": "dummy-usage-id",
             "course_id": "dummy-course-id",
+            "username": "dummy-username",
             "text": "dummy note text " + nid,
             "quote": "dummy note quote",
             "ranges": [
@@ -67,7 +68,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
                 }
             ],
         }
-        response = requests.post(self._get_url('api/v1/annotations'), data=json.dumps(dummy_note))
+        response = requests.post(self._get_url("api/v1/annotations"), data=json.dumps(dummy_note))
         self.assertTrue(response.ok)
         response_content = response.json()
         self.assertIn("id", response_content)
@@ -79,51 +80,59 @@ class StubEdxNotesServiceTest(unittest.TestCase):
     def test_note_read(self):
         notes = self._get_notes()
         for note in notes:
-            response = requests.get(self._get_url('api/v1/annotations/' + note['id']))
+            response = requests.get(self._get_url("api/v1/annotations/" + note["id"]))
             self.assertTrue(response.ok)
             self.assertDictEqual(note, response.json())
 
-        response = requests.get(self._get_url('api/v1/annotations/does_not_exist'))
+        response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
         self.assertEqual(response.status_code, 404)
 
     def test_note_update(self):
         notes = self._get_notes()
         for note in notes:
-            response = requests.get(self._get_url('api/v1/annotations/' + note['id']))
+            response = requests.get(self._get_url("api/v1/annotations/" + note["id"]))
             self.assertTrue(response.ok)
             self.assertDictEqual(note, response.json())
 
-        response = requests.get(self._get_url('api/v1/annotations/does_not_exist'))
+        response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
         self.assertEqual(response.status_code, 404)
 
     def test_search(self):
-        response = requests.get(self._get_url('api/v1/search'), params={"user": "dummy-user-id"})
+        response = requests.get(self._get_url("api/v1/search"), params={
+            "user": "dummy-user-id",
+            "usage_id": "dummy-usage-id",
+            "course_id": "dummy-course-id",
+        })
         notes = self._get_notes()
         self.assertTrue(response.ok)
         self.assertDictEqual({"total": 2, "rows": notes}, response.json())
 
-        response = requests.get(self._get_url('api/v1/search'), params={"user": "user-without-notes"})
+        response = requests.get(self._get_url("api/v1/search"), params={
+            "user": "user-without-notes",
+            "usage_id": "dummy-usage-id",
+            "course_id": "dummy-course-id",
+        })
         self.assertDictEqual({"total": 0, "rows": []}, response.json())
 
-        response = requests.get(self._get_url('api/v1/search'))
+        response = requests.get(self._get_url("api/v1/search"))
         self.assertEqual(response.status_code, 400)
 
     def test_delete(self):
         notes = self._get_notes()
-        response = requests.delete(self._get_url('api/v1/annotations/does_not_exist'))
+        response = requests.delete(self._get_url("api/v1/annotations/does_not_exist"))
         self.assertEqual(response.status_code, 404)
 
         for note in notes:
-            response = requests.delete(self._get_url('api/v1/annotations/' + note['id']))
+            response = requests.delete(self._get_url("api/v1/annotations/" + note["id"]))
             self.assertEqual(response.status_code, 204)
-            remaining_notes = self.server.get_all_notes()
-            self.assertNotIn(note['id'], [note["id"] for note in remaining_notes])
+            remaining_notes = self.server.get_notes()
+            self.assertNotIn(note["id"], [note["id"] for note in remaining_notes])
 
         self.assertEqual(len(remaining_notes), 0)
 
     def test_update(self):
         note = self._get_notes()[0]
-        response = requests.put(self._get_url('api/v1/annotations/' + note['id']), data=json.dumps({
+        response = requests.put(self._get_url("api/v1/annotations/" + note["id"]), data=json.dumps({
             "text": "new test text"
         }))
         self.assertEqual(response.status_code, 200)
@@ -133,37 +142,49 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         self.assertEqual(note["id"], updated_note["id"])
         self.assertItemsEqual(note, updated_note)
 
-        response = requests.get(self._get_url('api/v1/annotations/does_not_exist'))
+        response = requests.get(self._get_url("api/v1/annotations/does_not_exist"))
         self.assertEqual(response.status_code, 404)
 
     def test_notes_collection(self):
-        response = requests.get(self._get_url('api/v1/annotations'), params={"user": "dummy-user-id"})
+        response = requests.get(self._get_url("api/v1/annotations"), params={"user": "dummy-user-id"})
         self.assertTrue(response.ok)
         self.assertEqual(len(response.json()), 2)
 
-        response = requests.get(self._get_url('api/v1/annotations'))
+        response = requests.get(self._get_url("api/v1/annotations"))
         self.assertEqual(response.status_code, 400)
 
     def test_cleanup(self):
-        response = requests.put(self._get_url('cleanup'))
+        response = requests.put(self._get_url("cleanup"))
         self.assertTrue(response.ok)
-        self.assertEqual(len(self.server.get_all_notes()), 0)
+        self.assertEqual(len(self.server.get_notes()), 0)
 
     def test_create_notes(self):
         dummy_notes = self._get_dummy_notes(count=2)
-        response = requests.post(self._get_url('create_notes'), data=json.dumps(dummy_notes))
+        response = requests.post(self._get_url("create_notes"), data=json.dumps(dummy_notes))
         self.assertTrue(response.ok)
         self.assertEqual(len(self._get_notes()), 4)
 
-        response = requests.post(self._get_url('create_notes'))
+        response = requests.post(self._get_url("create_notes"))
         self.assertEqual(response.status_code, 400)
+
+    def test_headers(self):
+        note = self._get_notes()[0]
+        response = requests.get(self._get_url("api/v1/annotations/" + note["id"]))
+        self.assertTrue(response.ok)
+        self.assertEqual(response.headers.get("access-control-allow-origin"), "*")
+
+        response = requests.options(self._get_url("api/v1/annotations/"))
+        self.assertTrue(response.ok)
+        self.assertEqual(response.headers.get("access-control-allow-origin"), "*")
+        self.assertEqual(response.headers.get("access-control-allow-methods"), "GET, POST, PUT, DELETE, OPTIONS")
+        self.assertIn("X-CSRFToken", response.headers.get("access-control-allow-headers"))
 
     def _get_notes(self):
         """
         Return a list of notes from the stub EdxNotes service.
         """
-        notes = self.server.get_all_notes()
-        self.assertGreater(len(notes), 0, 'Notes are empty.')
+        notes = self.server.get_notes()
+        self.assertGreater(len(notes), 0, "Notes are empty.")
         return notes
 
     def _get_url(self, path):
