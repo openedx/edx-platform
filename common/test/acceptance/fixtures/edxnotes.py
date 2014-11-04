@@ -2,47 +2,58 @@
 Tools for creating edxnotes content fixture data.
 """
 
-from datetime import datetime
-
+import json
 import factory
 import requests
 
 from . import EDXNOTES_STUB_URL
 
 
+class Range(factory.Factory):
+    FACTORY_FOR = dict
+    start = "/p[1]"
+    end = "/p[1]"
+    startOffset = 0
+    endOffset = 8
+
+
 class Note(factory.Factory):
-    id = None
-    annotator_schema_version = "v1.0"
-    created = datetime.utcnow().isoformat()
-    updated = datetime.utcnow().isoformat()
-    user = "dummy-user-id"
+    FACTORY_FOR = dict
+    user = "dummy-user"
     username = "dummy-username"
+    usage_id = "dummy-usage-id"
     course_id = "dummy-course-id"
     text = "dummy note text"
     quote = "dummy note quote"
-    ranges = [
-        {
-            "start": "/p[1]",
-            "end": "/p[1]",
-            "startOffset": 0,
-            "endOffset": 10
-        }
-    ]
+    ranges = [Range()]
+
+
+class EdxNotesFixtureError(Exception):
+    """
+    Error occurred while installing a edxnote fixture.
+    """
+    pass
 
 
 class EdxNotesFixture(object):
+    notes = []
 
-    def push(self):
+    def create_note(self, note):
+        self.notes.append(note)
+        return self
+
+    def install(self):
         """
-        Push the data to the stub comments service.
+        Push the data to the stub EdxNotes service.
         """
-        requests.put(
-            '{}/set_config'.format(EDXNOTES_STUB_URL),
-            data=self.get_config_data()
+        response = requests.post(
+            '{}/create_notes'.format(EDXNOTES_STUB_URL),
+            data=json.dumps(self.notes)
         )
 
-    def get_config_data(self):
-        """
-        return a dictionary with the fixture's data serialized for PUTting to the stub server's config endpoint.
-        """
-        raise NotImplementedError()
+        if not response.ok:
+            raise EdxNotesFixtureError(
+                "Could not create notes {0}.  Status was {1}".format(
+                    json.dumps(self.notes), response.status_code))
+
+        return self

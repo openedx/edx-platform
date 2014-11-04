@@ -1,5 +1,5 @@
 """
-Stub implementation of EdXNotes for acceptance tests
+Stub implementation of EdxNotes for acceptance tests
 """
 
 import json
@@ -11,9 +11,9 @@ from copy import deepcopy
 from .http import StubHttpRequestHandler, StubHttpService
 
 
-class StubEdXNotesServiceHandler(StubHttpRequestHandler):
+class StubEdxNotesServiceHandler(StubHttpRequestHandler):
     """
-    Handler for EdXNotes requests.
+    Handler for EdxNotes requests.
     """
     URL_HANDLERS = {
         "GET": {
@@ -53,7 +53,7 @@ class StubEdXNotesServiceHandler(StubHttpRequestHandler):
         if method in self.URL_HANDLERS:
             handlers_list = self.URL_HANDLERS[method]
         else:
-            self.log_error('Unrecognized method "{method}"'.format(method=method))
+            self.log_error("Unrecognized method '{method}'".format(method=method))
             return
 
         # Check the path (without querystring params) against our list of handlers
@@ -66,42 +66,61 @@ class StubEdXNotesServiceHandler(StubHttpRequestHandler):
 
     def do_GET(self):
         """
-        Handle GET methods to the EdXNotes API stub.
+        Handle GET methods to the EdxNotes API stub.
         """
-        self._send_handler_response('GET')
+        self._send_handler_response("GET")
 
     def do_POST(self):
         """
-        Handle POST methods to the EdXNotes API stub.
+        Handle POST methods to the EdxNotes API stub.
         """
-        self._send_handler_response('POST')
+        self._send_handler_response("POST")
 
     def do_PUT(self):
         """
-        Handle PUT methods to the EdXNotes API stub.
+        Handle PUT methods to the EdxNotes API stub.
         """
-        if self.path.startswith('/set_config'):
+        if self.path.startswith("/set_config"):
             return StubHttpRequestHandler.do_PUT(self)
 
-        self._send_handler_response('PUT')
+        self._send_handler_response("PUT")
 
     def do_DELETE(self):
         """
-        Handle DELETE methods to the EdXNotes API stub.
+        Handle DELETE methods to the EdxNotes API stub.
         """
-        self._send_handler_response('DELETE')
+        self._send_handler_response("DELETE")
+
+    def do_OPTIONS(self):
+        self.send_response(200, headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Length, Content-Type, X-Annotator-Auth-Token, X-Requested-With, X-Annotator-Auth-Token, X-Requested-With, X-CSRFToken",
+        })
+
+    def respond(self, status_code=200, content=None):
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+        }
+        if status_code < 400 and content:
+            headers["Content-Type"] = "application/json"
+            content = json.dumps(content)
+        else:
+            headers["Content-Type"] = "text/html"
+
+        self.send_response(status_code, content, headers)
 
     def _create(self):
         """
         Create a note, assign id, annotator_schema_version, created and updated dates.
         """
         note = json.loads(self.request_content)
-        note['id'] = uuid4().hex
-        note['annotator_schema_version'] = "v1.0"
-        note['created'] = datetime.utcnow().isoformat()
-        note['updated'] = datetime.utcnow().isoformat()
+        note["id"] = uuid4().hex
+        note["annotator_schema_version"] = "v1.0"
+        note["created"] = datetime.utcnow().isoformat()
+        note["updated"] = datetime.utcnow().isoformat()
         self.server.add_notes(note)
-        self.send_json_response(note)
+        self.respond(content=note)
 
     def _create_notes(self):
         """
@@ -110,63 +129,68 @@ class StubEdXNotesServiceHandler(StubHttpRequestHandler):
         try:
             notes = json.loads(self.request_content)
         except ValueError:
-            self.send_response(400, content="Bad Request")
+            self.respond(400, "Bad Request")
             return
 
         if not isinstance(notes, list):
-            self.send_response(400, content="Bad Request")
+            self.respond(400, "Bad Request")
             return
 
         for note in notes:
-            note['id'] = uuid4().hex
-            note['annotator_schema_version'] = "v1.0"
-            note['created'] = datetime.utcnow().isoformat()
-            note['updated'] = datetime.utcnow().isoformat()
+            note["id"] = uuid4().hex
+            note["annotator_schema_version"] = "v1.0"
+            note["created"] = datetime.utcnow().isoformat()
+            note["updated"] = datetime.utcnow().isoformat()
             self.server.add_notes(note)
 
-        self.send_json_response(notes)
+        self.respond(content=notes)
 
     def _read(self, note_id):
         """
         Return the note by note id.
         """
-        result = self.server.filter_by_id(note_id)
+        notes = self.server.get_notes()
+        result = self.server.filter_by_id(notes, note_id)
         if result:
-            self.send_json_response(result[0])
+            self.respond(content=result[0])
         else:
-            self.send_response(404, content="404 Not Found")
+            self.respond(404, "404 Not Found")
 
     def _update(self, note_id):
         """
         Update the note by note id.
         """
-        result = self.server.filter_by_id(note_id)
-        if result:
-            result[0].update(json.loads(self.request_content))
-            self.send_json_response(result)
+        note = self.server.update_note(note_id, json.loads(self.request_content))
+        if note:
+            self.respond(content=note)
         else:
-            self.send_response(404, content="404 Not Found")
+            self.respond(404, "404 Not Found")
 
     def _delete(self, note_id):
         """
         Delete the note by note id.
         """
         if self.server.delete_note(note_id):
-            self.send_response(204, "No Content")
+            self.respond(204, "No Content")
         else:
-            self.send_response(404, content="404 Not Found")
+            self.respond(404, "404 Not Found")
 
     def _search(self):
         """
-        Search for a notes by user id.
+        Search for a notes by user id, course_id and usage_id.
         """
         user = self.get_params.get("user", None)
-        if user is None:
-            self.send_response(400, content="Bad Request")
+        usage_id = self.get_params.get("usage_id", None)
+        course_id = self.get_params.get("course_id", None)
+        if user is None or usage_id is None or course_id is None:
+            self.respond(400, "Bad Request")
             return
 
-        results = self.server.filter_by_user(user)
-        self.send_json_response({
+        notes = self.server.get_notes()
+        results = self.server.filter_by_user(notes, user)
+        results = self.server.filter_by_course_id(results, course_id)
+        results = self.server.filter_by_usage_id(results, usage_id)
+        self.respond(content={
             "total": len(results),
             "rows": results,
         })
@@ -179,24 +203,25 @@ class StubEdXNotesServiceHandler(StubHttpRequestHandler):
         if user is None:
             self.send_response(400, content="Bad Request")
             return
-        self.send_json_response(self.server.filter_by_user(user))
+        notes = self.server.get_notes()
+        self.respond(content=self.server.filter_by_user(notes, user))
 
     def _cleanup(self):
         """
-        Helper method that removes all notes for the stub EdXNotes service.
+        Helper method that removes all notes for the stub EdxNotes service.
         """
         self.server.cleanup()
-        self.send_response(200)
+        self.respond()
 
 
-class StubEdXNotesService(StubHttpService):
-    HANDLER_CLASS = StubEdXNotesServiceHandler
+class StubEdxNotesService(StubHttpService):
+    HANDLER_CLASS = StubEdxNotesServiceHandler
 
     def __init__(self, *args, **kwargs):
-        super(StubEdXNotesService, self).__init__(*args, **kwargs)
+        super(StubEdxNotesService, self).__init__(*args, **kwargs)
         self.notes = list()
 
-    def get_all_notes(self):
+    def get_notes(self):
         return deepcopy(self.notes)
 
     def add_notes(self, notes):
@@ -206,8 +231,16 @@ class StubEdXNotesService(StubHttpService):
         for note in notes:
             self.notes.append(note)
 
+    def update_note(self, note_id, note_info):
+        note = self.filter_by_id(self.notes, note_id)
+        if note:
+            note[0].update(note_info)
+            return note
+        else:
+            return None
+
     def delete_note(self, note_id):
-        note = self.filter_by_id(note_id)
+        note = self.filter_by_id(self.notes, note_id)
         if note:
             index = self.notes.index(note[0])
             self.notes.pop(index)
@@ -218,11 +251,17 @@ class StubEdXNotesService(StubHttpService):
     def cleanup(self):
         self.notes = list()
 
-    def filter_by_id(self, note_id):
-        return self.filter_by('id', note_id)
+    def filter_by_id(self, data, note_id):
+        return self.filter_by(data, "id", note_id)
 
-    def filter_by_user(self, user):
-        return self.filter_by('user', user)
+    def filter_by_user(self, data, user):
+        return self.filter_by(data, "user", user)
 
-    def filter_by(self, field_name, value):
-        return filter(lambda note: note.get(field_name) == value, self.notes)
+    def filter_by_usage_id(self, data, usage_id):
+        return self.filter_by(data, "usage_id", usage_id)
+
+    def filter_by_course_id(self, data, course_id):
+        return self.filter_by(data, "course_id", course_id)
+
+    def filter_by(self, data, field_name, value):
+        return filter(lambda note: note.get(field_name) == value, data)

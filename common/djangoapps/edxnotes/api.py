@@ -68,7 +68,7 @@ def _now():
 
 
 def get_prefix():
-    return '/edxnotes/api'
+    return 'http://127.0.0.1:8042/api/v1' or '/edxnotes/api'
 
 
 def get_user_id():
@@ -76,7 +76,7 @@ def get_user_id():
 
 
 def get_usage_id():
-    return 'usage_id'
+    return ''
 
 
 def get_course_id():

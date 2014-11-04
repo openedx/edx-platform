@@ -1,17 +1,17 @@
 """
-Unit tests for stub EdXNotes implementation.
+Unit tests for stub EdxNotes implementation.
 """
 
 import json
 import unittest
 import requests
 from uuid import uuid4
-from ..edxnotes import StubEdXNotesService
+from ..edxnotes import StubEdxNotesService
 
 
-class StubEdXNotesServiceTest(unittest.TestCase):
+class StubEdxNotesServiceTest(unittest.TestCase):
     """
-    Test cases for the stub EdXNotes service.
+    Test cases for the stub EdxNotes service.
     """
     maxDiff = None
 
@@ -19,7 +19,7 @@ class StubEdXNotesServiceTest(unittest.TestCase):
         """
         Start the stub server.
         """
-        self.server = StubEdXNotesService()
+        self.server = StubEdxNotesService()
         dummy_notes = self._get_dummy_notes(count=2)
         self.server.add_notes(dummy_notes)
         self.addCleanup(self.server.shutdown)
@@ -160,7 +160,7 @@ class StubEdXNotesServiceTest(unittest.TestCase):
 
     def _get_notes(self):
         """
-        Return a list of notes from the stub EdXNotes service.
+        Return a list of notes from the stub EdxNotes service.
         """
         notes = self.server.get_all_notes()
         self.assertGreater(len(notes), 0, 'Notes are empty.')
@@ -168,7 +168,7 @@ class StubEdXNotesServiceTest(unittest.TestCase):
 
     def _get_url(self, path):
         """
-        Construt a URL to the stub EdXNotes service.
+        Construt a URL to the stub EdxNotes service.
         """
         return "http://127.0.0.1:{port}/{path}/".format(
             port=self.server.port, path=path
