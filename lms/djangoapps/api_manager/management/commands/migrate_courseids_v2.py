@@ -4,7 +4,7 @@ One-time data migration script -- shoulen't need to run it again
 import logging
 
 from django.core.management.base import BaseCommand
-
+from progress.models import CourseModuleCompletion
 from api_manager import models as api_models
 
 log = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ class Command(BaseCommand):
         log.warning('Complete!')
 
         log.warning('Migrating Course Module Completions...')
-        course_module_completions = api_models.CourseModuleCompletion.objects.all()
+        course_module_completions = CourseModuleCompletion.objects.all()
         for cmc in course_module_completions:
             cmc.course_id = _migrate_course_id(cmc.course_id)
             cmc.content_id = _migrate_content_id(cmc.content_id)

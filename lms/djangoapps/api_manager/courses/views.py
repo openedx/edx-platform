@@ -39,13 +39,14 @@ from xmodule.modulestore.django import modulestore
 
 from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
     course_exists, get_modulestore, get_course_descriptor, get_aggregate_exclusion_user_ids
-from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
-    CourseModuleCompletion
+from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
+from progress.models import CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
 from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
-from .serializers import CourseModuleCompletionSerializer, CourseSerializer
+from .serializers import CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
+from progress.serializers import CourseModuleCompletionSerializer
 
 
 
