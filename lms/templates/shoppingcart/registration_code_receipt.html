@@ -1,5 +1,5 @@
 <%!
-from django.utils.translation import ugettext as _
+from util.markup import HTML, ugettext as _
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 %>
@@ -29,8 +29,8 @@ from courseware.courses import course_image_url, get_course_about_section
 
         <div class="course-title">
           <h1>
-            ${_("{course_name}").format(course_name=course.display_name)}
-              <span class="course-dates">${_("{start_date}").format(start_date=course.start_datetime_text())} -  ${_("{end_date}").format(end_date=course.end_datetime_text())}
+            ${course.display_name}
+              <span class="course-dates">${course.start_datetime_text()} - ${course.end_datetime_text()}
               </span>
           </h1>
         </div>
@@ -39,9 +39,12 @@ from courseware.courses import course_image_url, get_course_about_section
           % if reg_code_already_redeemed:
           <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
-            ${_("You've clicked a link for an enrollment code that has already been used."
-            " Check your <a href={dashboard_url}>course dashboard</a> to see if you're enrolled in the course,"
-            " or contact your company's administrator.").format(dashboard_url=dashboard_url) | n}
+            ${_("You've clicked a link for an enrollment code that has already been used. "
+                "Check your {link_start}course dashboard{link_end} to see if you're enrolled in the course, "
+                "or contact your company's administrator.").format(
+                    link_start=HTML('<a href="{dashboard_url}">').format(dashboard_url=dashboard_url),
+                    link_end=HTML('</a>'),
+            )}
           </p>
           % elif redemption_success:
           <p class="enrollment-text">
@@ -51,14 +54,17 @@ from courseware.courses import course_image_url, get_course_about_section
           % elif registered_for_course:
           <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
-            ${_("You're already registered for this course."
-            " Visit your <a href={dashboard_url}>dashboard</a> to see the course.").format(dashboard_url=dashboard_url) | n}
+            ${_("You're already registered for this course. "
+                "Visit your {link_start}dashboard{link_end} to see the course.").format(
+                    link_start=HTML('<a href="{dashboard_url}">').format(dashboard_url=dashboard_url),
+                    link_end=HTML('</a>'),
+            )}
           </p>
           % else:
           <p class="enrollment-text">
             ${_("You're about to activate an enrollment code for {course_name} by {site_name}. "
-            "This code can only be used one time, so you should only activate this code if you're its intended"
-            " recipient.").format(course_name=course.display_name, site_name=site_name)}
+            "This code can only be used one time, so you should only activate this code if you're its intended "
+            "recipient.").format(course_name=course.display_name, site_name=site_name)}
           </p>
           % endif
         </div>

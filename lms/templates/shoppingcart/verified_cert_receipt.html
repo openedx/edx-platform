@@ -189,8 +189,11 @@
               <div class="msg msg-refunds">
                 <h4 class="title sr">Please Note:</h4>
                 <div class="copy">
-     		  ## Translators: Please keep the "<del>" and "</del>" tags around your translation of the word "this" in your translation.
-                  <p>${_("Note: items with strikethough like <del>this</del> have been refunded.")}</p>
+                  ## Translators: Please keep the "{del_start}" and "{del_end}" tags around your translation of the word "this" in your translation.
+                  ${_("Note: items with strikethrough like {del_start}this{del_end} have been refunded.").format(
+                    del_start=HTML('<del>'),
+                    del_end=HTML('</del>'),
+                  )}
                 </div>
               </div>
               % endif

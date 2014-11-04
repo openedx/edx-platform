@@ -1,5 +1,5 @@
 <%inherit file="shopping_cart_flow.html" />
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from microsite_configuration import microsite %>
 <%!
@@ -33,18 +33,29 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
            ## we will show the button View Dashboard
           <% dashboard_url = reverse('dashboard') %>
           <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
-          ${_("You have successfully been enrolled for <b>{appended_course_names}</b>. The following receipt has been emailed to"
-          " <strong>{appended_recipient_emails}</strong>").format(appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails) | n}
+          ${_("You have successfully been enrolled for {b_start}{appended_course_names}{b_end}. The following receipt has been emailed to "
+              "{b_start}{appended_recipient_emails}{b_end}").format(
+                appended_course_names=appended_course_names,
+                appended_recipient_emails=appended_recipient_emails,
+                b_start=HTML('<strong>'),
+                b_end=HTML('</strong>'),
+                )}
         % elif order_type == 'business':
           % if total_registration_codes > 1 :
             <% code_plural_form = 'codes' %>
           % else:
             <% code_plural_form = 'code' %>
           % endif
-          ${_("You have successfully purchased <b>{total_registration_codes} course registration codes</b> "
-          "for <b>{appended_course_names}. </b>"
-           "The following receipt has been emailed to <strong>{appended_recipient_emails}</strong>"
-           ).format(total_registration_codes=total_registration_codes, appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails) | n}
+          ${_("You have successfully purchased {b_start}{total_registration_codes} course registration codes{b_end} "
+              "for {b_start}{appended_course_names}.{b_end}"
+              "The following receipt has been emailed to {b_start}{appended_recipient_emails}{b_end}"
+           ).format(
+              total_registration_codes=total_registration_codes,
+              appended_course_names=appended_course_names,
+              appended_recipient_emails=appended_recipient_emails,
+              b_start=HTML('<strong>'),
+              b_end=HTML('</strong>'),
+            )}
         % endif
 
       </div>
@@ -89,7 +100,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Company Name')}:</b>
                   <label>
                     % if order.company_name:
-                      ${_("{company_name}").format(company_name=order.company_name)}
+                      ${ order.company_name }
                     % else:
                       N/A
                     % endif
@@ -101,7 +112,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Purchase Order Number')}:</b>
                   <label>
                     % if order.customer_reference_number:
-                      ${_("{customer_reference_number}").format(customer_reference_number=order.customer_reference_number)}
+                      ${ order.customer_reference_number }
                     % else:
                       N/A
                     % endif
@@ -113,7 +124,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Company Contact Name')}:</b>
                   <label>
                     % if order.company_contact_name:
-                      ${_("{company_contact_name}").format(company_contact_name=order.company_contact_name)}
+                      ${ order.company_contact_name }
                     % else:
                       N/A
                     % endif
@@ -137,7 +148,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Recipient Name')}:</b>
                   <label>
                     % if order.recipient_name:
-                      ${_("{recipient_name}").format(recipient_name=order.recipient_name)}
+                      ${ order.recipient_name }
                     % else:
                       N/A
                     % endif
@@ -344,8 +355,11 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
       <div class="code-text">
         % if any_refunds:
           <span>
-          ## Translators: Please keep the "<del>" and "</del>" tags around your translation of the word "this" in your translation.
-            ${_("Note: items with strikethough like <del>this</del> have been refunded.")}
+            ## Translators: Please keep the "{del_start}" and "{del_end}" tags around your translation of the word "this" in your translation.
+            ${_("Note: items with strikethrough like {del_start}this{del_end} have been refunded.").format(
+              del_start=HTML('<del>'),
+              del_end=HTML('</del>'),
+            )}
           </span>
         % endif
         <span class="pull-right">${_("Total")}: <b>$${"{0:0.2f}".format(order.total_cost)} USD</b></span>
