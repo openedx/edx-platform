@@ -304,6 +304,8 @@ FEATURES = {
 
     # Separate the verification flow from the payment flow
     'SEPARATE_VERIFICATION_FROM_PAYMENT': False,
+
+    'ENABLE_EDXNOTES': False,
 }
 
 # Ignore static asset files on import which match this pattern
