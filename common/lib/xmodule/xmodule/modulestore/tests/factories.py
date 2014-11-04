@@ -45,9 +45,9 @@ class CourseFactory(XModuleFactory):
     """
     Factory for XModule courses.
     """
-    org = factory.Sequence(lambda n: u'org.عربي_.%d' % n)
-    number = factory.Sequence(lambda n: u'course._عربي_%d' % n)
-    display_name = factory.Sequence(lambda n: u'Run عربي %d' % n)
+    org = factory.Sequence(lambda n: 'org.%d' % n)
+    number = factory.Sequence(lambda n: 'course_%d' % n)
+    display_name = factory.Sequence(lambda n: 'Run %d' % n)
 
     # pylint: disable=unused-argument
     @classmethod
