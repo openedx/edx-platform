@@ -4,6 +4,7 @@ Utility methods useful for Studio page tests.
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from bok_choy.promise import EmptyPromise
+from bok_choy.javascript import js_defined
 
 from ...tests.helpers import disable_animations
 
@@ -50,6 +51,7 @@ def wait_for_notification(page):
     EmptyPromise(_is_saving_done, 'Notification should have been hidden.', timeout=60).fulfill()
 
 
+@js_defined('window.jQuery')
 def press_the_notification_button(page, name):
     # Because the notification uses a CSS transition,
     # Selenium will always report it as being visible.
@@ -101,6 +103,7 @@ def add_advanced_component(page, menu_index, name):
     click_css(page, component_css, 0)
 
 
+@js_defined('window.jQuery')
 def type_in_codemirror(page, index, text, find_prefix="$"):
     script = """
     var cm = {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror;
@@ -110,6 +113,7 @@ def type_in_codemirror(page, index, text, find_prefix="$"):
     page.browser.execute_script(script, str(text))
 
 
+@js_defined('window.jQuery')
 def get_codemirror_value(page, index=0, find_prefix="$"):
     return page.browser.execute_script(
         """

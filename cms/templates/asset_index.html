@@ -17,18 +17,10 @@
 % endfor
 </%block>
 
-<%block name="jsextra">
-<script type="text/javascript">
-    require(["jquery", "js/collections/asset", "js/views/assets", "jquery.fileupload"],
-            function($, AssetCollection, AssetsView) {
-
-        var assets = new AssetCollection();
-        assets.url = "${asset_callback_url}";
-        var assetsView = new AssetsView({collection: assets, el: $('.assets-wrapper')});
-        assetsView.render();
-
-    }); // end of require()
-</script>
+<%block name="requirejs">
+    require(["js/factories/asset_index"], function (AssetIndexFactory) {
+        AssetIndexFactory("${asset_callback_url}");
+    });
 </%block>
 
 <%block name="content">
@@ -72,9 +64,9 @@
             </div>
             <div class="bit">
                 <h3 class="title-3">${_("Using File URLs")}</h3>
-                
+
                 <p>${_("Use the {em_start}Embed URL{em_end} value to link to the file or image from a component, a course update, or a course handout.").format(em_start='<strong>', em_end="</strong>")}</p>
-                
+
                 <p>${_("Use the {em_start}External URL{em_end} value to reference the file or image only from outside of your course.").format(em_start='<strong>', em_end="</strong>")}</p>
                 <p>${_("Click in the Embed URL or External URL column to select the value, then copy it.")}</p>
             </div>

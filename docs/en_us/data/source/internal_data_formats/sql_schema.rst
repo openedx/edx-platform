@@ -605,7 +605,18 @@ user_id
 -----------
 course_id
 -----------
-  The ID of the course run that the user is enrolling in (for example, MITx/6.002x/2012_Fall). You can get this from the URL when you view the courseware on your browser.
+  The ID of the course run that the user is enrolling in, in the format
+  ``{key type}:{org}+{course}+{run}``. For example,
+  ``course-v1:edX+DemoX+Demo_2014``. When you view the course content in your
+  browser, the ``course_id`` appears as part of the URL. For example,
+  ``http://www.edx.org/courses/course-v1:edX+DemoX+Demo_2014/info``.
+
+  **History**: In October 2014, identifiers for some new courses began to use
+  the format shown above. Other new courses, and all courses created prior to
+  October 2014, use the format ``{org}/{course}/{run}``,  for example,
+  ``MITx/6.002x/2012_Fall``. The URL format for a course with a ``course_id``
+  in this format was
+  ``https://www.edx.org/courses/MITx/6.002x/2012_Fall/info``.
 
 ---------
 created
@@ -677,7 +688,13 @@ user_id
 -----------
 course_id
 -----------
-  The course identifier, in the format {org}/{course}/{run} (for example, ``MITx/6.002x/2012_Fall``). 
+  The course identifier, in the format ``{key type}:{org}+{course}+{run}``. For
+  example, ``course-v1:edX+DemoX+Demo_2014``.
+
+  **History**: In October 2014, identifiers for some new courses began to use
+  the format shown above. Other new courses, and all courses created prior to
+  October 2014, use the format ``{org}/{course}/{run}``,  for example,
+  ``MITx/6.002x/2012_Fall``.
 
 ----
 key
@@ -867,36 +884,56 @@ module_type
 -----------
 module_id
 -----------
-  Unique ID for a distinct piece of content in a course, these are recorded as URLs of the form i4x://{org}/{course_num}/{module_type}/{module_name}. Having URLs of this form allows us to give content a canonical representation even during a transition between backend data stores.
+  Unique ID for a distinct piece of content in a course. Each ``module_id`` is
+  recorded as a URL with the format ``{key type}:{org}+{course}+{run}@{module
+  type}+block@{module name or hash code}``. Having URLs of this form gives
+  content a canonical representation even during a transition between back-end
+  data stores.
 
-  As an example, this module_id:
+  As an example, this ``module_id``:
 
-    i4x://MITx/3.091x/problemset/Sample_Problems
+    ``block-v1:edX+DemoX+Demo_2014+type@problem+block@303034da25524878a2e66fb57c91cf85``
 
-  contains the following parts:
+  contains the following parts.
 
   .. list-table::
      :widths: 15 20 55
      :header-rows: 1
 
      * - Part
-       - Example
+       - Example Value
        - Definition
-     * - i4x://
-       -
-       - A convention selected based on plans for an i4x.org domain.
-     * - org
-       - MITx
-       - The organization part of the ID, indicating what organization created this piece of content.
-     * - course_num
-       - 3.091x
-       - The course number this content was created for. Note that there is no run information here, so you can't know what runs of the course this content is being used for from the ``module_id`` alone; you have to look at the ``courseware_studentmodule.course_id`` column.
-     * - module_type
-       - problemset
-       - The module type, same value as found in the ``courseware_studentmodule.module_type`` column.
-     * - module_name
-       - Sample_Problems
-       - The name given for this module by the content creators. If the module was not named, the system generates a name based on the type and a hash of its contents (for example, ``selfassessment_03c483062389``).
+     * - {key type}
+       - block-v1
+       - The type of namespace identifier, including the implementation
+         version.
+     * - {org}
+       - edX
+       - The organization part of the ID, indicating what organization created
+         this piece of content.
+     * - {course}
+       - DemoX
+       - The course that this content was created for. 
+     * - {run}
+       - Demo_2014
+       - The term or specific iteration of the course. 
+     * - type@{module type}
+       - type@problem
+       - The module type. The same value is stored in the
+         ``courseware_studentmodule.module_type`` column.
+     * - block@{module name or hash code}
+       - block@303034da25524878a2e66fb57c91cf85
+       - The name that the content creators supplied for this module. If the
+         module does not have a name, the system generates a hash code as its
+         identifier.
+
+**History**: In October 2014, identifiers for modules in some new courses began
+to use the format shown above. Other new courses, and all courses created prior
+to October 2014, use the format ``i4x://{org}/{course}/{module type}/{module
+name or hash code}``. For example,
+``i4x://MITx/3.091x/problemset/Sample_Problems``. Note that this format does
+not include course run information, so the
+``courseware_studentmodule.course_id`` column may need to be used as well.
 
 ------------
 student_id
@@ -974,7 +1011,17 @@ done
 -----------
 course_id
 -----------
-  The course that this row applies to, represented in the format {org}/{course}/{run} (for example, ``MITx/6.002x/2012_Fall``). The same course content (same ``module_id``) can be used in different courses, and a student's state needs to be tracked separately for each course.
+  The course that this row applies to, in the format ``{key
+  type}:{org}+{course}+{run}``. For example, ``course-v1:edX+DemoX+Demo_2014``.
+
+  Because the same course content (content with the same ``module_id``) can be
+  used in different courses, student state is tracked separately for each
+  course.
+
+  **History**: In October 2014, identifiers for some new courses began to use
+  the format shown above. Other new courses, and all courses created prior to
+  October 2014, use the format ``{org}/{course}/{run}``,  for example,
+  ``MITx/6.002x/2012_Fall``.
 
 .. _Certificates:
 

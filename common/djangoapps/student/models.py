@@ -776,7 +776,7 @@ class CourseEnrollment(models.Model):
             is_course_full = cls.num_enrolled_in(course.id) >= course.max_student_enrollments_allowed
         return is_course_full
 
-    def update_enrollment(self, mode=None, is_active=None):
+    def update_enrollment(self, mode=None, is_active=None, emit_unenrollment_event=True):
         """
         Updates an enrollment for a user in a class.  This includes options
         like changing the mode, toggling is_active True/False, etc.
@@ -784,6 +784,7 @@ class CourseEnrollment(models.Model):
         Also emits relevant events for analytics purposes.
 
         This saves immediately.
+
         """
         activation_changed = False
         # if is_active is None, then the call to update_enrollment didn't specify
@@ -813,7 +814,7 @@ class CourseEnrollment(models.Model):
                           u"mode:{}".format(self.mode)]
                 )
 
-            else:
+            elif emit_unenrollment_event:
                 UNENROLL_DONE.send(sender=None, course_enrollment=self)
 
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
@@ -987,7 +988,7 @@ class CourseEnrollment(models.Model):
             raise
 
     @classmethod
-    def unenroll(cls, user, course_id):
+    def unenroll(cls, user, course_id, emit_unenrollment_event=True):
         """
         Remove the user from a given course. If the relevant `CourseEnrollment`
         object doesn't exist, we log an error but don't throw an exception.
@@ -997,10 +998,12 @@ class CourseEnrollment(models.Model):
                adding an enrollment for it.
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+
+        `emit_unenrollment_events` can be set to False to suppress events firing.
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
-            record.update_enrollment(is_active=False)
+            record.update_enrollment(is_active=False, emit_unenrollment_event=emit_unenrollment_event)
 
         except cls.DoesNotExist:
             err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"

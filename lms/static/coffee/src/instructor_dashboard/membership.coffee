@@ -141,7 +141,7 @@ class AuthListWidget extends MemberListWidget
       url: @list_endpoint
       data: rolename: @rolename
       success: (data) => cb? null, data[@rolename]
-      error: std_ajax_err => 
+      error: std_ajax_err =>
         `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
         cb? gettext("Error fetching list for role") + " '#{@rolename}'"
 
@@ -174,6 +174,108 @@ class AuthListWidget extends MemberListWidget
     else
       @reload_list()
 
+class AutoEnrollmentViaCsv
+  constructor: (@$container) ->
+    # Wrapper for the AutoEnrollmentViaCsv subsection.
+    # This object handles buttons, success and failure reporting,
+    # and server communication.
+    @$student_enrollment_form = @$container.find("form#student-auto-enroll-form")
+    @$enrollment_signup_button = @$container.find("[name='enrollment_signup_button']")
+    @$students_list_file = @$container.find("input[name='students_list']")
+    @$csrf_token = @$container.find("input[name='csrfmiddlewaretoken']")
+    @$results = @$container.find("div.results")
+    @$browse_button = @$container.find("#browseBtn")
+    @$browse_file = @$container.find("#browseFile")
+
+    @processing = false
+
+    @$browse_button.on "change", (event) =>
+      if event.currentTarget.files.length == 1
+        @$browse_file.val(event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf("\\") + 1))
+
+    # attach click handler for @$enrollment_signup_button
+    @$enrollment_signup_button.click =>
+      @$student_enrollment_form.submit (event) =>
+        if @processing
+          return false
+
+        @processing = true
+
+        event.preventDefault()
+        data = new FormData(event.currentTarget)
+        $.ajax
+            dataType: 'json'
+            type: 'POST'
+            url: event.currentTarget.action
+            data: data
+            processData: false
+            contentType: false
+            success: (data) =>
+              @processing = false
+              @display_response data
+
+        return false
+
+  display_response: (data_from_server) ->
+    @$results.empty()
+    errors = []
+    warnings = []
+
+    result_from_server_is_success = true
+
+    if data_from_server.general_errors.length
+      result_from_server_is_success = false
+      for general_error in data_from_server.general_errors
+        general_error['is_general_error'] = true
+        errors.push general_error
+
+    if data_from_server.row_errors.length
+      result_from_server_is_success = false
+      for error in data_from_server.row_errors
+        error['is_general_error'] = false
+        errors.push error
+
+    if data_from_server.warnings.length
+      result_from_server_is_success = false
+      for warning in data_from_server.warnings
+        warning['is_general_error'] = false
+        warnings.push warning
+
+    render_response = (label, type, student_results) =>
+      if type is 'success'
+        task_res_section = $ '<div/>', class: 'message message-confirmation'
+        message_title = $ '<h3/>', class: 'message-title', text: label
+        task_res_section.append message_title
+        @$results.append task_res_section
+        return
+
+      if type is 'error'
+        task_res_section = $ '<div/>', class: 'message message-error'
+      if type is 'warning'
+        task_res_section = $ '<div/>', class: 'message message-warning'
+
+      message_title = $ '<h3/>', class: 'message-title', text: label
+      task_res_section. append message_title
+      messages_copy = $ '<div/>', class: 'message-copy'
+      task_res_section. append messages_copy
+      messages_summary = $ '<ul/>', class: 'list-summary summary-items'
+      messages_copy.append messages_summary
+
+      for student_result in student_results
+        if student_result.is_general_error
+          response_message =  student_result.response
+        else
+          response_message = student_result.username + '  ('+ student_result.email + '):  ' + '   (' + student_result.response + ')'
+        messages_summary.append $ '<li/>', class: 'summary-item', text: response_message
+
+      @$results.append task_res_section
+
+    if errors.length
+      render_response gettext("The following errors were generated:"), 'error', errors
+    if warnings.length
+      render_response gettext("The following warnings were generated:"), 'warning', warnings
+    if result_from_server_is_success
+      render_response gettext("All accounts were created successfully."), 'success', []
 
 class BetaTesterBulkAddition
   constructor: (@$container) ->
@@ -189,7 +291,7 @@ class BetaTesterBulkAddition
     @$btn_beta_testers.click (event) =>
       emailStudents = @$checkbox_emailstudents.is(':checked')
       autoEnroll = @$checkbox_autoenroll.is(':checked')
-      send_data = 
+      send_data =
         action: $(event.target).data('action')  # 'add' or 'remove'
         identifiers: @$identifier_input.val()
         email_students: emailStudents
@@ -580,7 +682,10 @@ class Membership
 
     # isolate # initialize BatchEnrollment subsection
     plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
-    
+
+    # isolate # initialize AutoEnrollmentViaCsv subsection
+    plantTimeout 0, => new AutoEnrollmentViaCsv @$section.find '.auto_enroll_csv'
+
     # initialize BetaTesterBulkAddition subsection
     plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
 

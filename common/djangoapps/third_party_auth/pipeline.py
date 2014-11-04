@@ -59,6 +59,8 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 
 import random
 import string  # pylint: disable-msg=deprecated-module
+from collections import OrderedDict
+import urllib
 import analytics
 from eventtracking import tracker
 
@@ -69,15 +71,40 @@ from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 
+import student
+from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=F0401
+from shoppingcart.exceptions import (  # pylint: disable=F0401
+    CourseDoesNotExistException,
+    ItemAlreadyInCartException,
+    AlreadyEnrolledInCourseException
+)
 from student.models import CourseEnrollment, CourseEnrollmentException
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from course_modes.models import CourseMode
+from opaque_keys.edx.keys import CourseKey
 
 from logging import getLogger
 
 from . import provider
 
 
+# These are the query string params you can pass
+# to the URL that starts the authentication process.
+#
+# `AUTH_ENTRY_KEY` is required and indicates how the user
+# enters the authentication process.
+#
+# `AUTH_REDIRECT_KEY` provides an optional URL to redirect
+# to upon successful authentication
+# (if not provided, defaults to `_SOCIAL_AUTH_LOGIN_REDIRECT_URL`)
+#
+# `AUTH_ENROLL_COURSE_ID_KEY` provides the course ID that a student
+# is trying to enroll in, used to generate analytics events
+# and auto-enroll students.
+
 AUTH_ENTRY_KEY = 'auth_entry'
+AUTH_REDIRECT_KEY = 'next'
+AUTH_ENROLL_COURSE_ID_KEY = 'enroll_course_id'
+
 AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_PROFILE = 'profile'
@@ -192,15 +219,25 @@ def _get_enabled_provider_by_name(provider_name):
     return enabled_provider
 
 
-def _get_url(view_name, backend_name, auth_entry=None):
+def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None, enroll_course_id=None):
     """Creates a URL to hook into social auth endpoints."""
     kwargs = {'backend': backend_name}
     url = reverse(view_name, kwargs=kwargs)
 
+    query_params = OrderedDict()
     if auth_entry:
-        url += '?%s=%s' % (AUTH_ENTRY_KEY, auth_entry)
+        query_params[AUTH_ENTRY_KEY] = auth_entry
 
-    return url
+    if redirect_url:
+        query_params[AUTH_REDIRECT_KEY] = redirect_url
+
+    if enroll_course_id:
+        query_params[AUTH_ENROLL_COURSE_ID_KEY] = enroll_course_id
+
+    return u"{url}?{params}".format(
+        url=url,
+        params=urllib.urlencode(query_params)
+    )
 
 
 def get_complete_url(backend_name):
@@ -241,7 +278,7 @@ def get_disconnect_url(provider_name):
     return _get_url('social:disconnect', enabled_provider.BACKEND_CLASS.name)
 
 
-def get_login_url(provider_name, auth_entry):
+def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id=None):
     """Gets the login URL for the endpoint that kicks off auth with a provider.
 
     Args:
@@ -251,6 +288,13 @@ def get_login_url(provider_name, auth_entry):
             for the auth pipeline. Used by the pipeline for later branching.
             Must be one of _AUTH_ENTRY_CHOICES.
 
+    Keyword Args:
+        redirect_url (string): If provided, redirect to this URL at the end
+            of the authentication process.
+
+        enroll_course_id (string): If provided, auto-enroll the user in this
+            course upon successful authentication.
+
     Returns:
         String. URL that starts the auth pipeline for a provider.
 
@@ -259,7 +303,13 @@ def get_login_url(provider_name, auth_entry):
     """
     assert auth_entry in _AUTH_ENTRY_CHOICES
     enabled_provider = _get_enabled_provider_by_name(provider_name)
-    return _get_url('social:begin', enabled_provider.BACKEND_CLASS.name, auth_entry=auth_entry)
+    return _get_url(
+        'social:begin',
+        enabled_provider.BACKEND_CLASS.name,
+        auth_entry=auth_entry,
+        redirect_url=redirect_url,
+        enroll_course_id=enroll_course_id
+    )
 
 
 def get_duplicate_provider(messages):
@@ -423,8 +473,54 @@ def redirect_to_supplementary_form(
     if is_register_2 and user_unset:
         return redirect(reverse(AUTH_ENTRY_REGISTER_2))
 
+
 @partial.partial
-def login_analytics(*args, **kwargs):
+def set_logged_in_cookie(backend=None, user=None, request=None, *args, **kwargs):
+    """This pipeline step sets the "logged in" cookie for authenticated users.
+
+    Some installations have a marketing site front-end separate from
+    edx-platform.  Those installations sometimes display different
+    information for logged in versus anonymous users (e.g. a link
+    to the student dashboard instead of the login page.)
+
+    Since social auth uses Django's native `login()` method, it bypasses
+    our usual login view that sets this cookie.  For this reason, we need
+    to set the cookie ourselves within the pipeline.
+
+    The procedure for doing this is a little strange.  On the one hand,
+    we need to send a response to the user in order to set the cookie.
+    On the other hand, we don't want to drop the user out of the pipeline.
+
+    For this reason, we send a redirect back to the "complete" URL,
+    so users immediately re-enter the pipeline.  The redirect response
+    contains a header that sets the logged in cookie.
+
+    If the user is not logged in, or the logged in cookie is already set,
+    the function returns `None`, indicating that control should pass
+    to the next pipeline step.
+
+    """
+    if user is not None and user.is_authenticated():
+        if request is not None:
+            # Check that the cookie isn't already set.
+            # This ensures that we allow the user to continue to the next
+            # pipeline step once he/she has the cookie set by this step.
+            has_cookie = student.helpers.is_logged_in_cookie_set(request)
+            if not has_cookie:
+                try:
+                    redirect_url = get_complete_url(backend.name)
+                except ValueError:
+                    # If for some reason we can't get the URL, just skip this step
+                    # This may be overly paranoid, but it's far more important that
+                    # the user log in successfully than that the cookie is set.
+                    pass
+                else:
+                    response = redirect(redirect_url)
+                    return student.helpers.set_logged_in_cookie(request, response)
+
+
+@partial.partial
+def login_analytics(strategy, *args, **kwargs):
     """ Sends login info to Segment.io """
     event_name = None
 
@@ -447,14 +543,13 @@ def login_analytics(*args, **kwargs):
             event_name = action_to_event_name[action]
 
     if event_name is not None:
-        registration_course_id = kwargs['request'].session.get('registration_course_id')
         tracking_context = tracker.get_tracker().resolve_context()
         analytics.track(
             kwargs['user'].id,
             event_name,
             {
                 'category': "conversion",
-                'label': registration_course_id,
+                'label': strategy.session_get('enroll_course_id'),
                 'provider': getattr(kwargs['backend'], 'name')
             },
             context={
@@ -464,21 +559,54 @@ def login_analytics(*args, **kwargs):
             }
         )
 
-#@partial.partial
-def change_enrollment(*args, **kwargs):
+
+@partial.partial
+def change_enrollment(strategy, user=None, *args, **kwargs):
+    """Enroll a user in a course.
+
+    If a user entered the authentication flow when trying to enroll
+    in a course, then attempt to enroll the user.
+    We will try to do this if the pipeline was started with the
+    querystring param `enroll_course_id`.
+
+    In the following cases, we can't enroll the user:
+        * The course does not have an honor mode.
+        * The course has an honor mode with a minimum price.
+        * The course is not yet open for enrollment.
+        * The course does not exist.
+
+    If we can't enroll the user now, then skip this step.
+    For paid courses, users will be redirected to the payment flow
+    upon completion of the authentication pipeline
+    (configured using the ?next parameter to the third party auth login url).
+
     """
-    If the user accessed the third party auth flow after trying to register for
-    a course, we automatically log them into that course.
-    """
-    if kwargs['strategy'].session_get('registration_course_id'):
-        try:
-            CourseEnrollment.enroll(
-                kwargs['user'],
-                SlashSeparatedCourseKey.from_deprecated_string(
-                    kwargs['strategy'].session_get('registration_course_id')
-                )
-            )
-        except CourseEnrollmentException:
-            pass
-        except Exception, e:
-            logger.exception(e)
+    enroll_course_id = strategy.session_get('enroll_course_id')
+    if enroll_course_id:
+        course_id = CourseKey.from_string(enroll_course_id)
+        modes = CourseMode.modes_for_course_dict(course_id)
+        if CourseMode.can_auto_enroll(course_id, modes_dict=modes):
+            try:
+                CourseEnrollment.enroll(user, course_id, check_access=True)
+            except CourseEnrollmentException:
+                pass
+            except Exception as ex:
+                logger.exception(ex)
+
+        # Handle white-label courses as a special case
+        # If a course is white-label, we should add it to the shopping cart.
+        elif CourseMode.is_white_label(course_id, modes_dict=modes):
+            try:
+                cart = Order.get_cart_for_user(user)
+                PaidCourseRegistration.add_to_order(cart, course_id)
+            except (
+                CourseDoesNotExistException,
+                ItemAlreadyInCartException,
+                AlreadyEnrolledInCourseException
+            ):
+                pass
+            # It's more important to complete login than to
+            # ensure that the course was added to the shopping cart.
+            # Log errors, but don't stop the authentication pipeline.
+            except Exception as ex:
+                logger.exception(ex)

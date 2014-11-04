@@ -25,7 +25,7 @@ General Exercises and Tools
           :width: 100
           :alt: Example annotation problem
      - :ref:`Annotation`
-     - Annotation problems ask students to respond to questions about a specific block of text. The question appears above the text when the student hovers the mouse over the highlighted text so that students can think about the question as they read.
+     - Annotation problems ask students to respond to questions about a specific block of text. The question appears above the text when the student hovers the mouse over the highlighted text so that students can think about the question as they read. Note that this problem type is not fully supported.
    * - .. image:: /Images/PollExample.png
           :width: 100
           :alt: Example poll

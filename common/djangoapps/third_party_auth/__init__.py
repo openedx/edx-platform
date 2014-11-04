@@ -6,7 +6,7 @@ from microsite_configuration import microsite
 def is_enabled():
     """Check whether third party authentication has been enabled. """
 
-    # We do this imports internally to avoid initializing settings prematurely
+    # We do this import internally to avoid initializing settings prematurely
     from django.conf import settings
 
     return microsite.get_value(

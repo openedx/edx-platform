@@ -20,6 +20,8 @@ from user_api.api import account as account_api
 from user_api.api import profile as profile_api
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
+from student_account.helpers import auth_pipeline_urls
+
 
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -280,17 +282,23 @@ def _third_party_auth_context(request):
         "providers": []
     }
 
+    course_id = request.GET.get("course_id")
+    login_urls = auth_pipeline_urls(
+        third_party_auth.pipeline.AUTH_ENTRY_LOGIN_2,
+        course_id=course_id
+    )
+    register_urls = auth_pipeline_urls(
+        third_party_auth.pipeline.AUTH_ENTRY_REGISTER_2,
+        course_id=course_id
+    )
+
     if third_party_auth.is_enabled():
         context["providers"] = [
             {
                 "name": enabled.NAME,
                 "iconClass": enabled.ICON_CLASS,
-                "loginUrl": third_party_auth.pipeline.get_login_url(
-                   enabled.NAME, third_party_auth.pipeline.AUTH_ENTRY_LOGIN_2
-                ),
-                "registerUrl": third_party_auth.pipeline.get_login_url(
-                    enabled.NAME, third_party_auth.pipeline.AUTH_ENTRY_REGISTER_2
-                )
+                "loginUrl": login_urls[enabled.NAME],
+                "registerUrl": register_urls[enabled.NAME]
             }
             for enabled in third_party_auth.provider.Registry.enabled()
         ]
