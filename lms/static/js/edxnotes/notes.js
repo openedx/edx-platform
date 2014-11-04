@@ -15,29 +15,39 @@
         };
 
         /**
+         * Returns course id for the component.
+         * @param {jQuery Element} The container element.
+         * @return {String} Course id.
+         **/
+        getCourseId = function (element) {
+            return element.closest('[data-course-id]').data('course-id');
+        };
+
+        /**
          * Returns options for the annotator.
          * @param {jQuery Element} The container element.
          * @param {String} params.prefix The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
+         * @param {String} params.username Username of annotation owner.
          * @param {String} params.usageId Usage Id of the component.
          * @param {String} params.courseId Course id.
          * @return {Object} Options.
          **/
         getOptions = function (element, params) {
-            var usageId = params.usageId || getUsageId(element);
+            var usageId = params.usageId || getUsageId(element),
+                courseId = params.courseId || getCourseId(element),
+                defaultParams = {
+                    user: params.user,
+                    usage_id: usageId,
+                    username: params.username,
+                    course_id: courseId
+                };
+
             return {
                 store: {
                     prefix: params.prefix,
-                    annotationData: {
-                        user: params.user,
-                        usage_id: usageId,
-                        course_id: params.courseId
-                    },
-                    loadFromSearch: {
-                        user: params.user,
-                        usage_id: usageId,
-                        course_id: params.courseId
-                    }
+                    annotationData: defaultParams,
+                    loadFromSearch: defaultParams
                 }
             };
         };

@@ -873,6 +873,14 @@ MOCK_PEER_GRADING = False
 # Used for testing, debugging staff grading
 MOCK_STAFF_GRADING = False
 
+
+################################# EdxNotes config  #########################
+
+# Configure the LMS to use our stub EdxNotes implementation
+EDXNOTES_INTERFACE = {
+    'url': 'http://localhost:8042/',
+}
+
 ################################# Jasmine ##################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 

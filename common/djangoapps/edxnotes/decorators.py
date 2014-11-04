@@ -1,9 +1,10 @@
 """
 Decorators related to edXNotes.
 """
-from edxnotes.api import (
+from edxnotes.helpers import (
     get_prefix,
     get_user_id,
+    get_username,
     generate_uid,
     get_usage_id,
     get_course_id,
@@ -32,6 +33,7 @@ def edxnotes(cls):
                     'courseId': get_course_id(),
                     'prefix': get_prefix(),
                     'user': get_user_id(),
+                    'username': get_username(),
                     'debug': settings.DEBUG,
                 },
             })

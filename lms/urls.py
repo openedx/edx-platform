@@ -363,9 +363,6 @@ if settings.COURSEWARE_ENABLED:
         # LTI endpoints listing
         url(r'^courses/{}/lti_rest_endpoints/'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.get_course_lti_endpoints', name='lti_rest_endpoints'),
-
-        # EdX Notes
-        url(r'^edxnotes/api/', include('edxnotes.urls'), name='edxnotes_url'),
     )
 
     # allow course staff to change to student view of courseware
