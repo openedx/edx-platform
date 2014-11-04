@@ -109,10 +109,10 @@ class TestProfEdVerification(ModuleStoreTestCase):
         # automatically in the course.
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
 
-        # Expect that the rendered page says that the student is "registering",
-        # not that they've already been registered.
-        self.assertIn("You are registering for", resp.content)
-        self.assertNotIn("You are now registered", resp.content)
+        # Expect that the rendered page says that the student is "enrolled",
+        # not that they've already been enrolled.
+        self.assertIn("You are enrolling", resp.content)
+        self.assertNotIn("You are now enrolled", resp.content)
 
     def _prices_on_page(self, page_content):
         """ Retrieve the available prices on the verify page. """
