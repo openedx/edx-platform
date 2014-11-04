@@ -2,6 +2,7 @@
 Django database models supporting the progress app
 """
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Sum, Q
@@ -114,3 +115,25 @@ class StudentProgressHistory(TimeStampedModel):
     user = models.ForeignKey(User, db_index=True)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
     completions = models.IntegerField()
+
+
+class CourseModuleCompletion(TimeStampedModel):
+    """
+    The CourseModuleCompletion model contains user, course, module information
+    to monitor a user's progression throughout the duration of a course,
+    we need to observe and record completions of the individual course modules.
+    """
+    user = models.ForeignKey(User, db_index=True, related_name="course_completions")
+    course_id = models.CharField(max_length=255, db_index=True)
+    content_id = models.CharField(max_length=255, db_index=True)
+    stage = models.CharField(max_length=255, null=True, blank=True)
+
+    @classmethod
+    def get_actual_completions(cls):
+        """
+        This would skip those modules with ignorable categories
+        """
+        detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
+        cat_list = [Q(content_id__contains=item.strip()) for item in detached_categories]
+        cat_list = reduce(lambda a, b: a | b, cat_list)
+        return cls.objects.all().exclude(cat_list)
