@@ -286,7 +286,10 @@ FEATURES = {
     'ALLOW_AUTOMATED_SIGNUPS': False,
 
     # Display demographic data on the analytics tab in the instructor dashboard.
-    'DISPLAY_ANALYTICS_DEMOGRAPHICS': True
+    'DISPLAY_ANALYTICS_DEMOGRAPHICS': True,
+
+    # Enable display of enrollment counts in instructor and legacy analytics dashboard
+    'DISPLAY_ANALYTICS_ENROLLMENTS': True,
 }
 
 # Ignore static asset files on import which match this pattern

@@ -609,22 +609,6 @@ function goto( mode)
     <p>${_("No Analytics are available at this time.")}</p>
   %endif
 
-  %if analytics_results.get("StudentsEnrolled"):
-    <p>
-      ${_("Students enrolled (historical count, includes those who have since unenrolled):")}
-      ${analytics_results["StudentsEnrolled"]['data'][0]['students']}
-      (${analytics_results["StudentsEnrolled"]['time']})
-    </p>
-  %endif
-
-  %if analytics_results.get("StudentsActive"):
-    <p>
-      ${_("Students active in the last week:")}
-      ${analytics_results["StudentsActive"]['data'][0]['active']}
-      (${analytics_results["StudentsActive"]['time']})
-    </p>
-  %endif
-
   %if analytics_results.get("StudentsDropoffPerDay"):
     <p>
       ${_("Student activity day by day")}
