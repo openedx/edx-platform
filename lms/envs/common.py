@@ -293,6 +293,8 @@ FEATURES = {
 
     # Enable display of enrollment counts in instructor and legacy analytics dashboard
     'DISPLAY_ANALYTICS_ENROLLMENTS': True,
+
+    'ENABLE_EDXNOTES': False
 }
 
 # Ignore static asset files on import which match this pattern
