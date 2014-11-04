@@ -59,6 +59,7 @@ OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
 EDXNOTES_INTERFACE = {
     'url': 'http://localhost:8042/',
 }
+FEATURES['ENABLE_EDXNOTES'] = True
 
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
