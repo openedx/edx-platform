@@ -8,8 +8,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db.models import Q
 
-from progress.models import StudentProgress
-from api_manager.models import CourseModuleCompletion
+from progress.models import StudentProgress, CourseModuleCompletion
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
