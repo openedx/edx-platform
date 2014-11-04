@@ -2,6 +2,7 @@
 Module rendering
 """
 
+from __future__ import absolute_import
 import hashlib
 import json
 import logging
@@ -70,7 +71,7 @@ from xmodule.lti_module import LTIModule
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mixin import wrap_with_license
-from api_manager.models import CourseModuleCompletion
+from progress.models import CourseModuleCompletion
 
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip

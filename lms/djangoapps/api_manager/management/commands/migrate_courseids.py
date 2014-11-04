@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from django.test import RequestFactory
 
 from api_manager import models as api_models
+from progress.models import CourseModuleCompletion
 from api_manager.courseware_access import get_course, get_course_child
 from opaque_keys import InvalidKeyError
 
@@ -46,7 +47,7 @@ class Command(BaseCommand):
                 pass  # If the key conversion fails it was either a new-style key or junk data
             ccg.save()
 
-        course_module_completions = api_models.CourseModuleCompletion.objects.all()
+        course_module_completions = CourseModuleCompletion.objects.all()
         for cmc in course_module_completions:
             course_id = cmc.course_id
             course_descriptor, course_key, course_content = get_course(request, request.user, course_id)

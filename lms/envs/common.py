@@ -433,8 +433,11 @@ FEATURES = {
     # addition to setting the flag to True here.  A reference is available in aws.py
     'STUDENT_PROGRESS': False,
 
+    # Enable the projects,
+    'PROJECTS_APP': False,
+
     # Enable the Organizations,
-    'ORGANIZATIONS_APP': False,
+    'ORGANIZATIONS_APP': False
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1946,7 +1949,6 @@ INSTALLED_APPS = (
     
     # EDX API application
     'api_manager',
-    'projects',
 )
 
 ######################### CSRF #########################################
