@@ -1,3 +1,5 @@
+import os
+from unittest import skipUnless
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -7,6 +9,7 @@ from ...pages.lms.edxnotes import EdxNotesUnitPage
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
 
 
+@skipUnless(os.environ.get('FEATURE_EDXNOTES'), 'Tests EdxNotes feature')
 class EdxNotesTest(UniqueCourseTest):
     """
     Tests for annotation inside HTML components in LMS.
