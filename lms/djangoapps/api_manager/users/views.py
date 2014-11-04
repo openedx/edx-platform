@@ -41,8 +41,8 @@ from util.password_policy_validators import (
     validate_password_dictionary
 )
 
-from api_manager.courses.serializers import CourseModuleCompletionSerializer
-from api_manager.courseware_access import get_course, get_course_child, get_course_key, course_exists, calculate_proforma_grade
+from progress.serializers import CourseModuleCompletionSerializer
+from api_manager.courseware_access import get_course, get_course_child, get_course_key, course_exists
 from api_manager.permissions import SecureAPIView, SecureListAPIView, IdsInFilterBackend, HasOrgsFilterBackend
 from api_manager.models import GroupProfile, APIUser as User
 from organizations.serializers import OrganizationSerializer

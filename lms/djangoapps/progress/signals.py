@@ -8,8 +8,7 @@ from django.db.models.signals import post_save
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
-from progress.models import StudentProgress, StudentProgressHistory
-from api_manager.models import CourseModuleCompletion
+from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
 log = logging.getLogger(__name__)
 
 
