@@ -2,8 +2,6 @@
 # pylint: disable=W0621
 
 from lettuce import world, step
-from terrain.steps import reload_the_page
-from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, upload_file
 from django.conf import settings
 
@@ -25,7 +23,6 @@ DUMMY_TIME = "15:30"
 DEFAULT_TIME = "00:00"
 
 
-############### ACTIONS ####################
 @step('I select Schedule and Details$')
 def test_i_select_schedule_and_details(step):
     world.click_course_settings()
@@ -49,7 +46,6 @@ def test_and_i_set_course_dates(step):
     set_date_or_time(COURSE_END_DATE_CSS, '12/26/2013')
     set_date_or_time(ENROLLMENT_START_DATE_CSS, '12/1/2013')
     set_date_or_time(ENROLLMENT_END_DATE_CSS, '12/10/2013')
-
     set_date_or_time(COURSE_START_TIME_CSS, DUMMY_TIME)
     set_date_or_time(ENROLLMENT_END_TIME_CSS, DUMMY_TIME)
 
@@ -164,24 +160,34 @@ def image_url_present(_step):
     assert world.css_value(field_css).endswith(expected_value)
 
 
-############### HELPER METHODS ####################
 def set_date_or_time(css, date_or_time):
     """
     Sets date or time field.
     """
-    world.css_fill(css, date_or_time)
-    e = world.css_find(css).first
-    # hit Enter to apply the changes
-    e._element.send_keys(Keys.ENTER)
+    world.wait_for_visible(css)
+    # Note that in studio date fields need a change event, and time fields
+    # need an input or changeTime event. See views/settings/main.js
+    script = """
+    window.$("{css}").focus();
+    window.$("{css}").val("{date_or_time}");
+    window.$("{css}").change();
+    window.$("{css}").trigger("input");""".format(
+        css=css,
+        date_or_time=date_or_time
+    )
+    world.browser.driver.execute_script(script)
+    world.wait_for(lambda _: world.css_has_value(css, date_or_time))
 
 
 def verify_date_or_time(css, date_or_time):
     """
     Verifies date or time field.
     """
-    # We need to wait for JavaScript to fill in the field, so we use
-    # css_has_value(), which first checks that the field is not blank
-    assert_true(world.css_has_value(css, date_or_time))
+    # If we're expecting a non-empty string, give the page
+    # a chance to fill in values
+    if date_or_time:
+        world.wait_for(lambda _: world.css_value(css))
+    assert_equal(world.css_value(css), date_or_time)
 
 
 @step('I do not see the changes')
