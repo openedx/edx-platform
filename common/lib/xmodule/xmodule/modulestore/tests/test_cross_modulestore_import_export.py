@@ -17,6 +17,7 @@ import random
 from contextlib import contextmanager, nested
 from shutil import rmtree
 from tempfile import mkdtemp
+from path import path
 
 from xmodule.tests import CourseComparisonTest
 
@@ -30,13 +31,14 @@ from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleSto
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.xml import XMLModuleStore
 
 
 COMMON_DOCSTORE_CONFIG = {
     'host': MONGO_HOST,
     'port': MONGO_PORT_NUM,
 }
-
+DATA_DIR = path(__file__).dirname().parent.parent.parent.parent.parent / "test" / "data"
 
 XBLOCK_MIXINS = (InheritanceMixin, XModuleMixin)
 
@@ -161,6 +163,30 @@ class VersioningModulestoreBuilder(object):
 
     def __repr__(self):
         return 'SplitModulestoreBuilder()'
+
+
+class XmlModulestoreBuilder(object):
+    """
+    A builder class for a XMLModuleStore.
+    """
+    # pylint: disable=unused-argument
+    @contextmanager
+    def build(self, contentstore=None, course_ids=None):
+        """
+        A contextmanager that returns an isolated xml modulestore
+
+        Args:
+            contentstore: The contentstore that this modulestore should use to store
+                all of its assets.
+        """
+        modulestore = XMLModuleStore(
+            DATA_DIR,
+            course_ids=course_ids,
+            default_class='xmodule.hidden_module.HiddenDescriptor',
+            xblock_mixins=XBLOCK_MIXINS,
+        )
+
+        yield modulestore
 
 
 class MixedModulestoreBuilder(object):
