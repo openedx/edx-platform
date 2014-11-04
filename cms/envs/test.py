@@ -224,3 +224,7 @@ FEATURES['USE_MICROSITES'] = True
 # For consistency in user-experience, keep the value of this setting in sync with
 # the one in lms/envs/test.py
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+
+EDXNOTES_INTERFACE = {
+    'url': 'http://localhost:8042/',
+}
