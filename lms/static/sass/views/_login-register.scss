@@ -130,6 +130,7 @@
     .form-field {
         @include clearfix;
         clear: both;
+        position: relative;
         width: 100%;
         margin: 0 0 $baseline 0;
 
@@ -166,7 +167,6 @@
 
         .field-link {
             position: relative;
-            float: right;
             color: $link-color-d1;
             font-weight: $font-regular;
             text-decoration: none !important; // needed but nasty
@@ -371,6 +371,12 @@
                 @extend %inline-form-field-tablet;
                 width: calc( 50% - 10px );
             }
+
+            .field-link {
+                position: absolute;
+                top: 0;
+                right: 0;
+            }
         }
     }
 
@@ -411,6 +417,12 @@
             &.select-year_of_birth {
                 @extend %inline-form-field-desktop;
                 width: 100px;
+            }
+
+            .field-link {
+                position: absolute;
+                top: 0;
+                right: 0;
             }
         }
 

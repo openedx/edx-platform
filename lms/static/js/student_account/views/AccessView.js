@@ -29,7 +29,7 @@ var edx = edx || {};
              * (all but include, contains, and reverse) into the
              * Underscore namespace
              */
-            _.mixin(_.str.exports())
+            _.mixin( _.str.exports() );
 
             this.tpl = $(this.tpl).html();
             this.activeForm = obj.mode || 'login';
@@ -132,7 +132,8 @@ var edx = edx || {};
 
         toggleForm: function( e ) {
             var type = $(e.currentTarget).val(),
-                $form = $('#' + type + '-form');
+                $form = $('#' + type + '-form'),
+                $anchor = $('#' + type + '-anchor');
 
             if ( !this.form.isLoaded( $form ) ) {
                 this.loadForm( type );
@@ -140,6 +141,11 @@ var edx = edx || {};
 
             this.element.hide( $(this.el).find('.form-wrapper') );
             this.element.show( $form );
+
+            // Scroll to top of selected form
+            $('html,body').animate({
+                scrollTop: $anchor.offset().top
+            },'slow');
         },
 
         form: {

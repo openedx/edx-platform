@@ -28,8 +28,9 @@ var edx = edx || {};
             var fields = html || '';
 
             $(this.el).html( _.template( this.tpl, {
-                // We pass the context object to the template so that
-                // we can perform variable interpolation using sprintf
+                /* We pass the context object to the template so that
+                 * we can perform variable interpolation using sprintf
+                 */
                 context: {
                     fields: fields,
                     currentProvider: this.currentProvider,
@@ -46,11 +47,8 @@ var edx = edx || {};
         thirdPartyAuth: function( event ) {
             var providerUrl = $(event.target).data('provider-url') || '';
 
-            if (providerUrl) {
+            if ( providerUrl ) {
                 window.location.href = providerUrl;
-            } else {
-                // TODO -- error handling here
-                console.log('No URL available for third party auth provider');
             }
         }
     });
