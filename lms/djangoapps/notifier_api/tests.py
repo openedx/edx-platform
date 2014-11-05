@@ -5,7 +5,7 @@ from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from django_comment_common.models import Role, Permission
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY

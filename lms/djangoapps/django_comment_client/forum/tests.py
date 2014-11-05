@@ -6,11 +6,7 @@ from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from edxmako.tests import mako_middleware_process_request
-from mock import patch, Mock, ANY, call
-from nose.tools import assert_true  # pylint: disable=no-name-in-module
 
-from course_groups.models import CourseUserGroup
-from courseware.courses import UserNotEnrolled
 from django_comment_client.forum import views
 from django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
@@ -24,6 +20,15 @@ from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from courseware.tests.modulestore_config import TEST_DATA_DIR
+from courseware.courses import UserNotEnrolled
+from nose.tools import assert_true  # pylint: disable=E0611
+from mock import patch, Mock, ANY, call
+
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+
+TEST_DATA_MONGO_MODULESTORE = mixed_store_config(TEST_DATA_DIR, {}, include_xml=False)
 
 log = logging.getLogger(__name__)
 

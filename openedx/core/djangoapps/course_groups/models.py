@@ -35,3 +35,17 @@ class CourseUserGroup(models.Model):
     COHORT = 'cohort'
     GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
+
+
+class CourseUserGroupPartitionGroup(models.Model):
+    """
+    """
+    course_user_group = models.OneToOneField(CourseUserGroup)
+    partition_id = models.IntegerField(
+        help_text="contains the id of a cohorted partition in this course"
+    )
+    group_id = models.IntegerField(
+        help_text="contains the id of a specific group within the cohorted partition"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

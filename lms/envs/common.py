@@ -1438,7 +1438,7 @@ INSTALLED_APPS = (
     'open_ended_grading',
     'psychometrics',
     'licenses',
-    'course_groups',
+    'openedx.core.djangoapps.course_groups',
     'bulk_email',
 
     # External auth (OpenID, shib)
