@@ -202,6 +202,69 @@ class AccessTestCase(TestCase):
         """Ensure has_access handles a user being passed as null"""
         access.has_access(None, 'staff', 'global', None)
 
+    def test_see_in_catalog(self):
+        """
+        Tests the 'see_in_catalog' permission check
+        """
+        user = UserFactory.create()
+        course_id = SlashSeparatedCourseKey('edX', 'test', '2012_Fall')
+        staff = StaffFactory.create(course_key=course_id)
+
+        # default case for new field on course module
+        # should be visible
+        course = Mock(
+            id=course_id
+        )
+        self.assertTrue(access._has_access_course_desc(user, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+
+        course = Mock(
+            id=course_id,
+            visible_in_catalog=True
+        )
+        self.assertTrue(access._has_access_course_desc(user, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+
+        # Now set visibility to False
+        course = Mock(
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'),
+            visible_in_catalog=False
+        )
+        self.assertFalse(access._has_access_course_desc(user, 'see_in_catalog', course))
+        # course staff should still be able to see
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+
+    def test_see_about_page(self):
+        """
+        Tests the 'see_about_page' permission check
+        """
+        user = UserFactory.create()
+        course_id = SlashSeparatedCourseKey('edX', 'test', '2012_Fall')
+        staff = StaffFactory.create(course_key=course_id)
+
+        # default case for new field on course module
+        # should be visible
+        course = Mock(
+            id=course_id
+        )
+        self.assertTrue(access._has_access_course_desc(user, 'see_about_page', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
+
+        course = Mock(
+            id=course_id,
+            visible_about_page=True
+        )
+        self.assertTrue(access._has_access_course_desc(user, 'see_about_page', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
+
+        # Now set visibility to False
+        course = Mock(
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'),
+            visible_about_page=False
+        )
+        self.assertFalse(access._has_access_course_desc(user, 'see_about_page', course))
+        # course staff should still be able to see
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
 
 class UserRoleTestCase(TestCase):
     """

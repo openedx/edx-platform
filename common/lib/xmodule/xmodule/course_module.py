@@ -582,6 +582,13 @@ class CourseFields(object):
         scope=Scope.settings,
     )
 
+    visible_about_page = Boolean(
+        display_name=_("Course Has An Accessible About Page"),
+        help=_("If this value is set to true, then a non-staff user will be able to visit the Course About page."),
+        default=True,
+        scope=Scope.settings,
+    )
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
 

@@ -703,8 +703,8 @@ def course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     permission_name = microsite.get_value(
-        'COURSE_CATALOG_VISIBILITY_PERMISSION',
-        settings.COURSE_CATALOG_VISIBILITY_PERMISSION
+        'COURSE_ABOUT_VISIBILITY_PERMISSION',
+        settings.COURSE_ABOUT_VISIBILITY_PERMISSION
     )
     course = get_course_with_access(request.user, permission_name, course_key)
 
@@ -715,6 +715,7 @@ def course_about(request, course_id):
         return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
     registered = registered_for_course(course, request.user)
+
     staff_access = has_access(request.user, 'staff', course)
     studio_url = get_studio_url(course, 'settings/details')
 
@@ -788,8 +789,8 @@ def mktg_course_about(request, course_id):
 
     try:
         permission_name = microsite.get_value(
-            'COURSE_CATALOG_VISIBILITY_PERMISSION',
-            settings.COURSE_CATALOG_VISIBILITY_PERMISSION
+            'COURSE_ABOUT_VISIBILITY_PERMISSION',
+            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
         )
         course = get_course_with_access(request.user, permission_name, course_key)
     except (ValueError, Http404):
