@@ -19,8 +19,9 @@
 
 <% _.each( context.providers, function( provider ) {
     if ( provider.loginUrl ) { %>
-        <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.loginUrl %>">
-            <span class="icon <%- provider.iconClass %>"></span><%- _.sprintf(gettext("Log in using %(name)s"), provider) %>
+        <button type="submit" class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.loginUrl %>">
+            <span class="icon <%- provider.iconClass %>" aria-hidden="true"></span>
+            <%- _.sprintf(gettext("Log in using %(name)s"), provider) %>
         </button>
     <% }
 }); %>
