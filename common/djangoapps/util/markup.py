@@ -3,6 +3,7 @@ Utilities for use in Mako markup.
 """
 
 from django.utils.translation import ugettext as django_ugettext
+from django.utils.translation import ungettext as django_ungettext
 import markupsafe
 
 
@@ -24,6 +25,11 @@ def ugettext(text):
 
     """
     return markupsafe.escape(django_ugettext(text))
+
+
+def ungettext(text1, text2, num):
+    """Translate a number-sensitive string, and escape it as plain text."""
+    return markupsafe.escape(django_ungettext(text1, text2, num))
 
 
 def HTML(html):                                 # pylint: disable=invalid-name

@@ -8,7 +8,7 @@ import unittest
 import ddt
 
 from edxmako.template import Template
-from util.markup import HTML, ugettext as _
+from util.markup import HTML, ugettext as _, ungettext
 
 
 @ddt.ddt
@@ -60,3 +60,8 @@ class FormatHtmlTest(unittest.TestCase):
         )
         out = template.render({})
         self.assertEqual(out.strip(), u"A &amp; B & C")
+
+    def test_ungettext(self):
+        for i in [1, 2]:
+            out = ungettext("1 & {}", "2 & {}", i).format(HTML("<>"))
+            self.assertEqual(out, "{} &amp; <>".format(i))
