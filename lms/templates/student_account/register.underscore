@@ -8,8 +8,9 @@
 <% } else {
     _.each( context.providers, function( provider) {
         if ( provider.registerUrl ) { %>
-            <button type="submit"class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.registerUrl %>">
-                <span class="icon <%- provider.iconClass %>"></span><%- _.sprintf(gettext("Register using %(name)s"), provider) %>
+            <button type="submit" class="button button-primary button-<%- provider.name %> login-provider" data-provider-url="<%- provider.registerUrl %>">
+                <span class="icon <%- provider.iconClass %>" aria-hidden="true"></span>
+                <%- _.sprintf(gettext("Register using %(name)s"), provider) %>
             </button>
     <%  }
     });
