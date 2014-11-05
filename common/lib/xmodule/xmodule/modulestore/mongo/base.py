@@ -25,6 +25,8 @@ from path import path
 from datetime import datetime
 from pytz import UTC
 from contracts import contract, new_contract
+from operator import itemgetter
+from sortedcontainers import SortedListWithKey
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -1493,7 +1495,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         course_assets, asset_idx = self._find_course_asset(course_key, asset_metadata.asset_id.path, thumbnail)
         info = 'thumbnails' if thumbnail else 'assets'
-        all_assets = course_assets[info]
+        all_assets = SortedListWithKey([], key=itemgetter('filename'))
+        # Assets should be pre-sorted, so add them efficiently without sorting.
+        # extend() will raise a ValueError if the passed-in list is not sorted.
+        all_assets.extend(course_assets[info])
 
         # Set the edited information for assets only - not thumbnails.
         if not thumbnail:
@@ -1502,16 +1507,37 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Translate metadata to Mongo format.
         metadata_to_insert = asset_metadata.to_mongo()
         if asset_idx is None:
-            # Append new metadata.
-            # Future optimization: Insert in order & binary search to retrieve.
-            all_assets.append(metadata_to_insert)
+            # Add new metadata sorted into the list.
+            all_assets.add(metadata_to_insert)
         else:
             # Replace existing metadata.
             all_assets[asset_idx] = metadata_to_insert
 
         # Update the document.
-        self.asset_collection.update({'_id': course_assets['_id']}, {'$set': {info: all_assets}})
+        self.asset_collection.update({'_id': course_assets['_id']}, {'$set': {info: all_assets.as_list()}})
         return True
+
+    @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
+    def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
+        """
+        Copy all the course assets from source_course_key to dest_course_key.
+
+        Arguments:
+            source_course_key (CourseKey): identifier of course to copy from
+            dest_course_key (CourseKey): identifier of course to copy to
+        """
+        source_assets = self._find_course_assets(source_course_key)
+        dest_assets = self._find_course_assets(dest_course_key)
+        dest_assets['assets'] = source_assets.get('assets', [])
+        dest_assets['thumbnails'] = source_assets.get('thumbnails', [])
+
+        # Update the document.
+        self.asset_collection.update(
+            {'_id': dest_assets['_id']},
+            {'$set': {'assets': dest_assets['assets'],
+                      'thumbnails': dest_assets['thumbnails']}
+             }
+        )
 
     @contract(asset_key='AssetKey', attr_dict=dict)
     def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):

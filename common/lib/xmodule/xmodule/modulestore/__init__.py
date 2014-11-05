@@ -14,6 +14,8 @@ import collections
 from contextlib import contextmanager
 import functools
 import threading
+from operator import itemgetter
+from sortedcontainers import SortedListWithKey
 
 from abc import ABCMeta, abstractmethod
 from contracts import contract, new_contract
@@ -97,6 +99,13 @@ class ModuleStoreEnum(object):
 
         # user ID to use for tests that do not have a django user available
         test = -3
+
+    class SortOrder(object):
+        """
+        Values for sorting asset metadata.
+        """
+        ascending = 1
+        descending = 2
 
 
 class BulkOpsRecord(object):
@@ -292,19 +301,23 @@ class ModuleStoreAssetInterface(object):
         if course_assets is None:
             return None, None
 
-        if get_thumbnail:
-            all_assets = course_assets['thumbnails']
-        else:
-            all_assets = course_assets['assets']
+        info = 'thumbnails' if get_thumbnail else 'assets'
+        all_assets = SortedListWithKey([], key=itemgetter('filename'))
+        # Assets should be pre-sorted, so add them efficiently without sorting.
+        # extend() will raise a ValueError if the passed-in list is not sorted.
+        all_assets.extend(course_assets.get(info, []))
 
         # See if this asset already exists by checking the external_filename.
         # Studio doesn't currently support using multiple course assets with the same filename.
         # So use the filename as the unique identifier.
-        for idx, asset in enumerate(all_assets):
-            if asset['filename'] == filename:
-                return course_assets, idx
+        idx = None
+        idx_left = all_assets.bisect_left({'filename': filename})
+        idx_right = all_assets.bisect_right({'filename': filename})
+        if idx_left != idx_right:
+            # Asset was found in the list.
+            idx = idx_left
 
-        return course_assets, None
+        return course_assets, idx
 
     @contract(asset_key='AssetKey')
     def _find_asset_info(self, asset_key, thumbnail=False, **kwargs):
@@ -358,19 +371,19 @@ class ModuleStoreAssetInterface(object):
         """
         return self._find_asset_info(asset_key, thumbnail=True, **kwargs)
 
-    @contract(course_key='CourseKey', start='int | None', maxresults='int | None', sort='list | None', get_thumbnails='bool')
-    def _get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, get_thumbnails=False, **kwargs):
+    @contract(course_key='CourseKey', start='int|None', maxresults='int|None',
+              sort='tuple(str,(int,>=1,<=2))|None', get_thumbnails='bool')
+    def _get_all_asset_metadata(self, course_key, start=0, maxresults=-1,
+                                sort=('displayname', ModuleStoreEnum.SortOrder.ascending),
+                                get_thumbnails=False, **kwargs):
         """
-        Returns a list of static asset (or thumbnail) metadata for a course.
-
-        Args:
             course_key (CourseKey): course identifier
-            start (int): optional - start at this asset number
+            start (int): optional - start at this asset number. Zero-based!
             maxresults (int): optional - return at most this many, -1 means no limit
             sort (array): optional - None means no sort
                 (sort_by (str), sort_order (str))
                 sort_by - one of 'uploadDate' or 'displayname'
-                sort_order - one of 'ascending' or 'descending'
+                sort_order - one of SortOrder.ascending or SortOrder.descending
             get_thumbnails (bool): True if getting thumbnail metadata, else getting asset metadata
 
         Returns:
@@ -382,35 +395,60 @@ class ModuleStoreAssetInterface(object):
             # to distinguish zero assets from "not able to retrieve assets".
             return None
 
-        if get_thumbnails:
-            all_assets = course_assets.get('thumbnails', [])
-        else:
-            all_assets = course_assets.get('assets', [])
+        # Determine the proper sort - with defaults of ('displayname', SortOrder.ascending).
+        sort_field = 'filename'
+        sort_order = ModuleStoreEnum.SortOrder.ascending
+        if sort:
+            if sort[0] == 'uploadDate' and not get_thumbnails:
+                sort_field = 'edited_on'
+            if sort[1] == ModuleStoreEnum.SortOrder.descending:
+                sort_order = ModuleStoreEnum.SortOrder.descending
 
-        # DO_NEXT: Add start/maxresults/sort functionality as part of https://openedx.atlassian.net/browse/PLAT-74
-        if start and maxresults and sort:
-            pass
+        info = 'thumbnails' if get_thumbnails else 'assets'
+        all_assets = SortedListWithKey(course_assets.get(info, []), key=itemgetter(sort_field))
+        num_assets = len(all_assets)
+
+        start_idx = start
+        end_idx = min(num_assets, start + maxresults)
+        if maxresults < 0:
+            # No limit on the results.
+            end_idx = num_assets
+
+        step_incr = 1
+        if sort_order == ModuleStoreEnum.SortOrder.descending:
+            # Flip the indices and iterate backwards.
+            step_incr = -1
+            start_idx = (num_assets - 1) - start_idx
+            end_idx = (num_assets - 1) - end_idx
 
         ret_assets = []
-        for asset in all_assets:
+        for idx in xrange(start_idx, end_idx, step_incr):
+            asset = all_assets[idx]
             if get_thumbnails:
                 thumb = AssetThumbnailMetadata(
                     course_key.make_asset_key('thumbnail', asset['filename']),
-                    internal_name=asset['filename'], **kwargs
+                    internal_name=asset['filename'],
+                    **kwargs
                 )
                 ret_assets.append(thumb)
             else:
-                asset = AssetMetadata(
+                new_asset = AssetMetadata(
                     course_key.make_asset_key('asset', asset['filename']),
                     basename=asset['filename'],
-                    edited_on=asset['edit_info']['edited_on'],
+                    internal_name=asset['internal_name'],
+                    locked=asset['locked'],
                     contenttype=asset['contenttype'],
-                    md5=str(asset['md5']), **kwargs
+                    md5=asset['md5'],
+                    curr_version=asset['curr_version'],
+                    prev_version=asset['prev_version'],
+                    edited_on=asset['edited_on'],
+                    edited_by=asset['edited_by'],
+                    **kwargs
                 )
-                ret_assets.append(asset)
+                ret_assets.append(new_asset)
         return ret_assets
 
-    @contract(course_key='CourseKey', start='int | None', maxresults='int | None', sort='list | None')
+    @contract(course_key='CourseKey', start='int|None', maxresults='int|None', sort='tuple(str,int)|None')
     def get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, **kwargs):
         """
         Returns a list of static assets for a course.
@@ -423,7 +461,7 @@ class ModuleStoreAssetInterface(object):
             sort (array): optional - None means no sort
                 (sort_by (str), sort_order (str))
                 sort_by - one of 'uploadDate' or 'displayname'
-                sort_order - one of 'ascending' or 'descending'
+                sort_order - one of SortOrder.ascending or SortOrder.descending
 
         Returns:
             List of AssetMetadata objects.

@@ -12,7 +12,7 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
-    MODULESTORE_SETUPS, MongoContentstoreBuilder, XmlModulestoreBuilder, MixedModulestoreBuilder
+    MODULESTORE_SETUPS, MongoContentstoreBuilder, XmlModulestoreBuilder, MixedModulestoreBuilder, MongoModulestoreBuilder
 )
 
 
@@ -63,88 +63,59 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         Setup assets. Save in store if given
         """
         asset_fields = ('filename', 'internal_name', 'basename', 'locked', 'edited_by', 'edited_on', 'curr_version', 'prev_version')
-        asset1_vals = ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, ModuleStoreEnum.UserID.test, datetime.now(pytz.utc), '14', '13')
-        asset2_vals = ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, ModuleStoreEnum.UserID.test, datetime.now(pytz.utc), '1', None)
-        asset3_vals = ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, ModuleStoreEnum.UserID.test * 2, datetime.now(pytz.utc), 'AB', 'AA')
-        asset4_vals = ('dog.png', 'PUPY4242X', 'pictures/animals', True, ModuleStoreEnum.UserID.test * 3, datetime.now(pytz.utc), '5', '4')
-        asset5_vals = ('not_here.txt', 'JJJCCC747', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49')
+        all_asset_data = (
+            ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, ModuleStoreEnum.UserID.test, datetime.now(pytz.utc), '14', '13'),
+            ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, ModuleStoreEnum.UserID.test, datetime.now(pytz.utc), '1', None),
+            ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, ModuleStoreEnum.UserID.test * 2, datetime.now(pytz.utc), 'AB', 'AA'),
+            ('dog.png', 'PUPY4242X', 'pictures/animals', True, ModuleStoreEnum.UserID.test * 3, datetime.now(pytz.utc), '5', '4'),
+            ('not_here.txt', 'JJJCCC747', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49'),
+            ('asset.txt', 'JJJCCC747858', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49'),
+            ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, ModuleStoreEnum.UserID.test * 7, datetime.now(pytz.utc), '1.1', '1.01'),
+            ('weather_patterns.bmp', '928SJXX2EB', 'science', False, ModuleStoreEnum.UserID.test * 8, datetime.now(pytz.utc), '52', '51'),
+            ('demo.swf', 'DFDFGGGG14', 'demos/easy', False, ModuleStoreEnum.UserID.test * 9, datetime.now(pytz.utc), '5', '4'),
+        )
 
-        asset1 = dict(zip(asset_fields[1:], asset1_vals[1:]))
-        asset2 = dict(zip(asset_fields[1:], asset2_vals[1:]))
-        asset3 = dict(zip(asset_fields[1:], asset3_vals[1:]))
-        asset4 = dict(zip(asset_fields[1:], asset4_vals[1:]))
-        non_existent_asset = dict(zip(asset_fields[1:], asset5_vals[1:]))
-
-        # Asset6 and thumbnail6 have equivalent information on purpose.
-        asset6_vals = ('asset.txt', 'JJJCCC747858', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49')
-        asset6 = dict(zip(asset_fields[1:], asset6_vals[1:]))
-
-        asset1_key = course1_key.make_asset_key('asset', asset1_vals[0])
-        asset2_key = course1_key.make_asset_key('asset', asset2_vals[0])
-        asset3_key = course2_key.make_asset_key('asset', asset3_vals[0])
-        asset4_key = course2_key.make_asset_key('asset', asset4_vals[0])
-        asset5_key = course2_key.make_asset_key('asset', asset5_vals[0])
-        asset6_key = course2_key.make_asset_key('asset', asset6_vals[0])
-
-        asset1_md = AssetMetadata(asset1_key, **asset1)
-        asset2_md = AssetMetadata(asset2_key, **asset2)
-        asset3_md = AssetMetadata(asset3_key, **asset3)
-        asset4_md = AssetMetadata(asset4_key, **asset4)
-        asset5_md = AssetMetadata(asset5_key, **non_existent_asset)
-        asset6_md = AssetMetadata(asset6_key, **asset6)
-
-        if store is not None:
-            store.save_asset_metadata(course1_key, asset1_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_metadata(course1_key, asset2_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_metadata(course2_key, asset3_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_metadata(course2_key, asset4_md, ModuleStoreEnum.UserID.test)
-            # 5 & 6 are not saved on purpose!
-
-        return (asset1_md, asset2_md, asset3_md, asset4_md, asset5_md, asset6_md)
+        for i, asset in enumerate(all_asset_data):
+            asset_dict = dict(zip(asset_fields[1:], asset[1:]))
+            if i in (0, 1) and course1_key:
+                asset_key = course1_key.make_asset_key('asset', asset[0])
+                asset_md = AssetMetadata(asset_key, **asset_dict)
+                if store is not None:
+                    store.save_asset_metadata(course1_key, asset_md, asset[4])
+            elif course2_key:
+                asset_key = course2_key.make_asset_key('asset', asset[0])
+                asset_md = AssetMetadata(asset_key, **asset_dict)
+                # Don't save assets 5 and 6.
+                if store is not None and i not in (4, 5):
+                    store.save_asset_metadata(course2_key, asset_md, asset[4])
 
     def setup_thumbnails(self, course1_key, course2_key, store=None):
         """
         Setup thumbs. Save in store if given
         """
         thumbnail_fields = ('filename', 'internal_name')
-        thumbnail1_vals = ('cat_thumb.jpg', 'XYXYXYXYXYXY')
-        thumbnail2_vals = ('kitten_thumb.jpg', '123ABC123ABC')
-        thumbnail3_vals = ('puppy_thumb.jpg', 'ADAM12ADAM12')
-        thumbnail4_vals = ('meerkat_thumb.jpg', 'CHIPSPONCH14')
-        thumbnail5_vals = ('corgi_thumb.jpg', 'RON8LDXFFFF10')
+        all_thumbnail_data = (
+            ('cat_thumb.jpg', 'XYXYXYXYXYXY'),
+            ('kitten_thumb.jpg', '123ABC123ABC'),
+            ('puppy_thumb.jpg', 'ADAM12ADAM12'),
+            ('meerkat_thumb.jpg', 'CHIPSPONCH14'),
+            ('corgi_thumb.jpg', 'RON8LDXFFFF10'),
+        )
 
-        thumbnail1 = dict(zip(thumbnail_fields[1:], thumbnail1_vals[1:]))
-        thumbnail2 = dict(zip(thumbnail_fields[1:], thumbnail2_vals[1:]))
-        thumbnail3 = dict(zip(thumbnail_fields[1:], thumbnail3_vals[1:]))
-        thumbnail4 = dict(zip(thumbnail_fields[1:], thumbnail4_vals[1:]))
-        non_existent_thumbnail = dict(zip(thumbnail_fields[1:], thumbnail5_vals[1:]))
+        for i, thumb in enumerate(all_thumbnail_data):
+            thumb_dict = dict(zip(thumbnail_fields[1:], thumb[1:]))
+            if i in (0, 1) and course1_key:
+                thumb_key = course1_key.make_asset_key('thumbnail', thumb[0])
+                thumb_md = AssetThumbnailMetadata(thumb_key, **thumb_dict)
+                if store is not None:
+                    store.save_asset_thumbnail_metadata(course1_key, thumb_md, ModuleStoreEnum.UserID.test)
+            elif course2_key:
+                thumb_key = course2_key.make_asset_key('thumbnail', thumb[0])
+                thumb_md = AssetThumbnailMetadata(thumb_key, **thumb_dict)
+                # Don't save assets 5 and 6.
+                if store is not None and i not in (4, 5):
+                    store.save_asset_thumbnail_metadata(course2_key, thumb_md, ModuleStoreEnum.UserID.test)
 
-        # Asset6 and thumbnail6 have equivalent information on purpose.
-        thumbnail6_vals = ('asset.txt', 'JJJCCC747858')
-        thumbnail6 = dict(zip(thumbnail_fields[1:], thumbnail6_vals[1:]))
-
-        thumb1_key = course1_key.make_asset_key('thumbnail', thumbnail1_vals[0])
-        thumb2_key = course1_key.make_asset_key('thumbnail', thumbnail2_vals[0])
-        thumb3_key = course2_key.make_asset_key('thumbnail', thumbnail3_vals[0])
-        thumb4_key = course2_key.make_asset_key('thumbnail', thumbnail4_vals[0])
-        thumb5_key = course2_key.make_asset_key('thumbnail', thumbnail5_vals[0])
-        thumb6_key = course2_key.make_asset_key('thumbnail', thumbnail6_vals[0])
-
-        thumb1_md = AssetThumbnailMetadata(thumb1_key, **thumbnail1)
-        thumb2_md = AssetThumbnailMetadata(thumb2_key, **thumbnail2)
-        thumb3_md = AssetThumbnailMetadata(thumb3_key, **thumbnail3)
-        thumb4_md = AssetThumbnailMetadata(thumb4_key, **thumbnail4)
-        thumb5_md = AssetThumbnailMetadata(thumb5_key, **non_existent_thumbnail)
-        thumb6_md = AssetThumbnailMetadata(thumb6_key, **thumbnail6)
-
-        if store is not None:
-            store.save_asset_thumbnail_metadata(course1_key, thumb1_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_thumbnail_metadata(course1_key, thumb2_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_thumbnail_metadata(course2_key, thumb3_md, ModuleStoreEnum.UserID.test)
-            store.save_asset_thumbnail_metadata(course2_key, thumb4_md, ModuleStoreEnum.UserID.test)
-            # thumb5 and thumb6 are not saved on purpose!
-
-        return (thumb1_md, thumb2_md, thumb3_md, thumb4_md, thumb5_md, thumb6_md)
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_save_one_and_confirm(self, storebuilder):
@@ -387,11 +358,67 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 store.delete_all_asset_metadata(course.id, ModuleStoreEnum.UserID.test)
                 self.assertEquals(len(store.get_all_asset_thumbnail_metadata(course.id)), 0)
 
-    def test_get_all_assets_with_paging(self):
-        pass
+    @ddt.data(*MODULESTORE_SETUPS)
+    def test_get_all_assets_with_paging(self, storebuilder):
+        """
+        Save multiple metadata in each store and retrieve it singularly, as all assets, and after deleting all.
+        """
+        # Temporarily only perform this test for Old Mongo - not Split.
+        if not isinstance(storebuilder, MongoModulestoreBuilder):
+            raise unittest.SkipTest
+        with MongoContentstoreBuilder().build() as contentstore:
+            with storebuilder.build(contentstore) as store:
+                course1 = CourseFactory.create(modulestore=store)
+                course2 = CourseFactory.create(modulestore=store)
+                self.setup_assets(course1.id, course2.id, store)
 
-    def test_copy_all_assets(self):
-        pass
+                expected_sorts_by_2 = (
+                    (
+                        ('displayname', ModuleStoreEnum.SortOrder.ascending),
+                        ('code.tgz', 'demo.swf', 'dog.png', 'roman_history.pdf', 'weather_patterns.bmp'),
+                        (2, 2, 1)
+                    ),
+                    (
+                        ('displayname', ModuleStoreEnum.SortOrder.descending),
+                        ('weather_patterns.bmp', 'roman_history.pdf', 'dog.png', 'demo.swf', 'code.tgz'),
+                        (2, 2, 1)
+                    ),
+                    (
+                        ('uploadDate', ModuleStoreEnum.SortOrder.ascending),
+                        ('code.tgz', 'dog.png', 'roman_history.pdf', 'weather_patterns.bmp', 'demo.swf'),
+                        (2, 2, 1)
+                    ),
+                    (
+                        ('uploadDate', ModuleStoreEnum.SortOrder.descending),
+                        ('demo.swf', 'weather_patterns.bmp', 'roman_history.pdf', 'dog.png', 'code.tgz'),
+                        (2, 2, 1)
+                    ),
+                )
+                # First, with paging across all sorts.
+                for sort_test in expected_sorts_by_2:
+                    for i in xrange(3):
+                        asset_page = store.get_all_asset_metadata(course2.id, start=2 * i, maxresults=2, sort=sort_test[0])
+                        self.assertEquals(len(asset_page), sort_test[2][i])
+                        self.assertEquals(asset_page[0].asset_id.path, sort_test[1][2 * i])
+                        if sort_test[2][i] == 2:
+                            self.assertEquals(asset_page[1].asset_id.path, sort_test[1][(2 * i) + 1])
+
+                # Now fetch everything.
+                asset_page = store.get_all_asset_metadata(course2.id, start=0, sort=('displayname', ModuleStoreEnum.SortOrder.ascending))
+                self.assertEquals(len(asset_page), 5)
+                self.assertEquals(asset_page[0].asset_id.path, 'code.tgz')
+                self.assertEquals(asset_page[1].asset_id.path, 'demo.swf')
+                self.assertEquals(asset_page[2].asset_id.path, 'dog.png')
+                self.assertEquals(asset_page[3].asset_id.path, 'roman_history.pdf')
+                self.assertEquals(asset_page[4].asset_id.path, 'weather_patterns.bmp')
+
+                # Some odd conditions.
+                asset_page = store.get_all_asset_metadata(course2.id, start=100, sort=('uploadDate', ModuleStoreEnum.SortOrder.ascending))
+                self.assertEquals(len(asset_page), 0)
+                asset_page = store.get_all_asset_metadata(course2.id, start=3, maxresults=0, sort=('displayname', ModuleStoreEnum.SortOrder.ascending))
+                self.assertEquals(len(asset_page), 0)
+                asset_page = store.get_all_asset_metadata(course2.id, start=3, maxresults=-12345, sort=('displayname', ModuleStoreEnum.SortOrder.descending))
+                self.assertEquals(len(asset_page), 2)
 
     @ddt.data(XmlModulestoreBuilder(), MixedModulestoreBuilder([('xml', XmlModulestoreBuilder())]))
     def test_xml_not_yet_implemented(self, storebuilder):
@@ -410,3 +437,30 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
             for method in ['_get_all_asset_metadata', 'get_all_asset_metadata', 'get_all_asset_thumbnail_metadata']:
                 with self.assertRaises(NotImplementedError):
                     getattr(store, method)(course_key)
+
+    @ddt.data(*MODULESTORE_SETUPS)
+    def test_copy_all_assets(self, storebuilder):
+        """
+        Create a course with assets and such, copy it all to another course, and check on it.
+        """
+        with MongoContentstoreBuilder().build() as contentstore:
+            with storebuilder.build(contentstore) as store:
+                course1 = CourseFactory.create(modulestore=store)
+                course2 = CourseFactory.create(modulestore=store)
+                self.setup_assets(course1.id, None, store)
+                self.setup_thumbnails(course1.id, None, store)
+                self.assertEquals(len(store.get_all_asset_metadata(course1.id)), 2)
+                self.assertEquals(len(store.get_all_asset_thumbnail_metadata(course1.id)), 2)
+                self.assertEquals(len(store.get_all_asset_metadata(course2.id)), 0)
+                self.assertEquals(len(store.get_all_asset_thumbnail_metadata(course2.id)), 0)
+                store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 101)
+                self.assertEquals(len(store.get_all_asset_metadata(course1.id)), 2)
+                self.assertEquals(len(store.get_all_asset_thumbnail_metadata(course1.id)), 2)
+                all_assets = store.get_all_asset_metadata(course2.id, sort=('displayname', ModuleStoreEnum.SortOrder.ascending))
+                self.assertEquals(len(all_assets), 2)
+                self.assertEquals(all_assets[0].asset_id.path, 'pic1.jpg')
+                self.assertEquals(all_assets[1].asset_id.path, 'shout.ogg')
+                all_thumbnails = store.get_all_asset_thumbnail_metadata(course2.id, sort=('uploadDate', ModuleStoreEnum.SortOrder.descending))
+                self.assertEquals(len(all_thumbnails), 2)
+                self.assertEquals(all_thumbnails[0].asset_id.path, 'kitten_thumb.jpg')
+                self.assertEquals(all_thumbnails[1].asset_id.path, 'cat_thumb.jpg')
