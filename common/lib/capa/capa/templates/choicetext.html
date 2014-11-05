@@ -1,4 +1,3 @@
-<%! from util.markup import ugettext as _ %>
 <% element_checked = False %>
 % for choice_id, _ in choices:
     <%choice_id = choice_id %>
@@ -63,7 +62,7 @@
     </fieldset>
         <input class= "choicetextvalue" type="hidden"  name="input_${id}{}" id="input_${id}" value="${value}" />
     % if show_correctness == "never" and (value or status not in ['unsubmitted']):
-    <div class="capa_alert">${_(submitted_message)}</div>
+    <div class="capa_alert">${submitted_message}</div>
     %endif
     % if msg:
     <span class="message">${msg|n}</span>
