@@ -39,6 +39,11 @@ from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
 
+from requests import HTTPError
+
+from social.apps.django_app import utils as social_utils
+from social.backends import oauth as social_oauth
+
 from edxmako.shortcuts import render_to_response, render_to_string
 from mako.exceptions import TopLevelLookupException
 
@@ -1108,6 +1113,35 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         "value": not_activated_msg,
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
+
+@require_POST
+@social_utils.strategy("social:complete")
+def login_oauth_token(request, backend):
+    """
+    Authenticate the client using an OAuth access token by using the token to
+    retrieve information from a third party and matching that information to an
+    existing user.
+    """
+    backend = request.social_strategy.backend
+    if isinstance(backend, social_oauth.BaseOAuth1) or isinstance(backend, social_oauth.BaseOAuth2):
+        if "access_token" in request.POST:
+            # Tell third party auth pipeline that this is an API call
+            request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_API
+            user = None
+            try:
+                user = backend.do_auth(request.POST["access_token"])
+            except HTTPError:
+                pass
+            # do_auth can return a non-User object if it fails
+            if user and isinstance(user, User):
+                return JsonResponse(status=204)
+            else:
+                # Ensure user does not re-enter the pipeline
+                request.social_strategy.clean_partial_pipeline()
+                return JsonResponse({"error": "invalid_token"}, status=401)
+        else:
+            return JsonResponse({"error": "invalid_request"}, status=400)
+    raise Http404
 
 
 @ensure_csrf_cookie
