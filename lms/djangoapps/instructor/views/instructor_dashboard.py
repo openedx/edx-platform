@@ -15,7 +15,7 @@ from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
-from django.http import Http404, HttpResponse, HttpResponseNotFound
+from django.http import Http404
 from django.conf import settings
 from util.json_request import JsonResponse
 
@@ -35,12 +35,9 @@ from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-
-from analyticsclient.client import Client
-from analyticsclient.exceptions import ClientError
-
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 
 log = logging.getLogger(__name__)
 
@@ -229,13 +226,13 @@ def _section_course_info(course, access):
     try:
         advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
         section_data['grade_cutoffs'] = reduce(advance, course.grade_cutoffs.items(), "")[:-2]
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
     # section_data['offline_grades'] = offline_grades_available(course_key)
 
     try:
         section_data['course_errors'] = [(escape(a), '') for (a, _unused) in modulestore().get_course_errors(course.id)]
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         section_data['course_errors'] = [('Error fetching errors', '')]
 
     return section_data
@@ -368,8 +365,13 @@ def _section_analytics(course, access):
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
 
-    if settings.FEATURES.get('ENABLE_ANALYTICS_ACTIVE_COUNT'):
-        _update_active_students(course_key, section_data)
+    if settings.ANALYTICS_DASHBOARD_URL:
+        # Construct a URL to the external analytics dashboard
+        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+        dashboard_link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
+                                                                            settings.ANALYTICS_DASHBOARD_NAME)
+        message = _("Demographic data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
+        section_data['demographic_message'] = message
 
     return section_data
 
@@ -389,31 +391,3 @@ def _section_metrics(course, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
-
-
-def _update_active_students(course_key, section_data):
-    auth_token = settings.ANALYTICS_DATA_TOKEN
-    base_url = settings.ANALYTICS_DATA_URL
-
-    section_data['active_student_count'] = 'N/A'
-    section_data['active_student_count_start'] = 'N/A'
-    section_data['active_student_count_end'] = 'N/A'
-
-    try:
-        client = Client(base_url=base_url, auth_token=auth_token)
-        course = client.courses(unicode(course_key))
-
-        recent_activity = course.recent_activity()
-        section_data['active_student_count'] = recent_activity['count']
-
-        def format_date(value):
-            return value.split('T')[0]
-
-        start = recent_activity['interval_start']
-        end = recent_activity['interval_end']
-
-        section_data['active_student_count_start'] = format_date(start)
-        section_data['active_student_count_end'] = format_date(end)
-
-    except (ClientError, KeyError) as e:
-        log.exception(e)

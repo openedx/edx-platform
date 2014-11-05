@@ -370,7 +370,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.find_asset_thumbnail_metadata(asset_key, **kwargs)
 
     @strip_key
-    @contract(course_key='CourseKey', start=int, maxresults=int, sort='list | None')
+    @contract(course_key='CourseKey', start=int, maxresults=int, sort='tuple|None')
     def get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, **kwargs):
         """
         Returns a list of static assets for a course.
@@ -590,6 +590,10 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             )
             # the super handles assets and any other necessities
             super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
+        else:
+            raise NotImplementedError("No code for cloning from {} to {}".format(
+                source_modulestore, dest_modulestore
+            ))
 
     @strip_key
     def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):

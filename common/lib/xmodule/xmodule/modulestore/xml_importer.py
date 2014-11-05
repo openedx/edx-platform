@@ -42,7 +42,8 @@ from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
+
 
 log = logging.getLogger(__name__)
 
@@ -438,6 +439,8 @@ def _import_module_and_update_references(
                 value = field.read_from(module)
                 # remove any export/import only xml_attributes
                 # which are used to wire together draft imports
+                if 'parent_url' in value:
+                    del value['parent_url']
                 if 'parent_sequential_url' in value:
                     del value['parent_sequential_url']
 
@@ -500,28 +503,26 @@ def _import_course_draft(
         # to ensure that pure XBlock field data is updated correctly.
         _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
 
+        parent_url = get_parent_url(module)
+        index = index_in_children_list(module)
+
         # make sure our parent has us in its list of children
-        # this is to make sure private only verticals show up
+        # this is to make sure private only modules show up
         # in the list of children since they would have been
         # filtered out from the non-draft store export.
-        # Note though that verticals nested below the unit level will not have
-        # a parent_sequential_url and do not need special handling.
-        if module.location.category == 'vertical' and 'parent_sequential_url' in module.xml_attributes:
-            sequential_url = module.xml_attributes['parent_sequential_url']
-            index = int(module.xml_attributes['index_in_children_list'])
-
+        if parent_url is not None and index is not None:
             course_key = descriptor.location.course_key
-            seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
+            parent_location = course_key.make_usage_key_from_deprecated_string(parent_url)
 
-            # IMPORTANT: Be sure to update the sequential in the NEW namespace
-            seq_location = seq_location.map_into_course(target_course_id)
+            # IMPORTANT: Be sure to update the parent in the NEW namespace
+            parent_location = parent_location.map_into_course(target_course_id)
 
-            sequential = store.get_item(seq_location, depth=0)
+            parent = store.get_item(parent_location, depth=0)
 
             non_draft_location = module.location.map_into_course(target_course_id)
-            if not any(child.block_id == module.location.block_id for child in sequential.children):
-                sequential.children.insert(index, non_draft_location)
-                store.update_item(sequential, user_id)
+            if not any(child.block_id == module.location.block_id for child in parent.children):
+                parent.children.insert(index, non_draft_location)
+                store.update_item(parent, user_id)
 
         _import_module_and_update_references(
             module, store, user_id,
@@ -537,8 +538,8 @@ def _import_course_draft(
 
     # First it is necessary to order the draft items by their desired index in the child list
     # (order os.walk returns them in is not guaranteed).
-    drafts = dict()
-    for dirname, _dirnames, filenames in os.walk(draft_dir + "/vertical"):
+    drafts = []
+    for dirname, _dirnames, filenames in os.walk(draft_dir):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
             with open(module_path, 'r') as f:
@@ -593,23 +594,27 @@ def _import_course_draft(
                         filename, __ = os.path.splitext(filename)
                         descriptor.location = descriptor.location.replace(name=filename)
 
-                        index = int(descriptor.xml_attributes['index_in_children_list'])
-                        if index in drafts:
-                            drafts[index].append(descriptor)
-                        else:
-                            drafts[index] = [descriptor]
+                        index = index_in_children_list(descriptor)
+                        parent_url = get_parent_url(descriptor, xml)
+                        draft_url = descriptor.location.to_deprecated_string()
 
-                except Exception:
+                        draft = draft_node_constructor(
+                            module=descriptor, url=draft_url, parent_url=parent_url, index=index
+                        )
+
+                        drafts.append(draft)
+
+                except Exception:  # pylint: disable=W0703
                     logging.exception('Error while parsing course xml.')
 
-        # For each index_in_children_list key, there is a list of vertical descriptors.
+    # sort drafts by `index_in_children_list` attribute
+    drafts.sort(key=lambda x: x.index)
 
-        for key in sorted(drafts.iterkeys()):
-            for descriptor in drafts[key]:
-                try:
-                    _import_module(descriptor)
-                except Exception:
-                    logging.exception('while importing draft descriptor %s', descriptor)
+    for draft in get_draft_subtree_roots(drafts):
+        try:
+            _import_module(draft.module)
+        except Exception:  # pylint: disable=W0703
+            logging.exception('while importing draft descriptor %s', draft.module)
 
 
 def allowed_metadata_by_category(category):
@@ -646,6 +651,56 @@ def check_module_metadata_editability(module):
         )
 
     return err_cnt
+
+
+def get_parent_url(module, xml=None):
+    """
+    Get the parent_url, if any, from module using xml as an alternative source. If it finds it in
+    xml but not on module, it modifies module so that the next call to this w/o the xml will get the parent url
+    """
+    if hasattr(module, 'xml_attributes'):
+        return module.xml_attributes.get(
+            # handle deprecated old attr
+            'parent_url', module.xml_attributes.get('parent_sequential_url')
+        )
+    if xml is not None:
+        create_xml_attributes(module, xml)
+        return get_parent_url(module)  # don't reparse xml b/c don't infinite recurse but retry above lines
+    return None
+
+
+def index_in_children_list(module, xml=None):
+    """
+    Get the index_in_children_list, if any, from module using xml
+    as an alternative source. If it finds it in xml but not on module,
+    it modifies module so that the next call to this w/o the xml
+    will get the field.
+    """
+    if hasattr(module, 'xml_attributes'):
+        val = module.xml_attributes.get('index_in_children_list')
+        if val is not None:
+            return int(val)
+        return None
+    if xml is not None:
+        create_xml_attributes(module, xml)
+        return index_in_children_list(module)  # don't reparse xml b/c don't infinite recurse but retry above lines
+    return None
+
+
+def create_xml_attributes(module, xml):
+    """
+    Make up for modules which don't define xml_attributes by creating them here and populating
+    """
+    xml_attrs = {}
+    for attr, val in xml.attrib.iteritems():
+        if attr not in module.fields:
+            # translate obsolete attr
+            if attr == 'parent_sequential_url':
+                attr = 'parent_url'
+            xml_attrs[attr] = val
+
+    # now cache it on module where it's expected
+    setattr(module, 'xml_attributes', xml_attrs)
 
 
 def validate_no_non_editable_metadata(module_store, course_id, category):

@@ -28,7 +28,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, ModuleStoreDraftAndPublished
 
 
 MODULE_DIR = path(__file__).dirname()
@@ -249,6 +249,7 @@ class LazyFormat(object):
     def __repr__(self):
         return unicode(self)
 
+
 class CourseComparisonTest(BulkAssertionTest):
     """
     Mixin that has methods for comparing courses for equality.
@@ -354,20 +355,22 @@ class CourseComparisonTest(BulkAssertionTest):
                 self.assertGreater(len(expected_items), 0)
                 self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
 
-        with expected_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, expected_course_key):
-            with actual_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, actual_course_key):
-                # compare draft
-                if expected_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
-                    revision = ModuleStoreEnum.RevisionOption.draft_only
-                else:
-                    revision = None
-                expected_items = expected_store.get_items(expected_course_key, revision=revision)
-                if actual_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
-                    revision = ModuleStoreEnum.RevisionOption.draft_only
-                else:
-                    revision = None
-                actual_items = actual_store.get_items(actual_course_key, revision=revision)
-                self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
+        # if the modulestore supports having a draft branch
+        if isinstance(expected_store, ModuleStoreDraftAndPublished):
+            with expected_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, expected_course_key):
+                with actual_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, actual_course_key):
+                    # compare draft
+                    if expected_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
+                        revision = ModuleStoreEnum.RevisionOption.draft_only
+                    else:
+                        revision = None
+                    expected_items = expected_store.get_items(expected_course_key, revision=revision)
+                    if actual_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
+                        revision = ModuleStoreEnum.RevisionOption.draft_only
+                    else:
+                        revision = None
+                    actual_items = actual_store.get_items(actual_course_key, revision=revision)
+                    self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
 
     def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key, expect_drafts=False):
         with self.bulk_assertions():

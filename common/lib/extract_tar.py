@@ -9,7 +9,8 @@ from os.path import abspath, realpath, dirname, join as joinpath
 from django.core.exceptions import SuspiciousOperation
 import logging
 
-log = logging.getLogger(__name__) # pylint: disable=C0103
+log = logging.getLogger(__name__)
+
 
 def resolved(rpath):
     """
@@ -17,11 +18,13 @@ def resolved(rpath):
     """
     return realpath(abspath(rpath))
 
+
 def _is_bad_path(path, base):
     """
     Is (the canonical absolute path of) `path` outside `base`?
     """
     return not resolved(joinpath(base, path)).startswith(base)
+
 
 def _is_bad_link(info, base):
     """
@@ -30,6 +33,7 @@ def _is_bad_link(info, base):
     # Links are interpreted relative to the directory containing the link
     tip = resolved(joinpath(base, dirname(info.name)))
     return _is_bad_path(info.linkname, base=tip)
+
 
 def safemembers(members):
     """
@@ -43,18 +47,19 @@ def safemembers(members):
             log.debug("File %r is blocked (illegal path)", finfo.name)
             raise SuspiciousOperation("Illegal path")
         elif finfo.issym() and _is_bad_link(finfo, base):
-            log.debug( "File %r is blocked: Hard link to %r", finfo.name, finfo.linkname)
+            log.debug("File %r is blocked: Hard link to %r", finfo.name, finfo.linkname)
             raise SuspiciousOperation("Hard link")
         elif finfo.islnk() and _is_bad_link(finfo, base):
             log.debug("File %r is blocked: Symlink to %r", finfo.name,
-                    finfo.linkname)
+                      finfo.linkname)
             raise SuspiciousOperation("Symlink")
         elif finfo.isdev():
             log.debug("File %r is blocked: FIFO, device or character file",
-                    finfo.name)
+                      finfo.name)
             raise SuspiciousOperation("Dev file")
 
     return members
+
 
 def safetar_extractall(tarf, *args, **kwargs):
     """

@@ -418,8 +418,15 @@
         pointer-events: auto;
       }
 
-      .course-title {
-        color: $orange-d1;
+      .view-live-button {
+        @extend %ui-depth3;
+        @extend %btn-primary-blue;
+        @extend %sizing;
+        @include transition(opacity $tmg-f2 ease-in-out 0);
+        @include box-sizing(border-box);
+        padding: ($baseline/2);
+        opacity: 0.0;
+        pointer-events: none;
       }
 
       .course-metadata {

@@ -487,11 +487,15 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         click_css(self, '.wrapper-mast nav.nav-actions .button-new')
 
-    def add_section_from_bottom_button(self):
+    def add_section_from_bottom_button(self, click_child_icon=False):
         """
         Clicks the button for adding a section which resides at the bottom of the screen.
         """
-        click_css(self, self.BOTTOM_ADD_SECTION_BUTTON)
+        element_css = self.BOTTOM_ADD_SECTION_BUTTON
+        if click_child_icon:
+            element_css += " .icon-plus"
+
+        click_css(self, element_css)
 
     def toggle_expand_collapse(self):
         """

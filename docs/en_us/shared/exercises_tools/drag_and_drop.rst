@@ -143,8 +143,8 @@ Template for Advanced Problem
           <drag_and_drop_input img="/static/TARGET_IMAGE.png" target_outline="true" one_per_target="true" no_labels="true" label_bg_color="rgb(222, 139, 238)">
               <draggable id="1" label="LABEL 1" />
               <draggable id="2" label="LABEL 2" />
-              <target id="A" x="NUMBER" Y="NUMBER" w="X+WIDTH" h="Y+HEIGHT"/>
-              <target id="B" x="NUMBER" Y="NUMBER" w="X+WIDTH" h="Y+HEIGHT"/>
+              <target id="A" x="NUMBER" y="NUMBER" w="X+WIDTH" h="Y+HEIGHT"/>
+              <target id="B" x="NUMBER" y="NUMBER" w="X+WIDTH" h="Y+HEIGHT"/>
           </drag_and_drop_input>
           <answer type="loncapa/python">
   correct_answer = [{

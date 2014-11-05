@@ -8,6 +8,7 @@ import settings
 
 log = logging.getLogger(__name__)
 
+
 class Thread(models.Model):
 
     accessible_fields = [

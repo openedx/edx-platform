@@ -8,7 +8,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from django.test.utils import override_settings
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from student.roles import CourseBetaTesterRole, CourseStaffRole
 
 from django_comment_common.models import (Role,
@@ -19,7 +19,7 @@ from instructor.access import (allow_access,
                                update_forum_role)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAccessList(ModuleStoreTestCase):
     """ Test access listings. """
     def setUp(self):
@@ -41,7 +41,7 @@ class TestInstructorAccessList(ModuleStoreTestCase):
         self.assertEqual(set(beta_testers), set(self.beta_testers))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAccessAllow(ModuleStoreTestCase):
     """ Test access allow. """
     def setUp(self):
@@ -75,7 +75,7 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
         allow_access(self.course, user, 'staff')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAccessRevoke(ModuleStoreTestCase):
     """ Test access revoke. """
     def setUp(self):
@@ -109,7 +109,7 @@ class TestInstructorAccessRevoke(ModuleStoreTestCase):
         revoke_access(self.course, user, 'robot-not-a-level')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAccessForum(ModuleStoreTestCase):
     """
     Test forum access control.

@@ -25,6 +25,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.utils.html import strip_tags
 import string  # pylint: disable=W0402
 import random
+import urllib
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -1696,7 +1697,7 @@ def send_email(request, course_id):
         course_id,
         request.user,
         send_to,
-        subject,message,
+        subject, message,
         template_name=template_name,
         from_addr=from_addr
     )
@@ -1791,13 +1792,15 @@ def proxy_legacy_analytics(request, course_id):
     analytics_name = request.GET.get('aname')
 
     # abort if misconfigured
-    if not (hasattr(settings, 'ANALYTICS_SERVER_URL') and hasattr(settings, 'ANALYTICS_API_KEY')):
+    if not (hasattr(settings, 'ANALYTICS_SERVER_URL') and
+            hasattr(settings, 'ANALYTICS_API_KEY') and
+            settings.ANALYTICS_SERVER_URL and settings.ANALYTICS_API_KEY):
         return HttpResponse("Analytics service not configured.", status=501)
 
     url = "{}get?aname={}&course_id={}&apikey={}".format(
         settings.ANALYTICS_SERVER_URL,
         analytics_name,
-        course_id.to_deprecated_string(),
+        urllib.quote(unicode(course_id)),
         settings.ANALYTICS_API_KEY,
     )
 

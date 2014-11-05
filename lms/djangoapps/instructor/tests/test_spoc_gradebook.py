@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from xmodule.modulestore.django import modulestore
@@ -16,7 +16,7 @@ from xmodule.modulestore.django import modulestore
 USER_COUNT = 11
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGradebook(ModuleStoreTestCase):
     """
     Test functionality of the spoc gradebook. Sets up a course with assignments and

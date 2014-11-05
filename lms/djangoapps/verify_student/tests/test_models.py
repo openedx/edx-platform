@@ -75,6 +75,7 @@ class MockS3Connection(object):
     def get_bucket(self, bucket_name):
         return MockBucket(bucket_name)
 
+
 def mock_software_secure_post(url, headers=None, data=None, **kwargs):
     """
     Mocks our interface when we post to Software Secure. Does basic assertions
@@ -103,6 +104,7 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
 
     return response
 
+
 def mock_software_secure_post_error(url, headers=None, data=None, **kwargs):
     """
     Simulates what happens if our post to Software Secure is rejected, for
@@ -111,6 +113,7 @@ def mock_software_secure_post_error(url, headers=None, data=None, **kwargs):
     response = requests.Response()
     response.status_code = 400
     return response
+
 
 def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs):
     """Simulates a connection failure when we try to submit to Software Secure."""
@@ -188,7 +191,7 @@ class TestPhotoVerification(TestCase):
         was when you submitted it.
         """
         user = UserFactory.create()
-        user.profile.name = u"Jack \u01B4" # gratuious non-ASCII char to test encodings
+        user.profile.name = u"Jack \u01B4"  # gratuious non-ASCII char to test encodings
 
         attempt = SoftwareSecurePhotoVerification(user=user)
         user.profile.name = u"Clyde \u01B4"

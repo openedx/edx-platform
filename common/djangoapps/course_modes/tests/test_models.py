@@ -7,12 +7,14 @@ Replace this with more appropriate tests for your application.
 
 from datetime import datetime, timedelta
 import pytz
+import ddt
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.test import TestCase
 from course_modes.models import CourseMode, Mode
 
 
+@ddt.ddt
 class CourseModeModelTest(TestCase):
     """
     Tests for the CourseMode model
@@ -146,3 +148,18 @@ class CourseModeModelTest(TestCase):
         honor.suggested_prices = '5, 10, 15'
         honor.save()
         self.assertTrue(CourseMode.has_payment_options(self.course_key))
+
+    @ddt.data(
+        ([], True),
+        ([("honor", 0), ("audit", 0), ("verified", 100)], True),
+        ([("honor", 100)], False),
+        ([("professional", 100)], False),
+    )
+    @ddt.unpack
+    def test_can_auto_enroll(self, modes_and_prices, can_auto_enroll):
+        # Create the modes and min prices
+        for mode_slug, min_price in modes_and_prices:
+            self.create_mode(mode_slug, mode_slug.capitalize(), min_price=min_price)
+
+        # Verify that we can or cannot auto enroll
+        self.assertEqual(CourseMode.can_auto_enroll(self.course_key), can_auto_enroll)

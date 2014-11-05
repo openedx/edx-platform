@@ -119,8 +119,8 @@ STATICFILES_DIRS += [
 # If we don't add these settings, then Django templates that can't
 # find pipelined assets will raise a ValueError.
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
-STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
-PIPELINE_ENABLED=False
+STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+PIPELINE_ENABLED = False
 
 update_module_store_settings(
     MODULESTORE,
@@ -202,6 +202,17 @@ simplefilter('ignore')  # Change to "default" to see the first instance of each 
 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+
+THIRD_PARTY_AUTH = {
+    "Google": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
+    },
+    "Facebook": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
+    },
+}
 
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
@@ -361,8 +372,8 @@ LINKEDIN_API['COMPANY_ID'] = '0000000'
 
 # Setting for the testing of Software Secure Result Callback
 VERIFY_STUDENT["SOFTWARE_SECURE"] = {
-        "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
-        "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+    "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
+    "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
 }
 
 VIDEO_CDN_URL = {
