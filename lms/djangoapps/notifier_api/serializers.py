@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import serializers
 
-from course_groups.cohorts import is_course_cohorted
+from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from notification_prefs import NOTIFICATION_PREF_KEY
 from lang_pref import LANGUAGE_KEY
 

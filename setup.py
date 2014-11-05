@@ -13,12 +13,14 @@ setup(
     # be reorganized to be a more conventional Python tree.
     packages=[
         "openedx.core.djangoapps.user_api",
+        "openedx.core.djangoapps.course_groups",
         "lms",
         "cms",
     ],
     entry_points={
         'openedx.user_partition_scheme': [
             'random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme',
+            'cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme',
         ],
     }
 )

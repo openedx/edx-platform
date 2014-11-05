@@ -1,6 +1,6 @@
 from django.test.utils import override_settings
 
-from course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles

@@ -2,7 +2,6 @@ import json
 
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from course_groups.tests.helpers import config_course_cohorts, CohortFactory
 from collections import namedtuple
 
 from django.http import Http404
@@ -14,9 +13,10 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from course_groups.models import CourseUserGroup
-from course_groups.views import list_cohorts, add_cohort, users_in_cohort, add_users_to_cohort, remove_user_from_cohort
-from course_groups.cohorts import get_cohort, CohortAssignmentType, get_cohort_by_name, DEFAULT_COHORT_NAME
+from ..models import CourseUserGroup
+from ..views import list_cohorts, add_cohort, users_in_cohort, add_users_to_cohort, remove_user_from_cohort
+from ..cohorts import get_cohort, CohortAssignmentType, get_cohort_by_name, DEFAULT_COHORT_NAME
+from .helpers import config_course_cohorts, CohortFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

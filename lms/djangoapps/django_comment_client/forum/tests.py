@@ -24,7 +24,7 @@ from courseware.courses import UserNotEnrolled
 from nose.tools import assert_true  # pylint: disable=E0611
 from mock import patch, Mock, ANY, call
 
-from course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
 TEST_DATA_MONGO_MODULESTORE = mixed_store_config(TEST_DATA_DIR, {}, include_xml=False)
 
