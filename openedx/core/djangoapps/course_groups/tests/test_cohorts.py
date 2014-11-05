@@ -1,24 +1,31 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import call, patch
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from course_groups import cohorts
-from course_groups.models import CourseUserGroup
-from course_groups.tests.helpers import topic_name_to_id, config_course_cohorts, CohortFactory
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, mixed_store_config
 
+from ..models import CourseUserGroup, CourseUserGroupPartitionGroup
+from .. import cohorts
+from ..tests.helpers import topic_name_to_id, config_course_cohorts, CohortFactory
 
 # NOTE: running this with the lms.envs.test config works without
 # manually overriding the modulestore.  However, running with
 # cms.envs.test doesn't.
-@patch("course_groups.cohorts.tracker")
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
+
+
+@patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
 class TestCohortSignals(TestCase):
     def setUp(self):
         self.course_key = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
@@ -446,7 +453,7 @@ class TestCohorts(TestCase):
             lambda: cohorts.get_cohort_by_id(course.id, cohort.id)
         )
 
-    @patch("course_groups.cohorts.tracker")
+    @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
     def test_add_cohort(self, mock_tracker):
         """
         Make sure cohorts.add_cohort() properly adds a cohort to a course and handles
@@ -469,7 +476,7 @@ class TestCohorts(TestCase):
             lambda: cohorts.add_cohort(SlashSeparatedCourseKey("course", "does_not", "exist"), "My Cohort")
         )
 
-    @patch("course_groups.cohorts.tracker")
+    @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
     def test_add_user_to_cohort(self, mock_tracker):
         """
         Make sure cohorts.add_user_to_cohort() properly adds a user to a cohort and
@@ -525,3 +532,127 @@ class TestCohorts(TestCase):
             User.DoesNotExist,
             lambda: cohorts.add_user_to_cohort(first_cohort, "non_existent_username")
         )
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestCohortsAndPartitionGroups(TestCase):
+
+    def setUp(self):
+        """
+        Regenerate a test course and cohorts for each test
+        """
+        self.test_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.course = modulestore().get_course(self.test_course_key)
+
+        self.first_cohort = CohortFactory(course_id=self.course.id, name="FirstCohort")
+        self.second_cohort = CohortFactory(course_id=self.course.id, name="SecondCohort")
+
+        self.partition_id = 1
+        self.group1_id = 10
+        self.group2_id = 20
+
+    def _link_cohort_partition_group(self, cohort, partition_id, group_id):
+        """
+        Utility to create cohort -> partition group assignments in the database.
+        """
+        link = CourseUserGroupPartitionGroup(
+            course_user_group=cohort,
+            partition_id=partition_id,
+            group_id=group_id,
+        )
+        link.save()
+        return link
+
+    def test_get_partition_group_id_for_cohort(self):
+        """
+        Basic test of the partition_group_id accessor function
+        """
+        # api should return nothing for an unmapped cohort
+        self.assertEqual(
+            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            (None, None),
+        )
+        # create a link for the cohort in the db
+        link = self._link_cohort_partition_group(
+            self.first_cohort,
+            self.partition_id,
+            self.group1_id
+        )
+        # api should return the specified partition and group
+        self.assertEqual(
+            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            (self.partition_id, self.group1_id)
+        )
+        # delete the link in the db
+        link.delete()
+        # api should return nothing again
+        self.assertEqual(
+            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            (None, None),
+        )
+
+    def test_multiple_cohorts(self):
+        """
+        Test that multiple cohorts can be linked to the same partition group
+        """
+        self._link_cohort_partition_group(
+            self.first_cohort,
+            self.partition_id,
+            self.group1_id,
+        )
+        self._link_cohort_partition_group(
+            self.second_cohort,
+            self.partition_id,
+            self.group1_id,
+        )
+        self.assertEqual(
+            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            (self.partition_id, self.group1_id),
+        )
+        self.assertEqual(
+            cohorts.get_partition_group_id_for_cohort(self.second_cohort),
+            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+        )
+
+    def test_multiple_partition_groups(self):
+        """
+        Test that a cohort cannot be mapped to more than one partition group
+        """
+        self._link_cohort_partition_group(
+            self.first_cohort,
+            self.partition_id,
+            self.group1_id,
+        )
+        with self.assertRaisesRegexp(IntegrityError, 'not unique'):
+            self._link_cohort_partition_group(
+                self.first_cohort,
+                self.partition_id,
+                self.group2_id,
+            )
+
+    def test_delete_cascade(self):
+        """
+        Test that cohort -> partition group links are automatically deleted
+        when their parent cohort is deleted.
+        """
+        self._link_cohort_partition_group(
+            self.first_cohort,
+            self.partition_id,
+            self.group1_id
+        )
+        self.assertEqual(
+            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            (self.partition_id, self.group1_id)
+        )
+        # delete the link
+        self.first_cohort.delete()
+        # api should return nothing at that point
+        self.assertEqual(
+            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            (None, None),
+        )
+        # link should no longer exist because of delete cascade
+        with self.assertRaises(CourseUserGroupPartitionGroup.DoesNotExist):
+            CourseUserGroupPartitionGroup.objects.get(
+                course_user_group_id=self.first_cohort.id
+            )

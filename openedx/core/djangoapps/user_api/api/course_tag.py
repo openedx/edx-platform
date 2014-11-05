@@ -7,7 +7,7 @@ Stores global metadata using the UserPreference model, and per-course metadata u
 UserCourseTag model.
 """
 
-from user_api.models import UserCourseTag
+from ..models import UserCourseTag
 
 # Scopes
 # (currently only allows per-course tags.  Can be expanded to support

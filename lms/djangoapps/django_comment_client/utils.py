@@ -17,8 +17,8 @@ from django_comment_client.permissions import check_permissions_by_view, cached_
 from edxmako import lookup_template
 import pystache_custom as pystache
 
-from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
-from course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore

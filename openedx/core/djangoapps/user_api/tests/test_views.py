@@ -888,7 +888,7 @@ class RegistrationViewTest(ApiTestCase):
         no_extra_fields_setting = {}
 
         with simulate_running_pipeline(
-            "user_api.views.third_party_auth.pipeline",
+            "openedx.core.djangoapps.user_api.views.third_party_auth.pipeline",
             "google-oauth2", email="bob@example.com",
             fullname="Bob", username="Bob123"
         ):
