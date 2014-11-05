@@ -40,7 +40,7 @@ Submit Documentation Issues
 We welcome input from the community on any documentation issues.  You can
 submit issues to the Documentation project in the `Open edX JIRA board`_.
 
-You will need to `create a free JIRA`_ account before you can submit your first
+You will need to `create a free JIRA account`_ account before you can submit your first
 ticket.
 
 .. _create a free JIRA account: https://openedx.atlassian.net/admin/users/sign-up
