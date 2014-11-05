@@ -5,28 +5,28 @@
 
 <% if ( mode === 'login' ) { %>
     <section id="register-anchor" class="form-type">
-        <h2>
+        <span>
             <input type="radio" name="form" id="register-option" value="register" class="form-toggle" <% if ( mode === 'register' ) { %>checked<% } %> >
             <label for="register-option" class="form-label"><%- gettext("I am a new user") %></label>
-        </h2>
+        </span>
         <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden" aria-hidden="true<% } %>"></div>
     </section>
 <% } %>
 
 <section id="login-anchor" class="form-type">
-    <h2>
+    <span>
         <input type="radio" name="form" id="login-option" value="login" class="form-toggle" <% if ( mode === 'login' ) { %>checked<% } %>>
         <label for="login-option" class="form-label"><%- gettext("I am a returning user") %></label>
-    </h2>
+    </span>
     <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden" aria-hidden="true<% } %>"></div>
 </section>
 
 <% if ( mode === 'register' ) { %>
     <section id="register-anchor" class="form-type">
-        <h2>
+        <span>
             <input type="radio" name="form" id="register-option" value="register" class="form-toggle" <% if ( mode === 'register' ) { %>checked<% } %> >
             <label for="register-option" class="form-label"><%- gettext("I am a new user") %></label>
-        </h2>
+        </span>
         <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden" aria-hidden="true<% } %>"></div>
     </section>
 <% } %>

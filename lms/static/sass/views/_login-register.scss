@@ -120,6 +120,7 @@
     .form-label {
         @extend %bold-label;
         padding: 0 0 0 5px;
+        letter-spacing: 1px;
     }
 
     .action-label {
