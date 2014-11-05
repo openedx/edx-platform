@@ -1104,11 +1104,11 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)
         response = self.client.get(redeem_url, **{'HTTP_HOST': 'localhost'})
         self.assertEquals(len(RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)), 1)
-        self.assertIn("You've clicked a link for an enrollment code that has already been used.", response.content)
+        self.assertIn("clicked a link for an enrollment code that has already been used.", response.content)
 
         #now check that the registration code has already been redeemed
         response = self.client.post(redeem_url, **{'HTTP_HOST': 'localhost'})
-        self.assertIn("You've clicked a link for an enrollment code that has already been used.", response.content)
+        self.assertIn("clicked a link for an enrollment code that has already been used.", response.content)
 
         #now check the response of the dashboard page
         dashboard_url = reverse('dashboard')
