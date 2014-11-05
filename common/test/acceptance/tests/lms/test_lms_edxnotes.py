@@ -9,16 +9,16 @@ from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
 
 
-class EdxNotesTest(UniqueCourseTest):
+class EdxNotesTestMixin(UniqueCourseTest):
     """
-    Tests for annotation inside HTML components in LMS.
+    Creates a course with initial data and contains useful helper methods.
     """
-
     def setUp(self):
         """
         Initialize pages and install a course fixture.
         """
-        super(EdxNotesTest, self).setUp()
+        super(EdxNotesTestMixin, self).setUp()
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.course_nav = CourseNavPage(self.browser)
         self.note_unit_page = EdxNotesUnitPage(self.browser, self.course_id)
         self.notes_page = EdxNotesPage(self.browser, self.course_id)
@@ -84,11 +84,16 @@ class EdxNotesTest(UniqueCourseTest):
         self.edxnotes_fixture.create_notes(notes_list)
         self.edxnotes_fixture.install()
 
+
+class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
+    """
+    Tests for creation, editing, deleting annotations inside annotatable components in LMS.
+    """
     def create_notes(self, components, offset=0):
         self.assertGreater(len(components), 0)
         index = offset
         for component in components:
-            for note in component.create_note(".annotate-id"):
+            for note in component.create_note(".{}".format(self.selector)):
                 note.text = "TEST TEXT {}".format(index)
                 index += 1
 
@@ -122,12 +127,12 @@ class EdxNotesTest(UniqueCourseTest):
     def test_can_create_notes(self):
         """
         Scenario: User can create notes.
-        Given I have a course with 3 annotatatble components
-        And I open the unit with 2 annotatatble components
+        Given I have a course with 3 annotatable components
+        And I open the unit with 2 annotatable components
         When I add 2 notes for the first component and 1 note for the second
         Then I see that notes were correctly created
         When I change sequential position to "2"
-        And I add note for the annotatatble component on the page
+        And I add note for the annotatable component on the page
         Then I see that note was correctly created
         When I refresh the page
         Then I see that note was correctly stored
@@ -157,7 +162,7 @@ class EdxNotesTest(UniqueCourseTest):
         """
         Scenario: User can edit notes.
         Given I have a course with 3 components with notes
-        And I open the unit with 2 annotatatble components
+        And I open the unit with 2 annotatable components
         When I change text in the notes
         Then I see that notes were correctly changed
         When I change sequential position to "2"
@@ -192,7 +197,7 @@ class EdxNotesTest(UniqueCourseTest):
         """
         Scenario: User can delete notes.
         Given I have a course with 3 components with notes
-        And I open the unit with 2 annotatatble components
+        And I open the unit with 2 annotatable components
         When I remove all notes on the page
         Then I do not see any notes on the page
         When I change sequential position to "2"
@@ -387,3 +392,76 @@ class EdxNotesPageTest(UniqueCourseTest):
         item.go_to_unit()
         self.courseware_page.wait_for_page()
         self.assertIn(text, self.courseware_page.xblock_component_html_content())
+
+
+class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
+    """
+    Tests for toggling single annotation.
+    """
+
+    def setUp(self):
+        super(EdxNotesToggleSingleNoteTest, self).setUp()
+        self._add_notes()
+        self.note_unit_page.visit()
+
+    def test_can_toggle_by_clicking_on_highlighted_text(self):
+        """
+        Scenario: User can toggle a single note by clicking on highlighted text.
+        Given I have a course with components with notes
+        When I click on highlighted text
+        And I move mouse out of the note
+        Then I see that the note is still shown
+        When I click outside the note
+        Then I see the the note is closed
+        """
+        note = self.note_unit_page.notes[0]
+
+        note.click_on_highlight()
+        self.note_unit_page.move_mouse_to('body')
+        self.assertTrue(note.is_visible)
+        self.note_unit_page.click('body')
+        self.assertFalse(note.is_visible)
+
+    def test_can_toggle_by_clicking_on_the_note(self):
+        """
+        Scenario: User can toggle a single note by clicking on the note.
+        Given I have a course with components with notes
+        When I click on the note
+        And I move mouse out of the note
+        Then I see that the note is still shown
+        When I click outside the note
+        Then I see the the note is closed
+        """
+        note = self.note_unit_page.notes[0]
+
+        note.show().click_on_viewer()
+        self.note_unit_page.move_mouse_to('body')
+        self.assertTrue(note.is_visible)
+        self.note_unit_page.click('body')
+        self.assertFalse(note.is_visible)
+
+    def test_interaction_between_notes(self):
+        """
+        Scenario: Interactions between notes works well.
+        Given I have a course with components with notes
+        When I click on highlighted text in the first component
+        And I move mouse out of the note
+        Then I see that the note is still shown
+        When I click on highlighted text in the second component
+        Then I do not see any notes
+        When I click again on highlighted text in the second component
+        Then I see appropriate note
+        """
+        note_1 = self.note_unit_page.notes[0]
+        note_2 = self.note_unit_page.notes[1]
+
+        note_1.click_on_highlight()
+        self.note_unit_page.move_mouse_to('body')
+        self.assertTrue(note_1.is_visible)
+
+        note_2.click_on_highlight()
+        self.assertFalse(note_1.is_visible)
+        self.assertFalse(note_2.is_visible)
+
+        note_2.click_on_highlight()
+        self.assertTrue(note_2.is_visible)
