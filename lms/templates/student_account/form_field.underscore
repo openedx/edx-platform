@@ -6,10 +6,6 @@
         </label>
     <% } %>
 
-    <% if( form === 'login' && name === 'password' ) { %>
-        <a href="#" class="forgot-password field-link"><%- gettext("Forgot password?") %></a>
-    <% } %>
-
     <% if ( type === 'select' ) { %>
         <select id="<%= form %>-<%= name %>"
             name="<%= name %>"
@@ -57,6 +53,10 @@
             <%= label %>
             <% if ( required && requiredStr ) { %> <%= requiredStr %><% } %>
         </label>
+    <% } %>
+
+    <% if( form === 'login' && name === 'password' ) { %>
+        <a href="#" class="forgot-password field-link"><%- gettext("Forgot password?") %></a>
     <% } %>
 
     <span id="<%= form %>-<%= name %>-desc" class="desc"><%= instructions %></span>
