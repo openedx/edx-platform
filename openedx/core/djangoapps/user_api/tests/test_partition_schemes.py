@@ -3,6 +3,7 @@ Test the user api's partition extensions.
 """
 from collections import defaultdict
 from mock import patch
+from unittest import TestCase
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme, UserPartitionError
 from student.tests.factories import UserFactory
@@ -105,3 +106,15 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
         # Now, get a new group using the same call
         new_group = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, user_partition)
         self.assertEqual(old_group.id, new_group.id)
+
+
+class TestExtension(TestCase):
+    """
+    Ensure that the scheme extension is correctly plugged in (via entry point
+    in setup.py)
+    """
+
+    def test_get_scheme(self):
+        self.assertEqual(UserPartition.get_scheme('random'), RandomUserPartitionScheme)
+        with self.assertRaisesRegexp(UserPartitionError, 'Unrecognized scheme'):
+            UserPartition.get_scheme('other')

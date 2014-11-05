@@ -24,7 +24,7 @@ from edxmako.shortcuts import marketing_link
 
 from .api import account as account_api, profile as profile_api
 from .helpers import FormDescription, shim_student_view, require_post_params
-from .models import UserPreference
+from .models import UserPreference, UserProfile
 from .serializers import UserSerializer, UserPreferenceSerializer
 
 

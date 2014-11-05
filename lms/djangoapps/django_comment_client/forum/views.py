@@ -11,7 +11,12 @@ import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import is_course_cohorted, get_cohort_id, get_course_cohorts, is_commentable_cohorted
+from openedx.core.djangoapps.course_groups.cohorts import (
+    is_course_cohorted,
+    get_cohort_id,
+    get_course_cohorts,
+    is_commentable_cohorted
+)
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission

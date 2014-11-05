@@ -24,11 +24,28 @@ class CourseUserGroup(models.Model):
 
     # Note: groups associated with particular runs of a course.  E.g. Fall 2012 and Spring
     # 2013 versions of 6.00x will have separate groups.
-    course_id = CourseKeyField(max_length=255, db_index=True,
-                                 help_text="Which course is this group associated with?")
+    course_id = CourseKeyField(
+        max_length=255,
+        db_index=True,
+        help_text="Which course is this group associated with?"
+    )
 
     # For now, only have group type 'cohort', but adding a type field to support
     # things like 'question_discussion', 'friends', 'off-line-class', etc
     COHORT = 'cohort'
     GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
+
+
+class CourseUserGroupPartitionGroup(models.Model):
+    """
+    """
+    course_user_group = models.OneToOneField(CourseUserGroup)
+    partition_id = models.IntegerField(
+        help_text="contains the id of a cohorted partition in this course"
+    )
+    group_id = models.IntegerField(
+        help_text="contains the id of a specific group within the cohorted partition"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
