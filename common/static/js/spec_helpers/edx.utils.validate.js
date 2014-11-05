@@ -131,9 +131,9 @@ var edx = edx || {};
                                 };
 
                                 if ( key === 'min' ) {
-                                    obj.context.count = $el.attr('minlength');
+                                    obj.context.count = parseInt( $el.attr('minlength'), 10 );
                                 } else if ( key === 'max' ) {
-                                    obj.context.count = $el.attr('maxlength');
+                                    obj.context.count = parseInt( $el.attr('maxlength'), 10 );
                                 }
                             }
 
