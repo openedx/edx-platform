@@ -50,7 +50,7 @@
                         <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">Loading...</span></p>
                     </div>
                 </article>
-                <aside class="content-supplementary" role="complimentary">
+                <aside class="content-supplementary" role="complementary">
                     <div id="publish-unit" class="window"></div>
                     <div id="publish-history"></div>
                 </aside>
