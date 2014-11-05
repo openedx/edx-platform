@@ -254,7 +254,7 @@ option to skip those tasks. This option can also be used with any of the test sp
 
 To run a single test, specify the name of the test file. For example:
 
-    paver test_bokchoy -t test_lms.py
+    paver test_bokchoy -t lms/test_lms.py
 
 Notice the test file location is relative to common/test/acceptance/tests. For example:
 
@@ -271,7 +271,7 @@ To test only a certain feature, specify the file and the testcase class:
 To execute only a certain test case, specify the file name, class, and
 test case method:
 
-    paver test_bokchoy -t test_lms.py:RegistrationTest.test_register
+    paver test_bokchoy -t lms/test_lms.py:RegistrationTest.test_register
 
 During acceptance test execution, log files and also screenshots of failed tests
 are captured in test_root/log.
@@ -385,9 +385,25 @@ generates HTML and XML (Cobertura format) reports.
 
 ## Code Style Quality
 
-To view code style quality (e.g. pep8 and pylint violations):
+To view code style quality (including pep8 and pylint violations):
 
     paver run_quality
+
+More specific options are below.
+
+* Running a particular quality report:
+
+		paver run_pep8
+		paver run_pylint
+
+* Running a report, and setting it to fail if it exceeds a given number of violations:
+
+		paver run_pep8 --limit=800
+
+* The `run_quality` uses the underlying diff-quality tool (which is packaged with [diff-cover](https://github.com/edx/diff-cover)). With that, the command can be set to fail if a certain diff threshold is not met. For example, to cause the process to fail if  quality expectations are less than 100% when compared to master (or in other words, if style quality is worse than what's already on master):
+
+		paver run_quality --percentage=100
+
 
 
 ## Testing using queue servers

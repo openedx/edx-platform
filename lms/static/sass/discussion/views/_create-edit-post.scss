@@ -46,7 +46,7 @@
     .field-help {
       @include box-sizing(border-box);
       display: inline-block;
-      padding-left: $baseline;
+      @include padding-left($baseline);
       width: 50%;
       font-size: 12px;
     }
@@ -131,7 +131,7 @@
   .post-option {
     @include box-sizing(border-box);
     display: inline-block;
-    margin-right: $baseline;
+    @include margin-right($baseline);
     border: 1px solid transparent;
     border-radius: 3px;
     padding: ($baseline/2);

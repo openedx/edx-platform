@@ -1,15 +1,16 @@
 """
 Support for inheritance of fields down an XBlock hierarchy.
 """
+from __future__ import absolute_import
 
 from datetime import datetime
 from pytz import UTC
-
 from xmodule.partitions.partitions import UserPartition
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
-
 from xmodule.fields import Date, Timedelta
+from django.conf import settings
+
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
@@ -66,8 +67,7 @@ class InheritanceMixin(XBlockMixin):
     giturl = String(
         display_name=_("GIT URL"),
         help=_("Enter the URL for the course data GIT repository."),
-        scope=Scope.settings,
-        deprecated=True  # Deprecated because GIT workflow users do not use Studio.
+        scope=Scope.settings
     )
     xqa_key = String(
         display_name=_("XQA Key"),
@@ -127,7 +127,7 @@ class InheritanceMixin(XBlockMixin):
     )
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
-        help=_("Enter the maximum number of times a student can try to answer problems. This is a course-wide setting, but you can specify a different number when you create an individual problem. To allow unlimited attempts, enter null."),
+        help=_("Enter the maximum number of times a student can try to answer problems. By default, Maximum Attempts is set to null, meaning that students have an unlimited number of attempts for problems. You can override this course-wide setting for individual problems. However, if the course-wide setting is a specific number, you cannot set the Maximum Attempts for individual problems to unlimited."),
         values={"min": 0}, scope=Scope.settings
     )
     matlab_api_key = String(
@@ -152,6 +152,16 @@ class InheritanceMixin(XBlockMixin):
         help=_("Enter true or false. If true, video caching will be used for HTML5 videos."),
         default=True,
         scope=Scope.settings
+    )
+
+    reset_key = "DEFAULT_SHOW_RESET_BUTTON"
+    default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
+    show_reset_button = Boolean(
+        display_name=_("Show Reset Button for Problems"),
+        help=_("Enter true or false. If true, problems in the course default to always displaying a 'Reset' button. You can "
+               "override this in each problem's settings. All existing problems are affected when this course-wide setting is changed."),
+        scope=Scope.settings,
+        default=default_reset_button
     )
 
 

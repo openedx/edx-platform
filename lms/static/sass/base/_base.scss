@@ -55,6 +55,15 @@ span {
   font: inherit;
 }
 
+.text-center {
+  text-align: center;
+}
+
+.text-dark-grey {
+  color: $dark-gray1;
+  font-size: 24px;
+}
+
 p + p, ul + p, ol + p {
   margin-top: 20px;
 }
@@ -107,6 +116,7 @@ a:focus {
 
 .container {
   @include clearfix;
+  @include box-sizing(border-box);
   margin: 0 auto 0;
   padding: 0px 30px;
   max-width: grid-width(12);

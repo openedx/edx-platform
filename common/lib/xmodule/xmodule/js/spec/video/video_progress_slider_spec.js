@@ -122,6 +122,11 @@
                         'option', 'value', 20
                     );
                 });
+
+                it('required aria values updated', function () {
+                    expect(state.videoProgressSlider.handle.attr('aria-valuenow')).toBe('20');
+                    expect(state.videoProgressSlider.handle.attr('aria-valuemax')).toBe('120');
+                });
             });
         });
 

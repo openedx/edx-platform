@@ -21,6 +21,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.views import get_course_lti_endpoints
 from lms.lib.xblock.runtime import quote_slashes
 
+
 class TestLTI(BaseTestXmodule):
     """
     Integration test for lti xmodule.
@@ -107,7 +108,7 @@ class TestLTI(BaseTestXmodule):
             old_parsed[u'OAuth oauth_nonce'] = mocked_nonce
             old_parsed[u'oauth_timestamp'] = mocked_timestamp
             old_parsed[u'oauth_signature'] = mocked_signature_after_sign
-            headers[u'Authorization'] = ', '.join([k+'="'+v+'"' for k, v in old_parsed.items()])
+            headers[u'Authorization'] = ', '.join([k + '="' + v + '"' for k, v in old_parsed.items()])
             return None, headers, None
 
         patcher = mock.patch.object(oauthlib.oauth1.Client, "sign", mocked_sign)

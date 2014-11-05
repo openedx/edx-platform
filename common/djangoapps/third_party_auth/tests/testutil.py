@@ -30,8 +30,10 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         super(TestCase, self).setUp()
+        self._original_providers = provider.Registry._get_all()
         provider.Registry._reset()
 
     def tearDown(self):
         provider.Registry._reset()
+        provider.Registry.configure_once(self._original_providers)
         super(TestCase, self).tearDown()

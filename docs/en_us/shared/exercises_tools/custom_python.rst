@@ -126,10 +126,10 @@ The script tag format encloses a Python script that contains a "check function" 
   <p>Enter two integers that sum to 10. </p>
   <customresponse cfn="test_add_to_ten">
           <textline size="10"/><br/>
-          <textline size="10/>
+          <textline size="10"/>
   </customresponse>
 
-    </problem>
+  </problem>
 
 **Important**: Python honors indentation. Within the ``<script>`` tag, the ``def check_func(expect, ans):`` line must have no indentation.
 
@@ -288,3 +288,45 @@ The following template does not return answers when the student clicks **Show An
       </solution>
   </problem>
 
+.. _Create a Randomized Custom Python-Evaluated Input Problem:
+
+*****************************************************************
+Create a Randomized Custom Python-Evaluated Input Problem
+*****************************************************************
+
+You can create a custom Python-evaluated input problem that randomizes
+variables in the Python code. 
+
+.. note:: 
+  In the problem settings, you must set the **Randomization** value to
+  something other than **Never** to have Python variables randomized. See
+  :ref:`Randomization` for more information.
+
+The following example demonstrates using randomization with a Python-evaluated
+input problem.
+
+.. note::
+ This example uses the method ``random.randint`` to generate random numbers.  You can use any standard Python library for this purpose.
+
+.. code-block:: xml
+
+  <problem>
+    <p>Some problems in the course will utilize randomized parameters.
+       For such problems, after you check your answer you will have the option 
+       of resetting the question, which reconstructs the problem with a new 
+       set of parameters.</p>
+  <script type="loncapa/python">
+  x1 = random.randint(0, 100)
+  x2 = random.randint(0, 100)
+  y = x1+x2
+  </script>
+  <p>Let (x_1 = $x1) and (x_2 = $x2). What is the value of (x_1+x_2)?</p>
+  <numericalresponse answer="$y">
+    <responseparam type="tolerance" default="0.01%" name="tol" 
+      description="Numerical Tolerance"/>
+    <textline size="10"/>
+  </numericalresponse>
+  <solution>
+    <p><b>Explanation:</b></p>
+  </solution>
+  </problem>

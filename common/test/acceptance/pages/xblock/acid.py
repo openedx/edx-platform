@@ -3,7 +3,7 @@ PageObjects related to the AcidBlock
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import Promise
+from bok_choy.promise import EmptyPromise, BrokenPromise
 from .utils import wait_for_xblock_initialization
 
 
@@ -31,8 +31,21 @@ class AcidView(PageObject):
         # and then wait to make sure that the xblock has finished initializing.
         return (
             self.q(css='{} .acid-block'.format(self.context_selector)).present and
-            wait_for_xblock_initialization(self, self.context_selector)
+            wait_for_xblock_initialization(self, self.context_selector) and
+            self._ajax_finished()
         )
+
+    def _ajax_finished(self):
+        try:
+            EmptyPromise(
+                lambda: self.browser.execute_script("return jQuery.active") == 0,
+                "AcidBlock tests still running",
+                timeout=240
+            ).fulfill()
+        except BrokenPromise:
+            return False
+        else:
+            return True
 
     def test_passed(self, test_selector):
         """

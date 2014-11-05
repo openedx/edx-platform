@@ -78,11 +78,10 @@ BULK_EMAIL_FAILURE_ERRORS = (
     SMTPException,
 )
 
-
-
 MAX_ATTEMPTS = 10
 
 log = logging.getLogger("linkedin")
+
 
 class Command(BaseCommand):
     """
@@ -151,7 +150,6 @@ class Command(BaseCommand):
                 log.exception("LinkedIn: User {} couldn't be processed".format(user.username))
 
         transaction.commit()
-
 
     def certificate_url(self, certificate):
         """
@@ -230,7 +228,7 @@ class Command(BaseCommand):
         while i <= num_attempts:
             try:
                 msg.send()
-                return True # Happy path!
+                return True  # Happy path!
             except SINGLE_EMAIL_FAILURE_ERRORS:
                 # Something unrecoverable is wrong about the email acct we're sending to
                 log.exception(

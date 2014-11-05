@@ -123,16 +123,16 @@
       // CASE: normal typographical headings
       h1 {
         @extend %heading-2;
+        @include text-align(left);
         margin-bottom: $baseline;
         padding-bottom: $baseline;
-        text-align: left;
       }
 
       // CASE: marketing/imageery-based headings
       .title {
         position: absolute;
         top: ($baseline*2.5);
-        left:($baseline*1.5);
+        @include left($baseline*1.5);
 
         .title-super, .title-sub {
           @extend %t-weight1;
@@ -149,7 +149,7 @@
 
         .title-sub {
           @include font-size(20);
-          margin-left: ($baseline*2);
+          @include margin-left($baseline*2);
           text-transform: lowercase;
           color: $header-graphic-sub-color;
         }
@@ -197,14 +197,14 @@
   }
 
   .content {
-    margin-right: ($baseline*2);
+    @include float(left);
+    @include margin-right($baseline*2);
     width: 600px;
-    float: left;
   }
 
   aside {
+    @include float(left);
     width: 280px;
-    float: left;
 
     p, ol, ul {
       font-size: 14px !important;
@@ -273,10 +273,10 @@
       margin: 0 0 $baseline 0;
 
       .field {
+        @include float(left);
+        @include margin(0, ($baseline*1.5), 0, 0);
         display: block;
-        float: left;
         border-bottom: none;
-        margin: 0 ($baseline*1.5) 0 0;
         padding-bottom: 0;
 
         input, textarea {
@@ -336,7 +336,7 @@
         .tip {
           position: absolute;
           top: 0;
-          right: 0;
+          @include right(0);
         }
       }
 
@@ -378,7 +378,7 @@
         input[type="checkbox"] {
           display: inline-block;
           width: auto;
-          margin-right: ($baseline/4);
+          @include margin-right($baseline/4);
         }
 
         label {
@@ -702,7 +702,7 @@
 
       h2 {
         @extend %heading-2;
-        text-align: left;
+        @include text-align(left);
       }
     }
 

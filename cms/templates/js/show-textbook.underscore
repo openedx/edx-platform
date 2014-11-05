@@ -12,7 +12,7 @@
         <%= chapters.length %> PDF Chapters
     </a></p>
 <% } else if(chapters.length === 1) { %>
-    <p>
+    <p dir="ltr">
         <%= chapters.at(0).get("asset_path") %>
     </p>
 <% } %>

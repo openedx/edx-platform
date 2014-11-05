@@ -24,10 +24,10 @@ class LmsBlockMixin(XBlockMixin):
     chrome = String(
         display_name=_("Courseware Chrome"),
         help=_("Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
-             "\"chromeless\" -- to not use tabs or the accordion; \n"
-             "\"tabs\" -- to use tabs only; \n"
-             "\"accordion\" -- to use the accordion only; or \n"
-             "\"tabs,accordion\" -- to use tabs and the accordion."),
+               "\"chromeless\" -- to not use tabs or the accordion; \n"
+               "\"tabs\" -- to use tabs only; \n"
+               "\"accordion\" -- to use the accordion only; or \n"
+               "\"tabs,accordion\" -- to use tabs and the accordion."),
         scope=Scope.settings,
         default=None,
     )

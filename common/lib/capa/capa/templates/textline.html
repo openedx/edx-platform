@@ -29,7 +29,6 @@
 
       <p class="status" 
          %if status != 'unsubmitted':
-         aria-hidden="true"
          %endif
          aria-describedby="input_${id}">
         %if value:
@@ -41,7 +40,7 @@
         ${status.display_name}
       </p>
 
-      <p id="answer_${id}" class="answer" aria-hidden="true"></p>
+      <p id="answer_${id}" class="answer"></p>
 
       % if do_math:
       <div id="display_${id}" class="equation">`{::}`</div>

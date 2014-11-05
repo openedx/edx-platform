@@ -39,8 +39,9 @@ def _attr_safe_json(obj):
     """
     return saxutils.escape(json.dumps(obj), {'"': '&quot;'})
 
+
 @newrelic.agent.function_trace()
-def make_course_settings(course, include_category_map=False):
+def make_course_settings(course):
     """
     Generate a JSON-serializable model for course settings, which will be used to initialize a
     DiscussionCourseSettings object on the client.
@@ -51,12 +52,11 @@ def make_course_settings(course, include_category_map=False):
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
         'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course)],
+        'category_map': utils.get_discussion_category_map(course)
     }
 
-    if include_category_map:
-        obj['category_map'] = utils.get_discussion_category_map(course)
-
     return obj
+
 
 @newrelic.agent.function_trace()
 def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PAGE):
@@ -158,6 +158,7 @@ def inline_discussion(request, course_id, discussion_id):
         'course_settings': make_course_settings(course)
     })
 
+
 @login_required
 def forum_form_discussion(request, course_id):
     """
@@ -167,7 +168,7 @@ def forum_form_discussion(request, course_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
-    course_settings = make_course_settings(course, include_category_map=True)
+    course_settings = make_course_settings(course)
 
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
@@ -214,7 +215,7 @@ def forum_form_discussion(request, course_id):
             'roles': _attr_safe_json(utils.get_role_ids(course_key)),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
-            'user_cohort': user_cohort_id, # read from container in NewPostView
+            'user_cohort': user_cohort_id,  # read from container in NewPostView
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
@@ -231,7 +232,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_key)
-    course_settings = make_course_settings(course, include_category_map=True)
+    course_settings = make_course_settings(course)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
     is_moderator = cached_has_permission(request.user, "see_all_cohorts", course_key)
@@ -316,6 +317,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         }
         return render_to_response('discussion/index.html', context)
 
+
 @require_GET
 @login_required
 def user_profile(request, course_id, user_id):
@@ -325,8 +327,6 @@ def user_profile(request, course_id, user_id):
     #TODO: Allow sorting?
     course = get_course_with_access(request.user, 'load_forum', course_key)
     try:
-        profiled_user = cc.User(id=user_id, course_id=course_key)
-
         query_params = {
             'page': request.GET.get('page', 1),
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
@@ -338,6 +338,9 @@ def user_profile(request, course_id, user_id):
             return HttpResponseBadRequest("Invalid group_id")
         if group_id is not None:
             query_params['group_id'] = group_id
+            profiled_user = cc.User(id=user_id, course_id=course_key, group_id=group_id)
+        else:
+            profiled_user = cc.User(id=user_id, course_id=course_key)
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
         query_params['page'] = page

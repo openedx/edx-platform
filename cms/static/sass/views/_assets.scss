@@ -5,16 +5,14 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend .ui-col-narrow;
   }
 
   .nav-actions {
@@ -36,10 +34,10 @@
 
     .new-button {
       @extend %t-action3;
-      margin-left: $baseline;
+      @include margin-left($baseline);
 
       [class^="icon-"] {
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
       }
     }
   }
@@ -70,7 +68,7 @@
       width: flex-grid(3, 12);
 
       &.pagination-compact {
-        text-align: right;
+        @include text-align(right);
       }
 
       &.pagination-full {
@@ -136,7 +134,7 @@
       .current-page {
         @extend %ui-depth1;
         position: absolute;
-        left: -($baseline/4);
+        @include left(-($baseline/4));
       }
 
       .page-divider {

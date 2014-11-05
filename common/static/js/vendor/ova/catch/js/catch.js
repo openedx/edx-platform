@@ -504,6 +504,13 @@ CatchAnnotation.prototype = {
         
         // Search Button
         el.on("click", ".searchbox .search-icon", onSearchButtonClick);
+        // Search should also run when user hits ENTER
+        $('input[name=search]').keyup(function(e) {
+            // ENTER == 13
+            if(e.which == 13) {
+                onSearchButtonClick();
+            }
+        });
 
         // Clear Search Button
         el.on("click", ".searchbox .clear-search-icon", onClearSearchButtonClick);
@@ -1001,6 +1008,9 @@ CatchAnnotation.prototype = {
             var positionAnnotator = videojs.findPosition(wrapper[0]);
             var positionAdder = {};
 
+            // the following addition to display makes sure the editor shows up
+            // after opening TinyMCE/editor within the image source
+            positionAdder.display = "block";
             positionAdder.left = positionLeft.left - positionAnnotator.left;
             positionAdder.top = positionLeft.top + 20 - positionAnnotator.top;
 
@@ -1010,9 +1020,9 @@ CatchAnnotation.prototype = {
             this.annotator.onAdderClick();
             
             // Set vertical editor
+            $(this.annotator.editor.element).css(positionAdder);
             this.annotator.editor.resetOrientation();
             this.annotator.editor.invertY();
-            this.annotator.editor.element.find('.annotator-widget').css('min-width', replyElem.css('width'));
 
             // set parent 
             var parentValue = $(this.annotator.editor.element).find(".reply-item span.parent-annotation");

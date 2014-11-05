@@ -9,12 +9,13 @@ from django.http import (
     HttpResponseBadRequest, HttpResponseForbidden, Http404
 )
 from django.utils.translation import ugettext as _
+from util.json_request import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
-from microsite_configuration import microsite
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from django.contrib.auth.decorators import login_required
+from microsite_configuration import microsite
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
@@ -31,7 +32,8 @@ from .exceptions import (
     MultipleCouponsNotAllowedException, InvalidCartItem
 )
 from .models import (
-    Order, PaidCourseRegistration, OrderItem, Coupon,
+    Order, OrderTypes,
+    PaidCourseRegistration, OrderItem, Coupon, CourseRegCodeItem,
     CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption,
     Donation, DonationConfiguration
 )
@@ -39,6 +41,7 @@ from .processors import (
     process_postpay_callback, render_purchase_form_html,
     get_signed_purchase_params, get_purchase_endpoint
 )
+
 import json
 from xmodule_django.models import CourseKeyField
 
@@ -91,21 +94,67 @@ def add_course_to_cart(request, course_id):
 
 
 @login_required
+def update_user_cart(request):
+    """
+    when user change the number-of-students from the UI then
+    this method Update the corresponding qty field in OrderItem model and update the order_type in order model.
+    """
+    try:
+        qty = int(request.POST.get('qty', -1))
+    except ValueError:
+        log.exception('Quantity must be an integer.')
+        return HttpResponseBadRequest('Quantity must be an integer.')
+
+    if not 1 <= qty <= 1000:
+        log.warning('Quantity must be between 1 and 1000.')
+        return HttpResponseBadRequest('Quantity must be between 1 and 1000.')
+
+    item_id = request.POST.get('ItemId', None)
+    if item_id:
+        try:
+            item = OrderItem.objects.get(id=item_id, status='cart')
+        except OrderItem.DoesNotExist:
+            log.exception('Cart OrderItem id={0} DoesNotExist'.format(item_id))
+            return HttpResponseNotFound('Order item does not exist.')
+
+        item.qty = qty
+        item.save()
+        item.order.update_order_type()
+        total_cost = item.order.total_cost
+        return JsonResponse({"total_cost": total_cost}, 200)
+
+    return HttpResponseBadRequest('Order item not found in request.')
+
+
+@login_required
 def show_cart(request):
+    """
+    This view shows cart items.
+    """
     cart = Order.get_cart_for_user(request.user)
     total_cost = cart.total_cost
-    cart_items = cart.orderitem_set.all()
+    cart_items = cart.orderitem_set.all().select_subclasses()
+    shoppingcart_items = []
+    for cart_item in cart_items:
+        course_key = getattr(cart_item, 'course_id')
+        if course_key:
+            course = get_course_by_id(course_key, depth=0)
+            shoppingcart_items.append((cart_item, course))
+
+    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
 
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
     )
     form_html = render_purchase_form_html(cart, callback_url=callback_url)
     context = {
-        'shoppingcart_items': cart_items,
+        'order': cart,
+        'shoppingcart_items': shoppingcart_items,
         'amount': total_cost,
+        'site_name': site_name,
         'form_html': form_html,
     }
-    return render_to_response("shoppingcart/list.html", context)
+    return render_to_response("shoppingcart/shopping_cart.html", context)
 
 
 @login_required
@@ -127,21 +176,25 @@ def clear_cart(request):
 
 @login_required
 def remove_item(request):
+    """
+    This will remove an item from the user cart and also delete the corresponding coupon codes redemption.
+    """
     item_id = request.REQUEST.get('id', '-1')
-    try:
-        item = OrderItem.objects.get(id=item_id, status='cart')
+
+    items = OrderItem.objects.filter(id=item_id, status='cart').select_subclasses()
+
+    if not len(items):
+        log.exception('Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(item_id))
+    else:
+        item = items[0]
         if item.user == request.user:
-            order_item_course_id = None
-            if hasattr(item, 'paidcourseregistration'):
-                order_item_course_id = item.paidcourseregistration.course_id
+            order_item_course_id = getattr(item, 'course_id')
             item.delete()
             log.info('order item {0} removed for user {1}'.format(item_id, request.user))
             remove_code_redemption(order_item_course_id, item_id, item, request.user)
+            item.order.update_order_type()
 
-    except OrderItem.DoesNotExist:
-        log.exception('Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(item_id))
     return HttpResponse('OK')
-
 
 def remove_code_redemption(order_item_course_id, item_id, item, user):
     """
@@ -159,16 +212,30 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
         log.info('Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'
                  .format(coupon_redemption.coupon.code, user, item_id))
     except CouponRedemption.DoesNotExist:
-        try:
-            # Try to remove redemption information of registration code, If exist.
-            reg_code_redemption = RegistrationCodeRedemption.objects.get(redeemed_by=user, order=item.order_id)
-        except RegistrationCodeRedemption.DoesNotExist:
-            log.debug('Code redemption does not exist for order item id={0}.'.format(item_id))
-        else:
-            if order_item_course_id == reg_code_redemption.registration_code.course_id:
-                reg_code_redemption.delete()
-                log.info('Registration code "{0}" redemption entry removed for user "{1}" for order item "{2}"'
-                         .format(reg_code_redemption.registration_code.code, user, item_id))
+        pass
+
+    try:
+        # Try to remove redemption information of registration code, If exist.
+        reg_code_redemption = RegistrationCodeRedemption.objects.get(redeemed_by=user, order=item.order_id)
+    except RegistrationCodeRedemption.DoesNotExist:
+        log.debug('Code redemption does not exist for order item id={0}.'.format(item_id))
+    else:
+        if order_item_course_id == reg_code_redemption.registration_code.course_id:
+            reg_code_redemption.delete()
+            log.info('Registration code "{0}" redemption entry removed for user "{1}" for order item "{2}"'
+                     .format(reg_code_redemption.registration_code.code, user, item_id))
+
+
+@login_required
+def reset_code_redemption(request):
+    """
+    This method reset the code redemption from user cart items.
+    """
+    cart = Order.get_cart_for_user(request.user)
+    cart.reset_cart_items_prices()
+    CouponRedemption.delete_coupon_redemption(request.user, cart)
+    RegistrationCodeRedemption.delete_registration_redemption(request.user, cart)
+    return HttpResponse('reset')
 
 
 @login_required
@@ -448,6 +515,49 @@ def postpay_callback(request):
         return render_to_response('shoppingcart/error.html', {'order': result['order'],
                                                               'error_html': result['error_html']})
 
+
+@require_http_methods(["GET", "POST"])
+@login_required
+def billing_details(request):
+    """
+    This is the view for capturing additional billing details
+    in case of the business purchase workflow.
+    """
+
+    cart = Order.get_cart_for_user(request.user)
+    cart_items = cart.orderitem_set.all()
+
+    if getattr(cart, 'order_type') != OrderTypes.BUSINESS:
+        raise Http404('Page not found!')
+
+    if request.method == "GET":
+        callback_url = request.build_absolute_uri(
+            reverse("shoppingcart.views.postpay_callback")
+        )
+        form_html = render_purchase_form_html(cart, callback_url=callback_url)
+        total_cost = cart.total_cost
+        context = {
+            'shoppingcart_items': cart_items,
+            'amount': total_cost,
+            'form_html': form_html,
+            'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        }
+        return render_to_response("shoppingcart/billing_details.html", context)
+    elif request.method == "POST":
+        company_name = request.POST.get("company_name", "")
+        company_contact_name = request.POST.get("company_contact_name", "")
+        company_contact_email = request.POST.get("company_contact_email", "")
+        recipient_name = request.POST.get("recipient_name", "")
+        recipient_email = request.POST.get("recipient_email", "")
+        customer_reference_number = request.POST.get("customer_reference_number", "")
+
+        cart.add_billing_details(company_name, company_contact_name, company_contact_email, recipient_name,
+                                 recipient_email, customer_reference_number)
+        return JsonResponse({
+            'response': _('success')
+        })  # status code 200: OK by default
+
+
 @login_required
 def show_receipt(request, ordernum):
     """
@@ -464,21 +574,20 @@ def show_receipt(request, ordernum):
         raise Http404('Order not found!')
 
     order_items = OrderItem.objects.filter(order=order).select_subclasses()
+    shoppingcart_items = []
+    course_names_list = []
+    for order_item in order_items:
+        course_key = getattr(order_item, 'course_id')
+        if course_key:
+            course = get_course_by_id(course_key, depth=0)
+            shoppingcart_items.append((order_item, course))
+            course_names_list.append(course.display_name)
+
+    appended_course_names = ", ".join(course_names_list)
     any_refunds = any(i.status == "refunded" for i in order_items)
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
-    # we want to have the ability to override the default receipt page when
-    # there is only one item in the order
-    context = {
-        'order': order,
-        'order_items': order_items,
-        'any_refunds': any_refunds,
-        'instructions': instructions,
-    }
-
-    if order_items.count() == 1:
-        receipt_template = order_items[0].single_item_receipt_template
-        context.update(order_items[0].single_item_receipt_context)
+    order_type = getattr(order, 'order_type')
 
     # Only orders where order_items.count() == 1 might be attempting to upgrade
     attempting_upgrade = request.session.get('attempting_upgrade', False)
@@ -486,6 +595,39 @@ def show_receipt(request, ordernum):
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, order_items[0].course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
         request.session['attempting_upgrade'] = False
+
+    recipient_list = []
+    registration_codes = None
+    total_registration_codes = None
+    recipient_list.append(getattr(order.user, 'email'))
+    if order_type == OrderTypes.BUSINESS:
+        registration_codes = CourseRegistrationCode.objects.filter(order=order)
+        total_registration_codes = registration_codes.count()
+        if order.company_contact_email:
+            recipient_list.append(order.company_contact_email)
+        if order.recipient_email:
+            recipient_list.append(order.recipient_email)
+
+    appended_recipient_emails = ", ".join(recipient_list)
+
+    context = {
+        'order': order,
+        'shoppingcart_items': shoppingcart_items,
+        'any_refunds': any_refunds,
+        'instructions': instructions,
+        'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        'order_type': order_type,
+        'appended_course_names': appended_course_names,
+        'appended_recipient_emails': appended_recipient_emails,
+        'total_registration_codes': total_registration_codes,
+        'registration_codes': registration_codes,
+        'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
+    }
+    # we want to have the ability to override the default receipt page when
+    # there is only one item in the order
+    if order_items.count() == 1:
+        receipt_template = order_items[0].single_item_receipt_template
+        context.update(order_items[0].single_item_receipt_context)
 
     return render_to_response(receipt_template, context)
 

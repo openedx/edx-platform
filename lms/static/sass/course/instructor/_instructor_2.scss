@@ -684,6 +684,52 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
+  // Auto Enroll Csv Section
+  .auto_enroll_csv {
+    .results {
+
+    }
+    .enrollment_signup_button {
+      margin-right: ($baseline/4);
+    }
+    // Custom File upload
+    .customBrowseBtn {
+      margin: ($baseline/2) 0;
+      display: inline-block;
+      .file-browse {
+        position:relative;
+        overflow:hidden;
+        display: inline;
+        margin-left: -5px;
+        span.browse{
+          @include button(simple, $blue);
+          padding: 6px ($baseline/2);
+          font-size: 12px;
+          border-radius: 0 3px 3px 0;
+          margin-right: ($baseline);
+        }
+        input.file_field {
+          position:absolute;
+          top:0;
+          right:0;
+          margin:0;
+          padding:0;
+          cursor:pointer;
+          opacity:0;
+          filter:alpha(opacity=0);
+        }
+      }
+      & > span, & input[disabled]{
+        vertical-align: middle;
+      }
+      input[disabled] {
+        cursor: not-allowed;
+        border: 1px solid $lightGrey1;
+        border-radius: 4px 0 0 4px;
+        padding: 6px 6px 5px;
+      }
+    }
+  }
 
   .enroll-option {
     margin: ($baseline/2) 0;
@@ -785,7 +831,6 @@ section.instructor-dashboard-content-2 {
         .info {
           @include box-sizing(border-box);
           padding: ($baseline/2);
-
           border: 1px solid $light-gray;
           color: $lighter-base-font-color;
           line-height: 1.3em;
@@ -833,7 +878,7 @@ section.instructor-dashboard-content-2 {
         input[type="button"].add {
           @include idashbutton($blue);
           position: absolute;
-          right: $baseline;
+          @include right($baseline);
         }
       }
 
@@ -1145,6 +1190,9 @@ input[name="subject"] {
 
 }
 #e-commerce{
+  input[name='list-order-sale-csv'] {
+    margin-right: 14px;
+  }
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
@@ -1293,19 +1341,17 @@ input[name="subject"] {
     width: 650px;
     margin-left: -325px;
     border-radius: 2px;
-    input[type="submit"]#update_coupon_button{
+    input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
+    input[type="button"]#set_course_button {
       @include button(simple, $blue);
       @extend .button-reset;
-    }
-    input[type="submit"]#add_coupon_button{
-      @include button(simple, $blue);
-      @extend .button-reset;
+      display: block;
+      height: auto;
+      margin: 0 auto;
+      width: 100%;
+      white-space: normal;
     }
     input[name="generate-registration-codes-csv"]{
-      @include button(simple, $blue);
-      @extend .button-reset;
-    }
-    input[type="submit"]#set_course_button{
       @include button(simple, $blue);
       @extend .button-reset;
     }
@@ -1621,3 +1667,8 @@ input[name="subject"] {
   }
 }
 
+.rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,
+.rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
+  left: 2em;
+  right: auto;
+}

@@ -372,7 +372,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
-
     def test_get_html_with_non_existant_edx_video_id(self):
         """
         Tests the VideoModule get_html where a edx_video_id is given but a video is not found
@@ -395,7 +394,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             <source src="example.mp4"/>
             <source src="example.webm"/>
             """,
-            'edx_video_id':"meow",
+            'edx_video_id': "meow",
             'result': {
                 'download_video_link': u'example_source.mp4',
                 'sources': json.dumps([u'example.mp4', u'example.webm']),
@@ -416,7 +415,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     @mock.patch('edxval.api.get_video_info')
     def test_get_html_with_mocked_edx_video_id(self, mock_get_video_info):
         mock_get_video_info.return_value = {
-            'url' : '/edxval/video/example',
+            'url': '/edxval/video/example',
             'edx_video_id': u'example',
             'duration': 111.0,
             'client_video_id': u'The example video',
@@ -441,8 +440,10 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 {sources}
             </video>
         """
+
         data = {
-            'download_video': 'true',
+            # test with download_video set to false and make sure download_video_link is not set (is None)
+            'download_video': 'false',
             'source': 'example_source.mp4',
             'sources': """
                 <source src="example.mp4"/>
@@ -450,11 +451,10 @@ class TestGetHtmlMethod(BaseTestXmodule):
             """,
             'edx_video_id': "mock item",
             'result': {
-                'download_video_link': u'http://www.meowmix.com',
+                'download_video_link': None,
                 'sources': json.dumps([u'example.mp4', u'example.webm']),
             }
         }
-
 
         # Video found for edx_video_id
         initial_context = {
@@ -555,7 +555,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 <source src="example.mp4"/>
                 <source src="example.webm"/>
             """,
-            'edx_video_id':"thundercats",
+            'edx_video_id': "thundercats",
             'result': {
                 'download_video_link': u'http://fake-video.edx.org/thundercats.mp4',
                 'sources': json.dumps([u'example.mp4', u'example.webm']),
@@ -623,8 +623,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         def side_effect(*args, **kwargs):
             cdn = {
-            'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
-            'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
+                'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
+                'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
             }
             return cdn.get(args[1])
 
@@ -716,7 +716,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
-
     @patch('xmodule.video_module.video_module.get_video_from_cdn')
     def test_get_html_cdn_source(self, mocked_get_video):
         """
@@ -724,8 +723,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         def side_effect(*args, **kwargs):
             cdn = {
-            'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
-            'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
+                'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
+                'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
             }
             return cdn.get(args[1])
 

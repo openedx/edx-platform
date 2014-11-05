@@ -17,7 +17,7 @@
                 this.mode = options.mode || 'inline';
                 this.course_settings = options.course_settings;
                 this.threadType = this.model.get('thread_type');
-                this.topicId = options.topicId;
+                this.topicId = this.model.get('commentable_id');
                 _.bindAll(this);
                 return this;
             },
@@ -28,16 +28,14 @@
                 this.template = _.template($('#thread-edit-template').html());
                 this.$el.html(this.template(this.model.toJSON())).appendTo(this.container);
                 this.submitBtn = this.$('.post-update');
-                if (this.isTabMode()) {
-                    threadTypeTemplate = _.template($("#thread-type-template").html());
-                    this.addField(threadTypeTemplate({form_id: formId}));
-                    this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
-                    this.topicView = new DiscussionTopicMenuView({
-                        topicId: this.topicId,
-                        course_settings: this.course_settings
-                    });
-                    this.addField(this.topicView.render());
-                }
+                threadTypeTemplate = _.template($("#thread-type-template").html());
+                this.addField(threadTypeTemplate({form_id: formId}));
+                this.$("#" + formId + "-post-type-" + this.threadType).attr('checked', true);
+                this.topicView = new DiscussionTopicMenuView({
+                    topicId: this.topicId,
+                    course_settings: this.course_settings
+                });
+                this.addField(this.topicView.render());
                 DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), 'edit-post-body');
                 return this;
             },
@@ -55,7 +53,13 @@
                 var title = this.$('.edit-post-title').val(),
                     threadType = this.$(".post-type-input:checked").val(),
                     body = this.$('.edit-post-body textarea').val(),
-                    commentableId = this.isTabMode() ? this.topicView.getCurrentTopicId() : null;
+                    commentableId = this.topicView.getCurrentTopicId(),
+                    postData = {
+                        title: title,
+                        thread_type: threadType,
+                        body: body,
+                        commentable_id: commentableId
+                    };
 
                 return DiscussionUtil.safeAjax({
                     $elem: this.submitBtn,
@@ -64,32 +68,18 @@
                     type: 'POST',
                     dataType: 'json',
                     async: false, // @TODO when the rest of the stuff below is made to work properly..
-                    data: {
-                        title: title,
-                        thread_type: threadType,
-                        body: body,
-                        commentable_id: commentableId
-                    },
+                    data: postData,
                     error: DiscussionUtil.formErrorHandler(this.$('.post-errors')),
                     success: function() {
-                        var newAttrs = {
-                            title: title,
-                            body: body
-                        };
                         // @TODO: Move this out of the callback, this makes it feel sluggish
                         this.$('.edit-post-title').val('').attr('prev-text', '');
                         this.$('.edit-post-body textarea').val('').attr('prev-text', '');
                         this.$('.wmd-preview p').html('');
-                        if (this.isTabMode()) {
-                            _.extend(newAttrs, {
-                                thread_type: threadType,
-                                commentable_id: commentableId,
-                                courseware_title: this.topicView.getFullTopicName()
-                            });
-                        }
-                        this.model.set(newAttrs).unset('abbreviatedBody');
+                        postData.courseware_title = this.topicView.getFullTopicName();
+                        this.model.set(postData).unset('abbreviatedBody');
                         this.trigger('thread:updated');
                         if (this.threadType !== threadType) {
+                            this.model.set("thread_type", threadType)
                             this.model.trigger('thread:thread_type_updated');
                             this.trigger('comment:endorse');
                         }

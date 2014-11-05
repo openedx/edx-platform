@@ -87,6 +87,20 @@
   width: 100%;
 }
 
+// layout placeholders
+.ui-col-wide  {
+  width: flex-grid(9, 12);
+  @include margin-right(flex-gutter());
+  @include float(left);
+}
+
+.ui-col-narrow  {
+  width: flex-grid(3, 12);
+  @include float(left);
+}
+
+
+
 // extends - UI - window
 %ui-window {
   @include clearfix();

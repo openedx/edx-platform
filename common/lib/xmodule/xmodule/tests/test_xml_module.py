@@ -132,7 +132,6 @@ class InheritingFieldDataTest(unittest.TestCase):
         self.assertEqual(child.not_inherited, "nothing")
 
 
-
 class EditableMetadataFieldsTest(unittest.TestCase):
     def test_display_name_field(self):
         editable_fields = self.get_xml_editable_fields(DictFieldData({}))
@@ -331,7 +330,6 @@ class TestDeserializeInteger(TestDeserialize):
         # 2.78 can be converted to int, so the string will be deserialized
         self.assertDeserializeEqual(-2.78, '-2.78')
 
-
     def test_deserialize_unsupported_types(self):
         self.assertDeserializeEqual('[3]', '[3]')
         # '2.78' cannot be converted to int, so input value is returned
@@ -415,7 +413,7 @@ class TestDeserializeAny(TestDeserialize):
     def test_deserialize(self):
         self.assertDeserializeEqual('hAlf', '"hAlf"')
         self.assertDeserializeEqual('false', '"false"')
-        self.assertDeserializeEqual({'bar': 'hat', 'frog' : 'green'}, '{"bar": "hat", "frog": "green"}')
+        self.assertDeserializeEqual({'bar': 'hat', 'frog': 'green'}, '{"bar": "hat", "frog": "green"}')
         self.assertDeserializeEqual([3.5, 5.6], '[3.5, 5.6]')
         self.assertDeserializeEqual('[', '[')
         self.assertDeserializeEqual(False, 'false')
@@ -457,10 +455,14 @@ class TestDeserializeTimedelta(TestDeserialize):
     test_field = Timedelta
 
     def test_deserialize(self):
-        self.assertDeserializeEqual('1 day 12 hours 59 minutes 59 seconds',
-            '1 day 12 hours 59 minutes 59 seconds')
-        self.assertDeserializeEqual('1 day 12 hours 59 minutes 59 seconds',
-            '"1 day 12 hours 59 minutes 59 seconds"')
+        self.assertDeserializeEqual(
+            '1 day 12 hours 59 minutes 59 seconds',
+            '1 day 12 hours 59 minutes 59 seconds'
+        )
+        self.assertDeserializeEqual(
+            '1 day 12 hours 59 minutes 59 seconds',
+            '"1 day 12 hours 59 minutes 59 seconds"'
+        )
         self.assertDeserializeNonString()
 
 

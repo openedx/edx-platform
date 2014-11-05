@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Open Sans";
+  font-weight: 300;
+  src: url('../../fonts/OpenSans/OpenSans-Light-webfont.eot?') format('eot'),
+    url('../../fonts/OpenSans/OpenSans-Light-webfont.woff') format('woff'),
+    url('../../fonts/OpenSans/OpenSans-Light-webfont.ttf')  format('truetype');
+}
+
 html, body {
 	height: 100%;
 	background: -webkit-radial-gradient(center, #fff, #e6e6e6);

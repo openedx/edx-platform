@@ -66,8 +66,10 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(index_info['course'], 'course')
         self.assertEqual(index_info['run'], '2014')
 
-        test_chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
-            parent_location=test_course.location)
+        test_chapter = persistent_factories.ItemFactory.create(
+            display_name='chapter 1',
+            parent_location=test_course.location
+        )
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
         test_course = self.split_store.get_course(test_course.id.version_agnostic())
@@ -156,8 +158,10 @@ class TemplateTests(unittest.TestCase):
             course='history', run='doomed', org='edu.harvard',
             display_name='doomed test course',
             user_id='testbot')
-        persistent_factories.ItemFactory.create(display_name='chapter 1',
-            parent_location=test_course.location)
+        persistent_factories.ItemFactory.create(
+            display_name='chapter 1',
+            parent_location=test_course.location
+        )
 
         id_locator = test_course.id.for_branch(ModuleStoreEnum.BranchName.draft)
         guid_locator = test_course.location.course_agnostic()
@@ -180,10 +184,17 @@ class TemplateTests(unittest.TestCase):
             display_name='history test course',
             user_id='testbot'
         )
-        chapter = persistent_factories.ItemFactory.create(display_name='chapter 1',
-            parent_location=test_course.location, user_id='testbot')
-        sub = persistent_factories.ItemFactory.create(display_name='subsection 1',
-            parent_location=chapter.location, user_id='testbot', category='vertical')
+        chapter = persistent_factories.ItemFactory.create(
+            display_name='chapter 1',
+            parent_location=test_course.location,
+            user_id='testbot'
+        )
+        sub = persistent_factories.ItemFactory.create(
+            display_name='subsection 1',
+            parent_location=chapter.location,
+            user_id='testbot',
+            category='vertical'
+        )
         first_problem = persistent_factories.ItemFactory.create(
             display_name='problem 1', parent_location=sub.location, user_id='testbot', category='problem',
             data="<problem></problem>"

@@ -140,7 +140,7 @@ Documentation
 
 Documentation for developers is available on the docs.edx.org web page.
 
-* `edX Developer Documentation`_ collects information directly from edX
+* The `edX Platform Developer's Guide`_ collects information directly from edX
   platform python docstrings. The topics in this guide include guidelines for
   contributing to Open edX, options for extending the Open edX platform, using
   the edX public sandboxes, instrumenting analytics, and testing.
@@ -152,7 +152,9 @@ Documentation for developers is available on the docs.edx.org web page.
 * XBlock_: Open edX courseware components provides preliminary documentation
   on the XBlock component architecture for building courses.
 
-* `edX Open Learning XML Guide`_ provides guidelines for building edX courses with Open Learning XML (OLX). Note that this guide is currently an Alpha version.
+* `edX Open Learning XML Guide`_ provides guidelines for building edX courses
+  with Open Learning XML (OLX). Note that this guide is currently an Alpha
+  version.
 
 GitHub
 -------
@@ -271,7 +273,7 @@ edX Global Community meetup_ group.
 .. _Open Source Home: http://edx-wiki.atlassian.net/wiki/display/OS/Open+Source+Home
 .. _XBlock: http://edx.readthedocs.org/projects/xblock/en/latest/
 .. _Installing, Configuring, and Running the edX Platform: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/
-.. _edX Developer Documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/
+.. _edX Platform Developer's Guide: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/
 .. _edx/configuration: http://github.com/edx/configuration/wiki
 .. _site: http://code.edx.org/
 .. _edx/edx-platform: https://github.com/edx/edx-platform

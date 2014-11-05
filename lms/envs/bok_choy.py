@@ -4,7 +4,7 @@ Settings for bok choy tests
 
 import os
 from path import path
-
+from tempfile import mkdtemp
 
 CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=E1120
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
@@ -41,6 +41,13 @@ update_module_store_settings(
     },
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
+
+###################### Grade Downloads ######################
+GRADES_DOWNLOAD = {
+    'STORAGE_TYPE': 'localfs',
+    'BUCKET': 'edx-grades',
+    'ROOT_PATH': os.path.join(mkdtemp(), 'edx-s3', 'grades'),
+}
 
 # Configure the LMS to use our stub XQueue implementation
 XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
