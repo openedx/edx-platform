@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Add support for user partitioning based on cohort.  TNL-710
+
 Platform: Add base support for cohorted group configurations.  TNL-649
 
 Common: Add configurable reset button to units

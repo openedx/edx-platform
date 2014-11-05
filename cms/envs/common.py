@@ -585,7 +585,7 @@ INSTALLED_APPS = (
     'contentstore',
     'course_creators',
     'student',  # misleading name due to sharing with lms
-    'course_groups',  # not used in cms (yet), but tests run
+    'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
 
     # Tracking
     'track',
