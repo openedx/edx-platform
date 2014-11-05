@@ -1999,3 +1999,11 @@ NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
 COUNTRIES_OVERRIDE = {
     "TW": _("Taiwan"),
 }
+
+# which access.py permission name to check in order to determine if a course is visible in
+# the course catalog. We default this to the legacy permission 'see_exists'.
+COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
+
+# which access.py permission name to check in order to determine if a course about page is
+# visible. We default this to the legacy permission 'see_exists'.
+COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
