@@ -73,9 +73,6 @@ var edx = edx || {};
 
             if (providerUrl) {
                 window.location.href = providerUrl;
-            } else {
-                // TODO -- error handling here
-                console.log('No URL available for third party auth provider');
             }
         },
 
