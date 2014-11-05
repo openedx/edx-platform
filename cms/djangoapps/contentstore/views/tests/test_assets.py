@@ -21,6 +21,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from django.conf import settings
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 class AssetsTestCase(CourseTestCase):
@@ -54,7 +57,7 @@ class BasicAssetsTestCase(AssetsTestCase):
         course_items = import_from_xml(
             module_store,
             self.user.id,
-            'common/test/data/',
+            TEST_DATA_DIR,
             ['toy'],
             static_content_store=contentstore(),
             verbose=True
@@ -247,7 +250,7 @@ class LockAssetTestCase(AssetsTestCase):
         course_items = import_from_xml(
             module_store,
             self.user.id,
-            'common/test/data/',
+            TEST_DATA_DIR,
             ['toy'],
             static_content_store=contentstore(),
             verbose=True

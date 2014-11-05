@@ -6,14 +6,16 @@ from mock import patch, MagicMock
 
 from courseware.models import XModuleUserStateSummaryField
 from courseware.tests.factories import UserStateSummaryFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+# pylint: disable=C0111
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):
