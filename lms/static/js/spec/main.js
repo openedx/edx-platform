@@ -521,6 +521,9 @@
         'lms/include/js/spec/edxnotes/notes_spec.js',
         'lms/include/js/spec/edxnotes/utils/logger_spec.js',
         'lms/include/js/spec/edxnotes/views/notes_page_spec.js'
+        'lms/include/js/spec/edxnotes/logger_spec.js',
+        'lms/include/js/spec/edxnotes/notes_spec.js',
+        'lms/include/js/spec/edxnotes/shim_spec.js'
     ]);
 
 }).call(this, requirejs, define);
