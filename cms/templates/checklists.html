@@ -2,7 +2,7 @@
 <%def name="online_help_token()"><% return "checklist" %></%def>
 <%!
   from django.core.urlresolvers import reverse
-  from django.utils.translation import ugettext as _
+  from util.markup import ugettext as _
 %>
 <%block name="title">${_("Course Checklists")}</%block>
 <%block name="bodyclass">is-signedin course view-checklists</%block>

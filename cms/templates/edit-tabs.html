@@ -2,7 +2,7 @@
 <%def name="online_help_token()"><% return "pages" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.utils.translation import ugettext as _
+  from util.markup import ugettext as _
   from django.core.urlresolvers import reverse
   from xmodule.tabs import StaticTab
   from django.template.defaultfilters import escapejs
