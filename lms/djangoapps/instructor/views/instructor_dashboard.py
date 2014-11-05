@@ -263,6 +263,7 @@ def _section_membership(course, access):
 
 
 def _is_small_course(course_key):
+    """ Compares against MAX_ENROLLMENT_INSTR_BUTTONS to determine if course enrollment is considered small. """
     is_small_course = False
     enrollment_count = CourseEnrollment.num_enrolled_in(course_key)
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
@@ -364,11 +365,9 @@ def _section_send_email(course, access):
 
 def _get_dashboard_link(course_key):
     # Construct a URL to the external analytics dashboard
-    link = None
-    if settings.ANALYTICS_DASHBOARD_URL:
-        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-        link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
-                                                                            settings.ANALYTICS_DASHBOARD_NAME)
+    analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+    link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
+                                                              settings.ANALYTICS_DASHBOARD_NAME)
     return link
 
 
