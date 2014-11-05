@@ -53,9 +53,3 @@ class LmsBlockMixin(XBlockMixin):
         default=False,
         scope=Scope.settings,
     )
-    visible_in_catalog = Boolean(
-        display_name=_("Course appears in the list of courses"),
-        help=_("If this value is set to true, then this course will appear the list of courses on the homepage."),
-        default=True,
-        scope=Scope.settings,
-    )
