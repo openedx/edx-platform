@@ -110,6 +110,7 @@ def _has_access_course_desc(user, action, course):
                   ACCESS_REQUIRE_STAFF_FOR_COURSE,
     'see_exists' -- can see that the course exists.
     'staff' -- staff access to course.
+    'visible_in_catalog' -- user is able to see the course listed in the course catalog
     """
     def can_load():
         """
@@ -204,6 +205,14 @@ def _has_access_course_desc(user, action, course):
 
         return can_enroll() or can_load()
 
+    def visible_in_catalog():
+        """
+        Implements the "can see course in catalog" logic if a course should be visible in the main course catalog
+        In this case we use the visible_in_catalog property on the course descriptor (in lms/lib/xblock/mixin.py)
+        but also allow course staff to see this.
+        """
+        return course.visible_in_catalog or _has_staff_access_to_descriptor(user, course, course.id)
+
     checkers = {
         'load': can_load,
         'load_forum': can_load_forum,
@@ -211,6 +220,7 @@ def _has_access_course_desc(user, action, course):
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
         'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id),
+        'visible_in_catalog': visible_in_catalog,
     }
 
     return _dispatch(checkers, action, user, course)

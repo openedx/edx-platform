@@ -701,7 +701,9 @@ def course_about(request, course_id):
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'see_exists', course_key)
+
+    permission_check = microsite.get_value('course_catalog_visibility_permission', 'see_exists')
+    course = get_course_with_access(request.user, permission_check, course_key)
 
     if microsite.get_value(
         'ENABLE_MKTG_SITE',
@@ -782,8 +784,9 @@ def mktg_course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
-        course = get_course_with_access(request.user, 'see_exists', course_key)
-    except (ValueError, Http404) as e:
+        permission_check = microsite.get_value('course_catalog_visibility_permission', 'see_exists')
+        course = get_course_with_access(request.user, permission_check, course_key)
+    except (ValueError, Http404):
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response(
