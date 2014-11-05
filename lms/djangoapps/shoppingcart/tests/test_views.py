@@ -467,7 +467,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
         test_query_set = coupon_admin.queryset(request)
         test_actions = coupon_admin.get_actions(request)
-        self.assertTrue('really_delete_selected' in test_actions['really_delete_selected'])
+        self.assertIn('really_delete_selected', test_actions['really_delete_selected'])
         self.assertEqual(get_coupon.is_active, True)
         coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=no-member
         for coupon in test_query_set:
@@ -1486,28 +1486,28 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
-        self.assertTrue('Activate Course Enrollment' in response.content)
+        self.assertIn('Activate Course Enrollment', response.content)
 
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('View Dashboard' in response.content)
+        self.assertIn('View Dashboard', response.content)
 
         #now check that the registration code has already been redeemed and user is already registered in the course
         RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)
         response = self.client.get(redeem_url)
         self.assertEquals(len(RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)), 1)
-        self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
+        self.assertIn("You've clicked a link for an enrollment code that has already been used.", response.content)
 
         #now check that the registration code has already been redeemed
         response = self.client.post(redeem_url)
-        self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
+        self.assertIn("You've clicked a link for an enrollment code that has already been used.", response.content)
 
         #now check the response of the dashboard page
         dashboard_url = reverse('dashboard')
         response = self.client.get(dashboard_url)
         self.assertEquals(response.status_code, 200)
-        self.assertTrue(self.course.display_name, response.content)
+        self.assertIn(self.course.display_name, response.content)
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
