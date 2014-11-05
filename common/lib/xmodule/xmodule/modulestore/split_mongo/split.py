@@ -2125,26 +2125,30 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Split specific lookup
         """
-        return self._lookup_course(course_key).structure
+        return self._lookup_course(course_key).structure.get('assets', {})
 
-    def _find_course_asset(self, course_key, filename, get_thumbnail=False):
-        structure = self._lookup_course(course_key).structure
-        return structure, self._lookup_course_asset(structure, filename, get_thumbnail)
+    def _find_course_asset(self, asset_key):
+        """
+        Return the raw dict of assets type as well as the index to the one being sought from w/in
+        it's subvalue (or None)
+        """
+        assets = self._lookup_course(asset_key.course_key).structure.get('assets', {})
+        return assets, self._lookup_course_asset(assets, asset_key)
 
-    def _lookup_course_asset(self, structure, filename, get_thumbnail=False):
+    def _lookup_course_asset(self, structure, asset_key):
         """
         Find the course asset in the structure or return None if it does not exist
         """
         # See if this asset already exists by checking the external_filename.
         # Studio doesn't currently support using multiple course assets with the same filename.
         # So use the filename as the unique identifier.
-        accessor = 'thumbnails' if get_thumbnail else 'assets'
-        for idx, asset in enumerate(structure.get(accessor, [])):
-            if asset['filename'] == filename:
+        accessor = asset_key.block_type
+        for idx, asset in enumerate(structure.setdefault(accessor, [])):
+            if asset['filename'] == asset_key.block_id:
                 return idx
         return None
 
-    def _update_course_assets(self, user_id, asset_key, update_function, get_thumbnail=False):
+    def _update_course_assets(self, user_id, asset_key, update_function):
         """
         A wrapper for functions wanting to manipulate assets. Gets and versions the structure,
         passes the mutable array for either 'assets' or 'thumbnails' as well as the idx to the function for it to
@@ -2158,10 +2162,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             index_entry = self._get_index_if_valid(asset_key.course_key)
             new_structure = self.version_structure(asset_key.course_key, original_structure, user_id)
 
-            accessor = 'thumbnails' if get_thumbnail else 'assets'
-            asset_idx = self._lookup_course_asset(new_structure, asset_key.path, get_thumbnail)
+            asset_idx = self._lookup_course_asset(new_structure.setdefault('assets', {}), asset_key)
 
-            new_structure[accessor] = update_function(new_structure.get(accessor, []), asset_idx)
+            new_structure['assets'][asset_key.block_type] = update_function(
+                new_structure['assets'][asset_key.block_type], asset_idx
+            )
 
             # update index if appropriate and structures
             self.update_structure(asset_key.course_key, new_structure)
@@ -2170,7 +2175,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 # update the index entry if appropriate
                 self._update_head(asset_key.course_key, index_entry, asset_key.branch, new_structure['_id'])
 
-    def _save_asset_info(self, course_key, asset_metadata, user_id, thumbnail=False):
+    def save_asset_metadata(self, asset_metadata, user_id):
         """
         The guts of saving a new or updated asset
         """
@@ -2186,7 +2191,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 all_assets[asset_idx] = metadata_to_insert
             return all_assets
 
-        return self._update_course_assets(user_id, asset_metadata.asset_id, _internal_method, thumbnail)
+        return self._update_course_assets(user_id, asset_metadata.asset_id, _internal_method)
 
     @contract(asset_key='AssetKey', attr_dict=dict)
     def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
@@ -2217,19 +2222,18 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             all_assets[asset_idx] = mdata.to_mongo()
             return all_assets
 
-        self._update_course_assets(user_id, asset_key, _internal_method, False)
+        self._update_course_assets(user_id, asset_key, _internal_method)
 
     @contract(asset_key='AssetKey')
-    def _delete_asset_data(self, asset_key, user_id, thumbnail=False):
+    def delete_asset_metadata(self, asset_key, user_id):
         """
-        Internal; deletes a single asset's metadata -or- thumbnail.
+        Internal; deletes a single asset's metadata.
 
         Arguments:
-            asset_key (AssetKey): key containing original asset/thumbnail filename
-            thumbnail: True if thumbnail deletion, False if asset metadata deletion
+            asset_key (AssetKey): key containing original asset filename
 
         Returns:
-            Number of asset metadata/thumbnail entries deleted (0 or 1)
+            Number of asset metadata entries deleted (0 or 1)
         """
         def _internal_method(all_asset_info, asset_idx):
             """
@@ -2242,33 +2246,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             return all_asset_info
 
         try:
-            self._update_course_assets(user_id, asset_key, _internal_method, thumbnail)
+            self._update_course_assets(user_id, asset_key, _internal_method)
             return 1
         except ItemNotFoundError:
             return 0
-
-    @contract(course_key='CourseKey')
-    def delete_all_asset_metadata(self, course_key, user_id):
-        """
-        Delete all of the assets which use this course_key as an identifier.
-
-        Arguments:
-            course_key (CourseKey): course_identifier
-        """
-        with self.bulk_operations(course_key):
-            original_structure = self._lookup_course(course_key).structure
-            index_entry = self._get_index_if_valid(course_key)
-            new_structure = self.version_structure(course_key, original_structure, user_id)
-
-            new_structure['assets'] = []
-            new_structure['thumbnails'] = []
-
-            # update index if appropriate and structures
-            self.update_structure(course_key, new_structure)
-
-            if index_entry is not None:
-                # update the index entry if appropriate
-                self._update_head(course_key, index_entry, course_key.branch, new_structure['_id'])
 
     @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
     def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):

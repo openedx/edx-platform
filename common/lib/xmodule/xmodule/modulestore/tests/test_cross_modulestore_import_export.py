@@ -40,7 +40,7 @@ COMMON_DOCSTORE_CONFIG = {
     'host': MONGO_HOST,
     'port': MONGO_PORT_NUM,
 }
-DATA_DIR = path(__file__).dirname().parent.parent.parent.parent.parent / "test" / "data"
+DATA_DIR = path(__file__).dirname().parent.parent / "tests" / "data" / "xml-course-root"
 
 XBLOCK_MIXINS = (InheritanceMixin, XModuleMixin)
 
