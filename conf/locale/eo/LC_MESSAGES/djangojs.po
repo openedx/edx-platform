@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-27 11:01-0400\n"
-"PO-Revision-Date: 2014-10-27 15:02:51.591584\n"
+"POT-Creation-Date: 2014-11-03 14:00-0500\n"
+"PO-Revision-Date: 2014-11-03 19:02:07.270619\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3146,6 +3146,10 @@ msgstr "Héädïng #"
 msgid "You have been logged out of your edX account. "
 msgstr "Ýöü hävé ßéén löggéd öüt öf ýöür édX äççöünt.  Ⱡ'σяєм ιρѕυм #"
 
+#: lms/static/js/course_survey.js
+msgid "There has been an error processing your survey."
+msgstr "Théré häs ßéén än érrör pröçéssïng ýöür sürvéý. Ⱡ'σяєм ιρѕυм #"
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr "Ûnknöwn Érrör Öççürréd. Ⱡ'σяє#"
@@ -3487,12 +3491,6 @@ msgstr "Ýöür ïmpört häs fäïléd. Ⱡ'σяє#"
 #: cms/static/js/views/import.js cms/static/js/views/import.js.c
 msgid "Choose new file"
 msgstr "Çhöösé néw fïlé Ⱡ'#"
-
-#: cms/static/js/factories/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-"Ýöür ïmpört ïs ïn prögréss; nävïgätïng äwäý wïll äßört ït. Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
 
 #: cms/static/js/factories/manage_users.js
 msgid "A valid email address is required"
