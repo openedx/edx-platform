@@ -15,7 +15,6 @@ from contracts import contract, new_contract
 from opaque_keys.edx.keys import AssetKey
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.assetstore import AssetMetadata, AssetThumbnailMetadata
 
 
 new_contract('AssetKey', AssetKey)
@@ -31,13 +30,6 @@ class AssetException(Exception):
 class AssetMetadataNotFound(AssetException):
     """
     Thrown when no asset metadata is present in the course modulestore for the particular asset requested.
-    """
-    pass
-
-
-class UnknownAssetType(AssetException):
-    """
-    Thrown when the asset type is not recognized.
     """
     pass
 
@@ -59,15 +51,7 @@ class AssetManager(object):
         """
         Finds a course asset either in the assetstore -or- in the deprecated contentstore.
         """
-        store = modulestore()
-        content_md = None
-        asset_type = asset_key.asset_type
-        if asset_type == AssetThumbnailMetadata.ASSET_TYPE:
-            content_md = store.find_asset_thumbnail_metadata(asset_key)
-        elif asset_type == AssetMetadata.ASSET_TYPE:
-            content_md = store.find_asset_metadata(asset_key)
-        else:
-            raise UnknownAssetType()
+        content_md = modulestore().find_asset_metadata(asset_key)
 
         # If found, raise an exception.
         if content_md:
