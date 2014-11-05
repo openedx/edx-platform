@@ -65,7 +65,10 @@
             'js/views/cohort_editor': 'js/views/cohort_editor',
             'js/views/cohorts': 'js/views/cohorts',
             'js/views/notification': 'js/views/notification',
-            'js/models/notification': 'js/models/notification'
+            'js/models/notification': 'js/models/notification',
+
+            // edxnotes
+            'annotator': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
         shim: {
             'gettext': {
@@ -257,6 +260,11 @@
             'js/views/notification': {
                 exports: 'NotificationView',
                 deps: ['backbone', 'jquery', 'underscore']
+            },
+            // edx notes
+            'annotator': {
+                exports: 'Annotator',
+                deps: ['jquery']
             }
         },
     });
@@ -270,7 +278,9 @@
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
         'lms/include/js/spec/student_account/account.js',
-        'lms/include/js/spec/student_profile/profile.js'
+        'lms/include/js/spec/student_profile/profile.js',
+        'lms/include/js/spec/edxnotes/logger_spec.js',
+        'lms/include/js/spec/edxnotes/notes_spec.js'
     ]);
 
 }).call(this, requirejs, define);

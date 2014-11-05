@@ -6,6 +6,7 @@
 <%
     # set doc language direction
     from django.utils.translation import get_language_bidi
+    from dealer.git import git
     dir_rtl = 'rtl' if get_language_bidi() else 'ltr'
 %>
 <head dir="${dir_rtl}">
@@ -69,6 +70,23 @@
   % else:
     <%static:js group='main_vendor'/>
   % endif
+
+  <script>
+    window.baseUrl = "${settings.STATIC_URL}";
+    (function (require) {
+    % if settings.DEBUG is True:
+        ## Using what amounts to a random number in the Development environment for cache-busting
+        var urlArgs = "bust=" + (new Date()).getTime();
+    % else:
+        var urlArgs = "v=${git.revision}";
+    % endif
+      require.config({
+          baseUrl: baseUrl,
+          urlArgs: urlArgs
+      });
+    }).call(this, require || RequireJS.require);
+  </script>
+  <script type="text/javascript" src="${static.url("require-config.js")}"></script>
 
   <%block name="headextra"/>
 
@@ -143,7 +161,6 @@
 
   </div>
 
-  <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   % if not disable_courseware_js:
     <%static:js group='application'/>
     <%static:js group='module-js'/>
