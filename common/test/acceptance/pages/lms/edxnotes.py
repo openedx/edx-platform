@@ -120,6 +120,21 @@ class EdxNotesUnitPage(CoursePage):
     def is_browser_on_page(self):
         return self.q(css="body.courseware .edx-notes-wrapper").present
 
+    def move_mouse_to(self, selector):
+        """
+        Moves mouse to the element that matches `selector(str)`.
+        """
+        body = self.q(css=selector)[0]
+        ActionChains(self.browser).move_to_element(body).release().perform()
+        return self
+
+    def click(self, selector):
+        """
+        Clicks on the element that matches `selector(str)`.
+        """
+        self.q(css=selector).first.click()
+        return self
+
     @property
     def components(self):
         """
@@ -204,6 +219,15 @@ class EdxNoteHighlight(NoteChild):
         self.item_id = parent_id
         disable_animations(self)
 
+    @property
+    def is_visible(self):
+        """
+        Returns True if the note is visible.
+        """
+        viewer_is_visible = self.q(css=self._bounded_selector(".annotator-viewer")).visible
+        editor_is_visible = self.q(css=self._bounded_selector(".annotator-editor")).visible
+        return viewer_is_visible or editor_is_visible
+
     def wait_for_adder_visibility(self):
         """
         Waiting for visibility of note adder button.
@@ -243,6 +267,20 @@ class EdxNoteHighlight(NoteChild):
         self.wait_for_adder_visibility()
         self.q(css=self._bounded_selector(self.ADDER_SELECTOR)).first.click()
         self.wait_for_editor_visibility()
+        return self
+
+    def click_on_highlight(self):
+        """
+        Clicks on the highlighted text.
+        """
+        ActionChains(self.browser).move_to_element(self.element).click().release().perform()
+        return self
+
+    def click_on_viewer(self):
+        """
+        Clicks on the highlighted text.
+        """
+        self.q(css=self._bounded_selector(".annotator-editor")).first.click()
         return self
 
     def show(self):
