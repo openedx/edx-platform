@@ -98,6 +98,11 @@ urlpatterns += patterns(
     url(r'^api/val/v0/', include('edxval.urls')),
 )
 
+if settings.FEATURES.get('ENABLE_VIDEO_UPLOAD_PIPELINE'):
+    urlpatterns += (
+        url(r'^video_upload/{}/$'.format(settings.COURSE_KEY_PATTERN), 'video_upload_handler'),
+    )
+
 js_info_dict = {
     'domain': 'djangojs',
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
