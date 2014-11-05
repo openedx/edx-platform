@@ -9,6 +9,7 @@ import os
 from path import path
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
+from bok_choy.javascript import js_defined
 
 
 def skip_if_browser(browser):
@@ -90,6 +91,7 @@ def enable_animations(page):
     enable_css_animations(page)
 
 
+@js_defined('window.jQuery')
 def disable_jquery_animations(page):
     """
     Disable jQuery animations.
@@ -97,6 +99,7 @@ def disable_jquery_animations(page):
     page.browser.execute_script("jQuery.fx.off = true;")
 
 
+@js_defined('window.jQuery')
 def enable_jquery_animations(page):
     """
     Enable jQuery animations.
