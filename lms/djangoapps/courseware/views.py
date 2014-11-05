@@ -701,7 +701,12 @@ def course_about(request, course_id):
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'see_exists', course_key)
+
+    permission_name = microsite.get_value(
+        'COURSE_ABOUT_VISIBILITY_PERMISSION',
+        settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+    )
+    course = get_course_with_access(request.user, permission_name, course_key)
 
     if microsite.get_value(
         'ENABLE_MKTG_SITE',
@@ -710,6 +715,7 @@ def course_about(request, course_id):
         return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
     registered = registered_for_course(course, request.user)
+
     staff_access = has_access(request.user, 'staff', course)
     studio_url = get_studio_url(course, 'settings/details')
 
@@ -782,8 +788,12 @@ def mktg_course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
-        course = get_course_with_access(request.user, 'see_exists', course_key)
-    except (ValueError, Http404) as e:
+        permission_name = microsite.get_value(
+            'COURSE_ABOUT_VISIBILITY_PERMISSION',
+            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+        )
+        course = get_course_with_access(request.user, permission_name, course_key)
+    except (ValueError, Http404):
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response(

@@ -24,6 +24,9 @@ _ = lambda text: text
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
+CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
+CATALOG_VISIBILITY_ABOUT = "about"
+CATALOG_VISIBILITY_NONE = "none"
 
 class StringOrDate(Date):
     def from_json(self, value):
@@ -573,6 +576,17 @@ class CourseFields(object):
         default=False,
         scope=Scope.settings,
         deprecated=True
+    )
+
+    catalog_visibility = String(
+        display_name=_("Course Visibility In Catalog"),
+        help=_("Defines the access permissions for showing the course in the course catalog. This can be set to one of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access to about page), 'none' (do not show in catalog and do not allow access to an about page)."),
+        default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+        scope=Scope.settings,
+        values=[
+            {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+            {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},
+            {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]
     )
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
