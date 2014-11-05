@@ -347,8 +347,11 @@ def get_courses(user, domain=None):
     '''
     courses = branding.get_visible_courses()
 
-    permission_check = microsite.get_value('course_catalog_visibility_permission', 'see_exists')
-    courses = [c for c in courses if has_access(user, permission_check, c)]
+    permission_name = microsite.get_value(
+        'COURSE_CATALOG_VISIBILITY_PERMISSION',
+        settings.COURSE_CATALOG_VISIBILITY_PERMISSION
+    )
+    courses = [c for c in courses if has_access(user, permission_name, c)]
 
     courses = sorted(courses, key=lambda course: course.number)
 

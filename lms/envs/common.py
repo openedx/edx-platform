@@ -1851,3 +1851,7 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 COUNTRIES_OVERRIDE = {
     "TW": _("Taiwan"),
 }
+
+# which access.py permission name to check in order to determine if a course is visible in
+# the course catalog
+COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
