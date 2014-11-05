@@ -284,7 +284,11 @@ class CourseFields(object):
         default=False,
         scope=Scope.settings
     )
-
+    video_upload_pipeline = Dict(
+        display_name=_("Video Upload Pipeline"),
+        help=_("Enter settings for the video upload pipeline, including the institute name and the secret token."),
+        scope=Scope.settings
+    )
     no_grade = Boolean(
         display_name=_("Course Not Graded"),
         help=_("Enter true or false. If true, the course will not be graded."),
