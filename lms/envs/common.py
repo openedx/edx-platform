@@ -1851,3 +1851,14 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
 # REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
 INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
 INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
+
+####################### In-line Analytics ######################
+ANALYTICS_ANSWER_DIST_URL = None
+INLINE_ANALYTICS_SUPPORTED_TYPES = {
+    'MultipleChoiceResponse': 'radio',
+    'ChoiceResponse': 'checkbox',
+    'OptionResponse': 'option',
+    'NumericalResponse': 'numerical',
+    'StringResponse': 'string',
+    'FormulaResponse': 'formula',
+}

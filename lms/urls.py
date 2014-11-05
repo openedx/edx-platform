@@ -376,6 +376,10 @@ if settings.COURSEWARE_ENABLED:
         # LTI endpoints listing
         url(r'^courses/{}/lti_rest_endpoints/'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.get_course_lti_endpoints', name='lti_rest_endpoints'),
+
+        # Analytics api endpoints for in-line analytics
+        url(r'^get_analytics_answer_dist/',
+            'courseware.views.get_analytics_answer_dist', name='get_analytics_answer_dist'),
     )
 
     # allow course staff to change to student view of courseware
