@@ -31,7 +31,8 @@ from instructor_task.tasks_helper import (
     reset_attempts_module_state,
     delete_problem_module_state,
     upload_grades_csv,
-    upload_students_csv
+    upload_students_csv,
+    cohort_students_and_upload
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
@@ -152,4 +153,16 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('generated')
     task_fn = partial(upload_students_csv, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
+def cohort_students(entry_id, xmodule_instance_args):
+    """
+    Cohort students in bulk, and upload the results.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
+    action_name = ugettext_noop('cohorted')
+    task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

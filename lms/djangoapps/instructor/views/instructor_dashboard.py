@@ -104,7 +104,7 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': unicode(course_key)}),
         'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
@@ -141,23 +141,23 @@ def _section_e_commerce(course, access):
         'section_key': 'e-commerce',
         'section_display_name': _('E-Commerce'),
         'access': access,
-        'course_id': course_key.to_deprecated_string(),
+        'course_id': unicode(course_key),
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-        'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_user_invoice_preference_url': reverse('get_user_invoice_preference', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'sale_validation_url': reverse('sale_validation', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_sale_order_records_url': reverse('get_sale_order_records', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_registration_code_csv_url': reverse('get_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'generate_registration_code_csv_url': reverse('generate_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'active_registration_code_csv_url': reverse('active_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'spent_registration_code_csv_url': reverse('spent_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': unicode(course_key)}),
+        'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': unicode(course_key)}),
+        'get_user_invoice_preference_url': reverse('get_user_invoice_preference', kwargs={'course_id': unicode(course_key)}),
+        'sale_validation_url': reverse('sale_validation', kwargs={'course_id': unicode(course_key)}),
+        'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': unicode(course_key)}),
+        'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': unicode(course_key)}),
+        'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': unicode(course_key)}),
+        'get_sale_order_records_url': reverse('get_sale_order_records', kwargs={'course_id': unicode(course_key)}),
+        'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': unicode(course_key)}),
+        'get_registration_code_csv_url': reverse('get_registration_codes', kwargs={'course_id': unicode(course_key)}),
+        'generate_registration_code_csv_url': reverse('generate_registration_codes', kwargs={'course_id': unicode(course_key)}),
+        'active_registration_code_csv_url': reverse('active_registration_codes', kwargs={'course_id': unicode(course_key)}),
+        'spent_registration_code_csv_url': reverse('spent_registration_codes', kwargs={'course_id': unicode(course_key)}),
+        'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': unicode(course_key)}),
+        'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': unicode(course_key)}),
         'coupons': coupons,
         'course_price': course_price,
         'total_amount': total_amount
@@ -213,7 +213,7 @@ def _section_course_info(course, access):
         'course_display_name': course.display_name,
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }
 
     if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
@@ -246,16 +246,17 @@ def _section_membership(course, access):
         'section_key': 'membership',
         'section_display_name': _('Membership'),
         'access': access,
-        'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'modify_beta_testers_button_url': reverse('bulk_beta_modify_access', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'modify_access_url': reverse('modify_access', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': course_key.to_deprecated_string()}),
+        'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
+        'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
+        'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': unicode(course_key)}),
+        'modify_beta_testers_button_url': reverse('bulk_beta_modify_access', kwargs={'course_id': unicode(course_key)}),
+        'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': unicode(course_key)}),
+        'modify_access_url': reverse('modify_access', kwargs={'course_id': unicode(course_key)}),
+        'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': unicode(course_key)}),
+        'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': unicode(course_key)}),
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
         'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
+        'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
@@ -280,12 +281,12 @@ def _section_student_admin(course, access):
         'section_display_name': _('Student Admin'),
         'access': access,
         'is_small_course': is_small_course,
-        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': unicode(course_key)}),
+        'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
+        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': unicode(course_key)}),
+        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': unicode(course_key)}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
+        'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
@@ -295,12 +296,12 @@ def _section_extensions(course):
     section_data = {
         'section_key': 'extensions',
         'section_display_name': _('Extensions'),
-        'units_with_due_dates': [(title_or_url(unit), unit.location.to_deprecated_string())
+        'units_with_due_dates': [(title_or_url(unit), unicode(unit.location))
                                  for unit in get_units_with_due_date(course)],
-        'change_due_date_url': reverse('change_due_date', kwargs={'course_id': course.id.to_deprecated_string()}),
-        'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': course.id.to_deprecated_string()}),
-        'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': course.id.to_deprecated_string()}),
-        'show_student_extensions_url': reverse('show_student_extensions', kwargs={'course_id': course.id.to_deprecated_string()}),
+        'change_due_date_url': reverse('change_due_date', kwargs={'course_id': unicode(course.id)}),
+        'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': unicode(course.id)}),
+        'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': unicode(course.id)}),
+        'show_student_extensions_url': reverse('show_student_extensions', kwargs={'course_id': unicode(course.id)}),
     }
     return section_data
 
@@ -312,12 +313,12 @@ def _section_data_download(course, access):
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
         'access': access,
-        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': unicode(course_key)}),
+        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': unicode(course_key)}),
+        'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': unicode(course_key)}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
+        'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
+        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 
@@ -335,8 +336,8 @@ def _section_send_email(course, access):
     fragment = course.system.render(html_module, 'studio_view')
     fragment = wrap_xblock(
         'LmsRuntime', html_module, 'studio_view', fragment, None,
-        extra_data={"course-id": course_key.to_deprecated_string()},
-        usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+        extra_data={"course-id": unicode(course_key)},
+        usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id)),
         # Generate a new request_token here at random, because this module isn't connected to any other
         # xblock rendering.
         request_token=uuid.uuid1().get_hex()
@@ -346,16 +347,16 @@ def _section_send_email(course, access):
         'section_key': 'send_email',
         'section_display_name': _('Email'),
         'access': access,
-        'send_email': reverse('send_email', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'send_email': reverse('send_email', kwargs={'course_id': unicode(course_key)}),
         'editor': email_editor,
         'list_instructor_tasks_url': reverse(
-            'list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}
+            'list_instructor_tasks', kwargs={'course_id': unicode(course_key)}
         ),
         'email_background_tasks_url': reverse(
-            'list_background_email_tasks', kwargs={'course_id': course_key.to_deprecated_string()}
+            'list_background_email_tasks', kwargs={'course_id': unicode(course_key)}
         ),
         'email_content_history_url': reverse(
-            'list_email_content', kwargs={'course_id': course_key.to_deprecated_string()}
+            'list_email_content', kwargs={'course_id': unicode(course_key)}
         ),
     }
     return section_data
@@ -376,8 +377,8 @@ def _section_analytics(course, access):
         'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
-        'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_distribution_url': reverse('get_distribution', kwargs={'course_id': unicode(course_key)}),
+        'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': unicode(course_key)}),
     }
 
     if settings.ANALYTICS_DASHBOARD_URL:
@@ -395,7 +396,7 @@ def _section_metrics(course, access):
         'section_key': 'metrics',
         'section_display_name': _('Metrics'),
         'access': access,
-        'course_id': course_key.to_deprecated_string(),
+        'course_id': unicode(course_key),
         'sub_section_display_name': get_section_display_name(course_key),
         'section_has_problem': get_array_section_has_problem(course_key),
         'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),

@@ -28,7 +28,8 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 cohorts.url = '/mock_service';
                 requests = AjaxHelpers.requests(test);
                 cohortsView = new CohortsView({
-                    model: cohorts
+                    model: cohorts,
+                    upload_cohorts_csv_url: "http://upload-csv-file-url/"
                 });
                 cohortsView.render();
                 if (initialCohortID) {
@@ -91,12 +92,13 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             };
 
             beforeEach(function () {
-                setFixtures("<div></div>");
+                setFixtures('<ul class="instructor-nav"><li class="nav-item"><<a href data-section="membership" class="active-section">Membership</a></li></ul><div></div>');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohorts');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/add-cohort-form');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-selector');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-editor');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/notification');
+                TemplateHelpers.installTemplate('templates/file-upload');
             });
 
             it("Show an error if no cohorts are defined", function() {
@@ -106,6 +108,18 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     'warning',
                     'Add Cohort Group'
                 );
+
+                // If no cohorts have been created, can't upload a CSV file.
+                expect(cohortsView.$('.wrapper-cohort-supplemental')).toHaveClass('is-hidden');
+            });
+
+            it("Syncs data when membership tab is clicked", function() {
+                createCohortsView(this, 1);
+                verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
+                $(cohortsView.getSectionCss("membership")).click();
+                AjaxHelpers.expectRequest(requests, 'GET', '/mock_service');
+                respondToRefresh(1001, 2);
+                verifyHeader(1, 'Cat Lovers', 1001);
             });
 
             describe("Cohort Selector", function () {
@@ -113,6 +127,34 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     createCohortsView(this);
                     expect(cohortsView.$('.cohort-select').val()).toBe('');
                     expect(cohortsView.$('.cohort-management-group-header .title-value').text()).toBe('');
+                });
+
+                it('can upload a CSV of cohort assignments if a cohort exists', function () {
+                    var uploadCsvToggle, fileUploadForm, fileUploadFormCss='#file-upload-form';
+
+                    createCohortsView(this);
+
+                    // Should see the control to toggle CSV file upload.
+                    expect(cohortsView.$('.wrapper-cohort-supplemental')).not.toHaveClass('is-hidden');
+                    // But upload form should not be visible until toggle is clicked.
+                    expect(cohortsView.$(fileUploadFormCss).length).toBe(0);
+                    uploadCsvToggle = cohortsView.$('.toggle-cohort-management-secondary');
+                    expect(uploadCsvToggle.text()).
+                        toContain('Assign students to cohort groups by uploading a CSV file');
+                    uploadCsvToggle.click();
+                    // After toggle is clicked, it should be hidden.
+                    expect(uploadCsvToggle).toHaveClass('is-hidden');
+
+                    fileUploadForm = cohortsView.$(fileUploadFormCss);
+                    expect(fileUploadForm.length).toBe(1);
+                    cohortsView.$(fileUploadForm).fileupload('add', {files: [{name: 'upload_file.txt'}]});
+                    cohortsView.$('.submit-file-button').click();
+
+                    // No file will actually be uploaded because "uploaded_file.txt" doesn't actually exist.
+                    AjaxHelpers.expectRequest(requests, 'POST', "http://upload-csv-file-url/", new FormData());
+                    AjaxHelpers.respondWithJson(requests, {});
+                    expect(cohortsView.$('.file-upload-form-result .message-confirmation .message-title').text().trim())
+                        .toBe("Your file 'upload_file.txt' has been uploaded. Please allow a few minutes for processing.");
                 });
 
                 it('can select a cohort', function () {

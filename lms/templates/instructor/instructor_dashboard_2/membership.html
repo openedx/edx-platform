@@ -249,6 +249,7 @@
     <div class="cohort-management membership-section"
          data-ajax_url="${section_data['cohorts_ajax_url']}"
          data-advanced-settings-url="${section_data['advanced_settings_url']}"
+         data-upload_cohorts_csv_url="${section_data['upload_cohorts_csv_url']}"
     >
     </div>
 
@@ -262,7 +263,8 @@
                 var cohortsView = new CohortsView({
                     el: cohortManagementElement,
                     model: cohorts,
-                    advanced_settings_url: cohortManagementElement.data('advanced-settings-url')
+                    advanced_settings_url: cohortManagementElement.data('advanced-settings-url'),
+                    upload_cohorts_csv_url: cohortManagementElement.data('upload_cohorts_csv_url')
                 });
                 cohorts.fetch().done(function() {
                     cohortsView.render();

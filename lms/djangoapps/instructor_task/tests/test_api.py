@@ -14,6 +14,7 @@ from instructor_task.api import (
     submit_delete_problem_state_for_all_students,
     submit_bulk_course_email,
     submit_calculate_students_features_csv,
+    submit_cohort_students,
 )
 
 from instructor_task.api_helper import AlreadyRunningError
@@ -199,5 +200,13 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             self.create_task_request(self.instructor),
             self.course.id,
             features=[]
+        )
+        self._test_resubmission(api_call)
+
+    def test_submit_cohort_students(self):
+        api_call = lambda: submit_cohort_students(
+            self.create_task_request(self.instructor),
+            self.course.id,
+            file_name=u'filename.csv'
         )
         self._test_resubmission(api_call)

@@ -6,6 +6,7 @@ import os
 import json
 from mock import Mock
 import shutil
+import unicodecsv
 from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
@@ -26,7 +27,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from instructor_task.api_helper import encode_problem_and_student_input
-from instructor_task.models import PROGRESS, QUEUING
+from instructor_task.models import PROGRESS, QUEUING, ReportStore
 from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.views import instructor_task_status
 
@@ -246,3 +247,27 @@ class TestReportMixin(object):
         reports_download_path = settings.GRADES_DOWNLOAD['ROOT_PATH']
         if os.path.exists(reports_download_path):
             shutil.rmtree(reports_download_path)
+
+    def verify_rows_in_csv(self, expected_rows, verify_order=True):
+        """
+        Verify that the last ReportStore CSV contains the expected content.
+
+        Arguments:
+            expected_rows (iterable): An iterable of dictionaries,
+                where each dict represents a row of data in the last
+                ReportStore CSV.  Each dict maps keys from the CSV
+                header to values in that row's corresponding cell.
+            verify_order (boolean): When True, we verify that both the
+                content and order of `expected_rows` matches the
+                actual csv rows.  When False (default), we only verify
+                that the content matches.
+        """
+        report_store = ReportStore.from_config()
+        report_csv_filename = report_store.links_for(self.course.id)[0][0]
+        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
+            # Expand the dict reader generator so we don't lose it's content
+            csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
+            if verify_order:
+                self.assertEqual(csv_rows, expected_rows)
+            else:
+                self.assertItemsEqual(csv_rows, expected_rows)

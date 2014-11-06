@@ -12,6 +12,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
+from util.json_request import JsonResponse
 from . import cohorts
 from .models import CourseUserGroup
 
@@ -23,7 +24,7 @@ def json_http_response(data):
     Return an HttpResponse with the data json-serialized and the right content
     type header.
     """
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return JsonResponse(data)
 
 
 def split_by_comma_and_whitespace(cstr):

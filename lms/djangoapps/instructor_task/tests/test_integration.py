@@ -5,7 +5,6 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
-import csv
 import json
 import logging
 from mock import patch
@@ -28,7 +27,7 @@ from instructor_task.api import (submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_delete_problem_state_for_all_students)
-from instructor_task.models import InstructorTask, ReportStore
+from instructor_task.models import InstructorTask
 from instructor_task.tasks_helper import upload_grades_csv
 from instructor_task.tests.test_base import (InstructorTaskModuleTestCase, TestReportMixin, TEST_COURSE_ORG,
                                              TEST_COURSE_NUMBER, OPTION_1, OPTION_2)
@@ -601,23 +600,6 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
             task_result (dict): Return value of `upload_grades_csv`.
         """
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, task_result)
-
-    def verify_rows_in_csv(self, expected_rows):
-        """
-        Verify that the grades CSV contains the expected content.
-
-        Arguments:
-            expected_rows (iterable): An iterable of dictionaries, where
-                each dict represents a row of data in the grades
-                report CSV.  Each dict maps keys from the CSV header
-                to values in that row's corresponding cell.
-        """
-        report_store = ReportStore.from_config()
-        report_csv_filename = report_store.links_for(self.course.id)[0][0]
-        with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
-            # Expand the dict reader generator so we don't lose it's content
-            csv_rows = [row for row in csv.DictReader(csv_file)]
-            self.assertEqual(csv_rows, expected_rows)
 
     def verify_grades_in_csv(self, students_grades):
         """

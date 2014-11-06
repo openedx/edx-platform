@@ -47,15 +47,17 @@
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"></script>
   <%static:js group='module-descriptor-js'/>
   <%static:js group='instructor_dash'/>
   <%static:js group='application'/>
 
   ## Backbone classes declared explicitly until RequireJS is supported
   <script type="text/javascript" src="${static.url('js/models/notification.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/notification.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/file_uploader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/cohort.js')}"></script>
   <script type="text/javascript" src="${static.url('js/collections/cohort.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/cohort_editor.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/cohorts.js')}"></script>
 </%block>
@@ -67,6 +69,10 @@
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>
 % endfor
+
+<script type="text/template" id="file-upload-tpl">
+  <%static:include path="file-upload.underscore" />
+</script>
 </%block>
 
 ## NOTE that instructor is set as the active page so that the instructor button lights up, even though this is the instructor_2 page.
