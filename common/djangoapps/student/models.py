@@ -32,7 +32,6 @@ from django.db.models import Count
 from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
-from cities.models import City
 from django_countries.fields import CountryField
 from config_models.models import ConfigurationModel
 from track import contexts
@@ -258,6 +257,33 @@ class UserProfile(models.Model):
     allow_certificate = models.BooleanField(default=1)
     cedula = models.CharField(max_length=132, blank=True, null=True)
     city = models.ForeignKey('cities.City', default=None, blank=True, null=True)
+
+    GRADO_CHOICES = (
+        ('none', 'Ninguno'),
+        ('sps1', 'SERVIDOR PUBLICO DE SERVICIOS 1'),
+        ('sps2', 'SERVIDOR PUBLICO DE SERVICIOS 2'),
+        ('spa1', 'SERVIDOR PUBLICO DE APOYO 1'),
+        ('spa2', 'SERVIDOR PUBLICO DE APOYO 2'),
+        ('spa3', 'SERVIDOR PUBLICO DE APOYO 3'),
+        ('spa4', 'SERVIDOR PUBLICO DE APOYO 4'),
+        ('sp1', 'SERVIDOR PUBLICO 1'),
+        ('sp2', 'SERVIDOR PUBLICO 2'),
+        ('sp3', 'SERVIDOR PUBLICO 3'),
+        ('sp4', 'SERVIDOR PUBLICO 4'),
+        ('sp5', 'SERVIDOR PUBLICO 5'),
+        ('sp6', 'SERVIDOR PUBLICO 6'),
+        ('sp7', 'SERVIDOR PUBLICO 7'),
+        ('asesor5', 'ASESOR 5 (AUTORIDADES DE GRADO 5-6)'),
+        ('dt', 'DIRECTOR TECNICO DE AREA'),
+        ('asesor4', 'GP1 / ASESOR 4 (AUTORIDADES GRADO 5-6)'),
+        ('asesor3', 'GP2 / ASESOR 3 (AUTORIDADES GRADO 7)'),
+        ('asesor2', 'GP 3 / ASESOR 2 (AUTORIDADES GRADO 8)'),
+        ('asesor1', 'COORDINADORES / ASESOR 1 (PRES-VICE)'),
+        ('st', 'SECRETARIO TECNICO'),
+        ('ministro', 'MINISTRO COORDINADOR'),
+    )
+    grado_ocupacional = models.CharField(max_length=64, default='none', blank=True, null=True)
+    institucion = models.CharField(max_length=128, default='NINGUNO', blank=True, null=True)
 
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
