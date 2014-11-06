@@ -55,7 +55,8 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue(self.e_commerce_link in response.content)
 
         # Order/Invoice sales csv button text should render in e-commerce page
-        self.assertTrue('Download All Order Sales' in response.content)
+        self.assertTrue('Total CC Amount' in response.content)
+        self.assertTrue('Download All CC Sales' in response.content)
         self.assertTrue('Download All Invoice Sales' in response.content)
         self.assertTrue('Enter the invoice number to invalidate or re-validate sale' in response.content)
 
