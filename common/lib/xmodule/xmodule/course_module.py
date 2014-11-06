@@ -1096,3 +1096,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return self.display_organization
 
         return self.org
+
+    @property
+    def video_pipeline_configured(self):
+        return (
+            self.video_upload_pipeline is not None and
+            'Institute_Name' in self.video_upload_pipeline and
+            'Access_Token' in self.video_upload_pipeline
+        )

@@ -1,73 +1,204 @@
-import logging
-from functools import partial
-import math
-import json
+"""
+Views related to the video upload feature
+"""
 
-from django.http import HttpResponseBadRequest
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django_future.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_POST
+from boto import s3
+from pytz import UTC
+from uuid import uuid4
+from datetime import datetime
+
 from django.conf import settings
-
-from edxmako.shortcuts import render_to_response
-from cache_toolbox.core import del_cached_content
-
-from contentstore.utils import reverse_course_url
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.content import StaticContent
-from xmodule.exceptions import NotFoundError
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from opaque_keys.edx.keys import CourseKey, AssetKey
-
-from util.date_utils import get_default_time_display
-from util.json_request import JsonResponse
+from django_future.csrf import ensure_csrf_cookie
 from django.http import HttpResponseNotFound
-from django.utils.translation import ugettext as _
-from pymongo import ASCENDING, DESCENDING
+from django.views.decorators.http import require_http_methods
+from opaque_keys.edx.keys import CourseKey
+
+from xmodule.modulestore.django import modulestore
+from xmodule.assetstore import AssetMetadata
+from util.json_request import expect_json, JsonResponse
 from .access import has_course_access
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
-__all__ = ['videos_list_handler']
+__all__ = ['videos_handler']
 
 
-# pylint: disable=unused-argument
-@login_required
-@ensure_csrf_cookie
-def videos_list_handler(request, course_key_string=None):
+# String constant used in asset keys to identify video assets.
+VIDEO_ASSET_TYPE = 'video'
+
+# Default expiration, in seconds, of one-time URLs used for uploading videos.
+KEY_EXPIRATION_IN_SECONDS = 3600
+
+
+class UploadStatus(object):
     """
-    The restful handler for videos.
-    It allows bulk upload of course vidoes, as well as listing of uploaded assets.
+    Constant values for the various statuses of video uploads
+    """
+    uploading = 'Uploading'
+    valid_file = "File Valid"
+    invalid_file = "File Invalid"
+    in_progress = "In Progress"
+    complete = "Complete"
+
+
+@expect_json
+@login_required
+@require_http_methods(("GET", "POST", "PUT"))
+def videos_handler(request, course_key_string):
+    """
+    The restful handler for video uploads.
 
     GET
-        html: return an html page which will show all uploaded course videos. Note that only the video container
-            is returned and that the actual assets are filled in with a client-side request.
-        json: returns a page of assets. The following parameters are supported:
-            page: the desired page of results (defaults to 0)
-            page_size: the number of items per page (defaults to 50)
-            sort: the video field to sort by (defaults to "date_added")
-            direction: the sort direction (defaults to "descending")
+        json: return json representing the videos that have been uploaded and their statuses
+    PUT or POST
+        json: upload a set of videos
     """
+    # The feature flag should be enabled
+    assert settings.FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE']
+
     course_key = CourseKey.from_string(course_key_string)
+
+    # For now, assume all studio users that have access to the course can upload videos.
+    # In the future, we plan to add a new org-level role for video uploaders.
     if not has_course_access(request.user, course_key):
         raise PermissionDenied()
 
-    response_format = request.REQUEST.get('format', 'html')
-    if request.method == 'GET':  # assume html
-        return _videos_index(request, course_key)
-    else:
-        return HttpResponseNotFound()
+    # Check whether the video upload feature is configured for this course
+    course = modulestore().get_course(course_key)
+    if not course.video_pipeline_configured:
+        return JsonResponse({"error": "Course not configured properly for video upload."}, status=400)
+
+    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        if request.method == 'GET':
+            return videos_index_json(course, request)
+        else:
+            return videos_post(course, request)
+    elif request.method == 'GET':
+        return videos_index_html(course, request)
+
+    return HttpResponseNotFound()
 
 
-def _videos_index(request, course_key):
+def videos_index_json(course, request):
     """
-    Display an editable asset library.
-
-    Supports start (0-based index into the list of assets) and max query parameters.
+    Returns a JSON in the following format: {
+        videos: [
+           {
+              edx_video_id: xxx,
+              file_name: xxx,
+              date_uploaded: xxx,
+              status: xxx,
+           },
+           ...
+        ]
+    }
     """
-    course_module = modulestore().get_course(course_key)
+    videos = []
+    for metadata in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE):
+        videos.append({
+            'edx_video_id': metadata.asset_id.path,
+            'file_name': metadata.fields['file_name'],
+            'date_uploaded': metadata.fields['upload_timestamp'], # TODO PLAT-278 use created_on field instead
+            'status': metadata.fields['status'],
+        })
+    return JsonResponse({'videos': videos}, status=200)
 
+
+def videos_index_html(course, request):
+    """
+    Returns an HTML rendering of the list of uploaded videos.
+    """
     return render_to_response('videos_index.html', {
-        'context_course': course_module
+        'context_course': course,
+        'videos': videos_index_json(course, request)
     })
+
+
+def videos_post(course, request):
+    """
+    Input (JSON): {
+        files: [
+            { file_name: xxx },
+            ...
+        ]
+    }
+    Returns (JSON): {
+        files: [
+            { file-name: xxx, upload-url: xxx },
+            ...
+        ]
+    }
+    """
+    bucket = storage_service_bucket()
+    institute_name = course.video_upload_pipeline['Institute_Name']
+
+    files = request.json['files']
+    for file in files:
+        file_name = file['file_name']
+
+        # 1. generate edx_video_id
+        edx_video_id = generate_edx_video_id(institute_name)
+
+        # 2. generate key for uploading file
+        key = storage_service_key(
+            bucket,
+            folder_name=institute_name,
+            file_name=edx_video_id,
+        )
+
+        # 3. set meta data for the file
+        for metadata_name, value in [
+            ('institute', course.video_upload_pipeline['Institute_Name']),
+            ('institute_token', course.video_upload_pipeline['Access_Token']),
+            ('user_supplied_file_name', file_name),
+            ('course_org', course.org),
+            ('course_number', course.number),
+            ('course_run', course.location.run),
+        ]:
+            key.set_metadata(metadata_name, value)
+
+        # 4. generate URL
+        file['upload-url'] = key.generate_url(KEY_EXPIRATION_IN_SECONDS, 'PUT')
+
+        # 5. persist edx_video_id
+        video_meta_data = AssetMetadata(
+            course.id.make_asset_key(VIDEO_ASSET_TYPE, edx_video_id),
+            fields={
+                'file_name': file_name,
+                'upload_timestamp': datetime.now(UTC),
+                'status': UploadStatus.uploading
+            }
+        )
+        modulestore().save_asset_metadata(video_meta_data, request.user.id)
+
+    return JsonResponse({'files': files}, status=200)
+
+
+def generate_edx_video_id(institute_name):
+    """
+    Generates and returns an edx-video-id to uniquely identify a new logical video.
+    """
+    return "{}-{}".format(institute_name, uuid4())
+
+
+def storage_service_bucket():
+    """
+    Returns a bucket in a cloud-based storage service for video uploads.
+    """
+    conn = s3.connection.S3Connection(
+        settings.AWS_ACCESS_KEY_ID,
+        settings.AWS_SECRET_ACCESS_KEY
+    )
+    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['BUCKET'])
+
+
+def storage_service_key(bucket, folder_name, file_name):
+    """
+    Returns a key to the given file in the given folder in the given bucket for video uploads.
+    """
+    key_name = "{}/{}/{}".format(
+        settings.VIDEO_UPLOAD_PIPELINE['ROOT_PATH'],
+        folder_name,
+        file_name
+    )
+    return s3.key.Key(bucket, key_name)

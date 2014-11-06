@@ -30,10 +30,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LMS_BASE = "localhost:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
-############################# ADVANCED COMPONENTS #############################
+############################# FEATURE FLAGS #############################
 
-# Make it easier to test advanced components in local dev
+# Make it easier to test features in local dev
 FEATURES['ALLOW_ALL_ADVANCED_COMPONENTS'] = True
+FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
 
 ################################# CELERY ######################################
 
