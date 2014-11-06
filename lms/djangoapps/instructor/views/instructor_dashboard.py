@@ -275,7 +275,7 @@ def _is_small_course(course_key):
 def _section_student_admin(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
-    is_small_course =_is_small_course(course_key)
+    is_small_course = _is_small_course(course_key)
 
     section_data = {
         'section_key': 'student_admin',
@@ -364,7 +364,7 @@ def _section_send_email(course, access):
 
 
 def _get_dashboard_link(course_key):
-    # Construct a URL to the external analytics dashboard
+    """ Construct a URL to the external analytics dashboard """
     analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
     link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
                                                               settings.ANALYTICS_DASHBOARD_NAME)

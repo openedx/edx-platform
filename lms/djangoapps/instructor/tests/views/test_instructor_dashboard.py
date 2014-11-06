@@ -38,10 +38,16 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         patch.stopall()
 
     def get_dashboard_enrollment_message(self):
+        """
+        Returns expected dashboard enrollment message with link to Insights.
+        """
         return 'Enrollment data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(unicode(self.course.id))
 
     def get_dashboard_demographic_message(self):
+        """
+        Returns expected dashboard demographic message with link to Insights.
+        """
         return 'Demographic data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(unicode(self.course.id))
 
