@@ -255,16 +255,36 @@ class RegistrationView(APIView):
             HttpResponse: 302 if redirecting to another page.
 
         """
-        # Handle duplicate username/email
-        conflicts = account_api.check_account_exists(
-            username=request.POST.get('username'),
-            email=request.POST.get('email')
-        )
+        email = request.POST.get('email')
+        username = request.POST.get('username')
+
+        # Handle duplicate email/username
+        conflicts = account_api.check_account_exists(email=email, username=username)
         if conflicts:
+            if all(conflict in conflicts for conflict in ['email', 'username']):
+                # Translators: This message is shown to users who attempt to create a new
+                # account using both an email address and a username associated with an
+                # existing account.
+                error_msg = _(
+                    u"It looks like {email_address} and {username} belong to an existing account."
+                ).format(email_address=email, username=username)
+            elif 'email' in conflicts:
+                # Translators: This message is shown to users who attempt to create a new
+                # account using an email address associated with an existing account.
+                error_msg = _(
+                    u"It looks like {email_address} belongs to an existing account."
+                ).format(email_address=email)
+            else:
+                # Translators: This message is shown to users who attempt to create a new
+                # account using a username associated with an existing account.
+                error_msg = _(
+                    u"It looks like {username} belongs to an existing account."
+                ).format(username=username)
+
             return HttpResponse(
                 status=409,
-                content=json.dumps(conflicts),
-                content_type="application/json"
+                content=error_msg,
+                content_type="text/plain"
             )
 
         # For the initial implementation, shim the existing login view
@@ -281,18 +301,11 @@ class RegistrationView(APIView):
         # a field on the registration form meant to hold the user's email address.
         email_placeholder = _(u"username@domain.com")
 
-        # Translators: These instructions appear on the registration form, immediately
-        # below a field meant to hold the user's email address.
-        email_instructions = _(
-            u"The email address you used to register with {platform_name}"
-        ).format(platform_name=settings.PLATFORM_NAME)
-
         form_desc.add_field(
             "email",
             field_type="email",
             label=email_label,
             placeholder=email_placeholder,
-            instructions=email_instructions,
             restrictions={
                 "min_length": account_api.EMAIL_MIN_LENGTH,
                 "max_length": account_api.EMAIL_MAX_LENGTH,

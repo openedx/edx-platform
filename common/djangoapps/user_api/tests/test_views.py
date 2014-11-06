@@ -832,9 +832,6 @@ class RegistrationViewTest(ApiTestCase):
                 u"required": True,
                 u"label": u"Email",
                 u"placeholder": u"username@domain.com",
-                u"instructions": u"The email address you used to register with {platform_name}".format(
-                    platform_name=settings.PLATFORM_NAME
-                ),
                 u"restrictions": {
                     "min_length": account_api.EMAIL_MIN_LENGTH,
                     "max_length": account_api.EMAIL_MAX_LENGTH
@@ -913,9 +910,6 @@ class RegistrationViewTest(ApiTestCase):
                     u"required": True,
                     u"label": u"Email",
                     u"placeholder": u"username@domain.com",
-                    "instructions": "The email address you used to register with {platform_name}".format(
-                        platform_name=settings.PLATFORM_NAME
-                    ),
                     u"restrictions": {
                         "min_length": account_api.EMAIL_MIN_LENGTH,
                         "max_length": account_api.EMAIL_MAX_LENGTH
@@ -1354,7 +1348,10 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
-        self.assertEqual(response.content, json.dumps(["email"]))
+        self.assertEqual(
+            response.content,
+            "It looks like {} belongs to an existing account.".format(self.EMAIL)
+        )
 
     def test_register_duplicate_username(self):
         # Register the first user
@@ -1376,7 +1373,10 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
-        self.assertEqual(response.content, json.dumps(["username"]))
+        self.assertEqual(
+            response.content,
+            "It looks like {} belongs to an existing account.".format(self.USERNAME)
+        )
 
     def test_register_duplicate_username_and_email(self):
         # Register the first user
@@ -1398,7 +1398,12 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
-        self.assertEqual(response.content, json.dumps(["email", "username"]))
+        self.assertEqual(
+            response.content,
+            "It looks like {} and {} belong to an existing account.".format(
+                self.EMAIL, self.USERNAME
+            )
+        )
 
     def _assert_reg_field(self, extra_fields_setting, expected_field):
         """Retrieve the registration form description from the server and
