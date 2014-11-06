@@ -555,9 +555,12 @@ YOUTUBE = {
 ############################# VIDEO UPLOAD PIPELINE #############################
 
 VIDEO_UPLOAD_PIPELINE = {
-    'BUCKET': 'edx-raw-videos',
+    'BUCKET': 'edx_videos',
     'ROOT_PATH': '',
+    'FOLDER': 'studio_upload_videos'
 }
+AWS_ACCESS_KEY_ID = ""
+AWS_SECRET_ACCESS_KEY = ""
 
 ############################ APPS #####################################
 
