@@ -12,6 +12,7 @@ define([
             var model = null,
                 view = null,
                 requests = null,
+                authComplete = false,
                 PLATFORM_NAME = 'edX',
                 USER_DATA = {
                     email: 'xsy@edx.org',
@@ -160,7 +161,10 @@ define([
 
             var createRegisterView = function(that) {
                 // Initialize the register model
-                model = new RegisterModel({ url: FORM_DESCRIPTION.submit_url });
+                model = new RegisterModel({}, {
+                    url: FORM_DESCRIPTION.submit_url,
+                    method: FORM_DESCRIPTION.method
+                });
 
                 // Initialize the register view
                 view = new RegisterView({
@@ -173,9 +177,10 @@ define([
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(that);
 
-                // Mock out redirection logic
-                spyOn(view, 'redirect').andCallFake(function() {
-                    return true;
+                // Intercept events from the view
+                authComplete = false;
+                view.on("auth-complete", function() {
+                    authComplete = true;
                 });
             };
 
@@ -225,16 +230,16 @@ define([
 
                 // Verify that the client contacts the server with the expected data
                 AjaxHelpers.expectRequest(
-                    requests, 'POST', FORM_DESCRIPTION.submit_url, $.param(
-                        $.extend({url: FORM_DESCRIPTION.submit_url}, USER_DATA)
-                    )
+                    requests, 'POST',
+                    FORM_DESCRIPTION.submit_url,
+                    $.param( USER_DATA )
                 );
 
                 // Respond with status code 200
                 AjaxHelpers.respondWithJson(requests, {});
 
-                // Verify that the user is redirected to the dashboard
-                expect(view.redirect).toHaveBeenCalledWith('/dashboard');
+                // Verify that auth complete is triggered
+                expect(authComplete).toBe(true);
             });
 
             it('displays third-party auth registration buttons', function() {
@@ -269,6 +274,9 @@ define([
 
                 // Verify that submission errors are visible
                 expect(view.$errors).not.toHaveClass('hidden');
+
+                // Expect that auth complete is NOT triggered
+                expect(authComplete).toBe(false);
             });
 
             it('displays an error if the server returns an error while registering', function() {
@@ -280,8 +288,9 @@ define([
                 // Simulate an error from the LMS servers
                 AjaxHelpers.respondWithError(requests);
 
-                // Expect that an error is displayed
+                // Expect that an error is displayed and that auth complete is NOT triggered
                 expect(view.$errors).not.toHaveClass('hidden');
+                expect(authComplete).toBe(false);
 
                 // If we try again and succeed, the error should go away
                 submitForm();
@@ -289,8 +298,9 @@ define([
                 // This time, respond with status code 200
                 AjaxHelpers.respondWithJson(requests, {});
 
-                // Expect that the error is hidden
+                // Expect that the error is hidden and that auth complete is triggered
                 expect(view.$errors).toHaveClass('hidden');
+                expect(authComplete).toBe(true);
             });
         });
     }

@@ -3,8 +3,10 @@ define([
     'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
     'js/student_account/views/AccessView',
-    'js/student_account/views/FormView'
-], function($, TemplateHelpers, AjaxHelpers, AccessView) {
+    'js/student_account/views/FormView',
+    'js/student_account/enrollment',
+    'js/student_account/shoppingcart'
+], function($, TemplateHelpers, AjaxHelpers, AccessView, FormView, EnrollmentInterface, ShoppingCartInterface) {
         describe('edx.student.account.AccessView', function() {
             'use strict';
 
@@ -51,7 +53,9 @@ define([
                             }
                         }
                     ]
-                };
+                },
+                FORWARD_URL = '/courseware/next',
+                COURSE_KEY = 'edx/DemoX/Fall';
 
             var ajaxAssertAndRespond = function(url, requestIndex) {
                 // Verify that the client contacts the server as expected
@@ -77,6 +81,14 @@ define([
                     platformName: 'edX'
                 });
 
+                // Mock the redirect call
+                spyOn( view, 'redirect' ).andCallFake( function() {} );
+
+                // Mock the enrollment and shopping cart interfaces
+                spyOn( EnrollmentInterface, 'enroll' ).andCallFake( function() {} );
+                spyOn( ShoppingCartInterface, 'addCourseToCart' ).andCallFake( function() {} );
+
+                // Initialize the subview
                 ajaxAssertAndRespond(AJAX_INFO[mode].url);
             };
 
@@ -97,6 +109,20 @@ define([
                 ajaxAssertAndRespond(AJAX_INFO[type].url, AJAX_INFO[type].requestIndex);
             };
 
+            /**
+             * Simulate query string params.
+             *
+             * @param {object} params Parameters to set, each of which
+             * should be prefixed with '?'
+             */
+            var setFakeQueryParams = function( params ) {
+                spyOn( $, 'url' ).andCallFake(function( requestedParam ) {
+                    if ( params.hasOwnProperty(requestedParam) ) {
+                        return params[requestedParam];
+                    }
+                });
+            };
+
             beforeEach(function() {
                 setFixtures('<div id="login-and-registration-container"></div>');
                 TemplateHelpers.installTemplate('templates/student_account/access');
@@ -104,6 +130,11 @@ define([
                 TemplateHelpers.installTemplate('templates/student_account/register');
                 TemplateHelpers.installTemplate('templates/student_account/password_reset');
                 TemplateHelpers.installTemplate('templates/student_account/form_field');
+
+                // Stub analytics tracking
+                // TODO: use RequireJS to ensure that this is loaded correctly
+                window.analytics = window.analytics || {};
+                window.analytics.track = window.analytics.track || function() {};
             });
 
             it('can initially display the login form', function() {
@@ -143,12 +174,81 @@ define([
                 view.resetPassword();
 
                 ajaxAssertAndRespond(
-                    AJAX_INFO['password_reset'].url,
-                    AJAX_INFO['password_reset'].requestIndex
+                    AJAX_INFO.password_reset.url,
+                    AJAX_INFO.password_reset.requestIndex
                 );
 
                 // Verify that the password reset wrapper is populated
                 expect($('#password-reset-wrapper')).not.toBeEmpty();
+            });
+
+            it('enrolls the user on auth complete', function() {
+                ajaxSpyAndInitialize(this, 'login');
+
+                // Simulate providing enrollment query string params
+                setFakeQueryParams({
+                    '?enrollment_action': 'enroll',
+                    '?course_id': COURSE_KEY
+                });
+
+                // Trigger auth complete on the login view
+                view.subview.login.trigger('auth-complete');
+
+                // Expect that the view tried to enroll the student
+                expect( EnrollmentInterface.enroll ).toHaveBeenCalledWith( COURSE_KEY );
+            });
+
+            it('adds a white-label course to the shopping cart on auth complete', function() {
+                ajaxSpyAndInitialize(this, 'register');
+
+                // Simulate providing "add to cart" query string params
+                setFakeQueryParams({
+                    '?enrollment_action': 'add_to_cart',
+                    '?course_id': COURSE_KEY
+                });
+
+                // Trigger auth complete on the register view
+                view.subview.register.trigger('auth-complete');
+
+                // Expect that the view tried to add the course to the user's shopping cart
+                expect( ShoppingCartInterface.addCourseToCart ).toHaveBeenCalledWith( COURSE_KEY );
+            });
+
+            it('redirects the user to the dashboard on auth complete', function() {
+                ajaxSpyAndInitialize(this, 'register');
+
+                // Trigger auth complete
+                view.subview.register.trigger('auth-complete');
+
+                // Since we did not provide a ?next query param, expect a redirect to the dashboard.
+                expect( view.redirect ).toHaveBeenCalledWith( '/dashboard' );
+            });
+
+            it('redirects the user to the next page on auth complete', function() {
+                ajaxSpyAndInitialize(this, 'register');
+
+                // Simulate providing a ?next query string parameter
+                setFakeQueryParams({ '?next': FORWARD_URL });
+
+                // Trigger auth complete
+                view.subview.register.trigger('auth-complete');
+
+                // Verify that we were redirected
+                expect( view.redirect ).toHaveBeenCalledWith( FORWARD_URL );
+            });
+
+            it('ignores redirect to external URLs', function() {
+                ajaxSpyAndInitialize(this, 'register');
+
+                // Simulate providing a ?next query string parameter
+                // that goes to an external URL
+                setFakeQueryParams({ '?next': "http://www.example.com" });
+
+                // Trigger auth complete
+                view.subview.register.trigger('auth-complete');
+
+                // Expect that we ignore the external URL and redirect to the dashboard
+                expect( view.redirect ).toHaveBeenCalledWith( "/dashboard" );
             });
 
             it('displays an error if a form definition could not be loaded', function() {

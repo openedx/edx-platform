@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, gettext) {
+(function($, gettext) {
     'use strict';
 
     edx.student = edx.student || {};
@@ -39,4 +39,4 @@ var edx = edx || {};
         }
     });
 
-})(jQuery, _, gettext);
+})(jQuery, gettext);
