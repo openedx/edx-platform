@@ -16,7 +16,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_NONE)
 
 # pylint: disable=C0111
-
+# pylint: disable=W0212
 
 class AccessTestCase(TestCase):
     """
@@ -206,9 +206,9 @@ class AccessTestCase(TestCase):
         """Ensure has_access handles a user being passed as null"""
         access.has_access(None, 'staff', 'global', None)
 
-    def test_catalog_visibility(self):
+    def test__catalog_visibility(self):
         """
-        Tests the 'see_in_catalog' permission check
+        Tests the catalog visibility tri-states
         """
         user = UserFactory.create()
         course_id = SlashSeparatedCourseKey('edX', 'test', '2012_Fall')
