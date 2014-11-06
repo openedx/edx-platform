@@ -1168,12 +1168,16 @@ def process_analytics_answer_dist(data):
         part_id = item['part_id']
 
         # Add count to appropriate aggregates
-        count_dict = count_by_part.get(part_id, {})
-        count_dict['totalAttemptCount'] = count_dict.get('totalAttemptCount', 0) + item['count']
+        count_dict = count_by_part.get(part_id, {
+            'totalAttemptCount': 0,
+            'totalCorrectCount': 0,
+            'totalIncorrectCount': 0,
+        })
+        count_dict['totalAttemptCount'] = count_dict.get('totalAttemptCount') + item['count']
         if item['correct']:
-            count_dict['totalCorrectCount'] = count_dict.get('totalCorrectCount', 0) + item['count']
+            count_dict['totalCorrectCount'] = count_dict.get('totalCorrectCount') + item['count']
         else:
-            count_dict['totalIncorrectCount'] = count_dict.get('totalIncorrectCount', 0) + item['count']
+            count_dict['totalIncorrectCount'] = count_dict.get('totalIncorrectCount') + item['count']
 
         count_by_part[part_id] = count_dict
 

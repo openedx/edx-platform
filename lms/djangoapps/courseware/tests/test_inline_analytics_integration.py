@@ -62,45 +62,97 @@ class InlineAnalyticsTest(unittest.TestCase):
 
     def test_process_analytics_answer_dist(self):
 
-        data = [{"course_id": "A/B/C",
-                 "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                 "correct": False,
-                 "count": 7,
-                 "value_id": "choice_0",
-                 "answer_value_text": "Option 1",
-                 "answer_value_numeric": "null",
-                 "variant": "null",
-                 "created": "2014-10-15T10:13:51"},
-                {"course_id": "A/B/C",
-                 "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
-                 "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
-                 "correct": True,
-                 "count": 23,
-                 "value_id": "choice_1",
-                 "answer_value_text": "Option 2",
-                 "answer_value_numeric": "null",
-                 "variant": "null",
-                 "created": "2014-10-15T10:13:51"}
-                ]
+        data = [
+            {
+                "course_id": "A/B/C",
+                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
+                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
+                "correct": False,
+                "count": 7,
+                "value_id": "choice_0",
+                "answer_value_text": "Option 1",
+                "answer_value_numeric": "null",
+                "variant": "null",
+                "created": "2014-10-15T10:13:51",
+            },
+            {
+                "course_id": "A/B/C",
+                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
+                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
+                "correct": True,
+                "count": 23,
+                "value_id": "choice_1",
+                "answer_value_text": "Option 2",
+                "answer_value_numeric": "null",
+                "variant": "null",
+                "created": "2014-10-15T10:13:51",
+            },
+        ]
 
-        processed_data = {"count_by_part": {"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {"totalIncorrectCount": 7,
-                                                                                                     "totalAttemptCount": 30,
-                                                                                                     "totalCorrectCount": 23
-                                                                                                     }
-                                            },
-                          "data_by_part": {"i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [{"count": 7,
-                                                                                                     "value_id": "choice_0",
-                                                                                                     "correct": False
-                                                                                                     },
-                                                                                                    {"count": 23,
-                                                                                                     "value_id": "choice_1",
-                                                                                                     "correct": True
-                                                                                                     }
-                                                                                                    ]
-                                           },
-                          "last_update_date": "Oct 15, 2014 at 10:13 UTC"
-                          }
+        processed_data = {
+            "count_by_part": {
+                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
+                    "totalIncorrectCount": 7,
+                    "totalAttemptCount": 30,
+                    "totalCorrectCount": 23,
+                },
+            },
+            "data_by_part": {
+                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
+                    {
+                        "count": 7,
+                        "value_id": "choice_0",
+                        "correct": False,
+                    },
+                    {
+                        "count": 23,
+                        "value_id": "choice_1",
+                        "correct": True,
+                    },
+                ]
+            },
+            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+        }
+
+        return_json = process_analytics_answer_dist(data)
+        self.assertEquals(json.loads(return_json.content), processed_data)
+
+    def test_process_analytics_answer_dist_missing_correct(self):
+
+        data = [
+            {
+                "course_id": "A/B/C",
+                "module_id": "i4x://A/B/problem/f3ed0ba7f89445ee9a83541e1fc8a2f2",
+                "part_id": "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1",
+                "correct": False,
+                "count": 7,
+                "value_id": "choice_0",
+                "answer_value_text": "Option 1",
+                "answer_value_numeric": "null",
+                "variant": "null",
+                "created": "2014-10-15T10:13:51",
+            },
+        ]
+
+        processed_data = {
+            "count_by_part": {
+                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": {
+                    "totalIncorrectCount": 7,
+                    "totalAttemptCount": 7,
+                    "totalCorrectCount": 0,
+                },
+            },
+            "data_by_part": {
+                "i4x-A-B-problem-f3ed0ba7f89445ee9a83541e1fc8a2f2_2_1": [
+                    {
+                        "count": 7,
+                        "value_id": "choice_0",
+                        "correct": False,
+                    },
+                ]
+            },
+            "last_update_date": "Oct 15, 2014 at 10:13 UTC"
+        }
 
         return_json = process_analytics_answer_dist(data)
         self.assertEquals(json.loads(return_json.content), processed_data)
