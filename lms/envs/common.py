@@ -1032,8 +1032,8 @@ instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/ins
 # These are not courseware, so they do not need many of the courseware-specific
 # JavaScript modules.
 student_account_js = [
-    'js/common_helpers/rwd_header_footer.js',
-    'js/common_helpers/edx.utils.validate.js',
+    'js/utils/rwd_header_footer.js',
+    'js/utils/edx.utils.validate.js',
     'js/student_account/enrollment_interface.js',
     'js/student_account/models/LoginModel.js',
     'js/student_account/models/RegisterModel.js',
