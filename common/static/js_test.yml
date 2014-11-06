@@ -34,6 +34,7 @@ lib_paths:
     - js/vendor/jquery.truncate.js
     - js/vendor/mustache.js
     - js/vendor/underscore-min.js
+    - js/vendor/underscore.string.min.js
     - js/vendor/backbone-min.js
     - js/vendor/jquery.timeago.js
     - js/vendor/URI.min.js
@@ -46,6 +47,7 @@ lib_paths:
 src_paths:
     - coffee/src
     - js/src
+    - js/utils
     - js/capa/src
 
 # Paths to spec (test) JavaScript files

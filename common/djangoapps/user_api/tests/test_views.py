@@ -720,7 +720,6 @@ class LoginSessionViewTest(ApiTestCase):
 
         # Missing both email and password
         response = self.client.post(self.url, {})
-        #COMEBACK
 
 
 @ddt.ddt

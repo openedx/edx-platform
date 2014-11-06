@@ -1,7 +1,15 @@
 var edx = edx || {};
 
-(function( $, _, gettext ) {
+(function( $, _, _s, gettext ) {
     'use strict';
+
+    /* Mix non-conflicting functions from underscore.string
+     * (all but include, contains, and reverse) into the
+     * Underscore namespace. In practice, this mixin is done
+     * by the access view, but doing it here helps keep the
+     * utility self-contained.
+     */
+    _.mixin( _.str.exports() );
 
     edx.utils = edx.utils || {};
 
@@ -35,6 +43,8 @@ var edx = edx || {};
                             email = _fn.validate.email.valid( $el );
                         }
                     } else if ( !isBlank ) {
+                        min = _fn.validate.str.minlength( $el );
+                        max = _fn.validate.str.maxlength( $el );
                         email = _fn.validate.email.valid( $el );
                     }
 
@@ -77,7 +87,7 @@ var edx = edx || {};
                 },
 
                 isBlank: function( $el ) {
-                    return ( $el.attr('type') === 'checkbox' ) ? !$el.prop('checked') :  !$el.val();
+                    return ( $el.attr('type') === 'checkbox' ) ? !$el.prop('checked') : !$el.val();
                 },
 
                 email: {
@@ -92,7 +102,7 @@ var edx = edx || {};
                     ),
 
                     valid: function( $el ) {
-                        return  $el.attr('type') === 'email' ? _fn.validate.email.format( $el.val() ) : true;
+                        return $el.attr('type') === 'email' ? _fn.validate.email.format( $el.val() ) : true;
                     },
 
                     format: function( str ) {
@@ -112,7 +122,7 @@ var edx = edx || {};
                             name = $el.attr('name');
                             customMsg = $el.data('errormsg-' + key) || false;
 
-                            // If the field has a custom error msg attached use it
+                            // If the field has a custom error msg attached, use it
                             if ( customMsg ) {
                                 tpl = _fn.validate.msg.custom;
 
@@ -154,4 +164,4 @@ var edx = edx || {};
 
     edx.utils.validate = utils.validate;
 
-})( jQuery, _, gettext );
+})( jQuery, _, _.str, gettext );
