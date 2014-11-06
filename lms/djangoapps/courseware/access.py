@@ -113,6 +113,7 @@ def _has_access_course_desc(user, action, course):
     'see_exists' -- can see that the course exists.
     'staff' -- staff access to course.
     'see_in_catalog' -- user is able to see the course listed in the course catalog.
+    'see_about_page' -- user is able to see the course about page.
     """
     def can_load():
         """
