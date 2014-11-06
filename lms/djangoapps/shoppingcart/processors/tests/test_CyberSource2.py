@@ -4,6 +4,7 @@ Tests for the newer CyberSource API implementation.
 """
 from mock import patch
 from django.test import TestCase
+from django.conf import settings
 import ddt
 
 from student.tests.factories import UserFactory
@@ -12,7 +13,13 @@ from shoppingcart.processors.CyberSource2 import (
     processor_hash,
     process_postpay_callback,
     render_purchase_form_html,
-    get_signed_purchase_params
+    get_signed_purchase_params,
+    _get_processor_exception_html
+)
+from shoppingcart.processors.exceptions import (
+    CCProcessorSignatureException,
+    CCProcessorDataException,
+    CCProcessorWrongAmountException
 )
 
 
@@ -226,6 +233,19 @@ class CyberSource2Test(TestCase):
         # Verify that this executes without a unicode error
         result = process_postpay_callback(params)
         self.assertTrue(result['success'])
+
+    @ddt.data('string', u'üñîçø∂é')
+    def test_get_processor_exception_html(self, error_string):
+        """
+        Tests the processor exception html message
+        """
+        for exception_type in [CCProcessorSignatureException, CCProcessorWrongAmountException, CCProcessorDataException]:
+            error_msg = error_string
+            exception = exception_type(error_msg)
+            html = _get_processor_exception_html(exception)
+            self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, html)
+            self.assertIn('Sorry!', html)
+            self.assertIn(error_msg, html)
 
     def _signed_callback_params(
         self, order_id, order_amount, paid_amount,

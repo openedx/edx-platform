@@ -25,6 +25,7 @@ import binascii
 import re
 import json
 import uuid
+import logging
 from textwrap import dedent
 from datetime import datetime
 from collections import OrderedDict, defaultdict
@@ -37,6 +38,8 @@ from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
 from microsite_configuration import microsite
+
+log = logging.getLogger(__name__)
 
 
 def process_postpay_callback(params):
@@ -82,6 +85,7 @@ def process_postpay_callback(params):
                 'error_html': _get_processor_decline_html(params)
             }
     except CCProcessorException as error:
+        log.exception('error processing CyberSource postpay callback')
         return {
             'success': False,
             'order': None,  # due to exception we may not have the order
@@ -449,9 +453,9 @@ def _get_processor_exception_html(exception):
     if isinstance(exception, CCProcessorDataException):
         return _format_error_html(
             _(
-                u"Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!  "
-                u"We apologize that we cannot verify whether the charge went through and take further action on your order.  "
-                u"The specific error message is: {msg}  "
+                u"Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data! "
+                u"We apologize that we cannot verify whether the charge went through and take further action on your order. "
+                u"The specific error message is: {msg} "
                 u"Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}."
             ).format(
                 msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
@@ -461,8 +465,8 @@ def _get_processor_exception_html(exception):
     elif isinstance(exception, CCProcessorWrongAmountException):
         return _format_error_html(
             _(
-                u"Sorry! Due to an error your purchase was charged for a different amount than the order total!  "
-                u"The specific error message is: {msg}.  "
+                u"Sorry! Due to an error your purchase was charged for a different amount than the order total! "
+                u"The specific error message is: {msg}. "
                 u"Your credit card has probably been charged. Contact us with payment-specific questions at {email}."
             ).format(
                 msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
@@ -476,7 +480,7 @@ def _get_processor_exception_html(exception):
                 u"unable to validate that the message actually came from the payment processor. "
                 u"The specific error message is: {msg}. "
                 u"We apologize that we cannot verify whether the charge went through and take further action on your order. "
-                u"Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}."
+                u"Your credit card may possibly have been charged. Contact us with payment-specific questions at {email}."
             ).format(
                 msg=u'<span class="exception_msg">{msg}</span>'.format(msg=exception.message),
                 email=payment_support_email
@@ -495,7 +499,7 @@ def _get_processor_exception_html(exception):
     else:
         return _format_error_html(
             _(
-                u"Sorry!  Your payment could not be processed because an unexpected exception occurred.  "
+                u"Sorry! Your payment could not be processed because an unexpected exception occurred. "
                 u"Please contact us at {email} for assistance."
             ).format(email=payment_support_email)
         )
@@ -503,7 +507,7 @@ def _get_processor_exception_html(exception):
 
 def _format_error_html(msg):
     """ Format an HTML error message """
-    return '<p class="error_msg">{msg}</p>'.format(msg=msg)
+    return u'<p class="error_msg">{msg}</p>'.format(msg=msg)
 
 
 CARDTYPE_MAP = defaultdict(lambda: "UNKNOWN")
