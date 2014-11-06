@@ -174,7 +174,7 @@ class AuthListWidget extends MemberListWidget
     else
       @reload_list()
 
-class AutoEnrollmentViaCsv
+class @AutoEnrollmentViaCsv
   constructor: (@$container) ->
     # Wrapper for the AutoEnrollmentViaCsv subsection.
     # This object handles buttons, success and failure reporting,
