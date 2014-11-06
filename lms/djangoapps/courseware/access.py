@@ -8,7 +8,9 @@ import pytz
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import (
+    CourseDescriptor, CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_ABOUT)
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
 
@@ -211,7 +213,8 @@ def _has_access_course_desc(user, action, course):
         In this case we use the visible_in_catalog property on the course descriptor
         but also allow course staff to see this.
         """
-        return course.visible_in_catalog or _has_staff_access_to_descriptor(user, course, course.id)
+        return course.catalog_visibility == CATALOG_VISIBILITY_CATALOG_AND_ABOUT or \
+            _has_staff_access_to_descriptor(user, course, course.id)
 
     def can_see_about_page():
         """
@@ -219,7 +222,9 @@ def _has_access_course_desc(user, action, course):
         In this case we use the visible_about_page property on the course descriptor
         but also allow course staff to see this.
         """
-        return course.visible_about_page or _has_staff_access_to_descriptor(user, course, course.id)
+        return course.catalog_visibility == CATALOG_VISIBILITY_CATALOG_AND_ABOUT or \
+            course.catalog_visibility == CATALOG_VISIBILITY_ABOUT or \
+            _has_staff_access_to_descriptor(user, course, course.id)
 
     checkers = {
         'load': can_load,

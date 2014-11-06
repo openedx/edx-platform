@@ -11,6 +11,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
+from xmodule.course_module import (
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -46,16 +48,14 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course_hidden_visibility = CourseFactory.create(
             display_name='Hidden_course',
             org='TestMicrositeX',
-            visible_in_catalog=False,
-            visible_about_page=False,
+            catalog_visibility=CATALOG_VISIBILITY_NONE,
         )
 
-        # have a course which explicitly sets visibility in catalog to True
+        # have a course which explicitly sets visibility in catalog and about to true
         self.course_with_visibility = CourseFactory.create(
             display_name='visible_course',
             org='TestMicrositeX',
-            visible_in_catalog=True,
-            visible_about_page=True,
+            catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
         )
 
     def setup_users(self):

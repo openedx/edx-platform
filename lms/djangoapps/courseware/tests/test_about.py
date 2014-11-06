@@ -20,6 +20,7 @@ from student.models import CourseEnrollment
 
 from shoppingcart.models import Order, PaidCourseRegistration
 
+from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
 
 # HTML for registration button
 REG_STR = "<form id=\"class_enroll_form\" method=\"post\" data-remote=\"true\" action=\"/change_enrollment\">"
@@ -38,12 +39,12 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category="about", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="overview"
         )
-        self.course_without_about = CourseFactory.create(visible_about_page=False)
+        self.course_without_about = CourseFactory.create(catalog_visibility=CATALOG_VISIBILITY_NONE)
         self.about = ItemFactory.create(
             category="about", parent_location=self.course_without_about.location,
             data="WITHOUT ABOUT", display_name="overview"
         )
-        self.course_with_about = CourseFactory.create(visible_about_page=True)
+        self.course_with_about = CourseFactory.create(catalog_visibility=CATALOG_VISIBILITY_ABOUT)
         self.about = ItemFactory.create(
             category="about", parent_location=self.course_with_about.location,
             data="WITH ABOUT", display_name="overview"
