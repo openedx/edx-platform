@@ -83,4 +83,8 @@ urlpatterns = patterns('',  # nopep8
     # spoc gradebook
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
+
+    # Cohort management
+    url(r'add_users_to_cohorts$',
+        'instructor.views.api.add_users_to_cohorts', name="add_users_to_cohorts"),
 )

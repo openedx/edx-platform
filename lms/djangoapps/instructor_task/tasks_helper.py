@@ -7,18 +7,23 @@ import json
 import urllib
 from datetime import datetime
 from time import time
+import unicodecsv
 
 from celery import Task, current_task
 from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
+from django.core.files.storage import DefaultStorage
 from django.db import transaction, reset_queries
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 
-from xmodule.modulestore.django import modulestore
 from track.views import task_track
+from util.file import course_filename_prefix_generator, UniversalNewlineIterator
+from xmodule.modulestore.django import modulestore
 
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
@@ -515,7 +520,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp):
     report_store.store_rows(
         course_id,
         u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
-            course_prefix=urllib.quote(unicode(course_id).replace("/", "_")),
+            course_prefix=course_filename_prefix_generator(course_id),
             csv_name=csv_name,
             timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
         ),
@@ -622,5 +627,90 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
 
     # Perform the upload
     upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+    """
+    Within a given course, cohort students in bulk, then upload the results
+    using a `ReportStore`.
+    """
+    start_time = time()
+    start_date = datetime.now(UTC)
+
+    # Iterate through rows to get total assignments for task progress
+    with DefaultStorage().open(task_input['file_name']) as f:
+        total_assignments = 0
+        for _line in unicodecsv.DictReader(UniversalNewlineIterator(f)):
+            total_assignments += 1
+
+    task_progress = TaskProgress(action_name, total_assignments, start_time)
+    current_step = {'step': 'Cohorting Students'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # cohorts_status is a mapping from cohort_name to metadata about
+    # that cohort.  The metadata will include information about users
+    # successfully added to the cohort, users not found, and a cached
+    # reference to the corresponding cohort object to prevent
+    # redundant cohort queries.
+    cohorts_status = {}
+
+    with DefaultStorage().open(task_input['file_name']) as f:
+        for row in unicodecsv.DictReader(UniversalNewlineIterator(f), encoding='utf-8'):
+            # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
+            username_or_email = row.get('email') or row.get('username')
+            cohort_name = row.get('cohort') or ''
+            task_progress.attempted += 1
+
+            if not cohorts_status.get(cohort_name):
+                cohorts_status[cohort_name] = {
+                    'Cohort Name': cohort_name,
+                    'Students Added': 0,
+                    'Students Not Found': set()
+                }
+                try:
+                    cohorts_status[cohort_name]['cohort'] = CourseUserGroup.objects.get(
+                        course_id=course_id,
+                        group_type=CourseUserGroup.COHORT,
+                        name=cohort_name
+                    )
+                    cohorts_status[cohort_name]["Exists"] = True
+                except CourseUserGroup.DoesNotExist:
+                    cohorts_status[cohort_name]["Exists"] = False
+
+            if not cohorts_status[cohort_name]['Exists']:
+                task_progress.failed += 1
+                continue
+
+            try:
+                with transaction.commit_on_success():
+                    add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
+                cohorts_status[cohort_name]['Students Added'] += 1
+                task_progress.succeeded += 1
+            except User.DoesNotExist:
+                cohorts_status[cohort_name]['Students Not Found'].add(username_or_email)
+                task_progress.failed += 1
+            except ValueError:
+                # Raised when the user is already in the given cohort
+                task_progress.skipped += 1
+
+            task_progress.update_task_state(extra_meta=current_step)
+
+    current_step['step'] = 'Uploading CSV'
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Filter the output of `add_users_to_cohorts` in order to upload the result.
+    output_header = ['Cohort Name', 'Exists', 'Students Added', 'Students Not Found']
+    output_rows = [
+        [
+            ','.join(status_dict.get(column_name, '')) if column_name == 'Students Not Found'
+            else status_dict[column_name]
+            for column_name in output_header
+        ]
+        for _cohort_name, status_dict in cohorts_status.iteritems()
+    ]
+    output_rows.insert(0, output_header)
+    upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)
 
     return task_progress.update_task_state(extra_meta=current_step)

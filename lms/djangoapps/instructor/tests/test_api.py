@@ -6,8 +6,11 @@ import datetime
 import ddt
 import io
 import json
+import os
 import random
 import requests
+import shutil
+import tempfile
 from unittest import TestCase
 from urllib import quote
 
@@ -3289,3 +3292,166 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_COUPON_CSV_HEADER))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+class TestBulkCohorting(ModuleStoreTestCase):
+    """
+    Test adding users to cohorts in bulk via CSV upload.
+    """
+    def setUp(self):
+        super(TestBulkCohorting, self).setUp()
+        self.course = CourseFactory.create()
+        self.staff_user = StaffFactory(course_key=self.course.id)
+        self.non_staff_user = UserFactory.create()
+        self.tempdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        if os.path.exists(self.tempdir):
+            shutil.rmtree(self.tempdir)
+
+    def call_add_users_to_cohorts(self, csv_data, suffix='.csv', method='POST'):
+        """
+        Call `add_users_to_cohorts` with a file generated from `csv_data`.
+        """
+        # this temporary file will be removed in `self.tearDown()`
+        __, file_name = tempfile.mkstemp(suffix=suffix, dir=self.tempdir)
+        with open(file_name, 'w') as file_pointer:
+            file_pointer.write(csv_data.encode('utf-8'))
+        with open(file_name, 'r') as file_pointer:
+            url = reverse('add_users_to_cohorts', kwargs={'course_id': unicode(self.course.id)})
+            if method == 'POST':
+                return self.client.post(url, {'uploaded-file': file_pointer})
+            elif method == 'GET':
+                return self.client.get(url, {'uploaded-file': file_pointer})
+
+    def expect_error_on_file_content(self, file_content, error, file_suffix='.csv'):
+        """
+        Verify that we get the error we expect for a given file input.
+        """
+        self.client.login(username=self.staff_user.username, password='test')
+        response = self.call_add_users_to_cohorts(file_content, suffix=file_suffix)
+        self.assertEqual(response.status_code, 400)
+        result = json.loads(response.content)
+        self.assertEqual(result['error'], error)
+
+    def verify_success_on_file_content(self, file_content, mock_store_upload, mock_cohort_task):
+        """
+        Verify that `addd_users_to_cohorts` successfully validates the
+        file content, uploads the input file, and triggers the
+        background task.
+        """
+        mock_store_upload.return_value = (None, 'fake_file_name.csv')
+        self.client.login(username=self.staff_user.username, password='test')
+        response = self.call_add_users_to_cohorts(file_content)
+        self.assertEqual(response.status_code, 204)
+        self.assertTrue(mock_store_upload.called)
+        self.assertTrue(mock_cohort_task.called)
+
+    def test_no_cohort_field(self):
+        """
+        Verify that we get a descriptive verification error when we haven't
+        included a cohort field in the uploaded CSV.
+        """
+        self.expect_error_on_file_content(
+            'username,email\n', "The file must contain a 'cohort' column containing cohort names."
+        )
+
+    def test_no_username_or_email_field(self):
+        """
+        Verify that we get a descriptive verification error when we haven't
+        included a username or email field in the uploaded CSV.
+        """
+        self.expect_error_on_file_content(
+            'cohort\n', "The file must contain a 'username' column, an 'email' column, or both."
+        )
+
+    def test_empty_csv(self):
+        """
+        Verify that we get a descriptive verification error when we haven't
+        included any data in the uploaded CSV.
+        """
+        self.expect_error_on_file_content(
+            '', "The file must contain a 'cohort' column containing cohort names."
+        )
+
+    def test_wrong_extension(self):
+        """
+        Verify that we get a descriptive verification error when we haven't
+        uploaded a file with a '.csv' extension.
+        """
+        self.expect_error_on_file_content(
+            '', "The file must end with the extension '.csv'.", file_suffix='.notcsv'
+        )
+
+    def test_non_staff_no_access(self):
+        """
+        Verify that we can't access the view when we aren't a staff user.
+        """
+        self.client.login(username=self.non_staff_user.username, password='test')
+        response = self.call_add_users_to_cohorts('')
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_only(self):
+        """
+        Verify that we can't call the view when we aren't using POST.
+        """
+        self.client.login(username=self.staff_user.username, password='test')
+        response = self.call_add_users_to_cohorts('', method='GET')
+        self.assertEqual(response.status_code, 405)
+
+    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('instructor.views.api.store_uploaded_file')
+    def test_success_username(self, mock_store_upload, mock_cohort_task):
+        """
+        Verify that we store the input CSV and call a background task when
+        the CSV has username and cohort columns.
+        """
+        self.verify_success_on_file_content(
+            'username,cohort\nfoo_username,bar_cohort', mock_store_upload, mock_cohort_task
+        )
+
+    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('instructor.views.api.store_uploaded_file')
+    def test_success_email(self, mock_store_upload, mock_cohort_task):
+        """
+        Verify that we store the input CSV and call the cohorting background
+        task when the CSV has email and cohort columns.
+        """
+        self.verify_success_on_file_content(
+            'email,cohort\nfoo_email,bar_cohort', mock_store_upload, mock_cohort_task
+        )
+
+    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('instructor.views.api.store_uploaded_file')
+    def test_success_username_and_email(self, mock_store_upload, mock_cohort_task):
+        """
+        Verify that we store the input CSV and call the cohorting background
+        task when the CSV has username, email and cohort columns.
+        """
+        self.verify_success_on_file_content(
+            'username,email,cohort\nfoo_username,bar_email,baz_cohort', mock_store_upload, mock_cohort_task
+        )
+
+    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('instructor.views.api.store_uploaded_file')
+    def test_success_carriage_return(self, mock_store_upload, mock_cohort_task):
+        """
+        Verify that we store the input CSV and call the cohorting background
+        task when lines in the CSV are delimited by carriage returns.
+        """
+        self.verify_success_on_file_content(
+            'username,email,cohort\rfoo_username,bar_email,baz_cohort', mock_store_upload, mock_cohort_task
+        )
+
+    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('instructor.views.api.store_uploaded_file')
+    def test_success_carriage_return_line_feed(self, mock_store_upload, mock_cohort_task):
+        """
+        Verify that we store the input CSV and call the cohorting background
+        task when lines in the CSV are delimited by carriage returns and line
+        feeds.
+        """
+        self.verify_success_on_file_content(
+            'username,email,cohort\r\nfoo_username,bar_email,baz_cohort', mock_store_upload, mock_cohort_task
+        )

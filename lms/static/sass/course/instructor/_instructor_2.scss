@@ -106,6 +106,19 @@
       }
     }
   }
+
+  // UI: visual dividers
+  .divider-lv0 {
+    border-top: ($baseline/5) solid $gray-l4;
+  }
+
+  .divider-lv1 {
+    border-top: ($baseline/10) solid $gray-l4;
+  }
+
+  .divider-lv2 {
+    border-top: ($baseline/20) solid $gray-l4;
+  }
 }
 
 // instructor dashboard 2
@@ -311,6 +324,12 @@ section.instructor-dashboard-content-2 {
       color: $gray;
     }
   }
+
+  .subsection-title {
+    @extend %hd-lv5;
+    @extend %t-weight4;
+    margin-bottom: ($baseline/2);
+  }
 }
 
 
@@ -434,7 +453,7 @@ section.instructor-dashboard-content-2 {
       .tip {
         @extend %t-copy-sub1;
         margin-top: ($baseline/4);
-        color: $gray-l3;
+        color: $gray-l2;
       }
 
       .field-text {
@@ -448,6 +467,10 @@ section.instructor-dashboard-content-2 {
           width: 100%;
           padding: ($baseline/2) ($baseline*0.75);
         }
+      }
+
+      .input-file {
+        margin-bottom: ($baseline/2);
       }
     }
 
@@ -472,7 +495,6 @@ section.instructor-dashboard-content-2 {
 
   .cohort-management-nav {
     @include clearfix();
-    margin-bottom: $baseline;
 
     .cohort-management-nav-form {
       width: 60%;
@@ -486,10 +508,10 @@ section.instructor-dashboard-content-2 {
 
     .action-create {
       @include idashbutton($blue);
+      @extend %t-weight4;
       float: right;
       text-align: right;
       text-shadow: none;
-      font-weight: 600;
     }
 
     // STATE: is disabled
@@ -538,10 +560,6 @@ section.instructor-dashboard-content-2 {
   }
 
   // cohort group
-  .cohort-management-group {
-    border: 1px solid $gray-l5;
-  }
-
   .cohort-management-group-header {
     border-bottom: ($baseline/10) solid $gray-l4;
     background: $gray-l5;
@@ -610,6 +628,7 @@ section.instructor-dashboard-content-2 {
 
   .cohort-management-group-add {
     @extend %cohort-management-form;
+    border: 1px solid $gray-l5;
     padding: $baseline $baseline 0 $baseline;
 
     .message-title {
@@ -646,10 +665,51 @@ section.instructor-dashboard-content-2 {
     }
   }
 
+  // CSV-based file upload for auto cohort assigning
+  .toggle-cohort-management-secondary {
+    @extend %t-copy-sub1;
+  }
+
+  .cohort-management-file-upload {
+
+    .message-title {
+      @extend %t-title7;
+    }
+
+    .form-introduction {
+      @extend %t-copy-sub1;
+      margin-bottom: $baseline;
+
+      p {
+        color: $gray-l1;
+      }
+    }
+  }
+
+  .file-upload-form {
+    @extend %cohort-management-form;
+
+    .form-fields {
+      margin-bottom: $baseline;
+    }
+
+    .action-submit {
+      @include idashbutton($blue);
+      // needed to override very poor specificity and base rules for blue button
+      @include font-size(14);
+      margin-bottom: 0;
+      font-weight: 700;
+      text-shadow: none;
+    }
+  }
 
   .cohort-management-supplemental {
     @extend %t-copy-sub1;
-    margin-top: ($baseline/2);
+    margin-top: $baseline;
+    padding: ($baseline/2) $baseline;
+    background: $gray-l5;
+    border-radius: ($baseline/10);
+
 
     .icon {
       margin-right: ($baseline/4);
