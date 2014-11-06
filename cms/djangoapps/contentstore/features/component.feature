@@ -127,6 +127,6 @@ Feature: CMS.Component Adding
         When I add a "Blank Advanced Problem" "Advanced Problem" component
         Then I see the display name is "Blank Advanced Problem"
         When I change the display name to ""
-        Then I see the display name is "problem"
+        Then I see the display name is "Blank Advanced Problem"
         When I unset the display name
         Then I see the display name is "Blank Advanced Problem"
