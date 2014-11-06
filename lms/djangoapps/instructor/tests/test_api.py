@@ -364,7 +364,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         # test the log for email that's send to new created user.
         info_log.assert_called_with("user already exists with username '{username}' and email '{email}'".format(username='test_student_1', email='test_student@example.com'))
 
-    def test_bad_file_upload_type(self):
+    def test_file_upload_type_not_csv(self):
         """
         Try uploading some non-CSV file and verify that it is rejected
         """
@@ -373,7 +373,19 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         self.assertNotEquals(len(data['general_errors']), 0)
+        self.assertEquals(data['general_errors'][0]['response'], 'Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
+
+    def test_bad_file_upload_type(self):
+        """
+        Try uploading some non-CSV file and verify that it is rejected
+        """
+        uploaded_file = SimpleUploadedFile("temp.csv", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['general_errors']), 0)
         self.assertEquals(data['general_errors'][0]['response'], 'Could not read uploaded file.')
+
 
     def test_insufficient_data(self):
         """
