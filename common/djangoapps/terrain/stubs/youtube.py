@@ -24,7 +24,7 @@ from urlparse import urlparse
 from collections import OrderedDict
 
 
-IFRAME_API_RESPONSE = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
+IFRAME_API_RESPONSE = None
 
 
 class StubYouTubeHandler(StubHttpRequestHandler):
@@ -50,6 +50,11 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         """
         Handle a GET request from the client and sends response back.
         """
+
+        # Initialize only once if IFRAME_API_RESPONSE is none.
+        global IFRAME_API_RESPONSE  # pylint: disable=W0603
+        if IFRAME_API_RESPONSE is None:
+            IFRAME_API_RESPONSE = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
 
         self.log_message(
             "Youtube provider received GET request to path {}".format(self.path)
