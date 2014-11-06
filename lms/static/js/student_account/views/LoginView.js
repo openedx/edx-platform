@@ -25,6 +25,8 @@ var edx = edx || {};
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
             this.platformName = data.platformName;
+
+            this.listenTo( this.model, 'sync', this.saveSuccess );
         },
 
         render: function( html ) {
@@ -74,6 +76,32 @@ var edx = edx || {};
             if (providerUrl) {
                 window.location.href = providerUrl;
             }
+        },
+
+        saveSuccess: function () {
+            var enrollment = edx.student.account.EnrollmentInterface,
+                redirectUrl = '/dashboard',
+                next = null;
+
+            // Check for forwarding url
+            if ( !_.isNull( $.url('?next') ) ) {
+                next = decodeURIComponent( $.url('?next') );
+
+                if ( !window.isExternal(next) ) {
+                    redirectUrl = next;
+                }
+            }
+
+            // If we need to enroll in a course, mark as enrolled
+            if ( $.url('?enrollment_action') === 'enroll' ) {
+                enrollment.enroll( decodeURIComponent( $.url('?course_id') ), redirectUrl );
+            } else {
+                this.redirect(redirectUrl);
+            }
+        },
+
+        redirect: function( url ) {
+            window.location.href = url;
         },
 
         saveError: function( error ) {

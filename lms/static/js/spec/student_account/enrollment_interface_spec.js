@@ -1,21 +1,13 @@
-define(['js/common_helpers/template_helpers', 'js/student_account/enrollment_interface'],
-    function(TemplateHelpers, EnrollmentInterface) {
+define(['js/student_account/enrollment_interface'],
+    function(EnrollmentInterface) {
         describe("edx.student.account.EnrollmentInterface", function() {
             'use strict';
 
-            it("find course modes using modeInArray ", function() {
-                var course_modes = [
-                    {
-                        slug: 'honor'
-                    },
-                    {
-                        slug: 'professional'
-                    }
-                ],
-                
-                expect(EnrollmentInterface.modeInArray('professional')).toBe(true);
-                expect(EnrollmentInterface.modeInArray('audit')).toBe(false);
+            it('checks if a given course mode slug exists in an array of mode objects', function() {
+                var courseModes = [ { slug: 'honor' }, { slug: 'professional' } ]
 
+                expect( EnrollmentInterface.modeInArray( courseModes, 'professional' ) ).toBe(true);
+                expect( EnrollmentInterface.modeInArray( courseModes, 'audit' ) ).toBe(false);
             });
         });
     }

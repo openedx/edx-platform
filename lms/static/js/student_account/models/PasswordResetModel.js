@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext) {
+(function($, Backbone) {
     'use strict';
 
     edx.student = edx.student || {};
@@ -31,11 +31,11 @@ var edx = edx || {};
                 headers: headers
             })
             .done(function() {
-                model.trigger('success');
+                model.trigger('sync');
             })
             .fail( function( error ) {
-                model.trigger( 'error', error );
+                model.trigger('error', error);
             });
         }
     });
-})(jQuery, _, Backbone, gettext);
+})(jQuery, Backbone);

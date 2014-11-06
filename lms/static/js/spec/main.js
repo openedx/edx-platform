@@ -23,6 +23,7 @@
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
+            'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
             'underscore': 'xmodule_js/common_static/js/vendor/underscore-min',
@@ -43,7 +44,6 @@
             'jasmine.async': 'xmodule_js/common_static/js/vendor/jasmine.async',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly.pkgd',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
-            'URI': 'xmodule_js/common_static/js/vendor/URI.min',
             'mathjax': '//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured',
             'youtube': '//www.youtube.com/player_api?noext',
             'tender': '//edxedge.tenderapp.com/tender_widget',
@@ -65,7 +65,17 @@
             'js/views/cohort_editor': 'js/views/cohort_editor',
             'js/views/cohorts': 'js/views/cohorts',
             'js/views/notification': 'js/views/notification',
-            'js/models/notification': 'js/models/notification'
+            'js/models/notification': 'js/models/notification',
+            'js/student_account/account': 'js/student_account/account',
+            'js/student_account/views/FormView': 'js/student_account/views/FormView',
+            'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
+            'js/student_account/views/LoginView': 'js/student_account/views/LoginView',
+            'js/student_account/models/PasswordResetModel': 'js/student_account/models/PasswordResetModel',
+            'js/student_account/views/PasswordResetView': 'js/student_account/views/PasswordResetView',
+            'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
+            'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
+            'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
+            'js/student_profile/profile': 'js/student_profile/profile'
         },
         shim: {
             'gettext': {
@@ -133,11 +143,31 @@
                 deps: ['jquery', 'tinymce'],
                 exports: 'jQuery.fn.tinymce'
             },
+            'jquery.url': {
+                deps: ['jquery'],
+                exports: 'jQuery.fn.url'
+            },
             'datepair': {
                 deps: ['jquery.ui', 'jquery.timepicker']
             },
             'underscore': {
-                exports: '_'
+                deps: ['underscore.string'],
+                exports: '_',
+                init: function(UnderscoreString) {
+                    /* Mix non-conflicting functions from underscore.string
+                     * (all but include, contains, and reverse) into the
+                     * Underscore namespace. This allows the login, register,
+                     * and password reset templates to render independent of the
+                     * access view.
+                     */
+                    _.mixin(UnderscoreString.exports());
+
+                    /* Since the access view is not using RequireJS, we also
+                     * expose underscore.string at _.str, so that the access
+                     * view can perform the mixin on its own.
+                     */
+                    _.str = UnderscoreString;
+                }
             },
             'backbone': {
                 deps: ['underscore', 'jquery'],
@@ -216,7 +246,6 @@
                 exports: 'js/student_account/account',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
             },
-
             'js/student_profile/profile': {
                 exports: 'js/student_profile/profile',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
@@ -261,60 +290,76 @@
                 deps: ['backbone', 'jquery', 'underscore']
             },
             'js/student_account/enrollment_interface': {
-                exports: 'js/student_account/enrollment_interface',
-                deps: ['jquery', 'underscore', 'gettext']
+                exports: 'edx.student.account.EnrollmentInterface',
+                deps: ['jquery', 'jquery.cookie', 'underscore', 'gettext']
             },
             // Student account registration/login
             // Loaded explicitly until these are converted to RequireJS
             'js/student_account/views/FormView': {
-                exports: 'js/student_account/views/FormView',
+                exports: 'edx.student.account.FormView',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext']
             },
             'js/student_account/models/LoginModel': {
-                exports: 'js/student_account/models/LoginModel',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+                exports: 'edx.student.account.LoginModel',
+                deps: ['jquery', 'jquery.cookie', 'backbone']
             },
             'js/student_account/views/LoginView': {
-                exports: 'js/student_account/views/LoginView',
+                exports: 'edx.student.account.LoginView',
                 deps: [
+                    'jquery',
+                    'jquery.url',
+                    'underscore',
+                    'gettext',
                     'js/student_account/models/LoginModel',
-                    'js/student_account/views/FormView',
-                    'underscore.string'
+                    'js/student_account/views/FormView'
                 ]
             },
             'js/student_account/models/PasswordResetModel': {
-                exports: 'js/student_account/models/PasswordResetModel',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+                exports: 'edx.student.account.PasswordResetModel',
+                deps: ['jquery', 'jquery.cookie', 'backbone']
             },
             'js/student_account/views/PasswordResetView': {
-                exports: 'js/student_account/views/PasswordResetView',
+                exports: 'edx.student.account.PasswordResetView',
                 deps: [
+                    'jquery',
+                    'underscore',
+                    'gettext',
                     'js/student_account/models/PasswordResetModel',
                     'js/student_account/views/FormView'
                 ]
             },
             'js/student_account/models/RegisterModel': {
-                exports: 'js/student_account/models/RegisterModel',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'jquery.cookie']
+                exports: 'edx.student.account.RegisterModel',
+                deps: ['jquery', 'jquery.cookie', 'backbone']
             },
             'js/student_account/views/RegisterView': {
-                exports: 'js/student_account/views/RegisterView',
+                exports: 'edx.student.account.RegisterView',
                 deps: [
+                    'jquery',
+                    'jquery.url',
+                    'underscore',
+                    'gettext',
                     'js/student_account/models/RegisterModel',
-                    'js/student_account/views/FormView',
-                    'underscore.string'
+                    'js/student_account/views/FormView'
                 ]
             },
             'js/student_account/views/AccessView': {
-                exports: 'js/student_account/views/AccessView',
+                exports: 'edx.student.account.AccessView',
                 deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext',
                     'js/student_account/views/LoginView',
                     'js/student_account/views/PasswordResetView',
                     'js/student_account/views/RegisterView',
-                    'underscore.string'
+                    'js/student_account/models/LoginModel',
+                    'js/student_account/models/PasswordResetModel',
+                    'js/student_account/models/RegisterModel',
+                    'js/student_account/views/FormView'
                 ]
             }
-        },
+        }
     });
 
     // TODO: why do these need 'lms/include' at the front but the CMS equivalent logic doesn't?
@@ -325,13 +370,13 @@
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
-        'lms/include/js/spec/student_account/account.js',
+        'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
         'lms/include/js/spec/student_account/register_spec.js',
         'lms/include/js/spec/student_account/password_reset_spec.js',
         'lms/include/js/spec/student_account/enrollment_interface_spec.js',
-        'lms/include/js/spec/student_profile/profile.js',
+        'lms/include/js/spec/student_profile/profile_spec.js'
     ]);
 
 }).call(this, requirejs, define);
