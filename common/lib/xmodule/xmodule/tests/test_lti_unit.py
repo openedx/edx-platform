@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Test for LTI Xmodule functional logic."""
 
+import datetime
+from django.utils.timezone import UTC
 from mock import Mock, patch, PropertyMock
 import textwrap
 from lxml import etree
@@ -8,7 +10,7 @@ from webob.request import Request
 from copy import copy
 import urllib
 
-
+from xmodule.fields import Timedelta
 from xmodule.lti_module import LTIDescriptor
 from xmodule.lti_2_util import LTIError
 
@@ -65,6 +67,9 @@ class LTIModuleTest(LogicTest):
             'grade': 0.5,
             'messageIdentifier': '528243ba5241b',
         }
+
+        self.xmodule.due = None
+        self.xmodule.graceperiod = None
 
     def get_request_body(self, params=None):
         """Fetches the body of a request specified by params"""
@@ -160,6 +165,26 @@ class LTIModuleTest(LogicTest):
         }
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(expected_response, real_response)
+
+    def test_grade_past_due(self):
+        """
+        Should fail if we do not accept past due grades, and it is past due.
+        """
+        self.xmodule.accept_grades_past_due = False
+        self.xmodule.due = datetime.datetime.now(UTC())
+        self.xmodule.graceperiod = Timedelta().from_json("0 seconds")
+        request = Request(self.environ)
+        request.body = self.get_request_body()
+        response = self.xmodule.grade_handler(request, '')
+        real_response = self.get_response_values(response)
+        expected_response = {
+            'action': None,
+            'code_major': 'failure',
+            'description': 'Grade is past due',
+            'messageIdentifier': 'unknown',
+        }
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(expected_response, real_response)
 
     def test_grade_not_in_range(self):
         """

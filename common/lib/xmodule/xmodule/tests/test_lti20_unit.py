@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tests for LTI Xmodule LTIv2.0 functional logic."""
+import datetime
 import textwrap
 
+from django.utils.timezone import UTC
 from mock import Mock
 from xmodule.lti_module import LTIDescriptor
 from xmodule.lti_2_util import LTIError
@@ -21,6 +23,8 @@ class LTI20RESTResultServiceTest(LogicTest):
         self.system.rebind_noauth_module_to_user = Mock()
         self.user_id = self.xmodule.runtime.anonymous_student_id
         self.lti_id = self.xmodule.lti_id
+        self.xmodule.due = None
+        self.xmodule.graceperiod = None
 
     def test_sanitize_get_context(self):
         """Tests that the get_context function does basic sanitization"""
@@ -366,6 +370,17 @@ class LTI20RESTResultServiceTest(LogicTest):
         """
         self.setup_system_xmodule_mocks_for_lti20_request_test()
         self.system.get_real_user = Mock(return_value=None)
+        mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
+        response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
+        self.assertEqual(response.status_code, 404)
+
+    def test_lti20_request_handler_grade_past_due(self):
+        """
+        Test that we get a 404 when accept_grades_past_due is False and it is past due
+        """
+        self.setup_system_xmodule_mocks_for_lti20_request_test()
+        self.xmodule.due = datetime.datetime.now(UTC())
+        self.xmodule.accept_grades_past_due = False
         mock_request = self.get_signed_lti20_mock_request(self.GOOD_JSON_PUT)
         response = self.xmodule.lti_2_0_result_rest_handler(mock_request, "user/abcd")
         self.assertEqual(response.status_code, 404)

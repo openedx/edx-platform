@@ -64,6 +64,9 @@ class LTI20ModuleMixin(object):
         if self.system.debug:
             self._log_correct_authorization_header(request)
 
+        if not self.accept_grades_past_due and self.is_past_due():
+            return Response(status=404)  # have to do 404 due to spec, but 400 is better, with error msg in body
+
         try:
             anon_id = self.parse_lti_2_0_handler_suffix(suffix)
         except LTIError:

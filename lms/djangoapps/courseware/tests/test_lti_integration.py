@@ -91,6 +91,7 @@ class TestLTI(BaseTestXmodule):
             'ask_to_send_email': self.item_descriptor.ask_to_send_email,
             'description': self.item_descriptor.description,
             'button_text': self.item_descriptor.button_text,
+            'accept_grades_past_due': self.item_descriptor.accept_grades_past_due,
         }
 
         def mocked_sign(self, *args, **kwargs):
