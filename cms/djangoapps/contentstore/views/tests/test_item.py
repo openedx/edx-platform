@@ -130,8 +130,10 @@ class GetItemTest(ItemTest):
         root_usage_key = self._create_vertical()
         html, __ = self._get_container_preview(root_usage_key)
 
-        # Verify that the Studio wrapper is not added
-        self.assertNotIn('wrapper-xblock', html)
+        # XBlock messages are added by the Studio wrapper.
+        self.assertIn('wrapper-xblock-message', html)
+        # Make sure that "wrapper-xblock" does not appear by itself (without -message at end).
+        self.assertNotRegexpMatches(html, r'wrapper-xblock[^-]+')
 
         # Verify that the header and article tags are still added
         self.assertIn('<header class="xblock-header xblock-header-vertical">', html)
