@@ -25,7 +25,6 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
-from cities.models import City
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError, transaction
 from django.db.models import Count
@@ -251,7 +250,6 @@ class UserProfile(models.Model):
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
     mailing_address = models.TextField(blank=True, null=True)
-#    city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
