@@ -174,7 +174,7 @@ class AuthListWidget extends MemberListWidget
     else
       @reload_list()
 
-class AutoEnrollmentViaCsv
+class @AutoEnrollmentViaCsv
   constructor: (@$container) ->
     # Wrapper for the AutoEnrollmentViaCsv subsection.
     # This object handles buttons, success and failure reporting,
@@ -220,7 +220,6 @@ class AutoEnrollmentViaCsv
     @$results.empty()
     errors = []
     warnings = []
-
     result_from_server_is_success = true
 
     if data_from_server.general_errors.length
@@ -241,41 +240,35 @@ class AutoEnrollmentViaCsv
         warning['is_general_error'] = false
         warnings.push warning
 
-    render_response = (label, type, student_results) =>
-      if type is 'success'
-        task_res_section = $ '<div/>', class: 'message message-confirmation'
-        message_title = $ '<h3/>', class: 'message-title', text: label
-        task_res_section.append message_title
-        @$results.append task_res_section
-        return
-
-      if type is 'error'
-        task_res_section = $ '<div/>', class: 'message message-error'
-      if type is 'warning'
-        task_res_section = $ '<div/>', class: 'message message-warning'
-
-      message_title = $ '<h3/>', class: 'message-title', text: label
-      task_res_section. append message_title
-      messages_copy = $ '<div/>', class: 'message-copy'
-      task_res_section. append messages_copy
-      messages_summary = $ '<ul/>', class: 'list-summary summary-items'
-      messages_copy.append messages_summary
-
+    render_response = (title, message, type, student_results) =>
+      details = []
       for student_result in student_results
         if student_result.is_general_error
-          response_message =  student_result.response
+          details.push student_result.response
         else
           response_message = student_result.username + '  ('+ student_result.email + '):  ' + '   (' + student_result.response + ')'
-        messages_summary.append $ '<li/>', class: 'summary-item', text: response_message
+          details.push response_message
 
-      @$results.append task_res_section
+      @$results.append @render_notification_view type, title, message, details
 
     if errors.length
-      render_response gettext("The following errors were generated:"), 'error', errors
+      render_response gettext('Errors'), gettext("The following errors were generated:"), 'error', errors
     if warnings.length
-      render_response gettext("The following warnings were generated:"), 'warning', warnings
+      render_response gettext('Warnings'), gettext("The following warnings were generated:"), 'warning', warnings
     if result_from_server_is_success
-      render_response gettext("All accounts were created successfully."), 'success', []
+      render_response gettext('Success'), gettext("All accounts were created successfully."), 'confirmation', []
+
+  render_notification_view: (type, title, message, details) ->
+    notification_model = new NotificationModel()
+    notification_model.set({
+          'type': type,
+          'title': title,
+          'message': message,
+          'details': details,
+    });
+    view = new NotificationView(model:notification_model);
+    view.render()
+    return view.$el.html()
 
 class BetaTesterBulkAddition
   constructor: (@$container) ->
