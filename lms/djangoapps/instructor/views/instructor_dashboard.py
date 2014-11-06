@@ -139,9 +139,12 @@ def _section_e_commerce(course, access):
     course_key = course.id
     coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
     course_price = None
+    total_amount = None
     course_honor_mode = CourseMode.mode_for_course(course_key, 'honor')
     if course_honor_mode and course_honor_mode.min_price > 0:
         course_price = course_honor_mode.min_price
+    if access['finance_admin']:
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key)
 
     section_data = {
         'section_key': 'e-commerce',
@@ -164,7 +167,8 @@ def _section_e_commerce(course, access):
         'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': course_key.to_deprecated_string()}),
         'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
         'coupons': coupons,
-        'course_price': course_price
+        'course_price': course_price,
+        'total_amount': total_amount
     }
     return section_data
 
