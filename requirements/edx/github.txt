@@ -9,7 +9,7 @@
 # Third-party:
 -e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
--e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
+-e git+https://github.com/edx/django-wiki.git@67fe4d99b2327ae500e9da120b53d836ca9f7b6b#egg=django-wiki
 -e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-2#egg=django-oauth2-provider
 -e git+https://github.com/clytwynec/flaky.git@clytwynec/fix-false-success-results#egg=flaky
 -e git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=mongodb_proxy
