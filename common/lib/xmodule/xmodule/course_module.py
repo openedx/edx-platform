@@ -287,7 +287,7 @@ class CourseFields(object):
     )
     video_upload_pipeline = Dict(
         display_name=_("Video Upload Pipeline"),
-        help=_("Enter settings for the video upload pipeline, including the institute name and the secret token."),
+        help=_("Enter settings for the video upload pipeline, including the secret course video token."),
         scope=Scope.settings
     )
     no_grade = Boolean(
@@ -1098,3 +1098,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return self.display_organization
 
         return self.org
+
+    @property
+    def video_pipeline_configured(self):
+        """
+        Returns whether the video pipeline advanced setting is configured for this course.
+        """
+        return (
+            self.video_upload_pipeline is not None and
+            'course_video_upload_token' in self.video_upload_pipeline
+        )
