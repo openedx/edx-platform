@@ -18,16 +18,15 @@ var edx = edx || {};
             year_of_birth: '',
             mailing_address: '',
             goals: '',
-            honor_code: false
         },
 
         ajaxType: '',
 
         urlRoot: '',
 
-        initialize: function( obj ) {
-            this.ajaxType = obj.method;
-            this.urlRoot = obj.url;
+        initialize: function( attributes, options ) {
+            this.ajaxType = options.method;
+            this.urlRoot = options.url;
         },
 
         sync: function(method, model) {
