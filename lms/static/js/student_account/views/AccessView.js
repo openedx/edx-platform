@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext) {
+(function($, _, Backbone, gettext, analytics) {
     'use strict';
 
     edx.student = edx.student || {};
@@ -125,6 +125,10 @@ var edx = edx || {};
         },
 
         resetPassword: function() {
+            analytics.track('edx.bi.password_reset_form.viewed', {
+                category: 'user-engagement'
+            });
+
             this.element.hide( this.$header );
             this.element.hide( $(this.el).find('.form-type') );
             this.loadForm('reset');
@@ -134,6 +138,10 @@ var edx = edx || {};
             var type = $(e.currentTarget).val(),
                 $form = $('#' + type + '-form'),
                 $anchor = $('#' + type + '-anchor');
+
+            analytics.track('edx.bi.' + type + '_form.toggled', {
+                category: 'user-engagement'
+            });
 
             if ( !this.form.isLoaded( $form ) ) {
                 this.loadForm( type );
@@ -170,4 +178,4 @@ var edx = edx || {};
         }
     });
 
-})(jQuery, _, Backbone, gettext);
+})(jQuery, _, Backbone, gettext, analytics);
