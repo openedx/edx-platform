@@ -5,6 +5,7 @@ Instructor (2) dashboard page.
 
 from bok_choy.page_object import PageObject
 from .course_page import CoursePage
+import os
 
 
 class InstructorDashboardPage(CoursePage):
@@ -12,7 +13,6 @@ class InstructorDashboardPage(CoursePage):
     Instructor dashboard, where course staff can manage a course.
     """
     url_path = "instructor"
-
     def is_browser_on_page(self):
         return self.q(css='div.instructor-dashboard-wrapper-2').present
 
@@ -31,9 +31,14 @@ class MembershipPage(PageObject):
     Membership section of the Instructor dashboard.
     """
     url = None
-
     def is_browser_on_page(self):
         return self.q(css='a[data-section=membership].active-section').present
+
+    def select_auto_enroll_section(self):
+        """
+        returns the MembershipPageAutoEnrollSection
+        """
+        return MembershipPageAutoEnrollSection(self.browser)
 
     def _get_cohort_options(self):
         """
@@ -152,6 +157,106 @@ class MembershipPage(PageObject):
         Click on the link to the Data Download Page.
         """
         self.q(css="a.link-cross-reference[data-section=data_download]").first.click()
+
+
+class MembershipPageAutoEnrollSection(PageObject):
+    """
+    CSV Auto Enroll section of the Membership tab of the Instructor dashboard.
+    """
+    url = None
+
+    auto_enroll_browse_button_selector = '.auto_enroll_csv .file-browse input.file_field#browseBtn'
+    auto_enroll_upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
+    NOTIFICATION_ERROR = 'error'
+    NOTIFICATION_WARNING = 'warning'
+    NOTIFICATION_SUCCESS = 'confirmation'
+
+    def is_browser_on_page(self):
+        return self.q(css=self.auto_enroll_browse_button_selector).present
+
+    def is_file_attachment_browse_button_visible(self):
+        """
+        Returns True if the Auto-Enroll Browse button is present.
+        """
+        return self.q(css=self.auto_enroll_browse_button_selector).is_present()
+
+    def is_upload_button_visible(self):
+        """
+        Returns True if the Auto-Enroll Upload button is present.
+        """
+        return self.q(css=self.auto_enroll_upload_button_selector).is_present()
+
+    def click_upload_file_button(self):
+        """
+        Clicks the Auto-Enroll Upload Button.
+        """
+        self.q(css=self.auto_enroll_upload_button_selector).click()
+
+    def is_notification_displayed(self, section_type):
+        """
+        Valid inputs for section_type: MembershipPageAutoEnrollSection.NOTIFICATION_SUCCESS /
+                                       MembershipPageAutoEnrollSection.NOTIFICATION_WARNING /
+                                       MembershipPageAutoEnrollSection.NOTIFICATION_ERROR
+        Returns True if a {section_type} notification is displayed.
+        """
+        notification_selector = '.auto_enroll_csv .results .message-%s' % section_type
+        self.wait_for_element_presence(notification_selector, "%s Notification" % section_type.title())
+        return self.q(css=notification_selector).is_present()
+
+    def first_notification_message(self, section_type):
+        """
+        Valid inputs for section_type: MembershipPageAutoEnrollSection.NOTIFICATION_WARNING /
+                                       MembershipPageAutoEnrollSection.NOTIFICATION_ERROR
+        Returns the first message from the list of messages in the {section_type} section.
+        """
+        error_message_selector = '.auto_enroll_csv .results .message-%s li.summary-item' % section_type
+        self.wait_for_element_presence(error_message_selector, "%s message" % section_type.title())
+        return self.q(css=error_message_selector).text[0]
+
+    def get_asset_path(self, file_name):
+        """
+        Returns the full path of the file to upload.
+        These files have been placed in edx-platform/common/test/data/uploads/
+        """
+
+        # Separate the list of folders in the path reaching to the current file,
+        # e.g.  '... common/test/acceptance/pages/lms/instructor_dashboard.py' will result in
+        #       [..., 'common', 'test', 'acceptance', 'pages', 'lms', 'instructor_dashboard.py']
+        folders_list_in_path = __file__.split(os.sep)
+
+        # Get rid of the last 4 elements: 'acceptance', 'pages', 'lms', and 'instructor_dashboard.py'
+        # to point to the 'test' folder, a shared point in the path's tree.
+        folders_list_in_path = folders_list_in_path[:-4]
+
+        # Append the folders in the asset's path
+        folders_list_in_path.extend(['data', 'uploads', file_name])
+
+        # Return the joined path of the required asset.
+        return os.sep.join(folders_list_in_path)
+
+    def upload_correct_csv_file(self):
+        """
+        Selects the correct file and clicks the upload button.
+        """
+        correct_files_path = self.get_asset_path('auto_reg_enrollment.csv')
+        self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(correct_files_path)
+        self.click_upload_file_button()
+
+    def upload_csv_file_with_errors_warnings(self):
+        """
+        Selects the file which will generate errors and warnings and clicks the upload button.
+        """
+        errors_warnings_files_path = self.get_asset_path('auto_reg_enrollment_errors_warnings.csv')
+        self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(errors_warnings_files_path)
+        self.click_upload_file_button()
+
+    def upload_non_csv_file(self):
+        """
+        Selects an image file and clicks the upload button.
+        """
+        errors_warnings_files_path = self.get_asset_path('image.jpg')
+        self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(errors_warnings_files_path)
+        self.click_upload_file_button()
 
 
 class DataDownloadPage(PageObject):
