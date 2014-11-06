@@ -1,12 +1,30 @@
 """
 A script to create some dummy users
 """
+import uuid
+
 from django.core.management.base import BaseCommand
 from student.models import CourseEnrollment
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from student.views import _do_create_account, get_random_post_override
+from student.views import _do_create_account
+
+
+def get_random_post_override():
+    id = uuid.uuid4().hex[:8]
+    return {
+        'username': 'user_{id}'.format(id=id),
+        'email': 'email_{id}@example.com'.format(id=id),
+        'password': '12345',
+        'name': 'User {id}'.format(id=id),
+        'level_of_education': 1,
+        'gender': 'other',
+        'mailing_address': '141 Portland Street',
+        'city': 'Cambridge',
+        'country': 'MA',
+        'goals': 'Rule the world',
+    }
 
 
 def create(num, course_key):
