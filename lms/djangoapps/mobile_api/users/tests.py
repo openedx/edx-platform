@@ -128,14 +128,13 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         self.assertEqual(serialized['course']['number'], self.course.id.course)
         self.assertEqual(serialized['course']['org'], self.course.id.org)
 
-    @skip("Broken as part of a merge from release. See MA-117")
     def test_course_serializer_with_display_overrides(self):
         self.course.display_coursenumber = "overridden_number"
         self.course.display_organization = "overridden_org"
         modulestore().update_item(self.course, self.user.id)
 
         self.client.login(username=self.username, password=self.password)
-        self._enroll()
+        self._enroll(self.course)
         serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=E1101
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
         self.assertEqual(serialized['course']['org'], self.course.display_organization)
