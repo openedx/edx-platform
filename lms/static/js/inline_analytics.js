@@ -115,8 +115,8 @@ window.InlineAnalytics = (function() {
                 } else if (!correct) {
                     answerClass = 'wrong';
                 }
-                tr = $('<tr><td class="answer_box" title="' + choiceText[index] + '">' +
-                    (parseInt(index, 10) + 1) + '</td><td class="answer_box ' +
+                tr = $('<tr><td class="answer_box" title="' + choiceText[valueIndex] + '">' +
+                    (parseInt(valueIndex, 10) + 1) + '</td><td class="answer_box ' +
                     answerClass + '"><span class="dot"></span></td><td class="answer_box">' +
                     count + '</td><td class="answer_box">' + percent + '%</td></tr>');
                 trs.push(tr[0]);
@@ -309,7 +309,10 @@ window.InlineAnalytics = (function() {
     function getChoiceTexts(partId) {
         var choiceText = [];
         $('#inputtype_' + partId).find("fieldset label").each(function(index) {
-            choiceText[index] = $(this).text();
+        	// Filter out the tick or cross text indicating correctness if present
+            choiceText[index] = $(this).contents().filter(function() {
+                return this.nodeType === 3; //Node.TEXT_NODE
+            }).text();
         });
         return choiceText;
     }
