@@ -21,6 +21,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.core.urlresolvers import reverse
 from model_utils.managers import InheritanceManager
+from model_utils.models import TimeStampedModel
 from django.core.mail.message import EmailMessage
 
 from xmodule.modulestore.django import modulestore
@@ -434,7 +435,7 @@ class Order(models.Model):
         return instruction_dict, instruction_set
 
 
-class OrderItem(models.Model):
+class OrderItem(TimeStampedModel):
     """
     This is the basic interface for order items.
     Order items are line items that fill up the shopping carts and orders.
