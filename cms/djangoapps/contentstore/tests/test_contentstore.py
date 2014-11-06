@@ -855,15 +855,14 @@ class MiscCourseTests(ContentStoreTestCase):
         self.assertContains(resp, unicode(asset_key))
 
     def test_prefetch_children(self):
-        # make sure we haven't done too many round trips to DB
-        # note we say 4 round trips here for:
+        # make sure we haven't done too many round trips to DB:
         # 1) the course,
         # 2 & 3) for the chapters and sequentials
         # Because we're querying from the top of the tree, we cache information needed for inheritance,
         # so we don't need to make an extra query to compute it.
         # set the branch to 'publish' in order to prevent extra lookups of draft versions
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, self.course.id):
-            with check_mongo_calls(3, 0):
+            with check_mongo_calls(3):
                 course = self.store.get_course(self.course.id, depth=2)
 
             # make sure we pre-fetched a known sequential which should be at depth=2
@@ -875,7 +874,7 @@ class MiscCourseTests(ContentStoreTestCase):
         # Now, test with the branch set to draft. No extra round trips b/c it doesn't go deep enough to get
         # beyond direct only categories
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
-            with check_mongo_calls(3, 0):
+            with check_mongo_calls(3):
                 self.store.get_course(self.course.id, depth=2)
 
     def _check_verticals(self, locations):

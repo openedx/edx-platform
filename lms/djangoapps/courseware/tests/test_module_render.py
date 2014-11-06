@@ -384,7 +384,7 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False}],
                           'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-            with check_mongo_calls(toc_finds, 0):
+            with check_mongo_calls(toc_finds):
                 actual = render.toc_for_course(
                     self.request.user, self.request, self.toy_course, self.chapter, None, self.field_data_cache
                 )
@@ -423,7 +423,7 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False}],
                           'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-            with check_mongo_calls(toc_finds, 0):
+            with check_mongo_calls(toc_finds):
                 actual = render.toc_for_course(self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache)
             for toc_section in expected:
                 self.assertIn(toc_section, actual)
