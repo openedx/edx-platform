@@ -838,6 +838,37 @@ def grading_handler(request, course_key_string, grader_index=None):
 
 
 # pylint: disable=invalid-name
+def _add_tab(request, tab_type, course_module):
+    """
+    Adds tab to the course.
+    """
+    # Add tab to the course if needed
+    changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
+    # If a tab has been added to the course, then send the
+    # metadata along to CourseMetadata.update_from_json
+    if changed:
+        course_module.tabs = new_tabs
+        request.json.update({'tabs': {'value': new_tabs}})
+        # Indicate that tabs should not be filtered out of
+        # the metadata
+        return True
+    return False
+
+
+# pylint: disable=invalid-name
+def _remove_tab(request, tab_type, course_module):
+    """
+    Removes the tab from the course.
+    """
+    changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
+    if changed:
+        course_module.tabs = new_tabs
+        request.json.update({'tabs': {'value': new_tabs}})
+        return True
+    return False
+
+
+# pylint: disable=invalid-name
 def _config_course_advanced_components(request, course_module):
     """
     Check to see if the user instantiated any advanced components. This
@@ -851,6 +882,7 @@ def _config_course_advanced_components(request, course_module):
     """
     # TODO refactor the above into distinct advanced policy settings
     filter_tabs = True  # Exceptional conditions will pull this to False
+
     if ADVANCED_COMPONENT_POLICY_KEY in request.json:  # Maps tab types to components
         tab_component_map = {
             'open_ended': OPEN_ENDED_COMPONENT_TYPES,
@@ -861,22 +893,13 @@ def _config_course_advanced_components(request, course_module):
             component_types = tab_component_map.get(tab_type)
             found_ac_type = False
             for ac_type in component_types:
-
                 # Check if the user has incorrectly failed to put the value in an iterable.
                 new_advanced_component_list = request.json[ADVANCED_COMPONENT_POLICY_KEY]['value']
                 if hasattr(new_advanced_component_list, '__iter__'):
                     if ac_type in new_advanced_component_list and ac_type in ADVANCED_COMPONENT_TYPES:
-
-                        # Add tab to the course if needed
-                        changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
-                        # If a tab has been added to the course, then send the
-                        # metadata along to CourseMetadata.update_from_json
-                        if changed:
-                            course_module.tabs = new_tabs
-                            request.json.update({'tabs': {'value': new_tabs}})
-                            # Indicate that tabs should not be filtered out of
-                            # the metadata
-                            filter_tabs = False  # Set this flag to avoid the tab removal code below.
+                        if _add_tab(request, tab_type, course_module):
+                            # Set this flag to avoid the tab removal code below.
+                            filter_tabs = False
                         found_ac_type = True  # break
                 else:
                     # If not iterable, return immediately and let validation handle.
@@ -885,13 +908,45 @@ def _config_course_advanced_components(request, course_module):
             # If we did not find a module type in the advanced settings,
             # we may need to remove the tab from the course.
             if not found_ac_type:  # Remove tab from the course if needed
-                changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
-                if changed:
-                    course_module.tabs = new_tabs
-                    request.json.update({'tabs': {'value': new_tabs}})
+                if _remove_tab(request, tab_type, course_module):
                     # Indicate that tabs should *not* be filtered out of
                     # the metadata
                     filter_tabs = False
+
+    return filter_tabs
+
+
+ # pylint: disable=invalid-name
+def _config_course_settings(request, course_module, filter_tabs=True):
+    """
+    This is a hack that does the following :
+    1) adds/removes the edx notes panel tab to a course automatically if
+    the user has indicated that they want the notes module enabled in
+    their course
+    """
+    tab_component_map = {
+        'edxnotes': ['edxnotes']
+    }
+     # Check to see if the user instantiated any notes or open ended components
+    for tab_type in tab_component_map.keys():
+        if tab_type in request.json:
+            component_types = tab_component_map.get(tab_type)
+            found_ac_type = False
+            for ac_type in component_types:
+                field_value = request.json[ac_type]['value']
+                if field_value is True:
+                    if _add_tab(request, ac_type, course_module):
+                        # Set this flag to avoid the tab removal code below.
+                        filter_tabs = False
+                    found_ac_type = True  # break
+
+                # If we did not find a module type in the advanced settings,
+                # we may need to remove the tab from the course.
+                if not found_ac_type:  # Remove tab from the course if needed
+                    if _remove_tab(request, ac_type, course_module):
+                        # Indicate that tabs should *not* be filtered out of
+                        # the metadata
+                        filter_tabs = False
 
     return filter_tabs
 
@@ -927,6 +982,7 @@ def advanced_settings_handler(request, course_key_string):
                 try:
                     # Whether or not to filter the tabs key out of the settings metadata
                     filter_tabs = _config_course_advanced_components(request, course_module)
+                    filter_tabs = _config_course_settings(request, course_module, filter_tabs)
 
                     # validate data formats and update
                     is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(

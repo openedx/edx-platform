@@ -69,3 +69,42 @@
     }
   }
 }
+
+// rotate clockwise
+@include keyframes(rotateCW) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(180deg));
+  }
+
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-rotateCW {
+  @include animation(rotateCW $tmg-s1 linear infinite);
+}
+
+.ui-loading {
+  @include animation(fadeIn $tmg-f2 linear 1);
+  @extend %ui-well;
+  @extend %t-copy-base;
+  opacity: .6;
+  background-color: $white;
+  padding: ($baseline*1.5) $baseline;
+  text-align: center;
+
+  .spin {
+    @extend %anim-rotateCW;
+    display: inline-block;
+  }
+
+  .copy {
+    padding-left: ($baseline/4);
+  }
+}
