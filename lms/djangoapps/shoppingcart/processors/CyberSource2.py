@@ -71,8 +71,10 @@ def process_postpay_callback(params):
             valid_params['req_currency'],
             valid_params['decision']
         )
+        # record the details of the purchase regardless of whether it's been
+        # accepted or not
+        _record_purchase(params, result['order'])
         if result['accepted']:
-            _record_purchase(params, result['order'])
             return {
                 'success': True,
                 'order': result['order'],
