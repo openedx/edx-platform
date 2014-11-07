@@ -1,6 +1,7 @@
 """ Handlers for OpenID Connect provider. """
 
 from django.conf import settings
+from django.core.cache import cache
 
 from courseware.access import has_access
 from student.models import anonymous_id_for_user
@@ -68,39 +69,45 @@ class CourseAccessHandler(object):
     valid only if the user is instructor or staff of at least one course.
 
     Each new scope has a corresponding claim: `instructor_courses` and
-    `staff_courses` that lists the course_ids for which the user as instructor
+    `staff_courses` that lists the course_ids for which the user has instructor
     or staff privileges.
 
-    The claims support claim request values. In other words, if no claim is
-    requested it returns all the courses for the corresponding privileges. If a
-    claim request is used, then it only returns the from the list of requested
-    values that have the corresponding privileges.
+    The claims support claim request values: if there is no claim request, the
+    value of the claim is the list all the courses for which the user has the
+    corresponding privileges. If a claim request is used, then the value of the
+    claim the list of courses from the requested values that have the
+    corresponding privileges.
 
     For example, if the user is staff of course_a and course_b but not
-    course_c, the request:
+    course_c, the claim corresponding to the scope request:
 
         scope = openid course_staff
 
-    will return:
+    has the value:
 
         {staff_courses: [course_a, course_b] }
 
-    If the request is:
+    For the claim request:
 
-        claims = {userinfo: {staff_courses=[course_b, course_d]}}
+        claims = {userinfo: {staff_courses: {values=[course_b, course_d]}}}
 
-    the result will be:
+    the corresponding claim will have the value:
 
         {staff_courses: [course_b] }.
 
-    This is useful to quickly determine if a user has the right
-    privileges for a given course.
+    This is useful to quickly determine if a user has the right privileges for a
+    given course.
 
     For a description of the function naming and arguments, see:
 
         `oauth2_provider/oidc/handlers.py`
 
     """
+
+    COURSE_CACHE_TIMEOUT = getattr(settings, 'OIDC_COURSE_HANDLER_CACHE_TIMEOUT', 60)  # In seconds.
+
+    def __init__(self, *_args, **_kwargs):
+        self._course_cache = {}
 
     def scope_course_instructor(self, data):
         """
@@ -109,7 +116,10 @@ class CourseAccessHandler(object):
 
         """
 
-        course_ids = self._courses_with_access_type(data, 'instructor')
+        # TODO: unfortunately there is not a faster and still correct way to
+        # check if a user is instructor of at least one course other than
+        # checking the access type against all known courses.
+        course_ids = self.find_courses(data['user'], 'instructor')
         return ['instructor_courses'] if course_ids else None
 
     def scope_course_staff(self, data):
@@ -118,8 +128,9 @@ class CourseAccessHandler(object):
         least one course.
 
         """
+        # TODO: see :method:CourseAccessHandler.scope_course_instructor
+        course_ids = self.find_courses(data['user'], 'staff')
 
-        course_ids = self._courses_with_access_type(data, 'staff')
         return ['staff_courses'] if course_ids else None
 
     def claim_instructor_courses(self, data):
@@ -128,7 +139,8 @@ class CourseAccessHandler(object):
         user has instructor privileges.
 
         """
-        return self._courses_with_access_type(data, 'instructor')
+
+        return self.find_courses(data['user'], 'instructor', data.get('values'))
 
     def claim_staff_courses(self, data):
         """
@@ -136,52 +148,66 @@ class CourseAccessHandler(object):
         has staff privileges.
 
         """
-        return self._courses_with_access_type(data, 'staff')
 
-    def _courses_with_access_type(self, data, access_type):
+        return self.find_courses(data['user'], 'staff', data.get('values'))
+
+    def find_courses(self, user, access_type, values=None):
         """
-        Utility function to list all courses for a user according to the
-        access type.
-
-        The field `data` follows the handler specification in:
-
-            `oauth2_provider/oidc/handlers.py`
+        Find all courses for which the user has the specified access type. If
+        `values` is specified, check only the courses from `values`.
 
         """
 
-        user = data['user']
-        values = set(data.get('values', []))
+        # Check the instance cache and update if not present.  The instance
+        # cache is useful since there are multiple scope and claims calls in the
+        # same request.
 
-        courses = _get_all_courses()
-        courses = (c for c in courses if has_access(user, access_type, c))
-        course_ids = (unicode(c.id) for c in courses)
-
-        # If values was provided, return only the requested authorized courses
-        if values:
-            return [c for c in course_ids if c in values]
+        key = (user.id, access_type)
+        if key in self._course_cache:
+            course_ids = self._course_cache[key]
         else:
-            return [c for c in course_ids]
+            course_ids = self._get_courses_with_access_type(user, access_type)
+            self._course_cache[key] = course_ids
+
+        # If values was specified, filter out other courses.
+        if values is not None:
+            course_ids = list(set(course_ids) & set(values))
+
+        return course_ids
+
+    # pylint: disable=missing-docstring
+    def _get_courses_with_access_type(self, user, access_type):
+
+        # Check the application cache and update if not present. The application
+        # cache is useful since there are calls to different endpoints in close
+        # succession, for example the id_token and user_info endpoins.
+
+        key = '-'.join([str(self.__class__), str(user.id), access_type])
+        course_ids = cache.get(key)
+
+        if course_ids is None:
+            course_ids = [unicode(course.id) for course in _get_all_courses()
+                          if has_access(user, access_type, course)]
+            cache.set(key, course_ids, self.COURSE_CACHE_TIMEOUT)
+
+        return course_ids
 
 
 class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
-    """
-    Configure the ID Token handler for the LMS.
-
-    Note that the values of the claims `instructor_courses` and
-    `staff_courses` are not included in the ID Token. The rationale is
-    that for global staff, the list of courses returned could be very
-    large. Instead they could check for specific courses using the
-    UserInfo endpoint.
-
-    """
-
+    """ Configure the ID Token handler for the LMS. """
     def claim_instructor_courses(self, data):
-        # Don't return list of courses in ID Tokens
-        return None
+        # Don't return list of courses unless they are requested as essential.
+        if data.get('essential'):
+            return super(IDTokenHandler, self).claim_instructor_courses(data)
+        else:
+            return None
 
     def claim_staff_courses(self, data):
-        # Don't return list of courses in ID Tokens
-        return None
+        # Don't return list of courses unless they are requested as essential.
+        if data.get('essential'):
+            return super(IDTokenHandler, self).claim_staff_courses(data)
+        else:
+            return None
 
 
 class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
@@ -194,6 +220,8 @@ def _get_all_courses():
     Utitilty function to list all available courses.
 
     """
+
     ms_courses = modulestore().get_courses()
     courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
+
     return courses
