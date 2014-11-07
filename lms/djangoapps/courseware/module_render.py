@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import hashlib
 import json
 import logging
@@ -52,7 +53,7 @@ from xmodule_modifiers import (
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
-from api_manager.models import CourseModuleCompletion
+from progress.models import CourseModuleCompletion
 
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code

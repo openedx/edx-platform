@@ -13,10 +13,9 @@ from django.db.models.signals import post_save
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from progress.management.commands import generate_progress_entries
-from progress.models import StudentProgress, StudentProgressHistory
+from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
 from progress.signals import handle_cmc_post_save_signal
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from api_manager.models import CourseModuleCompletion
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 import progress.signals
 

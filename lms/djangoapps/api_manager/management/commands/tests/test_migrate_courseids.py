@@ -10,6 +10,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from api_manager import models as api_models
+from progress.models import CourseModuleCompletion
 from api_manager.management.commands import migrate_courseids
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -70,14 +71,14 @@ class MigrateCourseIdsTests(TestCase):
         group_profile = api_models.GroupProfile.objects.create(group=group)
         course_group = api_models.CourseGroupRelationship.objects.create(course_id=self.old_style_course_id, group=group)
         course_content_group = api_models.CourseContentGroupRelationship.objects.create(course_id=self.old_style_course_id, content_id=self.old_style_content_id, group_profile=group_profile)
-        course_module_completion = api_models.CourseModuleCompletion.objects.create(user=user, course_id=self.old_style_course_id, content_id=self.old_style_content_id)
+        course_module_completion = CourseModuleCompletion.objects.create(user=user, course_id=self.old_style_course_id, content_id=self.old_style_content_id)
 
         user2 = User.objects.create(email='testuser2@edx.org', username='testuser2', password='testpassword2', is_active=True)
         group2 = Group.objects.create(name='Test Group2')
         group_profile2 = api_models.GroupProfile.objects.create(group=group2)
         course_group2 = api_models.CourseGroupRelationship.objects.create(course_id=self.new_style_course_id2, group=group2)
         course_content_group2 = api_models.CourseContentGroupRelationship.objects.create(course_id=self.new_style_course_id2, content_id=self.new_style_content_id2, group_profile=group_profile2)
-        course_module_completion2 = api_models.CourseModuleCompletion.objects.create(user=user2, course_id=self.new_style_course_id2, content_id=self.new_style_content_id2)
+        course_module_completion2 = CourseModuleCompletion.objects.create(user=user2, course_id=self.new_style_course_id2, content_id=self.new_style_content_id2)
 
 
         # Run the data migration
@@ -99,10 +100,10 @@ class MigrateCourseIdsTests(TestCase):
         self.assertEqual(updated_course_content_group.content_id, self.new_style_content_id2)
         print "Course Content Group Data Migration Passed"
 
-        updated_course_module_completion = api_models.CourseModuleCompletion.objects.get(id=course_module_completion.id)
+        updated_course_module_completion = CourseModuleCompletion.objects.get(id=course_module_completion.id)
         self.assertEqual(updated_course_module_completion.course_id, self.new_style_course_id)
         self.assertEqual(updated_course_module_completion.content_id, self.new_style_content_id)
-        updated_course_module_completion = api_models.CourseModuleCompletion.objects.get(id=course_module_completion2.id)
+        updated_course_module_completion = CourseModuleCompletion.objects.get(id=course_module_completion2.id)
         self.assertEqual(updated_course_module_completion.course_id, self.new_style_course_id2)
         self.assertEqual(updated_course_module_completion.content_id, self.new_style_content_id2)
         print "Course Module Completion Data Migration Passed"
