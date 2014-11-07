@@ -11,7 +11,8 @@ function($, _, XBlockInfo, PagedContainerPage, LibraryContainerView, ComponentTe
             model: new XBlockInfo(XBlockInfoJson, {parse: true}),
             templates: new ComponentTemplates(componentTemplates, {parse: true}),
             action: 'view',
-            viewClass: LibraryContainerView
+            viewClass: LibraryContainerView,
+            canEdit: true
         };
 
         xmoduleLoader.done(function () {

@@ -22,10 +22,12 @@ from django.utils.translation import ugettext as _
 <%block name="requirejs">
     require(["js/factories/library"], function(LibraryFactory) {
         LibraryFactory(
-            ${component_templates | n}, ${json.dumps(xblock_info) | n},
+            ${component_templates | n},
+            ${json.dumps(xblock_info) | n},
             {
                 isUnitPage: false,
-                page_size: 10
+                page_size: 10,
+                canEdit: ${"true" if can_edit else "false"}
             }
         );
     });
@@ -65,6 +67,7 @@ from django.utils.translation import ugettext as _
                         </p>
                     </div>
                 </div>
+                % if can_edit:
                 <div class="bit">
                     <h3 class="title-3">${_("Adding content to your library")}</h3>
                     <p>${_("Add components to your library for use in courses, using Add New Component at the bottom of this page.")}</p>
@@ -72,6 +75,7 @@ from django.utils.translation import ugettext as _
                     <h3 class="title-3">${_("Using library content in courses")}</h3>
                     <p>${_("Use library content in courses by adding the {em_start}library_content{em_end} policy key to Advanced Settings, then adding a Randomized Content Block to your courseware. In the settings for each Randomized Content Block, enter the Library ID for each library from which you want to draw content, and specify the number of problems to be randomly selected and displayed to each student.").format(em_start='<strong>', em_end="</strong>")}</p>
                 </div>
+                % endif
                 <div class="bit external-help">
                     <a href="${get_online_help_info('library')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content libraries")}</a>
                 </div>

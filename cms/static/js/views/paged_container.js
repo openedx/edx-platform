@@ -52,7 +52,8 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
                     success: function(fragment) {
                         self.handleXBlockFragment(fragment, options);
                         self.processPaging({ requested_page: options.page_number });
-                        self.page.renderAddXBlockComponents()
+                        self.page.renderAddXBlockComponents();
+                        self.page.updateBlockActions();
                     }
                 });
             },
