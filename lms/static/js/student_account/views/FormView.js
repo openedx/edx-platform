@@ -179,6 +179,11 @@ var edx = edx || {};
             $msg.html( html.join('') );
 
             this.element.show( this.$errors );
+
+            // Scroll to error messages
+            $('html,body').animate({
+                scrollTop: this.$errors.offset().top
+            },'slow');
         },
 
         submitForm: function( event ) {
