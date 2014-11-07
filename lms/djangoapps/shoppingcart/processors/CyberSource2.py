@@ -79,6 +79,7 @@ def process_postpay_callback(params):
                 'error_html': ''
             }
         else:
+            _record_payment_info(params, result['order'])
             return {
                 'success': False,
                 'order': result['order'],
@@ -86,6 +87,11 @@ def process_postpay_callback(params):
             }
     except CCProcessorException as error:
         log.exception('error processing CyberSource postpay callback')
+        # if we have the order and the id, log it
+        if hasattr(error, 'order'):
+            _record_payment_info(params, error.order)
+        else:
+            log.info(json.dumps(params))
         return {
             'success': False,
             'order': None,  # due to exception we may not have the order
@@ -350,7 +356,7 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
                 'order': order
             }
         else:
-            raise CCProcessorWrongAmountException(
+            ex = CCProcessorWrongAmountException(
                 _(
                     u"The amount charged by the processor {charged_amount} {charged_amount_currency} is different "
                     u"than the total cost of the order {total_cost} {total_cost_currency}."
@@ -361,6 +367,8 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
                     total_cost_currency=order.currency
                 )
             )
+            ex.order = order
+            raise ex
     else:
         return {
             'accepted': False,
@@ -406,6 +414,20 @@ def _record_purchase(params, order):
         cardtype=CARDTYPE_MAP[params.get('req_card_type', '')],
         processor_reply_dump=json.dumps(params)
     )
+
+
+def _record_payment_info(params, order):
+    """
+    Record the purchase and run purchased_callbacks
+
+    Args:
+        params (dict): The parameters we received from CyberSource.
+
+    Returns:
+        None
+    """
+    order.processor_reply_dump = json.dumps(params)
+    order.save()
 
 
 def _get_processor_decline_html(params):
