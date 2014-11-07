@@ -10,7 +10,7 @@ import requests
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_SPLIT_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -46,7 +46,7 @@ HTML_BOOK = {
 }
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_SPLIT_MODULESTORE)
 class StaticBookTest(ModuleStoreTestCase):
     """
     Helpers for the static book tests.
@@ -205,16 +205,16 @@ class StaticPdfBookTest(StaticBookTest):
 
     def test_static_url_map_contentstore(self):
         """
-        This ensure static  URL mapping is happening properly for
+        This ensure static URL mapping is happening properly for
         a course that uses the contentstore
         """
         self.make_course(pdf_textbooks=[PORTABLE_PDF_BOOK])
         url = self.make_url('pdf_book', book_index=0, chapter=1)
         response = self.client.get(url)
         self.assertNotContains(response, 'file={}'.format(PORTABLE_PDF_BOOK['chapters'][0]['url']))
-        self.assertContains(response, 'file=/c4x/{0.org}/{0.course}/asset/{1}'.format(
-            self.course.location,
-            PORTABLE_PDF_BOOK['chapters'][0]['url'].replace('/static/', '')))
+        key = self.course.id.make_asset_key('asset', PORTABLE_PDF_BOOK['chapters'][0]['url'].replace('/static/', ''))
+        expected = 'file=/{}'.format(key.for_branch(None))
+        self.assertContains(response, expected)
 
     def test_static_url_map_static_asset_path(self):
         """
