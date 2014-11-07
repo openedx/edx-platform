@@ -219,6 +219,17 @@ class CourseBetaTesterRole(CourseRole):
         super(CourseBetaTesterRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+class LibraryUserRole(CourseRole):
+    """
+    A user who can view a library and import content from it, but not edit it.
+    Used in Studio only.
+    """
+    ROLE = 'library_user'
+
+    def __init__(self, *args, **kwargs):
+        super(LibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
 class OrgStaffRole(OrgRole):
     """An organization staff member"""
     def __init__(self, *args, **kwargs):
@@ -229,6 +240,17 @@ class OrgInstructorRole(OrgRole):
     """An organization instructor"""
     def __init__(self, *args, **kwargs):
         super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)
+
+
+class OrgLibraryUserRole(OrgRole):
+    """
+    A user who can view any libraries in an org and import content from them, but not edit them.
+    Used in Studio only.
+    """
+    ROLE = LibraryUserRole.ROLE
+
+    def __init__(self, *args, **kwargs):
+        super(OrgLibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class CourseCreatorRole(RoleBase):

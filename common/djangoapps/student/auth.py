@@ -6,9 +6,10 @@ to decide whether to check course creator role, and other such functions.
 """
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from opaque_keys.edx.locator import LibraryLocator
 
 from student.roles import GlobalStaff, CourseCreatorRole, CourseStaffRole, CourseInstructorRole, CourseRole, \
-    CourseBetaTesterRole, OrgInstructorRole, OrgStaffRole
+    CourseBetaTesterRole, OrgInstructorRole, OrgStaffRole, LibraryUserRole, OrgLibraryUserRole
 
 
 def has_access(user, role):
@@ -40,9 +41,9 @@ def has_access(user, role):
     return False
 
 
-def has_course_author_access(user, course_key, role=CourseStaffRole):
+def has_studio_write_access(user, course_key, role=CourseStaffRole):
     """
-    Return True if user has studio (write) access to the given course.
+    Return True if user has studio write access to the given course.
     Note that the CMS permissions model is with respect to courses.
     There is a super-admin permissions if user.is_staff is set.
     Also, since we're unifying the user database between LMS and CAS,
@@ -62,6 +63,30 @@ def has_course_author_access(user, course_key, role=CourseStaffRole):
         return True
     # temporary to ensure we give universal access given a course until we impl branch specific perms
     return has_access(user, role(course_key.for_branch(None)))
+
+
+def has_course_author_access(*args, **kwargs):
+    """
+    Old name for has_studio_author_access
+    """
+    return has_studio_read_access(*args, **kwargs)
+
+
+def has_studio_read_access(user, course_key):
+    """
+    Return True iff user is allowed to view this course/library in studio.
+    Will also return True if user has write access in studio (has_course_author_access)
+
+    There is currently no such thing as read-only course access in studio, but
+    there is read-only access to content libraries.
+    """
+    if has_studio_write_access(user, course_key):
+        return True  # Global, Org, or Course "Instructors" and "Staff" can read and write
+    if isinstance(course_key, LibraryLocator):
+        if OrgLibraryUserRole(org=course_key.org).has_user(user):
+            return True  # User has read-only access to all libraries in this organization
+        return LibraryUserRole(course_key.for_branch(None)).has_user(user)  # User has read-only access this library
+    return False
 
 
 def add_users(caller, role, *users):

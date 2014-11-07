@@ -22,10 +22,12 @@ from django.utils.translation import ugettext as _
 <%block name="requirejs">
     require(["js/factories/library"], function(LibraryFactory) {
         LibraryFactory(
-            ${component_templates | n}, ${json.dumps(xblock_info) | n},
+            ${component_templates | n},
+            ${json.dumps(xblock_info) | n},
             {
                 isUnitPage: false,
-                page_size: 10
+                page_size: 10,
+                canEdit: ${"true" if can_edit else "false"}
             }
         );
     });
@@ -65,10 +67,12 @@ from django.utils.translation import ugettext as _
                         </p>
                     </div>
                 </div>
+                % if can_edit:
                 <div class="bit">
                     <h3 class="title-3">${_("Adding content components")}</h3>
                     <p>${_("You can add components to the library. Help text here.")}</p>
                 </div>
+                % endif
                 <div class="bit external-help">
                     <a href="${get_online_help_info('library')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content libraries")}</a>
                 </div>
