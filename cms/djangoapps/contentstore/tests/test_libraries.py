@@ -2,10 +2,16 @@
 Content library unit tests that require the CMS runtime.
 """
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from contentstore.utils import reverse_usage_url
+from contentstore.utils import reverse_url, reverse_usage_url, reverse_library_url
 from contentstore.views.preview import _load_preview_module
 from contentstore.views.tests.test_library import LIBRARY_REST_URL
 import ddt
+from mock import patch
+from student.auth import has_studio_read_access, has_studio_write_access
+from student.roles import (
+    CourseInstructorRole, CourseStaffRole, CourseCreatorRole, LibraryUserRole,
+    OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
+)
 from xmodule.library_content_module import LibraryVersionReference
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -15,13 +21,12 @@ from mock import Mock
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 
 
-@ddt.ddt
-class TestLibraries(ModuleStoreTestCase):
+class LibraryTestCase(ModuleStoreTestCase):
     """
-    High-level tests for libraries
+    Common functionality for content libraries tests
     """
     def setUp(self):
-        user_password = super(TestLibraries, self).setUp()
+        user_password = super(LibraryTestCase, self).setUp()
 
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=user_password)
@@ -98,6 +103,20 @@ class TestLibraries(ModuleStoreTestCase):
             }
         )
 
+    def _list_libraries(self):
+        """
+        Use the REST API to get a list of libraries visible to the current user.
+        """
+        response = self.client.get_json(LIBRARY_REST_URL)
+        self.assertEqual(response.status_code, 200)
+        return parse_json(response)
+
+
+@ddt.ddt
+class TestLibraries(LibraryTestCase):
+    """
+    High-level tests for libraries
+    """
     @ddt.data(
         (2, 1, 1),
         (2, 2, 2),
@@ -306,3 +325,234 @@ class TestLibraries(ModuleStoreTestCase):
         self.assertEqual(len(lc_block.children), 1)  # Children should not be deleted due to a bad setting.
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.data, data_value)
+
+
+@ddt.ddt
+class TestLibraryAccess(LibraryTestCase):
+    """
+    Test Roles and Permissions related to Content Libraries
+    """
+    def setUp(self):
+        """ Create a library, staff user, and non-staff user """
+        super(TestLibraryAccess, self).setUp()
+        self.non_staff_user, self.non_staff_user_password = self.create_non_staff_user()
+
+    def _login_as_non_staff_user(self, logout_first=True):
+        """ Login as a user that starts out with no roles/permissions granted. """
+        if logout_first:
+            self.client.logout()  # We start logged in as a staff user
+        self.client.login(username=self.non_staff_user.username, password=self.non_staff_user_password)
+
+    def _assert_cannot_create_library(self, org="org", library="libfail", expected_code=403):
+        """ Ensure the current user is not able to create a library. """
+        self.assertTrue(expected_code >= 300)
+        response = self.client.ajax_post(LIBRARY_REST_URL, {'org': org, 'library': library, 'display_name': "Irrelevant"})
+        self.assertEqual(response.status_code, expected_code)
+        key = LibraryLocator(org=org, library=library)
+        self.assertEqual(modulestore().get_library(key), None)
+
+    def _can_access_library(self, library):
+        """
+        Use the normal studio library URL to check if we have access
+
+        `library` can be a LibraryLocator or the library's root XBlock
+        """
+        if isinstance(library, (basestring, LibraryLocator)):
+            lib_key = library
+        else:
+            lib_key = library.location.library_key
+        response = self.client.get(reverse_library_url('library_handler', unicode(lib_key)))
+        self.assertIn(response.status_code, (200, 302, 403))
+        return response.status_code == 200
+
+    def tearDown(self):
+        """
+        Log out when done each test
+        """
+        self.client.logout()
+        super(TestLibraryAccess, self).tearDown()
+
+    def test_creation(self):
+        """
+        The user that creates a library should have instructor (admin) and staff permissions
+        """
+        # self.library has been auto-created by the staff user.
+        self.assertTrue(has_studio_write_access(self.user, self.lib_key))
+        self.assertTrue(has_studio_read_access(self.user, self.lib_key))
+        # Make sure the user was actually assigned the instructor role and not just using is_staff superpowers:
+        self.assertTrue(CourseInstructorRole(self.lib_key).has_user(self.user))
+
+        # Now log out and ensure we are forbidden from creating a library:
+        self.client.logout()
+        self._assert_cannot_create_library(expected_code=302)  # 302 redirect to login expected
+
+        # Now create a non-staff user with no permissions:
+        self._login_as_non_staff_user(logout_first=False)
+        self.assertFalse(CourseCreatorRole().has_user(self.non_staff_user))
+
+        # Now check that logged-in users without any permissions cannot create libraries
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
+            self._assert_cannot_create_library()
+
+    @ddt.data(
+        CourseInstructorRole,
+        CourseStaffRole,
+        LibraryUserRole,
+    )
+    def test_acccess(self, access_role):
+        """
+        Test the various roles that allow viewing libraries are working correctly.
+        """
+        # At this point, one library exists, created by the currently-logged-in staff user.
+        # Create another library as staff:
+        library2_key = self._create_library(library="lib2")
+        # Login as non_staff_user:
+        self._login_as_non_staff_user()
+
+        # non_staff_user shouldn't be able to access any libraries:
+        lib_list = self._list_libraries()
+        self.assertEqual(len(lib_list), 0)
+        self.assertFalse(self._can_access_library(self.library))
+        self.assertFalse(self._can_access_library(library2_key))
+
+        # Now manually intervene to give non_staff_user access to library2_key:
+        access_role(library2_key).add_users(self.non_staff_user)
+
+        # Now non_staff_user should be able to access library2_key only:
+        lib_list = self._list_libraries()
+        self.assertEqual(len(lib_list), 1)
+        self.assertEqual(lib_list[0]["library_key"], unicode(library2_key))
+        self.assertTrue(self._can_access_library(library2_key))
+        self.assertFalse(self._can_access_library(self.library))
+
+    @ddt.data(
+        OrgStaffRole,
+        OrgInstructorRole,
+        OrgLibraryUserRole,
+    )
+    def test_org_based_access(self, org_access_role):
+        """
+        Test the various roles that allow viewing all of an organization's
+        libraries are working correctly.
+        """
+        # Create some libraries as the staff user:
+        lib_key_pacific = self._create_library(org="PacificX", library="libP")
+        lib_key_atlantic = self._create_library(org="AtlanticX", library="libA")
+
+        # Login as a non-staff:
+        self._login_as_non_staff_user()
+
+        # Now manually intervene to give non_staff_user access to all "PacificX" libraries:
+        org_access_role(lib_key_pacific.org).add_users(self.non_staff_user)
+
+        # Now non_staff_user should be able to access lib_key_pacific only:
+        lib_list = self._list_libraries()
+        self.assertEqual(len(lib_list), 1)
+        self.assertEqual(lib_list[0]["library_key"], unicode(lib_key_pacific))
+        self.assertTrue(self._can_access_library(lib_key_pacific))
+        self.assertFalse(self._can_access_library(lib_key_atlantic))
+        self.assertFalse(self._can_access_library(self.lib_key))
+
+    @ddt.data(True, False)
+    def test_read_only_role(self, use_org_level_role):
+        """
+        Test the read-only role (LibraryUserRole and its org-level equivalent)
+        """
+        # As staff user, add a block to self.library:
+        block = ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+
+        # Login as a non_staff_user:
+        self._login_as_non_staff_user()
+        self.assertFalse(self._can_access_library(self.library))
+
+        block_url = reverse_usage_url('xblock_handler', block.location)
+
+        def can_read_block():
+            """ Check if studio lets us view the XBlock in the library """
+            response = self.client.get_json(block_url)
+            self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
+            return response.status_code == 200
+
+        def can_edit_block():
+            """ Check if studio lets us edit the XBlock in the library """
+            response = self.client.ajax_post(block_url)
+            self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
+            return response.status_code == 200
+
+        def can_delete_block():
+            """ Check if studio lets us delete the XBlock in the library """
+            response = self.client.delete(block_url)
+            self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
+            return response.status_code == 200
+
+        def can_copy_block():
+            """ Check if studio lets us duplicate the XBlock in the library """
+            response = self.client.ajax_post(reverse_url('xblock_handler'), {
+                'parent_locator': unicode(self.library.location),
+                'duplicate_source_locator': unicode(block.location),
+            })
+            self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
+            return response.status_code == 200
+
+        def can_create_block():
+            """ Check if studio lets us make a new XBlock in the library """
+            response = self.client.ajax_post(reverse_url('xblock_handler'), {
+                'parent_locator': unicode(self.library.location), 'category': 'html',
+            })
+            self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
+            return response.status_code == 200
+
+        # Check that we do not have read or write access to block:
+        self.assertFalse(can_read_block())
+        self.assertFalse(can_edit_block())
+        self.assertFalse(can_delete_block())
+        self.assertFalse(can_copy_block())
+        self.assertFalse(can_create_block())
+
+        # Give non_staff_user read-only permission:
+        if use_org_level_role:
+            OrgLibraryUserRole(self.lib_key.org).add_users(self.non_staff_user)
+        else:
+            LibraryUserRole(self.lib_key).add_users(self.non_staff_user)
+
+        self.assertTrue(self._can_access_library(self.library))
+        self.assertTrue(can_read_block())
+        self.assertFalse(can_edit_block())
+        self.assertFalse(can_delete_block())
+        self.assertFalse(can_copy_block())
+        self.assertFalse(can_create_block())
+
+    @ddt.data(
+        (LibraryUserRole, CourseStaffRole, True),
+        (CourseStaffRole, CourseStaffRole, True),
+        (None, CourseStaffRole, False),
+        (LibraryUserRole, None, False),
+    )
+    @ddt.unpack
+    def test_duplicate_across_courses(self, library_role, course_role, expected_result):
+        """
+        Test that the REST API will correctly allow/refuse when copying
+        from a library with (write, read, or no) access to a course with (write or no) access.
+        """
+        # As staff user, add a block to self.library:
+        block = ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+        # And create a course:
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        self._login_as_non_staff_user()
+
+        # Assign roles:
+        if library_role:
+            library_role(self.lib_key).add_users(self.non_staff_user)
+        if course_role:
+            course_role(course.location.course_key).add_users(self.non_staff_user)
+
+        # Copy block to the course:
+        response = self.client.ajax_post(reverse_url('xblock_handler'), {
+            'parent_locator': unicode(course.location),
+            'duplicate_source_locator': unicode(block.location),
+        })
+        self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
+        duplicate_action_allowed = (response.status_code == 200)
+        self.assertEqual(duplicate_action_allowed, expected_result)
