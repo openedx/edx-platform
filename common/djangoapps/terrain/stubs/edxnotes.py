@@ -127,10 +127,12 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         Create a note, assign id, annotator_schema_version, created and updated dates.
         """
         note = json.loads(self.request_content)
-        note["id"] = uuid4().hex
-        note["annotator_schema_version"] = "v1.0"
-        note["created"] = datetime.utcnow().isoformat()
-        note["updated"] = datetime.utcnow().isoformat()
+        note.update({
+            "id": uuid4().hex,
+            "annotator_schema_version": "v1.0",
+            "created": datetime.utcnow().isoformat(),
+            "updated": datetime.utcnow().isoformat(),
+        })
         self.server.add_notes(note)
         self.respond(content=note)
 
@@ -149,10 +151,12 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
             return
 
         for note in notes:
-            note["id"] = uuid4().hex
-            note["annotator_schema_version"] = "v1.0"
-            note["created"] = datetime.utcnow().isoformat()
-            note["updated"] = datetime.utcnow().isoformat()
+            note.update({
+                "id": uuid4().hex,
+                "annotator_schema_version": "v1.0",
+                "created": note["created"] if note.get("created") else datetime.utcnow().isoformat(),
+                "updated": note["updated"] if note.get("updated") else datetime.utcnow().isoformat(),
+            })
             self.server.add_notes(note)
 
         self.respond(content=notes)
@@ -194,13 +198,15 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         user = self.get_params.get("user", None)
         usage_id = self.get_params.get("usage_id", None)
         course_id = self.get_params.get("course_id", None)
-        if user is None or course_id is None:
+
+        if user is None:
             self.respond(400, "Bad Request")
             return
 
         notes = self.server.get_notes()
         results = self.server.filter_by_user(notes, user)
-        results = self.server.filter_by_course_id(results, course_id)
+        if course_id is not None:
+            results = self.server.filter_by_course_id(results, course_id)
         if usage_id is not None:
             results = self.server.filter_by_usage_id(results, usage_id)
         self.respond(content={
