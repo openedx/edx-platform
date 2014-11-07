@@ -289,9 +289,13 @@
                 exports: 'NotificationView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
-            'js/student_account/enrollment_interface': {
+            'js/student_account/enrollment': {
                 exports: 'edx.student.account.EnrollmentInterface',
-                deps: ['jquery', 'jquery.cookie', 'underscore', 'gettext']
+                deps: ['jquery', 'jquery.cookie']
+            },
+            'js/student_account/shoppingcart': {
+                exports: 'edx.student.account.ShoppingCartInterface',
+                deps: ['jquery', 'jquery.cookie', 'underscore']
             },
             // Student account registration/login
             // Loaded explicitly until these are converted to RequireJS
@@ -350,13 +354,16 @@
                     'underscore',
                     'backbone',
                     'gettext',
+                    'utility',
                     'js/student_account/views/LoginView',
                     'js/student_account/views/PasswordResetView',
                     'js/student_account/views/RegisterView',
                     'js/student_account/models/LoginModel',
                     'js/student_account/models/PasswordResetModel',
                     'js/student_account/models/RegisterModel',
-                    'js/student_account/views/FormView'
+                    'js/student_account/views/FormView',
+                    'js/student_account/enrollment',
+                    'js/student_account/shoppingcart',
                 ]
             }
         }
@@ -375,7 +382,8 @@
         'lms/include/js/spec/student_account/login_spec.js',
         'lms/include/js/spec/student_account/register_spec.js',
         'lms/include/js/spec/student_account/password_reset_spec.js',
-        'lms/include/js/spec/student_account/enrollment_interface_spec.js',
+        'lms/include/js/spec/student_account/enrollment_spec.js',
+        'lms/include/js/spec/student_account/shoppingcart_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js'
     ]);
 

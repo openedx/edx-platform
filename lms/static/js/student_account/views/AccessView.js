@@ -64,7 +64,7 @@ var edx = edx || {};
 
         load: {
             login: function( data, context ) {
-                var model = new edx.student.account.LoginModel({
+                var model = new edx.student.account.LoginModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
@@ -78,10 +78,14 @@ var edx = edx || {};
 
                 // Listen for 'password-help' event to toggle sub-views
                 context.listenTo( context.subview.login, 'password-help', context.resetPassword );
+
+                // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
+                context.listenTo( context.subview.login, 'auth-complete', context.authComplete );
+
             },
 
             reset: function( data, context ) {
-                var model = new edx.student.account.PasswordResetModel({
+                var model = new edx.student.account.PasswordResetModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
@@ -93,7 +97,7 @@ var edx = edx || {};
             },
 
             register: function( data, context ) {
-                var model = new edx.student.account.RegisterModel({
+                var model = new edx.student.account.RegisterModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
@@ -104,6 +108,9 @@ var edx = edx || {};
                     thirdPartyAuth: context.thirdPartyAuth,
                     platformName: context.platformName
                 });
+
+                // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
+                context.listenTo( context.subview.register, 'auth-complete', context.authComplete );
             }
         },
 
@@ -160,6 +167,92 @@ var edx = edx || {};
             $('html,body').animate({
                 scrollTop: $anchor.offset().top
             },'slow');
+        },
+
+        /**
+         * Once authentication has completed successfully, a user may need to:
+         *
+         * - Enroll in a course.
+         * - Add a course to the shopping cart.
+         * - Be redirected to the dashboard / track selection page / shopping cart.
+         *
+         * This handler is triggered upon successful authentication,
+         * either from the login or registration form.  It checks
+         * query string params, performs enrollment/shopping cart actions,
+         * then redirects the user to the next page.
+         *
+         * The optional query string params are:
+         *
+         * ?next: If provided, redirect to this page upon successful auth.
+         *   Django uses this when an unauthenticated user accesses a view
+         *   decorated with @login_required.
+         *
+         * ?enrollment_action: Can be either "enroll" or "add_to_cart".
+         *   If you provide this param, you must also provide a `course_id` param;
+         *   otherwise, no action will be taken.
+         *
+         * ?course_id: The slash-separated course ID to enroll in or add to the cart.
+         *
+         */
+        authComplete: function() {
+            var enrollment = edx.student.account.EnrollmentInterface,
+                shoppingcart = edx.student.account.ShoppingCartInterface,
+                redirectUrl = '/dashboard',
+                queryParams = this.queryParams();
+
+            if ( queryParams.enrollmentAction === 'enroll' && queryParams.courseId) {
+                /*
+                If we need to enroll in a course, mark as enrolled.
+                The enrollment interface will redirect the student once enrollment completes.
+                */
+                enrollment.enroll( decodeURIComponent( queryParams.courseId ) );
+            } else if ( queryParams.enrollmentAction === 'add_to_cart' && queryParams.courseId) {
+                /*
+                If this is a paid course, add it to the shopping cart and redirect
+                the user to the "view cart" page.
+                */
+                shoppingcart.addCourseToCart( decodeURIComponent( queryParams.courseId ) );
+            } else {
+                /*
+                Otherwise, redirect the user to the next page
+                Check for forwarding url and ensure that it isn't external.
+                If not, use the default forwarding URL.
+                */
+                if ( !_.isNull( queryParams.next ) ) {
+                    var next = decodeURIComponent( queryParams.next );
+
+                    // Ensure that the URL is internal for security reasons
+                    if ( !window.isExternal( next ) ) {
+                        redirectUrl = next;
+                    }
+                }
+
+                this.redirect( redirectUrl );
+            }
+        },
+
+        /**
+         * Redirect to a URL.  Mainly useful for mocking out in tests.
+         * @param  {string} url The URL to redirect to.
+         */
+        redirect: function( url ) {
+            window.location.href = url;
+        },
+
+        /**
+         * Retrieve query params that we use post-authentication
+         * to decide whether to enroll a student in a course, add
+         * an item to the cart, or redirect.
+         *
+         * @return {object} The query params.  If any param is not
+         * provided, it will default to null.
+         */
+        queryParams: function() {
+            return {
+                next: $.url( '?next' ),
+                enrollmentAction: $.url( '?enrollment_action' ),
+                courseId: $.url( '?course_id' )
+            };
         },
 
         form: {

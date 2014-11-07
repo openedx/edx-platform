@@ -79,29 +79,7 @@ var edx = edx || {};
         },
 
         saveSuccess: function () {
-            var enrollment = edx.student.account.EnrollmentInterface,
-                redirectUrl = '/dashboard',
-                next = null;
-
-            // Check for forwarding url
-            if ( !_.isNull( $.url('?next') ) ) {
-                next = decodeURIComponent( $.url('?next') );
-
-                if ( !window.isExternal(next) ) {
-                    redirectUrl = next;
-                }
-            }
-
-            // If we need to enroll in a course, mark as enrolled
-            if ( $.url('?enrollment_action') === 'enroll' ) {
-                enrollment.enroll( decodeURIComponent( $.url('?course_id') ), redirectUrl );
-            } else {
-                this.redirect(redirectUrl);
-            }
-        },
-
-        redirect: function( url ) {
-            window.location.href = url;
+            this.trigger('auth-complete');
         },
 
         saveError: function( error ) {

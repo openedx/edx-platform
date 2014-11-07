@@ -30,7 +30,10 @@ define([
 
             var createPasswordResetView = function(that) {
                 // Initialize the password reset model
-                model = new PasswordResetModel({ url: FORM_DESCRIPTION.submit_url });
+                model = new PasswordResetModel({}, {
+                    url: FORM_DESCRIPTION.submit_url,
+                    method: FORM_DESCRIPTION.method
+                });
 
                 // Initialize the password reset view
                 view = new PasswordResetView({
@@ -77,10 +80,9 @@ define([
 
                 // Verify that the client contacts the server with the expected data
                 AjaxHelpers.expectRequest(
-                    requests, 'POST', FORM_DESCRIPTION.submit_url, $.param({
-                        url: FORM_DESCRIPTION.submit_url,
-                        email: EMAIL
-                    })
+                    requests, 'POST',
+                    FORM_DESCRIPTION.submit_url,
+                    $.param({ email: EMAIL })
                 );
 
                 // Respond with status code 200
@@ -125,10 +127,10 @@ define([
 
                 // If we try again and succeed, the error should go away
                 submitEmail();
-                
+
                 // This time, respond with status code 200
                 AjaxHelpers.respondWithJson(requests, {});
-                
+
                 // Expect that the error is hidden
                 expect(view.$errors).toHaveClass('hidden');
             });

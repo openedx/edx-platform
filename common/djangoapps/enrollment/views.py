@@ -14,7 +14,7 @@ from student.models import NonExistentCourseError, CourseEnrollmentException
 
 
 class EnrollmentUserThrottle(UserRateThrottle):
-        rate = '50/second'  # TODO Limit significantly after performance testing.
+    rate = '50/second'  # TODO Limit significantly after performance testing.
 
 
 @api_view(['GET'])
