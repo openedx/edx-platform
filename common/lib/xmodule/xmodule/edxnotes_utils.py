@@ -9,7 +9,7 @@ def edxnotes(cls):
     Conditional decorator that loads edxnotes only when they are exist.
     """
     if "edxnotes" in sys.modules:
-        from edxnotes.decorators import edxnotes as notes
+        from edxnotes.decorators import edxnotes as notes  # pylint: disable=import-error
         return notes(cls)
     else:
         return cls
