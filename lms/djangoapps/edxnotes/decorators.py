@@ -2,11 +2,10 @@
 Decorators related to edXNotes.
 """
 from edxnotes.helpers import (
-    get_prefix,
-    get_user_id,
+    get_endpoint,
+    get_token,
     generate_uid,
-    get_usage_id,
-    get_course_id,
+    is_feature_enabled,
 )
 from edxmako.shortcuts import render_to_string
 from django.conf import settings
@@ -23,9 +22,11 @@ def edxnotes(cls):
         Returns raw html for the component.
         """
         is_studio = getattr(self.system, 'is_author_mode', False)
+        course = self.descriptor.runtime.modulestore.get_course(self.runtime.course_id)
 
-        # Must be disabled in Studio or depend on the feature flag.
-        if is_studio or not settings.FEATURES.get('ENABLE_EDXNOTES'):
+        # Must be disabled in Studio or depends on the feature flag/advanced
+        # settings of the course.
+        if is_studio or not is_feature_enabled(course):
             return original_get_html(self, *args, **kwargs)
         else:
             return render_to_string('edxnotes_wrapper.html', {
@@ -33,10 +34,10 @@ def edxnotes(cls):
                 'uid': generate_uid(),
                 'params': {
                     # Use camelCase to name keys.
-                    'usageId': get_usage_id(),
-                    'courseId': get_course_id(),
-                    'prefix': get_prefix(),
-                    'user': get_user_id(),
+                    'usageId': unicode(self.scope_ids.usage_id).encode('utf-8'),
+                    'courseId': unicode(self.runtime.course_id).encode('utf-8'),
+                    'token': get_token(),
+                    'endpoint': get_endpoint(),
                     'debug': settings.DEBUG,
                 },
             })

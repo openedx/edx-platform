@@ -1,0 +1,24 @@
+<div class="col-left">
+<% if (quote) { %>
+    <div class="edx-notes-item-quote"><%- quote %></div>
+<% } %>
+<% if (text) { %>
+    <div class="edx-notes-item-text"><%- text %></div>
+<% } %>
+</div>
+<div class="col-right">
+    <dl>
+    <% if (text && quote) { %>
+        <dt class="edx-notes-item-highlight-title"><%- gettext("Highlighted & Noted in:") %></dt>
+    <% } else if (text) { %>
+        <dt class="edx-notes-item-highlight-title"><%- gettext("Highlighted in:") %></dt>
+    <% } else if (quote) { %>
+        <dt class="edx-notes-item-highlight-title"><%- gettext("Noted in:") %></dt>
+    <% } %>
+        <dd><a class="edx-notes-item-unit-link" href="<%= unit.url %>" title="<%- gettext('Visit the unit.') %>"><%- unit.display_name %></a></dd>
+    <% if (updated) { %>
+        <dt class="edx-notes-item-last-edited-title"><%- gettext("Last Edited:") %></dt>
+        <dd class="edx-notes-item-last-edited-value"><%- updated %></dd>
+    <% } %>
+    </dl>
+</div>

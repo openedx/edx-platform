@@ -11,8 +11,8 @@ from . import EDXNOTES_STUB_URL
 
 class Range(factory.Factory):
     FACTORY_FOR = dict
-    start = "/p[1]"
-    end = "/p[1]"
+    start = "/div[1]/p[1]"
+    end = "/div[1]/p[1]"
     startOffset = 0
     endOffset = 8
 
@@ -37,8 +37,8 @@ class EdxNotesFixtureError(Exception):
 class EdxNotesFixture(object):
     notes = []
 
-    def create_note(self, note):
-        self.notes.append(note)
+    def create_notes(self, notes_list):
+        self.notes = notes_list
         return self
 
     def install(self):
@@ -53,6 +53,24 @@ class EdxNotesFixture(object):
         if not response.ok:
             raise EdxNotesFixtureError(
                 "Could not create notes {0}.  Status was {1}".format(
-                    json.dumps(self.notes), response.status_code))
+                    json.dumps(self.notes), response.status_code
+                )
+            )
+
+        return self
+
+    def cleanup(self):
+        """
+        Cleanup the stub EdxNotes service.
+        """
+        self.notes = []
+        response = requests.put('{}/cleanup'.format(EDXNOTES_STUB_URL))
+
+        if not response.ok:
+            raise EdxNotesFixtureError(
+                "Could not cleanup EdxNotes service {0}.  Status was {1}".format(
+                    json.dumps(self.notes), response.status_code
+                )
+            )
 
         return self

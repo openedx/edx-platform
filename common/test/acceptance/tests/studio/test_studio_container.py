@@ -431,8 +431,7 @@ class UnitPublishingTest(ContainerBase):
         add_discussion(unit)
         self._view_published_version(unit)
         self._verify_components_visible(['html'])
-        # We cannot use `assertEqual`, because EdxNotes adds its own DOM elements.
-        self.assertIn(self.html_content, self.courseware.xblock_component_html_content(0))
+        self.assertEqual(self.html_content, self.courseware.xblock_component_html_content(0))
 
     def test_view_live_after_publish(self):
         """

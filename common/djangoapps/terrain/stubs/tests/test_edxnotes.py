@@ -13,8 +13,6 @@ class StubEdxNotesServiceTest(unittest.TestCase):
     """
     Test cases for the stub EdxNotes service.
     """
-    maxDiff = None
-
     def setUp(self):
         """
         Start the stub server.

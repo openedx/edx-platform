@@ -61,7 +61,11 @@ class CoursewarePage(CoursePage):
                 (default is 0)
 
         """
-        return self.q(css=self.xblock_component_selector).attrs('innerHTML')[index].strip()
+        element = self.q(css='{} .edx-notes-wrapper-content'.format(self.xblock_component_selector))
+        if element.first:
+            return element.attrs('innerHTML')[index].strip()
+        else:
+            return self.q(css=self.xblock_component_selector).attrs('innerHTML')[index].strip()
 
     def tooltips_displayed(self):
         """
