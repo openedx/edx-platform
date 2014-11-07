@@ -394,8 +394,11 @@
         'lms/include/js/spec/student_profile/profile_spec.js'
         'lms/include/js/spec/student_account/account.js',
         'lms/include/js/spec/student_profile/profile.js',
-        'lms/include/js/spec/edxnotes/logger_spec.js',
-        'lms/include/js/spec/edxnotes/notes_spec.js'
+        'lms/include/js/spec/edxnotes/notes_spec.js',
+        'lms/include/js/spec/edxnotes/collections/notes_spec.js',
+        'lms/include/js/spec/edxnotes/models/note_spec.js',
+        'lms/include/js/spec/edxnotes/utils/logger_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_page_spec.js'
     ]);
 
 }).call(this, requirejs, define);

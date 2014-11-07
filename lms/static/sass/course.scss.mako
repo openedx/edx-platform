@@ -66,6 +66,7 @@
 @import "course/staff_grading";
 @import "course/rubric";
 @import "course/open_ended_grading";
+@import "course/edxnotes";
 
 // instructor
 @import "course/instructor/instructor";

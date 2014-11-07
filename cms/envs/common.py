@@ -107,6 +107,8 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': None,
+
+    'ENABLE_EDXNOTES': True,
 }
 ENABLE_JASMINE = False
 

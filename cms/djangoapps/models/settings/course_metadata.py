@@ -30,7 +30,7 @@ class CourseMetadata(object):
                      'user_partitions',
                      'name',  # from xblock
                      'tags',  # from xblock
-                     'visible_to_staff_only'
+                     'visible_to_staff_only',
     ]
 
     @classmethod
@@ -44,6 +44,10 @@ class CourseMetadata(object):
         # Do not show giturl if feature is not enabled.
         if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
             filtered_list.append('giturl')
+
+        # Do not show edxnotes if feature is not enabled.
+        if not settings.FEATURES.get('ENABLE_EDXNOTES'):
+            filtered_list.append('edxnotes')
 
         return filtered_list
 
