@@ -163,6 +163,12 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings,
         default=default_reset_button
     )
+    edxnotes = Boolean(
+        display_name=_("Enable Notes"),
+        help=_("Enter true or false. If true, you can use the Notes for HTML components."),
+        default=False,
+        scope=Scope.settings
+    )
 
 
 def compute_inherited_metadata(descriptor):

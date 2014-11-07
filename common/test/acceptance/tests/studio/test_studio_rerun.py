@@ -101,5 +101,4 @@ class CourseRerunTest(StudioCourseTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_xblock_components, 1)
-        # We cannot use `assertEqual`, because EdxNotes adds its own DOM elements.
-        self.assertIn(self.COMPONENT_CONTENT, courseware.xblock_component_html_content())
+        self.assertEqual(self.COMPONENT_CONTENT, courseware.xblock_component_html_content())
