@@ -7,6 +7,10 @@ from django.utils.translation import ungettext as django_ungettext
 import markupsafe
 
 
+# So that we can use escape() imported from here.
+escape = markupsafe.escape                      # pylint: disable=invalid-name
+
+
 def ugettext(text):
     """Translate a string, and escape it as plain text.
 

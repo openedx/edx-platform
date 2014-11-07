@@ -166,7 +166,13 @@
                 <div class="prompt-verify">
                   <h3 class="title">Before proceeding, please review carefully</h3>
 
-                   <p class="copy"> ${_("Once you verify your photo looks good and your name is correct, you can finish your re-verification and return to your course.  <strong>Note: You will not have another chance to re-verify.</strong>")}</p>
+                  <p class="copy">${_("Once you verify your photo looks good and your name is correct, "
+                                        "you can finish your re-verification and return to your course. "
+                                        "{em_start}Note: You will not have another chance to re-verify.{em_end}").format(
+                                            em_start=HTML("<strong>"),
+                                            em_end=HTML("</strong>"),
+                                        )}
+                  </p>
 
                   <ul class="list-actions">
                     <li class="action action-verify">

@@ -127,7 +127,12 @@
             <h3 class="title faq-question">${_("What will I need to re-verify?")}</h3>
             <div class="copy faq-answer">
 
-              <p>${_("Because you are just confirming that you are still you, the only thing you will need to do to re-verify is to <b>submit a new photo of your face with your webcam</b>. The process is quick and you will be brought back to where you left off so you can keep on learning.")}</p>
+              <p>${_("Because you are just confirming that you are still you, "
+                      "the only thing you will need to do to re-verify is to "
+                      "{em_start}submit a new photo of your face with your webcam{em_end}. "
+                      "The process is quick and you will be brought back to where you left off so you can keep on learning.").format(
+                          em_start=HTML("<b>"), em_end=HTML("</b>"),
+                    )}</p>
 
               <p>${_("If you changed your name during the semester and it no longer matches the original ID you submitted, you will need to re-edit your name to match as well.")}</p>
             </div>

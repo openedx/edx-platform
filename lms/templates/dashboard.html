@@ -366,7 +366,7 @@
 </section>
 
 <section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
-  <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
+  <div class="inner-wrapper" role="alertdialog" aria-labelledby="unenrollment-modal-title">
     <button class="close-modal">
       <i class="icon-remove"></i>
       <span class="sr">
@@ -377,7 +377,13 @@
 
     <header>
       <h2 id="unenrollment-modal-title">
-        ${_("<span id='track-info'></span> {course_number}?  <span id='refund-info'></span>").format(course_number="<span id='unenroll_course_number'></span>") | n}
+        # Note: this next string is constructed in a way that makes it impossible
+        # to produce good translations.  Please fix... :(
+        ${_("{track_info} {course_number}?  {refund_info}").format(
+            track_info=HTML("<span id='track-info'></span>"),
+            course_number=HTML("<span id='unenroll_course_number'></span>"),
+            refund_info=HTML("<span id='refund-info'></span>"),
+        )}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}

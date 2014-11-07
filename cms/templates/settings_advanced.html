@@ -52,7 +52,10 @@
 
           </header>
 
-          <p class="instructions">${_("<strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.") | n}</p>
+          <p class="instructions">${_("{em_start}Warning{em_end}: Do not modify these policies unless you are familiar with their purpose.").format(
+            em_start=HTML("<strong>"),
+            em_end=HTML("</strong>"),
+          )}</p>
 
           <div class="wrapper-options">
             <div class="wrapper-deprecated-setting">

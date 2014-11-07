@@ -8,7 +8,7 @@ import unittest
 import ddt
 
 from edxmako.template import Template
-from util.markup import HTML, ugettext as _, ungettext
+from util.markup import escape, HTML, ugettext as _, ungettext
 
 
 @ddt.ddt
@@ -25,6 +25,7 @@ class FormatHtmlTest(unittest.TestCase):
     )
     def test_simple(self, (before, after)):
         self.assertEqual(unicode(_(before)), after)
+        self.assertEqual(unicode(escape(before)), after)
 
     def test_formatting(self):
         # The whole point of this function is to make sure this works:

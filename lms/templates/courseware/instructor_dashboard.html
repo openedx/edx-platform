@@ -2,7 +2,7 @@
 ## We are no longer supporting this file or accepting changes into it.    ##
 ## Please see lms/templates/instructor for instructor dashboard templates ##
 
-<%! from util.markup import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%inherit file="../main.html" />
@@ -486,7 +486,9 @@ function goto( mode)
     <p>
     ## Translators: days_early_for_beta should not be translated
     ${_("Enter usernames or emails for students who should be beta-testers, one per line, or separated by commas.  They will get to "
-        "see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.") | n}
+        "see course materials early, as configured via the {tt_start}days_early_for_beta{tt_end} option in the course policy.").format(
+            tt_start=HTML('<tt>'), tt_end=HTML('</tt>')
+    )}
     </p>
     <p>
     <textarea cols="50" row="30" name="betausers"></textarea>

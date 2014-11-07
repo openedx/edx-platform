@@ -110,7 +110,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <p>${_('Your course summary page will not be viewable until your '
                       'course has been announced. To provide content for the '
                       'page and preview it, follow the instructions provided '
-                      'by your <abbr title="Program Manager">PM</abbr>.')}</p>
+                      'by your Program Manager.')}</p>
             </div>
           </div>
           % endif
@@ -188,7 +188,12 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
           <div class="notice notice-incontext notice-workflow">
             <h3 class="title">${_("These Dates Are Not Used When Promoting Your Course")}</h3>
             <div class="copy">
-              <p>${_('These dates impact <strong>when your courseware can be viewed</strong>, but they are <strong>not the dates shown on your course summary page</strong>.  To provide the course start and registration dates as shown on your course summary page, follow the instructions provided by your <abbr title="Program Manager">PM</abbr>.')}</p>
+              <p>${_("These dates impact {em_start}when your courseware can be viewed{em_end}, "
+                    "but they are {em_start}not the dates shown on your course summary page{em_end}. "
+                    "To provide the course start and registration dates as shown on your course summary page, "
+                    "follow the instructions provided by your Program Manager.").format(
+                        em_start=HTML("<strong>"), em_end=HTML("</strong>"),
+                    )}</p>
             </div>
           </div>
           % endif
