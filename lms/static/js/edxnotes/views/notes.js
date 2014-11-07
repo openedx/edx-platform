@@ -1,54 +1,46 @@
-;(function (define, $, _, undefined) {
+;(function (define, undefined) {
     'use strict';
     define([
-        'annotator', 'js/edxnotes/logger', 'js/edxnotes/shim'
-    ], function (Annotator, Logger) {
+         'jquery', 'underscore', 'annotator', 'js/edxnotes/utils/logger', 'js/edxnotes/views/shim'
+    ], function ($, _, Annotator, Logger) {
         var plugins = ['Store'],
-            getUsageId, getCourseId, getOptions, setupPlugins, getAnnotator;
-
-        /**
-         * Returns Usage id for the component.
-         * @param {jQuery Element} The container element.
-         * @return {String} Usage id.
-         **/
-        getUsageId = function (element) {
-            return element.closest('[data-usage-id]').data('usage-id');
-        };
-
-        /**
-         * Returns course id for the component.
-         * @param {jQuery Element} The container element.
-         * @return {String} Course id.
-         **/
-        getCourseId = function (element) {
-            return element.closest('[data-course-id]').data('course-id');
-        };
+            getOptions, setupPlugins, updateHeaders, getAnnotator;
 
         /**
          * Returns options for the annotator.
          * @param {jQuery Element} The container element.
-         * @param {String} params.prefix The endpoint of the store.
+         * @param {String} params.endpoint The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
          * @param {String} params.usageId Usage Id of the component.
          * @param {String} params.courseId Course id.
          * @return {Object} Options.
          **/
         getOptions = function (element, params) {
-            var usageId = params.usageId || getUsageId(element),
-                courseId = params.courseId || getCourseId(element),
-                defaultParams = {
-                    user: params.user,
-                    usage_id: usageId,
-                    course_id: courseId
-                };
+            var defaultParams = {
+                user: params.user,
+                usage_id: params.usageId,
+                course_id: params.courseId
+            };
 
             return {
                 store: {
-                    prefix: params.prefix,
+                    prefix: params.endpoint,
                     annotationData: defaultParams,
                     loadFromSearch: defaultParams
                 }
             };
+        };
+
+        /**
+         * Updates request headers.
+         * @param {jQuery Element} The container element.
+         * @param {String} token An authentication token.
+         **/
+        updateHeaders = function (element, token) {
+            var current = element.data('annotator:headers');
+            element.data('annotator:headers', $.extend(current, {
+              'x-annotator-auth-token': token
+            }));
         };
 
         /**
@@ -67,10 +59,11 @@
         /**
          * Factory method that returns Annotator.js instantiates.
          * @param {DOM Element} element The container element.
-         * @param {String} params.prefix The endpoint of the store.
+         * @param {String} params.endpoint The endpoint of the store.
          * @param {String} params.user User id of annotation owner.
          * @param {String} params.usageId Usage Id of the component.
          * @param {String} params.courseId Course id.
+         * @param {String} params.token An authentication token.
          * @return {Object} An instance of Annotator.js.
          **/
         getAnnotator = function (element, params) {
@@ -80,6 +73,7 @@
                 logger = new Logger(element.id, params.debug);
 
             setupPlugins(annotator, plugins, options);
+            updateHeaders(el, params.token);
             annotator.logger = logger;
             logger.log({
                 'element': element,
@@ -93,4 +87,4 @@
             factory: getAnnotator
         };
     });
-}).call(this, define || RequireJS.define, jQuery, _);
+}).call(this, define || RequireJS.define);

@@ -77,7 +77,7 @@
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
-            'js/student_profile/profile': 'js/student_profile/profile'
+            'js/student_profile/profile': 'js/student_profile/profile',
 
             // edxnotes
             'annotator': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
@@ -518,8 +518,9 @@
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
         'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
-        'lms/include/js/spec/edxnotes/logger_spec.js',
-        'lms/include/js/spec/edxnotes/notes_spec.js'
+        'lms/include/js/spec/edxnotes/notes_spec.js',
+        'lms/include/js/spec/edxnotes/utils/logger_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_page_spec.js'
     ]);
 
 }).call(this, requirejs, define);
