@@ -1443,12 +1443,7 @@ class DiscussionService(object):
         from django_comment_client.forum.views import get_threads, make_course_settings
         from django_comment_client.permissions import cached_has_permission
         import django_comment_client.utils as utils
-        from course_groups.cohorts import (
-            is_course_cohorted,
-            get_cohort_id,
-            get_cohorted_commentables,
-            get_course_cohorts
-        )
+        from course_groups.cohorts import get_cohort_id, get_cohorted_commentables
 
         escapedict = {'"': '&quot;'}
 
