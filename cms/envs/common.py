@@ -115,6 +115,8 @@ FEATURES = {
 
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
+
+    'ENABLE_EDXNOTES': True,
 }
 ENABLE_JASMINE = False
 

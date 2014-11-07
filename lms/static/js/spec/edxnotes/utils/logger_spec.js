@@ -1,4 +1,4 @@
-define(['js/edxnotes/logger'],
+define(['js/edxnotes/utils/logger'],
     function(Logger) {
         'use strict';
 
