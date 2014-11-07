@@ -1,0 +1,55 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! import json %>
+<%namespace name='static' file='static_content.html'/>
+<%inherit file="main.html" />
+
+<%block name="pagetitle">${_("Notes")}</%block>
+<%block name="headextra">
+    <%static:css group='style-course'/>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='edxnotes'" />
+<div class="container">
+    <div class="edx-notes-page-wrapper">
+        <div class="course-info">
+            <header>
+                <h1>${_('Notes')}</h1>
+                <small>${_("Highlights and personal notes you've made within the course")}</small>
+            </header>
+        % if notes:
+            <div class="ui-loading">
+                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+            </div>
+        % else:
+            <section class="no-content">${_('You do not have any notes within the course.')}</section>
+        % endif
+        </div>
+    </div>
+</div>
+
+## Include Underscore templates
+<%block name="header_extras">
+% for template_name in ["note-item"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="edxnotes/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+<%block name="js_extra">
+% if notes:
+<script type="text/javascript">
+    (function (require) {
+        require(['js/edxnotes/views/page_factory'], function (NotesFactory) {
+            var pageView = new NotesFactory({
+                notesList: ${notes},
+                debugMode: ${debug},
+                authToken: '${token}',
+                user: '${user.username}',
+                courseId: '${course.id}',
+                endpoint: '${endpoint}'
+            });
+        });
+    }).call(this, require || RequireJS.require);
+</script>
+% endif
+</%block>
