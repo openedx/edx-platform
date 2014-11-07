@@ -49,6 +49,13 @@ class CyberSource2Test(TestCase):
             line_cost=self.COST
         )
 
+    def assert_dump_recorded(self, order):
+        """
+        Verify that this order does have a dump of information from the
+        payment processor.
+        """
+        self.assertNotEqual(order.processor_reply_dump, '')
+
     def test_render_purchase_form_html(self):
         # Verify that the HTML form renders with the payment URL specified
         # in the test settings.
@@ -131,6 +138,7 @@ class CyberSource2Test(TestCase):
 
         # Expect that the order has been marked as purchased
         self.assertEqual(result['order'].status, 'purchased')
+        self.assert_dump_recorded(result['order'])
 
     def test_process_payment_rejected(self):
         # Simulate a callback from CyberSource indicating that the payment was rejected
@@ -140,6 +148,7 @@ class CyberSource2Test(TestCase):
         # Expect that we get an error message
         self.assertFalse(result['success'])
         self.assertIn(u"did not accept your payment", result['error_html'])
+        self.assert_dump_recorded(result['order'])
 
     def test_process_payment_invalid_signature(self):
         # Simulate a callback from CyberSource indicating that the payment was rejected
@@ -167,6 +176,9 @@ class CyberSource2Test(TestCase):
         # Expect an error
         self.assertFalse(result['success'])
         self.assertIn(u"different amount than the order total", result['error_html'])
+        # refresh data for current order
+        order = Order.objects.get(id=self.order.id)
+        self.assert_dump_recorded(order)
 
     def test_process_amount_paid_not_decimal(self):
         # Change the payment amount to a non-decimal
@@ -202,6 +214,7 @@ class CyberSource2Test(TestCase):
             msg="Payment was not successful: {error}".format(error=result.get('error_html'))
         )
         self.assertEqual(result['error_html'], '')
+        self.assert_dump_recorded(result['order'])
 
         # Expect that the order has placeholders for the missing credit card digits
         self.assertEqual(result['order'].bill_to_ccnum, '####')
@@ -233,6 +246,7 @@ class CyberSource2Test(TestCase):
         # Verify that this executes without a unicode error
         result = process_postpay_callback(params)
         self.assertTrue(result['success'])
+        self.assert_dump_recorded(result['order'])
 
     @ddt.data('string', u'üñîçø∂é')
     def test_get_processor_exception_html(self, error_string):
