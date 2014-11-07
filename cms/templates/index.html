@@ -456,6 +456,9 @@
                   <span class="label">${_("Course Number:")}</span>
                   <span class="value">${library_info['number']}</span>
                 </span>
+                % if not library_info["can_edit"]:
+                  <span class="extra-metadata">${_("(Read-only)")}</span>
+                % endif
               </div>
             </a>
           </li>

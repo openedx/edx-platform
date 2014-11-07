@@ -20,7 +20,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             },
 
             options: {
-                collapsedClass: 'is-collapsed'
+                collapsedClass: 'is-collapsed',
+                canEdit: true // If not specified, assume user has permission to make changes
             },
 
             view: 'container_preview',
@@ -113,9 +114,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                         // Notify the runtime that the page has been successfully shown
                         xblockView.notifyRuntime('page-shown', self);
 
-                        // Render the add buttons. Paged containers should do this on their own.
                         if (self.components_on_init) {
-                            // Render the add buttons
+                            // Render the add buttons. Paged containers should do this on their own.
                             self.renderAddXBlockComponents();
                         }
 
@@ -140,20 +140,31 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             onXBlockRefresh: function(xblockView, block_added) {
                 this.xblockView.refresh(block_added);
+                this.updateBlockActions();
                 // Update publish and last modified information from the server.
                 this.model.fetch();
             },
 
             renderAddXBlockComponents: function() {
                 var self = this;
-                this.$('.add-xblock-component').each(function(index, element) {
-                    var component = new AddXBlockComponent({
-                        el: element,
-                        createComponent: _.bind(self.createComponent, self),
-                        collection: self.options.templates
+                if (self.options.canEdit) {
+                    this.$('.add-xblock-component').each(function(index, element) {
+                        var component = new AddXBlockComponent({
+                            el: element,
+                            createComponent: _.bind(self.createComponent, self),
+                            collection: self.options.templates
+                        });
+                        component.render();
                     });
-                    component.render();
-                });
+                } else {
+                    this.$('.add-xblock-component').remove();
+                }
+            },
+
+            updateBlockActions: function() {
+                if (!this.options.canEdit) {
+                    this.xblockView.$el.find('.action-duplicate, .action-delete, .action-drag').remove();
+                }
             },
 
             editXBlock: function(event) {

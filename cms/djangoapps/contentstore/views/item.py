@@ -37,7 +37,7 @@ from util.date_utils import get_default_time_display
 
 from util.json_request import expect_json, JsonResponse
 
-from student.auth import has_course_author_access
+from student.auth import has_studio_write_access, has_studio_read_access
 from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
     ancestor_has_staff_lock
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
@@ -130,7 +130,8 @@ def xblock_handler(request, usage_key_string):
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)
 
-        if not has_course_author_access(request.user, usage_key.course_key):
+        access_check = has_studio_read_access if request.method == 'GET' else has_studio_write_access
+        if not access_check(request.user, usage_key.course_key):
             raise PermissionDenied()
 
         if request.method == 'GET':
@@ -166,6 +167,11 @@ def xblock_handler(request, usage_key_string):
             parent_usage_key = usage_key_with_run(request.json['parent_locator'])
             duplicate_source_usage_key = usage_key_with_run(request.json['duplicate_source_locator'])
 
+            source_course = duplicate_source_usage_key.course_key
+            dest_course = parent_usage_key.course_key
+            if not has_studio_write_access(request.user, dest_course) or not has_studio_read_access(request.user, source_course):
+                raise PermissionDenied()
+
             dest_usage_key = _duplicate_item(
                 parent_usage_key,
                 duplicate_source_usage_key,
@@ -197,7 +203,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             the second is the resource description
     """
     usage_key = usage_key_with_run(usage_key_string)
-    if not has_course_author_access(request.user, usage_key.course_key):
+    if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
@@ -304,7 +310,7 @@ def xblock_outline_handler(request, usage_key_string):
     a course.
     """
     usage_key = usage_key_with_run(usage_key_string)
-    if not has_course_author_access(request.user, usage_key.course_key):
+    if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')
@@ -474,12 +480,11 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 def _create_item(request):
     """View for create items."""
     usage_key = usage_key_with_run(request.json['parent_locator'])
-    category = request.json['category']
-
-    display_name = request.json.get('display_name')
-
-    if not has_course_author_access(request.user, usage_key.course_key):
+    if not has_studio_write_access(request.user, usage_key.course_key):
         raise PermissionDenied()
+
+    category = request.json['category']
+    display_name = request.json.get('display_name')
 
     if isinstance(usage_key, LibraryUsageLocator):
         # Only these categories are supported at this time.
@@ -627,7 +632,7 @@ def orphan_handler(request, course_key_string):
     """
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
-        if has_course_author_access(request.user, course_usage_key):
+        if has_studio_read_access(request.user, course_usage_key):
             return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()
