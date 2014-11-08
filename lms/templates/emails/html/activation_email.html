@@ -1,0 +1,27 @@
+<%! from microsite_configuration.middleware import microsite %>
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="one_call_to_action.html" />
+
+<%block name="title">
+${_("Account activation")}
+</%block>
+
+<%block name="msg_header">
+${_("Thank you for signing up for {platform_name}!").format(
+    platform_name=microsite.get_value(
+        'platform_name',
+        settings.PLATFORM_NAME
+    )
+  )
+}
+<br/>
+</%block>
+
+<%block name="msg_content" >
+${_("To activate your account, use the button below.")}
+<br/>
+</%block>
+
+<%block name="call_to_action_href">http://${ site }/activate/${ key }</%block>
+
+<%block name="call_to_action_label">${_("Activate my account")}</%block>

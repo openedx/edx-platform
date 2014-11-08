@@ -1,0 +1,43 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration.middleware import microsite %>
+
+<%namespace file="../../main.html" import="stanford_theme_enabled" />
+<%inherit file="one_call_to_action.html" />
+
+<%block name="title">
+  ${_("Request to change email")}
+</%block>
+
+<%block name="msg_header">
+  ${_("Email change")}
+<br/>
+</%block>
+
+<%block name="msg_content" >
+${_("We received a request to change the e-mail associated with your "
+    "{platform_name} account from {old_email} to {new_email}. "
+    "If this is correct, please confirm your new e-mail address using "
+    "the button below:").format(
+      platform_name=microsite.get_value(
+          'platform_name',
+          settings.PLATFORM_NAME
+      ),
+      old_email=old_email,
+      new_email=new_email
+    )
+  }
+
+</%block>
+
+<%block name="call_to_action_href">
+% if is_secure:
+https://${ site }/email_confirm/${ key }
+% else:
+http://${ site }/email_confirm/${ key }
+% endif
+</%block>
+
+<%block name="call_to_action_label">${_("Confirm change")}</%block>
+
+
+
