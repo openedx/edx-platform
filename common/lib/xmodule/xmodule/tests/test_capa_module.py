@@ -142,6 +142,7 @@ class CapaFactory(object):
 
         return module
 
+
 class CapaFactoryWithFiles(CapaFactory):
     """
     A factory for creating a Capa problem with files attached.

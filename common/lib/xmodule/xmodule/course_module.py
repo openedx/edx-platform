@@ -28,6 +28,7 @@ CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
 
+
 class StringOrDate(Date):
     def from_json(self, value):
         """
@@ -588,6 +589,7 @@ class CourseFields(object):
             {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},
             {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]
     )
+
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule

@@ -665,14 +665,18 @@ class LoginFailures(models.Model):
 class CourseEnrollmentException(Exception):
     pass
 
+
 class NonExistentCourseError(CourseEnrollmentException):
     pass
+
 
 class EnrollmentClosedError(CourseEnrollmentException):
     pass
 
+
 class CourseFullError(CourseEnrollmentException):
     pass
+
 
 class AlreadyEnrolledError(CourseEnrollmentException):
     pass

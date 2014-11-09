@@ -472,6 +472,7 @@ class TestYoutubeTranscripts(unittest.TestCase):
         self.assertEqual(transcripts, expected_transcripts)
         mock_get.assert_called_with('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_youtube_id'})
 
+
 class TestTranscript(unittest.TestCase):
     """
     Tests for Transcript class e.g. different transcript conversions.

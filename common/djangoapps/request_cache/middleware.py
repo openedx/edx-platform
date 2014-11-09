@@ -3,6 +3,7 @@ import threading
 _request_cache_threadlocal = threading.local()
 _request_cache_threadlocal.data = {}
 
+
 class RequestCache(object):
     @classmethod
     def get_request_cache(cls):

@@ -2690,6 +2690,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         self.db_connection.ensure_indexes()
 
+
 class SparseList(list):
     """
     Enable inserting items into a list in arbitrary order and then retrieving them.

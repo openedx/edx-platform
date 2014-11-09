@@ -22,6 +22,7 @@ from xmodule.exceptions import NotFoundError
 
 log = logging.getLogger(__name__)
 
+
 class StaticContentServer(object):
     def process_request(self, request):
         # look to see if the request is prefixed with an asset prefix tag

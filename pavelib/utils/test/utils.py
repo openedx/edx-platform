@@ -54,6 +54,7 @@ def clean_mongo():
         repo_root=Env.REPO_ROOT,
     ))
 
+
 def check_firefox_version():
     """
     Check that firefox is the correct version.

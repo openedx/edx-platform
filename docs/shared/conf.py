@@ -25,6 +25,7 @@ import sys, os
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
+
 def add_base(paths):
     """
     Returns a list of paths relative to BASEDIR.

@@ -2,6 +2,7 @@ import logging
 from xmodule.fields import Timedelta
 log = logging.getLogger(__name__)
 
+
 class TimeInfo(object):
     """
     This is a simple object that calculates and stores datetime information for an XModule
