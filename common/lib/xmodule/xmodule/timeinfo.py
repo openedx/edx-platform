@@ -14,6 +14,7 @@ class TimeInfo(object):
 
     """
     _delta_standin = Timedelta()
+
     def __init__(self, due_date, grace_period_string_or_timedelta):
         if due_date is not None:
             self.display_due_date = due_date
