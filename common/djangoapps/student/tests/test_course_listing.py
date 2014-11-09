@@ -105,7 +105,10 @@ class TestCourseListing(ModuleStoreTestCase):
         course_location = SlashSeparatedCourseKey('testOrg', 'erroredCourse', 'RunBabyRun')
         course = self._create_course_with_access_groups(course_location)
         course_db_record = mongo_store._find_one(course.location)
-        course_db_record.setdefault('metadata', {}).get('tabs', []).append({"type": "wiko", "name": "Wiki" })
+        course_db_record.setdefault('metadata', {}).get('tabs', []).append({
+            "type": "wiko",
+            "name": "Wiki",
+        })
         mongo_store.collection.update(
             {'_id': course.location.to_deprecated_son()},
             {'$set': {
