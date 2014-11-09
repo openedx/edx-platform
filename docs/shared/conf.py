@@ -33,7 +33,7 @@ def add_base(paths):
     """
 
     return [os.path.join(BASEDIR, x) for x in paths]
-    
+
 
 
 # If extensions (or modules to document with autodoc) are in another directory,
