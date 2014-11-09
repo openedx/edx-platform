@@ -29,7 +29,6 @@ class AnnotatableProblemTest(UniqueCourseTest):
     USERNAME = "STAFF_TESTER"
     EMAIL = "johndoe@example.com"
 
-
     DATA_TEMPLATE = dedent("""\
         <annotatable>
             <instructions>Instruction text</instructions>

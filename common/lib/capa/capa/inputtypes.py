@@ -839,7 +839,6 @@ class MatlabInput(CodeInput):
                     'No response from Xqueue within {xqueue_timeout} seconds. Aborted.'
                 ).format(xqueue_timeout=XQUEUE_TIMEOUT)
 
-
     def handle_ajax(self, dispatch, data):
         """
         Handle AJAX calls directed to this input

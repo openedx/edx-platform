@@ -192,7 +192,6 @@ def _render_to_html(tree):
             return children.replace(' ', '')
 
 
-
 def render_to_html(eq):
     '''
     Render a chemical equation string to html.
@@ -230,7 +229,6 @@ def render_to_html(eq):
     if arrow == '':
         # only one side
         return spanify(render_expression(left))
-
 
     return spanify(render_expression(left) + render_arrow(arrow) + render_expression(right))
 

@@ -310,7 +310,6 @@ class PhotoVerification(StatusModel):
 
         return (status, error_msg)
 
-
     def parsed_error_msg(self):
         """
         Sometimes, the error message we've received needs to be parsed into
@@ -776,7 +775,6 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         body_txt = json.dumps(body, indent=2, sort_keys=True, ensure_ascii=False).encode('utf-8')
 
         return header_txt + "\n\n" + body_txt
-
 
     def send_request(self):
         """

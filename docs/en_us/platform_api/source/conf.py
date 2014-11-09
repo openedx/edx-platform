@@ -179,7 +179,6 @@ def strip_tags(html):
     return s.get_data()
 
 
-
 def process_docstring(app, what, name, obj, options, lines):
     """Autodoc django models"""
 

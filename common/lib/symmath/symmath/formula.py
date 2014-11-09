@@ -257,7 +257,6 @@ class formula(object):
 
         fix_pmathml(xml)
 
-
         def fix_hat(xml):
             """
             hat i is turned into <mover><mi>i</mi><mo>^</mo></mover> ; mangle

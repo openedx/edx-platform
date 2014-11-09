@@ -238,7 +238,6 @@ class StorageTestBase(object):
         self.field_data_cache = FieldDataCache([self.mock_descriptor], course_id, self.user)
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
-
     def test_set_and_get_existing_field(self):
         self.kvs.set(self.key_factory('existing_field'), 'test_value')
         self.assertEquals('test_value', self.kvs.get(self.key_factory('existing_field')))

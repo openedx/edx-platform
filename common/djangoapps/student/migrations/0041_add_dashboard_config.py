@@ -18,11 +18,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('student', ['DashboardConfiguration'])
 
-
     def backwards(self, orm):
         # Deleting model 'DashboardConfiguration'
         db.delete_table('student_dashboardconfiguration')
-
 
     models = {
         'auth.group': {

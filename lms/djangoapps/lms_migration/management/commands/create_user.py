@@ -98,7 +98,6 @@ class Command(BaseCommand):
 
             name = raw_input('Full name: ')
 
-
         user = User(username=uname, email=email, is_active=True)
         user.set_password(password)
         try:

@@ -604,7 +604,6 @@ class MatlabTest(unittest.TestCase):
         the_input = self.input_class(test_capa_system(), elt, state)
         self.assertEqual(the_input.status, 'queued')
 
-
     @patch('capa.inputtypes.time.time', return_value=45)
     def test_matlab_response_timeout_exceeded(self, time):
 

@@ -18,14 +18,12 @@ class Migration(SchemaMigration):
                       self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'OrderItem.created'
         db.delete_column('shoppingcart_orderitem', 'created')
 
         # Deleting field 'OrderItem.modified'
         db.delete_column('shoppingcart_orderitem', 'modified')
-
 
     models = {
         'auth.group': {

@@ -14,7 +14,6 @@ class BlockKey(namedtuple('BlockKey', 'type id')):
     def __new__(cls, type, id):
         return super(BlockKey, cls).__new__(cls, type, id)
 
-
     @classmethod
     @contract(usage_key=BlockUsageLocator)
     def from_usage_key(cls, usage_key):

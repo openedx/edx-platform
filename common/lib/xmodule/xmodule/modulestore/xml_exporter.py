@@ -188,7 +188,6 @@ def adapt_references(subtree, destination_course_key, export_fs):
                 )
 
 
-
 def _export_field_content(xblock_item, item_dir):
     """
     Export all fields related to 'xblock_item' other than 'metadata' and 'data' to json file in provided directory

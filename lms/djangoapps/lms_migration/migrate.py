@@ -147,7 +147,6 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
             else:
                 html += '<ul><li>%s</li></ul>' % escape(data)
 
-
     #----------------------------------------
 
     html += '<hr width="100%"/>'

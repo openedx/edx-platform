@@ -82,7 +82,6 @@ class UtilTest(unittest.TestCase):
         result = compare_with_tolerance(infinity, infinity, '1.0', False)
         self.assertTrue(result)
 
-
     def test_sanitize_html(self):
         """
         Test for html sanitization with bleach.
