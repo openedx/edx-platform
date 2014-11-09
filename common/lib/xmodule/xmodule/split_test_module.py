@@ -26,7 +26,7 @@ log = logging.getLogger('edx.' + __name__)
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
-DEFAULT_GROUP_NAME =  _(u'Group ID {group_id}')
+DEFAULT_GROUP_NAME = _(u'Group ID {group_id}')
 
 
 class SplitTestFields(object):
