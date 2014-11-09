@@ -88,7 +88,7 @@ def modulestore():
         ModuleStoreNoSettings.modulestore = class_(
             None,  # contentstore
             ModuleStoreNoSettings.MODULESTORE['DOC_STORE_CONFIG'],
-            branch_setting_func = lambda: ModuleStoreEnum.Branch.draft_preferred,
+            branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
             **options
         )
 
