@@ -349,7 +349,8 @@ def send_mail_to_student(student, param_dict):
         ),
         'account_creation_and_enrollment': (
             'emails/enroll_email_enrolledsubject.txt',
-            'emails/account_creation_and_enroll_emailMessage.txt'
+            'emails/account_creation_and_enroll_emailMessage.txt',
+            'emails/html/account_creation_and_enroll_emailMessage.html'
         ),
     }
 
