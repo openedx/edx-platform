@@ -21,7 +21,8 @@
 #
 # -----------------------------------------------------------------------------
 
-import sys, os
+import os
+import sys
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
