@@ -20,6 +20,7 @@ from ..utils import get_lms_link_for_item
 
 __all__ = ['tabs_handler']
 
+
 @expect_json
 @login_required
 @ensure_csrf_cookie

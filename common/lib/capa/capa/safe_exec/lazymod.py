@@ -7,6 +7,7 @@ in the public domain.
 
 import sys
 
+
 class LazyModule(object):
     """A lazy module proxy."""
 

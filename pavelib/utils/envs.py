@@ -9,6 +9,7 @@ from lazy import lazy
 from path import path
 import memcache
 
+
 class Env(object):
     """
     Load information about the execution environment.

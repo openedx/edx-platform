@@ -32,6 +32,7 @@ def clear_lookups(namespace):
     if namespace in LOOKUP:
         del LOOKUP[namespace]
 
+
 def add_lookup(namespace, directory, package=None, prepend=False):
     """
     Adds a new mako template lookup directory to the given namespace.

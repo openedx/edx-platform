@@ -307,6 +307,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
         grand_locators = [grandkid.locator for grandkid in grandkids]
         return [descendant for descendant in descendants if not descendant.locator in grand_locators]
 
+
 class CourseOutlineUnit(CourseOutlineChild):
     """
     PageObject that wraps a unit link on the Studio Course Outline page.
@@ -328,6 +329,7 @@ class CourseOutlineUnit(CourseOutlineChild):
     def children(self):
         return self.q(css=self._bounded_selector(self.BODY_SELECTOR)).map(
             lambda el: CourseOutlineUnit(self.browser, el.get_attribute('data-locator'))).results
+
 
 class CourseOutlineSubsection(CourseOutlineContainer, CourseOutlineChild):
     """

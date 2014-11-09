@@ -6,6 +6,7 @@ import re
 import urlparse
 from .http import StubHttpRequestHandler, StubHttpService
 
+
 class StubCommentsServiceHandler(StubHttpRequestHandler):
 
     @property

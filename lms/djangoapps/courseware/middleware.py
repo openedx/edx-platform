@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 
 from courseware.courses import UserNotEnrolled
 
+
 class RedirectUnenrolledMiddleware(object):
     """
     Catch UserNotEnrolled errors thrown by `get_course_with_access` and redirect

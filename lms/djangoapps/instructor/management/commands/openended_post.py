@@ -112,6 +112,7 @@ def post_submission_for_student(student, course, location, task_number, dry_run=
 
     return False
 
+
 class DummyRequest(object):
     """Dummy request"""
 

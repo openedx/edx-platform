@@ -569,6 +569,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicG
             response, lambda d: d['discussion_data'][0]
         )
 
+
 @patch('lms.lib.comment_client.utils.requests.request')
 class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/active_threads"

@@ -18,6 +18,7 @@ from xmodule.course_module import (
 # pylint: disable=C0111
 # pylint: disable=W0212
 
+
 class AccessTestCase(TestCase):
     """
     Tests for the various access controls on the student dashboard

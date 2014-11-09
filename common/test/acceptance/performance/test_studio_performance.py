@@ -6,6 +6,7 @@ from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.overview import CourseOutlinePage
 from nose.plugins.attrib import attr
 
+
 @attr(har_mode='explicit')
 class StudioPagePerformanceTest(WebAppTest):
     """

@@ -259,6 +259,7 @@ def get_course_info_section_module(request, course, section_key):
         static_asset_path=course.static_asset_path
     )
 
+
 def get_course_info_section(request, course, section_key):
     """
     This returns the snippet of html to be rendered on the course info page,

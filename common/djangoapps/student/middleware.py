@@ -7,6 +7,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from student.models import UserStanding
 
+
 class UserStandingMiddleware(object):
     """
     Checks a user's standing on request. Returns a 403 if the user's

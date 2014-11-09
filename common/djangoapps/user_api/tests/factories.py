@@ -5,6 +5,7 @@ from student.tests.factories import UserFactory
 from user_api.models import UserPreference, UserCourseTag
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232, C0111
 class UserPreferenceFactory(DjangoModelFactory):

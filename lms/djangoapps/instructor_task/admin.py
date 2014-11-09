@@ -8,6 +8,7 @@ a task.
 from django.contrib import admin
 from .models import InstructorTask
 
+
 class InstructorTaskAdmin(admin.ModelAdmin):
     list_display = [
         'task_id',

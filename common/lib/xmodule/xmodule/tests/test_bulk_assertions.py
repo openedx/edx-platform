@@ -1,6 +1,7 @@
 import ddt
 from xmodule.tests import BulkAssertionTest
 
+
 @ddt.ddt
 class TestBulkAssertionTestCase(BulkAssertionTest):
 

@@ -37,6 +37,7 @@ FEATURES_WITHOUT_SSL_AUTH['AUTH_USE_CERTIFICATES'] = False
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
+
 @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
 class SSLClientTest(ModuleStoreTestCase):
     """

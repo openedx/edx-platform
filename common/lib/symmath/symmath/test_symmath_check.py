@@ -1,6 +1,7 @@
 from unittest import TestCase
 from .symmath_check import symmath_check
 
+
 class SymmathCheckTest(TestCase):
     def test_symmath_check_integers(self):
         number_list = [i for i in range(-100, 100)]

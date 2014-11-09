@@ -19,6 +19,7 @@ from edxmako.shortcuts import (
 from student.tests.factories import UserFactory
 from util.testing import UrlResetMixin
 
+
 @ddt.ddt
 class ShortcutsTests(UrlResetMixin, TestCase):
     """

@@ -168,6 +168,7 @@ class MockControllerQueryService(object):
         """
         pass
 
+
 def convert_seconds_to_human_readable(seconds):
     if seconds < 60:
         human_string = "{0} seconds".format(seconds)

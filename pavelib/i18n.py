@@ -168,6 +168,7 @@ def i18n_ltr():
     sh('git add conf/locale')
     sh('git commit --amend')
 
+
 @task
 @needs(
     "pavelib.i18n.i18n_transifex_pull",

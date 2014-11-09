@@ -75,6 +75,7 @@ def save_to_store(content, name, mime_type, location):
     contentstore().save(content)
     return content_location
 
+
 def save_subs_to_store(subs, subs_id, item, language='en'):
     """
     Save transcripts into `StaticContent`.
@@ -89,6 +90,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     filedata = json.dumps(subs, indent=2)
     filename = subs_filename(subs_id, language)
     return save_to_store(filedata, filename, 'application/json', item.location)
+
 
 def get_transcripts_from_youtube(youtube_id, settings, i18n):
     """
@@ -427,6 +429,7 @@ def get_or_create_sjson(item):
         generate_sjson_for_all_speeds(item, user_filename, result_subs_dict, item.transcript_language)
     sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
     return sjson_transcript
+
 
 class Transcript(object):
     """

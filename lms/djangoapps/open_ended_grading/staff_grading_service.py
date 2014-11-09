@@ -278,6 +278,7 @@ def get_next(request, course_id):
     return HttpResponse(json.dumps(_get_next(course_key, grader_id, location)),
                         mimetype="application/json")
 
+
 def get_problem_list(request, course_id):
     """
     Get all the problems for the given course id

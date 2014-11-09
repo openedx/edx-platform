@@ -140,6 +140,7 @@ def ajax_disable(request):
 
     return HttpResponse(status=204)
 
+
 @require_GET
 def ajax_status(request):
     """

@@ -196,6 +196,7 @@ def remove_item(request):
 
     return HttpResponse('OK')
 
+
 def remove_code_redemption(order_item_course_id, item_id, item, user):
     """
     If an item removed from shopping cart then we will remove

@@ -7,6 +7,7 @@ import urllib2
 import requests
 from terrain.stubs.lti import StubLtiService
 
+
 class StubLtiServiceTest(unittest.TestCase):
     """
     A stub of the LTI provider that listens on a local

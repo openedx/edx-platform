@@ -51,6 +51,7 @@ class GitImportError(Exception):
     CANNOT_BRANCH = _('Unable to switch to specified branch. Please check '
                       'your branch name.')
 
+
 def cmd_log(cmd, cwd):
     """
     Helper function to redirect stderr to stdout and log the command

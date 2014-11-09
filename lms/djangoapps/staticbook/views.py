@@ -130,6 +130,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
         },
     )
 
+
 @login_required
 def html_index(request, course_id, book_index, chapter=None):
     """

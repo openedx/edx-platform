@@ -124,6 +124,7 @@ def expand_checklist_action_url(course_module, checklist):
 
     return expanded_checklist
 
+
 def localize_checklist_text(checklist):
     """
     Localize texts for a given checklist and returns the modified version.

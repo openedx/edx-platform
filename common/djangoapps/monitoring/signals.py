@@ -78,6 +78,7 @@ def post_save_metrics(sender, **kwargs):
     tags = _database_tags(action, sender, kwargs)
     dog_stats_api.increment('edxapp.db.model', tags=tags)
 
+
 @receiver(post_delete, dispatch_uid='edxapp.monitoring.post_delete_metrics')
 def post_delete_metrics(sender, **kwargs):
     """

@@ -74,6 +74,7 @@ copyright = u'2014, edX'
 
 # Mock all the modules that the readthedocs build can't import
 
+
 class Mock(object):
     def __init__(self, *args, **kwargs):
         pass

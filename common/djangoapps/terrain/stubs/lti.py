@@ -21,6 +21,7 @@ import mock
 import requests
 from http import StubHttpRequestHandler, StubHttpService
 
+
 class StubLtiHandler(StubHttpRequestHandler):
     """
     A handler for LTI POST and GET requests.

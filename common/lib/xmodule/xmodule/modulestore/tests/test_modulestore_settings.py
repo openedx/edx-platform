@@ -12,6 +12,7 @@ from xmodule.modulestore.modulestore_settings import (
     get_mixed_stores,
 )
 
+
 @ddt.ddt
 class ModuleStoreSettingsMigration(TestCase):
     """

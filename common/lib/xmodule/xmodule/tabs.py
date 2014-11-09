@@ -225,6 +225,7 @@ class StaffTab(AuthenticatedCourseTab):
     def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):  # pylint: disable=unused-argument
         return is_user_staff
 
+
 class EnrolledOrStaffTab(CourseTab):
     """
     Abstract class for tabs that can be accessed by only users with staff access
