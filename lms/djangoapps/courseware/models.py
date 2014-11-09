@@ -54,10 +54,11 @@ class StudentModule(models.Model):
     ## Grade, and are we done?
     grade = models.FloatField(null=True, blank=True, db_index=True)
     max_grade = models.FloatField(null=True, blank=True)
-    DONE_TYPES = (('na', 'NOT_APPLICABLE'),
-                    ('f', 'FINISHED'),
-                    ('i', 'INCOMPLETE'),
-                    )
+    DONE_TYPES = (
+        ('na', 'NOT_APPLICABLE'),
+        ('f', 'FINISHED'),
+        ('i', 'INCOMPLETE'),
+    )
     done = models.CharField(max_length=8, choices=DONE_TYPES, default='na', db_index=True)
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
