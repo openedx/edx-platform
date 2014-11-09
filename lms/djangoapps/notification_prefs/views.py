@@ -157,7 +157,7 @@ def ajax_status(request):
         key=NOTIFICATION_PREF_KEY
     )
 
-    return HttpResponse(json.dumps({"status":len(qs)}), content_type="application/json")
+    return HttpResponse(json.dumps({"status": len(qs)}), content_type="application/json")
 
 
 @require_GET
