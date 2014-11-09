@@ -62,4 +62,4 @@ def is_masquerading_as_student(user):
     Return True if user is masquerading as a student, False otherwise
     '''
     masq = getattr(user, 'masquerade_as_student', False)
-    return masq==True
+    return masq is True

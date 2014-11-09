@@ -69,9 +69,9 @@ STATICFILES_DIRS += [
 # If we don't add these settings, then Django templates that can't
 # find pipelined assets will raise a ValueError.
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
-STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
+STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
-PIPELINE_ENABLED=False
+PIPELINE_ENABLED = False
 
 # Update module store settings per defaults for tests
 update_module_store_settings(
