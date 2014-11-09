@@ -11,7 +11,7 @@
 <div class="annotation-body">
 
     <div class="block block-highlight">${text | n}</div>
-    <div class="block block-comment">${comment | n}</div>
+    <div class="block block-comment">${comment or "" | n}</div>
 
     <div class="block">${comment_prompt | n}</div>
     <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value}</textarea>
