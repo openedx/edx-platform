@@ -103,7 +103,7 @@ class PeerGradingService(GradingService):
         self._record_result('get_problem_list', result)
         dog_stats_api.histogram(
             self._metric_name('get_problem_list.result.length'),
-            len(result.get('problem_list',[]))
+            len(result.get('problem_list', [])),
         )
         return result
 
