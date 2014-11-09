@@ -260,8 +260,10 @@ def _grade(student, request, course, keep_raw_scores):
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:
-                log.info("Unable to grade a section with a total possible score of zero. " +
-                              str(section_descriptor.location))
+                log.info(
+                    "Unable to grade a section with a total possible score of zero. " +
+                    str(section_descriptor.location)
+                )
 
         totaled_scores[section_format] = format_scores
 
