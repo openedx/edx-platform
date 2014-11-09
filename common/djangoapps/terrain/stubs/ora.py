@@ -45,7 +45,7 @@ class StudentState(object):
 
     @property
     def num_pending(self):
-        return max(self.INITIAL_ESSAYS_AVAILABLE- self.num_graded, 0)
+        return max(self.INITIAL_ESSAYS_AVAILABLE - self.num_graded, 0)
 
     @property
     def num_required(self):
