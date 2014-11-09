@@ -45,7 +45,7 @@ class TestXss(ModuleStoreTestCase):
         Build a request with the given action, call the instructor dashboard
         view, and check that HTML code in a user's name is properly escaped.
         """
-        req  = self._request_factory.post(
+        req = self._request_factory.post(
             "dummy_url",
             data={"action": action}
         )
