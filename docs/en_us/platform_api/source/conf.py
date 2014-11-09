@@ -126,7 +126,7 @@ MOCK_MODULES = [
     'yaml',
     'webob',
     'webob.multidict',
-    ]
+]
 
 if on_rtd:
     for mod_name in MOCK_MODULES:

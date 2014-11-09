@@ -80,7 +80,9 @@ class OpenResponseTest(UniqueCourseTest):
                     # This is the interface a student can use to grade his/her peers
                     XBlockFixtureDesc('peergrading', 'Peer Module'),
 
-        ))).install()
+                )
+            )
+        ).install()
 
         # Configure the XQueue stub's response for the text we will submit
         # The submission text is unique so we can associate each response with a particular test case.

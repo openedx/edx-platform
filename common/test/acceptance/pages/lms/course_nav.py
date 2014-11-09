@@ -147,7 +147,8 @@ class CourseNavPage(PageObject):
         # It *would* make sense to always get the HTML, but unfortunately
         # the open tab has some child <span> tags that we don't want.
         return self.q(
-            css=subsection_css).map(
+            css=subsection_css
+        ).map(
             lambda el: el.text.strip().split('\n')[0] if el.is_displayed() else el.get_attribute('innerHTML').strip()
         ).results
 

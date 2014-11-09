@@ -58,7 +58,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         resp = self.client.get_html('/course/',
                                {},
                                HTTP_ACCEPT_LANGUAGE='en'
-                               )
+        )
 
         self.assertContains(resp,
                             '<h1 class="page-header">My Courses</h1>',

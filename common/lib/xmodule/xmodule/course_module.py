@@ -442,7 +442,8 @@ class CourseFields(object):
                                       "action_url": "SettingsDetails",
                                       "action_text": _("Edit Course Schedule &amp; Details"),
                                       "action_external": False}]}
-        ])
+                        ]
+    )
     info_sidebar_name = String(
         display_name=_("Course Info Sidebar Name"),
         help=_("Enter the heading that you want students to see above your course handouts on the Course Info page. Your course handouts appear in the right panel of the page."),

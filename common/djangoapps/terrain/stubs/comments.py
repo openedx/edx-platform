@@ -81,7 +81,7 @@ class StubCommentsServiceHandler(StubHttpRequestHandler):
                 "collection": user_threads,
                 "page": page,
                 "num_pages": num_pages
-                })
+            })
         else:
             self.send_response(404, content="404 Not Found")
 

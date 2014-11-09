@@ -2121,7 +2121,8 @@ class CodeResponse(LoncapaResponse):
 
             if not parsed:
                 log.error("Unable to parse external grader message as valid"
-                      " XML: score_msg['msg']=%s", msg)
+                      " XML: score_msg['msg']=%s", msg
+                )
                 return fail
 
         return (True, score_result['correct'], score_result['score'], msg)
