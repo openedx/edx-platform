@@ -241,7 +241,7 @@ def capture_console_log(scenario):
             output_dir = '{}/log'.format(settings.TEST_ROOT)
             file_name = '{}/{}.log'.format(output_dir, scenario.name.replace(' ', '_'))
 
-            with open (file_name, 'w') as output_file:
+            with open(file_name, 'w') as output_file:
                 for line in log:
                     output_file.write("{}{}".format(dumps(line), '\n'))
 
