@@ -1442,6 +1442,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         return new_course
 
     DEFAULT_ROOT_BLOCK_ID = 'course'
+
     def create_course(
         self, org, course, run, user_id, master_branch=None, fields=None,
         versions_dict=None, search_targets=None, root_category='course',
