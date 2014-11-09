@@ -198,8 +198,12 @@ def set_value_in_cache(student_id, course_id, notification_type, value):
 
 
 def create_key_name(student_id, course_id, notification_type):
-    key_name = u"{prefix}{type}_{course}_{student}".format(prefix=KEY_PREFIX, type=notification_type, course=course_id,
-                                                          student=student_id)
+    key_name = u"{prefix}{type}_{course}_{student}".format(
+        prefix=KEY_PREFIX,
+        type=notification_type,
+        course=course_id,
+        student=student_id,
+    )
     return key_name
 
 

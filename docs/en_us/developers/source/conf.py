@@ -47,8 +47,14 @@ sys.path.append(root / "lms/djangoapps")
 sys.path.append(root / "lms/lib")
 sys.path.append(root / "cms/djangoapps")
 sys.path.append(root / "cms/lib")
-sys.path.insert(0, os.path.abspath(os.path.normpath(os.path.dirname(__file__)
-    + '/../../../')))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.normpath(
+            os.path.dirname(__file__) + '/../../../'
+        )
+    )
+)
 sys.path.append('.')
 
 #  django configuration  - careful here
