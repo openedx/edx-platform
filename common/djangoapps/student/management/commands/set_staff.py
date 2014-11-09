@@ -12,7 +12,7 @@ class Command(BaseCommand):
                     dest='unset',
                     default=False,
                     help='Set is_staff to False instead of True'),
-        )
+    )
 
     args = '<user|email> [user|email ...]>'
     help = """

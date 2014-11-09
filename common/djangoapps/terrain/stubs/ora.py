@@ -526,8 +526,7 @@ class StubOraService(StubHttpService):
             'num_graded': self.DUMMY_DATA['problem_list_num_graded'],
             'num_pending': self.DUMMY_DATA['problem_list_num_pending'],
             'num_required': self.DUMMY_DATA['problem_list_num_required']
-            } for location, name in self.problems.items()
-        ]
+        } for location, name in self.problems.items()]
 
     def register_problem(self, location, name):
         """

@@ -27,12 +27,12 @@ class UserStandingMiddleware(object):
                             'Your account has been disabled. If you believe '
                             'this was done in error, please contact us at '
                             '{link_start}{support_email}{link_end}'
-                        ).format(
+                ).format(
                             support_email=settings.DEFAULT_FEEDBACK_EMAIL,
                             link_start=u'<a href="mailto:{address}?subject={subject_line}">'.format(
                                 address=settings.DEFAULT_FEEDBACK_EMAIL,
                                 subject_line=_('Disabled Account'),
                             ),
                             link_end=u'</a>'
-                        )
+                )
                 return HttpResponseForbidden(msg)
