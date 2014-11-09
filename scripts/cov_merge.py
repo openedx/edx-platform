@@ -119,7 +119,7 @@ class ReportMerge(object):
             report_path = os.path.join(self.DESTINATION, output_file)
         else:
             report_filename = path.split('reports/')[1].split('/cover')[0].replace('/', '_')
-            report_path = os.path.join(self.DESTINATION, report_filename+'_coverage.html')
+            report_path = os.path.join(self.DESTINATION, report_filename + '_coverage.html')
 
         # Write everything to single report file
         with open(report_path, 'w') as report_file:

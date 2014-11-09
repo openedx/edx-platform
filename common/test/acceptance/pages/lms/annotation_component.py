@@ -41,7 +41,7 @@ class AnnotationComponentPage(PageObject):
         Return css selector for current active problem with sub_selector.
         """
         return 'div[data-problem-id="{}"] {}'.format(
-            self.q(css='.vert-{}'.format(self.active_problem+1)).map(
+            self.q(css='.vert-{}'.format(self.active_problem + 1)).map(
                 lambda el: el.get_attribute('data-id')).results[0],
             sub_selector,
         )
