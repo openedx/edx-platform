@@ -115,13 +115,14 @@ class Command(BaseCommand):
 
         if make_eamap:
             credentials = "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN=%s/emailAddress=%s" % (name, email)
-            eamap = ExternalAuthMap(external_id=email,
-                                    external_email=email,
-                                    external_domain=mit_domain,
-                                    external_name=name,
-                                    internal_password=password,
-                                    external_credentials=json.dumps(credentials),
-                )
+            eamap = ExternalAuthMap(
+                external_id=email,
+                external_email=email,
+                external_domain=mit_domain,
+                external_name=name,
+                internal_password=password,
+                external_credentials=json.dumps(credentials),
+            )
             eamap.user = user
             eamap.dtsignup = datetime.datetime.now(UTC)
             eamap.save()

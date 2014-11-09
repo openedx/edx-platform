@@ -152,16 +152,21 @@ class MongoConnection(object):
             original_version (str or ObjectID): The id of a structure
             block_key (BlockKey): The id of the block in question
         """
-        return [structure_from_mongo(structure) for structure in self.structures.find({
-            'original_version': original_version,
-            'blocks': {
-                '$elemMatch': {
-                    'block_id': block_key.id,
-                    'block_type': block_key.type,
-                    'edit_info.update_version': {'$exists': True},
-                }
-            }
-        })]
+        return [
+            structure_from_mongo(structure)
+            for structure in self.structures.find({
+                'original_version': original_version,
+                'blocks': {
+                    '$elemMatch': {
+                        'block_id': block_key.id,
+                        'block_type': block_key.type,
+                        'edit_info.update_version': {
+                            '$exists': True,
+                        },
+                    },
+                },
+            })
+        ]
 
     def insert_structure(self, structure):
         """
