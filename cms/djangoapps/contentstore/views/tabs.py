@@ -204,4 +204,3 @@ def primitive_insert(course, num, tab_type, name):
     tabs = course.tabs
     tabs.insert(num, new_tab)
     modulestore().update_item(course, ModuleStoreEnum.UserID.primitive_command)
-
