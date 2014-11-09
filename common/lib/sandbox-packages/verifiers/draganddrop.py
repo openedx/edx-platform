@@ -368,7 +368,8 @@ class DragAndDrop(object):
                 if draggable_name in answer['draggables']:
                     user_groups_data.append(draggable_name)
                     user_positions_data.append(
-                                            draggable_dict[draggable_name])
+                        draggable_dict[draggable_name]
+                    )
                     # proved that this is not excess
                     self.excess_draggables[draggable_name] = False
 

@@ -190,8 +190,8 @@ def _upload_asset(request, course_key):
 
     # first let's see if a thumbnail can be created
     (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
-            content,
-            tempfile_path=tempfile_path
+        content,
+        tempfile_path=tempfile_path,
     )
 
     # delete cached thumbnail even if one couldn't be created this time (else

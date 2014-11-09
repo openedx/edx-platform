@@ -52,19 +52,13 @@ def see_a_multi_step_component(step, category):
     world.wait_for(lambda _: len(world.css_find(selector)) == len(step.hashes))
 
     for idx, step_hash in enumerate(step.hashes):
-
         if category == 'HTML':
             html_matcher = {
-                'Text':
-                    '\n    \n',
-                'Announcement':
-                    '<p> Words of encouragement! This is a short note that most students will read. </p>',
-                'Zooming Image':
-                    '<h2>ZOOMING DIAGRAMS</h2>',
-                'E-text Written in LaTeX':
-                    '<h2>Example: E-text page</h2>',
-                'Raw HTML':
-                    '<p>This template is similar to the Text template. The only difference is',
+                'Text': '\n    \n',
+                'Announcement': '<p> Words of encouragement! This is a short note that most students will read. </p>',
+                'Zooming Image': '<h2>ZOOMING DIAGRAMS</h2>',
+                'E-text Written in LaTeX': '<h2>Example: E-text page</h2>',
+                'Raw HTML': '<p>This template is similar to the Text template. The only difference is',
             }
             actual_html = world.css_html(selector, index=idx)
             assert_in(html_matcher[step_hash['Component']], actual_html)
