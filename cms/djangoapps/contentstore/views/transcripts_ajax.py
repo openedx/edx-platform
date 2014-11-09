@@ -377,7 +377,10 @@ def choose_transcripts(request):
     if item.sub != html5_id:  # update sub value
         item.sub = html5_id
         item.save_with_metadata(request.user)
-    response = {'status': 'Success',  'subs': item.sub}
+    response = {
+        'status': 'Success',
+        'subs': item.sub,
+    }
     return JsonResponse(response)
 
 
@@ -408,7 +411,10 @@ def replace_transcripts(request):
 
     item.sub = youtube_id
     item.save_with_metadata(request.user)
-    response = {'status': 'Success',  'subs': item.sub}
+    response = {
+        'status': 'Success',
+        'subs': item.sub,
+    }
     return JsonResponse(response)
 
 
