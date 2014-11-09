@@ -76,7 +76,7 @@ def cleanup(filepath, remove_meta):
             print "WARNING: {0} has both slug and url_name".format(node)
 
         if ('url_name' in attrs and 'filename' in attrs and
-            len(attrs) == 2 and attrs['url_name'] == attrs['filename']):
+                len(attrs) == 2 and attrs['url_name'] == attrs['filename']):
             # This is a pointer tag in disguise.  Get rid of the filename.
             print 'turning {0}.{1} into a pointer tag'.format(node.tag, attrs['url_name'])
             del attrs['filename']

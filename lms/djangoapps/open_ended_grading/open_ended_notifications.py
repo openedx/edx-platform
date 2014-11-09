@@ -162,7 +162,7 @@ def combined_notifications(course, user):
                                                                          last_time_viewed)
         if notifications.get('success'):
             if (notifications.get('staff_needs_to_grade') or
-                notifications.get('student_needs_to_peer_grade')):
+                    notifications.get('student_needs_to_peer_grade')):
                 pending_grading = True
     except:
         #Non catastrophic error, so no real action
