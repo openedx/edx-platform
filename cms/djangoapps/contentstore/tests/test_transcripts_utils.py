@@ -161,7 +161,6 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     number = '999'
     display_name = 'Test course'
 
-
     def clear_sub_content(self, subs_id):
         """
         Remove, if subtitle content exists.
@@ -489,7 +488,6 @@ class TestTranscript(unittest.TestCase):
             At the left we can see...
 
         """)
-
 
         self.sjson_transcript = textwrap.dedent("""\
             {

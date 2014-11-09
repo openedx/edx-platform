@@ -10,7 +10,6 @@ from path import path
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 
-
 sys.path.append('../../../../')
 
 from docs.shared.conf import *
@@ -186,7 +185,6 @@ def strip_tags(html):
     s = MLStripper()
     s.feed(html)
     return s.get_data()
-
 
 
 def process_docstring(app, what, name, obj, options, lines):

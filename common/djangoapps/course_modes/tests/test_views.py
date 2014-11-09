@@ -150,7 +150,6 @@ class CourseModeViewTest(ModuleStoreTestCase):
         response = self.client.get(choose_track_url)
         self.assertRedirects(response, reverse('dashboard'))
 
-
     # Mapping of course modes to the POST parameters sent
     # when the user chooses that mode.
     POST_PARAMS_FOR_COURSE_MODE = {

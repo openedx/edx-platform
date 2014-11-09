@@ -115,7 +115,6 @@ class ModuleStoreSettingsMigration(TestCase):
         }
     }
 
-
     def assertStoreValuesEqual(self, store_setting1, store_setting2):
         """
         Tests whether the fields in the given store_settings are equal.

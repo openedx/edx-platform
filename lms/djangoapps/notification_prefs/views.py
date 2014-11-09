@@ -144,7 +144,6 @@ def ajax_status(request):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-
     qs = UserPreference.objects.filter(
         user=request.user,
         key=NOTIFICATION_PREF_KEY

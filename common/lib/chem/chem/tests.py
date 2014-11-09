@@ -64,7 +64,6 @@ class Test_Compare_Equations(unittest.TestCase):
         self.assertFalse(chemical_equations_equal('H2O( -> H2O2',
                                                   'H2O -> H2O2'))
 
-
         self.assertFalse(chemical_equations_equal('H2 + O2 ==> H2O2',   # strange arrow
                                                   '2O2 + 2H2 -> 2H2O2'))
 

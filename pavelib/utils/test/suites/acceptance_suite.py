@@ -95,7 +95,6 @@ class AcceptanceTestSuite(TestSuite):
         if not self.fasttest:
             self._setup_acceptance_db()
 
-
     def _setup_acceptance_db(self):
         """
         TODO: Improve the following

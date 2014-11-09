@@ -1395,7 +1395,6 @@ class CapaModuleTest(unittest.TestCase):
         Run the test for each possible rerandomize value
         """
 
-
         def _reset_and_get_seed(module):
             """
             Reset the XModule and return the module's seed
