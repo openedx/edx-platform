@@ -19,7 +19,8 @@ _ = lambda text: text
 
 class AnnotatableFields(object):
     """ Fields for `VideoModule` and `VideoDescriptor`. """
-    data = String(help=_("XML data for the annotation"),
+    data = String(
+        help=_("XML data for the annotation"),
         scope=Scope.content,
         default=textwrap.dedent("""\
         <annotatable>

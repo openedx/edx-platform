@@ -286,8 +286,15 @@ def _do_studio_prompt_action(intent, action):
     Wait for a studio prompt to appear and press the specified action button
     See cms/static/js/views/feedback_prompt.js for implementation
     """
-    assert intent in ['warning', 'error', 'confirmation', 'announcement',
-        'step-required', 'help', 'mini']
+    assert intent in [
+        'warning',
+        'error',
+        'confirmation',
+        'announcement',
+        'step-required',
+        'help',
+        'mini',
+    ]
     assert action in ['primary', 'secondary']
 
     world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))

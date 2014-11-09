@@ -32,13 +32,14 @@ class TestCourseAccess(ModuleStoreTestCase):
         # create a course via the view handler which has a different strategy for permissions than the factory
         self.course_key = SlashSeparatedCourseKey('myu', 'mydept.mycourse', 'myrun')
         course_url = reverse_url('course_handler')
-        self.client.ajax_post(course_url,
+        self.client.ajax_post(
+            course_url,
             {
                 'org': self.course_key.org,
                 'number': self.course_key.course,
                 'display_name': 'My favorite course',
                 'run': self.course_key.run,
-            }
+            },
         )
 
         self.users = self._create_users()

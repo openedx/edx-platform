@@ -301,8 +301,13 @@ def queue_subtasks_for_query(entry, action_name, create_subtask_fcn, item_querys
     subtask_id_list = [str(uuid4()) for _ in range(total_num_subtasks)]
 
     # Update the InstructorTask  with information about the subtasks we've defined.
-    TASK_LOG.info("Task %s: updating InstructorTask %s with subtask info for %s subtasks to process %s items.",
-             task_id, entry.id, total_num_subtasks, total_num_items)  # pylint: disable=E1101
+    TASK_LOG.info(
+        "Task %s: updating InstructorTask %s with subtask info for %s subtasks to process %s items.",
+        task_id,
+        entry.id,
+        total_num_subtasks,
+        total_num_items,
+    )  # pylint: disable=E1101
     progress = initialize_subtask_info(entry, action_name, total_num_items, subtask_id_list)
 
     # Construct a generator that will return the recipients to use for each subtask.
@@ -317,8 +322,12 @@ def queue_subtasks_for_query(entry, action_name, create_subtask_fcn, item_querys
     )
 
     # Now create the subtasks, and start them running.
-    TASK_LOG.info("Task %s: creating %s subtasks to process %s items.",
-             task_id, total_num_subtasks, total_num_items)
+    TASK_LOG.info(
+        "Task %s: creating %s subtasks to process %s items.",
+        task_id,
+        total_num_subtasks,
+        total_num_items,
+    )
     num_subtasks = 0
     for item_list in item_list_generator:
         subtask_id = subtask_id_list[num_subtasks]

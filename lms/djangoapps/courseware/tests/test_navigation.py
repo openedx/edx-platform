@@ -50,8 +50,10 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.tabssection = ItemFactory.create(parent=self.chapterchrome,
                                               display_name='tabs',
                                               chrome='tabs')
-        self.defaultchromesection = ItemFactory.create(parent=self.chapterchrome,
-                                             display_name='defaultchrome')
+        self.defaultchromesection = ItemFactory.create(
+            parent=self.chapterchrome,
+            display_name='defaultchrome',
+        )
         self.fullchromesection = ItemFactory.create(parent=self.chapterchrome,
                                                     display_name='fullchrome',
                                                     chrome='accordion,tabs')
