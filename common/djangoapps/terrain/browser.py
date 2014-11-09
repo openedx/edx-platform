@@ -95,7 +95,9 @@ def initial_setup(server):
 
         if browser_driver == 'chrome':
             desired_capabilities = DesiredCapabilities.CHROME
-            desired_capabilities['loggingPrefs'] = { 'browser':'ALL' }
+            desired_capabilities['loggingPrefs'] = {
+                'browser': 'ALL',
+            }
         elif browser_driver == 'firefox':
             desired_capabilities = DesiredCapabilities.FIREFOX
         else:
