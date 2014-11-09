@@ -3,4 +3,4 @@ def seventeen():
 
 
 def fortytwo(x):
-    return 42+x
+    return 42 + x
