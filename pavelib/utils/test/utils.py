@@ -73,4 +73,3 @@ def check_firefox_version():
             '\t$ firefox --version\n'
             '\t{version}'.format(version=expected_firefox_ver)
         )
-

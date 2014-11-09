@@ -387,4 +387,3 @@ def create_other_user(_step, name, has_extra_perms, role_name):
 @step('I log out')
 def log_out(_step):
     world.visit('logout')
-
