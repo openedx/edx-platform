@@ -106,7 +106,7 @@ class TrackMiddleware(object):
         for header_name, context_key in META_KEY_TO_CONTEXT_KEY.iteritems():
             context[context_key] = request.META.get(header_name, '')
 
-        # Google Analytics uses the clientId to keep track of unique visitors. A GA cookie looks like 
+        # Google Analytics uses the clientId to keep track of unique visitors. A GA cookie looks like
         # this: _ga=GA1.2.1033501218.1368477899. The clientId is this part: 1033501218.1368477899.
         google_analytics_cookie = request.COOKIES.get('_ga')
         if google_analytics_cookie is None:
