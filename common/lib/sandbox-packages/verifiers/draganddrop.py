@@ -98,7 +98,7 @@ class PositionsCompare(list):
             return False
 
         if (isinstance(self[0], (list, int, float)) and
-            isinstance(other[0], (list, int, float))):
+                isinstance(other[0], (list, int, float))):
             return self.coordinate_positions_compare(other)
 
         elif (isinstance(self[0], (unicode, str)) and

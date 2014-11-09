@@ -202,7 +202,7 @@ class XModuleMixin(XBlockMixin):
         # an XModule context, not an XModuleDescriptor context,
         # so we should use the xmodule_runtime (ModuleSystem) as the runtime.
         if (not isinstance(self, (XModule, XModuleDescriptor)) and
-            self.xmodule_runtime is not None):
+                self.xmodule_runtime is not None):
             return PureSystem(self.xmodule_runtime, self._runtime)
         else:
             return self._runtime
