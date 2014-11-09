@@ -160,4 +160,11 @@ class MockPeerGradingService(object):
                 ]}
 
     def get_data_for_location(self, problem_location, student_id):
-        return {"version": 1, "count_graded": 3, "count_required": 3, "success": True, "student_sub_count": 1, 'submissions_available' : 0}
+        return {
+            "version": 1,
+            "count_graded": 3,
+            "count_required": 3,
+            "success": True,
+            "student_sub_count": 1,
+            'submissions_available': 0,
+        }
