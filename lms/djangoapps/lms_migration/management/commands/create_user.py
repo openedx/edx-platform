@@ -28,8 +28,11 @@ class MyCompleter(object):  # Custom completer
     def complete(self, text, state):
         if state == 0:  # on first trigger, build possible matches
             if text:  # cache matches (entries that start with entered text)
-                self.matches = [s for s in self.options
-                                    if s and s.startswith(text)]
+                self.matches = [
+                    option
+                    for option in self.options
+                    if option and option.startswith(text)
+                ]
             else:  # no text entered, all matches possible
                 self.matches = self.options[:]
 

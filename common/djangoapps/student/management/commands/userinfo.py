@@ -19,13 +19,15 @@ Pass a single filename."""
         l = []
         for user in users:
             up = UserProfile.objects.get(user=user)
-            d = {'username': user.username,
-                  'email': user.email,
-                  'is_active': user.is_active,
-                  'joined': user.date_joined.isoformat(),
-                  'name': up.name,
-                  'language': up.language,
-                  'location': up.location}
+            d = {
+                'username': user.username,
+                'email': user.email,
+                'is_active': user.is_active,
+                'joined': user.date_joined.isoformat(),
+                'name': up.name,
+                'language': up.language,
+                'location': up.location,
+            }
             l.append(d)
         json.dump(l, f)
         f.close()
