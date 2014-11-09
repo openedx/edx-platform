@@ -6,6 +6,7 @@ from student.models import UserTestGroup
 import random
 import sys
 import datetime
+from textwrap import dedent
 
 import json
 from pytz import UTC
@@ -25,16 +26,15 @@ def group_from_value(groups, v):
 
 
 class Command(BaseCommand):
-    help = \
-''' Assign users to test groups. Takes a list
-of groups:
-a:0.3,b:0.4,c:0.3 file.txt "Testing something"
-Will assign each user to group a, b, or c with
-probability 0.3, 0.4, 0.3. Probabilities must
-add up to 1.
+    help = dedent("""\
+        Assign users to test groups. Takes a list of groups:
+        a:0.3,b:0.4,c:0.3 file.txt "Testing something"
+        Will assign each user to group a, b, or c with
+        probability 0.3, 0.4, 0.3. Probabilities must
+        add up to 1.
 
-Will log what happened to file.txt.
-'''
+        Will log what happened to file.txt.
+    """)
 
     def handle(self, *args, **options):
         if len(args) != 3:

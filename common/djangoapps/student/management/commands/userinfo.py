@@ -7,9 +7,8 @@ from student.models import UserProfile
 
 
 class Command(BaseCommand):
-    help = \
-''' Extract full user information into a JSON file.
-Pass a single filename.'''
+    help = """Extract full user information into a JSON file.
+Pass a single filename."""
 
     def handle(self, *args, **options):
         f = open(args[0], 'w')

@@ -15,9 +15,10 @@ _ = lambda text: text
 
 
 class AnnotatableFields(object):
-    data = String(help=_("XML data for the annotation"), scope=Scope.content,
-        default=textwrap.dedent(
-        """\
+    data = String(
+        help=_("XML data for the annotation"),
+        scope=Scope.content,
+        default=textwrap.dedent("""
         <annotatable>
             <instructions>
                 <p>Enter your (optional) instructions for the exercise in HTML format.</p>
