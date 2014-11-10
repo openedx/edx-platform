@@ -115,7 +115,23 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
 
         # Try to enroll, this should fail.
         resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
-        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_user_not_activated(self):
+        # Create a user account, but don't activate it
+        self.user = UserFactory.create(
+            username="inactive",
+            email="inactive@example.com",
+            password=self.PASSWORD,
+            is_active=False
+        )
+
+        # Log in with the unactivated account
+        self.client.login(username="inactive", password=self.PASSWORD)
+
+        # Enrollment should succeed, even though we haven't authenticated.
+        resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
+        self.assertEqual(resp.status_code, 200)
 
     def test_unenroll_not_enrolled_in_course(self):
         # Deactivate the enrollment in the course and verify the URL we get sent to
