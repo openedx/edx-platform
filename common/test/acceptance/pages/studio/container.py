@@ -7,6 +7,7 @@ from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
 from utils import click_css, confirm_prompt
+import time
 
 
 class ContainerPage(PageObject):
@@ -17,6 +18,9 @@ class ContainerPage(PageObject):
     NAME_INPUT_SELECTOR = '.page-header .xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.page-header .wrapper-xblock-field'
     ADD_MISSING_GROUPS_SELECTOR = '.notification-action-button[data-notification-action="add-missing-groups"]'
+
+    LAST_PUBLISHED = 'Last published '
+    LAST_SAVED = 'Draft saved on '
 
     def __init__(self, browser, locator):
         super(ContainerPage, self).__init__(browser)
@@ -126,6 +130,19 @@ class ContainerPage(PageObject):
         Returns the last saved message as displayed in the publishing sidebar component.
         """
         return self.q(css='.wrapper-last-draft').first.text[0]
+
+    @property
+    def last_saved_time(self):
+        last_saved_text = self.last_saved_text
+        if self.LAST_PUBLISHED in last_saved_text:
+            last_saved_text = last_saved_text[len(self.LAST_PUBLISHED):]
+        else:
+            last_saved_text = last_saved_text[len(self.LAST_SAVED):]
+
+        last_saved_text = last_saved_text[:last_saved_text.index(" by")]
+        time_obj = time.strptime(last_saved_text, "%b %d, %Y at %H:%M %Z")
+        return time.mktime(time_obj)
+
 
     @property
     def last_published_text(self):
