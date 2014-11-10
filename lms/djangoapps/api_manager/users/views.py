@@ -682,7 +682,7 @@ class UsersGroupsDetail(SecureAPIView):
         """
         DELETE /api/users/{user_id}/groups/{group_id}
         """
-        existing_user = User.objects.get(id=user_id, is_active=True)
+        existing_user = User.objects.get(id=user_id)
         existing_user.groups.remove(group_id)
         existing_user.save()
         return Response({}, status=status.HTTP_204_NO_CONTENT)
@@ -822,7 +822,7 @@ class UsersCoursesDetail(SecureAPIView):
         response_data = {}
         response_data['uri'] = base_uri
         try:
-            user = User.objects.get(id=user_id, is_active=True)
+            user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         if not course_exists(request, user, course_id):
@@ -894,7 +894,7 @@ class UsersCoursesDetail(SecureAPIView):
         DELETE /api/users/{user_id}/courses/{course_id}
         """
         try:
-            user = User.objects.get(id=user_id, is_active=True)
+            user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         if not course_exists(request, user, course_id):
