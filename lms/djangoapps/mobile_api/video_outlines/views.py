@@ -17,9 +17,10 @@ from rest_framework.exceptions import PermissionDenied
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
-from courseware.access import has_access
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
+
+from mobile_api.utils import mobile_available_when_enrolled
 
 from .serializers import BlockOutline, video_summary
 
@@ -139,7 +140,7 @@ def get_mobile_course(course_id, user):
     requesting user is a staff member.
     """
     course = modulestore().get_course(course_id, depth=None)
-    if course.mobile_available or has_access(user, 'staff', course):
+    if mobile_available_when_enrolled(course, user):
         return course
 
     raise PermissionDenied(detail="Course not available on mobile.")
