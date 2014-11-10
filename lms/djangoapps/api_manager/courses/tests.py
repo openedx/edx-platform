@@ -227,7 +227,7 @@ class CoursesApiTests(ModuleStoreTestCase):
                 )
 
         self.test_course_id = unicode(self.course.id)
-        self.test_bogus_course_id = 'i4x://foo/bar/baz'
+        self.test_bogus_course_id = 'foo/bar/baz'
         self.test_course_name = self.course.display_name
         self.test_course_number = self.course.number
         self.test_course_org = self.course.org

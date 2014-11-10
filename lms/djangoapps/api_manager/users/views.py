@@ -561,9 +561,9 @@ class UsersDetail(SecureAPIView):
             gender = request.DATA.get('gender')
             if gender:
                 existing_user_profile.gender = gender
-            title = request.DATA.get('title')
-            if title:
-                existing_user_profile.title = title
+            # Empty title is also allowed
+            title = request.DATA.get('title', None)
+            existing_user_profile.title = title
             avatar_url = request.DATA.get('avatar_url')
             if avatar_url:
                 existing_user_profile.avatar_url = avatar_url
