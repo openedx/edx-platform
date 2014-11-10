@@ -733,7 +733,8 @@ def course_about(request, course_id):
     in_cart = False
     reg_then_add_to_cart_link = ""
 
-    if (is_shopping_cart_enabled()):
+    _is_shopping_cart_enabled = is_shopping_cart_enabled()
+    if (_is_shopping_cart_enabled):
         registration_price = CourseMode.min_course_price_for_currency(course_key,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
@@ -775,6 +776,8 @@ def course_about(request, course_id):
          # We do not want to display the internal courseware header, which is used when the course is found in the
          # context. This value is therefor explicitly set to render the appropriate header.
         'disable_courseware_header': True,
+        'is_shopping_cart_enabled': _is_shopping_cart_enabled,
+        'cart_link': reverse('shoppingcart.views.show_cart'),
     })
 
 
