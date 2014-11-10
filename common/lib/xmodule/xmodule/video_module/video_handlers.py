@@ -55,7 +55,9 @@ class VideoStudentViewHandlers(object):
 
         if dispatch == 'save_user_state':
             for key in data:
-                if hasattr(self, key) and key in accepted_keys:
+                if type(key) == str:
+                    key = unicode(key, "UTF8")
+                if hasattr(self, key.encode('utf8')) and key in accepted_keys:
                     if key in conversions:
                         value = conversions[key](data[key])
                     else:

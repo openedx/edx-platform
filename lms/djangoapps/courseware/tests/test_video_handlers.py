@@ -131,6 +131,7 @@ class TestVideo(BaseTestXmodule):
             {'speed': 2.0},
             {'saved_video_position': "00:00:10"},
             {'transcript_language': 'uk'},
+            {'demoo�': 'sample'}
         ]
         for sample in data:
             response = self.clients[self.users[0].username].post(
@@ -151,6 +152,10 @@ class TestVideo(BaseTestXmodule):
         self.assertEqual(self.item_descriptor.transcript_language, 'en')
         self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
         self.assertEqual(self.item_descriptor.transcript_language, 'uk')
+
+        response = self.item_descriptor.handle_ajax('save_user_state', {'demoo�': "sample"})
+        self.assertEqual(json.loads(response)['success'], True)
+
 
     def tearDown(self):
         _clear_assets(self.item_descriptor.location)
