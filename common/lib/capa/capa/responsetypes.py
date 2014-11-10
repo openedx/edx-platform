@@ -715,12 +715,13 @@ class ChoiceResponse(LoncapaResponse):
         if not isinstance(student_answer, list):
             student_answer = [student_answer]
 
+        no_empty_answer = student_answer != []
         student_answer = set(student_answer)
 
         required_selected = len(self.correct_choices - student_answer) == 0
         no_extra_selected = len(student_answer - self.correct_choices) == 0
 
-        correct = required_selected & no_extra_selected
+        correct = required_selected & no_extra_selected & no_empty_answer
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
