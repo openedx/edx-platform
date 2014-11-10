@@ -1075,6 +1075,17 @@ class ChoiceResponseTest(ResponseTest):
         # No choice 3 exists --> mark incorrect
         self.assert_grade(problem, 'choice_3', 'incorrect')
 
+    def test_grade_with_no_checkbox_selected(self):
+        """
+        Test that answer marked as incorrect if no checkbox selected.
+        """
+        problem = self.build_problem(
+            choice_type='checkbox', choices=[False, False, False]
+        )
+
+        correct_map = problem.grade_answers({})
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
+
 
 class JavascriptResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import JavascriptResponseXMLFactory
