@@ -343,6 +343,20 @@ def shim_student_view(view_func, check_logged_in=False):
         if "course_id" in request.POST:
             del request.POST["course_id"]
 
+        # Include the course ID if it's specified in the analytics info
+        # so it can be included in analytics events.
+        if "analytics" in request.POST:
+            try:
+                analytics = json.loads(request.POST["analytics"])
+                if "enroll_course_id" in analytics:
+                    request.POST["course_id"] = analytics.get("enroll_course_id")
+            except (ValueError, TypeError):
+                LOGGER.error(
+                    u"Could not parse analytics object sent to user API: {analytics}".format(
+                        analytics=analytics
+                    )
+                )
+
         # Backwards compatibility: the student view expects both
         # terms of service and honor code values.  Since we're combining
         # these into a single checkbox, the only value we may get

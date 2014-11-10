@@ -133,6 +133,13 @@ class LoginSessionView(APIView):
     def post(self, request):
         """Log in a user.
 
+        You must send all required form fields with the request.
+
+        You can optionally send an `analytics` param with a JSON-encoded
+        object with additional info to include in the login analytics event.
+        Currently, the only supported field is "enroll_course_id" to indicate
+        that the user logged in while enrolling in a particular course.
+
         Arguments:
             request (HttpRequest)
 
@@ -148,7 +155,7 @@ class LoginSessionView(APIView):
         Example Usage:
 
             POST /user_api/v1/login_session
-            with POST params `email` and `password`
+            with POST params `email`, `password`, and `remember`.
 
             200 OK
 
@@ -245,6 +252,13 @@ class RegistrationView(APIView):
     @method_decorator(require_post_params(DEFAULT_FIELDS))
     def post(self, request):
         """Create the user's account.
+
+        You must send all required form fields with the request.
+
+        You can optionally send an `analytics` param with a JSON-encoded
+        object with additional info to include in the registration analytics event.
+        Currently, the only supported field is "enroll_course_id" to indicate
+        that the user registered while enrolling in a particular course.
 
         Arguments:
             request (HTTPRequest)
