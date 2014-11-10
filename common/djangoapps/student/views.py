@@ -1790,11 +1790,9 @@ def activate_account(request, key):
 
 
 @csrf_exempt
+@require_POST
 def password_reset(request):
     """ Attempts to send a password reset e-mail. """
-    if request.method != "POST":
-        raise Http404
-
     # Add some rate limiting here by re-using the RateLimitMixin as a helper class
     limiter = BadRequestRateLimiter()
     if limiter.is_rate_limit_exceeded(request):
