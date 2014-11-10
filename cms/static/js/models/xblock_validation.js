@@ -18,10 +18,10 @@ define(["backbone", "gettext", "underscore"], function (Backbone, gettext, _) {
             if (!response.empty) {
                 var summary = "summary" in response ? response.summary : {};
                 var messages = "messages" in response ? response.messages : [];
-                if (!(_.has(summary, "text")) || !summary.text) {
+                if (!summary.text) {
                     summary.text = gettext("This component has validation issues.");
                 }
-                if (!(_.has(summary, "type")) || !summary.type) {
+                if (!summary.type) {
                     summary.type = this.WARNING;
                     // Possible types are ERROR, WARNING, and NOT_CONFIGURED. NOT_CONFIGURED is treated as a warning.
                     _.find(messages, function (message) {
