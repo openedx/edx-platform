@@ -165,17 +165,17 @@ describe('edx.utils.validate', function () {
 
         setFixtures(select);
 
-        dropdown = $('#dropdown');
+        field = $('#dropdown');
 
         // Optional
         expectValid();
 
         // Required, default text selected
-        dropdown.attr('required', true);
+        field.attr('required', true);
         expectInvalid(REQUIRED_ERROR_FRAGMENT);
 
         // Required, country selected
-        dropdown.val('BE');
+        field.val('BE');
         expectValid();
     });
 
