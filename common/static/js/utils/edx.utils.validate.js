@@ -87,7 +87,18 @@ var edx = edx || {};
                 },
 
                 isBlank: function( $el ) {
-                    return ( $el.attr('type') === 'checkbox' ) ? !$el.prop('checked') : !$el.val();
+                    var type =  $el.attr('type'),
+                        isBlank;
+
+                    if ( type === 'checkbox' ) {
+                        isBlank = !$el.prop('checked');
+                    } else if ( type === 'select' ) {
+                        isBlank = ( $el.data('isdefault') === true );
+                    } else {
+                        isBlank = !$el.val();
+                    }
+
+                    return isBlank;
                 },
 
                 email: {
