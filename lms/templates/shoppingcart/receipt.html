@@ -35,8 +35,8 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
             <% course_info_url = reverse('info', kwargs={'course_id': course.id.to_deprecated_string()}) %>
             <a href="${course_info_url}" class="blue pull-right">${_("View Course")} <i class="icon-caret-right"></i></a>
           %endif
-          ${_("You have successfully been enrolled for <b>{appended_course_names}</b>. The following receipt has been emailed to"
-          " <strong>{appended_recipient_emails}</strong>").format(appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails)}
+          <span class="mt-7">${_("You have successfully been enrolled for <b>{appended_course_names}</b>. The following receipt has been emailed to"
+          " <strong>{appended_recipient_emails}</strong></span>").format(appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails)}
         % elif order_type == 'business':
           % if total_registration_codes > 1 :
             <% code_plural_form = 'codes' %>

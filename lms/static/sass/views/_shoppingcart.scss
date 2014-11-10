@@ -766,6 +766,7 @@
     padding: 20px 20px 20px 30px;
     margin: 20px 0;
     overflow: hidden;
+    width: 100%;
     .message-left{
       float: left;
       line-height: 24px;
@@ -778,6 +779,10 @@
         i{
           margin-left: 10px;
         }
+      }
+      .mt-7 {
+        display: block;
+        margin-top: 7px;
       }
     }
   }
@@ -810,6 +815,9 @@
     margin-bottom: 20px;
     padding:20px;
     color: $dark-gray1;
+    h2 {
+      font-family: $sans-serif;
+    }
   }
   hr.border{
     border-top: 2px solid $light-gray1;
