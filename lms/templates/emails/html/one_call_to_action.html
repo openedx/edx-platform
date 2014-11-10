@@ -1,0 +1,31 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="mc_base.html" />
+
+<%block name="title"></%block>
+
+<%block name="content_table">
+
+  <tr>
+    <td valign="top" class="mcnTextContent" style="padding-top: 18px;padding-right: 18px;padding-bottom: 9px;padding-left: 18px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;color: #606060;font-family: Helvetica;font-size: 15px;line-height: 150%;text-align: left;">
+
+      <h3 style="margin: 0;padding: 0;display: block;font-family: Helvetica;font-size: 18px;font-style: normal;font-weight: bold;line-height: 125%;letter-spacing: -.5px;text-align: left;color: #606060;">
+        <%block name="msg_header">${_("Message")}</%block>
+      </h3>
+      <br />
+      <%block name="msg_content" >${_("This message was generated automatically.")}</%block>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top" class="bottomShim" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;padding-top: 18px;padding-right: 18px;padding-bottom: 38px;padding-left: 18px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;color: #606060;font-family: Helvetica;font-size: 15px;line-height: 150%">
+      <table border="0" cellpadding="0" cellspacing="0" width="260" class="emailButton" style="border-collapse: separate;mso-table-lspace: 0pt;mso-table-rspace: 0pt;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;background-color: #2C9AB7;border-radius: 4px;">
+        <tr>
+          <td align="center" valign="middle" class="buttonContent" style="mso-table-lspace: 0pt;mso-table-rspace: 0pt;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;color: #FFFFFF;font-family: Helvetica;font-size: 18px;font-weight: bold;line-height: 100%;padding: 15px;text-align: center;">
+            <a href="<%block name="call_to_action_href" >#</%block>" target="_blank" style="word-wrap: break-word;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;color: #FFFFFF;display: block;text-decoration: none;"><%block name="call_to_action_label">${_("Action")}</%block></a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+
+</%block>

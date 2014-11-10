@@ -1,0 +1,20 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="mc_base.html" />
+
+<%block name="title"></%block>
+
+<%block name="content_table">
+
+  <tr>
+    <td valign="top" class="mcnTextContent" style="padding-top: 9px;padding-right: 18px;padding-bottom: 9px;padding-left: 18px;mso-table-lspace: 0pt;mso-table-rspace: 0pt;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;color: #606060;font-family: Helvetica;font-size: 15px;line-height: 150%;text-align: left;">
+
+      <h3><span style="font-family:arial,helvetica neue,helvetica,sans-serif"><%block name="msg_header">${_("Message")}</%block></span></h3>
+
+      <p><%block name="msg_content" >${_("This message was generated automatically.")}</%block></p>
+
+      <p><%block name="msg_content_2" ></%block></p>
+
+    </td>
+  </tr>
+
+</%block>
