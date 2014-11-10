@@ -56,6 +56,7 @@ import datetime
 import logging
 from contracts import contract, new_contract
 from importlib import import_module
+from mongodb_proxy import autoretry_read
 from path import path
 from pytz import UTC
 from bson.objectid import ObjectId
@@ -775,6 +776,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # add it in the envelope for the structure.
         return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
 
+    @autoretry_read()
     def get_courses(self, branch, **kwargs):
         '''
         Returns a list of course descriptors matching any given qualifiers.
@@ -2631,6 +2633,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         structure['blocks'][block_key] = content
 
+    @autoretry_read()
     def find_courses_by_search_target(self, field_name, field_value):
         """
         Find all the courses which cached that they have the given field with the given value.
