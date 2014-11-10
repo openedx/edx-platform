@@ -150,6 +150,17 @@ class StudentViewShimTest(TestCase):
         self.assertNotIn("enrollment_action", self.captured_request.POST)
         self.assertNotIn("course_id", self.captured_request.POST)
 
+    def test_include_analytics_info(self):
+        view = self._shimmed_view(HttpResponse())
+        request = HttpRequest()
+        request.POST["analytics"] = json.dumps({
+            "enroll_course_id": "edX/DemoX/Fall"
+        })
+        view(request)
+
+        # Expect that the analytics course ID was passed to the view
+        self.assertEqual(self.captured_request.POST.get("course_id"), "edX/DemoX/Fall")
+
     def test_third_party_auth_login_failure(self):
         view = self._shimmed_view(
             HttpResponse(status=403),
