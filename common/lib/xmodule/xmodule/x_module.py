@@ -1474,8 +1474,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         return result
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        if block.xmodule_runtime is not None:
-            return block.xmodule_runtime.handler_url(block, handler_name, suffix, query, thirdparty)
+        xmodule_runtime = getattr(block, 'xmodule_runtime', None)
+        if xmodule_runtime is not None:
+            return xmodule_runtime.handler_url(block, handler_name, suffix, query, thirdparty)
         else:
             # Currently, Modulestore is responsible for instantiating DescriptorSystems
             # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
@@ -1487,8 +1488,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):
         """
         See :meth:`xblock.runtime.Runtime:local_resource_url` for documentation.
         """
-        if block.xmodule_runtime is not None:
-            return block.xmodule_runtime.local_resource_url(block, uri)
+        xmodule_runtime = getattr(block, 'xmodule_runtime', None)
+        if xmodule_runtime is not None:
+            return xmodule_runtime.local_resource_url(block, uri)
         else:
             # Currently, Modulestore is responsible for instantiating DescriptorSystems
             # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
