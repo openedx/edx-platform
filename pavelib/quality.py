@@ -65,6 +65,7 @@ def run_pylint(options):
         raise Exception("Failed. Too many pylint violations. "
                         "The limit is {violations_limit}.".format(violations_limit=violations_limit))
 
+
 def _count_pylint_violations(report_file):
     """
     Parses a pylint report line-by-line and determines the number of violations reported
@@ -82,6 +83,7 @@ def _count_pylint_violations(report_file):
         if len(violation_list_for_line) == 4:
             num_violations_report += 1
     return num_violations_report
+
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
@@ -113,9 +115,11 @@ def run_pep8(options):
         raise Exception("Failed. Too many pep8 violations. "
                         "The limit is {violations_limit}.".format(violations_limit=violations_limit))
 
+
 def _count_pep8_violations(report_file):
     num_lines = sum(1 for line in open(report_file))
     return num_lines
+
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')

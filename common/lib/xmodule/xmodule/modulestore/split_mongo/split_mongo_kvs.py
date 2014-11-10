@@ -38,7 +38,6 @@ class SplitMongoKVS(InheritanceKeyValueStore):
 
         self.parent = parent
 
-
     def get(self, key):
         # load the field, if needed
         if key.field_name not in self._fields:

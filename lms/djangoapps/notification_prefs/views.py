@@ -132,6 +132,7 @@ def ajax_disable(request):
 
     return HttpResponse(status=204)
 
+
 @require_GET
 def ajax_status(request):
     """
@@ -142,7 +143,6 @@ def ajax_status(request):
     """
     if not request.user.is_authenticated():
         raise PermissionDenied
-
 
     qs = UserPreference.objects.filter(
         user=request.user,

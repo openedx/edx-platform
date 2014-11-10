@@ -74,6 +74,7 @@ copyright = u'2014, edX'
 
 # Mock all the modules that the readthedocs build can't import
 
+
 class Mock(object):
     def __init__(self, *args, **kwargs):
         pass
@@ -176,7 +177,6 @@ def strip_tags(html):
     s = MLStripper()
     s.feed(html)
     return s.get_data()
-
 
 
 def process_docstring(app, what, name, obj, options, lines):

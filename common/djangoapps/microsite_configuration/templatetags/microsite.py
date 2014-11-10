@@ -23,6 +23,7 @@ def page_title_breadcrumbs(*crumbs, **kwargs):
     else:
         return platform_name()
 
+
 @register.simple_tag(name="page_title_breadcrumbs", takes_context=True)
 def page_title_breadcrumbs_tag(context, *crumbs):
     """

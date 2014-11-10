@@ -37,6 +37,7 @@ from opaque_keys.edx.locator import CourseLocator
 # that disables the XML modulestore.
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
+
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class OrderTest(ModuleStoreTestCase):
     def setUp(self):

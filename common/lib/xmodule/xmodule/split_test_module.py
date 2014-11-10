@@ -357,6 +357,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         """
         return self.descriptor.validate()
 
+
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.wants('partitions')
 @XBlock.wants('user')

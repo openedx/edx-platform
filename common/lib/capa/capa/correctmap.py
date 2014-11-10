@@ -165,7 +165,6 @@ class CorrectMap(object):
         self.cmap.update(other_cmap.get_dict())
         self.set_overall_message(other_cmap.get_overall_message())
 
-
     def set_overall_message(self, message_str):
         """ Set a message that applies to the question as a whole,
             rather than to individual inputs. """

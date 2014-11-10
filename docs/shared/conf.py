@@ -25,6 +25,7 @@ import sys, os
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
 
+
 def add_base(paths):
     """
     Returns a list of paths relative to BASEDIR.
@@ -33,7 +34,6 @@ def add_base(paths):
     """
 
     return [os.path.join(BASEDIR, x) for x in paths]
-    
 
 
 # If extensions (or modules to document with autodoc) are in another directory,

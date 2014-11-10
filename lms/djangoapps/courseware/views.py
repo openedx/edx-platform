@@ -838,6 +838,7 @@ def mktg_course_about(request, course_id):
         if force_english:
             translation.deactivate()
 
+
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @transaction.commit_manually

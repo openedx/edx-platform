@@ -9,6 +9,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
 
+
 class Command(BaseCommand):
     help = '''Delete a MongoDB backed course'''
 

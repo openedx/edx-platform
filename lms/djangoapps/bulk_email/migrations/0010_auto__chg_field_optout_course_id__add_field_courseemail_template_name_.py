@@ -21,14 +21,12 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(max_length=255, null=True),
                       keep_default=False)
 
-
         # Changing field 'CourseEmail.course_id'
         db.alter_column('bulk_email_courseemail', 'course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255))
         # Adding field 'CourseEmailTemplate.name'
         db.add_column('bulk_email_courseemailtemplate', 'name',
                       self.gf('django.db.models.fields.CharField')(max_length=255, unique=True, null=True),
                       keep_default=False)
-
 
         # Changing field 'CourseAuthorization.course_id'
         db.alter_column('bulk_email_courseauthorization', 'course_id', self.gf('xmodule_django.models.CourseKeyField')(unique=True, max_length=255))
@@ -43,12 +41,10 @@ class Migration(SchemaMigration):
         # Deleting field 'CourseEmail.from_addr'
         db.delete_column('bulk_email_courseemail', 'from_addr')
 
-
         # Changing field 'CourseEmail.course_id'
         db.alter_column('bulk_email_courseemail', 'course_id', self.gf('django.db.models.fields.CharField')(max_length=255))
         # Deleting field 'CourseEmailTemplate.name'
         db.delete_column('bulk_email_courseemailtemplate', 'name')
-
 
         # Changing field 'CourseAuthorization.course_id'
         db.alter_column('bulk_email_courseauthorization', 'course_id', self.gf('django.db.models.fields.CharField')(max_length=255, unique=True))

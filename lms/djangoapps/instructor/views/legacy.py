@@ -1431,6 +1431,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 #-----------------------------------------------------------------------------
 # enrollment
 
+
 def _do_enroll_students(course, course_key, students, secure=False, overload=False, auto_enroll=False, email_students=False, is_shib_course=False):
     """
     Do the actual work of enrolling multiple students, presented as a string
