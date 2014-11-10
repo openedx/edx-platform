@@ -1246,6 +1246,16 @@ class DonationViewTest(ModuleStoreTestCase):
                 payment_info["payment_params"]["merchant_defined_data1"],
                 unicode(course_id)
             )
+            self.assertEqual(
+                payment_info["payment_params"]["merchant_defined_data2"],
+                "donation_course"
+            )
+        else:
+            self.assertEqual(payment_info["payment_params"]["merchant_defined_data1"], "")
+            self.assertEqual(
+                payment_info["payment_params"]["merchant_defined_data2"],
+                "donation_general"
+            )
 
         processor_response_params = PaymentFakeView.response_post_params(payment_info["payment_params"])
 
