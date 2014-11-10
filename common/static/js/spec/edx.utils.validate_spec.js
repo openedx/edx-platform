@@ -52,10 +52,10 @@ describe('edx.utils.validate', function () {
         createFixture('text', 'username', true, MIN_LENGTH, MAX_LENGTH, '');
         expectInvalid(REQUIRED_ERROR_FRAGMENT);
     });
-    
+
     it('fails if a field is provided a value below its minimum character limit', function () {
         createFixture('text', 'username', false, MIN_LENGTH, MAX_LENGTH, SHORT_STRING);
-        
+
         // Verify optional field behavior
         expectInvalid(MIN_ERROR_FRAGMENT);
 
@@ -66,7 +66,7 @@ describe('edx.utils.validate', function () {
 
     it('succeeds if a field with no minimum character limit is provided a value below its maximum character limit', function () {
         createFixture('text', 'username', false, null, MAX_LENGTH, SHORT_STRING);
-        
+
         // Verify optional field behavior
         expectValid();
 
@@ -152,6 +152,31 @@ describe('edx.utils.validate', function () {
         // Required, unchecked
         field.prop('checked', false);
         expectInvalid(REQUIRED_ERROR_FRAGMENT);
+    });
+
+    it('succeeds if a select is optional, or required and default is selected, but fails if a required select has the default option selected', function () {
+        var select = [
+            '<select id="dropdown" name="country">',
+                '<option value="" data-isdefault="true">Please select a country</option>',
+                '<option value="BE">Belgium</option>',
+                '<option value="DE">Germany</option>',
+            '</select>'
+        ].join('');
+
+        setFixtures(select);
+
+        field = $('#dropdown');
+
+        // Optional
+        expectValid();
+
+        // Required, default text selected
+        field.attr('required', true);
+        expectInvalid(REQUIRED_ERROR_FRAGMENT);
+
+        // Required, country selected
+        field.val('BE');
+        expectValid();
     });
 
     it('returns a custom error message if an invalid field has one attached', function () {

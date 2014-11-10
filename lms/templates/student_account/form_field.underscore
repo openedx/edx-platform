@@ -10,9 +10,10 @@
         <select id="<%= form %>-<%= name %>"
             name="<%= name %>"
             class="input-inline"
-            aria-describedby="<%= form %>-<%= name %>-desc">
+            aria-describedby="<%= form %>-<%= name %>-desc"
+            <% if ( required ) { %> required<% } %>>
         <% _.each(options, function(el) { %>
-            <option value="<%= el.value%>"><%= el.name %></option>
+            <option value="<%= el.value%>"<% if ( el.default ) { %> data-isdefault="true"<% } %>><%= el.name %></option>
         <% }); %>
         </select>
     <% } else if ( type === 'textarea' ) { %>
