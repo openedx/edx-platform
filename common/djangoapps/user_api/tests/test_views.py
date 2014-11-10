@@ -1345,7 +1345,9 @@ class RegistrationViewTest(ApiTestCase):
         self.assertEqual(response.status_code, 409)
         self.assertEqual(
             response.content,
-            "It looks like {} belongs to an existing account.".format(self.EMAIL)
+            "It looks like {} belongs to an existing account. Try again with a different email address.".format(
+                self.EMAIL
+            )
         )
 
     def test_register_duplicate_username(self):
@@ -1370,7 +1372,9 @@ class RegistrationViewTest(ApiTestCase):
         self.assertEqual(response.status_code, 409)
         self.assertEqual(
             response.content,
-            "It looks like {} belongs to an existing account.".format(self.USERNAME)
+            "It looks like {} belongs to an existing account. Try again with a different email address and username.".format(
+                self.USERNAME
+            )
         )
 
     def test_register_duplicate_username_and_email(self):
@@ -1395,7 +1399,7 @@ class RegistrationViewTest(ApiTestCase):
         self.assertEqual(response.status_code, 409)
         self.assertEqual(
             response.content,
-            "It looks like {} and {} belong to an existing account.".format(
+            "It looks like {} and {} belong to an existing account. Try again with a different email address and username.".format(
                 self.EMAIL, self.USERNAME
             )
         )
