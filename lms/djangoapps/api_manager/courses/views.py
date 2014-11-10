@@ -1144,7 +1144,7 @@ class CoursesUsersDetail(SecureAPIView):
         DELETE /api/courses/{course_id}/users/{user_id}
         """
         try:
-            user = User.objects.get(id=user_id, is_active=True)
+            user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         if not course_exists(request, request.user, course_id):
