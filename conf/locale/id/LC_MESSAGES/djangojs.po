@@ -39,7 +39,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-03 13:19-0500\n"
+"POT-Creation-Date: 2014-11-10 09:06-0500\n"
 "PO-Revision-Date: 2014-10-08 18:08+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/edx-platform/language/id/)\n"
@@ -71,8 +71,6 @@ msgstr "OK"
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
 msgstr "Batal"
 
@@ -2142,162 +2140,6 @@ msgstr ""
 msgid "Tags:"
 msgstr ""
 
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Available %s"
-msgstr "Tersedia %s"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Ini adalah daftar %s yang tersedia. Anda bisa tentukan beberapa dengan "
-"memilih mereka pada kotak di bawah dan lalu klik panah \"Pilih\" di antara "
-"dua kotak. "
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Type into this box to filter down the list of available %s."
-msgstr "Ketik pada kotak ini untuk menyaring daftar %s yang tersedia."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Filter"
-msgstr "Saring"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose all"
-msgstr "Pilih semua"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to choose all %s at once."
-msgstr "Klik untuk memilih semua %s sekaligus."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose"
-msgstr "Pilih"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove"
-msgstr "Hapus"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Chosen %s"
-msgstr "%s terpilih"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"Ini adalah daftar %s yang dipilih. Anda bisa menghapus beberapa dengan "
-"memilih pada kotak di bawah lalu klik panah \"Hapus\" di antara dua kotak."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove all"
-msgstr "Hapus semua"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to remove all chosen %s at once."
-msgstr "Klik untuk menghapus semua pilihan %s sekaligus."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid "%(sel)s of %(cnt)s selected"
-msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have unsaved changes on individual editable fields. If you run an "
-"action, your unsaved changes will be lost."
-msgstr ""
-"Pembaruan Anda pada isian individual belum disimpan.  Jika Anda melanjutkan "
-"aksi ini, pembaruan  yang belum disimpan akan hilang."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
-"action."
-msgstr ""
-"Anda telah memilih suatu aksi, tapi belum menyimpan perubahan Anda atas "
-"isian individual. Harap klik OK untuk menyimpan. Anda perlu menjalankan "
-"ulang aksinya."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
-"button."
-msgstr ""
-
-#. Translators: the names of months, keep the pipe (|) separators.
-#: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
-msgid ""
-"January|February|March|April|May|June|July|August|September|October|November|December"
-msgstr ""
-"Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember"
-
-#. Translators: abbreviations for days of the week, keep the pipe (|)
-#. separators.
-#: lms/static/admin/js/calendar.js
-msgid "S|M|T|W|T|F|S"
-msgstr "M|S|S|R|K|J|S"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
-#: lms/static/admin/js/collapse.min.js
-msgid "Show"
-msgstr "Tampilkan"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
-msgid "Hide"
-msgstr "Sembunyikan"
-
-#. Translators: the names of days, keep the pipe (|) separators.
-#: lms/static/admin/js/dateparse.js
-msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "Minggu|Senin|Selasa|Rabu|Kamis|Jum'at|Sabtu"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Now"
-msgstr "Sekarang"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Clock"
-msgstr "Jam"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Choose a time"
-msgstr "Pilih waktu"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Midnight"
-msgstr "Tengah malam"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "6 a.m."
-msgstr "6 pagi"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Noon"
-msgstr "Siang"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Today"
-msgstr "Hari ini"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Calendar"
-msgstr "Kalender"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Yesterday"
-msgstr "Kemarin"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Tomorrow"
-msgstr "Esok"
-
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "Buka Kalkulator"
@@ -3370,6 +3212,10 @@ msgstr ""
 msgid "or"
 msgstr "atau"
 
+#: cms/static/js/models/xblock_validation.js
+msgid "This component has validation issues."
+msgstr ""
+
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
 msgstr "Kursus harus memiliki tanggal mulai."
@@ -3659,6 +3505,20 @@ msgstr ""
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New %(component_type)s"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: cms/static/js/views/xblock_validation.js
+msgid "Error"
 msgstr ""
 
 #: cms/static/js/views/components/add_xblock.js
@@ -4607,6 +4467,10 @@ msgstr ""
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "New Group Configuration"
+msgstr ""
+
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Remove"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

@@ -10,7 +10,7 @@
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2013-2014
 # hoad, 2013
-# HoaD, 2013
+# HoaD, 2013-2014
 # Hoang Ha <halink0803@gmail.com>, 2014
 # Minh Tue Vo <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-03 13:19-0500\n"
+"POT-Creation-Date: 2014-11-10 09:06-0500\n"
 "PO-Revision-Date: 2014-10-18 07:50+0000\n"
 "Last-Translator: Doan Viet Hung <viethung.doan@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
@@ -93,8 +93,6 @@ msgstr "OK"
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
 msgstr "Hủy bỏ"
 
@@ -2132,161 +2130,6 @@ msgstr ""
 msgid "Tags:"
 msgstr ""
 
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Available %s"
-msgstr "Có sẵn %s"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Đây là danh sách %s có sẵn. Bạn có thể lựa chọn bằng cách chọn chúng trong "
-"hộp dưới đây rồi nhấn vào mũi tên \"Chọn\" giữa hai hộp."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Type into this box to filter down the list of available %s."
-msgstr "Gõ vào ô này để lọc ra danh sách %s có sẵn."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Filter"
-msgstr "Lọc"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose all"
-msgstr "Chọn tất cả"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to choose all %s at once."
-msgstr "Nhấn vào đây để chọn tất cả %s cùng một lúc."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose"
-msgstr "Chọn"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove"
-msgstr "Loại bỏ"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Chosen %s"
-msgstr "%s đã được chọn"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"Đây là danh sách %s đã lựa chọn. Bạn có thể loại bỏ một số bằng cách chọn "
-"chúng ở ô bên dưới và sau đó nhấp vào mũi tên \"Loại Bỏ\" giữa hai hộp."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove all"
-msgstr "Loại bỏ tất cả"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to remove all chosen %s at once."
-msgstr "Nhấn để loại bỏ tất cả %s đã chọn cùng một lúc."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid "%(sel)s of %(cnt)s selected"
-msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s của %(cnt)s đã chọn"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have unsaved changes on individual editable fields. If you run an "
-"action, your unsaved changes will be lost."
-msgstr ""
-"Bạn chưa lưu thay đổi trong các mục chỉnh sửa cá nhân. Nếu bạn chạy một tác "
-"vụ, những thay đổi  chưa lưu sẽ bị mất."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
-"action."
-msgstr ""
-"Bạn đã chọn một tác vụ, nhưng bạn chưa lưu những thay đổi của bạn trong mục "
-"cá nhân. Hãy nhấn OK để lưu. Bạn sẽ cần chạy lại tác vụ."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
-"button."
-msgstr ""
-
-#. Translators: the names of months, keep the pipe (|) separators.
-#: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
-msgid ""
-"January|February|March|April|May|June|July|August|September|October|November|December"
-msgstr ""
-"Tháng 1|Tháng 2|Tháng 3|Tháng 4|Tháng 5|Tháng 6|Tháng 7|Tháng 8|Tháng "
-"9|Tháng 10|Tháng 11|Tháng 12"
-
-#. Translators: abbreviations for days of the week, keep the pipe (|)
-#. separators.
-#: lms/static/admin/js/calendar.js
-msgid "S|M|T|W|T|F|S"
-msgstr "CN|T2|T3|T4|T5|T6|T7"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
-#: lms/static/admin/js/collapse.min.js
-msgid "Show"
-msgstr "Hiện"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
-msgid "Hide"
-msgstr "Ẩn"
-
-#. Translators: the names of days, keep the pipe (|) separators.
-#: lms/static/admin/js/dateparse.js
-msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "Chủ Nhật|Thứ 2|Thứ 3|Thứ 4|Thứ 5|Thứ 6|Thứ 7"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Now"
-msgstr "Bây giờ"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Clock"
-msgstr "Đồng hồ"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Choose a time"
-msgstr "Chọn thời gian"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Midnight"
-msgstr "Nửa đêm"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "6 a.m."
-msgstr "6h sáng"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Noon"
-msgstr "Giữa trưa"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Today"
-msgstr "Hôm nay"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Calendar"
-msgstr "Lịch"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Yesterday"
-msgstr "Hôm qua"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Tomorrow"
-msgstr "Ngày mai"
-
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr ""
@@ -3356,6 +3199,10 @@ msgstr ""
 msgid "or"
 msgstr "hoặc"
 
+#: cms/static/js/models/xblock_validation.js
+msgid "This component has validation issues."
+msgstr ""
+
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
 msgstr "Khoá học phải ấn định ngày bắt đầu."
@@ -3639,6 +3486,20 @@ msgstr "Thiết lập"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New %(component_type)s"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: cms/static/js/views/xblock_validation.js
+msgid "Error"
 msgstr ""
 
 #: cms/static/js/views/components/add_xblock.js
@@ -4585,6 +4446,10 @@ msgstr ""
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "New Group Configuration"
+msgstr ""
+
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Remove"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
