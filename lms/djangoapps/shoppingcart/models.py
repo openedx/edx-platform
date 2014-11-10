@@ -38,7 +38,7 @@ from .exceptions import (
     InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
     AlreadyEnrolledInCourseException, CourseDoesNotExistException,
     MultipleCouponsNotAllowedException, RegCodeAlreadyExistException,
-    ItemDoesNotExistAgainstRegCodeException
+    ItemDoesNotExistAgainstRegCodeException, ItemNotAllowedToRedeemRegCodeException
 )
 
 from microsite_configuration import microsite
@@ -632,6 +632,10 @@ class RegistrationCodeRedemption(models.Model):
         for item in cart_items:
             if getattr(item, 'course_id'):
                 if item.course_id == course_reg_code.course_id:
+                    # If the item qty is greater than 1 then the registration code should not be allowed to
+                    # redeem
+                    if item.qty > 1:
+                        raise ItemNotAllowedToRedeemRegCodeException
                     # If another account tries to use a existing registration code before the student checks out, an
                     # error message will appear.The reg code is un-reusable.
                     code_redemption = cls.objects.filter(registration_code=course_reg_code)

@@ -29,7 +29,8 @@ from .exceptions import (
     ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
     CourseDoesNotExistException, ReportTypeDoesNotExistException,
     RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException,
-    MultipleCouponsNotAllowedException, InvalidCartItem
+    MultipleCouponsNotAllowedException, InvalidCartItem,
+    ItemNotAllowedToRedeemRegCodeException
 )
 from .models import (
     Order, OrderTypes,
@@ -367,6 +368,8 @@ def use_registration_code(course_reg, user):
         return HttpResponseBadRequest(_("Oops! The code '{0}' you entered is either invalid or expired".format(course_reg.code)))
     except ItemDoesNotExistAgainstRegCodeException:
         return HttpResponseNotFound(_("Code '{0}' is not valid for any course in the shopping cart.".format(course_reg.code)))
+    except ItemNotAllowedToRedeemRegCodeException:
+        return HttpResponseNotFound(_("Cart item quantity should not be greater than 1 when applying activation code"))
 
     return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
 
