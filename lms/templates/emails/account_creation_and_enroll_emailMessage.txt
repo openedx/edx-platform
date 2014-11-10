@@ -9,6 +9,6 @@ ${_("password: {password}").format(password=password)}
 
 ${_("It is recommended that you change your password.")}
 
-${_("Sincerely yours,")}
+${_("Sincerely yours,
 
-${_("The {course_name} Team").format(course_name=course.display_name_with_default)}
+The {course_name} Team").format(course_name=course.display_name_with_default)}

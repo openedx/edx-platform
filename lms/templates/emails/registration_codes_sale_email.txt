@@ -6,8 +6,8 @@ ${_("An invoice for {currency_symbol}{total_price} is attached. Payment is due i
 
 ${_("A CSV file of your registration codes is attached. Please distribute registration codes to each student planning to enroll using the email template below.")}
 
-${_("Thanks,")}
-${_("Your {platform_name} Team").format(platform_name=platform_name)}
+${_("Thanks,
+Your {platform_name} Team").format(platform_name=platform_name)}
 
 
 ———————————————————————————————————————————
