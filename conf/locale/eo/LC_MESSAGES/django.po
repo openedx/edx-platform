@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-03 14:02-0500\n"
-"PO-Revision-Date: 2014-11-03 19:02:07.226440\n"
+"POT-Creation-Date: 2014-11-10 09:42-0500\n"
+"PO-Revision-Date: 2014-11-10 14:42:09.270615\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -197,6 +197,7 @@ msgstr "Éléméntärý/prïmärý sçhööl Ⱡ'σяєм#"
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "None"
 msgstr "Nöné Ⱡ'σяєм#"
 
@@ -2539,6 +2540,34 @@ msgstr ""
 " ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂#"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Visibility In Catalog"
+msgstr "Çöürsé Vïsïßïlïtý Ìn Çätälög Ⱡ'σяєм #"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Defines the access permissions for showing the course in the course catalog."
+" This can be set to one of three values: 'both' (show in catalog and allow "
+"access to about page), 'about' (only allow access to about page), 'none' (do"
+" not show in catalog and do not allow access to an about page)."
+msgstr ""
+"Défïnés thé äççéss pérmïssïöns för shöwïng thé çöürsé ïn thé çöürsé çätälög."
+" Thïs çän ßé sét tö öné öf thréé välüés: 'ßöth' (shöw ïn çätälög änd ällöw "
+"äççéss tö äßöüt pägé), 'äßöüt' (önlý ällöw äççéss tö äßöüt pägé), 'nöné' (dö"
+" nöt shöw ïn çätälög änd dö nöt ällöw äççéss tö än äßöüt pägé). Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Both"
+msgstr "Böth Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
+#: lms/templates/footer.html
+msgid "About"
+msgstr "Àßöüt Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "Généräl #"
 
@@ -2966,23 +2995,6 @@ msgstr "Éntér thé däté ßý whïçh prößléms äré düé. Ⱡ'σяєм �
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
 msgstr "Gröüp ÌD {group_id} Ⱡ#"
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Warning"
-msgstr "Wärnïng #"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This message will be added to the front of messages of type
-#. error,
-#. e.g. "Error: required field is missing".
-#: common/lib/xmodule/xmodule/split_test_module.py
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "Érrör Ⱡ'σяєм ι#"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Not Selected"
@@ -5785,84 +5797,84 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
+"        <p class=\"error_msg\">\n"
+"        Sorry! Our payment processor did not accept your payment.\n"
+"        The decision they returned was <span class=\"decision\">{decision}</span>,\n"
+"        and the reason was <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
+"        You were not charged. Please try a different form of payment.\n"
+"        Contact us with payment-related questions at {email}.\n"
+"        </p>\n"
+"        "
+msgstr ""
+"\n"
+"        <p class=\"error_msg\">\n"
+"        Sörrý! Öür päýmént pröçéssör dïd nöt äççépt ýöür päýmént.\n"
+"        Thé déçïsïön théý rétürnéd wäs <span class=\"decision\">{decision}</span>,\n"
+"        änd thé réäsön wäs <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
+"        Ýöü wéré nöt çhärgéd. Pléäsé trý ä dïfférént förm öf päýmént.\n"
+"        Çöntäçt üs wïth päýmént-rélätéd qüéstïöns ät {email}.\n"
+"        </p>\n"
+"         Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє є#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py
+msgid ""
+"\n"
 "            <p class=\"error_msg\">\n"
-"            Sorry! Our payment processor did not accept your payment.\n"
-"            The decision they returned was <span class=\"decision\">{decision}</span>,\n"
-"            and the reason was <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
-"            You were not charged. Please try a different form of payment.\n"
-"            Contact us with payment-related questions at {email}.\n"
+"            Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!\n"
+"            We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
 "            </p>\n"
 "            "
 msgstr ""
 "\n"
 "            <p class=\"error_msg\">\n"
-"            Sörrý! Öür päýmént pröçéssör dïd nöt äççépt ýöür päýmént.\n"
-"            Thé déçïsïön théý rétürnéd wäs <span class=\"decision\">{decision}</span>,\n"
-"            änd thé réäsön wäs <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
-"            Ýöü wéré nöt çhärgéd. Pléäsé trý ä dïfférént förm öf päýmént.\n"
-"            Çöntäçt üs wïth päýmént-rélätéd qüéstïöns ät {email}.\n"
+"            Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä päýmént çönfïrmätïön thät häd ïnçönsïstént dätä!\n"
+"            Wé äpölögïzé thät wé çännöt vérïfý whéthér thé çhärgé wént thröügh änd täké fürthér äçtïön ön ýöür ördér.\n"
+"            Thé spéçïfïç érrör méssägé ïs: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd.  Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}.\n"
 "            </p>\n"
-"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє м#"
+"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηι#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!\n"
-"                We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
+"            <p class=\"error_msg\">\n"
+"            Sorry! Due to an error your purchase was charged for a different amount than the order total!\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Your credit card has probably been charged. Contact us with payment-specific questions at {email}.\n"
+"            </p>\n"
+"            "
 msgstr ""
 "\n"
-"                <p class=\"error_msg\">\n"
-"                Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä päýmént çönfïrmätïön thät häd ïnçönsïstént dätä!\n"
-"                Wé äpölögïzé thät wé çännöt vérïfý whéthér thé çhärgé wént thröügh änd täké fürthér äçtïön ön ýöür ördér.\n"
-"                Thé spéçïfïç érrör méssägé ïs: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd.  Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}.\n"
-"                </p>\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,#"
+"            <p class=\"error_msg\">\n"
+"            Sörrý! Düé tö än érrör ýöür pürçhäsé wäs çhärgéd för ä dïfférént ämöünt thän thé ördér tötäl!\n"
+"            Thé spéçïfïç érrör méssägé ïs: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Ýöür çrédït çärd häs prößäßlý ßéén çhärgéd. Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}.\n"
+"            </p>\n"
+"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσя#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Due to an error your purchase was charged for a different amount than the order total!\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Your credit card has probably been charged. Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
+"            <p class=\"error_msg\">\n"
+"            Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are\n"
+"            unable to validate that the message actually came from the payment processor.\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
+"            Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
+"            </p>\n"
+"            "
 msgstr ""
 "\n"
-"                <p class=\"error_msg\">\n"
-"                Sörrý! Düé tö än érrör ýöür pürçhäsé wäs çhärgéd för ä dïfférént ämöünt thän thé ördér tötäl!\n"
-"                Thé spéçïfïç érrör méssägé ïs: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Ýöür çrédït çärd häs prößäßlý ßéén çhärgéd. Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}.\n"
-"                </p>\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σł#"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are\n"
-"                unable to validate that the message actually came from the payment processor.\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
-"                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
-msgstr ""
-"\n"
-"                <p class=\"error_msg\">\n"
-"                Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä çörrüptéd méssägé régärdïng ýöür çhärgé, sö wé äré\n"
-"                ünäßlé tö välïdäté thät thé méssägé äçtüällý çämé fröm thé päýmént pröçéssör.\n"
-"                Thé spéçïfïç érrör méssägé ïs: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Wé äpölögïzé thät wé çännöt vérïfý whéthér thé çhärgé wént thröügh änd täké fürthér äçtïön ön ýöür ördér.\n"
-"                Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd.  Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}.\n"
-"                </p>\n"
-"                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм#"
+"            <p class=\"error_msg\">\n"
+"            Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä çörrüptéd méssägé régärdïng ýöür çhärgé, sö wé äré\n"
+"            ünäßlé tö välïdäté thät thé méssägé äçtüällý çämé fröm thé päýmént pröçéssör.\n"
+"            Thé spéçïfïç érrör méssägé ïs: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Wé äpölögïzé thät wé çännöt vérïfý whéthér thé çhärgé wént thröügh änd täké fürthér äçtïön ön ýöür ördér.\n"
+"            Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd.  Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}.\n"
+"            </p>\n"
+"             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιт#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
@@ -6191,31 +6203,31 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Sorry! Our payment processor sent us back a payment confirmation that had "
-"inconsistent data!  We apologize that we cannot verify whether the charge "
-"went through and take further action on your order.  The specific error "
-"message is: {msg}  Your credit card may possibly have been charged.  Contact"
-" us with payment-specific questions at {email}."
+"inconsistent data! We apologize that we cannot verify whether the charge "
+"went through and take further action on your order. The specific error "
+"message is: {msg} Your credit card may possibly have been charged.  Contact "
+"us with payment-specific questions at {email}."
 msgstr ""
 "Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä päýmént çönfïrmätïön thät häd "
-"ïnçönsïstént dätä!  Wé äpölögïzé thät wé çännöt vérïfý whéthér thé çhärgé "
-"wént thröügh änd täké fürthér äçtïön ön ýöür ördér.  Thé spéçïfïç érrör "
-"méssägé ïs: {msg}  Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd.  Çöntäçt"
-" üs wïth päýmént-spéçïfïç qüéstïöns ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт"
-" ∂σłσ#"
+"ïnçönsïstént dätä! Wé äpölögïzé thät wé çännöt vérïfý whéthér thé çhärgé "
+"wént thröügh änd täké fürthér äçtïön ön ýöür ördér. Thé spéçïfïç érrör "
+"méssägé ïs: {msg} Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd.  Çöntäçt "
+"üs wïth päýmént-spéçïfïç qüéstïöns ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σł#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Sorry! Due to an error your purchase was charged for a different amount than"
-" the order total!  The specific error message is: {msg}.  Your credit card "
-"has probably been charged. Contact us with payment-specific questions at "
+" the order total! The specific error message is: {msg}. Your credit card has"
+" probably been charged. Contact us with payment-specific questions at "
 "{email}."
 msgstr ""
 "Sörrý! Düé tö än érrör ýöür pürçhäsé wäs çhärgéd för ä dïfférént ämöünt thän"
-" thé ördér tötäl!  Thé spéçïfïç érrör méssägé ïs: {msg}.  Ýöür çrédït çärd "
-"häs prößäßlý ßéén çhärgéd. Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät "
+" thé ördér tötäl! Thé spéçïfïç érrör méssägé ïs: {msg}. Ýöür çrédït çärd häs"
+" prößäßlý ßéén çhärgéd. Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät "
 "{email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ#"
+"єιυѕм#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -6223,14 +6235,14 @@ msgid ""
 " charge, so we are unable to validate that the message actually came from "
 "the payment processor. The specific error message is: {msg}. We apologize "
 "that we cannot verify whether the charge went through and take further "
-"action on your order. Your credit card may possibly have been charged.  "
+"action on your order. Your credit card may possibly have been charged. "
 "Contact us with payment-specific questions at {email}."
 msgstr ""
 "Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä çörrüptéd méssägé régärdïng ýöür"
 " çhärgé, sö wé äré ünäßlé tö välïdäté thät thé méssägé äçtüällý çämé fröm "
 "thé päýmént pröçéssör. Thé spéçïfïç érrör méssägé ïs: {msg}. Wé äpölögïzé "
 "thät wé çännöt vérïfý whéthér thé çhärgé wént thröügh änd täké fürthér "
-"äçtïön ön ýöür ördér. Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd.  "
+"äçtïön ön ýöür ördér. Ýöür çrédït çärd mäý pössïßlý hävé ßéén çhärgéd. "
 "Çöntäçt üs wïth päýmént-spéçïfïç qüéstïöns ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
 "łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм #"
@@ -6250,11 +6262,11 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
-"Sorry!  Your payment could not be processed because an unexpected exception "
-"occurred.  Please contact us at {email} for assistance."
+"Sorry! Your payment could not be processed because an unexpected exception "
+"occurred. Please contact us at {email} for assistance."
 msgstr ""
-"Sörrý!  Ýöür päýmént çöüld nöt ßé pröçésséd ßéçäüsé än ünéxpéçtéd éxçéptïön "
-"öççürréd.  Pléäsé çöntäçt üs ät {email} för ässïstänçé. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"Sörrý! Ýöür päýmént çöüld nöt ßé pröçésséd ßéçäüsé än ünéxpéçtéd éxçéptïön "
+"öççürréd. Pléäsé çöntäçt üs ät {email} för ässïstänçé. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
@@ -8115,11 +8127,6 @@ msgstr "(Révïséd 4/16/2014) Ⱡ'σя#"
 msgid "About & Company Info"
 msgstr "Àßöüt & Çömpäný Ìnfö Ⱡ'σя#"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
-msgid "About"
-msgstr "Àßöüt Ⱡ'σяєм ι#"
-
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
 msgid "News"
 msgstr "Néws Ⱡ'σяєм#"
@@ -8643,6 +8650,11 @@ msgstr "Räw dätä: #"
 #: lms/templates/name_changes.html
 msgid "Accepted"
 msgstr "Àççéptéd #"
+
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "Érrör Ⱡ'σяєм ι#"
 
 #: lms/templates/name_changes.html
 msgid "Rejected"
@@ -9737,13 +9749,6 @@ msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
 msgstr "Thïs çöürsé ïs ïn ýöür <a href=\"{cart_link}\">çärt</a>. Ⱡ'σяєм ιρ#"
 
 #: lms/templates/courseware/course_about.html
-msgid ""
-"Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
-msgstr ""
-"Àdd {course.display_number_with_default} tö Çärt ({currency_symbol}{cost}) "
-"Ⱡ'σяє#"
-
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "Çöürsé ïs füll Ⱡ'#"
 
@@ -9754,6 +9759,13 @@ msgstr "Énröllmént ïn thïs çöürsé ïs ßý ïnvïtätïön önlý Ⱡ'�
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "Énröllmént ïs Çlöséd Ⱡ'σя#"
+
+#: lms/templates/courseware/course_about.html
+msgid ""
+"Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
+msgstr ""
+"Àdd {course.display_number_with_default} tö Çärt ({currency_symbol}{cost}) "
+"Ⱡ'σяє#"
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course.display_number_with_default}"
@@ -10714,9 +10726,6 @@ msgstr "Énrölléd äs:  Ⱡ'#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "Verified"
 msgstr "Vérïfïéd #"
 
@@ -14566,36 +14575,40 @@ msgstr ""
 "çértïfïçätés{a_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are upgrading your enrollment for"
-msgstr "Ýöü äré üpgrädïng ýöür énröllmént för Ⱡ'σяєм ιρѕ#"
+msgid "You are upgrading your enrollment for {organization}'s {course_name}"
+msgstr ""
+"Ýöü äré üpgrädïng ýöür énröllmént för {organization}'s {course_name} Ⱡ'σяєм "
+"ιρѕυм #"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are re-verifying for"
-msgstr "Ýöü äré ré-vérïfýïng för Ⱡ'σяє#"
+msgid "You are re-verifying for {organization}'s {course_name}"
+msgstr "Ýöü äré ré-vérïfýïng för {organization}'s {course_name} Ⱡ'σяєм ιρ#"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are registering for"
-msgstr "Ýöü äré régïstérïng för Ⱡ'σяє#"
+msgid "You are enrolling in {organization}'s {course_name}"
+msgstr "Ýöü äré énröllïng ïn {organization}'s {course_name} Ⱡ'σяєм #"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Congrats! You are now enrolled in the audit track"
-msgstr "Çöngräts! Ýöü äré nöw énrölléd ïn thé äüdït träçk Ⱡ'σяєм ιρѕυм ∂#"
+msgid "Congrats! You are now enrolled in {organization}'s {course_name}"
+msgstr ""
+"Çöngräts! Ýöü äré nöw énrölléd ïn {organization}'s {course_name} Ⱡ'σяєм "
+"ιρѕυм#"
 
 #: lms/templates/verify_student/_verification_header.html
 msgid "Professional Education"
 msgstr "Pröféssïönäl Édüçätïön Ⱡ'σяє#"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Upgrading to:"
-msgstr "Ûpgrädïng tö: Ⱡ'#"
+msgid "{span_start}Upgrading to:{span_end} Verified"
+msgstr "{span_start}Ûpgrädïng tö:{span_end} Vérïfïéd Ⱡ'σяєм #"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Re-verifying for:"
-msgstr "Ré-vérïfýïng för: Ⱡ'σ#"
+msgid "{span_start}Re-verifying for:{span_end} Verified"
+msgstr "{span_start}Ré-vérïfýïng för:{span_end} Vérïfïéd Ⱡ'σяєм ι#"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Registering as: "
-msgstr "Régïstérïng äs:  Ⱡ'σ#"
+msgid "{span_start}Enrolling as:{span_end} Verified"
+msgstr "{span_start}Énröllïng äs:{span_end} Vérïfïéd Ⱡ'σяєм #"
 
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
@@ -16401,6 +16414,21 @@ msgstr ""
 "ѕє∂ ∂σ єιυѕмσ∂ тє#"
 
 #: cms/templates/export.html
+msgid ""
+"{em_start}Caution:{em_end} When you export a course, information such as "
+"MATLAB API keys, LTI passports, annotation secret token strings, and "
+"annotation storage URLs are included in the exported data. If you share your"
+" exported files, you may also be sharing sensitive or license-specific "
+"information."
+msgstr ""
+"{em_start}Çäütïön:{em_end} Whén ýöü éxpört ä çöürsé, ïnförmätïön süçh äs "
+"MÀTLÀB ÀPÌ kéýs, LTÌ pässpörts, ännötätïön séçrét tökén strïngs, änd "
+"ännötätïön störägé ÛRLs äré ïnçlüdéd ïn thé éxpörtéd dätä. Ìf ýöü shäré ýöür"
+" éxpörtéd fïlés, ýöü mäý älsö ßé shärïng sénsïtïvé ör lïçénsé-spéçïfïç "
+"ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υ#"
+
+#: cms/templates/export.html
 msgid "Export My Course Content"
 msgstr "Éxpört Mý Çöürsé Çöntént Ⱡ'σяє#"
 
@@ -16411,6 +16439,13 @@ msgstr "Éxpört Çöürsé Çöntént Ⱡ'σя#"
 #: cms/templates/export.html
 msgid "Data {em_start}exported with{em_end} your course:"
 msgstr "Dätä {em_start}éxpörtéd wïth{em_end} ýöür çöürsé: Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/export.html
+msgid ""
+"Values from Advanced Settings, including MATLAB API keys and LTI passports"
+msgstr ""
+"Välüés fröm Àdvänçéd Séttïngs, ïnçlüdïng MÀTLÀB ÀPÌ kéýs änd LTÌ pässpörts "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: cms/templates/export.html
 msgid "Course Content (all Sections, Sub-sections, and Units)"
@@ -16476,16 +16511,19 @@ msgstr "Whät çöntént ïs éxpörtéd? Ⱡ'σяєм#"
 
 #: cms/templates/export.html
 msgid ""
-"Only the course content and structure (including sections, subsections, and "
-"units) are exported. Other data, including student data, grading "
-"information, discussion forum data, course settings, and course team "
-"information, is not exported."
+"The course content and structure (including sections, subsections, and "
+"units) are exported. Values from Advanced Settings, including MATLAB API "
+"keys and LTI passports, are also exported. Other data, including student "
+"data, grading information, discussion forum data, course settings, and "
+"course team information, is not exported."
 msgstr ""
-"Önlý thé çöürsé çöntént änd strüçtüré (ïnçlüdïng séçtïöns, süßséçtïöns, änd "
-"ünïts) äré éxpörtéd. Öthér dätä, ïnçlüdïng stüdént dätä, grädïng "
-"ïnförmätïön, dïsçüssïön förüm dätä, çöürsé séttïngs, änd çöürsé téäm "
-"ïnförmätïön, ïs nöt éxpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тє#"
+"Thé çöürsé çöntént änd strüçtüré (ïnçlüdïng séçtïöns, süßséçtïöns, änd "
+"ünïts) äré éxpörtéd. Välüés fröm Àdvänçéd Séttïngs, ïnçlüdïng MÀTLÀB ÀPÌ "
+"kéýs änd LTÌ pässpörts, äré älsö éxpörtéd. Öthér dätä, ïnçlüdïng stüdént "
+"dätä, grädïng ïnförmätïön, dïsçüssïön förüm dätä, çöürsé séttïngs, änd "
+"çöürsé téäm ïnförmätïön, ïs nöt éxpörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂#"
 
 #: cms/templates/export.html
 msgid "Opening the downloaded file"
@@ -16501,6 +16539,10 @@ msgstr ""
 "Ûsé än ärçhïvé prögräm tö éxträçt thé dätä fröm thé .tär.gz fïlé. Éxträçtéd "
 "dätä ïnçlüdés thé çöürsé.xml fïlé, äs wéll äs süßföldérs thät çöntäïn çöürsé"
 " çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιη#"
+
+#: cms/templates/export.html
+msgid "Learn more about exporting a course"
+msgstr "Léärn möré äßöüt éxpörtïng ä çöürsé Ⱡ'σяєм ιρ#"
 
 #: cms/templates/export_git.html
 msgid "Export Course to Git"

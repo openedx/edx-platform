@@ -11,7 +11,7 @@
 # brunojm <brunojm@gmail.com>, 2014
 # brunojm <brunojm@gmail.com>, 2014
 # rqllira <contato@raquellira.com>, 2014
-# edgarapmelo <edgarapmelo@gmail.com>, 2014
+# Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # javiercencig <javier@jecnet.com.br>, 2014
 # Jefferson Floyd Conz <jefferson@conz.com.br>, 2014
@@ -29,6 +29,7 @@
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # Paulo Castro, 2013
+# Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
 # RenataBarboza, 2013
 # Renata Barboza-Murray, 2013-2014
 # Ricardo Pietrobon <pietr007@gmail.com>, 2013-2014
@@ -47,7 +48,7 @@
 # Bruno Horphoz <horphoz@gmail.com>, 2014
 # brunojm <brunojm@gmail.com>, 2014
 # Daniel Linhares <danielinhares@gmail.com>, 2014
-# edgarapmelo <edgarapmelo@gmail.com>, 2014
+# Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # aivuk <e@vaz.io>, 2014
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
@@ -66,6 +67,7 @@
 # 
 # Translators:
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
+# G <glaucogm@ufpr.br>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # lukassem <lucas_sem@hotmail.com>, 2014
 # Vitor Silva Martins Costa <costa.vsm@gmail.com>, 2014
@@ -75,7 +77,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# edgarapmelo <edgarapmelo@gmail.com>, 2014
+# Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # aivuk <e@vaz.io>, 2014
 # Jefferson Floyd Conz <jefferson@conz.com.br>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
@@ -87,8 +89,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-03 13:19-0500\n"
-"PO-Revision-Date: 2014-10-31 11:51+0000\n"
+"POT-Creation-Date: 2014-11-10 09:06-0500\n"
+"PO-Revision-Date: 2014-11-05 14:53+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -119,8 +121,6 @@ msgstr "OK"
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -2192,166 +2192,6 @@ msgstr "Responder"
 msgid "Tags:"
 msgstr "Marcações:"
 
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Available %s"
-msgstr "%s disponíveis"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"Esta é a lista de %s disponíveis. É possível escolher alguns dos itens "
-"selecionando-os na caixa abaixo e clicando na seta \"Escolher\" entre as "
-"duas caixas. "
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Type into this box to filter down the list of available %s."
-msgstr "Digite neste campo para filtrar a lista de %s disponíveis."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Filter"
-msgstr "Filtrar"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose all"
-msgstr "Escolher todos"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to choose all %s at once."
-msgstr "Clique para escolher todos os %s de uma vez."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose"
-msgstr "Escolher"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove"
-msgstr "Remover"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Chosen %s"
-msgstr "%s escolhidos"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"Esta é a lista de %s escolhidos. É possível excluir alguns selecionando-os "
-"na caixa abaixo e clicando na seta \"Excluir\" entre as duas caixas."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove all"
-msgstr "Remover todos"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to remove all chosen %s at once."
-msgstr "Clique para remover todos os %s escolhidos de uma só vez."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid "%(sel)s of %(cnt)s selected"
-msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s de %(cnt)s selecionado"
-msgstr[1] "%(sel)s de %(cnt)s selecionados"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have unsaved changes on individual editable fields. If you run an "
-"action, your unsaved changes will be lost."
-msgstr ""
-"Há alterações não salvas nos campos editáveis individuais. Ao executar uma "
-"ação, as alterações não salvas serão perdidas. "
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
-"action."
-msgstr ""
-"Uma ação foi selecionada, mas as alterações nos campos individuais não foram"
-" salvas. Por favor, clique em OK para salvar. A ação deverá ser executada "
-"novamente. "
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
-"button."
-msgstr ""
-"Uma ação foi selecionada, mas nenhuma alteração foi realizada nos campos "
-"individuais. Provavelmente, o botão Ir seja o mais indicado em vez do botão "
-"Salvar. "
-
-#. Translators: the names of months, keep the pipe (|) separators.
-#: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
-msgid ""
-"January|February|March|April|May|June|July|August|September|October|November|December"
-msgstr ""
-"Janeiro|Fevereiro|Março|Abril|Maio|Junho|Julho|Agosto|Setembro|Outubro|Novembro|Dezembro"
-
-#. Translators: abbreviations for days of the week, keep the pipe (|)
-#. separators.
-#: lms/static/admin/js/calendar.js
-msgid "S|M|T|W|T|F|S"
-msgstr "Dom|Seg|Ter|Qua|Qui|Sex|Sáb"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
-#: lms/static/admin/js/collapse.min.js
-msgid "Show"
-msgstr "Exibir"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
-msgid "Hide"
-msgstr "Ocultar"
-
-#. Translators: the names of days, keep the pipe (|) separators.
-#: lms/static/admin/js/dateparse.js
-msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "Domingo|Segunda|Terça|Quarta|Quinta|Sexta|Sábado"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Now"
-msgstr "Agora"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Clock"
-msgstr "Relógio"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Choose a time"
-msgstr "Escolha um horário"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Midnight"
-msgstr "Meia-noite"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "6 a.m."
-msgstr "6 horas"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Noon"
-msgstr "Meio-dia"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Today"
-msgstr "Hoje"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Calendar"
-msgstr "Calendário"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Yesterday"
-msgstr "Ontem"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Tomorrow"
-msgstr "Amanhã"
-
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "Abrir calculadora"
@@ -3493,6 +3333,10 @@ msgstr ""
 msgid "or"
 msgstr ""
 
+#: cms/static/js/models/xblock_validation.js
+msgid "This component has validation issues."
+msgstr ""
+
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
 msgstr ""
@@ -3781,6 +3625,20 @@ msgstr ""
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New %(component_type)s"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: cms/static/js/views/xblock_validation.js
+msgid "Error"
 msgstr ""
 
 #: cms/static/js/views/components/add_xblock.js
@@ -4723,6 +4581,10 @@ msgstr ""
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "New Group Configuration"
+msgstr ""
+
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Remove"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

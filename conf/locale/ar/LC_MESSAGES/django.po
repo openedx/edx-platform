@@ -12,6 +12,7 @@
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
 # a.nassif <a.nassif@sit-mena.com>, 2013
 # a.nassif <a.nassif@sit-mena.com>, 2013
+# A <smart.9922@hotmail.com>, 2014
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # AzizAhmed <dr.zezo@gmail.com>, 2014
 # HasnaG <hasnaa.elghandor@yahoo.com>, 2014
@@ -78,6 +79,7 @@
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Abdallah Nassif <abdoosh00@gmail.com>, 2014
+# A <smart.9922@hotmail.com>, 2014
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # Safaa_fadl <fadlaoui_safaa@yahoo.fr>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
@@ -114,7 +116,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-03 13:20-0500\n"
+"POT-Creation-Date: 2014-11-10 09:08-0500\n"
 "PO-Revision-Date: 2014-10-27 15:11+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -273,6 +275,7 @@ msgstr "الابتدائية"
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "None"
 msgstr "لا شيء"
 
@@ -385,7 +388,7 @@ msgstr "تم إيقاف حساب {}'s بنجاح"
 
 #: common/djangoapps/student/views.py
 msgid "Successfully reenabled {}'s account"
-msgstr "تمت إعادة تفعيل حساي {}'s بنجاح"
+msgstr "تمت إعادة تفعيل حساب {}'s بنجاح"
 
 #: common/djangoapps/student/views.py
 msgid "Unexpected account status"
@@ -469,7 +472,7 @@ msgstr "لم تقم بتعبئة واحد أو أكثر من الحقول الم
 
 #: common/djangoapps/student/views.py
 msgid "Username cannot be more than {num} characters long"
-msgstr "لا يمكن أن يتجاوز اسم المستخدم {num} حرف ورقم"
+msgstr "لا يمكن أن يتجاوز اسم المستخدم {num} حرف أو رقم "
 
 #: common/djangoapps/student/views.py
 msgid "Email cannot be more than {num} characters long"
@@ -512,19 +515,19 @@ msgid_plural ""
 " distinct passwords before reusing a previous password."
 msgstr[0] ""
 "إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
-"كلمة سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+"{num} كلمة سر متمايزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
 msgstr[1] ""
 "إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
-"كلمة سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+"{num} كلمة سر متمايزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
 msgstr[2] ""
 "إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
-"كلمات سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+"{num} كلمات سر متمايزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
 msgstr[3] ""
 "إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
-"كلمات سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+"{num} كلمات سر متمايزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
 msgstr[4] ""
 "إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
-"كلمات سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+"{num} كلمات سر متمايزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
 msgstr[5] ""
 "إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
 "{num} كلمات سر متمايزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
@@ -2533,6 +2536,27 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Visibility In Catalog"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Defines the access permissions for showing the course in the course catalog."
+" This can be set to one of three values: 'both' (show in catalog and allow "
+"access to about page), 'about' (only allow access to about page), 'none' (do"
+" not show in catalog and do not allow access to an about page)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Both"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
+#: lms/templates/footer.html
+msgid "About"
+msgstr "نبذة عن"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "عام"
 
@@ -2949,23 +2973,6 @@ msgstr "إدخال تاريخ الاستحقاق لحلّ المسائل."
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
 msgstr "الرمز التعريفي للمجموعة  {group_id}"
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Warning"
-msgstr "تحذير"
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This message will be added to the front of messages of type
-#. error,
-#. e.g. "Error: required field is missing".
-#: common/lib/xmodule/xmodule/split_test_module.py
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "حدث خطأ"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Not Selected"
@@ -3479,7 +3486,7 @@ msgid ""
 "Could not find needed tag {tag_name} in the survey responses. Please try "
 "submitting again."
 msgstr ""
-"لا يمكن إيجاد بطاقة التعريف{tag_name} المطلوبة ضمن إردود المسح الميداني. "
+"لا يمكن إيجاد بطاقة التعريف{tag_name} المطلوبة ضمن ردود المسح الميداني. "
 "الرجاء محاولة التقديم مرة ثانية."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
@@ -4077,7 +4084,7 @@ msgstr "المستخدم غير موجود"
 
 #: lms/djangoapps/dashboard/support.py
 msgid "Course {course_id} not past the refund window."
-msgstr "لم يتخطّى المساق {course_id} نافذة استرداد القيمة."
+msgstr "لم يتخطّ المساق {course_id} نافذة استرداد القيمة."
 
 #: lms/djangoapps/dashboard/support.py
 msgid "No order found for {user} in course {course_id}"
@@ -4261,7 +4268,7 @@ msgstr "تم التغيير بنجاح إلى الفرع: {branch_name}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Loaded course {course_name}<br/>Errors:"
-msgstr "المساق الذي تمّ تحميله  {course_name} <br/> الأخطاء:"
+msgstr "الأخطاء في المساق الذي تمّ تحميله  {course_name} <br/>:"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: cms/templates/course-create-rerun.html cms/templates/index.html
@@ -4425,7 +4432,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number '{0}' does not exist."
-msgstr "رقم الفاتورة '{0}' غير موجود."
+msgstr " الإيصال رقم '{0}' غير موجود.."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The sale associated with this invoice has already been invalidated."
@@ -4433,7 +4440,7 @@ msgstr "لقد سبق وتم إلغاء عملية البيع المتعلقة �
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number {0} has been invalidated."
-msgstr "لم تتم المصادقة على الفاتورة رقم {0}."
+msgstr "لم تتم المصادقة على الإيصال رقم {0}."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "This invoice is already active."
@@ -4441,7 +4448,7 @@ msgstr "هذه الفاتورة مفعلة مسبقًا."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The registration codes for invoice {0} have been re-activated."
-msgstr "لقد أعيد تفعيل رموز التسجيل للفاتورة رقم {0}."
+msgstr "لقد أعيد تفعيل رموز التسجيل للإيصال رقم {0}."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User ID"
@@ -4560,27 +4567,24 @@ msgstr "لا يوجد رمز للقسيمة"
 #: lms/djangoapps/instructor/views/coupons.py
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon id ({coupon_id}) DoesNotExist"
-msgstr "لا يوجد قسيمة تحمل الرمز التعريفي للقسيمة ({coupon_id})"
+msgstr "لا يوجد قسيمة تحمل الرمز التعريفي  ({coupon_id})"
 
 #: lms/djangoapps/instructor/views/coupons.py
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon id ({coupon_id}) is already inactive"
-msgstr ""
-"إنّ القسيمة التي  تحمل الرمز التعريفي للقسيمة ({coupon_id}) هي غير فعالة "
-"بالفعل"
+msgstr "إنّ القسيمة التي  تحمل الرمز التعريفي ({coupon_id}) غير مفعّلة بالفعل"
 
 #: lms/djangoapps/instructor/views/coupons.py
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon id ({coupon_id}) updated successfully"
-msgstr ""
-"تمّت عملية تحديث قسيمة تحمل الرمز التعريفي للقسيمة ({coupon_id}) بنجاح"
+msgstr "تمّ بنجاح تحديث قسيمة تحمل الرمز التعريفي ({coupon_id}) "
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid ""
 "The code ({code}) that you have tried to define is already in use as a "
 "registration code"
 msgstr ""
-"إنّ الرمز ({code}) الذي قد حاولت تحديده هو بالفعل قيد الاستخدام بمثابة رمز "
+"إنّ الرمز ({code}) الذي قد حاولت تحديده موجود قيد الاستخدام فعليًّا كرمز "
 "للتسجيل."
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -4593,7 +4597,7 @@ msgstr "الرجاء إدخال قيمة الخصم في القسيمة الأق
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) added successfully"
-msgstr "تمّت إضافة قسيمة تحمل رمز القسيمة ({code}) بنجاح"
+msgstr "تمّت بنجاح إضافة قسيمة تحمل رمز القسيمة ({code}) "
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) already exists for this course"
@@ -4606,16 +4610,16 @@ msgstr "لم نتمكّن من إيجاد الرمز التعريفي للقسي
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
-msgstr ""
-"تمّت عملية تحديث قسيمة تحمل الرمز التعريفي للقسيمة ({coupon_id}) بنجاح"
+msgstr "تمّت بنجاح تحديث قسيمة تحمل الرمز التعريفي ({coupon_id}) "
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid ""
 "To gain insights into student enrollment and participation {link_start}visit"
 " {analytics_dashboard_name}, our new course analytics product{link_end}."
 msgstr ""
-"للاطلاع على تسجيل ومشاركة الطلاب {link_start}اذهب إلى "
-"{analytics_dashboard_name}، منتجنا الجديد لتحليل المساقات{link_end}."
+"لمزيدٍ من المعلومات حول تسجيل ومشاركة الطلاب {link_start} يمكنك زيارة "
+"{analytics_dashboard_name}، منتجنا الجديد لتحليل التفاعل على المساقات "
+"{link_end}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "E-Commerce"
@@ -4672,22 +4676,22 @@ msgstr "تمّ إرسال 0"
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
-msgstr[0] "تمّ إرسال {num_emails}"
-msgstr[1] "تمّ إرسال {num_emails}"
-msgstr[2] "تمّ إرسال {num_emails}"
-msgstr[3] "تمّ إرسال {num_emails}"
-msgstr[4] "تمّ إرسال {num_emails}"
-msgstr[5] "تمّ إرسال {num_emails}"
+msgstr[0] "تمّ إرسال {num_emails} رسالة بريد إلكتروني"
+msgstr[1] "تمّ إرسال {num_emails} رسالة بريد إلكتروني"
+msgstr[2] "تمّ إرسال {num_emails} رسائل بريد إلكتروني"
+msgstr[3] "تمّ إرسال {num_emails} رسائل بريد إلكتروني"
+msgstr[4] "تمّ إرسال {num_emails} رسائل بريد إلكتروني"
+msgstr[5] "تمّ إرسال {num_emails} رسائل بريد إلكتروني"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "{num_emails} failed"
 msgid_plural "{num_emails} failed"
-msgstr[0] "لم تنجح عملية إرسال {num_emails}"
-msgstr[1] "لم تنجح عملية إرسال {num_emails}"
-msgstr[2] "لم تنجح عملية إرسال {num_emails}"
-msgstr[3] "لم تنجح عملية إرسال {num_emails}"
-msgstr[4] "لم تنجح عملية إرسال {num_emails}"
-msgstr[5] "لم تنجح عملية إرسال {num_emails}"
+msgstr[0] "لم تنجح عملية إرسال {num_emails} رسالة بريد إلكتروني"
+msgstr[1] "لم تنجح عملية إرسال {num_emails} رسالة بريد إلكتروني"
+msgstr[2] "لم تنجح عملية إرسال {num_emails} رسائل بريد إلكتروني"
+msgstr[3] "لم تنجح عملية إرسال {num_emails} رسائل بريد إلكتروني"
+msgstr[4] "لم تنجح عملية إرسال {num_emails} رسائل بريد إلكتروني"
+msgstr[5] "لم تنجح عملية إرسال {num_emails} رسائل بريد إلكتروني "
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 #: lms/templates/verify_student/midcourse_reverify_dash.html
@@ -5410,7 +5414,7 @@ msgid ""
 "contact {billing_email}. Please include your order number in your e-mail. "
 "Please do NOT include your credit card information."
 msgstr ""
-"ملاحظة - أمامك مهلة لا تزيد عن 2 أسبوع منذ بدء المساق لإلغاء التسجيل في  "
+"ملاحظة - أمامك مهلة لا تزيد عن أسبوعين منذ بدء المساق لإلغاء التسجيل في  "
 "الشهادة الموثّقة واسترداد المبلغ بالكامل. ولاستلام المبلغ المسترد، الرجاء "
 "الاتصال عبر رسالة بريد الإلكتروني على العنوان {billing_email}، والتي يجب أن "
 "تتضمن رقم الطلب. الرجاء عدم ذكر معلومات بطاقتك الائتمانية في تلك الرسالة.  "
@@ -5674,87 +5678,51 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
+"        <p class=\"error_msg\">\n"
+"        Sorry! Our payment processor did not accept your payment.\n"
+"        The decision they returned was <span class=\"decision\">{decision}</span>,\n"
+"        and the reason was <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
+"        You were not charged. Please try a different form of payment.\n"
+"        Contact us with payment-related questions at {email}.\n"
+"        </p>\n"
+"        "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py
+msgid ""
+"\n"
 "            <p class=\"error_msg\">\n"
-"            Sorry! Our payment processor did not accept your payment.\n"
-"            The decision they returned was <span class=\"decision\">{decision}</span>,\n"
-"            and the reason was <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
-"            You were not charged. Please try a different form of payment.\n"
-"            Contact us with payment-related questions at {email}.\n"
+"            Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!\n"
+"            We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
 "            </p>\n"
 "            "
 msgstr ""
-"\n"
-"\n"
-"<p class=\"error_msg\">\n"
-"نأسف! الدفعة المقدّمة لم يتم قبولها من معالج الدفع لدينا.\n"
-"القرار الذي جاء في الرد كان  <span class=\"decision\">{decision}</span>,\n"
-"وذلك بسبب <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
-"لم يتم اقتطاع المبلغ لديك. الرجاء محاولة الدفع باستخدام طريقة أخرى.\n"
-"الرجاء الاتصال بنا بخصوص أية أسئلة متعلّقة بالدفع على البريد الإلكتروني {email}.\n"
-"</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!\n"
-"                We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
+"            <p class=\"error_msg\">\n"
+"            Sorry! Due to an error your purchase was charged for a different amount than the order total!\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Your credit card has probably been charged. Contact us with payment-specific questions at {email}.\n"
+"            </p>\n"
+"            "
 msgstr ""
-"\n"
-"\n"
-"<p class=\"error_msg\">\n"
-"نأسف! أرسل لنا معالج الدفع لدينا رسالة تأكيد على استلام الدفعة تحمل بياناتٍ متناقضة.\n"
-"نعتذر عن عدم إمكان التحقق من أن عملية الدفع قد استكملت بنجاح وبالتالي اتخاذ مزيد من الإجراءات بخصوص طلبك.\n"
-"جاء في رسالة الخطأ تحديداً ما يلي:  <span class=\"exception_msg\">{msg}</span>.\n"
-"هناك احتمال أن يكون قد تم اقتطاع المبلغ من بطاقتك الائتمانية.\n"
-"الرجاء الاتصال بنا بخصوص أية أسئلة متعلّقة بالدفع على البريد الإلكتروني {email}.\n"
-"</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Due to an error your purchase was charged for a different amount than the order total!\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Your credit card has probably been charged. Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
+"            <p class=\"error_msg\">\n"
+"            Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are\n"
+"            unable to validate that the message actually came from the payment processor.\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
+"            Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
+"            </p>\n"
+"            "
 msgstr ""
-"\n"
-"\n"
-"<p class=\"error_msg\">\n"
-"نأسف! نظراً لحدوث خطأ فقد تم اقتطاع مبلغ للدفع يختلف عن مبلغ الإجمالي المتوجب بحسب الطلب! \n"
-"جاء في رسالة الخطأ تحديداً ما يلي:  <span class=\"exception_msg\">{msg}</span>.\n"
-"هناك احتمال أن يكون قد تم اقتطاع المبلغ من بطاقتك الائتمانية.\n"
-"الرجاء الاتصال بنا بخصوص أية أسئلة متعلّقة بالدفع على البريد الإلكتروني {email}.\n"
-"</p>"
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are\n"
-"                unable to validate that the message actually came from the payment processor.\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
-"                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
-msgstr ""
-"\n"
-"\n"
-"<p class=\"error_msg\">\n"
-"نأسف! فقد أرسل معالج الدفع لدينا رسالة مشوّهة بخصوص عملية الدفع الخاصة بك، لذا فليس بإمكاننا التحقق\n"
-"ما إذا كانت الرسالة قد جاءت بالفعل من معالج الدفع.\n"
-"جاء في رسالة الخطأ تحديداً ما يلي:  <span class=\"exception_msg\">{msg}</span>.\n"
-"نعتذر عن عدم إمكانية التحقق ما إذا تم بالفعل إتمام الدفعة وبالتالي اتخاذ المزيد من الإجراءات بخصوص طلبك.\n"
-"هناك احتمال أن يكون قد تم اقتطاع المبلغ من بطاقتك الائتمانية.\n"
-"الرجاء الاتصال بنا بخصوص أية أسئلة متعلّقة بالدفع على البريد الإلكتروني {email}.\n"
-"</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
@@ -6050,7 +6018,7 @@ msgid ""
 "charged. Please try a different form of payment.  Contact us with payment-"
 "related questions at {email}."
 msgstr ""
-"نأسف! الدفعة المقدّمة لم يتم قبولها من معالج الدفع لدينا.\n"
+"عذرًا! الدفعة المقدّمة لم يتم قبولها من معالج الدفع لدينا.\n"
 "القرار الذي جاء في الرد كان {decision}، وذلك بسبب {reason}.\n"
 "لم يتم اقتطاع المبلغ لديك. الرجاء محاولة الدفع باستخدام طريقة أخرى.\n"
 "الرجاء الاتصال بنا بخصوص أية أسئلة متعلّقة بالدفع على البريد الإلكتروني {email}."
@@ -6058,25 +6026,19 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Sorry! Our payment processor sent us back a payment confirmation that had "
-"inconsistent data!  We apologize that we cannot verify whether the charge "
-"went through and take further action on your order.  The specific error "
-"message is: {msg}  Your credit card may possibly have been charged.  Contact"
-" us with payment-specific questions at {email}."
+"inconsistent data! We apologize that we cannot verify whether the charge "
+"went through and take further action on your order. The specific error "
+"message is: {msg} Your credit card may possibly have been charged.  Contact "
+"us with payment-specific questions at {email}."
 msgstr ""
-"عذراً! فقد أرسل لنا معالج الدفع لدينا رسالة تأكيد على استلام الدفعة تحمل بياناتٍ متناقضة! نعتذر عن عدم إمكان التحقق من أن عملية الدفع قد استكملت بنجاح وبالتالي اتخاذ مزيد من الإجراءات بخصوص طلبك. جاء في رسالة حدث خطأ تحديداً ما يلي: {msg} هناك احتمال أن يكون قد تم اقتطاع المبلغ من بطاقتك الائتمانية.\n"
-"الرجاء الاتصال بنا بخصوص أية أسئلة متعلّقة بالدفع على البريد الإلكتروني {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Sorry! Due to an error your purchase was charged for a different amount than"
-" the order total!  The specific error message is: {msg}.  Your credit card "
-"has probably been charged. Contact us with payment-specific questions at "
+" the order total! The specific error message is: {msg}. Your credit card has"
+" probably been charged. Contact us with payment-specific questions at "
 "{email}."
 msgstr ""
-"عذراً! نظراً لحدوث خطأ فقد تم اقتطاع مبلغ للدفع يختلف عن مبلغ الإجمالي "
-"المتوجب بحسب الطلب! جاء في رسالة حدوث الخطأ تحديداً ما يلي: {msg}. هناك "
-"احتمال أن يكون قد تم اقتطاع المبلغ من بطاقتك الائتمانية.الرجاء الاتصال بنا "
-"بخصوص أية أسئلة متعلّقة بالدفع على البريد الإلكتروني {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -6084,11 +6046,9 @@ msgid ""
 " charge, so we are unable to validate that the message actually came from "
 "the payment processor. The specific error message is: {msg}. We apologize "
 "that we cannot verify whether the charge went through and take further "
-"action on your order. Your credit card may possibly have been charged.  "
+"action on your order. Your credit card may possibly have been charged. "
 "Contact us with payment-specific questions at {email}."
 msgstr ""
-"عذراً! فقد أرسل معالج الدفع لدينا رسالة مشوّهة بخصوص عملية الدفع الخاصة بك، لذا فليس بإمكاننا التحقّق مما إذا كانت الرسالة قد جاءت بالفعل من معالج الدفع. جاء في رسالة حدث خطأ تحديداً ما يلي: {msg}. نعتذر عن عدم إمكانية التحقق مما إذا تمّ بالفعل إتمام الدفعة وبالتالي اتخاذ المزيد من الإجراءات بخصوص طلبك. هناك احتمال أن يكون قد تم اقتطاع المبلغ من بطاقتك الائتمانية.\n"
-"الرجاء الاتصال بنا بخصوص أية أسئلة متعلّقة بالدفع على البريد الإلكتروني {email}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -6104,12 +6064,9 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
-"Sorry!  Your payment could not be processed because an unexpected exception "
-"occurred.  Please contact us at {email} for assistance."
+"Sorry! Your payment could not be processed because an unexpected exception "
+"occurred. Please contact us at {email} for assistance."
 msgstr ""
-"عذراً! لم نتمكّن من معالجة عملية الدفع الخاصة بك بسبب حدوث استثناء غير "
-"متوقّع. الرجاء الاتصال بنا على البريد الإلكتروني {email} للحصول على "
-"المساعدة."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -7731,7 +7688,7 @@ msgid ""
 "To uphold the credibility of your {platform} {cert_name_short}, all name "
 "changes will be recorded."
 msgstr ""
-"سيتم تسجيل وحفظ كافة التغييرات التي تطرأ على الاسم بغرض حفظ مصداقية شهادتك "
+"سيتم تسجيل وحفظ كافة التغييرات التي تطرأ على الاسم بغرض دعم مصداقية شهادتك "
 "{platform} {cert_name_short}."
 
 #. Translators: note that {platform} {cert_name_short} will look something
@@ -7844,7 +7801,7 @@ msgstr "فشلت عملية المصادقة الخارجية"
 
 #: lms/templates/folditbasic.html
 msgid "Due:"
-msgstr "موعد التسليم:"
+msgstr "تاريخ الاستحقاق:"
 
 #: lms/templates/folditbasic.html
 msgid "Status:"
@@ -7917,11 +7874,6 @@ msgstr "(روجعت في 16/4/2014)"
 #: lms/templates/footer-edx-new.html
 msgid "About & Company Info"
 msgstr "نبذة ومعلومات عن الشركة"
-
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
-msgid "About"
-msgstr "نبذة عن"
 
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
 msgid "News"
@@ -8289,7 +8241,7 @@ msgstr "للوصول لحسابك ومساقاتك"
 
 #: lms/templates/login.html
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr "نعتذر لكون حسابات  {platform_name}  غير متاحة حالياً"
+msgstr "عذرًا، حسابات  {platform_name}  غير متاحة حاليًا"
 
 #: lms/templates/login.html
 msgid "We couldn't log you in."
@@ -8430,6 +8382,11 @@ msgstr "البيانات الأولية:"
 #: lms/templates/name_changes.html
 msgid "Accepted"
 msgstr "مقبول"
+
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "حدث خطأ"
 
 #: lms/templates/name_changes.html
 msgid "Rejected"
@@ -8670,7 +8627,7 @@ msgstr ""
 "وسيتعين عليك الضغط على رابط التفعيل لإكمال العملية. إذا لم تجد هذه الرسالة، "
 "قم بالبحث في ملف الرسائل غير المرغوب بها، ثم حدّد الرسائل الواردة من "
 "{platform_name} على أنها ’ليست رسائل غير مرغوب بها‘، حيث أننا في "
-"{platform_name} نعتمد في معظم اتصالالتنا على رسائل البريد الالكتروني. "
+"{platform_name} نعتمد في معظم اتصالاتنا على رسائل البريد الالكتروني. "
 
 #: lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
@@ -8696,7 +8653,7 @@ msgstr "التسجيل في  {platform_name} "
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
-msgstr "إنشئ حسابي على {platform_name}"
+msgstr "يرجى إنشاء حساب لي على {platform_name}"
 
 #: lms/templates/register.html
 msgid "Welcome!"
@@ -8704,7 +8661,7 @@ msgstr "مرحباً! "
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
-msgstr "قم بالتسجيل أسفل لإنشاء حسابك على منصة {platform_name}"
+msgstr "قم بالتسجيل أدناه لإنشاء حسابك على منصة {platform_name}"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -8714,7 +8671,7 @@ msgstr "التسجيل من خلال {provider_name}"
 
 #: lms/templates/register.html
 msgid "Create your own {platform_name} account below"
-msgstr "أنشئ حسابك الخاص على  {platform_name} فيما يلي"
+msgstr "قم في الأسفل بإنشاء حسابك الخاص على  {platform_name} "
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -8837,9 +8794,7 @@ msgstr " على سبيل المثال  اسمك الكامل  (كما سيظهر
 
 #: lms/templates/signup_modal.html
 msgid "<i>Welcome</i> {name}"
-msgstr ""
-"</i>مرحباً<i> \n"
-"{name}"
+msgstr "</i>مرحباً<i> {name}"
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -9082,7 +9037,7 @@ msgstr "رقم الإصدار الخاص بالموقع"
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for {course_id}"
-msgstr "أحدث نشاط حِمل Git لـ {course_id}"
+msgstr "أحدث نشاط تحميل git لـ {course_id}"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -9320,7 +9275,7 @@ msgstr "نموذج التقييم الكامل قابل للتبديل"
 #. graded rubrics the user might have received
 #: lms/templates/combinedopenended/combined_open_ended_results.html
 msgid "{result_of_task} from grader {number}"
-msgstr "العلامة {result_of_task} من المسؤول عن التقييم{number}"
+msgstr "العلامة {result_of_task} من المسؤول عن التقييم رقم {number}"
 
 #. Translators: "See full feedback" is the text of
 #. a link that allows a user to see more detailed
@@ -9506,13 +9461,6 @@ msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
 msgstr "هذا المساق موجود ضمن <a href=\"{cart_link}\">cart</a>سلّة التسوّق</a>. "
 
 #: lms/templates/courseware/course_about.html
-msgid ""
-"Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
-msgstr ""
-"إضافة {course.display_number_with_default} إلى سلة التسوّق "
-"({currency_symbol}{cost})"
-
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "المساق ممتلئ بالكامل"
 
@@ -9523,6 +9471,13 @@ msgstr "التسجيل في هذا المساق يتم بموجب دعوة حص�
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
 msgstr "باب التسجيل مغلق"
+
+#: lms/templates/courseware/course_about.html
+msgid ""
+"Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
+msgstr ""
+"إضافة {course.display_number_with_default} إلى سلة التسوّق "
+"({currency_symbol}{cost})"
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course.display_number_with_default}"
@@ -9544,15 +9499,15 @@ msgstr "المشاركة مع الأصدقاء والعائلة!"
 #. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {account}: {url}"
-msgstr "لقد تسجّلت الآن في {number} {title} من خلال {url} :{account}"
+msgstr "لقد قمت الآن بالتسجيل في {number} {title} من خلال {url} :{account}"
 
 #: lms/templates/courseware/course_about.html
 msgid "Take a course with {platform} online"
-msgstr "التسجيل في مساق مع {platform} عبر الإنترنت"
+msgstr "التسجيل في مساق على منصة {platform} عبر الإنترنت"
 
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {platform} {url}"
-msgstr "لقد تسجّلت الآن في  {number} {title} من خلال {platform} {url}"
+msgstr "لقد قمت الآن بالتسجيل في {number} {title} من خلال {platform} {url}"
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -9606,7 +9561,7 @@ msgstr "استكشف المساقات المجانية من الجامعات ا�
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from {university_name}."
-msgstr "استكشف المساقات المجانية من  {university_name}."
+msgstr "استكشف المساقات المجانية التي تقدّمها {university_name}."
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -10314,7 +10269,7 @@ msgstr "عرض التقييم والدرجات في الاستوديو"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
-msgstr "متابعة تحصيل الطالب (‏{username})‏ '‏{email}'‏ في المساق"
+msgstr "متابعة تحصيل الطالب '{username}' ({email}) في المساق"
 
 #: lms/templates/courseware/progress.html
 msgid "Download your certificate"
@@ -10413,7 +10368,7 @@ msgid ""
 "{cert_name_long} was generated, we could not grant you a verified "
 "{cert_name_short}. An honor code {cert_name_short} has been granted instead."
 msgstr ""
-"لم نستطع منحك شهادة {cert_name_short} مصدّقة، لعدم حصولنا منك على مجموعة من "
+"لم نستطع منحك شهادة {cert_name_short} موثّقة، لعدم حصولنا منك على مجموعة من "
 "الصور الخاصة بالتحقق من الهوية حتى وقت إعداد الشهادة {cert_name_long}. وتم "
 "بدلاً من ذلك منحك شهادة ميثاق الشرف الأكاديمي {cert_name_short}."
 
@@ -10437,7 +10392,7 @@ msgstr "استكمال استبيان الآراء والملاحظات الخا
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Cover Image"
-msgstr "{course_number} {course_name} صورة الغلاف"
+msgstr "صورة غلاف {course_number} {course_name} "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as a verified student"
@@ -10452,9 +10407,6 @@ msgstr "مسجل كـ: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "Verified"
 msgstr "تم التحقق"
 
@@ -10486,11 +10438,11 @@ msgstr "التعليم المهني."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
-msgstr "تاريخ انتهاء المساق - {end_date} "
+msgstr "تاريخ استكمال المساق - {end_date} "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
-msgstr "تاريخ ابتداء المساق - {start_date} "
+msgstr "تاريخ بدء المساق - {start_date} "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course has not yet started"
@@ -10589,7 +10541,7 @@ msgid ""
 "verified certificates. Take a minute now to help us renew your identity."
 msgstr ""
 "الناس يتغيرون، ولذلك نطلب منك كل عام أن تعيد عملية التحقق من هويتك للتحقق من"
-" شهاداتنا. نرجو منك إعطاءنا دقيقة من وقتك لمساعدتنا في تجديد هويتك."
+" شهاداتنا الموثّقة. نرجو منك إعطاءنا دقيقة من وقتك لمساعدتنا في تجديد هويتك."
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 msgid "{course_name}: Re-verify by {date}"
@@ -10619,7 +10571,7 @@ msgid ""
 "us at {email}."
 msgstr ""
 "لم تنجح عملية إعادة التحقّق للمساق {course_name} ولم تعد مؤهّلاً لتسلّم "
-"شهادة مصدّقة. إذا كان هناك ثمّة خطأ ما، الرجاء الاتصال بنا على {email}."
+"شهادة موثّقة. إذا كنت تعتقد بوجود خطأ ما، الرجاء الاتصال بنا على {email}."
 
 #: lms/templates/dashboard/_dashboard_reverification_sidebar.html
 msgid "Re-verification now open for:"
@@ -10649,7 +10601,7 @@ msgstr "الحالة المرتبطة بالتحقّق من الهوية"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Reviewed and Verified"
-msgstr "تمت المعاينة والتحقّق"
+msgstr "تمت المراجعة والتوثيق"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Your verification status is good for one year after submission."
@@ -10670,7 +10622,7 @@ msgid ""
 " not receive a verified certificate."
 msgstr ""
 "في حال لم تتمكّن من اجتياز محاولة التحقّق قبل نهاية المساق الخاص بك، فلن "
-"تستلم شهادة مصدّقة."
+"تستلم شهادة موثّقة."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -11144,11 +11096,11 @@ msgstr ","
 #: lms/templates/discussion/_user_profile.html
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "%s بدأ النقاش"
-msgstr[1] "%s بدأ النقاش"
-msgstr[2] "%s بدأ النقاش"
-msgstr[3] "%s بدأ النقاش"
-msgstr[4] "%s بدأ النقاش"
+msgstr[0] "بدأ %s نقاش"
+msgstr[1] "بدأ %s نقاش"
+msgstr[2] "بدأ %s نقاش"
+msgstr[3] "بدأ %s نقاش"
+msgstr[4] "بدأ %s نقاش"
 msgstr[5] "بدأت %s مناقشات "
 
 #: lms/templates/discussion/_user_profile.html
@@ -11156,7 +11108,7 @@ msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s تعليق"
 msgstr[1] "%s تعليق"
-msgstr[2] "%s تعليقات"
+msgstr[2] "%s تعليق"
 msgstr[3] "%s تعليقات"
 msgstr[4] "%s تعليقات"
 msgstr[5] "%s تعليقات"
@@ -13816,7 +13768,7 @@ msgstr "اذهب للوحة المعلومات"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Verified Status"
-msgstr "الحالة المعرّفة "
+msgstr "حالة التحقّق"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid ""
@@ -14109,19 +14061,19 @@ msgstr ""
 "الأسئلة الشائعة لما يتعلق بشهاداتنا{a_end}."
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are upgrading your enrollment for"
+msgid "You are upgrading your enrollment for {organization}'s {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are re-verifying for"
-msgstr "أنت تقوم بعملية إعادة التحقّق بالنسبة لـ"
+msgid "You are re-verifying for {organization}'s {course_name}"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are registering for"
-msgstr "تقوم بالتسجيل لـ "
+msgid "You are enrolling in {organization}'s {course_name}"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Congrats! You are now enrolled in the audit track"
+msgid "Congrats! You are now enrolled in {organization}'s {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
@@ -14129,16 +14081,16 @@ msgid "Professional Education"
 msgstr "التعليم المهني"
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Upgrading to:"
-msgstr "الترقية لـ:"
+msgid "{span_start}Upgrading to:{span_end} Verified"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Re-verifying for:"
-msgstr "إجراء عملية إعادة التحقّق بالنسبة لـ:"
+msgid "{span_start}Re-verifying for:{span_end} Verified"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Registering as: "
-msgstr "تقوم بالتسجيل كـ: "
+msgid "{span_start}Enrolling as:{span_end} Verified"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
@@ -14547,7 +14499,7 @@ msgid ""
 msgstr ""
 "حدث خطأ ما أثناء عملية التحقّق السابقة الخاصة بك. الرجاء إتمام الخطوات "
 "التالية من أجل المتابعة بالنسبة لمسار مساقاتك الحالية في شهادة الإتمام "
-"المصدّقة."
+"الموثّقة."
 
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/reverification_confirmation.html
@@ -14925,7 +14877,7 @@ msgstr "ما الذي ستحتاجه للقيام بالتسجيل "
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
 "There are three things you will need to register as an ID verified student:"
-msgstr "هنالك ثلاثة أشياء ستحتاج إليها للتسجيل كطالب معرّف بالبطاقة الشخصية: "
+msgstr "هنالك ثلاثة أشياء ستحتاج إليها للتسجيل كطالب موثّق بالبطاقة الشخصية: "
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Activate Your Account"
@@ -15017,7 +14969,7 @@ msgstr "التحقق باستخدام البطاقة الشخصية "
 
 #: lms/templates/verify_student/verified.html
 msgid "You've Been Verified Previously"
-msgstr "لقد تم التحقق من هويتك مسبقاً "
+msgstr "لقد جرى التحقق من هويتك مسبقاً "
 
 #: lms/templates/verify_student/verified.html
 msgid ""
@@ -15110,7 +15062,7 @@ msgid ""
 "to start working within edX Studio."
 msgstr ""
 "تم بالفعل تفعيل هذا الحساب، الذي تم إنشاؤه باستخدام {0}. الرجاء تسجيل الدخول"
-" للبدء في العمل ضمن برنامج استديو EDX."
+" للبدء في العمل ضمن برنامج استديو edX."
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 msgid "Sign into Studio"
@@ -15190,7 +15142,7 @@ msgid ""
 "To add files to use in your course, click {em_start}Upload New File{em_end}."
 " Then follow the prompts to upload a file from your computer."
 msgstr ""
-"انقر {em_start}تحميل ملف جديد{em_end} لإضافة ملفات لتستخدمها في مساقك، ثم "
+"انقر {em_start} تحميل ملف جديد {em_end} لإضافة ملفات لتستخدمها في مساقك، ثم "
 "اتبع التعليمات لتقوم بتحميل ملف من جهاز الكومبيوتر لديك."
 
 #: cms/templates/asset_index.html
@@ -15199,9 +15151,9 @@ msgid ""
 "{em_start}10 MB{em_end}. In addition, do not upload video or audio files. "
 "You should use a third party service to host multimedia files."
 msgstr ""
-"{em_start}تحذير{em_end}: توصيك edX أن لا يتجاوز حجم الملف {em_start}10 "
-"ميغابايت{em_end}. بالإضافة لذلك، لا يمكنك تحميل ملفات فيديو أو صوت حيث يتعين"
-" عليك استخدام خدمة طرف ثالث لاستضافة ملفات الوسائط المتعددة."
+"{em_start} تحذير {em_end}: توصيك edX أن لا يتجاوز حجم الملف {em_start}10 "
+"ميغابايت {em_end}. بالإضافة لذلك، لا يمكنك تحميل ملفات فيديو أو صوت حيث "
+"يتعين عليك استخدام خدمة طرف ثالث لاستضافة ملفات الوسائط المتعددة."
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -15220,7 +15172,7 @@ msgid ""
 "Use the {em_start}Embed URL{em_end} value to link to the file or image from "
 "a component, a course update, or a course handout."
 msgstr ""
-"استخدم قيمة {em_start}الرابط الضمني{em_end} لربطه بالملف أو الصورة من أحد "
+"استخدم قيمة {em_start} الرابط الضمني {em_end} لربطه بالملف أو الصورة من أحد "
 "المركّبات أو تحديثات المساق أو ملحقات المساق."
 
 #: cms/templates/asset_index.html
@@ -15840,6 +15792,15 @@ msgstr ""
 "ومحتواه. يمكن أيضاً إعادة استيراد المساقات التي قد تمّ تصديرها."
 
 #: cms/templates/export.html
+msgid ""
+"{em_start}Caution:{em_end} When you export a course, information such as "
+"MATLAB API keys, LTI passports, annotation secret token strings, and "
+"annotation storage URLs are included in the exported data. If you share your"
+" exported files, you may also be sharing sensitive or license-specific "
+"information."
+msgstr ""
+
+#: cms/templates/export.html
 msgid "Export My Course Content"
 msgstr "تصدير محتوى المساق الخاص بي"
 
@@ -15850,6 +15811,11 @@ msgstr "تصدير محتوى المساق"
 #: cms/templates/export.html
 msgid "Data {em_start}exported with{em_end} your course:"
 msgstr "البيانات {em_start} التي تمّ تصديرها مع {em_end} مساقك:"
+
+#: cms/templates/export.html
+msgid ""
+"Values from Advanced Settings, including MATLAB API keys and LTI passports"
+msgstr ""
 
 #: cms/templates/export.html
 msgid "Course Content (all Sections, Sub-sections, and Units)"
@@ -15912,14 +15878,12 @@ msgstr "ما هو المحتوى الذي يتمّ تصديره؟"
 
 #: cms/templates/export.html
 msgid ""
-"Only the course content and structure (including sections, subsections, and "
-"units) are exported. Other data, including student data, grading "
-"information, discussion forum data, course settings, and course team "
-"information, is not exported."
+"The course content and structure (including sections, subsections, and "
+"units) are exported. Values from Advanced Settings, including MATLAB API "
+"keys and LTI passports, are also exported. Other data, including student "
+"data, grading information, discussion forum data, course settings, and "
+"course team information, is not exported."
 msgstr ""
-"يتمّ فقط تصدير محتوى وهيكل المساق (بما في ذلك، الأقسام، والأقسام الفرعية، "
-"والوحدات). لا يتمّ تصدير البينات الأخرى، بما فيها بيانات الطلاب، ومعلومات "
-"التقييم، وبيانات منتدى المناقشة، وإعدادات المساق، ومعلومات فريق المساق."
 
 #: cms/templates/export.html
 msgid "Opening the downloaded file"
@@ -15934,6 +15898,10 @@ msgid ""
 msgstr ""
 "استخدام برنامج أرشفة لاستخراج البيانات من ملفّ  .tar.gz. تشمل البيانات "
 "المستخرجة ملف course.xml، والملفات الفرعية التي تتضمّن محتوى المساق."
+
+#: cms/templates/export.html
+msgid "Learn more about exporting a course"
+msgstr ""
 
 #: cms/templates/export_git.html
 msgid "Export Course to Git"
@@ -17059,8 +17027,9 @@ msgid ""
 "for enrollment. Please navigate to this course at {link_for_about_page} to "
 "enroll."
 msgstr ""
-"المساق \"{course_display_name}\" المزوّد من {platform_name} مفتوح للتسجيل، "
-"يرجى الذهاب إلى هذا المساق عبر الرابط {link_for_about_page} للتسجيل."
+"مساق \"{course_display_name}\" الذي تقدّمه منصّة {platform_name} مفتوح "
+"للتسجيل حاليًا. يرجى الذهاب إلى هذا المساق عبر الرابط {link_for_about_page} "
+"للتسجيل."
 
 #: cms/templates/settings.html
 msgid "Send a note to students via email"
@@ -17331,9 +17300,9 @@ msgid ""
 " you use double quotation marks (&quot;) around the string. Do not use "
 "single quotation marks (&apos;)."
 msgstr ""
-"{em_start}ملاحظة:{em_end} عند إدخال النصوص بمثابة قيم السياسة، يرجى التأكّد "
-"من استخدام علامات الاقتباس المزدوجة  (&quot;) حول الجملة. يرجى عدم استخدام "
-"علامات الاقتباس الفردية (&apos;)."
+"{em_start}ملاحظة:{em_end} عند إدخال سلسلة من الحروف كقيم للسياسة المستخدمة، "
+"الرجاءالتأكّد من استخدام علامات الاقتباس المزدوجة  (&quot;) حول هذه السلسلة."
+" يرجى عدم استخدام علامات الاقتباس الفردية (&apos;)."
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
