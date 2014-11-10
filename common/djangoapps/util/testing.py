@@ -20,6 +20,7 @@ class UrlResetMixin(object):
     """
 
     def _reset_urls(self, urlconf_modules):
+        """Reset `urls.py` for a set of Django apps."""
         for urlconf in urlconf_modules:
             if urlconf in sys.modules:
                 reload(sys.modules[urlconf])

@@ -72,9 +72,9 @@ def require_post_params(required_params):
         HttpResponse
 
     """
-    def _decorator(func):
+    def _decorator(func):  # pylint: disable=missing-docstring
         @wraps(func)
-        def _wrapped(*args, **kwargs):
+        def _wrapped(*args, **_kwargs):  # pylint: disable=missing-docstring
             request = args[0]
             missing_params = set(required_params) - set(request.POST.keys())
             if len(missing_params) > 0:
@@ -342,7 +342,7 @@ def shim_student_view(view_func, check_logged_in=False):
 
     """
     @wraps(view_func)
-    def _inner(request):
+    def _inner(request):  # pylint: disable=missing-docstring
         # Ensure that the POST querydict is mutable
         request.POST = request.POST.copy()
 

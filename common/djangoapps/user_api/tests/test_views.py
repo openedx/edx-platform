@@ -112,6 +112,11 @@ class ApiTestCase(TestCase):
         self.assertEqual(response.status_code, 405)
 
     def assertAuthDisabled(self, method, uri):
+        """
+        Assert that the Django rest framework does not interpret basic auth
+        headers for views exposed to anonymous users as an attempt to authenticate.
+
+        """
         # Django rest framework interprets basic auth headers
         # as an attempt to authenticate with the API.
         # We don't want this for views available to anonymous users.
@@ -987,7 +992,7 @@ class RegistrationViewTest(ApiTestCase):
         )
 
     def test_register_form_year_of_birth(self):
-        this_year = datetime.datetime.now(UTC).year
+        this_year = datetime.datetime.now(UTC).year  # pylint: disable=maybe-no-member
         year_options = (
             [{"value": "", "name": "--", "default": True}] + [
                 {"value": unicode(year), "name": unicode(year)}
@@ -1067,13 +1072,17 @@ class RegistrationViewTest(ApiTestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>",
+                "label": "I agree to the {platform_name} <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>.".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>"
+                    "required": "You must agree to the {platform_name} <a href=\"https://www.test.com/honor\">Terms of Service and Honor Code</a>.".format(
+                        platform_name=settings.PLATFORM_NAME
+                    )
                 }
             }
         )
@@ -1084,13 +1093,17 @@ class RegistrationViewTest(ApiTestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the <a href=\"/honor\">Terms of Service and Honor Code</a>",
+                "label": "I agree to the {platform_name} <a href=\"/honor\">Terms of Service and Honor Code</a>.".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the <a href=\"/honor\">Terms of Service and Honor Code</a>"
+                    "required": "You must agree to the {platform_name} <a href=\"/honor\">Terms of Service and Honor Code</a>.".format(
+                        platform_name=settings.PLATFORM_NAME
+                    )
                 }
             }
         )
@@ -1107,13 +1120,17 @@ class RegistrationViewTest(ApiTestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the <a href=\"https://www.test.com/honor\">Honor Code</a>",
+                "label": "I agree to the {platform_name} <a href=\"https://www.test.com/honor\">Honor Code</a>.".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the <a href=\"https://www.test.com/honor\">Honor Code</a>"
+                    "required": "You must agree to the {platform_name} <a href=\"https://www.test.com/honor\">Honor Code</a>.".format(
+                        platform_name=settings.PLATFORM_NAME
+                    )
                 }
             }
         )
@@ -1122,13 +1139,17 @@ class RegistrationViewTest(ApiTestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the <a href=\"https://www.test.com/tos\">Terms of Service</a>",
+                "label": "I agree to the {platform_name} <a href=\"https://www.test.com/tos\">Terms of Service</a>.".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 "name": "terms_of_service",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the <a href=\"https://www.test.com/tos\">Terms of Service</a>"
+                    "required": "You must agree to the {platform_name} <a href=\"https://www.test.com/tos\">Terms of Service</a>.".format(
+                        platform_name=settings.PLATFORM_NAME
+                    )
                 }
             }
         )
@@ -1141,13 +1162,17 @@ class RegistrationViewTest(ApiTestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the <a href=\"/honor\">Honor Code</a>",
+                "label": "I agree to the {platform_name} <a href=\"/honor\">Honor Code</a>.".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 "name": "honor_code",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the <a href=\"/honor\">Honor Code</a>"
+                    "required": "You must agree to the {platform_name} <a href=\"/honor\">Honor Code</a>.".format(
+                        platform_name=settings.PLATFORM_NAME
+                    )
                 }
             }
         )
@@ -1156,13 +1181,17 @@ class RegistrationViewTest(ApiTestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the <a href=\"/tos\">Terms of Service</a>",
+                "label": "I agree to the {platform_name} <a href=\"/tos\">Terms of Service</a>.".format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 "name": "terms_of_service",
                 "defaultValue": False,
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the <a href=\"/tos\">Terms of Service</a>"
+                    "required": "You must agree to the {platform_name} <a href=\"/tos\">Terms of Service</a>.".format(
+                        platform_name=settings.PLATFORM_NAME
+                    )
                 }
             }
         )
@@ -1372,7 +1401,7 @@ class RegistrationViewTest(ApiTestCase):
         self.assertEqual(response.status_code, 409)
         self.assertEqual(
             response.content,
-            "It looks like {} belongs to an existing account. Try again with a different email address and username.".format(
+            "It looks like {} belongs to an existing account. Try again with a different username.".format(
                 self.USERNAME
             )
         )

@@ -111,7 +111,8 @@ AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_PROFILE = 'profile'
 AUTH_ENTRY_REGISTER = 'register'
 
-# TODO (ECOM-369): Repace `AUTH_ENTRY_LOGIN` and `AUTH_ENTRY_REGISTER`
+# pylint: disable=fixme
+# TODO (ECOM-369): Replace `AUTH_ENTRY_LOGIN` and `AUTH_ENTRY_REGISTER`
 # with these values once the A/B test completes, then delete
 # these constants.
 AUTH_ENTRY_LOGIN_2 = 'account_login'
@@ -153,6 +154,7 @@ _AUTH_ENTRY_CHOICES = frozenset([
     # login/registration, we needed to introduce two
     # additional end-points.  Once the test completes,
     # delete these constants from the choices list.
+    # pylint: disable=fixme
     AUTH_ENTRY_LOGIN_2,
     AUTH_ENTRY_REGISTER_2,
 
@@ -445,6 +447,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
 
         # TODO (ECOM-369): Delete these once the A/B test
         # for the combined login/registration form completes.
+        # pylint: disable=fixme
         'is_login_2': auth_entry == AUTH_ENTRY_LOGIN_2,
         'is_register_2': auth_entry == AUTH_ENTRY_REGISTER_2,
     }
@@ -457,6 +460,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
 # these kwargs in `redirect_to_supplementary_form`, but
 # these should redirect to the same location as "is_login" and "is_register"
 # (whichever login/registration end-points win in the test).
+# pylint: disable=fixme
 @partial.partial
 def ensure_user_information(
     strategy,
@@ -500,7 +504,7 @@ def ensure_user_information(
         return HttpResponseBadRequest()
 
     # TODO (ECOM-369): Consolidate this with `dispatch_to_login`
-    # once the A/B test completes.
+    # once the A/B test completes. # pylint: disable=fixme
     dispatch_to_login_2 = is_login_2 and (user_unset or user_inactive)
 
     if is_dashboard or is_profile:
@@ -510,7 +514,7 @@ def ensure_user_information(
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN], name='signin_user')
 
     # TODO (ECOM-369): Consolidate this with `dispatch_to_login`
-    # once the A/B test completes.
+    # once the A/B test completes. # pylint: disable=fixme
     if dispatch_to_login_2:
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN_2])
 
@@ -518,7 +522,7 @@ def ensure_user_information(
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER], name='register_user')
 
     # TODO (ECOM-369): Consolidate this with `is_register`
-    # once the A/B test completes.
+    # once the A/B test completes. # pylint: disable=fixme
     if is_register_2 and user_unset:
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER_2])
 
