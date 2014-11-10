@@ -456,6 +456,7 @@ class UsersApiTests(ModuleStoreTestCase):
 
         data["country"] = "US"
         data["year_of_birth"] = "1990"
+        data["title"] = ""
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 200)
         response = self.do_get(test_uri)
