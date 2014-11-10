@@ -1114,6 +1114,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
+@csrf_exempt
 @require_POST
 @social_utils.strategy("social:complete")
 def login_oauth_token(request, backend):
