@@ -1,5 +1,7 @@
 // lms - views - verification flow
 // ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
 
 // MISC: extends - button
 %btn-verify-primary {
@@ -12,7 +14,6 @@
 .is-expandable {
 
   .title-expand {
-
   }
 
   .expandable-icon {
@@ -438,7 +439,6 @@
           }
         }
       }
-
     }
   }
 
@@ -989,7 +989,7 @@
       @extend %t-weight4;
       position: absolute;
       top: -($baseline*1.25);
-      left: 45%;
+      left: calc( 50% - 46px );
       padding: ($baseline/2) ($baseline*1.5);
       background: white;
       text-align: center;
@@ -1129,22 +1129,35 @@
   }
 
   .content-supplementary {
-    width: flex-grid(12,12);
+    @include box-sizing(border-box);
+    @include outer-container;
+    @include span-columns(12);
 
     .list-help {
       @include clearfix();
 
       .help-item {
-        width: flex-grid(4,12);
+        @include fill-parent;
+
         float: left;
         margin-right: flex-gutter();
+        margin-bottom: 25px;
 
         &:last-child {
-          margin-right: 0;
+          margin: 0;
         }
+      }
+    }
 
-        &.help-item-technical {
-          width: flex-grid(8,12);
+    @include media( 550px ) {
+      .list-help {
+        .help-item {
+          @include span-columns(4);
+          margin-bottom: 0;
+
+          &.help-item-technical {
+            @include span-columns(8);
+          }
         }
       }
     }
@@ -1154,6 +1167,10 @@
 
   // VIEW: select a track
   &.step-select-track {
+    .container {
+      min-width: 0;
+      max-width: 1200px;
+    }
 
     .sts-track {
       @extend %text-sr;
@@ -1161,11 +1178,10 @@
 
     .form-register-choose {
       @include clearfix();
-      width: flex-grid(12,12);
       margin: ($baseline*2) 0;
 
       .deco-divider {
-        width: flex-grid(12,12);
+        @include fill-parent;
         float: left;
       }
     }
@@ -1175,7 +1191,7 @@
     }
 
     .register-choice {
-      width: flex-grid(12,12);
+      @include fill-parent;
       margin: 0 flex-gutter() $baseline 0;
       border-top: ($baseline/4) solid $m-gray-d4;
       padding: $baseline ($baseline*1.5);
@@ -1190,28 +1206,35 @@
         vertical-align: middle;
       }
 
-      .wrapper-copy {
-        width: flex-grid(8,8);
-      }
-
       .list-actions {
-        width: flex-grid(8,8);
+        @include fill-parent;
         text-align: right;
+        float: right;
+        margin: ($baseline/4) 0;
+        border-top: none;
+        clear: both;
       }
 
       .title {
         @extend %t-title5;
         @extend %t-weight5;
         margin-bottom: ($baseline/2);
+        width: calc( 100% - 30px );
       }
 
       .copy {
         @extend %t-copy-base;
       }
 
-      .action-select input {
-        @extend %t-weight4;
-        padding: ($baseline/2) ($baseline*0.75);
+      .action-select {
+        @include fill-parent;
+
+        input {
+          @extend %t-weight4;
+          padding: ($baseline/2) ($baseline*0.75);
+          width: 100%;
+          white-space: normal;
+        }
       }
     }
 
@@ -1226,15 +1249,9 @@
         display: block;
         width: ($baseline*2.9);
         height: ($baseline*4.2);
-        background: transparent url('../images/honor-ribbon.png') no-repeat 0 0;
-      }
-
-      .wrapper-copy {
-        width: flex-grid(8,8);
       }
 
       .list-actions {
-        width: flex-grid(8,8);
         margin: ($baseline) 0;
       }
 
@@ -1249,19 +1266,12 @@
 
       .deco-ribbon {
         position: absolute;
-        top: -($baseline*1.5);
+        top: -10px;
         right: $baseline;
         display: block;
-        width: ($baseline*3);
-        height: ($baseline*4);
-        background: transparent url('../images/vcert-ribbon-s.png') no-repeat 0 0;
-      }
-
-      .list-actions {
-        margin: ($baseline/4) 0;
-        border-top: none;
-        width: flex-grid(4,12);
-        float: right;
+        width: 45px;
+        height: 45px;
+        background: transparent url('../images/verified-ribbon.png') no-repeat 0 0;
       }
 
       .action-intro, .action-select {
@@ -1270,13 +1280,9 @@
       }
 
       .action-intro {
+        @include fill-parent;
         @extend %copy-detail;
-        width: flex-grid(3,8);
         text-align: left;
-      }
-
-      .action-select {
-        width: initial;
       }
 
       .action-select input {
@@ -1301,7 +1307,7 @@
     }
 
     .help-register {
-      width: flex-grid(4,12);
+      @include span-columns(4);
 
       .title {
         @extend %hd-lv4;
@@ -1333,8 +1339,8 @@
 
     .contribution-options {
       @include clearfix();
+      @include fill-parent;
       margin: 0;
-      width: flex-grid(8,12);
 
       &:after{
         clear: none;
@@ -1342,6 +1348,7 @@
       }
 
       .field {
+        @include fill-parent;
         float: left;
         margin: 0 ($baseline/2) ($baseline/2) 0;
         padding: ($baseline/2) ($baseline*0.75);
@@ -1377,6 +1384,65 @@
 
         .contribution-option-other1 label, .contribution-option-other2 label {
           @extend %text-sr;
+        }
+      }
+    }
+
+    @include media(min-width 550px max-width 768px) {
+      .contribution-options {
+        .field {
+          @include span-columns(6);
+
+          &:nth-of-type(even) {
+            margin-right: 0;
+          }
+        }
+      }
+
+      .register-choice {
+        .list-actions {
+          float: left;
+          width: auto;
+        }
+
+        .action-select {
+          width: initial;
+
+          input {
+            width: initial;
+          }
+        }
+      }
+    }
+
+    @include media( $desktop ) {
+      .contribution-options {
+        .field {
+          width: auto;
+        }
+      }
+
+      .register-choice {
+        .list-actions {
+          @include span-columns(4);
+          width: auto;
+        }
+
+        .action-select {
+          width: initial;
+
+          input {
+            width: initial;
+          }
+        }
+      }
+    }
+
+    @include media( $xl-desktop ) {
+      .register-choice {
+        .list-actions {
+          float: right;
+          clear: none;
         }
       }
     }
