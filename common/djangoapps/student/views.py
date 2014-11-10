@@ -1135,6 +1135,7 @@ def login_oauth_token(request, backend):
                 pass
             # do_auth can return a non-User object if it fails
             if user and isinstance(user, User):
+                login(request, user)
                 return JsonResponse(status=204)
             else:
                 # Ensure user does not re-enter the pipeline
