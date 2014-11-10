@@ -490,6 +490,12 @@ def donate(request):
         reverse("shoppingcart.views.postpay_callback")
     )
 
+    # Add extra to make it easier to track transactions
+    extra_data = [
+        unicode(course_id) if course_id else "",
+        "donation_course" if course_id else "donation_general"
+    ]
+
     response_params = json.dumps({
         # The HTTP end-point for the payment processor.
         "payment_url": get_purchase_endpoint(),
@@ -498,7 +504,7 @@ def donate(request):
         "payment_params": get_signed_purchase_params(
             cart,
             callback_url=callback_url,
-            extra_data=([unicode(course_id)] if course_id else None)
+            extra_data=extra_data
         ),
     })
 

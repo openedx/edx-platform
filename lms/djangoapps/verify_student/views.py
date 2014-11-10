@@ -238,7 +238,7 @@ def create_order(request):
     params = get_signed_purchase_params(
         cart,
         callback_url=callback_url,
-        extra_data=[unicode(course_id)]
+        extra_data=[unicode(course_id), current_mode.slug]
     )
 
     params['success'] = True
