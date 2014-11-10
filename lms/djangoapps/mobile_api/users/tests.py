@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from mobile_api.users.serializers import CourseEnrollmentSerializer
 from student.models import CourseEnrollment
 from student import auth
+from mobile_api.tests import ROLE_CASES
 
 
 @ddt.ddt
@@ -48,7 +49,7 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         })
         self.assertEqual(resp.status_code, 200)
 
-    def _verify_single_course_enrollment(self, course):
+    def _verify_single_course_enrollment(self, course, should_succeed):
         """
         check that enrolling in course adds us to it
         """
@@ -58,36 +59,32 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         self._enroll(course)
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, 200)
-
         courses = response.data   # pylint: disable=maybe-no-member
-        self.assertEqual(len(courses), 1)
 
-        found_course = courses[0]['course']
-        self.assertTrue('video_outline' in found_course)
-        self.assertTrue('course_handouts' in found_course)
-        self.assertEqual(found_course['id'], unicode(course.id))
-        self.assertEqual(courses[0]['mode'], 'honor')
-
-    def test_non_mobile_enrollments(self):
-        url = self._enrollment_url()
-        non_mobile_course = CourseFactory.create(mobile_available=False)
-        self.client.login(username=self.username, password=self.password)
-
-        self._enroll(non_mobile_course)
-        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, [])    # pylint: disable=maybe-no-member
 
-    @ddt.data(auth.CourseBetaTesterRole, auth.CourseStaffRole, auth.CourseInstructorRole)
-    def test_privileged_enrollments(self, role):
+        if should_succeed:
+            self.assertEqual(len(courses), 1)
+            found_course = courses[0]['course']
+            self.assertTrue('video_outline' in found_course)
+            self.assertTrue('course_handouts' in found_course)
+            self.assertEqual(found_course['id'], unicode(course.id))
+            self.assertEqual(courses[0]['mode'], 'honor')
+        else:
+            self.assertEqual(len(courses), 0)
+
+    @ddt.data(*ROLE_CASES)
+    @ddt.unpack
+    def test_non_mobile_enrollments(self, role, should_succeed):
         non_mobile_course = CourseFactory.create(mobile_available=False)
-        role(non_mobile_course.id).add_users(self.user)
 
-        self._verify_single_course_enrollment(non_mobile_course)
+        if role:
+            role(non_mobile_course.id).add_users(self.user)
+
+        self._verify_single_course_enrollment(non_mobile_course, should_succeed)
 
     def test_mobile_enrollments(self):
-        self._verify_single_course_enrollment(self.course)
+        self._verify_single_course_enrollment(self.course, True)
 
     def test_user_overview(self):
         self.client.login(username=self.username, password=self.password)
