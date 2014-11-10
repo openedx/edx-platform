@@ -29,7 +29,7 @@
           window.top.location.href = "${reverse('dashboard')}";
         }
       } else if (xhr.status == 403) {
-        window.top.location.href = "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
+        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
