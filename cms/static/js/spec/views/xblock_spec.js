@@ -102,6 +102,14 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/xblock", "
                     ]);
                     expect(promise.isRejected()).toBe(true);
                 });
+
+                it('Triggers an event to the runtime when a notification-action-button is clicked', function () {
+                    var notifySpy = spyOn(xblockView, "notifyRuntime").andCallThrough();
+
+                    postXBlockRequest(AjaxHelpers.requests(this), []);
+                    xblockView.$el.find(".notification-action-button").click();
+                    expect(notifySpy).toHaveBeenCalledWith("add-missing-groups", model.get("id"));
+                })
             });
         });
     });

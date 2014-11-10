@@ -5,17 +5,19 @@ import mock
 from mock import Mock
 
 from django.test import TestCase
-from django.test.utils import override_settings
 
 from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 import pytz
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from xmodule.course_module import (
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_ABOUT,
+    CATALOG_VISIBILITY_NONE)
 
-# pylint: disable=protected-access
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+# pylint: disable=C0111
+# pylint: disable=W0212
+
 class AccessTestCase(TestCase):
     """
     Tests for the various access controls on the student dashboard
@@ -203,6 +205,43 @@ class AccessTestCase(TestCase):
     def test__user_passed_as_none(self):
         """Ensure has_access handles a user being passed as null"""
         access.has_access(None, 'staff', 'global', None)
+
+    def test__catalog_visibility(self):
+        """
+        Tests the catalog visibility tri-states
+        """
+        user = UserFactory.create()
+        course_id = SlashSeparatedCourseKey('edX', 'test', '2012_Fall')
+        staff = StaffFactory.create(course_key=course_id)
+
+        course = Mock(
+            id=course_id,
+            catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT
+        )
+        self.assertTrue(access._has_access_course_desc(user, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(user, 'see_about_page', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
+
+        # Now set visibility to just about page
+        course = Mock(
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'),
+            catalog_visibility=CATALOG_VISIBILITY_ABOUT
+        )
+        self.assertFalse(access._has_access_course_desc(user, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(user, 'see_about_page', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
+
+        # Now set visibility to none, which means neither in catalog nor about pages
+        course = Mock(
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'),
+            catalog_visibility=CATALOG_VISIBILITY_NONE
+        )
+        self.assertFalse(access._has_access_course_desc(user, 'see_in_catalog', course))
+        self.assertFalse(access._has_access_course_desc(user, 'see_about_page', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
 
 
 class UserRoleTestCase(TestCase):

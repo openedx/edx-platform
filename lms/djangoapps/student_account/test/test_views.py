@@ -264,7 +264,6 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
         result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
         self.assertTrue(result)
 
-
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):
         # Log the user out

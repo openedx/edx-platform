@@ -6,7 +6,6 @@ import datetime
 import ddt
 import itertools
 import pymongo
-import unittest
 
 from collections import namedtuple
 from importlib import import_module
@@ -19,6 +18,10 @@ from uuid import uuid4
 from django.conf import settings
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
+from xmodule.contentstore.content import StaticContent
+import mimetypes
+from opaque_keys.edx.keys import CourseKey
 
 if not settings.configured:
     settings.configure()
@@ -70,12 +73,12 @@ class TestMixedModuleStore(CourseComparisonTest):
         'collection': COLLECTION,
         'asset_collection': ASSET_COLLECTION,
     }
+    MAPPINGS = {
+        XML_COURSEID1: 'xml',
+        XML_COURSEID2: 'xml',
+        BAD_COURSE_ID: 'xml',
+    }
     OPTIONS = {
-        'mappings': {
-            XML_COURSEID1: 'xml',
-            XML_COURSEID2: 'xml',
-            BAD_COURSE_ID: 'xml',
-        },
         'stores': [
             {
                 'NAME': 'draft',
@@ -95,6 +98,7 @@ class TestMixedModuleStore(CourseComparisonTest):
                 'OPTIONS': {
                     'data_dir': DATA_DIR,
                     'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                    'xblock_mixins': (EditInfoMixin, InheritanceMixin),
                 }
             },
         ]
@@ -111,6 +115,16 @@ class TestMixedModuleStore(CourseComparisonTest):
         """
         Set up the database for testing
         """
+        super(TestMixedModuleStore, self).setUp()
+
+        self.exclude_field(None, 'wiki_slug')
+        self.exclude_field(None, 'xml_attributes')
+        self.exclude_field(None, 'parent')
+        self.ignore_asset_key('_id')
+        self.ignore_asset_key('uploadDate')
+        self.ignore_asset_key('content_son')
+        self.ignore_asset_key('thumbnail_location')
+
         self.options = getattr(self, 'options', self.OPTIONS)
         self.connection = pymongo.MongoClient(
             host=self.HOST,
@@ -120,13 +134,12 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.connection.drop_database(self.DB)
         self.addCleanup(self.connection.drop_database, self.DB)
         self.addCleanup(self.connection.close)
-        super(TestMixedModuleStore, self).setUp()
 
         self.addTypeEqualityFunc(BlockUsageLocator, '_compare_ignore_version')
         self.addTypeEqualityFunc(CourseLocator, '_compare_ignore_version')
         # define attrs which get set in initdb to quell pylint
         self.writable_chapter_location = self.store = self.fake_location = self.xml_chapter_location = None
-        self.course_locations = []
+        self.course_locations = {}
 
         self.user_id = ModuleStoreEnum.UserID.test
 
@@ -217,11 +230,16 @@ class TestMixedModuleStore(CourseComparisonTest):
         """
         return self.course_locations[string].course_key
 
-    def _initialize_mixed(self):
+    # pylint: disable=dangerous-default-value
+    def _initialize_mixed(self, mappings=MAPPINGS, contentstore=None):
         """
-        initializes the mixed modulestore
+        initializes the mixed modulestore.
         """
-        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
+        self.store = MixedModuleStore(
+            contentstore, create_modulestore_instance=create_modulestore_instance,
+            mappings=mappings,
+            **self.options
+        )
         self.addCleanup(self.store.close_all_connections)
 
     def initdb(self, default):
@@ -300,7 +318,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         """
         Make sure we get back the store type we expect for given mappings
         """
-        self._initialize_mixed()
+        self._initialize_mixed(mappings={})
         with self.store.default_store(default_ms):
             self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
             if reset_mixed_mappings:
@@ -1759,7 +1777,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         Test the default store context manager
         """
         # initialize the mixed modulestore
-        self._initialize_mixed()
+        self._initialize_mixed(mappings={})
 
         with self.store.default_store(default_ms):
             self.verify_default_store(default_ms)
@@ -1769,7 +1787,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         Test the default store context manager, nested within one another
         """
         # initialize the mixed modulestore
-        self._initialize_mixed()
+        self._initialize_mixed(mappings={})
 
         with self.store.default_store(ModuleStoreEnum.Type.mongo):
             self.verify_default_store(ModuleStoreEnum.Type.mongo)
@@ -1785,12 +1803,72 @@ class TestMixedModuleStore(CourseComparisonTest):
         Test the default store context manager, asking for a fake store
         """
         # initialize the mixed modulestore
-        self._initialize_mixed()
+        self._initialize_mixed(mappings={})
 
         fake_store = "fake"
         with self.assertRaisesRegexp(Exception, "Cannot find store of type {}".format(fake_store)):
             with self.store.default_store(fake_store):
                 pass  # pragma: no cover
+
+    def save_asset(self, asset_key):
+        """
+        Load and save the given file. (taken from test_contentstore)
+        """
+        with open("{}/static/{}".format(DATA_DIR, asset_key.block_id), "rb") as f:
+            content = StaticContent(
+                asset_key, "Funky Pix", mimetypes.guess_type(asset_key.block_id)[0], f.read(),
+            )
+            self.store.contentstore.save(content)
+
+    @ddt.data(
+        [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.mongo],
+        [ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split],
+        [ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.split]
+    )
+    @ddt.unpack
+    def test_clone_course(self, source_modulestore, destination_modulestore):
+        """
+        Test clone course
+        """
+
+        with MongoContentstoreBuilder().build() as contentstore:
+            # initialize the mixed modulestore
+            self._initialize_mixed(contentstore=contentstore, mappings={})
+
+            with self.store.default_store(source_modulestore):
+
+                source_course_key = self.store.make_course_key("org.source", "course.source", "run.source")
+                self._create_course(source_course_key)
+                self.save_asset(source_course_key.make_asset_key('asset', 'picture1.jpg'))
+
+            with self.store.default_store(destination_modulestore):
+                dest_course_id = self.store.make_course_key("org.other", "course.other", "run.other")
+                self.store.clone_course(source_course_key, dest_course_id, self.user_id)
+
+                # pylint: disable=protected-access
+            source_store = self.store._get_modulestore_by_type(source_modulestore)
+            dest_store = self.store._get_modulestore_by_type(destination_modulestore)
+            self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
+
+    def test_clone_xml_split(self):
+        """
+        Can clone xml courses to split; so, test it.
+        """
+        with MongoContentstoreBuilder().build() as contentstore:
+            # initialize the mixed modulestore
+            self._initialize_mixed(contentstore=contentstore, mappings={self.XML_COURSEID2: 'xml', })
+            source_course_key = CourseKey.from_string(self.XML_COURSEID2)
+            with self.store.default_store(ModuleStoreEnum.Type.split):
+                dest_course_id = CourseLocator("org.other", "course.other", "run.other")
+                self.store.clone_course(
+                    source_course_key, dest_course_id, ModuleStoreEnum.UserID.test
+                )
+
+            # pylint: disable=protected-access
+            source_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
+            dest_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
+            self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
+
 
 # ============================================================================================================
 # General utils for not using django settings

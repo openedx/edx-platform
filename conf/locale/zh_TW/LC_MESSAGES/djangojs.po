@@ -69,7 +69,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-27 10:49-0400\n"
+"POT-Creation-Date: 2014-11-10 09:06-0500\n"
 "PO-Revision-Date: 2014-10-15 15:41+0000\n"
 "Last-Translator: Xaver Y.R. Chen <yrchen@atcity.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
@@ -101,8 +101,6 @@ msgstr "好的"
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
 msgstr "取消"
 
@@ -2117,151 +2115,6 @@ msgstr "回覆"
 msgid "Tags:"
 msgstr "標籤︰"
 
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Available %s"
-msgstr "可用 %s"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr "這是可用%s的列表。您可以在下面的方框中進行選擇，然後點擊兩個方框中間的“選擇”箭頭。"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Type into this box to filter down the list of available %s."
-msgstr "在方框中輸入資訊以過濾可用的%s列表。"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Filter"
-msgstr "過濾"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose all"
-msgstr "全部選擇"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to choose all %s at once."
-msgstr "單擊以選擇全部的%s"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose"
-msgstr "選擇"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove"
-msgstr "移除"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Chosen %s"
-msgstr "%s被選中"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr "這是被選中的%s的列表。您可以在下面的方框中選擇需要移除的項，然後點擊兩個方框中間的“移除”箭頭。"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove all"
-msgstr "全部移除"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to remove all chosen %s at once."
-msgstr "單擊以一次移除全部所選的%s"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid "%(sel)s of %(cnt)s selected"
-msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(cnt)s的%(sel)s已被選擇"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have unsaved changes on individual editable fields. If you run an "
-"action, your unsaved changes will be lost."
-msgstr "您在單獨可編輯的欄位有未儲存的變更。如果您執行操作，這些未儲存的變更將會遺失。"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
-"action."
-msgstr "您已經選擇一個操作，但是並未儲存對欄位進行的變更。請點擊“確定”來儲存。您需要再次執行該操作。"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
-"button."
-msgstr "您已經選擇了一個操作並且未對欄位做任何更改。您可能是想使用“繼續”按鈕而不是“儲存”按鈕。"
-
-#. Translators: the names of months, keep the pipe (|) separators.
-#: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
-msgid ""
-"January|February|March|April|May|June|July|August|September|October|November|December"
-msgstr "一月|二月|三月|四月|五月|六月|七月|八月|九月|十月|十一月|十二月"
-
-#. Translators: abbreviations for days of the week, keep the pipe (|)
-#. separators.
-#: lms/static/admin/js/calendar.js
-msgid "S|M|T|W|T|F|S"
-msgstr "日|一|二|三|四|五|六"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
-#: lms/static/admin/js/collapse.min.js
-msgid "Show"
-msgstr "顯示"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
-msgid "Hide"
-msgstr "隱藏"
-
-#. Translators: the names of days, keep the pipe (|) separators.
-#: lms/static/admin/js/dateparse.js
-msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "星期日|星期一|星期二|星期三|星期四|星期五|星期六"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Now"
-msgstr "現在"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Clock"
-msgstr "時鐘"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Choose a time"
-msgstr "選擇時間"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Midnight"
-msgstr "午夜"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "6 a.m."
-msgstr "上午六點"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Noon"
-msgstr "中午"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Today"
-msgstr "今天"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Calendar"
-msgstr "日曆"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Yesterday"
-msgstr "昨天"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Tomorrow"
-msgstr "明天"
-
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "開啟計算機"
@@ -2921,6 +2774,10 @@ msgstr "標題"
 msgid "You have been logged out of your edX account. "
 msgstr "您已經從edX帳號登出。"
 
+#: lms/static/js/course_survey.js
+msgid "There has been an error processing your survey."
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr "未知錯誤發生。"
@@ -3223,10 +3080,6 @@ msgstr ""
 msgid "Choose new file"
 msgstr ""
 
-#: cms/static/js/factories/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
-
 #: cms/static/js/factories/manage_users.js
 msgid "A valid email address is required"
 msgstr ""
@@ -3328,6 +3181,10 @@ msgstr "只有 <%= fileTypes %> 檔案可以上傳，請選擇 <%= fileExtension
 #: cms/static/js/models/uploads.js
 msgid "or"
 msgstr "或者"
+
+#: cms/static/js/models/xblock_validation.js
+msgid "This component has validation issues."
+msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
@@ -3609,6 +3466,20 @@ msgstr "設定"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New %(component_type)s"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: cms/static/js/views/xblock_validation.js
+msgid "Error"
 msgstr ""
 
 #: cms/static/js/views/components/add_xblock.js
@@ -4550,6 +4421,10 @@ msgstr ""
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "New Group Configuration"
+msgstr ""
+
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Remove"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

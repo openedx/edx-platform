@@ -200,11 +200,3 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
         )
         services['fs'] = xblock.reference.plugins.FSService()
         super(LmsModuleSystem, self).__init__(**kwargs)
-
-    # backward compatibility fix for callers not knowing this is a ModuleSystem v DescriptorSystem
-    @property
-    def resources_fs(self):
-        """
-        Return what would be the resources_fs on a DescriptorSystem
-        """
-        return getattr(self, 'filestore', None)

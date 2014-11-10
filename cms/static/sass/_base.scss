@@ -569,11 +569,6 @@ hr.divide {
 }
 
 .window {
-  // border-radius: 3px;
-  // box-shadow: 0 1px 1px $shadow-l1;
-  // margin-bottom: $baseline;
-  // border: 1px solid $gray-l2;
-  // background: $white;
 
   .window-contents {
     padding: 20px;
@@ -612,162 +607,6 @@ hr.divide {
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid #cbd1db;
-  }
-}
-
-// ====================
-
-// system notifications
-.toast-notification {
-  @include transition(all $tmg-f2 linear 0s);
-  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
-  @extend %t-copy-sub1;
-  display: none;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 99999;
-  max-width: 350px;
-  padding: 15px 20px 17px;
-  border-radius: 3px;
-  border: 1px solid #333;
-  background-color: rgba(30, 30, 30, .92);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
-  text-align: center;
-  color: #fff;
-
-  p, span {
-    color: #fff;
-  }
-
-  strong {
-    @extend %t-copy-base;
-    @extend %t-strong;
-    display: block;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-
-  .close-button {
-    @extend %t-action1;
-    @extend %t-strong;
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 27px;
-    height: 27px;
-    line-height: 25px;
-    color: #aaa;
-    text-align: center;
-
-    .close-icon {
-      @extend %t-action2;
-      @extend %t-strong;
-    }
-  }
-
-  .action-button {
-    @include blue-button;
-    @include box-sizing(border-box);
-    @extend %t-action4;
-    width: 100%;
-    margin-top: 10px;
-    text-align: center;
-  }
-}
-
-.waiting {
-  position: relative;
-
-  &:before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 999998;
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-    background: rgba(255, 255, 255, .9);
-  }
-
-  &:after {
-    @extend .spinner-icon;
-    content: '';
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-left: -10px;
-    margin-top: -10px;
-    z-index: 999999;
-  }
-}
-
-.waiting-inline {
-  &:after {
-    content: '';
-    @extend .spinner-icon;
-  }
-}
-
-.new-button {
-  @include green-button;
-  @extend %t-action4;
-  padding: 8px 20px 10px;
-  text-align: center;
-
-  &.big {
-    display: block;
-  }
-
-  .icon-plus {
-    margin-top: -2px;
-    line-height: 0;
-  }
-}
-
-.view-button {
-  @include blue-button;
-  @extend %t-action4;
-  text-align: center;
-
-  &.big {
-    display: block;
-  }
-
-  .icon-eye-open {
-    @extend %t-action2;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 8px;
-    margin-top: -3px;
-    line-height: 0;
-  }
-}
-
-.edit-button.standard,
-.delete-button.standard,
-.duplicate-button.standard {
-  @include white-button;
-  @extend %t-regular;
-  @extend %t-action4;
-  float: left;
-  padding: 3px 10px 4px;
-  margin-left: 7px;
-
-  .edit-icon,
-  .delete-icon,
-  .duplicate-icon{
-    margin-right: 4px;
-  }
-}
-
-.delete-button.standard {
-
-  &:hover {
-    background-color: tint($orange, 75%);
   }
 }
 
@@ -816,19 +655,6 @@ hr.divide {
 // UI - disabled
 .is-disabled {
   @extend %ui-disabled;
-}
-
-.non-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.wrap {
-  text-wrap: wrap;
-  white-space: pre-wrap;
-  white-space: -moz-pre-wrap;
-  word-wrap: break-word;
 }
 
 // ui - semantic + visual divider
@@ -920,15 +746,5 @@ body.js {
       margin-top: ($baseline/2);
       color: $gray-l1;
     }
-  }
-}
-
-// ====================
-
-// works in progress & testing
-body.hide-wip {
-
-  .wip-box {
-    display: none;
   }
 }

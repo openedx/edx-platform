@@ -18,7 +18,7 @@ from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 from xblock.fields import Scope, BlockScope, ScopeIds
 from django.test import TestCase
 from django.db import DatabaseError
-from xblock.core import KeyValueMultiSaveError
+from xblock.exceptions import KeyValueMultiSaveError
 
 
 def mock_field(scope, name):

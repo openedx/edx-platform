@@ -25,10 +25,12 @@ from django.utils.timezone import utc
 from django.test import RequestFactory
 
 from django.contrib.auth.models import User
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from student.tests.factories import UserFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
 from student.roles import CourseBetaTesterRole
@@ -134,7 +136,7 @@ class TestCommonExceptions400(unittest.TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -289,7 +291,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
 class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -526,7 +528,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test enrollment modification endpoint.
@@ -1050,7 +1052,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test bulk beta modify access endpoint.
@@ -1363,7 +1365,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
@@ -1601,7 +1603,7 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints that show data without side effects.
@@ -2044,7 +2046,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(response.status_code, 400)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change student grades.
@@ -2184,7 +2186,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertTrue(act.called)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -2266,7 +2268,7 @@ class MockCompletionInfo(object):
         return False, 'Task Errored In Some Way'
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test instructor task list endpoint.
@@ -2428,7 +2430,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(actual_tasks, expected_tasks)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch.object(instructor_task.api, 'get_instructor_task_history')
 class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -2563,7 +2565,8 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.assertDictEqual(expected_info, returned_info)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@ddt.ddt
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @override_settings(ANALYTICS_SERVER_URL="http://robotanalyticsserver.netbot:900/")
 @override_settings(ANALYTICS_API_KEY="robot_api_key")
 class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -2590,25 +2593,84 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
+    @ddt.data((ModuleStoreEnum.Type.mongo, False), (ModuleStoreEnum.Type.split, True))
+    @ddt.unpack
     @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy_url(self, act):
+    def test_analytics_proxy_url(self, store_type, assert_wo_encoding, act):
         """ Test legacy analytics proxy url generation. """
+        with modulestore().default_store(store_type):
+            course = CourseFactory.create()
+            instructor_local = InstructorFactory(course_key=course.id)
+            self.client.login(username=instructor_local.username, password='test')
+
+            act.return_value = self.FakeProxyResponse()
+
+            url = reverse('proxy_legacy_analytics', kwargs={'course_id': course.id.to_deprecated_string()})
+            response = self.client.get(url, {
+                'aname': 'ProblemGradeDistribution'
+            })
+            self.assertEqual(response.status_code, 200)
+
+            # Make request URL pattern - everything but course id.
+            url_pattern = "{url}get?aname={aname}&course_id={course_id}&apikey={api_key}".format(
+                url="http://robotanalyticsserver.netbot:900/",
+                aname="ProblemGradeDistribution",
+                course_id="{course_id!s}",
+                api_key="robot_api_key",
+            )
+
+            if assert_wo_encoding:
+                # Format url with no URL-encoding of parameters.
+                assert_url = url_pattern.format(course_id=course.id.to_deprecated_string())
+                with self.assertRaises(AssertionError):
+                    act.assert_called_once_with(assert_url)
+
+            # Format url *with* URL-encoding of parameters.
+            expected_url = url_pattern.format(course_id=quote(course.id.to_deprecated_string()))
+            act.assert_called_once_with(expected_url)
+
+    @override_settings(ANALYTICS_SERVER_URL="")
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_server_url(self, act):
+        """
+        Test legacy analytics when empty server url.
+        """
         act.return_value = self.FakeProxyResponse()
 
         url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {
             'aname': 'ProblemGradeDistribution'
         })
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 501)
 
-        # check request url
-        expected_url = "{url}get?aname={aname}&course_id={course_id!s}&apikey={api_key}".format(
-            url="http://robotanalyticsserver.netbot:900/",
-            aname="ProblemGradeDistribution",
-            course_id=self.course.id.to_deprecated_string(),
-            api_key="robot_api_key",
-        )
-        act.assert_called_once_with(expected_url)
+    @override_settings(ANALYTICS_API_KEY="")
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_api_key(self, act):
+        """
+        Test legacy analytics when empty server API key.
+        """
+        act.return_value = self.FakeProxyResponse()
+
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'aname': 'ProblemGradeDistribution'
+        })
+        self.assertEqual(response.status_code, 501)
+
+    @override_settings(ANALYTICS_SERVER_URL="")
+    @override_settings(ANALYTICS_API_KEY="")
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_empty_url_and_api_key(self, act):
+        """
+        Test legacy analytics when empty server url & API key.
+        """
+        act.return_value = self.FakeProxyResponse()
+
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'aname': 'ProblemGradeDistribution'
+        })
+        self.assertEqual(response.status_code, 501)
 
     @patch.object(instructor.views.api.requests, 'get')
     def test_analytics_proxy(self, act):
@@ -2686,7 +2748,7 @@ class TestInstructorAPIHelpers(TestCase):
         msk_from_problem_urlname(*args)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test data dumps for reporting.
@@ -2875,7 +2937,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 self.user1.profile.name, self.user1.username)})
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
 class TestCourseRegistrationCodes(ModuleStoreTestCase):
     """

@@ -39,7 +39,7 @@ class TestInheritedFieldParsing(XModuleXmlImportTest):
             parent=sequence,
             tag='video',
             attribs={
-                'parent_sequential_url': 'foo', 'garbage': 'asdlk',
+                'parent_url': 'foo', 'garbage': 'asdlk',
                 'download_video': 'true',
             }
         )

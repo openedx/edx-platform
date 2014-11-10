@@ -268,10 +268,6 @@ FEATURES = {
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
 
-    # Analytics Data API (for active student count)
-    # Default to false here b/c dev environments won't have the api, will override in aws.py
-    'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
-
     # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
     # False to not redirect the user
@@ -280,10 +276,6 @@ FEATURES = {
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
-
-    # Video Abstraction Layer used to allow video teams to manage video assets
-    # independently of courseware. https://github.com/edx/edx-val
-    'ENABLE_VIDEO_ABSTRACTION_LAYER_API': False,
 
     # Enable the new dashboard, account, and profile pages
     'ENABLE_NEW_DASHBOARD': False,
@@ -295,6 +287,9 @@ FEATURES = {
     # to allow an upload of a CSV file that contains a list of new accounts to create
     # and register for course.
     'ALLOW_AUTOMATED_SIGNUPS': False,
+
+    # Display demographic data on the analytics tab in the instructor dashboard.
+    'DISPLAY_ANALYTICS_DEMOGRAPHICS': True
 }
 
 # Ignore static asset files on import which match this pattern
@@ -514,6 +509,9 @@ EVENT_TRACKING_BACKENDS = {
 EVENT_TRACKING_PROCESSORS = [
     {
         'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
+    },
+    {
+        'ENGINE': 'track.shim.VideoEventProcessor'
     }
 ]
 
@@ -532,8 +530,11 @@ if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     })
 
 TRACKING_SEGMENTIO_WEBHOOK_SECRET = None
-TRACKING_SEGMENTIO_ALLOWED_ACTIONS = ['Track', 'Screen']
-TRACKING_SEGMENTIO_ALLOWED_CHANNELS = ['mobile']
+TRACKING_SEGMENTIO_ALLOWED_TYPES = ['track']
+TRACKING_SEGMENTIO_SOURCE_MAP = {
+    'analytics-android': 'mobile',
+    'analytics-ios': 'mobile',
+}
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
@@ -667,7 +668,6 @@ MANAGERS = ADMINS
 
 # Static content
 STATIC_URL = '/static/'
-ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
@@ -1264,7 +1264,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "common_static",
 )
 
-PIPELINE_UGLIFYJS_BINARY='node_modules/.bin/uglifyjs'
+PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
@@ -1501,6 +1501,9 @@ INSTALLED_APPS = (
 
     # edX Mobile API
     'mobile_api',
+
+    # Surveys
+    'survey',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1853,7 +1856,7 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
-### Analytics data api settings
+### Analytics Data API + Dashboard (Insights) settings
 ANALYTICS_DATA_URL = ""
 ANALYTICS_DATA_TOKEN = ""
 ANALYTICS_DASHBOARD_URL = ""
@@ -1868,3 +1871,11 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 COUNTRIES_OVERRIDE = {
     "TW": _("Taiwan"),
 }
+
+# which access.py permission name to check in order to determine if a course is visible in
+# the course catalog. We default this to the legacy permission 'see_exists'.
+COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
+
+# which access.py permission name to check in order to determine if a course about page is
+# visible. We default this to the legacy permission 'see_exists'.
+COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'

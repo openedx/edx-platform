@@ -54,7 +54,7 @@ require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
       ## need to insert this only after hls triggered, because otherwise it
       ## causes other <form> elements to become multipart/form-data,
       ## thus breaking multiple-choice input forms, for example.
-      $('#hls-finput').append('<input type="file" name="hlsfile" id="hlsfile" />');
+      $('#hls-finput').html('<input type="file" name="hlsfile" id="hlsfile" />');
 
       var el = $('#hls-modal-${hlskey}');
       setup_autoupload(el);

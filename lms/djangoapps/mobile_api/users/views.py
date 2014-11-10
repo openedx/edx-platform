@@ -8,8 +8,10 @@ from rest_framework.authentication import OAuth2Authentication, SessionAuthentic
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from courseware.access import has_access
+from courseware import access
 from student.models import CourseEnrollment, User
+from student.roles import CourseBetaTesterRole
+from student import auth
 
 from .serializers import CourseEnrollmentSerializer, UserSerializer
 
@@ -79,7 +81,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
           certified.
         * is_active: Whether the course is currently active; true or false.
         * course: A collection of data about the course:
-        
+
           * course_about: The URI to get the data for the course About page.
           * course_updates: The URI to get data for course updates.
           * number: The course number.
@@ -119,12 +121,18 @@ def my_user_info(request):
 
 def mobile_course_enrollments(enrollments, user):
     """
-    Return enrollments only if courses are mobile_available (or if the user has staff access)
-    enrollments is a list of CourseEnrollments.
+    Return enrollments only if courses are mobile_available (or if the user has
+    privileged (beta, staff, instructor) access)
+
+    :param enrollments is a list of CourseEnrollments.
     """
     for enr in enrollments:
         course = enr.course
+
+        # Implicitly includes instructor role via the following has_access check
+        role = CourseBetaTesterRole(course.id)
+
         # The course doesn't always really exist -- we can have bad data in the enrollments
         # pointing to non-existent (or removed) courses, in which case `course` is None.
-        if course and (course.mobile_available or has_access(user, 'staff', course)):
+        if course and (course.mobile_available or auth.has_access(user, role) or access.has_access(user, 'staff', course)):
             yield enr

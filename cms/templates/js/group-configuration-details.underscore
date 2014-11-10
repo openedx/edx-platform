@@ -71,7 +71,7 @@
                   <i class="icon-exclamation-sign"></i>
                 <% } %>
                 <span class="group-configuration-validation-message">
-                  <%= unit.validation.message %>
+                  <%= unit.validation.text %>
                 </span>
               </p>
             <% } %>

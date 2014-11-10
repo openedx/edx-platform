@@ -1290,10 +1290,12 @@ class GroupConfiguration(object):
                 'container_handler',
                 course.location.course_key.make_usage_key(unit.location.block_type, unit.location.name)
             )
+
+            validation_summary = split_test.general_validation_message()
             usage_info[split_test.user_partition_id].append({
                 'label': '{} / {}'.format(unit.display_name, split_test.display_name),
                 'url': unit_url,
-                'validation': split_test.general_validation_message,
+                'validation': validation_summary.to_json() if validation_summary else None,
             })
         return usage_info
 

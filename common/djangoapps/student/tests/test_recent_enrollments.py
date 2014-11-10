@@ -154,3 +154,17 @@ class TestRecentEnrollments(ModuleStoreTestCase):
             self.assertContains(response, "donate-container")
         else:
             self.assertNotContains(response, "donate-container")
+
+    def test_donate_button_honor_with_price(self):
+        # Enable the enrollment success message and donations
+        self._configure_message_timeout(10000)
+        DonationConfiguration(enabled=True).save()
+
+        # Create a white-label course mode
+        # (honor mode with a price set)
+        CourseModeFactory(mode_slug="honor", course_id=self.course.id, min_price=100)
+
+        # Check that the donate button is NOT displayed
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+        response = self.client.get(reverse("dashboard"))
+        self.assertNotContains(response, "donate-container")

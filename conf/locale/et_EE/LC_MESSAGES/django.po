@@ -44,7 +44,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-27 10:50-0400\n"
+"POT-Creation-Date: 2014-11-10 09:08-0500\n"
 "PO-Revision-Date: 2014-09-27 22:20+0000\n"
 "Last-Translator: Triple <nyke@planet.ee>\n"
 "Language-Team: Estonian (Estonia) (http://www.transifex.com/projects/p/edx-platform/language/et_EE/)\n"
@@ -108,14 +108,6 @@ msgstr ""
 
 #: common/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
-msgstr ""
-
-#: common/djangoapps/course_groups/views.py
-msgid "Requested page must be numeric"
-msgstr ""
-
-#: common/djangoapps/course_groups/views.py
-msgid "Requested page must be greater than zero"
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -209,6 +201,7 @@ msgstr ""
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "None"
 msgstr ""
 
@@ -2218,6 +2211,47 @@ msgid "Invitation Only"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Pre-Course Survey Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Name of SurveyForm to display as a pre-course survey to the user."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Pre-Course Survey Required"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Specify whether students must complete a survey before they can view your "
+"course content. If you set this value to true, you must add a name for the "
+"survey to the Course Survey Name setting above."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Visibility In Catalog"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Defines the access permissions for showing the course in the course catalog."
+" This can be set to one of three values: 'both' (show in catalog and allow "
+"access to about page), 'about' (only allow access to about page), 'none' (do"
+" not show in catalog and do not allow access to an about page)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Both"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
+#: lms/templates/footer.html
+msgid "About"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr ""
 
@@ -2573,23 +2607,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
-msgstr ""
-
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Warning"
-msgstr ""
-
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This message will be added to the front of messages of type
-#. error,
-#. e.g. "Error: required field is missing".
-#: common/lib/xmodule/xmodule/split_test_module.py
-#: lms/templates/name_changes.html lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/split_test_module.py
@@ -2953,9 +2970,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, problems default to displaying a 'Reset' "
-"button. This value may be overriden in each problem's settings. Existing "
-"problems whose reset setting have not been changed are affected."
+"Enter true or false. If true, problems in the course default to always "
+"displaying a 'Reset' button. You can override this in each problem's "
+"settings. All existing problems are affected when this course-wide setting "
+"is changed."
 msgstr ""
 
 #. Translators: "Self" is used to denote an openended response that is self-
@@ -4122,6 +4140,10 @@ msgid "Analytics"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Demographic data is now available in {dashboard_link}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Metrics"
 msgstr ""
@@ -5025,12 +5047,24 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
+"        <p class=\"error_msg\">\n"
+"        Sorry! Our payment processor did not accept your payment.\n"
+"        The decision they returned was <span class=\"decision\">{decision}</span>,\n"
+"        and the reason was <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
+"        You were not charged. Please try a different form of payment.\n"
+"        Contact us with payment-related questions at {email}.\n"
+"        </p>\n"
+"        "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py
+msgid ""
+"\n"
 "            <p class=\"error_msg\">\n"
-"            Sorry! Our payment processor did not accept your payment.\n"
-"            The decision they returned was <span class=\"decision\">{decision}</span>,\n"
-"            and the reason was <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
-"            You were not charged. Please try a different form of payment.\n"
-"            Contact us with payment-related questions at {email}.\n"
+"            Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!\n"
+"            We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
 "            </p>\n"
 "            "
 msgstr ""
@@ -5038,37 +5072,25 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!\n"
-"                We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
+"            <p class=\"error_msg\">\n"
+"            Sorry! Due to an error your purchase was charged for a different amount than the order total!\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            Your credit card has probably been charged. Contact us with payment-specific questions at {email}.\n"
+"            </p>\n"
+"            "
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Due to an error your purchase was charged for a different amount than the order total!\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                Your credit card has probably been charged. Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py
-msgid ""
-"\n"
-"                <p class=\"error_msg\">\n"
-"                Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are\n"
-"                unable to validate that the message actually came from the payment processor.\n"
-"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"                We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
-"                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
-"                </p>\n"
-"                "
+"            <p class=\"error_msg\">\n"
+"            Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are\n"
+"            unable to validate that the message actually came from the payment processor.\n"
+"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"            We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
+"            Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
+"            </p>\n"
+"            "
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
@@ -5309,17 +5331,17 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Sorry! Our payment processor sent us back a payment confirmation that had "
-"inconsistent data!  We apologize that we cannot verify whether the charge "
-"went through and take further action on your order.  The specific error "
-"message is: {msg}  Your credit card may possibly have been charged.  Contact"
-" us with payment-specific questions at {email}."
+"inconsistent data! We apologize that we cannot verify whether the charge "
+"went through and take further action on your order. The specific error "
+"message is: {msg} Your credit card may possibly have been charged.  Contact "
+"us with payment-specific questions at {email}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Sorry! Due to an error your purchase was charged for a different amount than"
-" the order total!  The specific error message is: {msg}.  Your credit card "
-"has probably been charged. Contact us with payment-specific questions at "
+" the order total! The specific error message is: {msg}. Your credit card has"
+" probably been charged. Contact us with payment-specific questions at "
 "{email}."
 msgstr ""
 
@@ -5329,7 +5351,7 @@ msgid ""
 " charge, so we are unable to validate that the message actually came from "
 "the payment processor. The specific error message is: {msg}. We apologize "
 "that we cannot verify whether the charge went through and take further "
-"action on your order. Your credit card may possibly have been charged.  "
+"action on your order. Your credit card may possibly have been charged. "
 "Contact us with payment-specific questions at {email}."
 msgstr ""
 
@@ -5343,8 +5365,8 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
-"Sorry!  Your payment could not be processed because an unexpected exception "
-"occurred.  Please contact us at {email} for assistance."
+"Sorry! Your payment could not be processed because an unexpected exception "
+"occurred. Please contact us at {email} for assistance."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
@@ -6530,15 +6552,15 @@ msgid "Help"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration for {} | Choose Your Track"
+msgid "Upgrade Your Enrollment for {} | Choose Your Track"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Register for {} | Choose Your Track"
+msgid "Enroll In {} | Choose Your Track"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Sorry, there was an error when trying to register you"
+msgid "Sorry, there was an error when trying to enroll you"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -6575,7 +6597,7 @@ msgid "):"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
-msgid "Upgrade Your Registration"
+msgid "Upgrade Your Enrollment"
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -6993,11 +7015,6 @@ msgstr ""
 msgid "About & Company Info"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
-msgid "About"
-msgstr ""
-
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
 msgid "News"
 msgstr ""
@@ -7158,6 +7175,7 @@ msgstr ""
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
 msgid "Submit"
 msgstr ""
 
@@ -7458,6 +7476,11 @@ msgstr ""
 
 #: lms/templates/name_changes.html
 msgid "Accepted"
+msgstr ""
+
+#: lms/templates/name_changes.html lms/templates/name_changes.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
 msgstr ""
 
 #: lms/templates/name_changes.html
@@ -8469,11 +8492,6 @@ msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-msgid ""
-"Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
-msgstr ""
-
-#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr ""
 
@@ -8483,6 +8501,11 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid ""
+"Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
@@ -9336,9 +9359,6 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
-#: lms/templates/verify_student/_verification_header.html
 msgid "Verified"
 msgstr ""
 
@@ -9426,7 +9446,6 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "View Course"
 msgstr ""
 
@@ -11225,18 +11244,6 @@ msgid "Send me a copy of the invoice"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Active Students"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid ""
-"The count of students who interacted at least once by opening pages, playing"
-" videos, posting in discussions, submitting problems, or completing other "
-"activities. The date range includes all activities from midnight on the "
-"start date (inclusive) though midnight on the end date (exclusive)."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Score Distribution"
 msgstr ""
 
@@ -12572,6 +12579,49 @@ msgstr ""
 msgid "Student Profile"
 msgstr ""
 
+#: lms/templates/survey/survey.html
+msgid "User Survey"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "Pre-Course Survey"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid ""
+"You can begin your course as soon as you complete the following form. "
+"Required fields are marked with an asterisk (*)."
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "You are missing the following required fields:"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "Cancel and Return to Dashboard"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "Why do I need to complete this information?"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid ""
+"We use the information you provide to improve our course for both current "
+"and future students. The more we know about your specific needs, the better "
+"we can make your course experience."
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid "Who can I contact if I have questions?"
+msgstr ""
+
+#: lms/templates/survey/survey.html
+msgid ""
+"If you have any questions about this course or this form, you can contact <a"
+" href=\"{mail_to_link}\"\">{mail_to_link}</a>."
+msgstr ""
+
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Edit Your Name"
 msgstr ""
@@ -12627,19 +12677,19 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are upgrading your registration for"
+msgid "You are upgrading your enrollment for {organization}'s {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are re-verifying for"
+msgid "You are re-verifying for {organization}'s {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "You are registering for"
+msgid "You are enrolling in {organization}'s {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Congrats! You are now registered to audit"
+msgid "Congrats! You are now enrolled in {organization}'s {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
@@ -12647,15 +12697,15 @@ msgid "Professional Education"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Upgrading to:"
+msgid "{span_start}Upgrading to:{span_end} Verified"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Re-verifying for:"
+msgid "{span_start}Re-verifying for:{span_end} Verified"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
-msgid "Registering as: "
+msgid "{span_start}Enrolling as:{span_end} Verified"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_support.html
@@ -14179,6 +14229,15 @@ msgid ""
 msgstr ""
 
 #: cms/templates/export.html
+msgid ""
+"{em_start}Caution:{em_end} When you export a course, information such as "
+"MATLAB API keys, LTI passports, annotation secret token strings, and "
+"annotation storage URLs are included in the exported data. If you share your"
+" exported files, you may also be sharing sensitive or license-specific "
+"information."
+msgstr ""
+
+#: cms/templates/export.html
 msgid "Export My Course Content"
 msgstr ""
 
@@ -14188,6 +14247,11 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "Data {em_start}exported with{em_end} your course:"
+msgstr ""
+
+#: cms/templates/export.html
+msgid ""
+"Values from Advanced Settings, including MATLAB API keys and LTI passports"
 msgstr ""
 
 #: cms/templates/export.html
@@ -14248,10 +14312,11 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid ""
-"Only the course content and structure (including sections, subsections, and "
-"units) are exported. Other data, including student data, grading "
-"information, discussion forum data, course settings, and course team "
-"information, is not exported."
+"The course content and structure (including sections, subsections, and "
+"units) are exported. Values from Advanced Settings, including MATLAB API "
+"keys and LTI passports, are also exported. Other data, including student "
+"data, grading information, discussion forum data, course settings, and "
+"course team information, is not exported."
 msgstr ""
 
 #: cms/templates/export.html
@@ -14264,6 +14329,10 @@ msgid ""
 "Use an archive program to extract the data from the .tar.gz file. Extracted "
 "data includes the course.xml file, as well as subfolders that contain course"
 " content."
+msgstr ""
+
+#: cms/templates/export.html
+msgid "Learn more about exporting a course"
 msgstr ""
 
 #: cms/templates/export_git.html

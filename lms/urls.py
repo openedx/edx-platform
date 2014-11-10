@@ -28,7 +28,7 @@ urlpatterns = ('',  # nopep8
     url(r'^reject_name_change$', 'student.views.reject_name_change'),
     url(r'^pending_name_changes$', 'student.views.pending_name_changes'),
     url(r'^event$', 'track.views.user_track'),
-    url(r'^segmentio/event$', 'track.views.segmentio.track_segmentio_event'),
+    url(r'^segmentio/event$', 'track.views.segmentio.segmentio_event'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),   # TODO: Is this used anymore? What is STATIC_GRAB?
 
     url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
@@ -81,6 +81,8 @@ urlpatterns = ('',  # nopep8
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
+        # Video Abstraction Layer used to allow video teams to manage video assets
+        # independently of courseware. https://github.com/edx/edx-val
         url(r'^api/val/v0/', include('edxval.urls')),
     )
 
@@ -123,7 +125,7 @@ favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
 urlpatterns += ((
     r'^favicon\.ico$',
     'django.views.generic.simple.redirect_to',
-    {'url':  settings.STATIC_URL + favicon_path}
+    {'url': settings.STATIC_URL + favicon_path}
 ),)
 
 # Semi-static views only used by edX, not by themes
@@ -154,7 +156,7 @@ if not settings.FEATURES["USE_CUSTOM_THEME"]:
 
         # Press releases
         url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
-)
+    )
 
 # Only enable URLs for those marketing links actually enabled in the
 # settings. Disable URLs by marking them as None.
@@ -261,6 +263,10 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.course_info', name="info"),
         url(r'^courses/{}/syllabus$'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.syllabus', name="syllabus"),   # TODO arjun remove when custom tabs in place, see courseware/courses.py
+
+        #Survey associated with a course
+        url(r'^courses/{}/survey$'.format(settings.COURSE_ID_PATTERN),
+            'courseware.views.course_survey', name="course_survey"),
 
         url(r'^courses/{}/book/(?P<book_index>\d+)/$'.format(settings.COURSE_ID_PATTERN),
             'staticbook.views.index', name="book"),
@@ -453,6 +459,10 @@ urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
+# Survey Djangoapp
+urlpatterns += (
+    url(r'^survey/', include('survey.urls')),
+)
 
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
@@ -531,6 +541,7 @@ if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     urlpatterns += (
         url(r'', include('third_party_auth.urls')),
+        url(r'^login_oauth_token/(?P<backend>[^/]+)/$', 'student.views.login_oauth_token'),
     )
 
 

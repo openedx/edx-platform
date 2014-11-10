@@ -14,7 +14,7 @@ from contracts import contract, new_contract
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.assetstore import AssetMetadata, AssetThumbnailMetadata
+from xmodule.assetstore import AssetMetadata
 
 from . import ModuleStoreWriteBase
 from . import ModuleStoreEnum
@@ -25,7 +25,6 @@ from .split_migrator import SplitMigrator
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
-new_contract('AssetThumbnailMetadata', AssetThumbnailMetadata)
 
 log = logging.getLogger(__name__)
 
@@ -315,8 +314,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_key)
         return store.delete_course(course_key, user_id)
 
-    @contract(course_key='CourseKey', asset_metadata='AssetMetadata')
-    def save_asset_metadata(self, course_key, asset_metadata, user_id):
+    @contract(asset_metadata='AssetMetadata')
+    def save_asset_metadata(self, asset_metadata, user_id):
         """
         Saves the asset metadata for a particular course's asset.
 
@@ -324,20 +323,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         course_key (CourseKey): course identifier
         asset_metadata (AssetMetadata): data about the course asset data
         """
-        store = self._get_modulestore_for_courseid(course_key)
-        return store.save_asset_metadata(course_key, asset_metadata, user_id)
-
-    @contract(course_key='CourseKey', asset_thumbnail_metadata='AssetThumbnailMetadata')
-    def save_asset_thumbnail_metadata(self, course_key, asset_thumbnail_metadata, user_id):
-        """
-        Saves the asset thumbnail metadata for a particular course asset's thumbnail.
-
-        Arguments:
-            course_key (CourseKey): course identifier
-            asset_thumbnail_metadata (AssetThumbnailMetadata): data about the course asset thumbnail
-        """
-        store = self._get_modulestore_for_courseid(course_key)
-        return store.save_asset_thumbnail_metadata(course_key, asset_thumbnail_metadata, user_id)
+        store = self._get_modulestore_for_courseid(asset_metadata.asset_id.course_key)
+        return store.save_asset_metadata(asset_metadata, user_id)
 
     @strip_key
     @contract(asset_key='AssetKey')
@@ -355,23 +342,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.find_asset_metadata(asset_key, **kwargs)
 
     @strip_key
-    @contract(asset_key='AssetKey')
-    def find_asset_thumbnail_metadata(self, asset_key, **kwargs):
-        """
-        Find the metadata for a particular course asset.
-
-        Arguments:
-            asset_key (AssetKey): key containing original asset filename
-
-        Returns:
-            asset metadata (AssetMetadata) -or- None if not found
-        """
-        store = self._get_modulestore_for_courseid(asset_key.course_key)
-        return store.find_asset_thumbnail_metadata(asset_key, **kwargs)
-
-    @strip_key
-    @contract(course_key='CourseKey', start=int, maxresults=int, sort='list | None')
-    def get_all_asset_metadata(self, course_key, start=0, maxresults=-1, sort=None, **kwargs):
+    @contract(course_key='CourseKey', start=int, maxresults=int, sort='tuple|None')
+    def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
         """
         Returns a list of static assets for a course.
         By default all assets are returned, but start and maxresults can be provided to limit the query.
@@ -394,22 +366,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 md5: An md5 hash of the asset content
         """
         store = self._get_modulestore_for_courseid(course_key)
-        return store.get_all_asset_metadata(course_key, start, maxresults, sort, **kwargs)
-
-    @strip_key
-    @contract(course_key='CourseKey')
-    def get_all_asset_thumbnail_metadata(self, course_key, **kwargs):
-        """
-        Returns a list of thumbnails for all course assets.
-
-        Args:
-            course_key (CourseKey): course identifier
-
-        Returns:
-            List of AssetThumbnailMetadata objects.
-        """
-        store = self._get_modulestore_for_courseid(course_key)
-        return store.get_all_asset_thumbnail_metadata(course_key, **kwargs)
+        return store.get_all_asset_metadata(course_key, asset_type, start, maxresults, sort, **kwargs)
 
     @contract(asset_key='AssetKey')
     def delete_asset_metadata(self, asset_key, user_id):
@@ -424,31 +381,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         store = self._get_modulestore_for_courseid(asset_key.course_key)
         return store.delete_asset_metadata(asset_key, user_id)
-
-    @contract(asset_key='AssetKey')
-    def delete_asset_thumbnail_metadata(self, asset_key, user_id):
-        """
-        Deletes a single asset's metadata.
-
-        Arguments:
-            asset_key (AssetKey): locator containing original asset filename
-
-        Returns:
-            Number of asset metadata entries deleted (0 or 1)
-        """
-        store = self._get_modulestore_for_courseid(asset_key.course_key)
-        return store.delete_asset_thumbnail_metadata(asset_key, user_id)
-
-    @contract(course_key='CourseKey')
-    def delete_all_asset_metadata(self, course_key, user_id):
-        """
-        Delete all of the assets which use this course_key as an identifier.
-
-        Arguments:
-            course_key (CourseKey): course_identifier
-        """
-        store = self._get_modulestore_for_courseid(course_key)
-        return store.delete_all_asset_metadata(course_key, user_id)
 
     @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
     def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
@@ -590,6 +522,10 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             )
             # the super handles assets and any other necessities
             super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
+        else:
+            raise NotImplementedError("No code for cloning from {} to {}".format(
+                source_modulestore, dest_modulestore
+            ))
 
     @strip_key
     def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):
