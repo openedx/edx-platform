@@ -24,8 +24,8 @@ messages = json.dumps(xblock.validate().to_json())
     require(["jquery", "js/factories/xblock_validation"], function($, XBlockValidationFactory) {
         XBlockValidationFactory(
             ${messages},
-            $.parseJSON("${bool(xblock_url)}".toLowerCase()),
-            $.parseJSON("${is_root == True}".toLowerCase()),
+            $.parseJSON("${bool(xblock_url)}".toLowerCase()),  // xblock_url will be None or a string
+            $.parseJSON("${bool(is_root)}".toLowerCase()),  // is_root will be None or a boolean
             $('div.xblock-validation-messages[data-locator="${xblock.location | h}"]')
         );
     });
