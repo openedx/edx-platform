@@ -260,7 +260,15 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=R0915
 
         try:
             upload_file = request.FILES.get('students_list')
-            students = [row for row in csv.reader(upload_file.read().splitlines())]
+            if upload_file.name.endswith('.csv'):
+                students = [row for row in csv.reader(upload_file.read().splitlines())]
+                course = get_course_by_id(course_id)
+            else:
+                general_errors.append({
+                    'username': '', 'email': '',
+                    'response': _('Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
+                })
+
         except Exception:  # pylint: disable=W0703
             general_errors.append({
                 'username': '', 'email': '', 'response': _('Could not read uploaded file.')
@@ -269,7 +277,6 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=R0915
             upload_file.close()
 
         generated_passwords = []
-        course = get_course_by_id(course_id)
         row_num = 0
         for student in students:
             row_num = row_num + 1
