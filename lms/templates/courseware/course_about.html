@@ -4,11 +4,6 @@
   from courseware.courses import course_image_url, get_course_about_section
   from django.conf import settings
   from edxmako.shortcuts import marketing_link
-
-  if settings.FEATURES.get('ENABLE_SHOPPING_CART'):
-      cart_link = reverse('shoppingcart.views.show_cart')
-  else:
-      cart_link = ""
 %>
 <%namespace name='static' file='../static_content.html'/>
 <%! from microsite_configuration import microsite %>
@@ -42,7 +37,7 @@
       event.preventDefault();
     });
 
-    % if settings.FEATURES.get('ENABLE_SHOPPING_CART') and settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
+    % if is_shopping_cart_enabled:
       add_course_complete_handler = function(jqXHR, textStatus) {
         if (jqXHR.status == 200) {
           location.href = "${cart_link}";
@@ -162,7 +157,7 @@
         ## so that they can register and become a real user that can enroll.
         % elif not is_shib_course and not can_enroll:
           <span class="register disabled">${_("Enrollment is Closed")}</span>
-        %elif settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and registration_price:
+        %elif is_shopping_cart_enabled and registration_price:
           <%
           if user.is_authenticated():
             reg_href = "#"
