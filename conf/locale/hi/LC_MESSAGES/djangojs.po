@@ -41,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-03 13:19-0500\n"
+"POT-Creation-Date: 2014-11-10 09:06-0500\n"
 "PO-Revision-Date: 2014-10-08 18:08+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -73,8 +73,6 @@ msgstr "ठीक"
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
 msgid "Cancel"
 msgstr "रद्द करें"
 
@@ -2163,169 +2161,6 @@ msgstr ""
 msgid "Tags:"
 msgstr ""
 
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Available %s"
-msgstr "%s जो कि तैयार हैं"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-"यह उन %s की सूची है जो कि तैयार हैं। आप इन पर क्लिक कर के इनमें से कुछ नीचे "
-"दिये गये डिब्बे में चुन सकते हैं। इसके लिये चयन करने के बाद दोनों डिब्बों के"
-" बीच में जो \"चुनें\" का तीर है उसे क्लिक करें। "
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Type into this box to filter down the list of available %s."
-msgstr ""
-"उन %s की सूची जो कि तैयार हैं को फ़िल्टर करने के लिये इस डिब्बे में टाइप "
-"करें।"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Filter"
-msgstr "फ़िल्टर"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose all"
-msgstr "सभी का चुनें"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to choose all %s at once."
-msgstr "सभी %s को एक साथ चुनने के लिए क्लिक करें।"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose"
-msgstr "चुनें"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove"
-msgstr "हटाएं"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Chosen %s"
-msgstr "चुनी हुई %s"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-"यह चुने हुये %s की सूची है। आप इन में से कुछ को हटा सकते हैं। इसके लिये पहले"
-" नीचे दिये गये डिब्बे में उनको चुनें ओर फिर दोनों डिब्बों के बीच में जो "
-"\"हटाएँ\" का तीर है उसे क्लिक करें। "
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove all"
-msgstr "सब हटायें"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to remove all chosen %s at once."
-msgstr "सभी %s को एक साथ हटाने करने के लिए क्लिक करें।"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid "%(sel)s of %(cnt)s selected"
-msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(cnt)s में से %(sel)s चुना हुआ है"
-msgstr[1] "%(cnt)s में से %(sel)s चुनें हुए हैं "
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have unsaved changes on individual editable fields. If you run an "
-"action, your unsaved changes will be lost."
-msgstr ""
-"अलग-अलग बदले जाने वाले क्षेत्रों में आपके द्वारा किये गये परिवर्तन अभी सेव "
-"नहीं हुये हैं। अगर आप इससे आगे कोई क्रिया करते हैं तो ये परिवर्तन रद्द हो "
-"जायेंगे।"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
-"action."
-msgstr ""
-"आपने एक क्रिया को चुना है लेकिन आपने अलग-अलग क्षेत्रों में किये हुये अपने "
-"परिवर्तनों को अभी तक सेव नहीं किया है। इन्हें सेव करने के लिये कृपया \"ओके\""
-" क्लिक करें। आपको यह क्रिया दोबारा करनी पड़ेगी।"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
-"button."
-msgstr ""
-"आपने एक क्रिया को चुना है, और आपने अलग-अलग क्षेत्रों में कोई परिवर्तन नहीं "
-"किये हैं। आप शायद सेव बटन की जगह \"गो\" बटन ढूँढ रहे हैं।"
-
-#. Translators: the names of months, keep the pipe (|) separators.
-#: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
-msgid ""
-"January|February|March|April|May|June|July|August|September|October|November|December"
-msgstr ""
-"जनवरी|फ़रवरी|मार्च|अप्रैल|मई|जून|जुलाई|अगस्त|सितम्बर|अक्टूबर|नवम्बर|दिसम्बर"
-
-#. Translators: abbreviations for days of the week, keep the pipe (|)
-#. separators.
-#: lms/static/admin/js/calendar.js
-msgid "S|M|T|W|T|F|S"
-msgstr "र|सो|मं|बु|गु|शु|श"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
-#: lms/static/admin/js/collapse.min.js
-msgid "Show"
-msgstr "दिखाएं"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
-msgid "Hide"
-msgstr "छिपाएं"
-
-#. Translators: the names of days, keep the pipe (|) separators.
-#: lms/static/admin/js/dateparse.js
-msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "रविवार|सोमवार|मंगलवार|बुधवार|गुरुवार|शुक्रवार|शनिवार"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Now"
-msgstr "अभी"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Clock"
-msgstr "घड़ी"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Choose a time"
-msgstr "समय का चयन करें"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Midnight"
-msgstr "मध्यरात्रि"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "6 a.m."
-msgstr "प्रातः ६ बजे"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Noon"
-msgstr "दोपहर"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Today"
-msgstr "आज"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Calendar"
-msgstr "कैलेंडर"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Yesterday"
-msgstr "कल"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Tomorrow"
-msgstr "कल"
-
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
 msgstr "कैलक्यूलेटर खोलें"
@@ -3431,6 +3266,10 @@ msgstr ""
 msgid "or"
 msgstr "या"
 
+#: cms/static/js/models/xblock_validation.js
+msgid "This component has validation issues."
+msgstr ""
+
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
 msgstr "इस पाठ्यक्रम के प्रारंभ होने की तिथि होनी चाहिए."
@@ -3728,6 +3567,20 @@ msgstr "सेटिंग्स"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New %(component_type)s"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: cms/static/js/views/xblock_validation.js
+msgid "Error"
 msgstr ""
 
 #: cms/static/js/views/components/add_xblock.js
@@ -4676,6 +4529,10 @@ msgstr ""
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "New Group Configuration"
+msgstr ""
+
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Remove"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
