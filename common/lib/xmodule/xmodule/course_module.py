@@ -1099,6 +1099,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def video_pipeline_configured(self):
+        """
+        Returns whether the video pipeline advanced setting is configured for this course.
+        """
         return (
             self.video_upload_pipeline is not None and
             'Institute_Name' in self.video_upload_pipeline and

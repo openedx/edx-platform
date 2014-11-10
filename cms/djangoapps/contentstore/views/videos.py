@@ -10,10 +10,10 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django_future.csrf import ensure_csrf_cookie
 from django.http import HttpResponseNotFound
 from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
+from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from xmodule.assetstore import AssetMetadata
@@ -70,16 +70,16 @@ def videos_handler(request, course_key_string):
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            return videos_index_json(course, request)
+            return videos_index_json(course)
         else:
             return videos_post(course, request)
     elif request.method == 'GET':
-        return videos_index_html(course, request)
+        return videos_index_html(course)
 
     return HttpResponseNotFound()
 
 
-def videos_index_json(course, request):
+def videos_index_json(course):
     """
     Returns a JSON in the following format: {
         videos: [
@@ -98,19 +98,19 @@ def videos_index_json(course, request):
         videos.append({
             'edx_video_id': metadata.asset_id.path,
             'file_name': metadata.fields['file_name'],
-            'date_uploaded': metadata.fields['upload_timestamp'], # TODO PLAT-278 use created_on field instead
+            'date_uploaded': metadata.fields['upload_timestamp'],  # TODO PLAT-278 use created_on field instead
             'status': metadata.fields['status'],
         })
     return JsonResponse({'videos': videos}, status=200)
 
 
-def videos_index_html(course, request):
+def videos_index_html(course):
     """
     Returns an HTML rendering of the list of uploaded videos.
     """
     return render_to_response('videos_index.html', {
         'context_course': course,
-        'videos': videos_index_json(course, request)
+        'videos': videos_index_json(course)
     })
 
 
@@ -132,9 +132,9 @@ def videos_post(course, request):
     bucket = storage_service_bucket()
     institute_name = course.video_upload_pipeline['Institute_Name']
 
-    files = request.json['files']
-    for file in files:
-        file_name = file['file_name']
+    video_files = request.json['files']
+    for video_file in video_files:
+        file_name = video_file['file_name']
 
         # 1. generate edx_video_id
         edx_video_id = generate_edx_video_id(institute_name)
@@ -158,7 +158,7 @@ def videos_post(course, request):
             key.set_metadata(metadata_name, value)
 
         # 4. generate URL
-        file['upload-url'] = key.generate_url(KEY_EXPIRATION_IN_SECONDS, 'PUT')
+        video_file['upload-url'] = key.generate_url(KEY_EXPIRATION_IN_SECONDS, 'PUT')
 
         # 5. persist edx_video_id
         video_meta_data = AssetMetadata(
@@ -171,7 +171,7 @@ def videos_post(course, request):
         )
         modulestore().save_asset_metadata(video_meta_data, request.user.id)
 
-    return JsonResponse({'files': files}, status=200)
+    return JsonResponse({'files': video_files}, status=200)
 
 
 def generate_edx_video_id(institute_name):
