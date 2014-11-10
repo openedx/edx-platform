@@ -208,6 +208,10 @@
 
         select {
             width: 100%;
+
+            &.error {
+                border-color: tint($red,50%);
+            }
         }
         /** FROM _accounts.scss - end **/
     }

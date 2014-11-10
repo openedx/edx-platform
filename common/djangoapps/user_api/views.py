@@ -379,7 +379,8 @@ class RegistrationView(APIView):
             "level_of_education",
             label=education_level_label,
             field_type="select",
-            options=self._options_with_default(UserProfile.LEVEL_OF_EDUCATION_CHOICES),
+            options=UserProfile.LEVEL_OF_EDUCATION_CHOICES,
+            include_default_option=True,
             required=required
         )
 
@@ -392,7 +393,8 @@ class RegistrationView(APIView):
             "gender",
             label=gender_label,
             field_type="select",
-            options=self._options_with_default(UserProfile.GENDER_CHOICES),
+            options=UserProfile.GENDER_CHOICES,
+            include_default_option=True,
             required=required
         )
 
@@ -406,7 +408,8 @@ class RegistrationView(APIView):
             "year_of_birth",
             label=yob_label,
             field_type="select",
-            options=self._options_with_default(options),
+            options=options,
+            include_default_option=True,
             required=required
         )
 
@@ -463,7 +466,8 @@ class RegistrationView(APIView):
             "country",
             label=country_label,
             field_type="select",
-            options=self._options_with_default(options),
+            options=options,
+            include_default_option=True,
             required=required
         )
 
@@ -532,12 +536,6 @@ class RegistrationView(APIView):
             error_messages={
                 "required": error_msg
             }
-        )
-
-    def _options_with_default(self, options):
-        """Include a default option as the first option. """
-        return (
-            [("", "--")] + list(options)
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):

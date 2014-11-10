@@ -125,7 +125,7 @@ class FormDescription(object):
     def add_field(
         self, name, label=u"", field_type=u"text", default=u"",
         placeholder=u"", instructions=u"", required=True, restrictions=None,
-        options=None, error_messages=None
+        options=None, include_default_option=False, error_messages=None
     ):
         """Add a field to the form description.
 
@@ -158,6 +158,9 @@ class FormDescription(object):
                 and `display_name` is the name to display to the user.
                 If the field type is "select", you *must* provide this kwarg.
 
+            include_default_option (boolean): If True, include a "default" empty option
+                at the beginning of the options list.
+
             error_messages (dict): Custom validation error messages.
                 Currently, the only supported key is "required" indicating
                 that the messages should be displayed if the user does
@@ -188,10 +191,20 @@ class FormDescription(object):
 
         if field_type == "select":
             if options is not None:
-                field_dict["options"] = [
+                field_dict["options"] = []
+
+                # Include an empty "default" option at the beginning of the list
+                if include_default_option:
+                    field_dict["options"].append({
+                        "value": "",
+                        "name": "--",
+                        "default": True
+                    })
+
+                field_dict["options"].extend([
                     {"value": option_value, "name": option_name}
                     for option_value, option_name in options
-                ]
+                ])
             else:
                 raise InvalidFieldError("You must provide options for a select field.")
 

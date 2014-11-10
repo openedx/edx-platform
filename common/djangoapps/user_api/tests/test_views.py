@@ -955,7 +955,7 @@ class RegistrationViewTest(ApiTestCase):
                 "required": False,
                 "label": "Highest Level of Education Completed",
                 "options": [
-                    {"value": "", "name": "--"},
+                    {"value": "", "name": "--", "default": True},
                     {"value": "p", "name": "Doctorate"},
                     {"value": "m", "name": "Master's or professional degree"},
                     {"value": "b", "name": "Bachelor's degree"},
@@ -978,7 +978,7 @@ class RegistrationViewTest(ApiTestCase):
                 "required": False,
                 "label": "Gender",
                 "options": [
-                    {"value": "", "name": "--"},
+                    {"value": "", "name": "--", "default": True},
                     {"value": "m", "name": "Male"},
                     {"value": "f", "name": "Female"},
                     {"value": "o", "name": "Other"},
@@ -989,7 +989,7 @@ class RegistrationViewTest(ApiTestCase):
     def test_register_form_year_of_birth(self):
         this_year = datetime.datetime.now(UTC).year
         year_options = (
-            [{"value": "", "name": "--"}] + [
+            [{"value": "", "name": "--", "default": True}] + [
                 {"value": unicode(year), "name": unicode(year)}
                 for year in range(this_year, this_year - 120, -1)
             ]
@@ -1042,7 +1042,7 @@ class RegistrationViewTest(ApiTestCase):
 
     def test_registration_form_country(self):
         country_options = (
-            [{"name": "--", "value": ""}] +
+            [{"name": "--", "value": "", "default": True}] +
             [
                 {"value": country_code, "name": unicode(country_name)}
                 for country_code, country_name in SORTED_COUNTRIES
