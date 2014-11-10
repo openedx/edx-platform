@@ -80,6 +80,34 @@ class TestGitExport(CourseTestCase):
                              stderr=StringIO.StringIO())
         self.assertEqual(ex.exception.code, 1)
 
+    def test_error_output(self):
+        """
+        Verify that error output is actually resolved as the correct string
+        """
+        output = StringIO.StringIO()
+        with self.assertRaises(SystemExit):
+            with self.assertRaisesRegexp(CommandError, GitExportError.BAD_COURSE):
+                call_command(
+                    'git_export', 'foo/bar:baz', 'silly',
+                    stdout=output, stderr=output
+                )
+        self.assertIn('Bad course location provided', output.getvalue())
+        output.close()
+
+        output = StringIO.StringIO()
+        with self.assertRaises(SystemExit):
+            with self.assertRaisesRegexp(CommandError, GitExportError.URL_BAD):
+                call_command(
+                    'git_export', 'foo/bar/baz', 'silly',
+                    stdout=output, stderr=output
+                )
+        self.assertIn(
+            'Non writable git url provided. Expecting something like:'
+            ' git@github.com:mitocw/edx4edx_lite.git',
+            output.getvalue()
+        )
+        output.close()
+
     def test_bad_git_url(self):
         """
         Test several bad URLs for validation
