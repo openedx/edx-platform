@@ -409,7 +409,6 @@ $edx-footer-bg-color: rgb(252,252,252);
   &.rwd {
     @include box-sizing(border-box);
     @include outer-container;
-    $grid-columns: 4;
 
     &.wrapper-footer footer {
       min-width: 0;
@@ -418,16 +417,13 @@ $edx-footer-bg-color: rgb(252,252,252);
     .footer-about,
     .footer-nav,
     .footer-follow {
-      @include span-columns(4);
+      @include span-columns(12);
     }
 
     @include media( $tablet ) {
-      /*$grid-columns: 8;*/
     }
 
     @include media( $desktop ) {
-      $grid-columns: 12;
-
       .footer-about {
         @include span-columns(6);
       }
