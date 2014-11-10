@@ -16,6 +16,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
+from microsite_configuration import microsite
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
@@ -256,7 +257,7 @@ def get_course_info_section_module(request, course, section_key):
         log_if_not_found=False,
         wrap_xmodule_display=False,
         static_asset_path=course.static_asset_path
-    )    
+    )
 
 def get_course_info_section(request, course, section_key):
     """
@@ -345,7 +346,13 @@ def get_courses(user, domain=None):
     Returns a list of courses available, sorted by course.number
     '''
     courses = branding.get_visible_courses()
-    courses = [c for c in courses if has_access(user, 'see_exists', c)]
+
+    permission_name = microsite.get_value(
+        'COURSE_CATALOG_VISIBILITY_PERMISSION',
+        settings.COURSE_CATALOG_VISIBILITY_PERMISSION
+    )
+
+    courses = [c for c in courses if has_access(user, permission_name, c)]
 
     courses = sorted(courses, key=lambda course: course.number)
 
