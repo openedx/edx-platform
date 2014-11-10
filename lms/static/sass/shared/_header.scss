@@ -147,12 +147,13 @@ header.global {
         height: 26px;
         width: 26px;
         display: inline-block;
-        opacity: 0.5;
+        opacity: 0.4;
         overflow: hidden;
         position: absolute;
         top: 0;
         @include transition(all 0.15s linear 0s);
         @include left($baseline/2);
+        color: $base-font-color;
       }
 
       &:hover, &:focus {
