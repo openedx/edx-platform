@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 from django.conf import settings
 from django.conf.urls import include, patterns, url
 from rest_framework import routers

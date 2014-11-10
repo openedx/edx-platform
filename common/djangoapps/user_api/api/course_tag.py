@@ -53,6 +53,10 @@ def set_course_tag(user, course_id, key, value):
         key: arbitrary (<=255 char string)
         value: arbitrary string
     """
+    # pylint: disable=W0511
+    # TODO: There is a risk of IntegrityErrors being thrown here given
+    # simultaneous calls from many processes. Handle by retrying after
+    # a short delay?
 
     record, _ = UserCourseTag.objects.get_or_create(
         user=user,
@@ -61,6 +65,3 @@ def set_course_tag(user, course_id, key, value):
 
     record.value = value
     record.save()
-
-    # TODO: There is a risk of IntegrityErrors being thrown here given
-    # simultaneous calls from many processes.  Handle by retrying after a short delay?

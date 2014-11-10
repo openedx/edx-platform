@@ -14,7 +14,9 @@ from student.models import NonExistentCourseError, CourseEnrollmentException
 
 
 class EnrollmentUserThrottle(UserRateThrottle):
-    rate = '50/second'  # TODO Limit significantly after performance testing.
+    """Limit the number of requests users can make to the enrollment API."""
+    # TODO Limit significantly after performance testing.  # pylint: disable=fixme
+    rate = '50/second'
 
 
 class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
@@ -48,7 +50,7 @@ class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
 
         """
         # Get the underlying HttpRequest object
-        request = request._request
+        request = request._request  # pylint: disable=protected-access
         user = getattr(request, 'user', None)
 
         # Unauthenticated, CSRF validation not required

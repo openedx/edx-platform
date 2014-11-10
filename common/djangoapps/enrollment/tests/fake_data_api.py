@@ -20,6 +20,7 @@ _ENROLLMENTS = []
 _COURSES = []
 
 
+# pylint: disable=unused-argument
 def get_course_enrollments(student_id):
     """Stubbed out Enrollment data request."""
     return _ENROLLMENTS
@@ -48,18 +49,21 @@ def get_course_enrollment_info(course_id):
 
 
 def _get_fake_enrollment(student_id, course_id):
+    """Get an enrollment from the enrollments array."""
     for enrollment in _ENROLLMENTS:
         if student_id == enrollment['student'] and course_id == enrollment['course']['course_id']:
             return enrollment
 
 
 def _get_fake_course_info(course_id):
+    """Get a course from the courses array."""
     for course in _COURSES:
         if course_id == course['course_id']:
             return course
 
 
 def add_enrollment(student_id, course_id, is_active=True, mode='honor'):
+    """Append an enrollment to the enrollments array."""
     enrollment = {
         "created": datetime.datetime.now(),
         "mode": mode,
@@ -72,6 +76,7 @@ def add_enrollment(student_id, course_id, is_active=True, mode='honor'):
 
 
 def add_course(course_id, enrollment_start=None, enrollment_end=None, invite_only=False, course_modes=None):
+    """Append course to the courses array."""
     course_info = {
         "course_id": course_id,
         "enrollment_end": enrollment_end,
@@ -90,7 +95,8 @@ def add_course(course_id, enrollment_start=None, enrollment_end=None, invite_onl
 
 
 def reset():
-    global _COURSES
+    """Set the enrollments and courses arrays to be empty."""
+    global _COURSES  # pylint: disable=global-statement
     _COURSES = []
-    global _ENROLLMENTS
+    global _ENROLLMENTS  # pylint: disable=global-statement
     _ENROLLMENTS = []

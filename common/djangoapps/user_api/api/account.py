@@ -8,7 +8,6 @@ information and preferences).
 """
 from django.conf import settings
 from django.db import transaction, IntegrityError
-from django.db.models import Q
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.contrib.auth.forms import PasswordResetForm
 

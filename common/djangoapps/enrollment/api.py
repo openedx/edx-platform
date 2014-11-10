@@ -11,33 +11,36 @@ log = logging.getLogger(__name__)
 
 
 class CourseEnrollmentError(Exception):
-    """ Generic Course Enrollment Error.
+    """Generic Course Enrollment Error.
 
     Describes any error that may occur when reading or updating enrollment information for a student or a course.
 
     """
     def __init__(self, msg, data=None):
-        super(Exception, self).__init__(msg)
+        super(CourseEnrollmentError, self).__init__(msg)
         # Corresponding information to help resolve the error.
         self.data = data
 
 
 class CourseModeNotFoundError(CourseEnrollmentError):
+    """The requested course mode could not be found."""
     pass
 
 
 class EnrollmentNotFoundError(CourseEnrollmentError):
+    """The requested enrollment could not be found."""
     pass
 
 
 class EnrollmentApiLoadError(CourseEnrollmentError):
+    """The data API could not be loaded."""
     pass
 
 DEFAULT_DATA_API = 'enrollment.data'
 
 
 def get_enrollments(student_id):
-    """ Retrieves all the courses a student is enrolled in.
+    """Retrieves all the courses a student is enrolled in.
 
     Takes a student and retrieves all relative enrollments. Includes information regarding how the student is enrolled
     in the the course.
@@ -107,7 +110,7 @@ def get_enrollments(student_id):
 
 
 def get_enrollment(student_id, course_id):
-    """ Retrieves all enrollment information for the student in respect to a specific course.
+    """Retrieves all enrollment information for the student in respect to a specific course.
 
     Gets all the course enrollment information specific to a student in a course.
 
@@ -151,7 +154,7 @@ def get_enrollment(student_id, course_id):
 
 
 def add_enrollment(student_id, course_id, mode='honor', is_active=True):
-    """ Enrolls a student in a course.
+    """Enrolls a student in a course.
 
     Enrolls a student in a course. If the mode is not specified, this will default to 'honor'.
 
@@ -199,7 +202,7 @@ def add_enrollment(student_id, course_id, mode='honor', is_active=True):
 
 
 def deactivate_enrollment(student_id, course_id):
-    """ Un-enrolls a student in a course
+    """Un-enrolls a student in a course
 
     Deactivate the enrollment of a student in a course. We will not remove the enrollment data, but simply flag it
     as inactive.
@@ -249,7 +252,7 @@ def deactivate_enrollment(student_id, course_id):
 
 
 def update_enrollment(student_id, course_id, mode):
-    """ Updates the course mode for the enrolled user.
+    """Updates the course mode for the enrolled user.
 
     Update a course enrollment for the given student and course.
 
@@ -295,7 +298,7 @@ def update_enrollment(student_id, course_id, mode):
 
 
 def get_course_enrollment_details(course_id):
-    """ Get the course modes for course. Also get enrollment start and end date, invite only, etc.
+    """Get the course modes for course. Also get enrollment start and end date, invite only, etc.
 
     Given a course_id, return a serializable dictionary of properties describing course enrollment information.
 

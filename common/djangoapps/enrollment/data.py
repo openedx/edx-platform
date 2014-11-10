@@ -7,7 +7,6 @@ import logging
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from enrollment.serializers import CourseEnrollmentSerializer, CourseField
 from student.models import CourseEnrollment, NonExistentCourseError
 
@@ -17,7 +16,7 @@ log = logging.getLogger(__name__)
 def get_course_enrollments(student_id):
     """Retrieve a list representing all aggregated data for a student's course enrollments.
 
-    Construct a representation of all course enrollment data for a specific student..
+    Construct a representation of all course enrollment data for a specific student.
 
     Args:
         student_id (str): The name of the student to retrieve course enrollment information for.
@@ -29,7 +28,7 @@ def get_course_enrollments(student_id):
     qset = CourseEnrollment.objects.filter(
         user__username=student_id, is_active=True
     ).order_by('created')
-    return CourseEnrollmentSerializer(qset).data
+    return CourseEnrollmentSerializer(qset).data  # pylint: disable=no-member
 
 
 def get_course_enrollment(student_id, course_id):
@@ -50,7 +49,7 @@ def get_course_enrollment(student_id, course_id):
         enrollment = CourseEnrollment.objects.get(
             user__username=student_id, course_id=course_key
         )
-        return CourseEnrollmentSerializer(enrollment).data
+        return CourseEnrollmentSerializer(enrollment).data  # pylint: disable=no-member
     except CourseEnrollment.DoesNotExist:
         return None
 
@@ -79,7 +78,7 @@ def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
 
     enrollment.update_enrollment(is_active=is_active, mode=mode)
     enrollment.save()
-    return CourseEnrollmentSerializer(enrollment).data
+    return CourseEnrollmentSerializer(enrollment).data  # pylint: disable=no-member
 
 
 def get_course_enrollment_info(course_id):

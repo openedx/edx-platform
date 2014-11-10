@@ -14,12 +14,12 @@ from user_api.helpers import (
 
 
 class FakeInputException(Exception):
-    """Fake exception that should be intercepted. """
+    """Fake exception that should be intercepted."""
     pass
 
 
 class FakeOutputException(Exception):
-    """Fake exception that should be raised. """
+    """Fake exception that should be raised."""
     pass
 
 
@@ -36,9 +36,7 @@ def intercepted_function(raise_error=None):
 
 
 class InterceptErrorsTest(TestCase):
-    """
-    Tests for the decorator that intercepts errors.
-    """
+    """Tests for the decorator that intercepts errors."""
 
     @raises(FakeOutputException)
     def test_intercepts_errors(self):
@@ -73,7 +71,7 @@ class InterceptErrorsTest(TestCase):
 
 
 class FormDescriptionTest(TestCase):
-
+    """Tests of helper functions which generate form descriptions."""
     def test_to_json(self):
         desc = FormDescription("post", "/submit")
         desc.add_field(
@@ -134,7 +132,7 @@ class FormDescriptionTest(TestCase):
 
 @ddt.ddt
 class StudentViewShimTest(TestCase):
-
+    "Tests of the student view shim."
     def setUp(self):
         self.captured_request = None
 
@@ -211,8 +209,8 @@ class StudentViewShimTest(TestCase):
         response = view(HttpRequest())
         self.assertEqual(response.status_code, 403)
 
-    def _shimmed_view(self, response, check_logged_in=False):
-        def stub_view(request):
+    def _shimmed_view(self, response, check_logged_in=False):  # pylint: disable=missing-docstring
+        def stub_view(request):  # pylint: disable=missing-docstring
             self.captured_request = request
             return response
         return shim_student_view(stub_view, check_logged_in=check_logged_in)
