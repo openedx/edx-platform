@@ -18,7 +18,7 @@
 
 <form id="register" autocomplete="off">
     <div class="status submission-error hidden" aria-hidden="true">
-        <h4 class="message-title"><%- gettext("An error occurred in your registration.") %></h4>
+        <h4 class="message-title"><%- gettext("We couldn't complete your registration.") %></h4>
         <ul class="message-copy"></ul>
     </div>
 

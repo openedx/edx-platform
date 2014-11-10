@@ -18,10 +18,10 @@ var edx = edx || {};
             validate: {
 
                 msg: {
-                    email: '<li><%- gettext("The email address you\'ve provided is invalid.") %></li>',
-                    min: '<li><%- _.sprintf(gettext("%(field)s must have at least %(count)d characters"), context) %></li>',
-                    max: '<li><%- _.sprintf(gettext("%(field)s can only contain up to %(count)d characters"), context) %></li>',
-                    required: '<li><%- _.sprintf(gettext("%(field)s is required"), context) %></li>',
+                    email: '<li><%- gettext("The email address you\'ve provided isn\'t formatted correctly.") %></li>',
+                    min: '<li><%- _.sprintf(gettext("%(field)s must have at least %(count)d characters."), context) %></li>',
+                    max: '<li><%- _.sprintf(gettext("%(field)s can only contain up to %(count)d characters."), context) %></li>',
+                    required: '<li><%- _.sprintf(gettext("The %(field)s field cannot be empty."), context) %></li>',
                     custom: '<li><%= content %></li>'
                 },
 
@@ -73,12 +73,6 @@ var edx = edx || {};
                         var max = $el.attr('maxlength') || false;
 
                         return ( !!max ) ? max >= $el.val().length : true;
-                    },
-
-                    capitalizeFirstLetter: function( str ) {
-                        str = str.replace('_', ' ');
-
-                        return str.charAt(0).toUpperCase() + str.slice(1);
                     }
                 },
 
@@ -121,16 +115,21 @@ var edx = edx || {};
                     }
                 },
 
+                getLabel: function( id ) {
+                    // Extract the field label, remove the asterisk (if it appears) and any extra whitespace
+                    return $("label[for=" + id + "]").text().split("*")[0].trim();
+                },
+
                 getMessage: function( $el, tests ) {
                     var txt = [],
                         tpl,
-                        name,
+                        label,
                         obj,
                         customMsg;
 
                     _.each( tests, function( value, key ) {
                         if ( !value ) {
-                            name = $el.attr('name');
+                            label = _fn.validate.getLabel( $el.attr('id') );
                             customMsg = $el.data('errormsg-' + key) || false;
 
                             // If the field has a custom error msg attached, use it
@@ -147,7 +146,7 @@ var edx = edx || {};
                                     // We pass the context object to the template so that
                                     // we can perform variable interpolation using sprintf
                                     context: {
-                                        field: _fn.validate.str.capitalizeFirstLetter( name )
+                                        field: label
                                     }
                                 };
 

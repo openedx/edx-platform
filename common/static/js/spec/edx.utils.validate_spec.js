@@ -9,9 +9,10 @@ describe('edx.utils.validate', function () {
         VALID_STRING = 'xsy_is_awesome',
         SHORT_STRING = 'x',
         LONG_STRING = 'xsy_is_way_too_awesome',
-        REQUIRED_ERROR_FRAGMENT = 'required',
+        EMAIL_ERROR_FRAGMENT = 'formatted',
         MIN_ERROR_FRAGMENT = 'least',
         MAX_ERROR_FRAGMENT = 'up to',
+        REQUIRED_ERROR_FRAGMENT = 'empty',
         CUSTOM_MESSAGE = 'custom message';
 
     var createFixture = function( type, name, required, minlength, maxlength, value ) {
@@ -117,11 +118,11 @@ describe('edx.utils.validate', function () {
         createFixture('email', 'email', false, MIN_LENGTH, MAX_LENGTH, 'localpart');
 
         // Verify optional field behavior
-        expectInvalid('invalid');
+        expectInvalid(EMAIL_ERROR_FRAGMENT);
 
         // Verify required field behavior
         field.prop('required', false);
-        expectInvalid('invalid');
+        expectInvalid(EMAIL_ERROR_FRAGMENT);
     });
 
     it('succeeds if an email field is provided a valid address', function () {
