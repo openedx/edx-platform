@@ -8,6 +8,7 @@ from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
 from django.template import loader
+from django.contrib.sites.models import get_current_site
 
 from django.conf import settings
 from microsite_configuration import microsite
@@ -29,11 +30,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
 
-    def save(self, domain_override=None,
-    	subject_template_name='registration/password_reset_subject.txt',
-        email_template_name='registration/password_reset_email.html',
-        use_https=False, token_generator=default_token_generator,
-        from_email=None, request=None):
+    def save(self, domain_override=None, subject_template_name='registration/password_reset_subject.txt', email_template_name='registration/password_reset_email.html', use_https=False, token_generator=default_token_generator, from_email=None, request=None):
         """
         Generates a one-use only link for resetting password and sends to the
         user.
@@ -46,7 +43,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 domain = current_site.domain
             else:
                 site_name = domain = domain_override
-            c = {
+            context = {
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
@@ -54,10 +51,10 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': use_https and 'https' or 'http',
-                'platform_name' : microsite.get_value('platform_name', settings.PLATFORM_NAME),
-	    }
-            subject = loader.render_to_string(subject_template_name, c)
+                'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME)
+            }
+            subject = loader.render_to_string(subject_template_name, context)
             # Email subject *must not* contain newlines
             subject = ''.join(subject.splitlines())
-            email = loader.render_to_string(email_template_name, c)
+            email = loader.render_to_string(email_template_name, context)
             send_mail(subject, email, from_email, [user.email])
