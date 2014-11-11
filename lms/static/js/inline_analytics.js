@@ -89,14 +89,20 @@ window.InlineAnalytics = (function() {
 
         if (result) {
             // Loop through results and construct row array
+            // Rows returned from the analytics API are in "option" order so we use this
+            // to determine if any rows are "missing" from the data.
             var arrayLength = result.length;
             for (index = 0; index < arrayLength; index++) {
 
+                // valueId: option for this row in the api result
                 valueId = result[index]['value_id'];
-                currentIndex = index;
+                // currentIndex: number of rows already added to graphic
+                currentIndex = trs.length;
+                // valueIndex: index of the option for this row in the api result
                 valueIndex = valueId.replace('choice_', '');
 
-                // Generate rows for gaps in answers in the results
+                // If the current row we are looking to add is less than the row indicated
+                // by the option for this index then add rows for those that are missing
                 if (currentIndex < valueIndex) {
                     insertMissingRows(partId,
                         currentIndex,
@@ -115,8 +121,8 @@ window.InlineAnalytics = (function() {
                 } else if (!correct) {
                     answerClass = 'wrong';
                 }
-                tr = $('<tr><td class="answer_box" title="' + choiceText[index] + '">' +
-                    (parseInt(index, 10) + 1) + '</td><td class="answer_box ' +
+                tr = $('<tr><td class="answer_box" title="' + choiceText[valueIndex] + '">' +
+                    (parseInt(valueIndex, 10) + 1) + '</td><td class="answer_box ' +
                     answerClass + '"><span class="dot"></span></td><td class="answer_box">' +
                     count + '</td><td class="answer_box">' + percent + '%</td></tr>');
                 trs.push(tr[0]);
@@ -309,7 +315,10 @@ window.InlineAnalytics = (function() {
     function getChoiceTexts(partId) {
         var choiceText = [];
         $('#inputtype_' + partId).find("fieldset label").each(function(index) {
-            choiceText[index] = $(this).text();
+        	// Filter out the tick or cross text indicating correctness if present
+            choiceText[index] = $(this).contents().filter(function() {
+                return this.nodeType === 3; //Node.TEXT_NODE
+            }).text();
         });
         return choiceText;
     }
@@ -389,7 +398,7 @@ window.InlineAnalytics = (function() {
             for (index = 0; index < arrayLength; index++) {
                 id = divs[index].id;
                 partId = id.substring(0, id.indexOf('_analytics'));
-                if (divs[index].dataset.question_type !== 'None') {
+                if (divs[index].dataset.question_type) {
                     partsToGet.push(partId);
                 }
 
@@ -425,6 +434,9 @@ window.InlineAnalytics = (function() {
                     }
                 });
 
+            } else {
+            	// API was not called, (no parts to get) so display the existing messages
+            	$('#' + elementId + '_analytics_close').show();
             }
         });
 
