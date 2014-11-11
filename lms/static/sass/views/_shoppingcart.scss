@@ -362,6 +362,7 @@
         text-transform: uppercase;
         color: $light-gray2;
         padding: 0;
+        line-height: 20px;
       }
       h1{
         font-size: 24px;
@@ -385,7 +386,8 @@
           font-size: 16px;
           text-transform: uppercase;
           color: $light-gray2;
-          padding-top: 13px;
+          padding-top: 11px;
+          font-weight: 400;
           .price{
               span{
                 color: $dark-gray1;
@@ -402,6 +404,7 @@
           line-height: 44px;
           text-transform: uppercase;
           color: $light-gray2;
+          margin-top: 3px;
           .numbers-row{
             position: relative;
             label{
@@ -525,6 +528,7 @@
         span{
           display: inline-block;
           padding: 9px 0px;
+          margin-right: -20px;
           b{
             font-weight: 600;
             font-size: 24px;
