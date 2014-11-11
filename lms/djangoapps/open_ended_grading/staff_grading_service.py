@@ -321,7 +321,7 @@ def get_problem_list(request, course_id):
                 u'If not, please do so and return to this page.'
             )
         valid_problem_list = []
-        for i in xrange(0,len(problem_list)):
+        for i in xrange(0, len(problem_list)):
             # Needed to ensure that the 'location' key can be accessed.
             try:
                 problem_list[i] = json.loads(problem_list[i])
