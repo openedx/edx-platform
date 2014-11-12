@@ -1,22 +1,20 @@
-nav.course-material {
+.wrapper-course-material {
   @include clearfix();
   @include box-sizing(border-box);
   border-bottom: none;
-  margin: 0px auto 0px;
-  padding: 0px;
+  margin: 0 auto 0;
+  padding: 0;
   width: 100%;
 
-  .inner-wrapper {
-    margin: 0 auto;
-    max-width: 1200px;
-    width: flex-grid(12);
+  .course-material{
+    @extend %inner-wrapper; 
   }
 
   ol.course-tabs {
     @include border-top-radius(4px);
     @include clearfix();
-    padding: 28px 0 10px 0;
     @include margin-left(10px);
+    padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
     li {
       @include float(left);
@@ -30,7 +28,7 @@ nav.course-material {
       }
 
       &.prominent + li {
-          padding-left: 15px;
+          padding-left: ($baseline*0.75);
           border-left: 1px solid #333;
       }
 
@@ -39,7 +37,7 @@ nav.course-material {
         color: #555;
         display: block;
         text-align: center;
-        padding: 10px 13px 12px;
+        padding: ($baseline/2) 13px 12px;
         font-size: 14px;
         font-weight: bold;
         text-decoration: none;
@@ -74,7 +72,7 @@ nav.course-material {
 header.global.slim {
   box-shadow: 0 1px 2px $shadow-l1;
   height: auto;
-  padding: 5px 0 10px 0;
+  padding: ($baseline/4) 0 ($baseline/2) 0;
   border-bottom: 1px solid $outer-border-color;
   background: $header-bg;
 
@@ -119,7 +117,7 @@ header.global.slim {
   }
 
   h1.logo {
-    margin: 0 10px 0 13px;
+    margin: 0 ($baseline/2) 0 0;
     @include padding-right(20px);
 
     &:before {

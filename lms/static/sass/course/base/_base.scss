@@ -1,8 +1,13 @@
+// lms - course - base
+// ====================
+
 body {
   min-width: 980px;
   min-height: 100%;
-  background-image: $course-bg-image;
   background-color: $course-bg-color;
+
+  //for background texture:
+  //background-image: $course-bg-image;
 }
 
 body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
@@ -27,7 +32,7 @@ a {
 }
 
 .container {
-  padding: 20px 0 0 0;
+  padding: 0;
 
   > div {
     display: table;
@@ -52,6 +57,7 @@ form.choicegroup {
     @include float(left);
   }
 }
+
 
 textarea,
 input[type="text"],

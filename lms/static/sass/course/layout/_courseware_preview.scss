@@ -1,0 +1,27 @@
+.wrapper-preview-menu {
+  @include clearfix();
+  @include box-sizing(border-box);
+  margin: 0 auto 0;
+  padding: ($baseline*0.75);
+  width: 100%;
+  background-color: $gray-l3;
+
+  .preview-menu {
+    @extend %inner-wrapper;
+  }
+
+  .preview-actions {
+    display: inline-block;
+
+    .action-preview {
+      display: inline-block;
+
+      .action-preview-label {
+        display: inline-block;
+        margin-right: ($baseline/2);
+        margin-bottom: 0;
+        vertical-align: middle;
+      }
+    }
+  }
+}
