@@ -1,3 +1,14 @@
+// lms - course - extends
+// ====================
+
+// lms inner wrapper
+%inner-wrapper {
+  margin: 0 auto;
+  max-width: 1180px;
+  width: flex-grid(12);
+}
+
+// Older Course Extends - to review/remove with LMS cleanup
 h1.top-header {
   border-bottom: 1px solid $border-color-2;
   @include text-align(left);
