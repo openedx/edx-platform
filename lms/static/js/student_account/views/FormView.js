@@ -28,6 +28,9 @@ var edx = edx || {};
         // String to append to required label fields
         requiredStr: '*',
 
+        // Id of required footnote
+        requiredNote: 'register-footnote',
+
         initialize: function( data ) {
             this.model = data.model;
             this.preRender( data );
@@ -71,7 +74,8 @@ var edx = edx || {};
             var html = [],
                 i,
                 len = data.length,
-                fieldTpl = this.fieldTpl;
+                fieldTpl = this.fieldTpl,
+                requiredNote = '';
 
             this.fields = data;
 
@@ -80,9 +84,12 @@ var edx = edx || {};
                     data[i].errorMessages = this.escapeStrings( data[i].errorMessages );
                 }
 
+                requiredNote = data[i].required ? this.requiredNote : '';
+
                 html.push( _.template( fieldTpl, $.extend( data[i], {
                     form: this.formType,
-                    requiredStr: this.requiredStr
+                    requiredStr: this.requiredStr,
+                    requiredNote: requiredNote
                 }) ) );
             }
 
@@ -114,6 +121,21 @@ var edx = edx || {};
             });
 
             return obj;
+        },
+
+        focusFirstError: function() {
+            var $error = this.$form.find('.error').first(),
+                $field = {},
+                $parent = {};
+
+            if ( $error.is('label') ) {
+                $parent = $error.parent('.form-field');
+                $error = $parent.find('input') || $parent.find('select');
+            } else {
+                $field = $error;
+            }
+
+            $error.focus();
         },
 
         forgotPassword: function( event ) {
@@ -184,6 +206,9 @@ var edx = edx || {};
             $('html,body').animate({
                 scrollTop: this.$errors.offset().top
             },'slow');
+
+            // Focus on first error field
+            this.focusFirstError();
         },
 
         submitForm: function( event ) {

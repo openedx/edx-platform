@@ -18,6 +18,8 @@ var edx = edx || {};
 
         formType: 'register',
 
+        requiredNote: 'register-footnote',
+
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';

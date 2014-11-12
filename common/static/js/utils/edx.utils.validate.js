@@ -51,6 +51,8 @@ var edx = edx || {};
                     response.isValid = required && min && max && email;
 
                     if ( !response.isValid ) {
+                        _fn.validate.removeDefault( $el );
+
                         response.message = _fn.validate.getMessage( $el, {
                             required: required,
                             min: min,
@@ -162,6 +164,11 @@ var edx = edx || {};
                     });
 
                     return txt.join(' ');
+                },
+
+                // Removes the default HTML5 validation pop-up
+                removeDefault: function( $el ) {
+                    $el.setCustomValidity(' ');
                 }
             }
         };
