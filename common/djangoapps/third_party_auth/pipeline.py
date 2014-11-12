@@ -119,6 +119,30 @@ AUTH_ENTRY_REGISTER_2 = 'account_register'
 
 AUTH_ENTRY_API = 'api'
 
+# URLs associated with auth entry points
+# These are used to request additional user information
+# (for example, account credentials when logging in),
+# and when the user cancels the auth process
+# (e.g., refusing to grant permission on the provider's login page).
+# We don't use "reverse" here because doing so may cause modules
+# to load that depend on this module.
+AUTH_DISPATCH_URLS = {
+    AUTH_ENTRY_DASHBOARD: '/dashboard',
+    AUTH_ENTRY_LOGIN: '/login',
+    AUTH_ENTRY_REGISTER: '/register',
+
+    # TODO (ECOM-369): Replace the dispatch URLs
+    # for `AUTH_ENTRY_LOGIN` and `AUTH_ENTRY_REGISTER`
+    # with these values, but DO NOT DELETE THESE KEYS.
+    AUTH_ENTRY_LOGIN_2: '/account/login/',
+    AUTH_ENTRY_REGISTER_2: '/account/register/',
+
+    # If linking/unlinking an account from the new student profile
+    # page, redirect to the profile page.  Only used if
+    # `FEATURES['ENABLE_NEW_DASHBOARD']` is true.
+    AUTH_ENTRY_PROFILE: '/profile/',
+}
+
 _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_DASHBOARD,
     AUTH_ENTRY_LOGIN,
@@ -483,20 +507,20 @@ def ensure_user_information(
         return
 
     if dispatch_to_login:
-        return redirect('/login', name='signin_user')
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN], name='signin_user')
 
     # TODO (ECOM-369): Consolidate this with `dispatch_to_login`
     # once the A/B test completes.
     if dispatch_to_login_2:
-        return redirect(reverse(AUTH_ENTRY_LOGIN_2))
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN_2])
 
     if is_register and user_unset:
-        return redirect('/register', name='register_user')
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER], name='register_user')
 
     # TODO (ECOM-369): Consolidate this with `is_register`
     # once the A/B test completes.
     if is_register_2 and user_unset:
-        return redirect(reverse(AUTH_ENTRY_REGISTER_2))
+        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER_2])
 
 
 @partial.partial
