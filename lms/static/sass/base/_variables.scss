@@ -348,11 +348,13 @@ $dashboard-course-cover-border: $light-gray;
 
 // MISC: course assets
 $content-wrapper-bg: $white;
-$course-bg-color: #d6d6d6;
-$course-bg-image: url(../images/bg-texture.png);
+$course-bg-color: #f2f2f2;
 $account-content-wrapper-bg: shade($body-bg, 2%);
 $course-profile-bg: rgb(245,245,245);
 $course-header-bg: rgba(255,255,255, 0.93);
+
+// MISC: course background texture
+//$course-bg-image: url(../images/bg-texture.png);
 
 // MISC: borders
 $border-color-1: rgb(190,190,190);
