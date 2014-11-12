@@ -5,6 +5,7 @@ Instructor (2) dashboard page.
 
 from bok_choy.page_object import PageObject
 from .course_page import CoursePage
+import os
 
 
 class InstructorDashboardPage(CoursePage):
@@ -12,6 +13,9 @@ class InstructorDashboardPage(CoursePage):
     Instructor dashboard, where course staff can manage a course.
     """
     url_path = "instructor"
+    browse_button_selector = '.auto_enroll_csv .file-browse input.file_field'
+    upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
+    file_path_selector = '.auto_enroll_csv input#browseBtn'
 
     def is_browser_on_page(self):
         return self.q(css='div.instructor-dashboard-wrapper-2').present
@@ -25,6 +29,77 @@ class InstructorDashboardPage(CoursePage):
         membership_section.wait_for_page()
         return membership_section
 
+    def file_attachment_browse_button_is_visible(self):
+        return self.q(css=self.browse_button_selector).is_present()
+
+    def click_browse_button(self):
+        self.q(css=self.browse_button_selector).click()
+
+    def is_file_browse_dialog_visible(self):
+        return True
+
+    def is_upload_button_visible(self):
+        return self.q(css=self.upload_button_selector).is_present()
+
+    def click_upload_file_button(self):
+        self.q(css=self.upload_button_selector).click()
+
+    def is_error_notification_displayed(self):
+        notification_selector = '.auto_enroll_csv .results .message-error'
+        self.wait_for_element_presence(notification_selector, "Error Notification")
+        return self.q(css=notification_selector).is_present()
+
+    def is_warning_notification_displayed(self):
+        notification_selector = '.auto_enroll_csv .results .message-warning'
+        self.wait_for_element_presence(notification_selector, "Warning Notification")
+        return self.q(css=notification_selector).is_present()
+
+    def is_success_notification_displayed(self):
+        notification_selector = '.auto_enroll_csv .results .message-confirmation'
+        self.wait_for_element_presence(notification_selector, "Success Notification")
+        return self.q(css=notification_selector).is_present()
+
+    def first_error_message(self):
+        error_message_selector = '.auto_enroll_csv .results .message-error li.summary-item'
+        self.wait_for_element_presence(error_message_selector, "message")
+        return self.q(css=error_message_selector).text[0]
+
+    def first_warning_message(self):
+        error_message_selector = '.auto_enroll_csv .results .message-warning li.summary-item'
+        self.wait_for_element_presence(error_message_selector, "message")
+        return self.q(css=error_message_selector).text[0]
+
+    def switch_to_alert_and_accept(self):
+        #  customized from
+        #  http://stackoverflow.com/questions/11290077/switch-to-web-dialog-box-in-selenium-webdriver-python
+
+        parent_h = self.browser.current_window_handle
+        #  click on the link that opens a new window
+        handles = self.browser.window_handles  # before the pop-up window closes
+        if handles and parent_h != handles[0]:
+            handles.remove(parent_h)
+        self.browser.switch_to_window(handles.pop())
+        #  do stuff in the popup
+        #  popup window closes
+        self.browser.switch_to_window(parent_h)
+
+    def get_asset_path(self, file_name):
+        return os.sep.join(__file__.split(os.sep)[:-5]) + '/test/data/uploads/%s'%file_name
+
+    def upload_correct_csv_file(self):
+        correct_files_path = self.get_asset_path('auto_reg_enrollment.csv')
+        self.q(css=self.file_path_selector).results[0].send_keys(correct_files_path)
+        self.click_upload_file_button()
+
+    def upload_csv_file_with_errors_warnings(self):
+        errors_warnings_files_path = self.get_asset_path('auto_reg_enrollment_errors_warnings.csv')
+        self.q(css=self.file_path_selector).results[0].send_keys(errors_warnings_files_path)
+        self.click_upload_file_button()
+
+    def upload_non_csv_file(self):
+        errors_warnings_files_path = self.get_asset_path('image.jpg')
+        self.q(css=self.file_path_selector).results[0].send_keys(errors_warnings_files_path)
+        self.click_upload_file_button()
 
 class MembershipPage(PageObject):
     """
