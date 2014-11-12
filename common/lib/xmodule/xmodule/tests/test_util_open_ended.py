@@ -85,7 +85,8 @@ class DummyModulestore(object):
         raise NotImplementedError("Sub-tests must specify how to generate a module-system")
 
     def setup_modulestore(self, name):
-        self.modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+        # pylint: disable=attribute-defined-outside-init
+        self.modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
 
     def get_course(self, _):
         """Get a test course by directory name.  If there's more than one, error."""

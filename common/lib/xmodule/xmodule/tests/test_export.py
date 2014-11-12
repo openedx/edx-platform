@@ -104,7 +104,7 @@ class RoundTripTestCase(unittest.TestCase):
         shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
         print("Starting import")
-        initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
+        initial_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses = initial_import.get_courses()
         self.assertEquals(len(courses), 1)
@@ -122,7 +122,7 @@ class RoundTripTestCase(unittest.TestCase):
             lxml.etree.ElementTree(root).write(course_xml)
 
         print("Starting second import")
-        second_import = XMLModuleStore(root_dir, course_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
+        second_import = XMLModuleStore(root_dir, source_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses2 = second_import.get_courses()
         self.assertEquals(len(courses2), 1)

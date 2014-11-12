@@ -31,7 +31,7 @@ class TestXMLModuleStore(unittest.TestCase):
     Test around the XML modulestore
     """
     def test_xml_modulestore_type(self):
-        store = XMLModuleStore(DATA_DIR, course_dirs=[])
+        store = XMLModuleStore(DATA_DIR, source_dirs=[])
         self.assertEqual(store.get_modulestore_type(), ModuleStoreEnum.Type.xml)
 
     def test_unicode_chars_in_xml_content(self):
@@ -46,7 +46,7 @@ class TestXMLModuleStore(unittest.TestCase):
 
         # Load the course, but don't make error modules.  This will succeed,
         # but will record the errors.
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'], load_error_modules=False)
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['toy'], load_error_modules=False)
 
         # Look up the errors during load. There should be none.
         errors = modulestore.get_course_errors(SlashSeparatedCourseKey("edX", "toy", "2012_Fall"))
@@ -54,7 +54,7 @@ class TestXMLModuleStore(unittest.TestCase):
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
     def test_tilde_files_ignored(self, _fake_glob):
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['tilde'], load_error_modules=False)
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['tilde'], load_error_modules=False)
         about_location = SlashSeparatedCourseKey('edX', 'tilde', '2012_Fall').make_usage_key(
             'about', 'index',
         )
@@ -66,7 +66,7 @@ class TestXMLModuleStore(unittest.TestCase):
         """
         Test the get_courses_for_wiki method
         """
-        store = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
+        store = XMLModuleStore(DATA_DIR, source_dirs=['toy', 'simple'])
         for course in store.get_courses():
             course_locations = store.get_courses_for_wiki(course.wiki_slug)
             self.assertEqual(len(course_locations), 1)
@@ -92,7 +92,7 @@ class TestXMLModuleStore(unittest.TestCase):
         Test the has_course method
         """
         check_has_course_method(
-            XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple']),
+            XMLModuleStore(DATA_DIR, source_dirs=['toy', 'simple']),
             SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'),
             locator_key_fields=SlashSeparatedCourseKey.KEY_FIELDS
         )
@@ -101,7 +101,7 @@ class TestXMLModuleStore(unittest.TestCase):
         """
         Test the branch setting context manager
         """
-        store = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
+        store = XMLModuleStore(DATA_DIR, source_dirs=['toy'])
         course = store.get_courses()[0]
 
         # XML store allows published_only branch setting
@@ -119,7 +119,7 @@ class TestXMLModuleStore(unittest.TestCase):
         """
         Test a course whose structure is not a tree.
         """
-        store = XMLModuleStore(DATA_DIR, course_dirs=['xml_dag'])
+        store = XMLModuleStore(DATA_DIR, source_dirs=['xml_dag'])
         course_key = store.get_courses()[0].id
 
         mock_logging.warning.assert_called_with(
