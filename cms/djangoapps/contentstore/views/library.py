@@ -188,5 +188,6 @@ def library_blocks_view(library, user, response_format):
         'context_library': library,
         'component_templates': json.dumps(component_templates),
         'xblock_info': xblock_info,
-        'templates': CONTAINER_TEMPATES
+        'templates': CONTAINER_TEMPATES,
+        'lib_users_url': reverse_library_url('manage_library_users', unicode(library.location.library_key)),
     })
