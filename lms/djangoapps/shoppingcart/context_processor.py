@@ -6,7 +6,8 @@ navigation.  We want to do this in the context_processor to
 2) because navigation.html is "called" by being included in other templates, there's no "views.py" to put this.
 """
 
-import shoppingcart
+from .models import Order, PaidCourseRegistration, CourseRegCodeItem
+from .utils import is_shopping_cart_enabled
 
 
 def user_has_cart_context_processor(request):
@@ -19,11 +20,11 @@ def user_has_cart_context_processor(request):
         # user is logged in and
         request.user.is_authenticated() and
         # do we have the feature turned on
-        shoppingcart.utils.is_shopping_cart_enabled() and
+        is_shopping_cart_enabled() and
         # user's cart has PaidCourseRegistrations
-        shoppingcart.models.Order.user_cart_has_items(
+        Order.user_cart_has_items(
             request.user,
-            [shoppingcart.models.PaidCourseRegistration, shoppingcart.models.CourseRegCodeItem]
+            [PaidCourseRegistration, CourseRegCodeItem]
         )
     )
 
