@@ -265,13 +265,20 @@ class MongoContentstoreBuilder(object):
     def __repr__(self):
         return 'MongoContentstoreBuilder()'
 
-
-MODULESTORE_SETUPS = (
-    MongoModulestoreBuilder(),
-#     VersioningModulestoreBuilder(),  # FIXME LMS-11227
+MIXED_MODULESTORE_BOTH_SETUP = MixedModulestoreBuilder([
+    ('draft', MongoModulestoreBuilder()),
+    ('split', VersioningModulestoreBuilder())
+])
+MIXED_MODULESTORE_SETUPS = (
     MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())]),
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
+DIRECT_MODULESTORE_SETUPS = (
+    MongoModulestoreBuilder(),
+#     VersioningModulestoreBuilder(),  # FUTUREDO: LMS-11227
+)
+MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
+
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 COURSE_DATA_NAMES = (
     'toy',

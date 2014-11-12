@@ -12,7 +12,8 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
-    MODULESTORE_SETUPS, MongoContentstoreBuilder, XmlModulestoreBuilder, MixedModulestoreBuilder, MongoModulestoreBuilder
+    MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS, MongoContentstoreBuilder,
+    XmlModulestoreBuilder, MixedModulestoreBuilder, MongoModulestoreBuilder
 )
 
 
@@ -414,9 +415,9 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 store.get_all_asset_metadata(course_key, 'asset')
 
     @ddt.data(*MODULESTORE_SETUPS)
-    def test_copy_all_assets(self, storebuilder):
+    def test_copy_all_assets_same_modulestore(self, storebuilder):
         """
-        Create a course with assets and such, copy it all to another course, and check on it.
+        Create a course with assets, copy them all to another course in the same modulestore, and check on it.
         """
         with MongoContentstoreBuilder().build() as contentstore:
             with storebuilder.build(contentstore) as store:
@@ -428,6 +429,33 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 101)
                 self.assertEquals(len(store.get_all_asset_metadata(course1.id, 'asset')), 2)
                 all_assets = store.get_all_asset_metadata(
+                    course2.id, 'asset', sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
+                )
+                self.assertEquals(len(all_assets), 2)
+                self.assertEquals(all_assets[0].asset_id.path, 'pic1.jpg')
+                self.assertEquals(all_assets[1].asset_id.path, 'shout.ogg')
+
+    @ddt.data(
+        ('mongo', 'split'),
+        ('split', 'mongo'),
+    )
+    @ddt.unpack
+    def test_copy_all_assets_cross_modulestore(self, from_store, to_store):
+        """
+        Create a course with assets, copy them all to another course in a different modulestore, and check on it.
+        """
+        mixed_builder = MIXED_MODULESTORE_BOTH_SETUP
+        with MongoContentstoreBuilder().build() as contentstore:
+            with mixed_builder.build(contentstore) as mixed_store:
+                with mixed_store.default_store(from_store):
+                    course1 = CourseFactory.create(modulestore=mixed_store)
+                with mixed_store.default_store(to_store):
+                    course2 = CourseFactory.create(modulestore=mixed_store)
+                self.setup_assets(course1.id, None, mixed_store)
+                self.assertEquals(len(mixed_store.get_all_asset_metadata(course1.id, 'asset')), 2)
+                self.assertEquals(len(mixed_store.get_all_asset_metadata(course2.id, 'asset')), 0)
+                mixed_store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 102)
+                all_assets = mixed_store.get_all_asset_metadata(
                     course2.id, 'asset', sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
                 )
                 self.assertEquals(len(all_assets), 2)
