@@ -516,6 +516,7 @@ class ProblemExecutionTest(UniqueCourseTest):
         problem_page.click_check()
         self.assertFalse(problem_page.is_correct())
 
+
 class AutoEnrollmentWithCSVTest(UniqueCourseTest):
     """
     Tests of problems.
@@ -556,8 +557,3 @@ class AutoEnrollmentWithCSVTest(UniqueCourseTest):
         self.instructor_dashboard_page.upload_non_csv_file()
         self.assertTrue(self.instructor_dashboard_page.is_error_notification_displayed())
         self.assertEqual(self.instructor_dashboard_page.first_error_message(), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
-
-
-
-
-
