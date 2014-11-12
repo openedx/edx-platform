@@ -7,7 +7,7 @@
         <% } %>
     </div>
 
-    <div class="status submission-error hidden" aria-hidden="true">
+    <div class="status submission-error hidden" aria-hidden="true" aria-live="polite">
         <h4 class="message-title"><%- gettext("We couldn't log you in.") %></h4>
         <ul class="message-copy"></ul>
     </div>
