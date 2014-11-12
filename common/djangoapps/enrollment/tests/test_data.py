@@ -34,7 +34,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
     PASSWORD = "edx"
 
     def setUp(self):
-        """ Create a course and user, then log in. """
+        """Create a course and user, then log in. """
         super(EnrollmentDataTest, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
@@ -163,6 +163,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         data.get_course_enrollment_info("this/is/bananas")
 
     def _create_course_modes(self, course_modes, course=None):
+        """Create the course modes required for a test. """
         course_id = course.id if course else self.course.id
         for mode_slug in course_modes:
             CourseModeFactory.create(

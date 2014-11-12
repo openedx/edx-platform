@@ -3,7 +3,6 @@ Serializers for all Course Enrollment related return objects.
 
 """
 from rest_framework import serializers
-from rest_framework.fields import Field
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 
@@ -36,7 +35,7 @@ class CourseField(serializers.RelatedField):
 
     def to_native(self, course):
         course_id = unicode(course.id)
-        course_modes = ModeSerializer(CourseMode.modes_for_course(course.id)).data
+        course_modes = ModeSerializer(CourseMode.modes_for_course(course.id)).data  # pylint: disable=no-member
 
         return {
             "course_id": course_id,

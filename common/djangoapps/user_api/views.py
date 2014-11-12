@@ -1,6 +1,5 @@
 """HTTP end-points for the User API. """
 import copy
-import json
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -25,7 +24,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from edxmako.shortcuts import marketing_link
 
 import third_party_auth
-from microsite_configuration import microsite
 from user_api.api import account as account_api, profile as profile_api
 from user_api.helpers import FormDescription, shim_student_view, require_post_params
 
@@ -54,7 +52,7 @@ class LoginSessionView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
-    def get(self, request):
+    def get(self, request):  # pylint: disable=unused-argument
         """Return a description of the login form.
 
         This decouples clients from the API definition:
@@ -63,9 +61,6 @@ class LoginSessionView(APIView):
 
         See `user_api.helpers.FormDescription` for examples
         of the JSON-encoded form description.
-
-        Arguments:
-            request (HttpRequest)
 
         Returns:
             HttpResponse
@@ -307,6 +302,15 @@ class RegistrationView(APIView):
         return shim_student_view(create_account)(request)
 
     def _add_email_field(self, form_desc, required=True):
+        """Add an email field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's email address.
         email_label = _(u"Email")
@@ -328,6 +332,15 @@ class RegistrationView(APIView):
         )
 
     def _add_name_field(self, form_desc, required=True):
+        """Add a name field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
         name_label = _(u"Full Name")
@@ -347,6 +360,15 @@ class RegistrationView(APIView):
         )
 
     def _add_username_field(self, form_desc, required=True):
+        """Add a username field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
         username_label = _(u"Username")
@@ -369,6 +391,15 @@ class RegistrationView(APIView):
         )
 
     def _add_password_field(self, form_desc, required=True):
+        """Add a password field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's password.
         password_label = _(u"Password")
@@ -385,6 +416,15 @@ class RegistrationView(APIView):
         )
 
     def _add_level_of_education_field(self, form_desc, required=True):
+        """Add a level of education field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
         education_level_label = _(u"Highest Level of Education Completed")
@@ -399,6 +439,15 @@ class RegistrationView(APIView):
         )
 
     def _add_gender_field(self, form_desc, required=True):
+        """Add a gender field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's gender.
         gender_label = _(u"Gender")
@@ -413,6 +462,15 @@ class RegistrationView(APIView):
         )
 
     def _add_year_of_birth_field(self, form_desc, required=True):
+        """Add a year of birth field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's year of birth.
         yob_label = _(u"Year of Birth")
@@ -428,6 +486,15 @@ class RegistrationView(APIView):
         )
 
     def _add_mailing_address_field(self, form_desc, required=True):
+        """Add a mailing address field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's mailing address.
         mailing_address_label = _(u"Mailing Address")
@@ -440,6 +507,15 @@ class RegistrationView(APIView):
         )
 
     def _add_goals_field(self, form_desc, required=True):
+        """Add a goals field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This phrase appears above a field on the registration form
         # meant to hold the user's reasons for registering with edX.
         goals_label = _(
@@ -454,6 +530,15 @@ class RegistrationView(APIView):
         )
 
     def _add_city_field(self, form_desc, required=True):
+        """Add a city field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a field on the registration form
         # which allows the user to input the city in which they live.
         city_label = _(u"City")
@@ -465,6 +550,15 @@ class RegistrationView(APIView):
         )
 
     def _add_country_field(self, form_desc, required=True):
+        """Add a country field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the country in which the user lives.
         country_label = _(u"Country")
@@ -486,6 +580,15 @@ class RegistrationView(APIView):
         )
 
     def _add_honor_code_field(self, form_desc, required=True):
+        """Add an honor code field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Separate terms of service and honor code checkboxes
         if self._is_field_visible("terms_of_service"):
             terms_text = _(u"Honor Code")
@@ -531,6 +634,15 @@ class RegistrationView(APIView):
         )
 
     def _add_terms_of_service_field(self, form_desc, required=True):
+        """Add a terms of service field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (Boolean): Whether this field is required; defaults to True
+
+        """
         # Translators: This is a legal document users must agree to
         # in order to register a new account.
         terms_text = _(u"Terms of Service")
@@ -615,6 +727,7 @@ class RegistrationView(APIView):
                     restrictions={}
                 )
 
+
 class PasswordResetView(APIView):
     """HTTP end-point for GETting a description of the password reset form. """
 
@@ -622,7 +735,7 @@ class PasswordResetView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
-    def get(self, request):
+    def get(self, request):  # pylint: disable=unused-argument
         """Return a description of the password reset form.
 
         This decouples clients from the API definition:
@@ -631,9 +744,6 @@ class PasswordResetView(APIView):
 
         See `user_api.helpers.FormDescription` for examples
         of the JSON-encoded form description.
-
-        Arguments:
-            request (HttpRequest)
 
         Returns:
             HttpResponse

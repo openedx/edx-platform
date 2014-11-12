@@ -60,7 +60,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
                 mode_display_name=mode_slug,
             )
 
-        # Enroll in the course and verify the URL we get sent to
+        # Create an enrollment
         self._create_enrollment()
 
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
@@ -159,6 +159,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def _create_enrollment(self):
+        """Enroll in the course and verify the URL we are sent to. """
         resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.content)
