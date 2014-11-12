@@ -1,0 +1,171 @@
+<%inherit file="../../base.html" />
+
+<%block name="view_notes">
+  <%include file="_note-usage.html" />
+</%block>
+
+<%!
+from django.core.urlresolvers import reverse
+%>
+<%block name="title">[template] Course Video Uploads UI</%block>
+<%block name="bodyclass">is-signedin course view-video-upload</%block>
+
+<%block name="content">
+
+<div id="content">
+
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">Content</small>
+        <span class="sr">&gt; </span>Video Uploads
+      </h1>
+
+      <nav class="nav-actions">
+        <h3 class="sr">Page Actions</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="button button-new" data-category="chapter" data-parent="" data-default-name="">
+              <i class="icon-plus"></i>Upload New File
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+
+      <article class="content-primary" role="main">
+
+        <div class="wrapper-dnd">
+          <article class="outline outline-complex" data-locator="" data-course-key="">
+            <h2 class="sr outline-title">Your Uploaded Videos</h2>
+            
+            <div class="drag-drop">
+              <form id="form-drag-drop" action="upload.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+                <fieldset>
+                  <legend class="sr">Upload your videos</legend>
+                  <div class="area-drag-drop">
+                    Drag and drop your video files here, or...
+
+                    <label for="video-files" class="sr">Files to upload:</label>
+                    <input type="file" class="sr" id="video-files" name="video-files[]" multiple="multiple" />
+                  </div>
+                  <div class="action-area">
+                    <button type="button" class="button primary-green"><i class="icon-plus"></i>Select files</button>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+
+          </article>
+
+          <section class="video-upload-progress-container">
+            <h3 class="sr">Video Upload Progress</h3>
+            <ul>
+              <li>
+                <h4 id="video-upload-001">Something random that's supposed to be uploading</h4>
+                <div class="progress-bar">
+                  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 37%" aria-describedby="video-upload-001"></div>
+                </div>
+                <div class="video-actions">
+                  <button type="button"><i class="icon-cancel"></i><span class="sr">Cancel</span></button>
+                </div>
+              </li>
+              <li>
+                <h4 id="video-upload-002">Something random that's supposed to be uploading</h4>
+                <div class="progress-bar">
+                  <div class="bar bar-error" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 37%" aria-describedby="video-upload-002"></div>
+                </div>
+                <div class="video-actions">
+                  <button type="button"><i class="icon-retry"></i><span class="sr">Retry</span></button>
+                </div>
+              </li>
+              <li>
+                <h4 id="video-upload-003">Something random that's supposed to be uploading</h4>
+                <div class="progress-bar">
+                  <div class="bar bar-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 37%" aria-describedby="video-upload-003"></div>
+                </div>
+                <div class="video-actions">
+                  <button type="button"><i class="icon-remove"></i><span class="sr">Remove</span></button>
+                </div>
+              </li>
+              <li>
+                <h4 id="video-upload-004">Something random that's supposed to be uploading</h4>
+                <div class="progress-bar">
+                  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 37%" aria-describedby="video-upload-004"></div>
+                </div>
+                <div class="video-actions">
+                  <button type="button"><i class="icon-cancel"></i><span class="sr">Cancel</span></button>
+                </div>
+              </li>
+              <li>
+                <h4 id="video-upload-005">Something random that's supposed to be uploading</h4>
+                <div class="progress-bar">
+                  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 37%" aria-describedby="video-upload-005"></div>
+                </div>
+                <div class="video-actions">
+                  <button type="button"><i class="icon-cancel"></i><span class="sr">Cancel</span></button>
+                </div>
+              </li>
+              <li>
+                <h4 id="video-upload-006">Something random that's supposed to be uploading</h4>
+                <div class="progress-bar">
+                  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 37%" aria-describedby="video-upload-006"></div>
+                </div>
+                <div class="video-actions">
+                  <button type="button"><i class="icon-cancel"></i><span class="sr">Cancel</span></button>
+                </div>
+              </li>
+              <li>
+                <h4 id="video-upload-007">Something random that's supposed to be uploading</h4>
+                <div class="progress-bar">
+                  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 37%" aria-describedby="video-upload-007"></div>
+                </div>
+                <div class="video-actions">
+                  <button type="button"><i class="icon-cancel"></i><span class="sr">Cancel</span></button>
+                </div>
+              </li>
+              <li>
+                <h4 id="video-upload-008">Something random that's supposed to be uploading</h4>
+                <div class="progress-bar">
+                  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="37" style="width: 37%" aria-describedby="video-upload-008"></div>
+                </div>
+                <div class="video-actions">
+                  <button type="button"><i class="icon-cancel"></i><span class="sr">Cancel</span></button>
+                </div>
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="ui-loading is-hidden">
+          <p><span class="spin">
+            <i class="icon-refresh"></i></span>
+            <span class="copy">Loading &hellip;</span>
+          </p>
+        </div>
+
+      </article>
+
+      <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+          <h3 class="title-3">Adding Videos</h3>
+          <p>To submit your course videos for processing simply drag and drop the files on to this page, or select files from your computer by using the Select files button.</p>
+        </div>
+
+        <div class="bit">
+          <h3 class="title-3">More Help Goes Here</h3>
+          <p>You can create new sections and subsections, set the release date for sections, and create new units in existing subsections.  You can set the assignment type for subsections that are to be graded, and you can open a subsection for further editing.</p>
+          <p>In addition, you can drag and drop sections, subsections, and units to reorganize your course.</p>
+        </div>
+      </aside>
+
+    </section>
+  </div>
+
+</div>
+</%block>
