@@ -121,6 +121,8 @@ if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
     urlpatterns += (
         url(r'^library/{}?$'.format(LIBRARY_KEY_PATTERN),
             'contentstore.views.library_handler', name='library_handler'),
+        url(r'^library/{}/team/$'.format(LIBRARY_KEY_PATTERN),
+            'contentstore.views.manage_library_users', name='manage_library_users'),
     )
 
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
