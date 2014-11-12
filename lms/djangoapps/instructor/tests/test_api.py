@@ -1050,6 +1050,38 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
         )
 
+    def test_enroll_already_enrolled_student(self):
+        """
+        Ensure that already enrolled "verified" students cannot be downgraded
+        to "honor"
+        """
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.enrolled_student, course_id=self.course.id
+        )
+        # make this enrollment "verified"
+        course_enrollment.mode = u'verified'
+        course_enrollment.save()
+        self.assertEqual(course_enrollment.mode, u'verified')
+
+        # now re-enroll the student through the instructor dash
+        url = reverse(
+            'students_update_enrollment',
+            kwargs={'course_id': self.course.id.to_deprecated_string()},
+        )
+        params = {
+            'identifiers': self.enrolled_student.email,
+            'action': 'enroll',
+            'email_students': True,
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+
+        # affirm that the student is still in "verified" mode
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.enrolled_student, course_id=self.course.id
+        )
+        self.assertEqual(course_enrollment.mode, u"verified")
+
 
 @ddt.ddt
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
