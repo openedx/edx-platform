@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
@@ -52,6 +52,7 @@ class LoginSessionView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
+    @method_decorator(ensure_csrf_cookie)
     def get(self, request):  # pylint: disable=unused-argument
         """Return a description of the login form.
 
@@ -123,8 +124,8 @@ class LoginSessionView(APIView):
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
-    @method_decorator(ensure_csrf_cookie)
     @method_decorator(require_post_params(["email", "password"]))
+    @method_decorator(csrf_protect)
     def post(self, request):
         """Log in a user.
 
@@ -204,6 +205,7 @@ class RegistrationView(APIView):
             handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
             self.field_handlers[field_name] = handler
 
+    @method_decorator(ensure_csrf_cookie)
     def get(self, request):
         """Return a description of the registration form.
 
@@ -243,8 +245,8 @@ class RegistrationView(APIView):
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
-    @method_decorator(ensure_csrf_cookie)
     @method_decorator(require_post_params(DEFAULT_FIELDS))
+    @method_decorator(csrf_protect)
     def post(self, request):
         """Create the user's account.
 
@@ -735,6 +737,7 @@ class PasswordResetView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
+    @method_decorator(ensure_csrf_cookie)
     def get(self, request):  # pylint: disable=unused-argument
         """Return a description of the password reset form.
 
