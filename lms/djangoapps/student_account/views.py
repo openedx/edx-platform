@@ -52,6 +52,7 @@ def index(request):
 
 
 @require_http_methods(['GET'])
+@ensure_csrf_cookie
 def login_and_registration_form(request, initial_mode="login"):
     """Render the combined login/registration form, defaulting to login
 
