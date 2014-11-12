@@ -142,7 +142,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             self.assertEqual('link' if linked else 'unlink', icon_state)
             self.assertEqual(self.PROVIDER_CLASS.NAME, provider_name)
 
-    def assert_exception_redirect_looks_correct(self, auth_entry=None):
+    def assert_exception_redirect_looks_correct(self, expected_uri, auth_entry=None):
         """Tests middleware conditional redirection.
 
         middleware.ExceptionMiddleware makes sure the user ends up in the right
@@ -157,13 +157,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(302, response.status_code)
         self.assertIn('canceled', location)
         self.assertIn(self.backend_name, location)
-
-        if auth_entry:
-            # Custom redirection to form.
-            self.assertTrue(location.startswith('/' + auth_entry))
-        else:
-            # Stock framework redirection to root.
-            self.assertTrue(location.startswith('/?'))
+        self.assertTrue(location.startswith(expected_uri + '?'))
 
     def assert_first_party_auth_trumps_third_party_auth(self, email=None, password=None, success=None):
         """Asserts first party auth was used in place of third party auth.
@@ -410,13 +404,19 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     # Actual tests, executed once per child.
 
     def test_canceling_authentication_redirects_to_login_when_auth_entry_login(self):
-        self.assert_exception_redirect_looks_correct(auth_entry=pipeline.AUTH_ENTRY_LOGIN)
+        self.assert_exception_redirect_looks_correct('/login', auth_entry=pipeline.AUTH_ENTRY_LOGIN)
 
     def test_canceling_authentication_redirects_to_register_when_auth_entry_register(self):
-        self.assert_exception_redirect_looks_correct(auth_entry=pipeline.AUTH_ENTRY_REGISTER)
+        self.assert_exception_redirect_looks_correct('/register', auth_entry=pipeline.AUTH_ENTRY_REGISTER)
+
+    def test_canceling_authentication_redirects_to_login_when_auth_login_2(self):
+        self.assert_exception_redirect_looks_correct('/account/login/', auth_entry=pipeline.AUTH_ENTRY_LOGIN_2)
+
+    def test_canceling_authentication_redirects_to_login_when_auth_register_2(self):
+        self.assert_exception_redirect_looks_correct('/account/register/', auth_entry=pipeline.AUTH_ENTRY_REGISTER_2)
 
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
-        self.assert_exception_redirect_looks_correct()
+        self.assert_exception_redirect_looks_correct('/')
 
     def test_full_pipeline_succeeds_for_linking_account(self):
         # First, create, the request and strategy that store pipeline state,
