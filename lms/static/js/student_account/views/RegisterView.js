@@ -57,9 +57,5 @@ var edx = edx || {};
         saveSuccess: function() {
             this.trigger('auth-complete');
         },
-
-        redirect: function( url ) {
-            window.location.href = url;
-        }
     });
 })(jQuery, _, gettext);

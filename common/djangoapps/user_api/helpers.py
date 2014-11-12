@@ -323,9 +323,6 @@ def shim_student_view(view_func, check_logged_in=False):
         (instead of always using status 200, but setting "success" to False in
         the JSON-serialized content of the response)
 
-    * Use status code 302 for redirects instead of
-        "redirect_url" in the JSON-serialized content of the response.
-
     * Use status code 403 to indicate a login failure.
 
     The shim will preserve any cookies set by the view.
@@ -389,17 +386,30 @@ def shim_student_view(view_func, check_logged_in=False):
         # Most responses from this view are JSON-encoded
         # dictionaries with keys "success", "value", and
         # (sometimes) "redirect_url".
+        #
         # We want to communicate some of this information
         # using HTTP status codes instead.
+        #
+        # We ignore the "redirect_url" parameter, because we don't need it:
+        # 1) It's used to redirect on change enrollment, which
+        # our client will handle directly
+        # (that's why we strip out the enrollment params from the request)
+        # 2) It's used by third party auth when a user has already successfully
+        # authenticated and we're not sending login credentials.  However,
+        # this case is never encountered in practice: on the old login page,
+        # the login form would be submitted directly, so third party auth
+        # would always be "trumped" by first party auth.  If a user has
+        # successfully authenticated with us, we redirect them to the dashboard
+        # regardless of how they authenticated; and if a user is completing
+        # the third party auth pipeline, we redirect them from the pipeline
+        # completion end-point directly.
         try:
             response_dict = json.loads(response.content)
             msg = response_dict.get("value", u"")
-            redirect_url = response_dict.get("redirect_url") or response_dict.get("redirect")
             success = response_dict.get("success")
         except (ValueError, TypeError):
             msg = response.content
             success = True
-            redirect_url = None
 
         # If the user is not authenticated when we expect them to be
         # send the appropriate status code.
@@ -425,11 +435,6 @@ def shim_student_view(view_func, check_logged_in=False):
             else:
                 response.status_code = 403
                 response.content = msg
-
-        # If the view wants to redirect us, send a status 302
-        elif redirect_url is not None:
-            response.status_code = 302
-            response['Location'] = redirect_url
 
         # If an error condition occurs, send a status 400
         elif response.status_code != 200 or not success:
