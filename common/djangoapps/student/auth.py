@@ -12,6 +12,14 @@ from student.roles import GlobalStaff, CourseCreatorRole, CourseStaffRole, Cours
     CourseBetaTesterRole, OrgInstructorRole, OrgStaffRole, LibraryUserRole, OrgLibraryUserRole
 
 
+# Studio permissions:
+STUDIO_EDIT_ROLES = 8
+STUDIO_VIEW_USERS = 4
+STUDIO_EDIT_CONTENT = 2
+STUDIO_VIEW_CONTENT = 1
+# In addition to the above, one is always allowed to "demote" oneself to a lower role within a course, or remove oneself.
+
+
 def has_access(user, role):
     """
     Check whether this user has access to this role (either direct or implied)
@@ -41,7 +49,34 @@ def has_access(user, role):
     return False
 
 
-def has_studio_write_access(user, course_key, role=CourseStaffRole):
+def get_user_permissions(user, course_key, org=None):
+    """
+    Get the bitmask of permissions that this user has in the given course context.
+    Can also set course_key=None and pass in an org to get the user's
+    permissions for that organization as a whole.
+    """
+    if org is None:
+        org = course_key.org
+        course_key = course_key.for_branch(None)
+    else:
+        assert course_key is None
+    all_perms = STUDIO_EDIT_ROLES | STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
+    # global staff, org instructors, and course instructors have all permissions:
+    if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
+        return all_perms
+    if course_key and has_access(user, CourseInstructorRole(course_key)):
+        return all_perms
+    # Staff have all permissions except EDIT_ROLES:
+    if OrgStaffRole(org=org).has_user(user) or (course_key and has_access(user, CourseStaffRole(course_key))):
+        return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
+    # Otherwise, for libraries, users can view only:
+    if (course_key and isinstance(course_key, LibraryLocator)):
+        if OrgLibraryUserRole(org=org).has_user(user) or has_access(user, LibraryUserRole(course_key)):
+            return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
+    return 0
+
+
+def has_studio_write_access(user, course_key):
     """
     Return True if user has studio write access to the given course.
     Note that the CMS permissions model is with respect to courses.
@@ -53,23 +88,15 @@ def has_studio_write_access(user, course_key, role=CourseStaffRole):
 
     :param user:
     :param course_key: a CourseKey
-    :param role: an AccessRole
     """
-    if GlobalStaff().has_user(user):
-        return True
-    if OrgInstructorRole(org=course_key.org).has_user(user):
-        return True
-    if OrgStaffRole(org=course_key.org).has_user(user):
-        return True
-    # temporary to ensure we give universal access given a course until we impl branch specific perms
-    return has_access(user, role(course_key.for_branch(None)))
+    return bool(STUDIO_EDIT_CONTENT & get_user_permissions(user, course_key))
 
 
-def has_course_author_access(*args, **kwargs):
+def has_course_author_access(user, course_key):
     """
-    Old name for has_studio_author_access
+    Old name for has_studio_write_access
     """
-    return has_studio_read_access(*args, **kwargs)
+    return has_studio_write_access(user, course_key)
 
 
 def has_studio_read_access(user, course_key):
@@ -80,13 +107,7 @@ def has_studio_read_access(user, course_key):
     There is currently no such thing as read-only course access in studio, but
     there is read-only access to content libraries.
     """
-    if has_studio_write_access(user, course_key):
-        return True  # Global, Org, or Course "Instructors" and "Staff" can read and write
-    if isinstance(course_key, LibraryLocator):
-        if OrgLibraryUserRole(org=course_key.org).has_user(user):
-            return True  # User has read-only access to all libraries in this organization
-        return LibraryUserRole(course_key.for_branch(None)).has_user(user)  # User has read-only access this library
-    return False
+    return bool(STUDIO_VIEW_CONTENT & get_user_permissions(user, course_key))
 
 
 def add_users(caller, role, *users):

@@ -70,7 +70,7 @@ class UsersTestCase(CourseTestCase):
     def test_detail_post(self):
         resp = self.client.post(
             self.detail_url,
-            data={"role": None},
+            data={"role": ""},
         )
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
@@ -218,7 +218,7 @@ class UsersTestCase(CourseTestCase):
             data={"role": "instructor"},
             HTTP_ACCEPT="application/json",
         )
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 403)
         result = json.loads(resp.content)
         self.assertIn("error", result)
 
@@ -232,7 +232,7 @@ class UsersTestCase(CourseTestCase):
             data={"role": "instructor"},
             HTTP_ACCEPT="application/json",
         )
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 403)
         result = json.loads(resp.content)
         self.assertIn("error", result)
 
@@ -255,7 +255,7 @@ class UsersTestCase(CourseTestCase):
         self.user.save()
 
         resp = self.client.delete(self.detail_url)
-        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.status_code, 403)
         result = json.loads(resp.content)
         self.assertIn("error", result)
         # reload user from DB

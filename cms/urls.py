@@ -5,6 +5,11 @@ from django.conf.urls import patterns, include, url
 from ratelimitbackend import admin
 admin.autodiscover()
 
+# Pattern to match a course key or a library key
+COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(r'[^/]+/[^/]+/[^/]+', r'[^/:]+:[^/+]+\+[^/+]+(\+[^/]+)?')
+# Pattern to match a library key only
+LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
+
 urlpatterns = patterns('',  # nopep8
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
@@ -66,7 +71,7 @@ urlpatterns += patterns(
     url(r'^signin$', 'login_page', name='login'),
     url(r'^request_course_creator$', 'request_course_creator'),
 
-    url(r'^course_team/{}/(?P<email>.+)?$'.format(settings.COURSE_KEY_PATTERN), 'course_team_handler'),
+    url(r'^course_team/{}/(?P<email>.+)?$'.format(COURSELIKE_KEY_PATTERN), 'course_team_handler'),
     url(r'^course_info/{}$'.format(settings.COURSE_KEY_PATTERN), 'course_info_handler'),
     url(
         r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
@@ -113,7 +118,6 @@ urlpatterns += patterns(
 )
 
 if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
-    LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
     urlpatterns += (
         url(r'^library/{}?$'.format(LIBRARY_KEY_PATTERN),
             'contentstore.views.library_handler', name='library_handler'),
