@@ -94,6 +94,8 @@ def videos_index_json(course):
     }
     """
     videos = []
+    if not modulestore() or not modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE):
+        return JsonResponse({'videos': videos}, status=200) 
     for metadata in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE):
         videos.append({
             'edx_video_id': metadata.asset_id.path,
