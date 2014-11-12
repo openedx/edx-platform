@@ -11,23 +11,21 @@ class Command(BaseCommand):
 Pass a single filename."""
 
     def handle(self, *args, **options):
-        f = open(args[0], 'w')
-        #text = open(args[0]).read()
-        #subject = open(args[1]).read()
+        file_output = open(args[0], 'w')
         users = User.objects.all()
 
-        l = []
+        data_list = []
         for user in users:
-            up = UserProfile.objects.get(user=user)
-            d = {
+            profile = UserProfile.objects.get(user=user)
+            data = {
                 'username': user.username,
                 'email': user.email,
                 'is_active': user.is_active,
                 'joined': user.date_joined.isoformat(),
-                'name': up.name,
-                'language': up.language,
-                'location': up.location,
+                'name': profile.name,
+                'language': profile.language,
+                'location': profile.location,
             }
-            l.append(d)
-        json.dump(l, f)
-        f.close()
+            data_list.append(data)
+        json.dump(data_list, file_output)
+        file_output.close()
