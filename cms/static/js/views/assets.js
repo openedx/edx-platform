@@ -10,7 +10,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             events : {
                 "click .column-sort-link": "onToggleColumn",
-                "click .upload-button": "showUploadModal"
+                "click .upload-button": "showUploadModal",
+                "click .filterable-column .nav-item": "onFilterColumn",
+                "click .filterable-column .column-filter-link": "toggleFilterColumn"
             },
 
             initialize : function(options) {
@@ -74,7 +76,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             renderPageItems: function() {
                 var self = this,
                 assets = this.collection,
-                hasAssets = assets.length > 0,
+                hasAssets = this.collection.assetFilter != '' ? true: assets.length > 0,
                 tableBody = this.getTableBody();
                 tableBody.empty();
                 if (hasAssets) {
@@ -117,6 +119,11 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             onToggleColumn: function(event) {
                 var columnName = event.target.id;
                 this.toggleSortOrder(columnName);
+            },
+
+            onFilterColumn: function(event) {
+                var columnName = event.target.id;
+                this.openFilterColumn(columnName, event);
             },
 
             hideModal: function (event) {
@@ -216,6 +223,42 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var percentVal = percentComplete + '%';
                 $('.upload-modal .progress-fill').width(percentVal);
                 $('.upload-modal .progress-fill').html(percentVal);
+            },
+
+            openFilterColumn: function(sortColumn, event) {
+                var $this = $(event.currentTarget);
+                this.toggleFilterColumnState($this, event);
+            },
+
+            toggleFilterColumnState: function(menu, event){
+                var $subnav = menu.find('.wrapper-nav-sub');
+                var $title = menu.find('.title');
+
+                if ($subnav.hasClass('is-shown')) {
+                    $subnav.removeClass('is-shown');
+                    $title.removeClass('is-selected');
+                } else {
+                    $('.nav-dd .nav-item .title').removeClass('is-selected');
+                    $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
+                    $title.addClass('is-selected');
+                    $subnav.addClass('is-shown');
+                }
+                // if propagation is not stopped, the event will bubble up to the
+                // body element, which will close the dropdown.
+                event.stopPropagation();
+            },
+
+            toggleFilterColumn: function(event) {
+                event.preventDefault();
+                var collection = this.collection;
+                collection.assetFilter = $(event.currentTarget).data('assetfilter');
+                this.setPage(0);
+                this.closeFilterPopup(event);
+            },
+
+            closeFilterPopup: function(event){
+                var $menu = $(event.currentTarget).parents('.nav-dd.nav-item');
+                this.toggleFilterColumnState($menu, event);
             },
 
             displayFinishedUpload: function (resp) {
