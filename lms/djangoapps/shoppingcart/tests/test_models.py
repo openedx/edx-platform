@@ -49,6 +49,11 @@ class OrderTest(ModuleStoreTestCase):
             self.other_course_keys.append(CourseFactory.create().id)
         self.cost = 40
 
+        # Add mock tracker for event testing.
+        patcher = patch('shoppingcart.models.analytics')
+        self.mock_tracker = patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_get_cart_for_user(self):
         # create a cart
         cart = Order.get_cart_for_user(user=self.user)
@@ -148,6 +153,13 @@ class OrderTest(ModuleStoreTestCase):
         for item in cart.orderitem_set.all():
             self.assertEqual(item.status, 'purchased')
 
+    @override_settings(
+        SEGMENT_IO_LMS_KEY="foobar",
+        FEATURES={
+            'SEGMENT_IO_LMS': True,
+            'STORE_BILLING_INFO': True,
+        }
+    )
     def test_purchase(self):
         # This test is for testing the subclassing functionality of OrderItem, but in
         # order to do this, we end up testing the specific functionality of
@@ -166,6 +178,27 @@ class OrderTest(ModuleStoreTestCase):
         self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].body)
         self.assertIn(unicode(cart.total_cost), mail.outbox[0].body)
         self.assertIn(item.additional_instruction_text, mail.outbox[0].body)
+
+        # Assert Google Analytics event fired for purchase.
+        self.mock_tracker.track.assert_called_once_with(  # pylint: disable=E1103
+            1,
+            'Completed Order',
+            {
+                'orderId': 1,
+                'currency': 'usd',
+                'total': '40',
+                'products': [
+                    {
+                        'sku': u'CertificateItem-' + unicode(self.course_key) + u'-honor',
+                        'category': 'CertificateItem honor',
+                        'price': '40',
+                        'id': 1,
+                        'quantity': 1
+                    }
+                ]
+            },
+            context={'Google Analytics': {'clientId': None}}
+        )
 
     def test_purchase_item_failure(self):
         # once again, we're testing against the specific implementation of

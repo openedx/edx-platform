@@ -3,6 +3,7 @@
 from collections import namedtuple
 from datetime import datetime
 from decimal import Decimal
+import analytics
 import pytz
 import logging
 import smtplib
@@ -30,6 +31,7 @@ from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, UNENROLL_DONE
+from eventtracking import tracker
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
 
@@ -395,6 +397,49 @@ class Order(models.Model):
             csv_file, courses_info = self.generate_registration_codes_csv(orderitems, site_name)
 
         self.send_confirmation_emails(orderitems, self.order_type == OrderTypes.BUSINESS, csv_file, site_name, courses_info)
+        self._emit_purchase_event(orderitems)
+
+    def _emit_purchase_event(self, orderitems):
+        """
+        Emit an analytics purchase event for this Order. Will iterate over all associated
+        OrderItems and add them as products in the event as well.
+
+        """
+        event_name = 'Completed Order'  # Required event name by Segment
+        try:
+            products = []
+            for item in orderitems:
+                mode = item.mode if hasattr(item, 'mode') else ''
+                item = {
+                    'id': item.id,
+                    'sku': item.sku,
+                    'price': str(item.unit_cost),
+                    'quantity': item.qty,
+                    'category': '{type} {mode}'.format(type=type(item).__name__, mode=mode)
+                }
+                products.append(item)
+
+            if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+                tracking_context = tracker.get_tracker().resolve_context()
+                analytics.track(self.user.id, event_name, {  # pylint: disable=E1101
+                    'orderId': self.id,  # pylint: disable=E1101
+                    'total': str(self.total_cost),
+                    'currency': self.currency,
+                    'products': products
+                }, context={
+                    'Google Analytics': {
+                        'clientId': tracking_context.get('client_id')
+                    }
+                })
+
+        except Exception:  # pylint: disable=W0703
+            # Capturing all exceptions thrown while tracking analytics events. We do not want
+            # an operation to fail because of an analytics event, so we will capture these
+            # errors in the logs.
+            log.exception(
+                u'Unable to emit {event} event for user {user} and order {order}'.format(
+                    event=event_name, user=self.user.id, order=self.id)  # pylint: disable=E1101
+            )
 
     def add_billing_details(self, company_name='', company_contact_name='', company_contact_email='', recipient_name='',
                             recipient_email='', customer_reference_number=''):
@@ -548,6 +593,15 @@ class OrderItem(TimeStampedModel):
         Currently, only used for e-mails.
         """
         return ''
+
+    @property
+    def sku(self):
+        """Generate a SKU that uniquely defines the OrderItem
+
+        Uses properties of the OrderItem to distinguish it from other types of items.
+
+        """
+        return type(self).__name__
 
 
 class Invoice(models.Model):
@@ -880,6 +934,21 @@ class PaidCourseRegistration(OrderItem):
         except PaidCourseRegistrationAnnotation.DoesNotExist:
             return u""
 
+    @property
+    def sku(self):
+        """Generate a SKU that uniquely defines the OrderItem
+
+        Uses properties of the OrderItem to distinguish it from other types of items. The
+        associated course ID and SKU will be added to the SKU if available.
+
+        """
+        sku = type(self).__name__
+        if self.course_id != CourseKeyField.Empty:
+            sku = sku + u'-' + unicode(self.course_id)
+        if self.mode:
+            sku = sku + u'-' + unicode(self.mode)
+        return sku
+
 
 class CourseRegCodeItem(OrderItem):
     """
@@ -1000,6 +1069,21 @@ class CourseRegCodeItem(OrderItem):
             return CourseRegCodeItemAnnotation.objects.get(course_id=self.course_id).annotation
         except CourseRegCodeItemAnnotation.DoesNotExist:
             return u""
+
+    @property
+    def sku(self):
+        """Generate a SKU that uniquely defines the OrderItem
+
+        Uses properties of the OrderItem to distinguish it from other types of items. The associated
+        course and mode will be added to the SKU if available.
+
+        """
+        sku = type(self).__name__
+        if self.course_id != CourseKeyField.Empty:
+            sku = sku + u'-' + unicode(self.course_id)
+        if self.mode:
+            sku = sku + u'-' + unicode(self.mode)
+        return sku
 
 
 class CourseRegCodeItemAnnotation(models.Model):
@@ -1222,6 +1306,21 @@ class CertificateItem(OrderItem):
                 status='purchased',
                 unit_cost__gt=(CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd')))).count()
 
+    @property
+    def sku(self):
+        """Generate a SKU that uniquely defines the OrderItem
+
+        Uses properties of the OrderItem to distinguish it from other types of items. A certificate
+        mode will be added to the SKU, as well as the associated course.
+
+        """
+        sku = type(self).__name__
+        if self.course_id != CourseKeyField.Empty:
+            sku = sku + u'-' + unicode(self.course_id)
+        if self.mode:
+            sku = sku + u'-' + unicode(self.mode)
+        return sku
+
 
 class DonationConfiguration(ConfigurationModel):
     """Configure whether donations are enabled on the site."""
@@ -1369,3 +1468,16 @@ class Donation(OrderItem):
         return {
             'receipt_has_donation_item': True,
         }
+
+    @property
+    def sku(self):
+        """Generate a SKU that uniquely defines the Donation type.
+
+        Uses properties of the OrderItem to distinguish it from other types of items. Donations
+        may be bound to a course, which will be added to the SKU if available.
+
+        """
+        sku = type(self).__name__
+        if self.course_id != CourseKeyField.Empty:
+            sku = sku + u'-' + unicode(self.course_id)
+        return sku
