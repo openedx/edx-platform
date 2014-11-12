@@ -65,7 +65,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     this.pagingFooter.render();
 
                     // Hide the contents until the collection has loaded the first time
-                    this.$('.asset-library').hide();
+                    this.$('.assets-library').hide();
                     this.$('.no-asset-content').hide();
                 }
                 return tableBody;
@@ -85,7 +85,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                         }
                     );
                 }
-                self.$('.asset-library').toggle(hasAssets);
+                self.$('.assets-library').toggle(hasAssets);
                 self.$('.no-asset-content').toggle(!hasAssets);
                 return this;
             },

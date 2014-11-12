@@ -1,8 +1,7 @@
-<div class="asset-library">
-
+<div class="assets-library">
     <div id="asset-paging-header"></div>
-
-    <table>
+    
+    <table class="assets-table">
         <caption class="sr"><%= gettext("List of uploaded files and assets in this course") %></caption>
         <colgroup>
             <col class="thumb-cols" />
@@ -21,13 +20,12 @@
             <th class="actions-col"><span class="sr"><%= gettext("Actions") %></span></th>
         </tr>
         </thead>
-
-        <tbody id="asset-table-body" ></tbody>
+        <tbody id="asset-table-body"></tbody>
     </table>
 
     <div id="asset-paging-footer"></div>
-
 </div>
+
 <div class="no-asset-content">
     <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button upload-button new-button"><i class="icon-plus"></i><%= gettext("Upload your first asset") %></a></p>
 </div>
