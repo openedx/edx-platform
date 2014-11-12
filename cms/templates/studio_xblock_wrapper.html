@@ -2,7 +2,9 @@
 from util.markup import ugettext as _
 from contentstore.views.helpers import xblock_studio_url
 import json
+from django.template.defaultfilters import escapejs
 %>
+
 <%
 xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
@@ -23,10 +25,10 @@ messages = json.dumps(xblock.validate().to_json())
 <script>
     require(["jquery", "js/factories/xblock_validation"], function($, XBlockValidationFactory) {
         XBlockValidationFactory(
-            ${messages},
+            JSON.parse('${messages | n,escapejs}'),
             $.parseJSON("${bool(xblock_url)}".toLowerCase()),  // xblock_url will be None or a string
             $.parseJSON("${bool(is_root)}".toLowerCase()),  // is_root will be None or a boolean
-            $('div.xblock-validation-messages[data-locator="${xblock.location | h}"]')
+            $('div.xblock-validation-messages[data-locator="${xblock.location}"]')
         );
     });
 </script>
