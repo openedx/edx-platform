@@ -24,20 +24,21 @@ class TestPublish(SplitWMongoCourseBoostrapper):
 
         # with bulk will delay all inheritance computations which won't be added into the mongo_calls
         with self.draft_mongo.bulk_operations(self.old_course_key):
-            # finds: 1 for parent to add child
+            # finds: 1 for parent to add child and 2 to get ancestors
             # sends: 1 for insert, 1 for parent (add child)
-            with check_mongo_calls(1, 2):
+            with check_mongo_calls(3, 2):
                 self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', 'runid', split=False)
 
-            with check_mongo_calls(2, 2):
+            with check_mongo_calls(4, 2):
                 self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', 'runid', split=False)
             # For each vertical (2) created:
             #   - load draft
             #   - load non-draft
             #   - get last error
             #   - load parent
+            #   - get ancestors
             #   - load inheritable data
-            with check_mongo_calls(7, 4):
+            with check_mongo_calls(15, 6):
                 self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', split=False)
                 self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1', split=False)
             # For each (4) item created
@@ -48,8 +49,9 @@ class TestPublish(SplitWMongoCourseBoostrapper):
             #   - load parent
             #   - load inheritable data
             #   - load parent
+            #   - load ancestors
             # count for updates increased to 16 b/c of edit_info updating
-            with check_mongo_calls(16, 8):
+            with check_mongo_calls(40, 16):
                 self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)
                 self._create_item(
                     'discussion', 'Discussion1',
@@ -77,7 +79,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
                     split=False
                 )
 
-            with check_mongo_calls(0, 2):
+            with check_mongo_calls(2, 2):
                 # 2 finds b/c looking for non-existent parents
                 self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None, split=False)
                 self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, split=False)
