@@ -50,6 +50,7 @@ from xmodule_modifiers import (
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
 
+from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
@@ -675,6 +676,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
 
 @csrf_exempt
+@commit_on_success_with_read_committed
 def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
     """
     Entry point for unauthenticated XBlock handlers.
@@ -684,6 +686,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
     return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
 
 
+@commit_on_success_with_read_committed
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
