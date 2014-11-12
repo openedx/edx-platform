@@ -95,6 +95,13 @@
         }
     }
 
+    .note {
+        @extend %t-copy-sub2;
+        display: block;
+        font-weight: normal;
+        color: $gray;
+        margin-top: 15px;
+    }
 
 
     /** The forms **/

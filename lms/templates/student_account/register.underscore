@@ -25,4 +25,6 @@
     <%= context.fields %>
 
     <button class="action action-primary action-update js-register register-button"><%- gettext("Register") %></button>
+
+    <p class="note">* <%- gettext("Required fields") %></p>
 </form>
