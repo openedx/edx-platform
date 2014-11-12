@@ -30,6 +30,7 @@
 
 // Course base / layout styles
 @import 'course/layout/courseware_header';
+@import 'course/layout/courseware_preview';
 @import 'course/layout/footer';
 @import 'course/base/mixins';
 @import 'course/base/base';
