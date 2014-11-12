@@ -168,7 +168,9 @@ var edx = edx || {};
 
                 // Removes the default HTML5 validation pop-up
                 removeDefault: function( $el ) {
-                    $el.setCustomValidity(' ');
+                    if ( $el.setCustomValidity ) {
+                        $el.setCustomValidity(' ');
+                    }
                 }
             }
         };

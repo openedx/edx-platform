@@ -90,7 +90,7 @@
         @include span-columns(4);
         padding: 25px 10px;
 
-        &:first-of-type {
+        &:nth-of-type(2) {
             border-bottom: 1px solid $gray-l4;
         }
     }
