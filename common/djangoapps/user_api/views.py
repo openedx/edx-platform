@@ -280,19 +280,19 @@ class RegistrationView(APIView):
                 # account using both an email address and a username associated with an
                 # existing account.
                 error_msg = _(
-                    u"It looks like {email_address} and {username} belong to an existing account."
+                    u"It looks like {email_address} and {username} belong to an existing account. Try again with a different email address and username."
                 ).format(email_address=email, username=username)
             elif 'email' in conflicts:
                 # Translators: This message is shown to users who attempt to create a new
                 # account using an email address associated with an existing account.
                 error_msg = _(
-                    u"It looks like {email_address} belongs to an existing account."
+                    u"It looks like {email_address} belongs to an existing account. Try again with a different email address."
                 ).format(email_address=email)
             else:
                 # Translators: This message is shown to users who attempt to create a new
                 # account using a username associated with an existing account.
                 error_msg = _(
-                    u"It looks like {username} belongs to an existing account."
+                    u"It looks like {username} belongs to an existing account. Try again with a different username."
                 ).format(username=username)
 
             return HttpResponse(
@@ -504,14 +504,20 @@ class RegistrationView(APIView):
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         label = _(
-            u"I agree to the {terms_of_service}"
-        ).format(terms_of_service=terms_link)
+            u"I agree to the {platform_name} {terms_of_service}."
+        ).format(
+            platform_name=settings.PLATFORM_NAME,
+            terms_of_service=terms_link
+        )
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(
-            u"You must agree to the {terms_of_service}"
-        ).format(terms_of_service=terms_link)
+            u"You must agree to the {platform_name} {terms_of_service}."
+        ).format(
+            platform_name=settings.PLATFORM_NAME,
+            terms_of_service=terms_link
+        )
 
         form_desc.add_field(
             "honor_code",
@@ -535,11 +541,21 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(u"I agree to the {terms_of_service}").format(terms_of_service=terms_link)
+        label = _(
+            u"I agree to the {platform_name} {terms_of_service}."
+        ).format(
+            platform_name=settings.PLATFORM_NAME,
+            terms_of_service=terms_link
+        )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        error_msg = _("You must agree to the {terms_of_service}").format(terms_of_service=terms_link)
+        error_msg = _(
+            u"You must agree to the {platform_name} {terms_of_service}."
+        ).format(
+            platform_name=settings.PLATFORM_NAME,
+            terms_of_service=terms_link
+        )
 
         form_desc.add_field(
             "terms_of_service",

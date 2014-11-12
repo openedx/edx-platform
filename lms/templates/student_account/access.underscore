@@ -5,7 +5,7 @@
 
 <section id="form-load-fail" class="form-type hidden" aria-hidden="true">
     <div class="status submission-error">
-        <p class="message-copy"><%- gettext("Apologies, we appear to be experiencing technical difficulties. Please try again later.") %></p>
+        <p class="message-copy"><%- gettext("Sorry, we're having some technical problems. Wait a few minutes and try again.") %></p>
     </div>
 </section>
 
