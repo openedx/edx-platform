@@ -177,7 +177,7 @@ class StudentViewShimTest(TestCase):
         self.assertEqual(response.content, "Not a JSON dict")
 
     @ddt.data("redirect", "redirect_url")
-    def test_redirect_from_json(self, redirect_key):
+    def test_ignore_redirect_from_json(self, redirect_key):
         view = self._shimmed_view(
             HttpResponse(content=json.dumps({
                 "success": True,
@@ -185,8 +185,8 @@ class StudentViewShimTest(TestCase):
             }))
         )
         response = view(HttpRequest())
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], "/redirect")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, "")
 
     def test_error_from_json(self):
         view = self._shimmed_view(
