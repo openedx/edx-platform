@@ -132,6 +132,59 @@ class SessionsApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
+    def test_double_sessions_same_user(self):
+        local_username = self.test_username + str(randint(11, 99))
+        local_username = local_username[3:-1]  # username is a 32-character field
+        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password}
+        response = self.do_post(self.base_users_uri, data)
+
+        # log in once
+        data = {'username': local_username, 'password': self.test_password}
+        response = self.do_post(self.base_sessions_uri, data)
+        session1 = response.data['token']
+
+        # test that first session is valid
+        test_uri = self.base_sessions_uri + '/' + session1
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
+        # log in again with the same user
+        data = {'username': local_username, 'password': self.test_password}
+        response = self.do_post(self.base_sessions_uri, data)
+        session2 = response.data['token']
+
+        # assert that the two sessions keys are not the same
+        self.assertNotEqual(session1, session2)
+
+        # test that first session is still valid
+        test_uri = self.base_sessions_uri + '/' + session1
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
+        # test that second session is valid
+        test_uri = self.base_sessions_uri + '/' + session2
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
+        # terminate first session
+        test_uri = self.base_sessions_uri + '/' + session1
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+        # test that second session is valid
+        test_uri = self.base_sessions_uri + '/' + session2
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
+        # terminate second session
+        test_uri = self.base_sessions_uri + '/' + session2
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
     def test_session_detail_get_undefined(self):
         test_uri = self.base_sessions_uri + "/123456789"
         response = self.do_get(test_uri)
