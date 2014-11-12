@@ -167,6 +167,7 @@ class VerifiedView(View):
         return render_to_response('verify_student/verified.html', context)
 
 
+@require_POST
 @login_required
 def create_order(request):
     """
