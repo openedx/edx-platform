@@ -1504,7 +1504,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         asset_metadata.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
 
         # Translate metadata to Mongo format.
-        metadata_to_insert = asset_metadata.to_mongo()
+        metadata_to_insert = asset_metadata.to_storable()
         if asset_idx is None:
             # Add new metadata sorted into the list.
             all_assets.add(metadata_to_insert)
@@ -1562,11 +1562,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Form an AssetMetadata.
         all_assets = course_assets[asset_key.block_type]
         md = AssetMetadata(asset_key, asset_key.path)
-        md.from_mongo(all_assets[asset_idx])
+        md.from_storable(all_assets[asset_idx])
         md.update(attr_dict)
 
         # Generate a Mongo doc from the metadata and update the course asset info.
-        all_assets[asset_idx] = md.to_mongo()
+        all_assets[asset_idx] = md.to_storable()
 
         self.asset_collection.update({'_id': course_assets['_id']}, {"$set": {asset_key.block_type: all_assets}})
 

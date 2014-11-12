@@ -336,7 +336,7 @@ class ModuleStoreAssetInterface(object):
         info = asset_key.block_type
         mdata = AssetMetadata(asset_key, asset_key.path, **kwargs)
         all_assets = course_assets[info]
-        mdata.from_mongo(all_assets[asset_idx])
+        mdata.from_storable(all_assets[asset_idx])
         return mdata
 
     @contract(course_key='CourseKey', start='int | None', maxresults='int | None', sort='tuple(str,(int,>=1,<=2))|None',)
@@ -392,7 +392,7 @@ class ModuleStoreAssetInterface(object):
         for idx in xrange(start_idx, end_idx, step_incr):
             raw_asset = all_assets[idx]
             new_asset = AssetMetadata(course_key.make_asset_key(asset_type, raw_asset['filename']))
-            new_asset.from_mongo(raw_asset)
+            new_asset.from_storable(raw_asset)
             ret_assets.append(new_asset)
         return ret_assets
 
