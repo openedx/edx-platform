@@ -3,6 +3,7 @@ from ...fixtures.course import CourseFixture
 from ..helpers import UniqueCourseTest
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.utils import verify_ordering
+from ...pages.studio.component_editor import ComponentEditorView
 
 
 class StudioCourseTest(UniqueCourseTest):
@@ -98,3 +99,14 @@ class ContainerBase(StudioCourseTest):
         # Reload the page to see that the change was persisted.
         container = self.go_to_nested_container_page()
         verify_ordering(self, container, expected_ordering)
+
+    def modify_display_name_and_verify(self, component):
+        """
+        Helper method for changing a display name.
+        """
+        modified_name = 'modified'
+        self.assertNotEqual(component.name, modified_name)
+        component.edit()
+        component_editor = ComponentEditorView(self.browser, component.locator)
+        component_editor.set_field_value_and_save('Display Name', modified_name)
+        self.assertEqual(component.name, modified_name)

@@ -12,6 +12,7 @@ from ...pages.studio.utils import add_discussion, drag
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.staff_view import StaffPage
 
+from pytz import UTC
 import datetime
 from bok_choy.promise import Promise, EmptyPromise
 from base_studio_test import ContainerBase
@@ -262,17 +263,6 @@ class EditContainerTest(NestedVerticalTest):
     Tests of editing a container.
     """
 
-    def modify_display_name_and_verify(self, component):
-        """
-        Helper method for changing a display name.
-        """
-        modified_name = 'modified'
-        self.assertNotEqual(component.name, modified_name)
-        component.edit()
-        component_editor = ComponentEditorView(self.browser, component.locator)
-        component_editor.set_field_value_and_save('Display Name', modified_name)
-        self.assertEqual(component.name, modified_name)
-
     def test_edit_container_on_unit_page(self):
         """
         Test the "edit" button on a container appearing on the unit page.
@@ -301,9 +291,6 @@ class UnitPublishingTest(ContainerBase):
     LOCKED_STATUS = "Publishing Status\nVisible to Staff Only"
     RELEASE_TITLE_RELEASED = "RELEASED:"
     RELEASE_TITLE_RELEASE = "RELEASE:"
-
-    LAST_PUBLISHED = 'Last published'
-    LAST_SAVED = 'Draft saved on'
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -373,18 +360,18 @@ class UnitPublishingTest(ContainerBase):
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC\nwith Section "Test Section"'
         )
-        self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
+        self._verify_last_published_and_saved(unit, unit.LAST_PUBLISHED, unit.LAST_PUBLISHED)
         # Should not be able to click on Publish action -- but I don't know how to test that it is not clickable.
         # TODO: continue discussion with Muhammad and Jay about this.
 
         # Add a component to the page so it will have unpublished changes.
         add_discussion(unit)
         self._verify_publish_title(unit, self.DRAFT_STATUS)
-        self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_SAVED)
+        self._verify_last_published_and_saved(unit, unit.LAST_PUBLISHED, unit.LAST_SAVED)
         unit.publish_action.click()
         unit.wait_for_ajax()
         self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
-        self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
+        self._verify_last_published_and_saved(unit, unit.LAST_PUBLISHED, unit.LAST_PUBLISHED)
 
     def test_discard_changes(self):
         """
@@ -665,6 +652,41 @@ class UnitPublishingTest(ContainerBase):
         unit.publish_action.click()
         unit.wait_for_ajax()
         self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+
+    def test_last_edited_date_unit_display_name(self):
+        """
+        Scenario: case that passes (changing display name of unit)
+        """
+        original_time = datetime.datetime.now(UTC)
+
+        def minute_passed():
+            time_passed = datetime.datetime.now(UTC) - original_time
+            return time_passed.seconds > 60
+
+        unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
+        last_saved_time = unit.last_saved_time
+        EmptyPromise(minute_passed, 'Waiting for a minute to pass', timeout=65).fulfill()
+        add_discussion(unit)
+        updated_saved_time = unit.last_saved_time
+        self.assertTrue((updated_saved_time - last_saved_time) >= 60, "Last modified time did not change")
+
+    def test_last_edited_date_component_display_name(self):
+        """
+        Scenario: bug-- changing dispaly name of component does not cause last modified date to change.
+        """
+        original_time = datetime.datetime.now(UTC)
+
+        def minute_passed():
+            time_passed = datetime.datetime.now(UTC) - original_time
+            return time_passed.seconds > 60
+
+        unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
+        last_saved_time = unit.last_saved_time
+        EmptyPromise(minute_passed, 'Waiting for a minute to pass', timeout=65).fulfill()
+        component = unit.xblocks[1]
+        self.modify_display_name_and_verify(component)
+        updated_saved_time = unit.last_saved_time
+        self.assertTrue((updated_saved_time - last_saved_time) >= 60, "Last modified time did not change")
 
     def _view_published_version(self, unit):
         """
