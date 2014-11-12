@@ -30,6 +30,9 @@
 @import 'elements/controls'; // buttons, link styles, sliders, etc.
 @import 'elements/navigation'; // all archetypes of navigation
 
+// base - views
+@import 'views/video-upload';
+
 // xmodule
 @import 'xmodule/modules/css/module-styles.scss';
 @import 'xmodule/descriptors/css/module-styles.scss';
