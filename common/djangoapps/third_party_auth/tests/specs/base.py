@@ -122,10 +122,12 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         duplicate_account_error_needle = '<section class="dashboard-banner third-party-auth">'
         assert_duplicate_presence_fn = self.assertIn if duplicate else self.assertNotIn
 
+        unicode_content = response.content.decode('utf-8')
+
         self.assertEqual(200, response.status_code)
-        self.assertIn(user.email, response.content.decode('UTF-8'))
-        self.assertIn(user.username, response.content.decode('UTF-8'))
-        assert_duplicate_presence_fn(duplicate_account_error_needle, response.content)
+        self.assertIn(user.email, unicode_content)
+        self.assertIn(user.username, unicode_content)
+        assert_duplicate_presence_fn(duplicate_account_error_needle, unicode_content)
 
         if linked is not None:
 
@@ -135,10 +137,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             else:
                 expected_control_text = pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_DASHBOARD)
 
-            icon_state = re.search(r'third-party-auth.+icon icon-(\w+)', response.content, re.DOTALL).groups()[0]
-            provider_name = re.search(r'<span class="provider">([^<]+)', response.content, re.DOTALL).groups()[0]
+            icon_state = re.search(r'third-party-auth.+icon icon-(\w+)', unicode_content, re.DOTALL).groups()[0]
+            provider_name = re.search(r'<span class="provider">([^<]+)', unicode_content, re.DOTALL).groups()[0]
 
-            self.assertIn(expected_control_text, response.content)
+            self.assertIn(expected_control_text, unicode_content)
             self.assertEqual('link' if linked else 'unlink', icon_state)
             self.assertEqual(self.PROVIDER_CLASS.NAME, provider_name)
 
