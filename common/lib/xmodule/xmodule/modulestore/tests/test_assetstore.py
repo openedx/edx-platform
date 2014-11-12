@@ -330,8 +330,6 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         Save multiple metadata in each store and retrieve it singularly, as all assets, and after deleting all.
         """
         # Temporarily only perform this test for Old Mongo - not Split.
-        if not isinstance(storebuilder, MongoModulestoreBuilder):
-            raise unittest.SkipTest
         with MongoContentstoreBuilder().build() as contentstore:
             with storebuilder.build(contentstore) as store:
                 course1 = CourseFactory.create(modulestore=store)
