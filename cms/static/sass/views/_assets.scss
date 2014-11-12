@@ -215,6 +215,33 @@
           padding-left: ($baseline*0.75);
           padding-right: ($baseline*0.75);
         }
+
+        .nav-dd{
+          // basic layout - nav items
+          margin: 0 -($baseline/2);
+          .wrapper-nav-sub {
+            top: 89px;
+
+            > ol > .nav-item {
+              @extend %t-action3;
+              @extend %t-strong;
+              display: inline-block;
+              vertical-align: middle;
+
+              &:last-child {
+                margin-right: 0;
+              }
+            }
+
+            .nav-item a {
+              color: $gray-d1;
+
+              &:hover {
+                color: $blue-s1;
+              }
+            }
+          }
+        }
       }
 
       td {
