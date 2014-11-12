@@ -1,4 +1,3 @@
-
 <%!
 from django.utils.translation import ugettext as _
 from contentstore.views.helpers import xblock_studio_url
@@ -21,30 +20,16 @@ messages = json.dumps(xblock.validate().to_json())
 </script>
 </%block>
 
-<script type='text/javascript'>
-    require(["js/views/xblock_validation", "js/models/xblock_validation"],
-            function (XBlockValidationView, XBlockValidationModel) {
-                var validationMessages = ${messages};
-                % if xblock_url and not is_root:
-                validationMessages.showSummaryOnly = true;
-                % endif
-
-                var model = new XBlockValidationModel(validationMessages, {parse: true});
-                if (!model.get("empty")) {
-                    var validationEle = $('div.xblock-validation-messages[data-locator="${xblock.location | h}"]');
-                    var viewOptions = {
-                        el: validationEle,
-                        model: model
-                    };
-                    % if is_root:
-                    viewOptions.root = true;
-                    % endif
-                    var view = new XBlockValidationView(viewOptions);
-                    view.render();
-                }
-            });
+<script>
+    require(["jquery", "js/factories/xblock_validation"], function($, XBlockValidationFactory) {
+        XBlockValidationFactory(
+            ${messages},
+            $.parseJSON("${bool(xblock_url)}".toLowerCase()),  // xblock_url will be None or a string
+            $.parseJSON("${bool(is_root)}".toLowerCase()),  // is_root will be None or a boolean
+            $('div.xblock-validation-messages[data-locator="${xblock.location | h}"]')
+        );
+    });
 </script>
-
 
 % if not is_root:
     % if is_reorderable:
