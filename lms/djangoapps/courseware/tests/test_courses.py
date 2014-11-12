@@ -15,7 +15,7 @@ from courseware.tests.helpers import get_request_for_user
 from student.tests.factories import UserFactory
 import xmodule.modulestore.django as store_django
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
@@ -160,7 +160,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         super(CoursesRenderTest, self).setUp()
 
         store = store_django.modulestore()
-        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
+        course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_key = course_items[0].id
         self.course = get_course_by_id(course_key)
         self.request = get_request_for_user(UserFactory.create())

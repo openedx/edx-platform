@@ -14,13 +14,12 @@ import ddt
 from nose.plugins.skip import SkipTest
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
     MODULESTORE_SETUPS,
     SHORT_NAME_MAP,
     TEST_DATA_DIR,
-    MongoContentstoreBuilder,
 )
 from xmodule.modulestore.perf_tests.generate_asset_xml import make_asset_xml, validate_xml, ASSET_XSD_FILE
 
@@ -111,19 +110,19 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
                     dest_course_key = dest_store.make_course_key('a', 'course', 'course')
 
                     with CodeBlockTimer("initial_import"):
-                        import_from_xml(
+                        import_course_from_xml(
                             source_store,
                             'test_user',
                             TEST_DATA_ROOT,
-                            course_dirs=TEST_COURSE,
+                            source_dirs=TEST_COURSE,
                             static_content_store=source_content,
-                            target_course_id=source_course_key,
-                            create_course_if_not_present=True,
+                            target_id=source_course_key,
+                            create_if_not_present=True,
                             raise_on_failure=True,
                         )
 
                     with CodeBlockTimer("export"):
-                        export_to_xml(
+                        export_course_to_xml(
                             source_store,
                             source_content,
                             source_course_key,
@@ -132,14 +131,14 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
                         )
 
                     with CodeBlockTimer("second_import"):
-                        import_from_xml(
+                        import_course_from_xml(
                             dest_store,
                             'test_user',
                             self.export_dir,
-                            course_dirs=['exported_source_course'],
+                            source_dirs=['exported_source_course'],
                             static_content_store=dest_content,
-                            target_course_id=dest_course_key,
-                            create_course_if_not_present=True,
+                            target_id=dest_course_key,
+                            create_if_not_present=True,
                             raise_on_failure=True,
                         )
 
@@ -194,14 +193,14 @@ class FindAssetTest(unittest.TestCase):
                 )
 
                 with CodeBlockTimer("initial_import"):
-                    import_from_xml(
+                    import_course_from_xml(
                         source_store,
                         'test_user',
                         TEST_DATA_ROOT,
-                        course_dirs=TEST_COURSE,
+                        source_dirs=TEST_COURSE,
                         static_content_store=source_content,
-                        target_course_id=source_course_key,
-                        create_course_if_not_present=True,
+                        target_id=source_course_key,
+                        create_if_not_present=True,
                         raise_on_failure=True,
                     )
 
@@ -259,14 +258,14 @@ class TestModulestoreAssetSize(unittest.TestCase):
         with source_ms.build() as (source_content, source_store):
             source_course_key = source_store.make_course_key('a', 'course', 'course')
 
-            import_from_xml(
+            import_course_from_xml(
                 source_store,
                 'test_user',
                 TEST_DATA_ROOT,
-                course_dirs=TEST_COURSE,
+                source_dirs=TEST_COURSE,
                 static_content_store=source_content,
-                target_course_id=source_course_key,
-                create_course_if_not_present=True,
+                target_id=source_course_key,
+                create_if_not_present=True,
                 raise_on_failure=True,
             )
 

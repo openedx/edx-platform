@@ -11,7 +11,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.base import location_to_query
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from django.conf import settings
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
@@ -34,7 +34,7 @@ class ExportAllCourses(ModuleStoreTestCase):
         This test validates that redundant Mac metadata files ('._example.txt', '.DS_Store') are
         cleaned up on import
         """
-        import_from_xml(
+        import_course_from_xml(
             self.module_store,
             '**replace_user**',
             TEST_DATA_DIR,
