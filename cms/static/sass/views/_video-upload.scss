@@ -1,0 +1,194 @@
+.view-video-upload {
+
+  .file-drop {
+    @include clearfix();
+    margin-bottom: ($baseline*1.5);
+    background: $white;
+    border: 2px dashed #ccc;
+    border-radius: ($baseline/5);
+
+    .file-drop-upload-form {
+      display: inline-block;
+      width: 100%;
+      vertical-align: middle;
+
+      .file-drop-area {
+        padding: ($baseline*3);
+        text-align: center;
+      }
+    }
+
+    &:hover, 
+    &.is-dropped {
+      background: $blue-l5;
+      border-style: solid;
+      border-color: $blue-l4;
+    }
+
+    &.has-dropped {
+      background: $blue-l4;
+      border-style: solid;
+      border-color: $blue-l3;
+    }
+  }
+
+  .video-upload-progress-container {
+    margin-bottom: ($baseline*2);
+
+     .video-upload-progress-list {
+      @extend %cont-no-list;
+
+      .video-upload-item {
+        display: inline-block;
+        width: flex-grid(4);
+        vertical-align: top;
+        padding: 6px .5%;
+
+        .video-detail-wrapper {
+          min-height: ($baseline*2.5);
+          padding: ($baseline/2);
+          border: 1px solid #ccc;
+          border-radius: ($baseline/5);
+
+          .video-detail-title {
+            margin-bottom: ($baseline/2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 90%;
+            font-weight: 600;
+          }
+
+          .video-detail-progress-bar {
+            // display: inline-block;
+            display: none; // Hiding for v 1
+            width: flex-grid(10);
+            border-radius: ($baseline/5);
+
+            progress.upload-progress-bar { 
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              appearance: none;
+              width: 100%;
+              height: 5px;
+              border: none;
+            }
+
+            progress.upload-progress-bar::-webkit-progress-bar {
+              background: $white;
+              border-radius: ($baseline/5);
+            }
+
+            progress.upload-progress-bar::-webkit-progress-value {
+              background: $gray;
+            }
+          }
+
+          .video-detail-progress-bar.bar-error {
+
+            progress.upload-progress-bar::-webkit-progress-value {
+              background: $color-error;
+            }
+          }
+
+          .video-detail-progress-bar.bar-success {
+
+            progress.upload-progress-bar::-webkit-progress-value {
+              background: $color-ready;
+            }
+          }
+
+          .video-actions {
+            // display: inline-block;
+            display: none; // Hiding for v 1
+            width: flex-grid(2);
+            margin-top: ($baseline/5);
+            text-align: right;
+
+            .action-button {
+              background: transparent;
+              border: 0;
+
+              .icon {
+                color: $gray;
+              }
+
+              .icon-remove:hover, .icon-remove:focus, 
+              .icon-trash:hover, .icon-trash:focus {
+                color: $color-error;
+              } 
+
+              .icon-rotate-left:hover, .icon-rotate-left:focus {
+                color: $blue;
+              }
+            }
+          }
+
+          .status-message {
+            @include font-size(12);
+            @include line-height(12);
+
+            .error {
+              color: $color-error;
+            }
+
+            .success {
+              color: $color-ready;
+            }
+          }
+        }
+      }
+
+      .video-upload-item:hover, .video-upload-item:focus {
+
+        .video-detail-wrapper {
+          @include transition(all $tmg-f3);
+          background: $white;
+
+          .video-detail-progress-bar {
+
+            progress.upload-progress-bar::-webkit-progress-bar {
+              background: $gray-l5;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .assets-wrapper {
+    margin-top: ($baseline*2.5);
+
+    .asset-library {
+
+      h3 {
+        margin-bottom: ($baseline*2);
+        font-weight: 600;
+      }
+
+      table {
+        font-size: 80%;
+
+        td.name-col {
+
+          a {
+            font-weight: 600;
+          }
+        }
+
+        td.status-col {
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+
+  .button {
+    @extend %ui-btn;
+
+    &.primary-green {
+      @extend %btn-primary-green;
+    }
+  }
+
+}

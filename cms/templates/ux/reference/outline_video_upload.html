@@ -1,0 +1,311 @@
+<%inherit file="../../base.html" />
+
+<%block name="view_notes">
+  <%include file="_note-usage.html" />
+</%block>
+
+<%!
+from django.core.urlresolvers import reverse
+%>
+<%block name="title">[template] Course Video Uploads UI</%block>
+<%block name="bodyclass">is-signedin course view-uploads view-video-upload</%block>
+
+<%block name="content">
+
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">Content</small>
+        <span class="sr">&gt; </span>Video Uploads
+      </h1>
+
+      <nav class="nav-actions">
+        <h3 class="nav-actions-title sr">Page Actions</h3>
+        <ul class="nav-actions-list">
+          <li class="nav-item">
+            <a href="#" class="button button-new" data-category="chapter" data-parent="" data-default-name="">
+              <i class="icon-plus"></i>Upload New File
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <h2 class="is-hidden">Content</h2>
+      <div class="content-primary" role="main">
+        <h3 class="is-hidden">Video Uploads</h3>
+        <div class="file-drop" id="file-drop">
+          <form class="file-drop-upload-form" action="upload.php" method="POST" enctype="multipart/form-data">
+            <label for="file-drop-filename" class="file-drop-filename-label sr"></label>
+            <input class="file-drop-filename sr" type="hidden" id="file-drop-filename" name="file" />
+            <div class="file-drop-area">
+              <span id="file-drop-area-status">Drag and drop or click here to upload video files.</span>
+
+              <label for="video-files" class="video-files-label sr">Choose one or many files to upload:</label>
+              <input type="file" class="video-files-filename sr" id="video-files" name="video-files[]" multiple="multiple" />
+            </div>
+          </form>
+        </div>
+
+        <section class="video-upload-progress-container">
+          <h3 class="video-upload-progress-title sr">Video Upload Progress</h3>
+          <ul class="video-upload-progress-list">
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-001">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-001"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-remove"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-002">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar bar-error">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="51" aria-describedby="video-upload-002"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-retry"><i class="icon icon-rotate-left"></i><span class="sr">Retry</span></button>
+                </div>
+                <div class="status-message">
+                  <p class="text error">Upload failed</p>
+                </div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-003">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar bar-success">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="100" aria-describedby="video-upload-003"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-delete"><i class="icon icon-trash"></i><span class="sr">Remove</span></button>
+                </div>
+                <div class="status-message">
+                  <p class="text success"><i class="icon icon-ok"></i> Complete!</p>
+                </div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-004">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-004"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-005">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-005"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-006">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-006"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-007">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-007"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-008">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-008"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-009">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-009"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <div class="wrapper-sock wrapper">
+          <ul class="list-actions list-cta">
+            <li class="action-item">
+              <a href="#all-uploads" class="cta cta-show-sock"><span class="copy">...and 103 more.</span> Show all</a>
+            </li>
+          </ul>
+        </div>
+
+        <section class="assets-wrapper">
+          <div class="asset-library">
+            <h3>Previous Uploads</h3>
+            <table>
+              <caption class="sr">List of uploaded files and assets in this course</caption>
+              <thead>
+                <tr>
+                  <th class="name-col sortable-column"><span class="column-sort-link" id="js-asset-name-col">Name</span></th>
+                  <th class="duration-col sortable-column"><span class="column-sort-link" id="js-asset-duration-col">Duration</span></th>
+                  <th class="date-col">Date Added</th>
+                  <th class="video-id-col">Video ID</th>
+                  <th class="status-col sortable-column"><span class="column-sort-link" id="js-asset-status-col">Status</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="name-col">
+                    <a href="#">Something-random</a>
+                  </td>
+                  <td class="duration-col">
+                    4.35MB
+                  </td>
+                  <td class="date-col">
+                    Nov. 12, 2014 at 4:35pm
+                  </td>
+                  <td class="video-id-col">
+                    MIT4758331-V004100
+                  </td>
+                  <td class="status-col">
+                    <span class="success">Complete</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="name-col">
+                    <a href="#">section1-unit3</a>
+                  </td>
+                  <td class="duration-col">
+                    1.05GB
+                  </td>
+                  <td class="date-col">
+                    Nov. 12, 2014 at 4:47pm
+                  </td>
+                  <td class="video-id-col"></td>
+                  <td class="status-col">
+                    <span class="info">In Progress</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="ui-loading is-hidden">
+          <p><span class="spin">
+            <i class="icon-refresh"></i></span>
+            <span class="copy">Loading &hellip;</span>
+          </p>
+        </div>
+      </div>
+
+      <aside class="content-supplementary" role="complementary">
+        <div class="bit">
+          <h3 class="title-3">Adding Videos</h3>
+          <p>To submit your course videos for processing simply drag and drop the files on to this page, or select files from your computer by using the Select files button.</p>
+        </div>
+
+        <div class="bit">
+          <h3 class="title-3">More Help Goes Here</h3>
+          <p>You can create new sections and subsections, set the release date for sections, and create new units in existing subsections.  You can set the assignment type for subsections that are to be graded, and you can open a subsection for further editing.</p>
+          <p>In addition, you can drag and drop sections, subsections, and units to reorganize your course.</p>
+        </div>
+      </aside>
+
+    </section>
+  </div>
+
+  <div class="upload-modal modal">
+    <button type="button" class="close-button" aria-describedby="modal-title"><i class="icon icon-remove-sign"></i><span class="sr">Close</span></button>
+    <div class="modal-body">
+      <h1 class="title sr" id="modal-title">Preview Uploaded File</h1>
+      <div class="embeddable"></div>
+      <div class="filename">
+        <p>something-random.mp4</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  var file_drop = document.getElementById('file-drop'),
+      file_drop_text = document.getElementById('file-drop-area-status');
+
+  file_drop.ondragover = function() {
+    this.className = 'file-drop is-dropped';
+    return false;
+  };
+
+  file_drop.ondragend = function() {
+    this.className = 'file-drop is-dropped';
+    return false;
+  };
+
+  file_drop.ondrop = function(e) {
+    this.className = 'file-drop has-dropped';
+    e.preventDefault();
+
+    var file = e.dataTransfer.files[0],
+        reader = new FileReader();
+
+    file_drop_text.innerHTML = file.name;
+
+    reader.onload = function(event) {
+      // console.log(event.target);
+      // console.log(event.target.name);
+    };
+
+    // console.log(file);
+    // console.log(file.name);
+    reader.readAsDataURL(file);
+
+    return false;
+  };
+  </script>
+
+</%block>
