@@ -300,7 +300,8 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
 ############### XBlock filesystem field config ##########
-DJFS = AUTH_TOKENS.get('DJFS', None)
+if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
+    DJFS = AUTH_TOKENS['DJFS']
 
 ############### Module Store Items ##########
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = ENV_TOKENS.get('HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', {})
