@@ -87,7 +87,7 @@ class AssetMetadata(object):
             else:
                 self.fields[attr] = val
 
-    def to_mongo(self):
+    def to_storable(self):
         """
         Converts metadata properties into a MongoDB-storable dict.
         """
@@ -106,7 +106,7 @@ class AssetMetadata(object):
         }
 
     @contract(asset_doc='dict|None')
-    def from_mongo(self, asset_doc):
+    def from_storable(self, asset_doc):
         """
         Fill in all metadata fields from a MongoDB document.
 
