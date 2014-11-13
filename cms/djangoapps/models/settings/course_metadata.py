@@ -14,6 +14,7 @@ class CourseMetadata(object):
     # The list of fields that wouldn't be shown in Advanced Settings.
     # Should not be used directly. Instead the filtered_list method should be used if the field needs to be filtered
     # depending on the feature flag.
+<<<<<<< HEAD
     FILTERED_LIST = [
         'xml_attributes',
         'start',
@@ -31,6 +32,7 @@ class CourseMetadata(object):
         'name',  # from xblock
         'tags',  # from xblock
         'visible_to_staff_only',
+        'group_access',
     ]
 
     @classmethod
