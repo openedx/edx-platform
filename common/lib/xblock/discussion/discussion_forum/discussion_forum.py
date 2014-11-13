@@ -8,9 +8,8 @@ from .utils import (
     render_template,
     render_mako_template,
     render_mustache_templates,
-    get_js_urls, get_css_urls,
-    asset_to_static_url
-)
+    asset_to_static_url,
+    add_resources_to_fragment)
 
 log = logging.getLogger(__name__)
 
@@ -76,10 +75,7 @@ class DiscussionXBlock(XBlock):
 
         fragment.add_content(render_mako_template('discussion/_discussion_inline.html', context))
 
-        for url in get_js_urls():
-            fragment.add_javascript_url(url)
-        for url in get_css_urls():
-            fragment.add_css_url(url)
+        add_resources_to_fragment(fragment)
 
         fragment.add_javascript(render_template('static/js/discussion_inline.js', {'course_id': self.course_id}))
         fragment.add_content(render_mustache_templates())
@@ -167,11 +163,7 @@ class DiscussionCourseXBlock(XBlock):
         context = discussion_service.get_course_template_context()
         context['enable_new_post_btn'] = True
 
-        for url in get_js_urls():
-            fragment.add_javascript_url(url)
-
-        for url in get_css_urls():
-            fragment.add_css_url(url)
+        add_resources_to_fragment(fragment)
 
         fragment.add_content(render_mako_template('discussion/_discussion_course.html', context))
 

@@ -137,6 +137,15 @@ def get_css_urls():
     return [asset_to_static_url(path) for path in CSS_URLS]
 
 
+def add_resources_to_fragment(fragment):
+    # order is important : code in discussion_thread_list_view -> updateSidebar depends on the
+    # fact that html is properly styled as it does height calculations.
+    for url in CSS_URLS:
+        fragment.add_css_url(asset_to_static_url(url))
+    for url in JS_URLS + discussion_js:
+        fragment.add_javascript_url(asset_to_static_url(url))
+
+
 def asset_to_static_url(asset_path):
     """
     :param str asset_path: path to asset
