@@ -39,6 +39,12 @@
                             <span class="action-button-text">Add Component</span>
                         </a>
                    </li>
+                   <li class="action-item action-toggle-preview nav-item">
+                       <a href="#" class="button button-toggle-preview action-button toggle-preview-button is-hidden">
+                           <i class="icon fa fa-refresh"></i>
+                           <span class="action-button-text preview-text"></span>
+                       </a>
+                   </li>
                 </ul>
             </nav>
         </header>

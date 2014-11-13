@@ -113,6 +113,12 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             if aside_type != 'acid_aside'
         ]
 
+    def render_child_placeholder(self, block, view_name, context):
+        """
+        Renders a placeholder XBlock.
+        """
+        return self.wrap_xblock(block, view_name, Fragment(), context)
+
 
 class StudioPermissionsService(object):
     """
@@ -240,6 +246,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
+            'show_preview': context.get('show_preview', True),
             'content': frag.content,
             'is_root': is_root,
             'is_reorderable': is_reorderable,

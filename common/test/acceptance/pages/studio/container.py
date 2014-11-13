@@ -500,6 +500,12 @@ class XBlockWrapper(PageObject):
         """
         self.q(css=self._bounded_selector('span.message-text a')).first.click()
 
+    def is_placeholder(self):
+        """
+        Checks to see if the XBlock is rendered as a placeholder without a preview.
+        """
+        return not self.q(css=self._bounded_selector('.wrapper-xblock article')).present
+
     @property
     def group_configuration_link_name(self):
         """

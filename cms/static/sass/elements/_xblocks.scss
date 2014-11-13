@@ -356,6 +356,10 @@
       margin-bottom: 0;
       border-bottom: 1px solid $gray-l4;
       background-color: $gray-l6;
+      &.is-collapsed {
+        border-bottom: 0;
+        border-radius: 3px;
+      }
     }
 
     .xblock-render {

@@ -1,12 +1,23 @@
 define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/models/xblock_info",
-    "js/views/paged_container", "js/views/paging_header", "js/views/paging_footer"],
-    function ($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter) {
+    "js/views/paged_container", "js/views/paging_header", "js/views/paging_footer", "js/views/xblock"],
+    function ($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter, XBlockView) {
 
         var htmlResponseTpl = _.template('' +
-            '<div class="xblock-container-paging-parameters" data-start="<%= start %>" data-displayed="<%= displayed %>" data-total="<%= total %>"/>'
+            '<div class="xblock-container-paging-parameters" ' +
+                'data-start="<%= start %>" ' +
+                'data-displayed="<%= displayed %>" ' +
+                'data-total="<%= total %>" ' +
+                'data-previews="<%= previews %>"></div>'
         );
 
-        function getResponseHtml(options){
+        function getResponseHtml(override_options){
+            var default_options = {
+                start: 0,
+                displayed: PAGE_SIZE,
+                total: PAGE_SIZE + 1,
+                previews: true
+            };
+            var options = _.extend(default_options, override_options);
             return '<div class="xblock" data-request-token="request_token">' +
                 '<div class="container-paging-header"></div>' +
                 htmlResponseTpl(options) +
@@ -14,43 +25,43 @@ define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/mo
                 '</div>'
         }
 
+        var makePage = function(html_parameters) {
+            return {
+                resources: [],
+                html: getResponseHtml(html_parameters)
+            };
+        };
+
         var PAGE_SIZE = 3;
 
-        var mockFirstPage = {
-            resources: [],
-            html: getResponseHtml({
+        var mockFirstPage = makePage({
                 start: 0,
                 displayed: PAGE_SIZE,
                 total: PAGE_SIZE + 1
-            })
-        };
+        });
 
-        var mockSecondPage = {
-            resources: [],
-            html: getResponseHtml({
-                start: PAGE_SIZE,
-                displayed: 1,
-                total: PAGE_SIZE + 1
-            })
-        };
+        var mockSecondPage = makePage({
+            start: PAGE_SIZE,
+            displayed: 1,
+            total: PAGE_SIZE + 1
+        });
 
-        var mockEmptyPage = {
-            resources: [],
-            html: getResponseHtml({
-                start: 0,
-                displayed: 0,
-                total: 0
-            })
-        };
+        var mockEmptyPage = makePage({
+            start: 0,
+            displayed: 0,
+            total: 0
+        });
 
-        var respondWithMockPage = function(requests) {
+        var respondWithMockPage = function(requests, mockPage) {
             var requestIndex = requests.length - 1;
-            var request = requests[requestIndex];
-            var url = new URI(request.url);
-            var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
-            var page = queryParameters.page_number;
-            var response = page === "0" ? mockFirstPage : mockSecondPage;
-            AjaxHelpers.respondWithJson(requests, response, requestIndex);
+            if (typeof mockPage == 'undefined') {
+                var request = requests[requestIndex];
+                var url = new URI(request.url);
+                var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
+                var page = queryParameters.page_number;
+                mockPage = page === "0" ? mockFirstPage : mockSecondPage;
+            }
+            AjaxHelpers.respondWithJson(requests, mockPage, requestIndex);
         };
 
         var MockPagingView = PagedContainer.extend({
@@ -65,10 +76,26 @@ define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/mo
             beforeEach(function () {
                 var feedbackTpl = readFixtures('system-feedback.underscore');
                 setFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" }).text(feedbackTpl));
-                pagingContainer = new MockPagingView({ page_size: PAGE_SIZE });
+                pagingContainer = new MockPagingView({page_size: PAGE_SIZE});
             });
 
             describe("Container", function () {
+                describe("rendering", function(){
+
+                    it('should set show_previews', function() {
+                       var requests = AjaxHelpers.requests(this);
+                       expect(pagingContainer.collection.showChildrenPreviews).toBe(true); //precondition check
+
+                       pagingContainer.setPage(0);
+                       respondWithMockPage(requests, makePage({previews: false}));
+                       expect(pagingContainer.collection.showChildrenPreviews).toBe(false);
+
+                       pagingContainer.setPage(0);
+                       respondWithMockPage(requests, makePage({previews: true}));
+                       expect(pagingContainer.collection.showChildrenPreviews).toBe(true);
+                   });
+                });
+
                 describe("setPage", function () {
                     it('can set the current page', function () {
                         var requests = AjaxHelpers.requests(this);
@@ -304,8 +331,6 @@ define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/mo
             });
 
             describe("PagingFooter", function () {
-                var pagingFooter;
-
                 beforeEach(function () {
                     var pagingFooterTpl = readFixtures('paging-footer.underscore');
                     appendSetFixtures($("<script>", { id: "paging-footer-tpl", type: "text/template" }).text(pagingFooterTpl));
@@ -482,6 +507,58 @@ define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/mo
                         requests[1].respond(500);
                         expect(pagingContainer.collection.currentPage).toBe(0);
                         expect(pagingContainer.pagingFooter.$('.page-number-input')).toHaveValue('');
+                    });
+                });
+            });
+
+            describe("Previews", function(){
+                describe("Toggle Previews", function(){
+                    var testSendsAjax,
+                        defaultUrl = "/preview/xblock/handler/trigger_previews";
+
+                    testSendsAjax = function (show_previews) {
+                        it("should send " + (!show_previews) + " when showChildrenPreviews was " + show_previews, function(){
+                            var requests = AjaxHelpers.requests(this);
+                            pagingContainer.collection.showChildrenPreviews = show_previews;
+                            pagingContainer.togglePreviews();
+                            AjaxHelpers.expectJsonRequest(requests, 'POST', defaultUrl, { showChildrenPreviews: !show_previews});
+                            AjaxHelpers.respondWithJson(requests, { showChildrenPreviews: !show_previews });
+                        });
+                    };
+                    testSendsAjax(true);
+                    testSendsAjax(false);
+
+                    it("should trigger render on success", function(){
+                        spyOn(pagingContainer, 'render');
+                        var requests = AjaxHelpers.requests(this);
+
+                        pagingContainer.togglePreviews();
+                        AjaxHelpers.respondWithJson(requests, { showChildrenPreviews: true });
+
+                        expect(pagingContainer.render).toHaveBeenCalled();
+                    });
+
+                    it("should not trigger render on failure", function(){
+                        spyOn(pagingContainer, 'render');
+                        var requests = AjaxHelpers.requests(this);
+
+                        pagingContainer.togglePreviews();
+                        AjaxHelpers.respondWithError(requests);
+
+                        expect(pagingContainer.render).not.toHaveBeenCalled();
+                    });
+
+                    it("should send force_render when new block causes page change", function() {
+                        var requests = AjaxHelpers.requests(this);
+                        pagingContainer.setPage(0);
+                        respondWithMockPage(requests);
+                        spyOn(pagingContainer, 'render');
+                        var mockXBlockInfo = new XBlockInfo({id: 'mock-location'});
+                        var mockXBlockView = new XBlockView({model: mockXBlockInfo});
+                        mockXBlockView.model.id = 'mock-location';
+                        pagingContainer.refresh(mockXBlockView, true);
+                        expect(pagingContainer.render).toHaveBeenCalled();
+                        expect(pagingContainer.render.mostRecentCall.args[0].force_render).toEqual('mock-location');
                     });
                 });
             });

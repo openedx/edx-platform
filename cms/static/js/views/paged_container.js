@@ -1,6 +1,6 @@
-define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettext",
+define(["jquery", "underscore", "js/views/utils/view_utils", "js/views/container", "js/utils/module", "gettext",
         "js/views/feedback_notification", "js/views/paging_header", "js/views/paging_footer", "js/views/paging_mixin"],
-    function ($, _, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter, PagingMixin) {
+    function ($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter, PagingMixin) {
         var PagedContainerView = ContainerView.extend(PagingMixin).extend({
             initialize: function(options){
                 var self = this;
@@ -24,7 +24,9 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
                     bind: function() {},
                     // size() on backbone collections shows how many objects are in the collection, or in the case
                     // of paginator, on the current page.
-                    size: function() { return self.collection._size; }
+                    size: function() { return self.collection._size; },
+                    // Toggles the functionality for showing and hiding child previews.
+                    showChildrenPreviews: true
                 };
             },
 
@@ -47,21 +49,29 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
                     url: decodeURIComponent(xblockUrl) + "/" + view,
                     type: 'GET',
                     cache: false,
-                    data: this.getRenderParameters(options.page_number),
+                    data: this.getRenderParameters(options.page_number, options.force_render),
                     headers: { Accept: 'application/json' },
                     success: function(fragment) {
                         self.handleXBlockFragment(fragment, options);
                         self.processPaging({ requested_page: options.page_number });
+                        self.page.updatePreviewButton(self.collection.showChildrenPreviews);
                         self.page.renderAddXBlockComponents();
+                        if (options.force_render) {
+                            var target = $('.studio-xblock-wrapper[data-locator="' + options.force_render + '"]');
+                            // Scroll us to the element with a little buffer at the top for context.
+                            ViewUtils.setScrollOffset(target, ($(window).height() * .10));
+                        }
                     }
                 });
             },
 
-            getRenderParameters: function(page_number) {
+            getRenderParameters: function(page_number, force_render) {
+                // Options should at least contain page_number.
                 return {
                     page_size: this.page_size,
                     enable_paging: true,
-                    page_number: page_number
+                    page_number: page_number,
+                    force_render: force_render
                 };
             },
 
@@ -70,8 +80,10 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
                 return Math.ceil(total_count / this.page_size);
             },
 
-            setPage: function(page_number) {
-                this.render({ page_number: page_number});
+            setPage: function(page_number, additional_options) {
+                additional_options = additional_options || {};
+                var options = _.extend({page_number: page_number}, additional_options);
+                this.render(options);
             },
 
             processPaging: function(options){
@@ -80,13 +92,15 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
                 var $element = this.$el.find('.xblock-container-paging-parameters'),
                     total = $element.data('total'),
                     displayed = $element.data('displayed'),
-                    start = $element.data('start');
+                    start = $element.data('start'),
+                    previews = $element.data('previews');
 
                 this.collection.currentPage = options.requested_page;
                 this.collection.totalCount = total;
                 this.collection.totalPages = this.getPageCount(total);
                 this.collection.start = start;
                 this.collection._size = displayed;
+                this.collection.showChildrenPreviews = previews;
 
                 this.processPagingHeaderAndFooter();
             },
@@ -112,23 +126,44 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
                 this.pagingFooter.render();
             },
 
-            refresh: function(block_added) {
-                if (block_added) {
-                    this.collection.totalCount += 1;
-                    this.collection._size +=1;
-                    if (this.collection.totalCount == 1) {
-                        this.render();
+            refresh: function(xblockView, block_added, is_duplicate) {
+                if (!block_added) {
+                    return
+                }
+                if (is_duplicate) {
+                    // Duplicated blocks can be inserted onto the current page.
+                    var xblock = xblockView.xblock.element.parents(".studio-xblock-wrapper").first();
+                    var all_xblocks = xblock.parent().children(".studio-xblock-wrapper");
+                    var index = all_xblocks.index(xblock);
+                    if ((index + 1 <= this.page_size) && (all_xblocks.length > this.page_size)) {
+                        // Pop the last XBlock off the bottom.
+                        all_xblocks[all_xblocks.length - 1].remove();
                         return
                     }
-                    this.collection.totalPages = this.getPageCount(this.collection.totalCount);
-                    var new_page = this.collection.totalPages - 1;
-                    // If we're on a new page due to overflow, or this is the first item, set the page.
-                    if (((this.collection.currentPage) != new_page) || this.collection.totalCount == 1) {
-                        this.setPage(new_page);
-                    } else {
-                        this.pagingHeader.render();
-                        this.pagingFooter.render();
+                }
+                this.collection.totalCount += 1;
+                this.collection._size +=1;
+                if (this.collection.totalCount == 1) {
+                    this.render();
+                    return
+                }
+                this.collection.totalPages = this.getPageCount(this.collection.totalCount);
+                var target_page = this.collection.totalPages - 1;
+                // If we're on a new page due to overflow, or this is the first item, set the page.
+                if (((this.collection.currentPage) != target_page) || this.collection.totalCount == 1) {
+                    var force_render = xblockView.model.id;
+                    if (is_duplicate) {
+                        // The duplicate should be on the next page if we've gotten here.
+                        target_page = this.collection.currentPage + 1;
                     }
+                    this.setPage(
+                        target_page,
+                        {force_render: force_render}
+                    );
+
+                } else {
+                    this.pagingHeader.render();
+                    this.pagingFooter.render();
                 }
             },
 
@@ -157,6 +192,19 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
 
             sortDisplayName: function() {
                 return gettext("Date added");  // TODO add support for sorting
+            },
+
+            togglePreviews: function(){
+                var self = this,
+                    xblockUrl = this.model.url();
+                return $.ajax({
+                    // No runtime, so can't get this via the handler() call.
+                    url: '/preview' + decodeURIComponent(xblockUrl) + "/handler/trigger_previews",
+                    type: 'POST',
+                    data: JSON.stringify({ showChildrenPreviews: !this.collection.showChildrenPreviews}),
+                    dataType: 'json'
+                })
+                .then(self.render).promise();
             }
         });
 

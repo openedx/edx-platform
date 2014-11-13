@@ -8,7 +8,12 @@
 </script>
 % endfor
 
-<div class="xblock-container-paging-parameters" data-start="${first_displayed}" data-displayed="${displayed_children}" data-total="${total_children}"></div>
+<div class="xblock-container-paging-parameters"
+     data-start="${first_displayed}"
+     data-displayed="${displayed_children}"
+     data-total="${total_children}"
+     data-previews="${'true' if previews else 'false'}"
+></div>
 
 <div class="container-paging-header"></div>
 
