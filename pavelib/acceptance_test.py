@@ -48,7 +48,7 @@ def test_acceptance(options):
     if opts['default_store'] not in ['draft', 'split']:
         msg = colorize(
             'red',
-            'No modulestore specified, running tests for both draft and split.'
+            'No modulestore specified, running tests for draft.'
         )
         print(msg)
 
