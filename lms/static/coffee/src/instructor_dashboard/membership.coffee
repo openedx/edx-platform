@@ -242,7 +242,6 @@ class @AutoEnrollmentViaCsv
 
     render_response = (title, message, type, student_results) =>
       details = []
-      notification_model = new NotificationModel()
       for student_result in student_results
         if student_result.is_general_error
           details.push student_result.response
@@ -250,15 +249,7 @@ class @AutoEnrollmentViaCsv
           response_message = student_result.username + '  ('+ student_result.email + '):  ' + '   (' + student_result.response + ')'
           details.push response_message
 
-      notification_model.set({
-          'type': type,
-          'title': title,
-          'message': message,
-          'details': details,
-      });
-      view = new NotificationView(model:notification_model);
-      view.render()
-      @$results.append view.$el
+      @$results.append @render_notification_view type, title, message, details
 
     if errors.length
       render_response gettext('Errors'), gettext("The following errors were generated:"), 'error', errors
@@ -266,6 +257,18 @@ class @AutoEnrollmentViaCsv
       render_response gettext('Warnings'), gettext("The following warnings were generated:"), 'warning', warnings
     if result_from_server_is_success
       render_response gettext('Success'), gettext("All accounts were created successfully."), 'confirmation', []
+
+  render_notification_view: (type, title, message, details) ->
+    notification_model = new NotificationModel()
+    notification_model.set({
+          'type': type,
+          'title': title,
+          'message': message,
+          'details': details,
+    });
+    view = new NotificationView(model:notification_model);
+    view.render()
+    return view.$el.html()
 
 class BetaTesterBulkAddition
   constructor: (@$container) ->
