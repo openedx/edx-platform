@@ -19,6 +19,8 @@ var edx = edx || {};
 
         requiredStr: '',
 
+        submitButton: '.js-reset',
+
         preRender: function( data ) {
             this.listenTo( this.model, 'sync', this.saveSuccess );
         },
@@ -26,6 +28,7 @@ var edx = edx || {};
         toggleErrorMsg: function( show ) {
             if ( show ) {
                 this.setErrors();
+                this.toggleDisableButton(false)
             } else {
                 this.element.hide( this.$errors );
             }

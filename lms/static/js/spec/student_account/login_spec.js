@@ -134,6 +134,9 @@ define([
             // Submit the form, with successful validation
             submitForm(true);
 
+            // Form button should be disabled on success.
+            expect(view.$submitButton).toHaveAttr('disabled');
+
             // Verify that the client contacts the server with the expected data
             AjaxHelpers.expectRequest(
                 requests, 'POST',
@@ -213,6 +216,8 @@ define([
 
             // Expect auth complete NOT to have been triggered
             expect(authComplete).toBe(false);
+            // Form button should be re-enabled when errors occur
+            expect(view.$submitButton).not.toHaveAttr('disabled');
         });
 
         it('displays an error if the server returns an error while logging in', function() {
@@ -227,9 +232,14 @@ define([
             // Expect that an error is displayed and that auth complete is not triggered
             expect(view.$errors).not.toHaveClass('hidden');
             expect(authComplete).toBe(false);
+            // Form button should be re-enabled on server failure.
+            expect(view.$submitButton).not.toHaveAttr('disabled');
 
             // If we try again and succeed, the error should go away
             submitForm();
+
+            // Form button should be disabled on success.
+            expect(view.$submitButton).toHaveAttr('disabled');
 
             // This time, respond with status code 200
             AjaxHelpers.respondWithJson(requests, {});

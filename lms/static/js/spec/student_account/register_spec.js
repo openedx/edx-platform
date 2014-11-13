@@ -242,6 +242,8 @@ define([
 
             // Verify that auth complete is triggered
             expect(authComplete).toBe(true);
+            // Form button should be disabled on success.
+            expect(view.$submitButton).toHaveAttr('disabled');
         });
 
         it('sends analytics info containing the enrolled course ID', function() {
@@ -295,6 +297,8 @@ define([
 
             // Verify that no submission errors are visible
             expect(view.$errors).toHaveClass('hidden');
+            // Form button should be disabled on success.
+            expect(view.$submitButton).toHaveAttr('disabled');
         });
 
         it('displays registration form validation errors', function() {
@@ -308,6 +312,8 @@ define([
 
             // Expect that auth complete is NOT triggered
             expect(authComplete).toBe(false);
+            // Form button should be re-enabled on error.
+            expect(view.$submitButton).not.toHaveAttr('disabled');
         });
 
         it('displays an error if the server returns an error while registering', function() {
@@ -332,6 +338,8 @@ define([
             // Expect that the error is hidden and that auth complete is triggered
             expect(view.$errors).toHaveClass('hidden');
             expect(authComplete).toBe(true);
+            // Form button should be disabled on success.
+            expect(view.$submitButton).toHaveAttr('disabled');
         });
     });
 });
