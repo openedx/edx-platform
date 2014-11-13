@@ -16,6 +16,9 @@ class InstructorDashboardPage(CoursePage):
     browse_button_selector = '.auto_enroll_csv .file-browse input.file_field'
     upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
     file_path_selector = '.auto_enroll_csv input#browseBtn'
+    NOTIFICATION_ERROR = 'error'
+    NOTIFICATION_WARNING = 'warning'
+    NOTIFICATION_SUCCESS = 'confirmation'
 
     def is_browser_on_page(self):
         return self.q(css='div.instructor-dashboard-wrapper-2').present
@@ -53,44 +56,20 @@ class InstructorDashboardPage(CoursePage):
         """
         self.q(css=self.upload_button_selector).click()
 
-    def is_error_notification_displayed(self):
+    def is_notification_displayed(self, section_type):
         """
-        Returns True if an Error notification is displayed.
+        Returns True if a {notification_type} notification is displayed.
         """
-        notification_selector = '.auto_enroll_csv .results .message-error'
-        self.wait_for_element_presence(notification_selector, "Error Notification")
+        notification_selector = '.auto_enroll_csv .results .message-%s' % section_type
+        self.wait_for_element_presence(notification_selector, "%s Notification" % section_type.title())
         return self.q(css=notification_selector).is_present()
 
-    def is_warning_notification_displayed(self):
-        """
-        Returns True if a Warning notification is displayed.
-        """
-        notification_selector = '.auto_enroll_csv .results .message-warning'
-        self.wait_for_element_presence(notification_selector, "Warning Notification")
-        return self.q(css=notification_selector).is_present()
-
-    def is_success_notification_displayed(self):
-        """
-        Returns True if a Success / Confirmation notification is displayed.
-        """
-        notification_selector = '.auto_enroll_csv .results .message-confirmation'
-        self.wait_for_element_presence(notification_selector, "Success Notification")
-        return self.q(css=notification_selector).is_present()
-
-    def first_error_message(self):
+    def first_notification_message(self, section_type):
         """
         Returns the first messages from the list of errors.
         """
-        error_message_selector = '.auto_enroll_csv .results .message-error li.summary-item'
-        self.wait_for_element_presence(error_message_selector, "message")
-        return self.q(css=error_message_selector).text[0]
-
-    def first_warning_message(self):
-        """
-        Returns the first messages from the list of warnings.
-        """
-        error_message_selector = '.auto_enroll_csv .results .message-warning li.summary-item'
-        self.wait_for_element_presence(error_message_selector, "message")
+        error_message_selector = '.auto_enroll_csv .results .message-%s li.summary-item' % section_type
+        self.wait_for_element_presence(error_message_selector, "%s message" % section_type.title())
         return self.q(css=error_message_selector).text[0]
 
     def get_asset_path(self, file_name):
@@ -123,6 +102,7 @@ class InstructorDashboardPage(CoursePage):
         errors_warnings_files_path = self.get_asset_path('image.jpg')
         self.q(css=self.file_path_selector).results[0].send_keys(errors_warnings_files_path)
         self.click_upload_file_button()
+
 
 class MembershipPage(PageObject):
     """
