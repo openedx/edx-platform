@@ -80,10 +80,6 @@ class SplitTestFields(object):
     # location needs to actually match one of the children of this
     # Block.  (expected invariant that we'll need to test, and handle
     # authoring tools that mess this up)
-
-    # TODO: is there a way to add some validation around this, to
-    # be run on course load or in studio or ....
-
     group_id_to_child = ReferenceValueDict(
         help=_("Which child module students in a particular group_id should see"),
         scope=Scope.content
