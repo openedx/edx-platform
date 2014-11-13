@@ -25,5 +25,5 @@
     <%= context.fields %>
 
     <button class="action action-primary action-update js-register register-button"><%- gettext("Register") %></button>
-    <p id="register-footnote" class="note">* <%- gettext("Required field") %></p>
+    <p class="note">* <%- gettext("Required field") %></p>
 </form>

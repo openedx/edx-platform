@@ -10,8 +10,7 @@
         <select id="<%= form %>-<%= name %>"
             name="<%= name %>"
             class="input-inline"
-            aria-describedby="<%= form %>-<%= name %>-desc <%= requiredNote %>"
-            oninvalid="setCustomValidity(' ')"
+            aria-describedby="<%= form %>-<%= name %>-desc"
             <% if ( required ) { %> aria-required="true" required<% } %>>
         <% _.each(options, function(el) { %>
             <option value="<%= el.value%>"<% if ( el.default ) { %> data-isdefault="true"<% } %>><%= el.name %></option>
@@ -22,8 +21,7 @@
             type="<%= type %>"
             name="<%= name %>"
             class="input-block"
-            aria-describedby="<%= form %>-<%= name %>-desc <%= requiredNote %>"
-            oninvalid="setCustomValidity(' ')"
+            aria-describedby="<%= form %>-<%= name %>-desc"
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
             <% if ( typeof errorMessages !== 'undefined' ) {
@@ -37,8 +35,7 @@
            type="<%= type %>"
            name="<%= name %>"
            class="input-block <% if ( type === 'checkbox' ) { %>checkbox<% } %>"
-           aria-describedby="<%= form %>-<%= name %>-desc <%= requiredNote %>"
-           oninvalid="setCustomValidity(' ')"
+           aria-describedby="<%= form %>-<%= name %>-desc"
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
             <% if ( required ) { %> aria-required="true" required<% } %>
