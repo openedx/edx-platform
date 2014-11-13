@@ -352,6 +352,9 @@ class Order(models.Model):
 
         """
         if self.status == 'purchased':
+            log.error(
+                u"`purchase` method called on order {}, but order is already purchased.".format(self.id)  # pylint: disable=E1101
+            )
             return
         self.status = 'purchased'
         self.purchase_time = datetime.now(pytz.utc)
@@ -1038,7 +1041,7 @@ class CertificateItem(OrderItem):
     mode = models.SlugField()
 
     @receiver(UNENROLL_DONE)
-    def refund_cert_callback(sender, course_enrollment=None, **kwargs):
+    def refund_cert_callback(sender, course_enrollment=None, skip_refund=False, **kwargs):  # pylint: disable=E0213,W0613
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
         occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
@@ -1048,7 +1051,7 @@ class CertificateItem(OrderItem):
         """
 
         # Only refund verified cert unenrollments that are within bounds of the expiration date
-        if not course_enrollment.refundable():
+        if (not course_enrollment.refundable()) or skip_refund:
             return
 
         target_certs = CertificateItem.objects.filter(course_id=course_enrollment.course_id, user_id=course_enrollment.user, status='purchased', mode='verified')

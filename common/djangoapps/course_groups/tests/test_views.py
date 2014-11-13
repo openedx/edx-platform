@@ -209,6 +209,7 @@ class ListCohortsTestCase(CohortViewsTestCase):
             actual_cohorts,
         )
 
+
 class AddCohortTestCase(CohortViewsTestCase):
     """
     Tests the `add_cohort` view.

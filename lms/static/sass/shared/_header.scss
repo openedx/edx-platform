@@ -320,7 +320,6 @@ header.global {
 .view-courses .nav-global-02,
 .view-schools .nav-global-03,
 .view-register .nav-global-04 {
-
   a {
     text-decoration: none;
     color: $link-color !important;
@@ -643,8 +642,8 @@ header.global-new {
       float: left;
       text-decoration: none;
       color: $m-gray;
-      margin-toP: 9px;
       font-size: 18px;
+      margin-top: 9px;
 
       &:hover,
       &:active,
@@ -703,6 +702,7 @@ header.global-new {
         &:focus {
           background: $m-blue-d5;
           color: white;
+          border-bottom: none;
         }
       }
 

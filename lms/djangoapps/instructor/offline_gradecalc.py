@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 
 from instructor.utils import DummyRequest
 
+
 class MyEncoder(JSONEncoder):
 
     def _iterencode(self, obj, markers=None):

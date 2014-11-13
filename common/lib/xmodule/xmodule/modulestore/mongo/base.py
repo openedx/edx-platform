@@ -20,7 +20,6 @@ import re
 from uuid import uuid4
 
 from bson.son import SON
-from contracts import contract, new_contract
 from datetime import datetime
 from fs.osfs import OSFS
 from mongodb_proxy import MongoProxy, autoretry_read
@@ -1237,10 +1236,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             # update subtree edited info for ancestors
             # don't update the subtree info for descendants of the publish root for efficiency
-            if (
-                (not isPublish or (isPublish and is_publish_root)) and
-                not self._is_in_bulk_operation(xblock.location.course_key)
-            ):
+            if not isPublish or (isPublish and is_publish_root):
                 ancestor_payload = {
                     'edit_info.subtree_edited_on': now,
                     'edit_info.subtree_edited_by': user_id

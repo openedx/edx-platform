@@ -606,7 +606,6 @@ class StringResponseTest(ResponseTest):
         self.assert_grade(problem, u"î", "incorrect")
         self.assert_grade(problem, u"o", "incorrect")
 
-
     def test_backslash_and_unicode_regexps(self):
         """
         Test some special cases of [unicode] regexps.
@@ -1040,8 +1039,6 @@ class CodeResponseTest(ResponseTest):
 
                 output = self.problem.update_score(xserver_msgs['correct'], queuekey=1000 + i)
                 self.assertEquals(output[answer_id]['msg'], u'Invalid grader reply. Please contact the course staff.')
-
-
 
 
 class ChoiceResponseTest(ResponseTest):

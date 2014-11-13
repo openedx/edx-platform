@@ -86,6 +86,7 @@ class LMSLinksTestCase(TestCase):
         link = utils.get_lms_link_for_item(location)
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test")
 
+
 class ExtraPanelTabTestCase(TestCase):
     """ Tests adding and removing extra course tabs. """
 

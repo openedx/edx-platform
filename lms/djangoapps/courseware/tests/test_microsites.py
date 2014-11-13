@@ -10,9 +10,10 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-
+from course_modes.models import CourseMode
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -55,6 +56,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course_with_visibility = CourseFactory.create(
             display_name='visible_course',
             org='TestMicrositeX',
+            course="foo",
             catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
         )
 
@@ -189,3 +191,33 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('about_course', args=[self.course_hidden_visibility.id.to_deprecated_string()])
         resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(resp.status_code, 404)
+
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    def test_paid_course_registration(self):
+        """
+        Make sure that Microsite overrides on the ENABLE_SHOPPING_CART and
+        ENABLE_PAID_COURSE_ENROLLMENTS are honored
+        """
+        course_mode = CourseMode(
+            course_id=self.course_with_visibility.id,
+            mode_slug="honor",
+            mode_display_name="honor cert",
+            min_price=10,
+        )
+        course_mode.save()
+
+        # first try on the non microsite, which
+        # should pick up the global configuration (where ENABLE_PAID_COURSE_REGISTRATIONS = False)
+        url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("Register for {}".format(self.course_with_visibility.id.course), resp.content)
+        self.assertNotIn("Add {} to Cart ($10)".format(self.course_with_visibility.id.course), resp.content)
+
+        # now try on the microsite
+        url = reverse('about_course', args=[self.course_with_visibility.id.to_deprecated_string()])
+        resp = self.client.get(url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn("Register for {}".format(self.course_with_visibility.id.course), resp.content)
+        self.assertIn("Add {} to Cart ($10)".format(self.course_with_visibility.id.course), resp.content)
+        self.assertIn('$("#add_to_cart_post").click', resp.content)

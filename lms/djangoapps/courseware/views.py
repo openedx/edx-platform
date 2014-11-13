@@ -49,6 +49,7 @@ from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEnd
 from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
 from shoppingcart.models import CourseRegistrationCode
+from shoppingcart.utils import is_shopping_cart_enabled
 from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
@@ -586,7 +587,7 @@ def course_info(request, course_id):
 
         # check to see if there is a required survey that must be taken before
         # the user can access the course.
-        if survey.utils.must_answer_survey(course, request.user):
+        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
             return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
         staff_access = has_access(request.user, 'staff', course)
@@ -731,8 +732,9 @@ def course_about(request, course_id):
     registration_price = 0
     in_cart = False
     reg_then_add_to_cart_link = ""
-    if (settings.FEATURES.get('ENABLE_SHOPPING_CART') and
-        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+
+    _is_shopping_cart_enabled = is_shopping_cart_enabled()
+    if (_is_shopping_cart_enabled):
         registration_price = CourseMode.min_course_price_for_currency(course_key,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
@@ -774,6 +776,8 @@ def course_about(request, course_id):
          # We do not want to display the internal courseware header, which is used when the course is found in the
          # context. This value is therefor explicitly set to render the appropriate header.
         'disable_courseware_header': True,
+        'is_shopping_cart_enabled': _is_shopping_cart_enabled,
+        'cart_link': reverse('shoppingcart.views.show_cart'),
     })
 
 
@@ -837,6 +841,7 @@ def mktg_course_about(request, course_id):
         # Just to be safe, reset the language if we forced it to be English.
         if force_english:
             translation.deactivate()
+
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

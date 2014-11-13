@@ -37,6 +37,7 @@ from opaque_keys.edx.locator import CourseLocator
 # that disables the XML modulestore.
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
+
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class OrderTest(ModuleStoreTestCase):
     def setUp(self):
@@ -494,6 +495,24 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertTrue(target_certs[0])
         self.assertTrue(target_certs[0].refund_requested_time)
         self.assertEquals(target_certs[0].order.status, 'refunded')
+
+    def test_no_refund_on_cert_callback(self):
+        # If we explicitly skip refunds, the unenroll action should not modify the purchase.
+        CourseEnrollment.enroll(self.user, self.course_key, 'verified')
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
+        cart.purchase()
+
+        CourseEnrollment.unenroll(self.user, self.course_key, skip_refund=True)
+        target_certs = CertificateItem.objects.filter(
+            course_id=self.course_key,
+            user_id=self.user,
+            status='purchased',
+            mode='verified'
+        )
+        self.assertTrue(target_certs[0])
+        self.assertFalse(target_certs[0].refund_requested_time)
+        self.assertEquals(target_certs[0].order.status, 'purchased')
 
     def test_refund_cert_callback_before_expiration(self):
         # If the expiration date has not yet passed on a verified mode, the user can be refunded

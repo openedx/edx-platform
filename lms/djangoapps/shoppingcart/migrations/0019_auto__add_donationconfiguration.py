@@ -17,11 +17,9 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('shoppingcart', ['DonationConfiguration'])
 
-
     def backwards(self, orm):
         # Deleting model 'DonationConfiguration'
         db.delete_table('shoppingcart_donationconfiguration')
-
 
     models = {
         'auth.group': {

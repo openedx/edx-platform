@@ -284,8 +284,6 @@ $edx-footer-bg-color: rgb(252,252,252);
       @extend %t-weight4;
     }
   }
-
-
 }
 
 .edx-footer-new {
@@ -356,7 +354,7 @@ $edx-footer-bg-color: rgb(252,252,252);
 
   .footer-nav-title {
     @extend %edx-footer-title;
-    font-size: 13px;
+    margin-top: $baseline;
   }
 
   .footer-nav-links {
@@ -378,14 +376,14 @@ $edx-footer-bg-color: rgb(252,252,252);
 
   .footer-follow-title {
     @extend %edx-footer-title;
-    font-size: 13px;
+    margin-top: $baseline;
   }
 
   .footer-follow-links {
 
     a {
       @extend %edx-footer-link;
-      line-height: 34px;
+      margin-top: 20px;
 
       .icon, .copy {
         display: inline-block;

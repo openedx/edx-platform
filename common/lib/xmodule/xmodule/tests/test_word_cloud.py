@@ -46,4 +46,3 @@ class WordCloudModuleTest(LogicTest):
         self.assertEqual(
             100.0,
             sum(i['percent'] for i in response['top_words']))
-

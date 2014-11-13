@@ -289,7 +289,10 @@ FEATURES = {
     'ALLOW_AUTOMATED_SIGNUPS': False,
 
     # Display demographic data on the analytics tab in the instructor dashboard.
-    'DISPLAY_ANALYTICS_DEMOGRAPHICS': True
+    'DISPLAY_ANALYTICS_DEMOGRAPHICS': True,
+
+    # Enable display of enrollment counts in instructor and legacy analytics dashboard
+    'DISPLAY_ANALYTICS_ENROLLMENTS': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1026,6 +1029,7 @@ main_vendor_js = base_vendor_js + [
 
 dashboard_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+rwd_header_footer_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/common_helpers/rwd_header_footer.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1219,6 +1223,10 @@ PIPELINE_JS = {
     'dashboard': {
         'source_filenames': dashboard_js,
         'output_filename': 'js/dashboard.js'
+    },
+    'rwd_header_footer': {
+        'source_filenames': rwd_header_footer_js,
+        'output_filename': 'js/rwd_header_footer.js'
     },
     'student_account': {
         'source_filenames': student_account_js,

@@ -132,7 +132,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     def get_transcripts_for_student(self):
         """Return transcript information necessary for rendering the XModule student view.
 
-        This is more or less a direct extraction from `get_html`. 
+        This is more or less a direct extraction from `get_html`.
 
         Returns:
             Tuple of (track_url, transcript_language, sorted_languages)

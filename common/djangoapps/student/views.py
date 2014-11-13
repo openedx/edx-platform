@@ -1115,6 +1115,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
+@csrf_exempt
 @require_POST
 @social_utils.strategy("social:complete")
 def login_oauth_token(request, backend):
@@ -1135,6 +1136,7 @@ def login_oauth_token(request, backend):
                 pass
             # do_auth can return a non-User object if it fails
             if user and isinstance(user, User):
+                login(request, user)
                 return JsonResponse(status=204)
             else:
                 # Ensure user does not re-enter the pipeline
@@ -1791,11 +1793,9 @@ def activate_account(request, key):
 
 
 @csrf_exempt
+@require_POST
 def password_reset(request):
     """ Attempts to send a password reset e-mail. """
-    if request.method != "POST":
-        raise Http404
-
     # Add some rate limiting here by re-using the RateLimitMixin as a helper class
     limiter = BadRequestRateLimiter()
     if limiter.is_rate_limit_exceeded(request):

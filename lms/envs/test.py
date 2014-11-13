@@ -354,6 +354,8 @@ MICROSITE_CONFIGURATION = {
         "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
         "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
         "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
+        "ENABLE_SHOPPING_CART": True,
+        "ENABLE_PAID_COURSE_REGISTRATION": True,
     },
     "default": {
         "university": "default_university",

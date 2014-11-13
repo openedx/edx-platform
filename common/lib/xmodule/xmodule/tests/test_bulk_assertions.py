@@ -1,6 +1,7 @@
 import ddt
 from xmodule.tests import BulkAssertionTest
 
+
 @ddt.ddt
 class TestBulkAssertionTestCase(BulkAssertionTest):
 
@@ -20,7 +21,6 @@ class TestBulkAssertionTestCase(BulkAssertionTest):
     @ddt.unpack
     def test_passing_asserts_passthrough(self, assertion, *args):
         getattr(self, assertion)(*args)
-
 
     @ddt.data(
         ('assertTrue', False),

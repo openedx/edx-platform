@@ -261,6 +261,7 @@ def course_rerun_handler(request, course_key_string):
                 'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
             })
 
+
 def _course_outline_json(request, course_module):
     """
     Returns a JSON representation of the course module and recursively all of its children.
