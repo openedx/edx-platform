@@ -3,7 +3,7 @@ Course about page (with registration button)
 """
 
 from .course_page import CoursePage
-from .register import RegisterPage
+from .login_and_register import RegisterPage
 
 
 class CourseAboutPage(CoursePage):
