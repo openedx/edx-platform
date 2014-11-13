@@ -1106,6 +1106,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         return (
             self.video_upload_pipeline is not None and
-            'Institute_Name' in self.video_upload_pipeline and
-            'Access_Token' in self.video_upload_pipeline
+            'institute_name' in self.video_upload_pipeline and
+            'access_token' in self.video_upload_pipeline
         )

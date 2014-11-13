@@ -5,6 +5,7 @@ Unit tests for video-related REST APIs.
 import json
 import datetime
 import dateutil.parser
+from pytz import UTC
 
 from mock import patch
 from unittest import skip
@@ -49,8 +50,8 @@ class VideoUploadTestCase(CourseTestCase):
             {'file_name': 'file2'},
         ]
         self.course.video_upload_pipeline = {
-            'Institute_Name': self.institute_name,
-            'Access_Token': 'xxx',
+            'institute_name': self.institute_name,
+            'access_token': 'xxx',
         }
         self.store.update_item(self.course, self.user.id)
         response = self.client.ajax_post(
@@ -100,4 +101,4 @@ class VideoUploadTestCase(CourseTestCase):
 
             # upload date
             upload_date = dateutil.parser.parse(video['date_uploaded'])
-            self.assertEquals(upload_date.date(), datetime.datetime.now().date())
+            self.assertEquals(upload_date.date(), datetime.datetime.now(UTC).date())

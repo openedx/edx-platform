@@ -11,9 +11,10 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
+
 from opaque_keys.edx.keys import CourseKey
-from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from xmodule.assetstore import AssetMetadata
@@ -34,11 +35,11 @@ class UploadStatus(object):
     """
     Constant values for the various statuses of video uploads
     """
-    uploading = 'Uploading'
-    valid_file = "File Valid"
-    invalid_file = "File Invalid"
-    in_progress = "In Progress"
-    complete = "Complete"
+    uploading = _("Uploading")
+    valid_file = _("File Valid")
+    invalid_file = _("File Invalid")
+    in_progress = _("In Progress")
+    complete = _("Complete")
 
 
 @expect_json
@@ -66,7 +67,7 @@ def videos_handler(request, course_key_string):
     # Check whether the video upload feature is configured for this course
     course = modulestore().get_course(course_key)
     if not course.video_pipeline_configured:
-        return JsonResponse({"error": "Course not configured properly for video upload."}, status=400)
+        return JsonResponse({"error": _("Course not configured properly for video upload.")}, status=400)
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
@@ -96,7 +97,8 @@ def videos_index_json(course):
         videos.append({
             'edx_video_id': metadata.asset_id.path,
             'file_name': metadata.fields['file_name'],
-            'date_uploaded': metadata.fields['upload_timestamp'],  # TODO PLAT-278 use created_on field instead
+            # TODO PLAT-278 use created_on field instead  # pylint: disable=fixme
+            'date_uploaded': metadata.fields['upload_timestamp'],
             'status': metadata.fields['status'],
         })
     return JsonResponse({'videos': videos}, status=200)
@@ -112,13 +114,13 @@ def videos_post(course, request):
     }
     Returns (JSON): {
         files: [
-            { file-name: xxx, upload-url: xxx },
+            { file_name: xxx, upload_url: xxx },
             ...
         ]
     }
     """
     bucket = storage_service_bucket()
-    institute_name = course.video_upload_pipeline['Institute_Name']
+    institute_name = course.video_upload_pipeline['institute_name']
 
     video_files = request.json['files']
     for video_file in video_files:
@@ -136,8 +138,8 @@ def videos_post(course, request):
 
         # 3. set meta data for the file
         for metadata_name, value in [
-            ('institute', course.video_upload_pipeline['Institute_Name']),
-            ('institute_token', course.video_upload_pipeline['Access_Token']),
+            ('institute', course.video_upload_pipeline['institute_name']),
+            ('institute_token', course.video_upload_pipeline['access_token']),
             ('user_supplied_file_name', file_name),
             ('course_org', course.org),
             ('course_number', course.number),
@@ -166,7 +168,7 @@ def generate_edx_video_id(institute_name):
     """
     Generates and returns an edx-video-id to uniquely identify a new logical video.
     """
-    return "{}-{}".format(institute_name, uuid4())
+    return "vid-v1:{}-{}".format(institute_name, uuid4())
 
 
 def storage_service_bucket():
