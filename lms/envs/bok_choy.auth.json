@@ -26,7 +26,7 @@
         "default": {
             "ENGINE": "django.db.backends.mysql",
             "HOST": "localhost",
-            "NAME": "test",
+            "NAME": "edxtest",
             "PASSWORD": "",
             "PORT": "3306",
             "USER": "root"

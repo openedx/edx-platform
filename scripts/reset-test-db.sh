@@ -25,8 +25,7 @@
 DB_CACHE_DIR="common/test/db_cache"
 
 # Ensure the test database exists.
-echo "CREATE DATABASE IF NOT EXISTS test;" | mysql -u root
-echo "GRANT ALL ON test.* TO mysql@localhost" | mysql -u root
+echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
 
 # Clear out the test database
 ./manage.py lms --settings bok_choy reset_db --traceback --noinput
@@ -35,7 +34,7 @@ echo "GRANT ALL ON test.* TO mysql@localhost" | mysql -u root
 if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_data.json ]]; then
 
     # Load the schema, then the data (including the migration history)
-    mysql -u root test < $DB_CACHE_DIR/bok_choy_schema.sql
+    mysql -u root edxtest < $DB_CACHE_DIR/bok_choy_schema.sql
     ./manage.py lms --settings bok_choy loaddata $DB_CACHE_DIR/bok_choy_data.json
 
     # Re-run migrations to ensure we are up-to-date
@@ -53,6 +52,6 @@ else
 
     # Dump the schema and data to the cache
     ./manage.py lms --settings bok_choy dumpdata > $DB_CACHE_DIR/bok_choy_data.json
-    mysqldump -u root --no-data --skip-comments --skip-dump-date test > $DB_CACHE_DIR/bok_choy_schema.sql
+    mysqldump -u root --no-data --skip-comments --skip-dump-date edxtest > $DB_CACHE_DIR/bok_choy_schema.sql
 fi
 
