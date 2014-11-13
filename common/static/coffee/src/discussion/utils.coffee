@@ -13,8 +13,10 @@ $ ->
 
 class @DiscussionUtil
 
-  @baseUrl = '';
+  @baseUrl = ''
   @wmdEditors: {}
+
+  @localUrls: []
 
   @getTemplate: (id) ->
     $("script##{id}").html()
@@ -58,7 +60,9 @@ class @DiscussionUtil
             .click -> handler(this)
 
   @urlFor: (name, param, param1, param2) ->
-    @baseUrl + {
+    prefix = if name not in @localUrls then @baseUrl else ""
+
+    prefix + {
       follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
       unfollow_discussion     : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
       create_thread           : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
