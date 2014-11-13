@@ -13,7 +13,7 @@ from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
 import json
 
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
 
@@ -640,6 +640,25 @@ class CourseFields(object):
         scope=Scope.settings,
         deprecated=True
     )
+    oli_analytics_service_url = String(
+        display_name=_("OLI Analytics Service URL"),
+        help=_("Complete URL to the OLI analytics service that will be used to model student knowledge for this course."),
+        scope=Scope.settings,
+        default=None
+    )
+    oli_analytics_service_secret = String(
+        display_name=_("OLI Analytics Service Secret"),
+        help=_("Secret key used to authenticate requests to the OLI analytics service."),
+        scope=Scope.settings,
+        default=None
+    )
+    oli_analytics_service_timeout = Float(
+        display_name=_("OLI Analytics Service Timeout"),
+        help=_("Number of seconds to wait to receive a response from the OLI analytics service."),
+        scope=Scope.settings,
+        default=1
+    )
+
 
     catalog_visibility = String(
         display_name=_("Course Visibility In Catalog"),
