@@ -25,6 +25,13 @@ from django.core.urlresolvers import reverse
 ## Enable fast preview to fix discussion MathJax rendering bug when page first loads.
 <%include file="_js_body_dependencies.html" args="disable_fast_preview=False"/>
 <%static:js group='discussion'/>
+<script language="javascript">
+    $(function () {
+        $("section.discussion").each(function (index, elem) {
+            DiscussionApp.start(elem, true);
+        });
+    });
+</script>
 </%block>
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
