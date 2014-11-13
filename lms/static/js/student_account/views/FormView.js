@@ -28,9 +28,6 @@ var edx = edx || {};
         // String to append to required label fields
         requiredStr: '*',
 
-        // Id of required footnote
-        requiredNote: 'register-footnote',
-
         initialize: function( data ) {
             this.model = data.model;
             this.preRender( data );
@@ -74,8 +71,7 @@ var edx = edx || {};
             var html = [],
                 i,
                 len = data.length,
-                fieldTpl = this.fieldTpl,
-                requiredNote = '';
+                fieldTpl = this.fieldTpl;
 
             this.fields = data;
 
@@ -84,12 +80,9 @@ var edx = edx || {};
                     data[i].errorMessages = this.escapeStrings( data[i].errorMessages );
                 }
 
-                requiredNote = data[i].required ? this.requiredNote : '';
-
                 html.push( _.template( fieldTpl, $.extend( data[i], {
                     form: this.formType,
-                    requiredStr: this.requiredStr,
-                    requiredNote: requiredNote
+                    requiredStr: this.requiredStr
                 }) ) );
             }
 
