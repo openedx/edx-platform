@@ -8,7 +8,6 @@ import urlparse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
-from django.core.files.storage import get_storage_class
 from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
@@ -17,6 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
+from util.file import store_uploaded_file
 from courseware.courses import get_course_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
@@ -558,7 +558,6 @@ def upload(request, course_id):  # ajax upload file to a question or answer
     """
 
     # check upload permission
-    result = ''
     error = ''
     new_file_name = ''
     try:
@@ -570,29 +569,11 @@ def upload(request, course_id):  # ajax upload file to a question or answer
 
         #request.user.assert_can_upload_file()
 
-        # check file type
-        f = request.FILES['file-upload']
-        file_extension = os.path.splitext(f.name)[1].lower()
-        if not file_extension in cc_settings.ALLOWED_UPLOAD_FILE_TYPES:
-            file_types = "', '".join(cc_settings.ALLOWED_UPLOAD_FILE_TYPES)
-            msg = _("allowed file types are '%(file_types)s'") % \
-                {'file_types': file_types}
-            raise exceptions.PermissionDenied(msg)
-
-        # generate new file name
-        new_file_name = str(time.time()).replace('.', str(random.randint(0, 100000))) + file_extension
-
-        file_storage = get_storage_class()()
-        # use default storage to store file
-        file_storage.save(new_file_name, f)
-        # check file size
-        # byte
-        size = file_storage.size(new_file_name)
-        if size > cc_settings.MAX_UPLOAD_FILE_SIZE:
-            file_storage.delete(new_file_name)
-            msg = _("Maximum upload file size is %(file_size)s bytes.") % \
-                {'file_size': cc_settings.MAX_UPLOAD_FILE_SIZE}
-            raise exceptions.PermissionDenied(msg)
+        base_file_name = str(time.time()).replace('.', str(random.randint(0, 100000)))
+        file_storage, new_file_name = store_uploaded_file(
+            request, 'file-upload', cc_settings.ALLOWED_UPLOAD_FILE_TYPES, base_file_name,
+            max_file_size=cc_settings.MAX_UPLOAD_FILE_SIZE
+        )
 
     except exceptions.PermissionDenied, err:
         error = unicode(err)

@@ -7,11 +7,15 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest
 import json
 import logging
 import re
+import csv
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
+from util.json_request import JsonResponse
+from util.file import store_uploaded_file, course_and_time_based_filename_generator
+from django.utils.translation import ugettext as _
 from . import cohorts
 from .models import CourseUserGroup
 
@@ -23,7 +27,7 @@ def json_http_response(data):
     Return an HttpResponse with the data json-serialized and the right content
     type header.
     """
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return JsonResponse(data)
 
 
 def split_by_comma_and_whitespace(cstr):
@@ -147,6 +151,25 @@ def users_in_cohort(request, course_key_string, cohort_id):
                                'page': page,
                                'num_pages': paginator.num_pages,
                                'users': user_info})
+
+
+@ensure_csrf_cookie
+@require_POST
+def add_users_to_cohorts(request, course_key_string):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    get_course_with_access(request.user, 'staff', course_key)
+
+    try:
+        # TODO: what is the maximum filesize we want to enforce?
+        file_storage, filename = store_uploaded_file(
+            request, 'uploaded-file', ['.csv'],
+            course_and_time_based_filename_generator(course_key, "cohorts")
+        )
+    except Exception as err:
+        return JsonResponse({"error": str(err)}, status=400)
+
+    return json_http_response({})
+
 
 
 @ensure_csrf_cookie

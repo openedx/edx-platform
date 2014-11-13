@@ -1,4 +1,4 @@
-(function($, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView) {
+(function($, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderModel, FileUploaderView) {
     var hiddenClass = 'is-hidden',
         disabledClass = 'is-disabled';
 
@@ -27,11 +27,30 @@
             return this;
         },
 
-        renderSelector: function(selectedCohort) {
+        renderCSVUploadAndSelector: function(selectedCohort) {
+            var fileUploaderModel = new FileUploaderModel({
+                title: gettext("Assign students to cohorts via a CSV file"),
+                description: gettext("Upload a CSV file, then download your results."),
+                extension: ".csv",
+                url: this.model.url + "/add_users_to_cohorts"
+            });
+            var fileUploaderView = new FileUploaderView({
+                model: fileUploaderModel,
+                el: this.$('.csv-upload'),
+                successNotification: function (file, event, data) {
+                    var message = interpolate_text(gettext("Your file '{file}' has been uploaded. Go check... in 5 minutes."), {file: file});
+                    return new NotificationModel({
+                        type: "confirmation",
+                        title: message
+                    });
+                }
+            }).render();
+
             this.$('.cohort-select').html(this.selectorTemplate({
                 cohorts: this.model.models,
                 selectedCohort: selectedCohort
             }));
+
         },
 
         onSync: function() {
@@ -40,7 +59,7 @@
             this.hideAddCohortForm();
             if (hasCohorts) {
                 this.$('.cohort-management-nav').removeClass(hiddenClass);
-                this.renderSelector(selectedCohort);
+                this.renderCSVUploadAndSelector(selectedCohort);
                 if (selectedCohort) {
                     this.showCohortEditor(selectedCohort);
                 }
@@ -180,4 +199,4 @@
             $(window).scrollTop(0);
         }
     });
-}).call(this, $, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView);
+}).call(this, $, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderModel, FileUploaderView);
