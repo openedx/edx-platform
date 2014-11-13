@@ -114,9 +114,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             "properties": {
                 'name': kwargs.get('name', str(sentinel.name)),
                 'data': kwargs.get('data', {}),
-                'context': {
-                    'course_id': kwargs.get('course_id') or '',
-                }
             },
             "channel": 'server',
             "context": {
@@ -125,6 +122,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                     "version": "unknown"
                 },
                 'userAgent': str(sentinel.user_agent),
+                'course_id': kwargs.get('course_id') or '',
             },
             "receivedAt": "2014-08-27T16:33:39.100Z",
             "timestamp": "2014-08-27T16:33:39.215Z",
@@ -141,7 +139,10 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         }
 
         if 'context' in kwargs:
-            sample_event['properties']['context'].update(kwargs['context'])
+            sample_event['context'].update(kwargs['context'])
+
+        if 'open_in_browser_url' in kwargs:
+            sample_event['context']['open_in_browser_url'] = kwargs['open_in_browser_url']
 
         return sample_event
 
@@ -304,9 +305,9 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=self.create_segmentio_event_json(
                 name=name,
                 data=input_payload,
+                open_in_browser_url='https://testserver/courses/foo/bar/baz/courseware/Week_1/Activity/2',
                 context={
                     'course_id': course_id,
-                    'browser_page': 'https://testserver/courses/foo/bar/baz/courseware/Week_1/Activity/2',
                     'application': {
                         'name': 'edx.mobileapp.android',
                         'version': '29',
@@ -342,14 +343,14 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                         'library': {
                             'name': 'test-app',
                             'version': 'unknown'
+                        },
+                        'application': {
+                            'name': 'edx.mobileapp.android',
+                            'version': '29',
+                            'component': 'videoplayer'
                         }
                     },
                     'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
-                    'application': {
-                        'name': 'edx.mobileapp.android',
-                        'version': '29',
-                        'component': 'videoplayer'
-                    }
                 },
             }
             expected_payload = {
