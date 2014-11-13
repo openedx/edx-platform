@@ -40,7 +40,6 @@ class SplitTestMixin(object):
             partition_id, name, description, groups, MockUserPartitionScheme("random")
         ).to_json()
 
-
     def verify_groups(self, container, active_groups, inactive_groups, verify_missing_groups_not_present=True):
         """
         Check that the groups appear and are correctly categorized as to active and inactive.

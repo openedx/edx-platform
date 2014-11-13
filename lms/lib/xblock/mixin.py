@@ -1,7 +1,9 @@
 """
 Namespace that defines fields common to all blocks used in the LMS
 """
-from xblock.fields import Boolean, Scope, String, XBlockMixin
+from xblock.fields import Boolean, Scope, String, XBlockMixin, Dict
+from xblock.validation import ValidationMessage
+from xmodule.modulestore.inheritance import UserPartitionList
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
@@ -53,3 +55,73 @@ class LmsBlockMixin(XBlockMixin):
         default=False,
         scope=Scope.settings,
     )
+    group_access = Dict(
+        help="A dictionary that maps which groups can be shown this block. The keys "
+             "are group configuration ids and the values are a list of group IDs. "
+             "If there is no key for a group configuration or if the list of group IDs "
+             "is empty then the block is considered visible to all. Note that this "
+             "field is ignored if the block is visible_to_staff_only.",
+        default={},
+        scope=Scope.settings,
+    )
+
+    # Specified here so we can see what the value set at the course-level is.
+    user_partitions = UserPartitionList(
+        help=_("The list of group configurations for partitioning students in content experiments."),
+        default=[],
+        scope=Scope.settings
+    )
+
+    def _get_user_partition(self, user_partition_id):
+        """
+        Returns the user partition with the specified id, or None if there is no such partition.
+        """
+        for user_partition in self.user_partitions:
+            if user_partition.id == user_partition_id:
+                return user_partition
+
+        return None
+
+    def is_visible_to_group(self, user_partition, group):
+        """
+        Returns true if this xblock should be shown to a user in the specified user partition group.
+        This method returns true if one of the following is true:
+         - the xblock has no group_access dictionary specified
+         - if the dictionary has no key for the user partition's id
+         - if the value for the user partition's id is an empty list
+         - if the value for the user partition's id contains the specified group's id
+        """
+        if not self.group_access:
+            return True
+        group_ids = self.group_access.get(user_partition.id, [])
+        if len(group_ids) == 0:
+            return True
+        return group.id in group_ids
+
+    def validate(self):
+        """
+        Validates the state of this xblock instance.
+        """
+        _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
+        validation = super(LmsBlockMixin, self).validate()
+        for user_partition_id, group_ids in self.group_access.iteritems():
+            user_partition = self._get_user_partition(user_partition_id)
+            if not user_partition:
+                validation.add(
+                    ValidationMessage(
+                        ValidationMessage.ERROR,
+                        _(u"This xblock refers to a deleted or invalid content group configuration.")
+                    )
+                )
+            else:
+                for group_id in group_ids:
+                    group = user_partition.get_group(group_id)
+                    if not group:
+                        validation.add(
+                            ValidationMessage(
+                                ValidationMessage.ERROR,
+                                _(u"This xblock refers to a deleted or invalid content group.")
+                            )
+                        )
+
+        return validation

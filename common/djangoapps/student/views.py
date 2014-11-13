@@ -110,7 +110,7 @@ from student.helpers import (
 )
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 
 import analytics
 from eventtracking import tracker
