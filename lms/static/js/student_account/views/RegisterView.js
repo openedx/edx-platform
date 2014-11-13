@@ -18,8 +18,6 @@ var edx = edx || {};
 
         formType: 'register',
 
-        requiredNote: 'register-footnote',
-
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
@@ -58,6 +56,6 @@ var edx = edx || {};
 
         saveSuccess: function() {
             this.trigger('auth-complete');
-        },
+        }
     });
 })(jQuery, _, gettext);
