@@ -243,5 +243,18 @@
       data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
-
+  
+  %if section_data['access']['instructor'] and settings.FEATURES.get('PERSONAL_ONLINE_COURSES', False):
+    <div class="auth-list-container"
+      data-rolename="poc_coach"
+      data-display-name="${_("POC Coaches")}"
+      data-info-text="
+        ${_("POC Coaches are able to create their own Personal Online Courses "
+            "based on this course, which they can use to provide personalized "
+            "instruction to their own students based in this course material.")}"
+      data-list-endpoint="${section_data['list_course_role_members_url']}"
+      data-modify-endpoint="${section_data['modify_access_url']}"
+      data-add-button-label="${_("Add POC Coach")}"
+    ></div>
+  %endif
 </div>

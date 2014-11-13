@@ -681,7 +681,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         if not has_access(user, 'load', descriptor, course_id):
             return None
 
-    (system, field_data) = get_module_system_for_user(
+    (system, student_data) = get_module_system_for_user(
         user=user,
         field_data_cache=field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
         descriptor=descriptor,
@@ -699,6 +699,15 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     authored_data = OverrideFieldData.wrap(user, descriptor._field_data)  # pylint: disable=protected-access
     descriptor.bind_for_student(system, LmsFieldData(authored_data, field_data), user.id)
     descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
+
+    # Do not check access when it's a noauth request.
+    # Not that the access check needs to happen after the descriptor is bound
+    # for the student, since there may be field override data for the student
+    # that affects xblock visibility.
+    if getattr(user, 'known', True):
+        if not has_access(user, 'load', descriptor, course_id):
+            return None
+
     return descriptor
 
 

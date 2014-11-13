@@ -193,6 +193,7 @@ class CourseTab(object):
             'edxnotes': EdxNotesTab,
             'syllabus': SyllabusTab,
             'instructor': InstructorTab,  # not persisted
+            'poc_coach': PocCoachTab,  # not persisted
         }
 
         tab_type = tab_dict.get('type')
@@ -733,6 +734,28 @@ class InstructorTab(StaffTab):
         )
 
 
+class PocCoachTab(CourseTab):
+    """
+    A tab for the personal online course coaches.
+    """
+    type = 'poc_coach'
+
+    def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
+        super(PocCoachTab, self).__init__(
+            name=_('POC Coach'),
+            tab_id=self.type,
+            link_func=link_reverse_func('poc_coach_dashboard'),
+        )
+
+    def can_display(self, course, settings, *args, **kw):
+        # TODO Check that user actually has 'poc_coach' role on course
+        #      this is difficult to do because the user isn't passed in.
+        #      We need either a hack or an architectural realignment.
+        return (
+            settings.FEATURES.get('PERSONAL_ONLINE_COURSES', False) and
+            super(PocCoachTab, self).can_display(course, settings, *args, **kw))
+
+
 class CourseTabList(List):
     """
     An XBlock field class that encapsulates a collection of Tabs in a course.
@@ -833,6 +856,9 @@ class CourseTabList(List):
         instructor_tab = InstructorTab()
         if instructor_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
             yield instructor_tab
+        poc_coach_tab = PocCoachTab()
+        if poc_coach_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
+            yield poc_coach_tab
 
     @staticmethod
     def iterate_displayable_cms(

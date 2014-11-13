@@ -214,6 +214,9 @@ FEATURES = {
     # True.
     'INDIVIDUAL_DUE_DATES': False,
 
+    # Enable Personal Online Courses
+    'PERSONAL_ONLINE_COURSES': False,
+
     # Enable legacy instructor dashboard
     'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
 

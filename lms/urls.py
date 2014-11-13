@@ -343,6 +343,15 @@ if settings.COURSEWARE_ENABLED:
         # For the instructor
         url(r'^courses/{}/instructor$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
+        url(r'^courses/{}/poc_coach$'.format(settings.COURSE_ID_PATTERN),
+            'pocs.views.dashboard', name='poc_coach_dashboard'),
+        url(r'^courses/{}/create_poc$'.format(settings.COURSE_ID_PATTERN),
+            'pocs.views.create_poc', name='create_poc'),
+        url(r'^courses/{}/save_poc$'.format(settings.COURSE_ID_PATTERN),
+            'pocs.views.save_poc', name='save_poc'),
+        url(r'^courses/{}/poc_invite$'.format(settings.COURSE_ID_PATTERN),
+            'pocs.views.poc_invite', name='poc_invite'),
+
         url(r'^courses/{}/set_course_mode_price$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.instructor_dashboard.set_course_mode_price', name="set_course_mode_price"),
         url(r'^courses/{}/instructor/api/'.format(settings.COURSE_ID_PATTERN),
