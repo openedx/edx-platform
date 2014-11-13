@@ -21,6 +21,8 @@ var edx = edx || {};
 
         requiredStr: '',
 
+        submitButton: '.js-login',
+
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
@@ -54,6 +56,7 @@ var edx = edx || {};
             this.$form = this.$container.find('form');
             this.$errors = this.$container.find('.submission-error');
             this.$authError = this.$container.find('.already-authenticated-msg');
+            this.$submitButton = this.$container.find(this.submitButton);
 
             /* If we're already authenticated with a third-party
              * provider, try logging in.  The easiest way to do this
@@ -101,6 +104,7 @@ var edx = edx || {};
                 this.element.hide( this.$authError );
                 this.element.show( this.$errors );
             }
+            this.toggleDisableButton(false);
         }
     });
 })(jQuery, _, gettext);

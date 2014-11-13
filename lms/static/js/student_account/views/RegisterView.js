@@ -18,6 +18,8 @@ var edx = edx || {};
 
         formType: 'register',
 
+        submitButton: '.js-register',
+
         preRender: function( data ) {
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
@@ -57,5 +59,6 @@ var edx = edx || {};
         saveSuccess: function() {
             this.trigger('auth-complete');
         }
+        
     });
 })(jQuery, _, gettext);
