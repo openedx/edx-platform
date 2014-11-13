@@ -364,15 +364,15 @@ class ModuleStoreAssetInterface(object):
             return None
 
         # Determine the proper sort - with defaults of ('displayname', SortOrder.ascending).
-        sort_field = 'filename'
+        key_func = itemgetter('filename')
         sort_order = ModuleStoreEnum.SortOrder.ascending
         if sort:
             if sort[0] == 'uploadDate':
-                sort_field = 'edited_on'
+                key_func = lambda x: x['edit_info']['edited_on']
             if sort[1] == ModuleStoreEnum.SortOrder.descending:
                 sort_order = ModuleStoreEnum.SortOrder.descending
 
-        all_assets = SortedListWithKey(course_assets.get(asset_type, []), key=itemgetter(sort_field))
+        all_assets = SortedListWithKey(course_assets.get(asset_type, []), key=key_func)
         num_assets = len(all_assets)
 
         start_idx = start

@@ -47,11 +47,13 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         """
         Make a single test asset metadata.
         """
+        now = datetime.now(pytz.utc)
         return AssetMetadata(
             asset_loc, internal_name='EKMND332DDBK',
             basename='pictures/historical', contenttype='image/jpeg',
             locked=False, fields={'md5': '77631ca4f0e08419b70726a447333ab6'},
-            edited_by=ModuleStoreEnum.UserID.test, edited_on=datetime.now(pytz.utc),
+            edited_by=ModuleStoreEnum.UserID.test, edited_on=now,
+            created_by=ModuleStoreEnum.UserID.test, created_on=now,
             curr_version='v1.0', prev_version='v0.95'
         )
 
@@ -66,17 +68,23 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         """
         Setup assets. Save in store if given
         """
-        asset_fields = ('filename', 'internal_name', 'basename', 'locked', 'edited_by', 'edited_on', 'curr_version', 'prev_version')
+        asset_fields = (
+            'filename', 'internal_name', 'basename', 'locked',
+            'edited_by', 'edited_on', 'created_by', 'created_on',
+            'curr_version', 'prev_version'
+        )
+        now = datetime.now(pytz.utc)
+        user_id = ModuleStoreEnum.UserID.test
         all_asset_data = (
-            ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, ModuleStoreEnum.UserID.test, datetime.now(pytz.utc), '14', '13'),
-            ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, ModuleStoreEnum.UserID.test, datetime.now(pytz.utc), '1', None),
-            ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, ModuleStoreEnum.UserID.test * 2, datetime.now(pytz.utc), 'AB', 'AA'),
-            ('dog.png', 'PUPY4242X', 'pictures/animals', True, ModuleStoreEnum.UserID.test * 3, datetime.now(pytz.utc), '5', '4'),
-            ('not_here.txt', 'JJJCCC747', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49'),
-            ('asset.txt', 'JJJCCC747858', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49'),
-            ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, ModuleStoreEnum.UserID.test * 7, datetime.now(pytz.utc), '1.1', '1.01'),
-            ('weather_patterns.bmp', '928SJXX2EB', 'science', False, ModuleStoreEnum.UserID.test * 8, datetime.now(pytz.utc), '52', '51'),
-            ('demo.swf', 'DFDFGGGG14', 'demos/easy', False, ModuleStoreEnum.UserID.test * 9, datetime.now(pytz.utc), '5', '4'),
+            ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, user_id, now, user_id, now, '14', '13'),
+            ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, user_id, now, user_id, now, '1', None),
+            ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, user_id * 2, now, user_id * 2, now, 'AB', 'AA'),
+            ('dog.png', 'PUPY4242X', 'pictures/animals', True, user_id * 3, now, user_id * 3, now, '5', '4'),
+            ('not_here.txt', 'JJJCCC747', '/dev/null', False, user_id * 4, now, user_id * 4, now, '50', '49'),
+            ('asset.txt', 'JJJCCC747858', '/dev/null', False, user_id * 4, now, user_id * 4, now, '50', '49'),
+            ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, user_id * 7, now, user_id * 7, now, '1.1', '1.01'),
+            ('weather_patterns.bmp', '928SJXX2EB', 'science', False, user_id * 8, now, user_id * 8, now, '52', '51'),
+            ('demo.swf', 'DFDFGGGG14', 'demos/easy', False, user_id * 9, now, user_id * 9, now, '5', '4'),
         )
 
         for i, asset in enumerate(all_asset_data):
@@ -204,6 +212,8 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
 
     DISALLOWED_ATTRS = (
         ('asset_id', 'IAmBogus'),
+        ('created_by', 'Smith'),
+        ('created_on', datetime.now(pytz.utc)),
     )
 
     UNKNOWN_ATTRS = (
