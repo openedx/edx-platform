@@ -4,28 +4,39 @@
     background: white;
     border: 2px dashed #ccc;
     border-radius: .5rem;
+    margin-bottom: 1.5rem;
 
     form {
 
       fieldset {
 
         .area-drag-drop, .action-area {
-          padding: ($baseline*1.5 $baseline*1.5 $baseline/2 $baseline*1.5);
-          text-align: center;
+          display: table-cell;
+          vertical-align: middle;
+          padding-top: ($baseline*1.5);
+          padding-bottom: ($baseline*1.5);
+          float: left;
         }
 
         .area-drag-drop {
+          text-align: right;
+          padding-right: 2%;
+          width: 50%;
         }
 
         .action-area {
-          padding-bottom: ($baseline*1.5);
-          padding-top: 0;
+          text-align: left;
+          padding-left: 2%;
+          padding-top: 20px;
+          padding-bottom: 20px;
+          width: 44%;
         }
       }
     }
   }
 
   .video-upload-progress-container {
+    margin-bottom: 1.5rem;
 
     ul {
       list-style: none;
@@ -38,14 +49,19 @@
         display: block;
         float: left;
         width: flex-grid(4,12);
+        min-height: 10rem;
         border: 1px solid #ccc;
         border-radius: .5rem;
-        margin: 1% .6% .3%;
+        margin: 1% .5% .3%;
 
         h4 {
+          white-space: nowrap;
           padding: 1rem;
+          margin-bottom: .75rem;
           overflow: hidden;
           text-overflow: ellipsis;
+          font-size: 90%;
+          font-weight: 600;
         }
 
         .progress-bar {
@@ -77,6 +93,46 @@
 
           // Shame, shame...
           margin-top: -12px;
+
+          button {
+            border: 0;
+            background: transparent;
+
+            .icon {
+              color: $gray;
+            }
+
+            .icon-remove:hover, .icon-remove:focus, 
+            .icon-trash:hover, .icon-trash:focus {
+              color: $red;
+            } 
+
+            .icon-rotate-left:hover, .icon-rotate-left:focus {
+              color: $blue;
+            }
+          }
+        }
+
+        .status-message {
+          padding: 1rem;
+          font-size: 80%;
+          line-height: 150%;
+        }
+      }
+
+      li.is-duplicate {
+
+        h4 {
+          margin-bottom: 0;
+        }
+
+        .status-message {
+          padding-top: 0;
+        }
+
+        .progress-bar, 
+        .video-actions {
+          display: none;
         }
       }
 
@@ -84,6 +140,45 @@
         background: white;
       }
     }
+  }
+
+  .assets-wrapper {
+    margin-top: 2.5rem;
+
+    .asset-library {
+
+      h3 {
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+      }
+
+      table {
+        font-size: 80%;
+
+        td.title-col {
+
+          a {
+            font-weight: 600;
+          }
+        }
+
+        td.actions-col {
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+  
+  /*
+   * Feedback
+   * Patterns?
+   */
+  .error {
+    color: $red;
+  }
+
+  .success {
+    color: $green;
   }
 
   /*
