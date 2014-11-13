@@ -5,6 +5,7 @@ Instructor (2) dashboard page.
 
 from bok_choy.page_object import PageObject
 from .course_page import CoursePage
+import os
 
 
 class InstructorDashboardPage(CoursePage):
@@ -12,6 +13,12 @@ class InstructorDashboardPage(CoursePage):
     Instructor dashboard, where course staff can manage a course.
     """
     url_path = "instructor"
+    browse_button_selector = '.auto_enroll_csv .file-browse input.file_field'
+    upload_button_selector = '.auto_enroll_csv button[name="enrollment_signup_button"]'
+    file_path_selector = '.auto_enroll_csv input#browseBtn'
+    NOTIFICATION_ERROR = 'error'
+    NOTIFICATION_WARNING = 'warning'
+    NOTIFICATION_SUCCESS = 'confirmation'
 
     def is_browser_on_page(self):
         return self.q(css='div.instructor-dashboard-wrapper-2').present
@@ -24,6 +31,77 @@ class InstructorDashboardPage(CoursePage):
         membership_section = MembershipPage(self.browser)
         membership_section.wait_for_page()
         return membership_section
+
+    def file_attachment_browse_button_is_visible(self):
+        """
+        Returns True if the Browse button is present.
+        """
+        return self.q(css=self.browse_button_selector).is_present()
+
+    def click_browse_button(self):
+        """
+        Clicks the Browse Button.
+        """
+        self.q(css=self.browse_button_selector).click()
+
+    def is_upload_button_visible(self):
+        """
+        Returns True if the Upload button is present.
+        """
+        return self.q(css=self.upload_button_selector).is_present()
+
+    def click_upload_file_button(self):
+        """
+        Clicks the Upload Button.
+        """
+        self.q(css=self.upload_button_selector).click()
+
+    def is_notification_displayed(self, section_type):
+        """
+        Returns True if a {notification_type} notification is displayed.
+        """
+        notification_selector = '.auto_enroll_csv .results .message-%s' % section_type
+        self.wait_for_element_presence(notification_selector, "%s Notification" % section_type.title())
+        return self.q(css=notification_selector).is_present()
+
+    def first_notification_message(self, section_type):
+        """
+        Returns the first messages from the list of errors.
+        """
+        error_message_selector = '.auto_enroll_csv .results .message-%s li.summary-item' % section_type
+        self.wait_for_element_presence(error_message_selector, "%s message" % section_type.title())
+        return self.q(css=error_message_selector).text[0]
+
+    def get_asset_path(self, file_name):
+        """
+        Returns the full path of the file to upload.
+        These files have been placed in edx-platform/common/test/data/uploads/
+        """
+        return os.sep.join(__file__.split(os.sep)[:-5]) + '/test/data/uploads/%s' % file_name
+
+    def upload_correct_csv_file(self):
+        """
+        Selects the correct file and clicks the upload button.
+        """
+        correct_files_path = self.get_asset_path('auto_reg_enrollment.csv')
+        self.q(css=self.file_path_selector).results[0].send_keys(correct_files_path)
+        self.click_upload_file_button()
+
+    def upload_csv_file_with_errors_warnings(self):
+        """
+        Selects the file which will generate errors and warnings and clicks the upload button.
+        """
+        errors_warnings_files_path = self.get_asset_path('auto_reg_enrollment_errors_warnings.csv')
+        self.q(css=self.file_path_selector).results[0].send_keys(errors_warnings_files_path)
+        self.click_upload_file_button()
+
+    def upload_non_csv_file(self):
+        """
+        Selects an image file and clicks the upload button.
+        """
+        errors_warnings_files_path = self.get_asset_path('image.jpg')
+        self.q(css=self.file_path_selector).results[0].send_keys(errors_warnings_files_path)
+        self.click_upload_file_button()
 
 
 class MembershipPage(PageObject):
