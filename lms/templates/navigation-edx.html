@@ -53,11 +53,15 @@ site_status_msg = get_site_status_msg(course_id)
     % if user.is_authenticated():
     <div class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
-        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-          <div class="nav-global-01">
-            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
-          </div>
-        % endif
+          <li class="nav-global-01">
+            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+          </li>
+          <li class="nav-global-02">
+            <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
+          </li>
+          <li class="nav-global-03">
+            <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
+          </li>
       </%block>
     </div>
 

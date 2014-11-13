@@ -352,6 +352,9 @@ class Order(models.Model):
 
         """
         if self.status == 'purchased':
+            log.error(
+                u"`purchase` method called on order {}, but order is already purchased.".format(self.id)  # pylint: disable=E1101
+            )
             return
         self.status = 'purchased'
         self.purchase_time = datetime.now(pytz.utc)

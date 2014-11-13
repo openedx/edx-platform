@@ -1,5 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
+<%namespace name='static' file='../static_content.html'/>
+
 <header class="page-header">
     <h2 class="title">
         <span class="wrapper-sts">
@@ -66,3 +68,7 @@
         % endif
     </h2>
 </header>
+
+<%block name="js_extra">
+    <%static:js group='rwd_header_footer'/>
+</%block>
