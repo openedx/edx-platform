@@ -55,7 +55,11 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
 
     def clean_name(self):
         """Validate the name field. Enforce uniqueness constraint on 'name' field"""
-        name = self.cleaned_data.get("name")
+
+        # Note that we get back a blank string in the Form for an empty 'name' field
+        # we want those to be set to None in Python and NULL in the database
+        name = self.cleaned_data.get("name").strip() or None
+
         # if we are creating a new CourseEmailTemplate, then we need to
         # enforce the uniquess constraint as part of the Form validation
         if not self.instance.pk:
