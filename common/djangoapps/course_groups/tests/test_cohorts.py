@@ -531,3 +531,79 @@ class TestCohorts(django.test.TestCase):
             User.DoesNotExist,
             lambda: cohorts.add_user_to_cohort(first_cohort, "non_existent_username")
         )
+
+    def test_add_users_to_cohorts(self):
+        """
+        Make sure cohorts.add_users_to_cohorts() properly adds many students to
+        many cohorts.
+        """
+        def _assert_ret_val_contains(ret_val, expected_val):
+            """
+            Assert that the return value of `add_users_to_cohorts` contains the fields we expect it to.
+            Fields that aren't explicitly passed in default to empty values.
+            """
+            for cohort_name, expected_fields in expected_val.iteritems():
+                if expected_fields.get("valid", True):
+                    defaults = {
+                        "valid": True,
+                        "added": [],
+                        "changed": [],
+                        "present": [],
+                        "unknown": [],
+                    }
+                    for key in defaults:
+                        if key not in expected_fields:
+                            expected_fields[key] = defaults[key]
+            self.assertEqual(ret_val, expected_val)
+
+        user_1 = UserFactory(username="user1", email="user1@example.com")
+        user_2 = UserFactory(username="user2", email="user2@example.com")
+        course = modulestore().get_course(self.toy_course_key)
+        CourseEnrollment.enroll(user_1, self.toy_course_key)
+        CourseEnrollment.enroll(user_2, self.toy_course_key)
+        first_cohort = CohortFactory(course_id=course.id, name="FirstCohort")
+        second_cohort = CohortFactory(course_id=course.id, name="SecondCohort")
+
+        # Success case: Add uncohorted users to several cohorts
+        _assert_ret_val_contains(
+            cohorts.add_users_to_cohorts(
+                course.id,
+                {user_1.username: first_cohort.name, user_2.email: second_cohort.name}
+            ),
+            {first_cohort.name: {"added": [user_1.username]}, second_cohort.name: {"added": [user_2.email]}})
+
+        # Success case: Add cohorted users to new cohort
+        _assert_ret_val_contains(
+            cohorts.add_users_to_cohorts(
+                course.id,
+                {user_2.username: first_cohort.name, user_1.email: second_cohort.name}
+            ),
+            {first_cohort.name: {"changed": [user_2.username]}, second_cohort.name: {"changed": [user_1.email]}}
+        )
+
+        # Success case: Add cohorted users to the same cohort
+        _assert_ret_val_contains(
+            cohorts.add_users_to_cohorts(
+                course.id,
+                {user_2.username: first_cohort.name, user_1.email: second_cohort.name}
+            ),
+            {first_cohort.name: {"present": [user_2.username]}, second_cohort.name: {"present": [user_1.email]}}
+        )
+
+        # Failure case: Add users to an unknown cohort
+        _assert_ret_val_contains(
+            cohorts.add_users_to_cohorts(
+                course.id,
+                {user_2.username: "Non_existent_cohort_1", user_1.email: "Non_existent_cohort_2"}
+            ),
+            {"Non_existent_cohort_1": {"valid": False}, "Non_existent_cohort_2": {"valid": False}}
+        )
+
+        # Failure case: Add unknown users to cohorts
+        _assert_ret_val_contains(
+            cohorts.add_users_to_cohorts(
+                course.id,
+                {"Non_existent_User_1": first_cohort.name, "Non_existent_User_2": second_cohort.name}
+            ),
+            {first_cohort.name: {"unknown": ["Non_existent_User_1"]}, second_cohort.name: {"unknown": ["Non_existent_User_2"]}}
+        )

@@ -1,17 +1,13 @@
-"""
-Utility methods for working with files.
-"""
+import csv
+from datetime import datetime
+import os
+from pytz import UTC
+import urllib
 
-from django.utils.translation import ugettext as _
-from django.utils.translation import ungettext
 from django.core import exceptions
 from django.core.files.storage import get_storage_class
-import os
-import time
-import random
-import urllib
-from datetime import datetime
-from pytz import UTC
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 
 
 def store_uploaded_file(request, file_key, allowed_file_types, base_storage_filename, max_file_size=10240000):
@@ -86,3 +82,14 @@ def course_and_time_based_filename_generator(course_id, base_name):
         base_name=base_name,
         timestamp_str=datetime.now(UTC).strftime("%Y-%m-%d-%H%M%S")
     )
+
+
+def unicode_csv_dictreader(utf8_data, **kwargs):
+    """
+    Read a CSV file as a dict using csv.DictReader, but respect utf-8.
+
+    Based on http://stackoverflow.com/a/5005573
+    """
+    csv_reader = csv.DictReader(utf8_data, **kwargs)
+    for row in csv_reader:
+        yield dict([(unicode(key, 'utf-8'), unicode(value, 'utf-8')) for key, value in row.iteritems()])
