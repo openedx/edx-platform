@@ -697,7 +697,7 @@ body.js {
         @extend %cont-text-sr;
       }
 
-      [class^="icon-"] {
+      .icon {
         @extend %t-action1;
         color: $white;
       }

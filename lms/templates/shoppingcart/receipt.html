@@ -29,7 +29,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
            ## in case of multiple courses in single self purchase scenario,
            ## we will show the button View Dashboard
           <% dashboard_url = reverse('dashboard') %>
-          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
+          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon fa fa-caret-right"></i></a>
           <span class="mt-7">
             ${_(u"You have successfully been enrolled for {course_names}. "
                 u"The following receipt has been emailed to {receipient_emails}").format(
@@ -94,7 +94,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
     %endif
     <div class="bordered-bar">
       <h2>${_('Invoice')} #${order.id}<span>${_('Date of purchase')}: ${order_purchase_date} </span><span
-          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon-print"></i> ${_('Print Receipt')}</a></span>
+          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon fa fa-print"></i> ${_('Print Receipt')}</a></span>
       </h2>
     </div>
     % if order.total_cost > 0:

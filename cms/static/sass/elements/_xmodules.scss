@@ -4,10 +4,16 @@
 // general - display mode (xblock-student_view or xmodule_display)
 .xmodule_display,
 .xblock-student_view {
+
   // font styling
   i,
   em {
     font-style: italic;
+  }
+
+
+  .icon {
+    font-style: normal;
   }
 }
 
@@ -52,7 +58,7 @@
           width: 100%;
           padding: ($baseline/2);
 
-          *[class^="icon-"] {
+          .icon {
             margin-right: ($baseline/4);
           }
         }
@@ -142,8 +148,8 @@
             color: $red;
           }
 
-          [class^="icon-"],
-          [class*=" icon-"] {
+          .icon,
+          [class*=" fa-"] {
             @extend %t-icon4;
             margin-right: ($baseline/4);
           }
@@ -281,7 +287,7 @@
           display: block;
           padding: ($baseline/2);
 
-          *[class^="icon-"] {
+          .icon {
             margin-right: ($baseline/4);
           }
         }

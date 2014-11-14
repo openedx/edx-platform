@@ -21,8 +21,8 @@ define(['jquery.form', 'js/index'], function() {
                 .find('.label')
                     .text('Sorry, there was error with your request');
             $('#request-coursecreator-submit')
-                .find('.icon-cog')
-                    .toggleClass('icon-spin');
+                .find('.fa-cog')
+                    .toggleClass('fa-spin');
         };
 
         $('#request-coursecreator').ajaxForm({

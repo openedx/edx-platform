@@ -27,5 +27,5 @@
 </div>
 
 <div class="no-asset-content">
-    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button upload-button new-button"><i class="icon-plus"></i><%= gettext("Upload your first asset") %></a></p>
+    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button new-button upload-button"><i class="icon fa fa-plus"></i><%= gettext("Upload your first asset") %></a></p>
 </div>

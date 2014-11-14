@@ -65,7 +65,7 @@
       padding: ($baseline*1.5) ($baseline*2);
 
       // custom rules to reuse xblock validation styling in ui-well context
-      .icon-warning-sign {
+      .fa-warning {
         display: none;
       }
     }
@@ -175,7 +175,7 @@
           margin-bottom: ($baseline/10);
         }
 
-        [class^="icon-"] {
+        .icon {
           margin-left: ($baseline/4);
           color: $gray-d1;
         }

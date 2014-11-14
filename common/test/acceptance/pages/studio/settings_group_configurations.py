@@ -221,11 +221,11 @@ class GroupConfiguration(object):
 
     @property
     def details_error_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-usages .icon-exclamation-sign').present
+        return self.find_css('.wrapper-group-configuration-usages .fa-exclamation-circle').present
 
     @property
     def details_warning_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-usages .icon-warning-sign').present
+        return self.find_css('.wrapper-group-configuration-usages .fa-warning').present
 
     @property
     def details_message_is_present(self):
@@ -237,7 +237,7 @@ class GroupConfiguration(object):
 
     @property
     def edit_warning_icon_is_present(self):
-        return self.find_css('.wrapper-group-configuration-validation .icon-warning-sign').present
+        return self.find_css('.wrapper-group-configuration-validation .fa-warning').present
 
     @property
     def edit_warning_message_is_present(self):

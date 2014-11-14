@@ -382,6 +382,10 @@ form {
     @extend %ui-btn-non-blue;
     @extend %t-copy-base;
     padding-top: ($baseline/10);
+
+    .icon.icon {
+      vertical-align: baseline;
+    }
   }
 
   .incontext-editor-form {

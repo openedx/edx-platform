@@ -20,7 +20,7 @@ var DetailsView = ValidatingView.extend({
     },
 
     initialize : function() {
-        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon-file"></i><%= filename %></a>');
+        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon fa fa-file"></i><%= filename %></a>');
         // fill in fields
         this.$el.find("#course-organization").val(this.model.get('org'));
         this.$el.find("#course-number").val(this.model.get('course_id'));

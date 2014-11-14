@@ -65,14 +65,14 @@ from django.utils.translation import ugettext as _
                 <div class="counter">
                     <input maxlength="3" title="Input qty and press enter." max="999" type="text" name="students" value="${item.qty}" id="${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}">
                 </div>
-                <div class="inc button"><i class="icon-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon-caret-down"></i></div>
+                <div class="inc button"><i class="icon fa fa-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon-caret-down"></i></div>
                     <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                 <span class="error-text hidden" id="students-${item.id}"></span>
             </div>
               </div>
 
             <div class="col-3">
-               <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon-remove-sign"></i></a>
+               <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon fa fa-times-circle"></i></a>
             </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ from django.utils.translation import ugettext as _
            </div>
            % else:
            <div class="code-applied">
-              <span class="green"><i class="icon-ok"></i>${_('code has been applied')}</span>
+              <span class="green"><i class="icon fa fa-check-square-o"></i>${_('code has been applied')}</span>
               <input type="submit" value="Reset" class="blue-border" id="submit-reset-redemption">
            </div>
             %endif
@@ -102,7 +102,7 @@ from django.utils.translation import ugettext as _
           <div class="col-2 relative">
              % if order_type == 'business':
               <div name="billing">
-                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon-caret-right"></i>
+                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon fa fa-caret-right"></i>
                     <p>
                         ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
                     </p>

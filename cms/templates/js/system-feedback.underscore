@@ -9,8 +9,8 @@
   >
   <div class="<%= type %> <%= intent %> <% if(obj.actions) { %>has-actions<% } %>">
     <% if(obj.icon) { %>
-      <% var iconClass = {"warning": "warning-sign", "confirmation": "ok", "error": "warning-sign", "announcement": "bullhorn", "step-required": "exclamation-sign", "help": "question-sign", "mini": "cog"} %>
-      <i class="feedback-symbol icon-<%= iconClass[intent] %>"></i>
+      <% var iconClass = {"warning": "warning", "confirmation": "ok", "error": "warning", "announcement": "bullhorn", "step-required": "exclamation-circle", "help": "question", "mini": "cog"} %>
+      <i class="feedback-symbol fa fa-<%= iconClass[intent] %>"></i>
     <% } %>
 
     <div class="copy">
@@ -40,7 +40,7 @@
 
     <% if(obj.closeIcon) { %>
     <a href="#" rel="view" class="action action-close action-<%= type %>-close">
-      <i class="icon-remove-sign"></i>
+      <i class="icon fa fa-times-circle"></i>
       <span class="label">close <%= type %></span>
     </a>
     <% } %>

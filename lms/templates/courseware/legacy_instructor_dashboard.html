@@ -141,7 +141,7 @@ function goto( mode)
     %if settings.FEATURES.get('IS_EDX_DOMAIN', False):
     ## Only show this banner on the edx.org website (other sites may choose to show this if they wish)
     <div class="wrapper-msg urgency-low msg-warning is-shown">
-        <p>${_("You are using the legacy instructor dashboard, which we will retire in the near future.")} <a href="${ standard_dashboard_url }">${_("Return to the Instructor Dashboard")} <i class="icon-double-angle-right"></i></a></p>
+        <p>${_("You are using the legacy instructor dashboard, which we will retire in the near future.")} <a href="${ standard_dashboard_url }">${_("Return to the Instructor Dashboard")} <i class="icon fa fa-double-angle-right"></i></a></p>
           <p class="note">${_("If the Instructor Dashboard is missing functionality, please contact your PM to let us know.")}</p>
     </div>
     %endif
@@ -477,14 +477,14 @@ function goto( mode)
           <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
           <div class="metrics-left" id="metric_opened_${i}">
             <h3>${_("Count of Students that Opened a Subsection")}</h3>
-            <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+            <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading...")}</p>
           </div>
           <div class="metrics-right" id="metric_grade_${i}">
             <h3>${_("Grade Distribution per Problem")}</h3>
             %if not metrics_results['section_has_problem'][i]:
               <p>${_("There are no problems in this section.")}</p>
             %else:
-              <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+              <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading...")}</p>
             %endif
           </div>
         </div>

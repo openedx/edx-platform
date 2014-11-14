@@ -336,7 +336,7 @@
             @extend %t-action3;
             @extend %t-strong;
 
-            [class^="icon-"] {
+            .icon {
               @extend %t-icon5;
               display: inline-block;
               vertical-align: middle;
@@ -508,14 +508,15 @@
         height: ($baseline*2);
         position: relative;
         display: inline-block;
-        vertical-align: middle;
         margin-right: flex-gutter();
+        vertical-align: middle;
+        text-align: center;
         border-radius: 20px;
         border: 1px solid $darkGrey;
         background-color: #d1dae3;
         color: #6d788b;
 
-        .plus-icon {
+        .icon {
           position: absolute;
           top: 50%;
           left: 50%;

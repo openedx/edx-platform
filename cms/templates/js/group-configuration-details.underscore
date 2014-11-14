@@ -2,7 +2,7 @@
     <header class="group-configuration-header">
         <h3 class="group-configuration-title">
             <a href="#" class="group-toggle <% if(showGroups){ print('hide'); } else { print('show'); } %>-groups">
-                <i class="ui-toggle-expansion icon-caret-<% if(showGroups){ print('down'); } else { print('right'); } %>"></i>
+                <i class="ui-toggle-expansion icon fa fa-caret-<% if(showGroups){ print('down'); } else { print('right'); } %>"></i>
                 <%= name %>
             </a>
         </h3>
@@ -46,11 +46,11 @@
         </li>
         <% if (_.isEmpty(usage)) { %>
             <li class="action action-delete wrapper-delete-button">
-                <button class="delete action-icon"><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
+                <button class="delete action-icon"><i class="icon fa fa-trash-o"></i><span><%= gettext("Delete") %></span></button>
             </li>
         <% } else { %>
             <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Cannot delete when in use by an experiment') %>">
-                <button class="delete action-icon is-disabled" aria-disabled="true" ><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
+                <button class="delete action-icon is-disabled" aria-disabled="true"><i class="icon fa fa-trash-o"></i><span><%= gettext("Delete") %></span></button>
             </li>
         <% } %>
     </ul>
@@ -66,9 +66,9 @@
             <% if (unit.validation) { %>
               <p>
                 <% if (unit.validation.type === 'warning') { %>
-                  <i class="icon-warning-sign"></i>
+                  <i class="icon fa fa-warning"></i>
                 <% } else if (unit.validation.type === 'error') { %>
-                  <i class="icon-exclamation-sign"></i>
+                  <i class="icon fa fa-exclamation-circle"></i>
                 <% } %>
                 <span class="group-configuration-validation-message">
                   <%= unit.validation.text %>

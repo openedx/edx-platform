@@ -80,9 +80,9 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <p class="action-inline">
             <a href="" class="action-staff-lock" role="button" aria-pressed="<%= hasExplicitStaffLock %>">
                 <% if (hasExplicitStaffLock) { %>
-                    <i class="icon-check"></i>
+                    <i class="icon fa fa-check-square-o"></i>
                 <% } else { %>
-                    <i class="icon-check-empty"></i>
+                    <i class="icon fa fa-square-o"></i>
                 <% } %>
                 <%= gettext('Hide from students') %>
             </a>

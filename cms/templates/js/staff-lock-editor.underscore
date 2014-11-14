@@ -5,8 +5,8 @@
         <li class="field field-checkbox checkbox-cosmetic">
             <input type="checkbox" id="staff_lock" name="staff_lock" class="input input-checkbox" />
             <label for="staff_lock" class="label">
-              <i class="icon-check input-checkbox-checked"></i>
-              <i class="icon-check-empty input-checkbox-unchecked"></i>
+              <i class="icon fa fa-check-square-o input-checkbox-checked"></i>
+              <i class="icon fa fa-square-o input-checkbox-unchecked"></i>
               <%= gettext('Hide from students') %>
             </label>
 

@@ -15,7 +15,7 @@
 %if is_not_active:
 <div class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
-    <i class="msg-icon icon-warning-sign"></i>
+    <i class="msg-icon fa fa-warning"></i>
     <div class="msg-content">
       <h3 class="title">${_("You need to activate your edX account before proceeding")}</h3>
       <div class="copy">
@@ -63,7 +63,7 @@
 
           <li class="progress-step progress-step-icon" id="progress-step5">
             <span class="wrapper-step-number"><span class="step-number">
-              <i class="icon-ok"></i>
+              <i class="icon fa fa-check-square-o"></i>
             </span></span>
             <span class="step-name">${_("Confirmation")}</span>
           </li>
@@ -97,7 +97,7 @@
           <li class="req req-0 req-activate">
             <h4 class="title">${_("Activate Your Account")}</h4>
             <div class="placeholder-art">
-              <i class="icon-envelope-alt"></i>
+              <i class="icon fa fa-envelope-o"></i>
             </div>
 
             <div class="copy">
@@ -112,8 +112,10 @@
           <li class="req req-1 req-id">
             <h4 class="title">${_("Identification")}</h4>
             <div class="placeholder-art">
-              <i class="icon-list-alt icon-under"></i>
-              <i class="icon-user icon-over"></i>
+              <span class="fa-stack">
+                <i class="icon fa fa-list-alt fa-stack-2x"></i>
+                <i class="icon fa fa-user fa-stack-1"></i>
+              </span>
             </div>
 
             <div class="copy">
@@ -127,18 +129,18 @@
           <li class="req req-2 req-webcam">
             <h4 class="title">${_("Webcam")}</h4>
             <div class="placeholder-art">
-              <i class="icon-facetime-video"></i>
+              <i class="icon fa fa-facetime-video"></i>
             </div>
 
             <div class="copy">
               <p>
                 <span class="copy-super">${_("A webcam and a modern browser")}</span>
                 <span class="copy-sub"><strong>
-                  <a rel="external" href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>, 
-                  <a rel="external" href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>, 
+                  <a rel="external" href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>,
+                  <a rel="external" href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>,
                   <a rel="external" href="http://www.apple.com/safari/">Safari</a>,
-                  ## Translators: This phrase will look like this: "Internet Explorer 9 or later" 
-                  <a rel="external" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">${_("{internet_explorer_version} or later").format(internet_explorer_version="Internet Explorer 9")}</a></strong>. 
+                  ## Translators: This phrase will look like this: "Internet Explorer 9 or later"
+                  <a rel="external" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">${_("{internet_explorer_version} or later").format(internet_explorer_version="Internet Explorer 9")}</a></strong>.
                   ${_("Please make sure your browser is updated to the most recent version possible.")}
                 </span>
               </p>
@@ -148,7 +150,7 @@
           <li class="req req-3 req-payment">
             <h4 class="title">${_("Credit or Debit Card")}</h4>
             <div class="placeholder-art">
-              <i class="icon-credit-card"></i>
+              <i class="icon fa fa-credit-card"></i>
             </div>
 
             <div class="copy">

@@ -48,7 +48,7 @@
           padding: ($baseline/2) ($baseline/2);
           background: transparent;
 
-          [class^="icon-"] {
+          .icon {
             @include transition(top $tmg-f2 ease-in-out $tmg-f2);
             @extend %t-action3;
             display: inline-block;

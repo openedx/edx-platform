@@ -95,7 +95,7 @@
           }
         }
 
-        [class^="icon-"] {
+        .icon {
           display: inline-block;
           vertical-align: middle;
         }
@@ -131,7 +131,7 @@
   .wrapper-xblock.is-collapsible,
   .wrapper-xblock.xblock-type-container {
 
-    [class^="icon-"] {
+    .icon {
       font-style: normal;
     }
 
@@ -168,7 +168,7 @@
       padding: ($baseline*0.75);
       color: $white;
 
-      [class^="icon-"] {
+      .icon {
         font-style: normal;
       }
 
@@ -189,7 +189,7 @@
         &.has-warnings {
           border-top: 3px solid $orange;
 
-          .icon-warning-sign {
+          .fa-warning {
             margin-right: ($baseline/2);
             color: $orange;
           }
@@ -198,7 +198,7 @@
         &.has-errors {
           border-top: 3px solid $red-l2;
 
-          .icon-exclamation-sign {
+          .fa-exclamation-circle {
             margin-right: ($baseline/2);
             color: $red-l2;
           }
@@ -651,7 +651,7 @@
         width: 100%;
         padding: ($baseline/2);
 
-        *[class^="icon-"] {
+        .icon {
           margin-right: ($baseline/4);
         }
       }
@@ -722,7 +722,7 @@
         width: 88%;
         padding: ($baseline/2);
 
-        *[class^="icon-"] {
+        .icon {
           margin-right: ($baseline/4);
         }
       }

@@ -135,11 +135,15 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             else:
                 expected_control_text = pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_DASHBOARD)
 
-            icon_state = re.search(r'third-party-auth.+icon icon-(\w+)', response.content, re.DOTALL).groups()[0]
             provider_name = re.search(r'<span class="provider">([^<]+)', response.content, re.DOTALL).groups()[0]
 
             self.assertIn(expected_control_text, response.content)
-            self.assertEqual('link' if linked else 'unlink', icon_state)
+            if linked:
+                self.assertIn("fa fa-link", response.content)
+                self.assertNotIn("fa fa-unlink", response.content)
+            else:
+                self.assertNotIn("fa fa-link", response.content)
+                self.assertIn("fa fa-unlink", response.content)
             self.assertEqual(self.PROVIDER_CLASS.NAME, provider_name)
 
     def assert_exception_redirect_looks_correct(self, expected_uri, auth_entry=None):
