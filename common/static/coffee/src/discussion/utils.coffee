@@ -18,6 +18,8 @@ class @DiscussionUtil
 
   @localUrls: []
 
+  @force_async = false
+
   @getTemplate: (id) ->
     $("script##{id}").html()
 
@@ -164,6 +166,9 @@ class @DiscussionUtil
         params["loadingCallback"].apply(params["$loading"])
       else
         params["$loading"].loading(params["takeFocus"])
+
+    if @force_async
+      params["async"] = true
 
     request = $.ajax(params).always ->
       if $elem
