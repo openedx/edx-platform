@@ -28,6 +28,8 @@ var edx = edx || {};
         // String to append to required label fields
         requiredStr: '*',
 
+        submitButton: '',
+
         initialize: function( data ) {
             this.model = data.model;
             this.preRender( data );
@@ -65,6 +67,7 @@ var edx = edx || {};
 
             this.$form = $container.find('form');
             this.$errors = $container.find('.submission-error');
+            this.$submitButton = $container.find(this.submitButton);
         },
 
         buildForm: function( data ) {
@@ -178,6 +181,7 @@ var edx = edx || {};
         saveError: function( error ) {
             this.errors = ['<li>' + error.responseText + '</li>'];
             this.setErrors();
+            this.toggleDisableButton(false);
         },
 
         setErrors: function() {
@@ -209,6 +213,8 @@ var edx = edx || {};
 
             event.preventDefault();
 
+            this.toggleDisableButton(true);
+
             if ( !_.compact(this.errors).length ) {
                 this.model.set( data );
                 this.model.save();
@@ -221,8 +227,23 @@ var edx = edx || {};
         toggleErrorMsg: function( show ) {
             if ( show ) {
                 this.setErrors();
+                this.toggleDisableButton(false);
             } else {
                 this.element.hide( this.$errors );
+            }
+        },
+
+        /**
+         * If a form button is defined for this form, this will disable the button on
+         * submit, and re-enable the button if an error occurs.
+         *
+         * Args:
+         *      disabled (boolean): If set to TRUE, disable the button.
+         *
+         */
+        toggleDisableButton: function ( disabled ) {
+            if (this.$submitButton) {
+                this.$submitButton.attr('disabled', disabled);
             }
         },
 
