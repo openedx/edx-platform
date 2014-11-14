@@ -13,6 +13,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
+from instructor_task.api import submit_cohort_students
 from util.json_request import JsonResponse
 from util.file import store_uploaded_file, course_and_time_based_filename_generator
 from django.utils.translation import ugettext as _
@@ -165,10 +166,12 @@ def add_users_to_cohorts(request, course_key_string):
             request, 'uploaded-file', ['.csv'],
             course_and_time_based_filename_generator(course_key, "cohorts")
         )
+        submit_cohort_students(request, course_key, filename)
     except Exception as err:
         return JsonResponse({"error": str(err)}, status=400)
 
-    return json_http_response({})
+    # For now, until UX is defined
+    return json_http_response({"success": True})
 
 
 
