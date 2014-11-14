@@ -570,7 +570,9 @@ DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'xmodule',
     'collection': 'modulestore',
-    'asset_collection': 'assetstore',
+    # If 'asset_collection' defined, it'll be used
+    # as the collection name for asset metadata.
+    # Otherwise, a default collection name will be used.
 }
 MODULESTORE = {
     'default': {
