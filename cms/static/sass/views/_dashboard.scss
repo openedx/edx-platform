@@ -299,18 +299,20 @@
       line-height: $baseline*2;
       margin: 0 10px;
 
-      &.active, &:hover {
+      &.active {
         border-bottom: 4px solid $blue;
+      }
+
+      &.active, &:hover {
+        a {
+          color: $gray-d2;
+        }
       }
 
       a {
         color: $blue;
         cursor: pointer;
         display: inline-block;
-      }
-
-      &.active a {
-        color: $gray-d2;
       }
     }
   }
