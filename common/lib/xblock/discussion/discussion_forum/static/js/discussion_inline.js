@@ -7,10 +7,8 @@ function DiscussionInlineBlock(runtime, element) {
   if (testUrl.match(/^(http|https):\/\//)) {
     var hostname = testUrl.match(/^(.*:\/\/[a-z0-9:\-.]+)\//)[1];
     DiscussionUtil.setBaseUrl(hostname);
+    DiscussionUtil.force_async = true;
   }
 
-  new DiscussionModuleView({
-    el: el,
-    async_thread_views: true
-  });
+  new DiscussionModuleView({ el: el });
 }

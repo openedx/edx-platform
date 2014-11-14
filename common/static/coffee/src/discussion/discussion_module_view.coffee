@@ -99,7 +99,6 @@ if Backbone?
         @$el.append($discussion)
 
       @newPostForm = $('.new-post-article')
-      async = @options.async_thread_views
       @threadviews = @discussion.map (thread) =>
         view = new DiscussionThreadView(
           el: @$("article#thread_#{thread.id}"),
