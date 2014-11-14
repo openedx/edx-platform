@@ -180,7 +180,7 @@
 // button elements
 .button {
 
-  [class^="icon-"] {
+  .icon {
     display: inline-block;
     vertical-align: middle;
     margin-right: ($baseline/4);
@@ -267,7 +267,7 @@
         background-color: $gray-l1;
       }
 
-      [class^="icon-"] {
+      .icon {
         font-style: normal;
       }
     }
@@ -378,7 +378,7 @@
     border-top: 1px solid $blue-l1;
     opacity: 0.0;
 
-    *[class^="icon-caret"] {
+    *[class^="fa-caret"] {
       @extend %t-icon5;
       position: absolute;
       top: -12px;

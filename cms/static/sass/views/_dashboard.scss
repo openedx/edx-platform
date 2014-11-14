@@ -89,7 +89,7 @@
         margin: 3px flex-gutter() 0 0;
       }
 
-      .icon-remove-sign {
+      .fa-times-circle {
         @extend %t-action1;
         @include transform(rotate(45deg));
         @include transform-origin(center center);
@@ -114,7 +114,7 @@
       .ui-toggle-control {
         @include border-bottom-radius(0);
 
-        .icon-remove-sign {
+        .fa-times-circle {
           @include transform(rotate(90deg));
           @include transform-origin(center center);
         }
@@ -162,7 +162,7 @@
         position: relative;
         overflow: hidden;
 
-        .icon-cog {
+        .fa-cog {
           @include transition(all $tmg-f1 ease-in-out $tmg-f1);
           @extend %t-icon4;
           position: absolute;
@@ -176,7 +176,7 @@
         &.is-submitting {
           padding-left: ($baseline*2);
 
-          .icon-cog {
+          .fa-cog {
             left: ($baseline*0.75);
             visibility: visible;
             opacity: 1.0;
@@ -189,7 +189,7 @@
           background: $red;
           border-color: $red-d1;
 
-          .icon-cog {
+          .fa-cog {
             left: ($baseline*0.75);
             visibility: visible;
             opacity: 1.0;
