@@ -1748,6 +1748,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         # Make last user as observer to make sure that data is being filtered out
         allow_access(course, users[USER_COUNT-1], 'observer')
 
+        contents = []
         for i in xrange(1, 26):
             local_content_name = 'Video_Sequence{}'.format(i)
             local_content = ItemFactory.create(
@@ -1756,6 +1757,7 @@ class CoursesApiTests(ModuleStoreTestCase):
                 data=self.test_data,
                 display_name=local_content_name
             )
+            contents.append(local_content)
             if i < 3:
                 user_id = users[0].id
             elif i < 10:
@@ -1827,6 +1829,21 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertIsNone(response.data.get('leaders', None))
         self.assertEqual(response.data['position'], 0)
         self.assertEqual(response.data['completions'], 0)
+
+        # test a case where completions are greater than total course modules. it should not be more than 100
+        contents.append(self.course_content)
+        for content in contents[2:]:
+            user_id = users[0].id
+            content_id = unicode(content.scope_ids.usage_id)
+            completions_data = {'content_id': content_id, 'user_id': user_id}
+            response = self.do_post(completion_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        test_uri = '{}?user_id={}'.format(leaders_uri, users[0].id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual('{0:.3f}'.format(response.data['completions']), '100.000')
+
 
     def test_courses_metrics_grades_list_get(self):
         # Retrieve the list of grades for this course
