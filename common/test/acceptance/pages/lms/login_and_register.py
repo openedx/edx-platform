@@ -191,6 +191,32 @@ class CombinedLoginAndRegisterPage(PageObject):
         # Submit it
         self.q(css=".login-button").click()
 
+    def password_reset(self, email):
+        """Navigates to, fills in, and submits the password reset form.
+
+        Requires that the "login" form is visible.
+
+        Keyword Arguments:
+            email (unicode): The user's email address.
+
+        """
+        login_form = self.current_form
+
+        # Click the password reset link on the login page
+        self.q(css="a.forgot-password").click()
+
+        # Wait for the password reset form to load
+        EmptyPromise(
+            lambda: self.current_form != login_form,
+            "Finish toggling to the password reset form"
+        ).fulfill()
+
+        # Fill in the form
+        self.q(css="#password-reset-email").fill(email)
+
+        # Submit it
+        self.q(css="button.js-reset").click()
+
     @property
     @unguarded
     def current_form(self):
@@ -207,7 +233,7 @@ class CombinedLoginAndRegisterPage(PageObject):
             return "register"
         elif self.q(css=".login-button").visible:
             return "login"
-        elif self.q(css=".js-reset").visible:
+        elif self.q(css=".js-reset").visible or self.q(css=".js-reset-success").visible:
             return "password-reset"
 
     @property
@@ -221,3 +247,16 @@ class CombinedLoginAndRegisterPage(PageObject):
             errors = self.errors
             return (bool(errors), errors)
         return Promise(_check_func, "Errors are visible").fulfill()
+
+    @property
+    def success(self):
+        """Return a success message displayed to the user."""
+        if self.q(css=".submission-success").visible:
+            return self.q(css=".submission-success h4").text
+
+    def wait_for_success(self):
+        """Wait for a success message to be visible, then return it."""
+        def _check_func():
+            success = self.success
+            return (bool(success), success)
+        return Promise(_check_func, "Success message is visible").fulfill()

@@ -69,7 +69,12 @@ class RegistrationTest(UniqueCourseTest):
 
 @attr('shard_1')
 class LoginFromCombinedPageTest(UniqueCourseTest):
-    """Test that we can log in using the combined login/registration page. """
+    """Test that we can log in using the combined login/registration page.
+
+    Also test that we can request a password reset from the combined
+    login/registration page.
+
+    """
 
     def setUp(self):
         """Initialize the page objects and create a test course. """
@@ -111,6 +116,29 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
     def test_toggle_to_register_form(self):
         self.login_page.visit().toggle_form()
         self.assertEqual(self.login_page.current_form, "register")
+
+    def test_password_reset_success(self):
+        # Create a user account
+        email, password = self._create_unique_user()
+
+        # Navigate to the password reset form and try to submit it
+        self.login_page.visit().password_reset(email=email)
+
+        # Expect that we're shown a success message
+        self.assertIn("PASSWORD RESET EMAIL SENT", self.login_page.wait_for_success())
+
+    def test_password_reset_failure(self):
+        # Navigate to the password reset form
+        self.login_page.visit()
+
+        # User account does not exist
+        self.login_page.password_reset(email="nobody@nowhere.com")
+
+        # Expect that we're shown a failure message
+        self.assertIn(
+            "No active user with the provided email address exists.",
+            self.login_page.wait_for_errors()
+        )
 
     def _create_unique_user(self):
         username = "test_{uuid}".format(uuid=self.unique_id[0:6])
