@@ -5,8 +5,7 @@ Classes representing asset metadata.
 from datetime import datetime
 import pytz
 from contracts import contract, new_contract
-from bisect import bisect_left, bisect_right
-from opaque_keys.edx.keys import CourseKey, AssetKey
+from opaque_keys.edx.keys import AssetKey
 
 new_contract('AssetKey', AssetKey)
 new_contract('datetime', datetime)
@@ -26,12 +25,19 @@ class AssetMetadata(object):
     # Default type for AssetMetadata objects. A constant for convenience.
     ASSET_TYPE = 'asset'
 
-    @contract(asset_id='AssetKey', basename='basestring|None', internal_name='basestring|None', locked='bool|None', contenttype='basestring|None',
-              fields='dict | None', curr_version='basestring|None', prev_version='basestring|None', edited_by='int|None', edited_on='datetime|None')
+    @contract(asset_id='AssetKey',
+              basename='basestring|None', internal_name='basestring|None',
+              locked='bool|None', contenttype='basestring|None',
+              thumbnail='basestring|None', fields='dict|None',
+              curr_version='basestring|None', prev_version='basestring|None',
+              created_by='int|None', created_on='datetime|None',
+              edited_by='int|None', edited_on='datetime|None')
     def __init__(self, asset_id,
                  basename=None, internal_name=None,
-                 locked=None, contenttype=None, thumbnail=None, fields=None,
+                 locked=None, contenttype=None,
+                 thumbnail=None, fields=None,
                  curr_version=None, prev_version=None,
+                 created_by=None, created_on=None,
                  edited_by=None, edited_on=None,
                  field_decorator=None,):
         """
@@ -60,8 +66,12 @@ class AssetMetadata(object):
         self.thumbnail = thumbnail
         self.curr_version = curr_version
         self.prev_version = prev_version
+        now = datetime.now(pytz.utc)
         self.edited_by = edited_by
-        self.edited_on = edited_on or datetime.now(pytz.utc)
+        self.edited_on = edited_on or now
+        # created_by and created_on should only be set here.
+        self.created_by = created_by
+        self.created_on = created_on or now
         self.fields = fields or {}
 
     def __repr__(self):
@@ -70,7 +80,8 @@ class AssetMetadata(object):
             self.basename, self.internal_name,
             self.locked, self.contenttype, self.fields,
             self.curr_version, self.prev_version,
-            self.edited_by, self.edited_on
+            self.edited_by, self.edited_on,
+            self.created_by, self.created_on
         ))
 
     def update(self, attr_dict):
@@ -99,10 +110,14 @@ class AssetMetadata(object):
             'contenttype': self.contenttype,
             'thumbnail': self.thumbnail,
             'fields': self.fields,
-            'curr_version': self.curr_version,
-            'prev_version': self.prev_version,
-            'edited_by': self.edited_by,
-            'edited_on': self.edited_on
+            'edit_info': {
+                'curr_version': self.curr_version,
+                'prev_version': self.prev_version,
+                'edited_by': self.edited_by,
+                'edited_on': self.edited_on,
+                'created_by': self.created_by,
+                'created_on': self.created_on
+            }
         }
 
     @contract(asset_doc='dict|None')
@@ -120,7 +135,9 @@ class AssetMetadata(object):
         self.contenttype = asset_doc['contenttype']
         self.thumbnail = asset_doc['thumbnail']
         self.fields = asset_doc['fields']
-        self.curr_version = asset_doc['curr_version']
-        self.prev_version = asset_doc['prev_version']
-        self.edited_by = asset_doc['edited_by']
-        self.edited_on = asset_doc['edited_on']
+        self.curr_version = asset_doc['edit_info']['curr_version']
+        self.prev_version = asset_doc['edit_info']['prev_version']
+        self.edited_by = asset_doc['edit_info']['edited_by']
+        self.edited_on = asset_doc['edit_info']['edited_on']
+        self.created_by = asset_doc['edit_info']['created_by']
+        self.created_on = asset_doc['edit_info']['created_on']
