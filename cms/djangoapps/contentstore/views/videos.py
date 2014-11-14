@@ -44,14 +44,14 @@ class UploadStatus(object):
 
 @expect_json
 @login_required
-@require_http_methods(("GET", "POST", "PUT"))
+@require_http_methods(("GET", "POST", "PATCH"))
 def videos_handler(request, course_key_string):
     """
     The restful handler for video uploads.
 
     GET
         json: return json representing the videos that have been uploaded and their statuses
-    PUT or POST
+    PATCH or POST
         json: upload a set of videos
     """
     # The feature flag should be enabled
