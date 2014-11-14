@@ -93,10 +93,6 @@ class MongoConnection(object):
             wait_time=retry_wait_time
         )
 
-        # Remove when adding official Split support for asset metadata storage.
-        if asset_collection:
-            pass
-
         if user is not None and password is not None:
             self.database.authenticate(user, password)
 
