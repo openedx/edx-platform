@@ -28,6 +28,8 @@ if Backbone?
 
       @renderShowView()
       @renderAttrs()
+      if @model.get("thread").get("closed")
+        @hideCommentForm()
 
       @renderComments()
       @
@@ -195,7 +197,9 @@ if Backbone?
           url: url
           type: "POST"
           dataType: 'json'
-          async: false # TODO when the rest of the stuff below is made to work properly..
+          # TODO when the rest of the stuff below is made to work properly..
+          # Note it can be forced to true on global basis via DiscussionUtils.force_async
+          async: false
           data:
               body: newBody
           error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))

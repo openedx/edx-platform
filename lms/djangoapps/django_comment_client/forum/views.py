@@ -36,7 +36,7 @@ def _attr_safe_json(obj):
     return saxutils.escape(json.dumps(obj), {'"': '&quot;'})
 
 @newrelic.agent.function_trace()
-def make_course_settings(course, include_category_map=False):
+def make_course_settings(course):
     """
     Generate a JSON-serializable model for course settings, which will be used to initialize a
     DiscussionCourseSettings object on the client.
@@ -47,10 +47,8 @@ def make_course_settings(course, include_category_map=False):
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
         'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course.id)],
+        'category_map': utils.get_discussion_category_map(course)
     }
-
-    if include_category_map:
-        obj['category_map'] = utils.get_discussion_category_map(course)
 
     return obj
 
@@ -183,7 +181,7 @@ def forum_form_discussion(request, course_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_id)
-    course_settings = make_course_settings(course, include_category_map=True)
+    course_settings = make_course_settings(course)
 
     try:
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
@@ -246,7 +244,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_id)
-    course_settings = make_course_settings(course, include_category_map=True)
+    course_settings = make_course_settings(course)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 

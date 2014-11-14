@@ -7,6 +7,7 @@ class @DiscussionViewSpecHelper
           pinned: false,
           endorsed: false,
           votes: {up_count: '0'},
+          read: false,
           unread_comments_count: 0,
           comments_count: 0,
           abuse_flaggers: [],

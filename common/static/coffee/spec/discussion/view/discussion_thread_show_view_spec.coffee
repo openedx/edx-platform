@@ -142,3 +142,18 @@ describe "DiscussionThreadShowView", ->
             $el = $('#fixture-element').html(@view.getAuthorDisplay())
             expect($el.find('a.username').length).toEqual(0)
             expect($el.text()).toMatch(/^(\s*)anonymous(\s*)$/)
+
+    describe "cohorting", ->
+        it "renders correctly for an uncohorted thread", ->
+            @view.render()
+            expect(@view.$('.group-visibility-label').text().trim()).toEqual(
+                'This post is visible to everyone.'
+            )
+
+        it "renders correctly for a cohorted thread", ->
+            @thread.set('group_id', '1')
+            @thread.set('group_name', 'Mock Cohort')
+            @view.render()
+            expect(@view.$('.group-visibility-label').text().trim()).toEqual(
+                'This post is visible only to Mock Cohort.'
+            )

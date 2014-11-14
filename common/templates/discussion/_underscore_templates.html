@@ -1,6 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django_comment_client.permissions import has_permission %>
+
+<%namespace name='static' file='../static_content.html'/>
+
 ## IMPORTANT: In order to keep js tests valid and relevant, please be sure to update the appropriate HTML in
 ## common/static/coffee/spec/discussion_spec_helper.coffee is changed and regenerated, whenever this one changes.
 <script aria-hidden="true" type="text/template" id="thread-template">
@@ -14,12 +17,14 @@
             </div>
             <div class="post-extended-content">
                 <div class="response-count"/>
+                % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
                 <div class="add-response">
                     <button class="button add-response-btn">
                         <i class="icon icon-reply"></i>
                         <span class="add-response-btn-text">${_('Add A Response')}</span>
                     </button>
                 </div>
+                % endif
                 <ol class="responses js-response-list"/>
                 <div class="response-pagination"/>
                 <div class="post-status-closed bottom-post-status" style="display: none">
@@ -44,69 +49,16 @@
     </article>
 </script>
 
-<script aria-hidden="true" type="text/template" id="thread-show-template">
-  <div class="discussion-post">
-      <header>
-      ${"<% if (obj.group_id) { %>"}
-      <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
-              ${"<% }  %>"}
-
-          <div class="post-header-content">
-
-            <h1>${'<%- title %>'}</h1>
-            <p class="posted-details">
-                ## This part is incredibly gross but necessary to combine i18n in
-                ## mako with logic in underscore.
-                ## Translators: post_type describes the kind of post this is
-                ## (e.g. "question" or "discussion"); time_ago is how much time
-                ## has passed since the post was created (e.g. "4 hours ago")
-                ${_("{post_type} posted {time_ago} by {author}").format(
-                    post_type="<%- thread_type %>",
-                    time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>",
-                    author="<%= author_display %>"
-                )}
-            </p>
-            <div class="post-labels">
-                <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
-                <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
-                <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
-            </div>
-          </div>
-          <div class="post-header-actions post-extended-content">
-            ${"""<%=
-                _.template(
-                    $('#forum-actions').html(),
-                    {
-                        contentId: cid,
-                        contentType: 'post',
-                        primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
-                    }
-                )
-            %>"""}
-          </div>
-      </header>
-
-      <div class="post-body">${'<%- body %>'}</div>
-
-      <%  js_block = u"""
-          var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
-          print(interpolate('{}', {{'courseware_title_linked': courseware_link}}, true));
-          """.format(
-                  ## Translators: 'courseware_title_linked' is a placeholder for the title of the courseware unit referenced by this discussion thread.
-                  escapejs(_("(this post is about %(courseware_title_linked)s)"))
-              )
-      %>
-      ${'<% if (mode == "tab" && obj.courseware_url) { %>'}
-          <div class="post-context">${'<%'}${js_block}${'%>'}</div>
-      ${'<% } %>'}
-  </div>
+% for template_name in ['thread-show']:
+<script aria-hidden="true" type="text/template" id="${template_name}-template">
+    <%static:include path="js/discussion/${template_name}.underscore" />
 </script>
+% endfor
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
-  <div class="discussion-post edit-post-form">
     <h1>${_("Editing post")}</h1>
-    <ul class="edit-post-form-errors"></ul>
+    <ul class="post-errors"></ul>
+    <div class="forum-edit-post-form-wrapper"></div>
     <div class="form-row">
       <label class="sr" for="edit-post-title">${_("Edit post title")}</label>
       <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="${_('Title') | h}">
@@ -116,7 +68,6 @@
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
-  </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
@@ -434,55 +385,7 @@
 <script aria-hidden="true" type="text/template" id="new-post-template">
     <form class="forum-new-post-form">
         <ul class="post-errors" style="display: none"></ul>
-        <div class="post-field">
-            <div class="field-label">
-                <span class="field-label-text">
-                    ## Translators: This is the label for a control to
-                    ## select a forum post type
-                    ${_("Post type:")}
-                </span><fieldset class="field-input">
-                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question" checked>
-                    <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
-                        <i class="icon icon-question"></i>
-                        ## Translators: This is a forum post type
-                        ${_("Question")}
-                    </label>
-                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion">
-                    <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
-                        <i class="icon icon-comments"></i>
-                        ## Translators: This is a forum post type
-                        ${_("Discussion")}
-                    </label>
-                </fieldset>
-            </div><span class="field-help">
-                ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
-            </span>
-        </div>
-        ${'<% if (mode=="tab") { %>'}
-        <div class="post-field">
-            ## Using div here instead of label because we are using a non-native control
-            <div class="field-label">
-                <span class="field-label-text">
-                    ${_("Topic Area:")}
-                </span><div class="field-input post-topic">
-                    <a href="#" class="post-topic-button">
-                        <span class="sr">${_("Discussion topics; current selection is: ")}</span>
-                        <span class="js-selected-topic"></span>
-                        <span class="drop-arrow" aria-hidden="true">▾</span>
-                    </a>
-                    <div class="topic-menu-wrapper">
-                        <label class="topic-filter-label">
-                            <span class="sr">${_("Filter topics")}</span>
-                            <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
-                        </label>
-                        <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
-                   </div>
-               </div>
-            </div><span class="field-help">
-                ${_("Add your post to a relevant topic to help others find it.")}
-            </span>
-        </div>
-        ${'<% } %>'}
+        <div class="forum-new-post-form-wrapper"></div>
         ${'<% if (cohort_options) { %>'}
         <div class="post-field">
             <label class="field-label">
@@ -496,7 +399,7 @@
                     ${'<% }); %>'}
                  </select>
             </label><div class="field-help">
-                ${_("Instructors can set whether a post in a cohorted topic is visible to all cohorts or only to a specific cohort.")}
+                ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort group.")}
             </div>
         </div>
         ${'<% } %>'}
@@ -534,6 +437,33 @@
     </form>
 </script>
 
+<script aria-hidden="true" type="text/template" id="thread-type-template">
+    <div class="post-field">
+        <div class="field-label">
+            <span class="field-label-text">
+                ## Translators: This is the label for a control to
+                ## select a forum post type
+                ${_("Post type:")}
+            </span><fieldset class="field-input">
+                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
+                <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
+                    <i class="icon icon-question"></i>
+                    ## Translators: This is a forum post type
+                    ${_("Question")}
+                </label>
+                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
+                <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
+                    <i class="icon icon-comments"></i>
+                    ## Translators: This is a forum post type
+                    ${_("Discussion")}
+                </label>
+            </fieldset>
+        </div><span class="field-help">
+            ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
+        </span>
+    </div>
+</script>
+
 <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
     <li role="menuitem" class="topic-menu-item">
         <a href="#" class="topic-title" data-discussion-id="${'<%- id %>'}" data-cohorted="${'<%- is_cohorted %>'}">${'<%- text %>'}</a>
@@ -545,6 +475,28 @@
         <span class="topic-title">${'<%- text %>'}</span>
         <ul role="menu" class="topic-submenu">${'<%= entries %>'}</ul>
     </li>
+</script>
+
+<script aria-hidden="true" type="text/template" id="topic-template">
+    ## Using div here instead of label because we are using a non-native control
+    <div class="field-label">
+        <span class="field-label-text">${_("Topic Area:")}</span><div class="field-input post-topic">
+            <a href="#" class="post-topic-button">
+                <span class="sr">${_("Discussion topics; current selection is: ")}</span>
+                <span class="js-selected-topic"></span>
+                <span class="drop-arrow" aria-hidden="true">▾</span>
+            </a>
+            <div class="topic-menu-wrapper">
+                <label class="topic-filter-label">
+                    <span class="sr">${_("Filter topics")}</span>
+                    <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
+                </label>
+                <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
+           </div>
+       </div>
+    </div><span class="field-help">
+        ${_("Add your post to a relevant topic to help others find it.")}
+    </span>
 </script>
 
 <%def name="primaryAction(action_class, icon, sr_label, unchecked_label, checked_label)">
