@@ -436,6 +436,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
     """
     A Mongodb backed ModuleStore
     """
+
+    # If no name is specified for the asset metadata collection, this name is used.
+    DEFAULT_ASSET_COLLECTION_NAME = 'assetstore'
+
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
     # pylint: disable=W0201
@@ -474,9 +478,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             self.collection = self.database[collection]
 
             # Collection which stores asset metadata.
-            self.asset_collection = None
-            if asset_collection is not None:
-                self.asset_collection = self.database[asset_collection]
+            if asset_collection is None:
+                asset_collection = self.DEFAULT_ASSET_COLLECTION_NAME
+            self.asset_collection = self.database[asset_collection]
 
             if user is not None and password is not None:
                 self.database.authenticate(user, password)
@@ -1465,9 +1469,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns:
             Asset info for the course
         """
-        if self.asset_collection is None:
-            return None
-
         # Using the course_key, find or insert the course asset metadata document.
         # A single document exists per course to store the course asset metadata.
         course_key = self.fill_in_run(course_key)
@@ -1493,9 +1494,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns:
             True if info save was successful, else False
         """
-        if self.asset_collection is None:
-            return False
-
         course_assets, asset_idx = self._find_course_asset(asset_metadata.asset_id)
         all_assets = SortedListWithKey([], key=itemgetter('filename'))
         # Assets should be pre-sorted, so add them efficiently without sorting.
@@ -1552,9 +1550,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ItemNotFoundError if no such item exists
             AttributeError is attr is one of the build in attrs.
         """
-        if self.asset_collection is None:
-            return
-
         course_assets, asset_idx = self._find_course_asset(asset_key)
         if asset_idx is None:
             raise ItemNotFoundError(asset_key)
@@ -1581,9 +1576,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns:
             Number of asset metadata entries deleted (0 or 1)
         """
-        if self.asset_collection is None:
-            return 0
-
         course_assets, asset_idx = self._find_course_asset(asset_key)
         if asset_idx is None:
             return 0
@@ -1607,9 +1599,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Arguments:
             course_key (CourseKey): course_identifier
         """
-        if self.asset_collection is None:
-            return
-
         # Using the course_id, find the course asset metadata document.
         # A single document exists per course to store the course asset metadata.
         course_assets = self._find_course_assets(course_key)
