@@ -12,6 +12,7 @@ from celery import Task, current_task
 from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
+from django.core.files.storage import DefaultStorage
 from django.db import transaction, reset_queries
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
@@ -19,6 +20,8 @@ from pytz import UTC
 from xmodule.modulestore.django import modulestore
 from track.views import task_track
 
+from util.file import unicode_csv_dictreader
+from course_groups.cohorts import add_users_to_cohorts
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
@@ -622,5 +625,68 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
 
     # Perform the upload
     upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+    """
+    Within a given course, cohort students in bulk, then upload the results
+    using a `ReportStore`.
+    """
+    start_time = time()
+    start_date = datetime.now()
+
+    # In order to cohort users in bulk, we expect a CSV file with the header
+    # column 'username_or_email' which identifies the user, and 'cohort_name'
+    # which identifies the cohort in which to place that user.  Additional
+    # columns are ignored.
+    first_row = next(unicode_csv_dictreader(DefaultStorage().open(task_input['file_name'], 'rU')))
+    if not first_row.get('username_or_email') or not first_row.get('cohort_name'):
+        raise ValueError(
+            'Input CSV file must contain "{username_or_email}" and "{cohort_name}" columns.'.format(
+                username_or_email='username_or_email',
+                cohort_name='cohort_name'
+            )
+        )
+    users_to_cohorts = {
+        row.get('username_or_email'): row.get('cohort_name')
+        for row in unicode_csv_dictreader(DefaultStorage().open(task_input['file_name'], 'rU'))
+    }
+
+    task_progress = TaskProgress(action_name, len(users_to_cohorts), start_time)
+    current_step = {'step': 'Cohorting Students'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    cohorts_status = add_users_to_cohorts(course_id, users_to_cohorts)
+
+    for cohort_name, status_dict in cohorts_status.iteritems():
+        task_progress.succeeded += len(status_dict['added'] + status_dict['changed'])
+        task_progress.skipped += len(status_dict['present'])
+        task_progress.failed += len(status_dict['unknown'])
+        task_progress.attempted += task_progress.succeeded + task_progress.skipped + task_progress.failed
+    task_progress.update_task_state(extra_meta=current_step)
+
+    current_step['step'] = 'Uploading CSV'
+    task_progress.update_task_state(extra_meta=current_step)
+
+    # Filter the output of `add_users_to_cohorts` in order to upload the result.
+    # Since there may be many users in each of the 'added', 'changed',
+    # 'present' and 'unknown' fields, only show the full user list for
+    # 'unknown'.
+    output_header = ['cohort_name', 'valid', 'added', 'changed', 'present', 'unknown']
+    output_rows = [
+        [cohort_name]
+        +
+        [
+            status_dict.get(column, '') if column == 'valid'
+            else ','.join(status_dict.get(column, '')) if column == 'unknown'
+            else len(status_dict.get(column, ''))
+            for column in output_header if column != 'cohort_name'
+        ]
+        for cohort_name, status_dict in cohorts_status.iteritems()
+    ]
+    output_rows.insert(0, output_header)
+    upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)
 
     return task_progress.update_task_state(extra_meta=current_step)
