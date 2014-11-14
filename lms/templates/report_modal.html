@@ -1,0 +1,157 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='static_content.html'/>
+<%! from django.conf import settings %>
+<%! from microsite_configuration import microsite %>
+<%! platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME) %>
+
+<div class="report-tab">
+  <a href="#report-modal" rel="leanModal" role="button">${_("Problem on Page?")}</a>
+</div>
+
+<section id="report-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Problem Reports").format(platform_name=platform_name)}">
+  <div class="inner-wrapper" id="report-form-wrapper">
+    <button class="close-modal "tabindex="0">
+      <i class="icon-remove"></i>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <header><h2>Report A Problem</h2><hr></header>
+
+    <form id="report-form" method="post" data-remote="true" action="/submit_feedback">
+      <p>${_("If you've found a problem on this page (e.g. an error), please let us know! For other questions, please check out the 'Help' tab.")}</p>
+      <hr>
+      <div id="report-error" class="modal-form-error" tabindex="-1"></div>
+% if not user.is_authenticated():
+      <label data-field="name" for="report-form-name">${_('Name')}*</label>
+      <input name="name" type="text" id="report-form-name" aria-required="true">
+      <label data-field="email" for="report-form-email">${_('E-mail')}*</label>
+      <input name="email" type="text" id="report-form-email" aria-required="true">
+% endif
+      <label data-field="subject" for="report-form-subject">${_('Brief description of the problem')}*</label>
+      <input name="subject" type="text" id="report-form-subject" aria-required="true">
+      <label data-field="details" for="report-form-details">${_('Details of the problem you are encountering')}*</label>
+      <textarea name="details" id="report-form-details" aria-required="true" placeholder="Include error messages, steps which lead to the issue, etc."></textarea>
+      <input name="issue_type" type="hidden" value="problem">
+      <input name="course_id" type="hidden" value="${course.id.to_deprecated_string() | h}">
+      <div class="submit">
+        <input name="submit" type="submit" value="${_('Submit Problem Report')}" id="report-submit">
+      </div>
+      <p>${_("Unfortunately, we won't be able to send personal replies for problem reports, but we'll look at them all, and try to make fixes as quickly as we can.")}</p>
+    </form>
+  </div>
+
+  <div class="inner-wrapper" id="report-success-wrapper" tabindex="0">
+    <button class="close-modal" tabindex="0">
+      <i class="icon-remove"></i>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <header>
+      <h2>${_('Thank You!')}</h2>
+      <hr>
+    </header>
+
+    <p>
+    ${_('Thank you for reporting your problem. We will look at it shortly and make fixes as quickly as we can. '
+	'In the meantime, please visit the discussion forum to see if others have encountered or solved your problem.')}
+    </p>
+  </div>
+</section>
+
+<script type="text/javascript">
+(function() {
+    var onModalClose = function() {
+            $("#report-modal .close-modal").off("click");
+            $("#lean_overlay").off("click");
+            $("#report-modal").attr("aria-hidden", "true");
+            $('area,input,select,textarea,button').removeAttr('tabindex');
+            $(".report-tab a").focus();
+        },
+        cycle_modal_tab = function(from_element_name, to_element_name) {
+            $(from_element_name).on('keydown', function(e) {
+                var keyCode = e.keyCode || e.which;
+                if (keyCode === 9) {
+                    e.preventDefault();
+                    $(to_element_name).focus();
+                }
+            });
+        };
+
+    $(".report-tab").click(function() {
+        $(".field-error").removeClass("field-error");
+        $("#report-form")[0].reset();
+        $("#report-form input[type='submit']").removeAttr("disabled");
+        $("#report-error").css("display", "none");
+        $("#report-success-wrapper").css("display", "none");
+        $("#report-modal").attr("aria-hidden", "false");
+        $("#report-modal .close-modal").click(onModalClose);
+        $("#lean_overlay").click(onModalClose);
+        $("#report-form-wrapper .close-modal").focus();
+    });
+    cycle_modal_tab("#report-submit", "#report-form-wrapper .close-modal");
+    cycle_modal_tab("#report-success-wrapper .close-modal", "#report-success-wrapper");
+    $("#report-modal").on("keydown", function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 27) {
+            e.preventDefault();
+            $("#report-form-wrapper .close-modal").click();
+        }
+    });
+    $("#report-form").submit(function() {
+        $("input[type='submit']", this).attr("disabled", "disabled");
+        $('area,input,select,textarea,button').attr('tabindex', -1);
+        $("#report-form-wrapper .close-modal").focus();
+    });
+    $("#report-form").on("ajax:complete", function() {
+        $("input[type='submit']", this).removeAttr("disabled");
+    });
+    $("#report-form").on("ajax:success", function(event, data, status, xhr) {
+        $("#report-form-wrapper").css("display", "none");
+        $("#report-success-wrapper").css("display", "block");
+        $("#report-success-wrapper").focus();
+    });
+    $("#report-form").on("ajax:error", function(event, xhr, status, error) {
+        $(".field-error").removeClass("field-error").removeAttr("aria-invalid");
+        var responseData;
+        try {
+            responseData = jQuery.parseJSON(xhr.responseText);
+        } catch(err) {
+        }
+        if (responseData) {
+            $("[data-field='"+responseData.field+"']").addClass("field-error").attr("aria-invalid", "true");
+            $("#report-error").html(responseData.error).stop().css("display", "block");
+        } else {
+            // If no data (or malformed data) is returned, a server error occurred
+            htmlStr = "${_('An error has occurred.')}";
+% if settings.FEEDBACK_SUBMISSION_EMAIL:
+            htmlStr += " " + _.template(
+              "${_('Please {link_start}send us e-mail{link_end}.')}",
+              {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'},
+              {interpolate: /\{(.+?)\}/g})
+% else:
+            // If no email is configured, we can't do much other than
+            // ask the user to try again later
+            htmlStr += " ${_('Please try again later.')}";
+% endif
+            $("#report-error").html(htmlStr).stop().css("display", "block");
+% if settings.FEEDBACK_SUBMISSION_EMAIL:
+            $("#feedback_email").click(function(e) {
+                mailto = "mailto:" + "${settings.FEEDBACK_SUBMISSION_EMAIL}" +
+                    "?subject=" + $("#report-form input[name='subject']").val() +
+                    "&body=" + $("#report-form textarea[name='details']").val();
+                window.open(mailto);
+                e.preventDefault();
+            });
+%endif
+        }
+        // Make change explicit to assistive technology
+        $("#report-error").focus();
+    });
+})(this)
+</script>
