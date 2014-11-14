@@ -374,7 +374,7 @@ def add_user_to_cohort(cohort, username_or_email):
     return (user, previous_cohort_name)
 
 
-def add_users_to_cohorts(course_key, cohorts_to_users):
+def add_users_to_cohorts(course_key, users_to_cohorts):
     """
     Within a particular course, put all specified users in specified
     cohorts, removing them from their current cohort if necessary.
@@ -382,17 +382,16 @@ def add_users_to_cohorts(course_key, cohorts_to_users):
     Arguments:
         course_id (course id): ID of the course in which to do the
             cohorting.
-        cohorts_to_users (dict): The keys of this dict are cohort
-            names and the values are usernames/emails of users to
-            place in those cohorts.
+        cohorts_to_users (dict): The keys of this dict are usernames/emails
+            and the values are names of cohorts in which to place the users.
     Returns:
         dict: Statistics regarding the cohorted users:
             {
                 "cohort_a": {
                     "valid": True,  # Boolean: cohort exists
-                    "added": 0,     # integer: users added
-                    "changed": 1,   # integer: users changed from prior cohort
-                    "present": 2,   # integer: users already in cohort
+                    "added": ["user a", ...],     # list: users added
+                    "changed": ["user b", ...],   # list: users changed from prior cohort
+                    "present": ["user c", ...],   # list: users already in cohort
                     "unknown": ["unknown_username", ...],  # list: unknown usernames/emails
                 },
                 "cohort_b": {
@@ -402,6 +401,13 @@ def add_users_to_cohorts(course_key, cohorts_to_users):
             }
     """
     cohort_status = {}
+
+    cohorts_to_users = {}
+    for username_or_email, cohort_name in users_to_cohorts.iteritems():
+        if cohorts_to_users.get(cohort_name):
+            cohorts_to_users[cohort_name].append(username_or_email)
+        else:
+            cohorts_to_users[cohort_name] = [username_or_email]
 
     for cohort_name, usernames_or_emails in cohorts_to_users.iteritems():
         try:

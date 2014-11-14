@@ -568,7 +568,7 @@ class TestCohorts(django.test.TestCase):
         _assert_ret_val_contains(
             cohorts.add_users_to_cohorts(
                 course.id,
-                {first_cohort.name: [user_1.username], second_cohort.name: [user_2.email]}
+                {user_1.username: first_cohort.name, user_2.email: second_cohort.name}
             ),
             {first_cohort.name: {"added": [user_1.username]}, second_cohort.name: {"added": [user_2.email]}})
 
@@ -576,7 +576,7 @@ class TestCohorts(django.test.TestCase):
         _assert_ret_val_contains(
             cohorts.add_users_to_cohorts(
                 course.id,
-                {first_cohort.name: [user_2.username], second_cohort.name: [user_1.email]}
+                {user_2.username: first_cohort.name, user_1.email: second_cohort.name}
             ),
             {first_cohort.name: {"changed": [user_2.username]}, second_cohort.name: {"changed": [user_1.email]}}
         )
@@ -585,7 +585,7 @@ class TestCohorts(django.test.TestCase):
         _assert_ret_val_contains(
             cohorts.add_users_to_cohorts(
                 course.id,
-                {first_cohort.name: [user_2.username], second_cohort.name: [user_1.email]}
+                {user_2.username: first_cohort.name, user_1.email: second_cohort.name}
             ),
             {first_cohort.name: {"present": [user_2.username]}, second_cohort.name: {"present": [user_1.email]}}
         )
@@ -594,7 +594,7 @@ class TestCohorts(django.test.TestCase):
         _assert_ret_val_contains(
             cohorts.add_users_to_cohorts(
                 course.id,
-                {"Non_existent_cohort_1": [user_2.username], "Non_existent_cohort_2": [user_1.email]}
+                {user_2.username: "Non_existent_cohort_1", user_1.email: "Non_existent_cohort_2"}
             ),
             {"Non_existent_cohort_1": {"valid": False}, "Non_existent_cohort_2": {"valid": False}}
         )
@@ -603,7 +603,7 @@ class TestCohorts(django.test.TestCase):
         _assert_ret_val_contains(
             cohorts.add_users_to_cohorts(
                 course.id,
-                {first_cohort.name: ["Non_existent_User_1"], second_cohort.name: ["Non_existent_User_2"]}
+                {"Non_existent_User_1": first_cohort.name, "Non_existent_User_2": second_cohort.name}
             ),
             {first_cohort.name: {"unknown": ["Non_existent_User_1"]}, second_cohort.name: {"unknown": ["Non_existent_User_2"]}}
         )
