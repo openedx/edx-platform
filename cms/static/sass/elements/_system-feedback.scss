@@ -656,7 +656,7 @@
       @extend %cont-text-sr;
     }
 
-    [class^="icon"] {
+    .icon {
       @extend %t-icon6;
       color: $white;
       width: auto;
@@ -763,7 +763,7 @@
     padding: ($baseline/2) ($baseline*0.75);
     color: $white;
 
-    [class^="icon-"] {
+    .icon {
       font-style: normal;
     }
 
@@ -785,7 +785,7 @@
     &.has-warnings {
       border-bottom: 3px solid $orange;
 
-      .icon-warning-sign {
+      .fa-warning {
         margin-right: ($baseline/2);
         color: $orange;
       }
@@ -794,7 +794,7 @@
     &.has-errors {
       border-bottom: 3px solid $red-l2;
 
-      .icon-exclamation-sign {
+      .fa-exclamation-circle {
         margin-right: ($baseline/2);
         color: $red-l2;
       }

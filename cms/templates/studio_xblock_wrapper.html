@@ -46,7 +46,7 @@ messages = json.dumps(xblock.validate().to_json())
         <div class="header-details">
             % if show_inline:
             <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
-                <i class="icon-caret-down ui-toggle-expansion"></i>
+                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
                 <span class="sr">${_('Expand or Collapse')}</span>
             </a>
             % endif
@@ -58,20 +58,20 @@ messages = json.dumps(xblock.validate().to_json())
                     % if not show_inline:
                         <li class="action-item action-edit">
                             <a href="#" class="edit-button action-button">
-                                <i class="icon-pencil"></i>
+                                <i class="icon fa fa-pencil"></i>
                                 <span class="action-button-text">${_("Edit")}</span>
                             </a>
                         </li>
                         <li class="action-item action-duplicate">
                             <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
-                            <i class="icon-copy"></i>
+                            <i class="icon fa fa-copy"></i>
                             <span class="sr">${_("Duplicate")}</span>
                             </a>
                         </li>
                     % endif
                     <li class="action-item action-delete">
                         <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
-                        <i class="icon-trash"></i>
+                        <i class="icon fa fa-trash-o"></i>
                         <span class="sr">${_("Delete")}</span>
                         </a>
                     </li>
@@ -94,7 +94,7 @@ messages = json.dumps(xblock.validate().to_json())
                     <a href="${xblock_url}" class="action-button">
                         ## Translators: this is a verb describing the action of viewing more details
                         <span class="action-button-text">${_('View')}</span>
-                        <i class="icon-arrow-right"></i>
+                        <i class="icon fa fa-arrow-right"></i>
                     </a>
                 </li>
             </ul>

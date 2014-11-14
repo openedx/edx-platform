@@ -61,7 +61,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 <div class="response-count"/>
                 <div class="add-response">
                     <button class="button add-response-btn">
-                        <i class="icon icon-reply"></i>
+                        <i class="icon fa fa-reply"></i>
                         <span class="add-response-btn-text">Add A Response</span>
                     </button>
                 </div>
@@ -81,8 +81,8 @@ browser and pasting the output.  When that file changes, this one should be rege
             </div>
         </div>
         <div class="post-tools">
-            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon icon-plus"/> Expand discussion</a>
-            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon icon-minus"/> Collapse discussion</a>
+            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon fa fa-plus"/> Expand discussion</a>
+            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon fa fa-minus"/> Collapse discussion</a>
         </div>
     </article>
 </script>
@@ -106,7 +106,7 @@ browser and pasting the output.  When that file changes, this one should be rege
     <div class="discussion-response"></div>
     <a href="#" class="action-show-comments">
         <%- interpolate('Show Comments (%(num_comments)s)', {num_comments: comments.length}, true) %>
-        <i class="icon icon-caret-down"></i>
+        <i class="icon fa fa-caret-down"></i>
     </a>
     <ol class="comments">
         <li class="new-comment">
@@ -143,7 +143,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 )%><% } %>
           </p>
           <div class="post-labels">
-              <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
+              <span class="post-label-reported"><i class="icon fa fa-flag"></i>Reported</span>
           </div>
           </div>
           <div class="response-header-actions">
@@ -200,7 +200,7 @@ browser and pasting the output.  When that file changes, this one should be rege
       )%>
     </p>
     <div class="post-labels">
-      <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
+      <span class="post-label-reported"><i class="icon fa fa-flag"></i>Reported</span>
     </div>
   </div>
 </script>
@@ -224,34 +224,34 @@ browser and pasting the output.  When that file changes, this one should be rege
         <%
         var icon_class, sr_text;
         if (thread_type == "discussion") {
-            icon_class = "icon-comments";
+            icon_class = "fa-comments";
             sr_text = "discussion";
         } else if (endorsed) {
-            icon_class = "icon-ok";
+            icon_class = "fa-check";
             sr_text = "answered question";
         } else {
-            icon_class = "icon-question";
+            icon_class = "fa-question";
             sr_text = "unanswered question";
         }
         %>
         <span class="sr"><%= sr_text %></span>
-        <i class="icon <%= icon_class %>"></i>
+        <i class="icon fa <%= icon_class %>"></i>
       </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title"><%- title %></span>
 
         <%
         var labels = "";
         if (pinned) {
-            labels += '<li class="post-label-pinned"><i class="icon icon-pushpin"></i>Pinned</li> ';
+            labels += '<li class="post-label-pinned"><i class="icon fa fa-thumb-tack"></i>Pinned</li> ';
         }
         if (typeof(subscribed) != "undefined" && subscribed) {
-            labels += '<li class="post-label-following"><i class="icon icon-star"></i>Following</li> ';
+            labels += '<li class="post-label-following"><i class="icon fa fa-star"></i>Following</li> ';
         }
         if (staff_authored) {
-            labels += '<li class="post-label-by-staff"><i class="icon icon-user"></i>By: Staff</li> ';
+            labels += '<li class="post-label-by-staff"><i class="icon fa fa-user"></i>By: Staff</li> ';
         }
         if (community_ta_authored) {
-            labels += '<li class="post-label-by-community-ta"><i class="icon icon-user"></i>By: Community TA</li> ';
+            labels += '<li class="post-label-by-community-ta"><i class="icon fa fa-user"></i>By: Community TA</li> ';
         }
         if (labels != "") {
             print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
@@ -307,7 +307,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         </div>
 
         <div class="search-alert-controls">
-          <a href="#" class="dismiss control control-dismiss"><i class="icon icon-remove"></i></a>
+          <a href="#" class="dismiss control control-dismiss"><i class="icon fa fa-remove"></i></a>
         </div>
     </div>
 </script>
@@ -344,7 +344,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <div class="post-options">
             <label class="post-option is-enabled">
                 <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
-                <i class="icon icon-star"></i>follow this post
+                <i class="icon fa fa-star"></i>follow this post
             </label>
             <% if (allow_anonymous) { %>
             <label class="post-option">
@@ -374,12 +374,12 @@ browser and pasting the output.  When that file changes, this one should be rege
             </span><fieldset class="field-input">
                 <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-question" value="question" checked>
                 <label for="<%= form_id %>-post-type-question" class="post-type-label">
-                    <i class="icon icon-question"></i>
+                    <i class="icon fa fa-question"></i>
                     "Question"
                 </label>
                 <input type="radio" name="<%= form_id %>-post-type" class="post-type-input" id="<%= form_id %>-post-type-discussion" value="discussion">
                 <label for="<%= form_id %>-post-type-discussion" class="post-type-label">
-                    <i class="icon icon-comments"></i>
+                    <i class="icon fa fa-comments"></i>
                     "Discussion"
                 </label>
             </fieldset>
@@ -434,7 +434,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-unchecked">Endorse</span>
                     <span class="label-checked">Unendorse</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-ok"></i></span>
+                <span class="action-icon"><i class="icon fa fa-check"></i></span>
             </a>
         </li>
     </script>
@@ -448,7 +448,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-unchecked">Mark as Answer</span>
                     <span class="label-checked">Unmark as Answer</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-ok"></i></span>
+                <span class="action-icon"><i class="icon fa fa-check"></i></span>
             </a>
         </li>
     </script>
@@ -462,7 +462,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-unchecked">Follow</span>
                     <span class="label-checked">Unfollow</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-star"></i></span>
+                <span class="action-icon"><i class="icon fa fa-star"></i></span>
             </a>
         </li>
     </script>
@@ -482,7 +482,7 @@ browser and pasting the output.  When that file changes, this one should be rege
             </span>
 
             <span class="action-icon" aria-hidden="true">
-                <i class="icon icon-plus"></i>
+                <i class="icon fa fa-plus"></i>
             </span>
         </a>
     </li>
@@ -500,7 +500,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-checked">Unreport</span>
                 </span>
                 <span class="action-icon">
-                  <i class="icon icon-flag"></i>
+                  <i class="icon fa fa-flag"></i>
                 </span>
             </a>
         </li>
@@ -516,7 +516,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-checked">Unpin</span>
                 </span>
                 <span class="action-icon">
-                  <i class="icon icon-pushpin"></i>
+                  <i class="icon fa fa-thumb-tack"></i>
                 </span>
             </a>
         </li>
@@ -532,7 +532,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-checked">Open</span>
                 </span>
                 <span class="action-icon">
-                  <i class="icon icon-lock"></i>
+                  <i class="icon fa fa-lock"></i>
                 </span>
             </a>
         </li>
@@ -546,7 +546,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-edit" role="button">
                 <span class="action-label">Edit</span>
-                <span class="action-icon"><i class="icon icon-pencil"></i></span>
+                <span class="action-icon"><i class="icon fa fa-pencil"></i></span>
             </a>
         </li>
     </script>
@@ -556,7 +556,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-delete" role="button">
                 <span class="action-label">Delete</span>
-                <span class="action-icon"><i class="icon icon-remove"></i></span>
+                <span class="action-icon"><i class="icon fa fa-remove"></i></span>
             </a>
         </li>
     </script>
@@ -569,7 +569,7 @@ browser and pasting the output.  When that file changes, this one should be rege
             <div class="more-wrapper">
                 <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-<%= contentId %>">
                     <span class="action-label">More</span>
-                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                    <span class="action-icon"><i class="icon fa fa-ellipsis-h"></i></span>
                 </a>
                 <div class="actions-dropdown" id="action-menu-<%= contentType %>" aria-expanded="false">
                   <ul class="actions-dropdown-list">

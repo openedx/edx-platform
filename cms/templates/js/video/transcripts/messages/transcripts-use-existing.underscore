@@ -1,5 +1,5 @@
 <div class="transcripts-message-status status-error">
-    <i class="icon-remove"></i>
+    <i class="icon fa fa-remove"></i>
     <%= gettext("Confirm Timed Transcript") %>
 </div>
 

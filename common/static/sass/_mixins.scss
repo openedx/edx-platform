@@ -347,7 +347,7 @@
     @extend %t-action3;
     margin-left: $baseline;
 
-    [class^="icon-"] {
+    .icon {
       margin-right: ($baseline/2);
     }
   }

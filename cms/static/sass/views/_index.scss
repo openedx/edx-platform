@@ -162,7 +162,7 @@
               right: ($baseline/2);
               opacity: 0.0;
 
-              [class^="icon-"] {
+              .icon {
                 @include border-top-radius(3px);
                 @extend %t-icon4;
                 display: inline-block;

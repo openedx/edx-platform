@@ -35,8 +35,8 @@ define([
         usageUnit: '.group-configuration-usage-unit',
         usageUnitAnchor: '.group-configuration-usage-unit a',
         usageUnitMessage: '.group-configuration-validation-message',
-        usageUnitWarningIcon: '.group-configuration-usage-unit i.icon-warning-sign',
-        usageUnitErrorIcon: '.group-configuration-usage-unit i.icon-exclamation-sign',
+        usageUnitWarningIcon: '.group-configuration-usage-unit i.fa-warning',
+        usageUnitErrorIcon: '.group-configuration-usage-unit i.fa-exclamation-circle',
         warningMessage: '.group-configuration-validation-text',
         warningIcon: '.wrapper-group-configuration-validation > i',
         note: '.wrapper-delete-button'

@@ -9,7 +9,7 @@
                 <h3 class="sr">${_("Page Actions")}</h3>
                 <ul>
                     <li class="nav-item">
-                        <a href="#" class="button new-button"><i class="icon-plus"></i> ${_("New Group Configuration")}</a>
+                        <a href="#" class="button new-button"><i class="icon fa fa-plus"></i> ${_("New Group Configuration")}</a>
                     </li>
                 </ul>
             </nav>
@@ -20,7 +20,7 @@
         <section class="content">
             <article class="content-primary" role="main">
                 <div class="ui-loading">
-                    <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
                 </div>
             </article>
             <aside class="content-supplementary" role="complementary"></aside>
