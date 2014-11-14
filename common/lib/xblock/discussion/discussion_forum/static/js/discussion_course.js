@@ -9,6 +9,7 @@ function DiscussionCourseBlock(runtime, element) {
     var hostname = testUrl.match(/^(.*:\/\/[a-z\-.]+)\//)[1];
     DiscussionUtil.setBaseUrl(hostname);
     DiscussionUtil.localUrls.push('user_profile');
+    DiscussionUtil.force_async = true;
     pushState = false
   }
 
