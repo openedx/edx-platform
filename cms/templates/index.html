@@ -129,15 +129,14 @@
                   <li class="field text required" id="field-organization">
                     <label for="new-library-org">${_("Organization")}</label>
                     <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" aria-required="true" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
-                    <span class="tip">${_("The name of the organization sponsoring the library.")}  <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
+                    <span class="tip">${_("The public organization name for your library.")} ${_("This cannot be changed.")}</span>
                     <span class="tip tip-error is-hiding"></span>
                   </li>
 
                   <li class="field text required" id="field-library-number">
-                    <label for="new-library-number">${_("Library Code/Number")}</label>
-                    ## Translators: This is an example for the "number" used to identify a library, seen when filling out the form to create a new library. This example is short for "Computer Science Problems". The example number may contain letters but must not contain spaces.
-                    <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" aria-required="true" placeholder="${_('e.g. CSPROB')}" />
-                    <span class="tip">${_("The unique code that identifies this library.")} <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
+                    <label for="new-library-number">${_("Major Version Number")}</label>
+                    <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" aria-required="true" value="1" />
+                    <span class="tip">${_("The {em_start}major version number{em_end} of your library. Minor revisions are tracked as edits happen within a library.").format(em_start='<strong>', em_end='</strong>')}</span>
                     <span class="tip tip-error is-hiding"></span>
                   </li>
                 </ol>
