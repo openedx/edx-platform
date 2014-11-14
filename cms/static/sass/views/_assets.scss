@@ -17,7 +17,7 @@
 
   .nav-actions {
 
-    .icon-cloud-upload {
+    .fa-cloud-upload {
       @extend %t-copy;
       vertical-align: bottom;
       margin-right: ($baseline/5);
@@ -36,7 +36,7 @@
       @extend %t-action3;
       @include margin-left($baseline);
 
-      [class^="icon-"] {
+      .icon {
         @include margin-right($baseline/2);
       }
     }
@@ -361,11 +361,11 @@
       }
 
       &.action-lock .lock-checkbox ~ .action-button {
-        .icon-lock {
+        .fa-lock {
           display: none;
         }
 
-        .icon-unlock-alt {
+        .fa-unlock-alt {
           display: inline-block;
         }
       }
@@ -374,11 +374,11 @@
         background-color: $gray;
         color: $white;
 
-        .icon-lock {
+        .fa-lock {
           display: inline-block;
         }
 
-       .icon-unlock-alt {
+       .fa-unlock-alt {
           display: none;
         }
       }
@@ -453,7 +453,7 @@
       background: none;
       padding: 0;
 
-      [class^="icon-"] {
+      .icon {
         @extend %t-action1;
       }
 

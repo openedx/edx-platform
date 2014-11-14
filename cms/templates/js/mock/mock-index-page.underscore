@@ -5,7 +5,7 @@
       <h3 class="sr">Page Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button new-button new-course-button"><i class="icon-plus icon-inline"></i>
+          <a href="#" class="button new-button new-course-button"><i class="icon fa fa-plus icon-inline"></i>
               New Course</a>
         </li>
       </ul>
@@ -106,7 +106,7 @@
                 <dl class="course-status">
                   <dt class="label sr">This re-run processing status:</dt>
                   <dd class="value">
-                    <i class="icon icon-refresh icon-spin"></i>
+                    <i class="icon fa fa-refresh icon-spin"></i>
                     <span class="copy">Configuring as re-run</span>
                   </dd>
                 </dl>
@@ -142,7 +142,7 @@
                 <dl class="course-status">
                   <dt class="label sr">This re-run processing status:</dt>
                   <dd class="value">
-                    <i class="icon icon-warning-sign"></i>
+                    <i class="icon fa fa-warning"></i>
                     <span class="copy">Configuration Error</span>
                   </dd>
                 </dl>
@@ -154,7 +154,7 @@
                 <ul  class="status-actions">
                   <li class="action action-dismiss">
                     <a href="#" class="button dismiss-button" data-dismiss-link="dummy_dismiss_url">
-                      <i class="icon icon-remove-sign"></i>
+                      <i class="icon fa fa-times-circle"></i>
                       <span class="button-copy">Dismiss</span>
                     </a>
                   </li>

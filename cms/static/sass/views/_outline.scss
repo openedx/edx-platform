@@ -575,7 +575,7 @@
       border-top: 1px solid $blue-l1;
       opacity: 0.0;
 
-      *[class^="icon-caret"] {
+      *[class^="fa-caret"] {
         @extend %t-icon5;
         position: absolute;
         top: -12px;

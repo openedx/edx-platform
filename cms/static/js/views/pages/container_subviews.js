@@ -218,8 +218,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             checkStaffLock: function(check) {
-                this.$('.action-staff-lock i').removeClass('icon-check icon-check-empty');
-                this.$('.action-staff-lock i').addClass(check ? 'icon-check' : 'icon-check-empty');
+                this.$('.action-staff-lock i').removeClass('fa-check-square-o fa-square-o');
+                this.$('.action-staff-lock i').addClass(check ? 'fa-check-square-o' : 'fa-square-o');
             }
         });
 

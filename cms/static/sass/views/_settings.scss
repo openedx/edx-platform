@@ -338,7 +338,7 @@
             @extend %t-action3;
             @extend %t-strong;
 
-            [class^="icon-"] {
+            .icon {
               @extend %t-icon5;
               display: inline-block;
               vertical-align: middle;

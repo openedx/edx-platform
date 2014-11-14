@@ -285,7 +285,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                 var template = _.template(
                     '<li class="list-settings-item">' +
                         '<input type="text" class="input" value="<%= ele %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
+                        '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon fa fa-remove-sign"></i><span class="sr">Remove</span></a>' +
                     '</li>'
                 );
                 list.append($(template({'ele': ele, 'index': index})));
@@ -452,7 +452,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                     '<li class="list-settings-item">' +
                         '<input type="text" class="input input-key" value="<%= key %>">' +
                         '<input type="text" class="input input-value" value="<%= value %>">' +
-                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
+                        '<a href="#" class="remove-action remove-setting" data-value="<%= value %>"><i class="icon fa fa-remove-sign"></i><span class="sr">Remove</span></a>' +
                     '</li>'
                 );
 
