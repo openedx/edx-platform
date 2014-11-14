@@ -70,10 +70,13 @@ def get_course_leaf_nodes(course_key):
     """
     nodes = []
     detached_categories = getattr(settings, 'PROGRESS_DETACHED_CATEGORIES', [])
-    verticals = get_modulestore().get_items(course_key,  qualifiers={'category': 'vertical'})
+    store = get_modulestore()
+    verticals = store.get_items(course_key,  qualifiers={'category': 'vertical'})
+    orphans = store.get_orphans(course_key)
     for vertical in verticals:
-        nodes.extend([unit for unit in vertical.children
-                      if getattr(unit, 'category') not in detached_categories])
+        if hasattr(vertical, 'children') and vertical.location not in orphans:
+            nodes.extend([unit for unit in vertical.children
+                          if getattr(unit, 'category') not in detached_categories])
     return nodes
 
 
