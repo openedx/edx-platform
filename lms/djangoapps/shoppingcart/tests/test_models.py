@@ -189,8 +189,9 @@ class OrderTest(ModuleStoreTestCase):
                 'total': '40',
                 'products': [
                     {
-                        'sku': u'CertificateItem-' + unicode(self.course_key) + u'-honor',
-                        'category': 'CertificateItem honor',
+                        'sku': u'CertificateItem.honor',
+                        'name': unicode(self.course_key),
+                        'category': unicode(self.course_key.org),
                         'price': '40',
                         'id': 1,
                         'quantity': 1
