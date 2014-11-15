@@ -10,6 +10,8 @@ from django.conf import settings
 from mako.template import Template as MakoTemplate
 
 
+discussion_js = sorted(rooted_glob(settings.COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+
 JS_URLS = [
     # VENDOR
     'js/vendor/URI.min.js',
@@ -27,18 +29,12 @@ JS_URLS = [
     'xblock/discussion/js/vendor/Markdown.Editor.js',
     'xblock/discussion/js/vendor/mathjax_delay_renderer.js',
     'xblock/discussion/js/vendor/customwmd.js',
-]
+] + discussion_js
 
 CSS_URLS = [
     'xblock/discussion/css/vendor/font-awesome.css',
     'sass/discussion-forum.css',
 ]
-
-main_js = u'coffee/src/discussion/main.js'
-all_js = set(rooted_glob(settings.COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
-all_js.remove(main_js)
-
-discussion_js = sorted(all_js) + [main_js]
 
 
 def load_resource(resource_path):
@@ -127,22 +123,12 @@ def load_scenarios_from_path(scenarios_path):
     return get_scenarios_from_path(scenarios_path, include_identifier=True)
 
 
-def get_js_urls():
-    """ Returns a list of all additional javascript files """
-    return [asset_to_static_url(path) for path in JS_URLS + discussion_js]
-
-
-def get_css_urls():
-    """ Returns a list of all additional css files """
-    return [asset_to_static_url(path) for path in CSS_URLS]
-
-
 def add_resources_to_fragment(fragment):
     # order is important : code in discussion_thread_list_view -> updateSidebar depends on the
     # fact that html is properly styled as it does height calculations.
     for url in CSS_URLS:
         fragment.add_css_url(asset_to_static_url(url))
-    for url in JS_URLS + discussion_js:
+    for url in JS_URLS:
         fragment.add_javascript_url(asset_to_static_url(url))
 
 
