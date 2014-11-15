@@ -127,6 +127,6 @@ class VideoEventProcessor(object):
 
         context = event['context']
 
-        if 'browser_page' in context:
-            page, _sep, _tail = context.pop('browser_page').rpartition('/')
+        if 'open_in_browser_url' in context:
+            page, _sep, _tail = context.pop('open_in_browser_url').rpartition('/')
             event['page'] = page
