@@ -46,7 +46,7 @@ def get_enrollments(student_id):
     in the the course.
 
     Args:
-        student_id (str): The ID of the student we want to retrieve course enrollment information for.
+        student_id (str): The username of the student we want to retrieve course enrollment information for.
 
     Returns:
         A list of enrollment information for the given student.
@@ -354,11 +354,18 @@ def _validate_course_mode(course_id, mode):
     """
     course_enrollment_info = _data_api().get_course_enrollment_info(course_id)
     course_modes = course_enrollment_info["course_modes"]
-    if mode not in (mode['slug'] for mode in course_modes):
-        msg = u"Specified course mode unavailable for course {course_id}".format(course_id=course_id)
+    available_modes = [m['slug'] for m in course_modes]
+    if mode not in available_modes:
+        msg = (
+            u"Specified course mode '{mode}' unavailable for course {course_id}.  "
+            u"Available modes were: {available}"
+        ).format(
+            mode=mode,
+            course_id=course_id,
+            available=", ".join(available_modes)
+        )
         log.warn(msg)
-        error = CourseModeNotFoundError(msg, course_enrollment_info)
-        raise error
+        raise CourseModeNotFoundError(msg, course_enrollment_info)
 
 
 def _data_api():
@@ -374,4 +381,5 @@ def _data_api():
     try:
         return importlib.import_module(api_path)
     except (ImportError, ValueError):
+        log.exception(u"Could not load module at '{path}'".format(path=api_path))
         raise EnrollmentApiLoadError(api_path)
