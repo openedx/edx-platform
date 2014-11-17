@@ -407,25 +407,13 @@ class Order(models.Model):
         """
         event_name = 'Completed Order'  # Required event name by Segment
         try:
-            products = []
-            for item in orderitems:
-                mode = item.mode if hasattr(item, 'mode') else ''
-                item = {
-                    'id': item.id,
-                    'sku': item.sku,
-                    'price': str(item.unit_cost),
-                    'quantity': item.qty,
-                    'category': '{type} {mode}'.format(type=type(item).__name__, mode=mode)
-                }
-                products.append(item)
-
             if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
                 tracking_context = tracker.get_tracker().resolve_context()
                 analytics.track(self.user.id, event_name, {  # pylint: disable=E1101
                     'orderId': self.id,  # pylint: disable=E1101
                     'total': str(self.total_cost),
                     'currency': self.currency,
-                    'products': products
+                    'products': [item.analytics_data() for item in orderitems]
                 }, context={
                     'Google Analytics': {
                         'clientId': tracking_context.get('client_id')
@@ -594,14 +582,25 @@ class OrderItem(TimeStampedModel):
         """
         return ''
 
-    @property
-    def sku(self):
-        """Generate a SKU that uniquely defines the OrderItem
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
 
-        Uses properties of the OrderItem to distinguish it from other types of items.
+        The default implementation returns defaults for most attributes. When no name or
+        category is specified by the implementation, the string 'N/A' is placed for the
+        name and category.  This should be handled appropriately by all implementations.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
 
         """
-        return type(self).__name__
+        return {
+            'id': self.id,  # pylint: disable=E1101
+            'sku': type(self).__name__,
+            'name': 'N/A',
+            'price': str(self.unit_cost),
+            'quantity': self.qty,
+            'category': 'N/A',
+        }
 
 
 class Invoice(models.Model):
@@ -934,20 +933,24 @@ class PaidCourseRegistration(OrderItem):
         except PaidCourseRegistrationAnnotation.DoesNotExist:
             return u""
 
-    @property
-    def sku(self):
-        """Generate a SKU that uniquely defines the OrderItem
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
 
-        Uses properties of the OrderItem to distinguish it from other types of items. The
-        associated course ID and SKU will be added to the SKU if available.
+        If the Order Item is associated with a course, additional fields will be populated with
+        course information. If there is a mode associated, the mode data is included in the SKU.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
 
         """
-        sku = type(self).__name__
+        data = super(PaidCourseRegistration, self).analytics_data()
+        sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            sku = sku + u'-' + unicode(self.course_id)
+            data['name'] = unicode(self.course_id)
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=E1101
         if self.mode:
-            sku = sku + u'-' + unicode(self.mode)
-        return sku
+            data['sku'] = sku + u'.' + unicode(self.mode)
+        return data
 
 
 class CourseRegCodeItem(OrderItem):
@@ -1070,20 +1073,24 @@ class CourseRegCodeItem(OrderItem):
         except CourseRegCodeItemAnnotation.DoesNotExist:
             return u""
 
-    @property
-    def sku(self):
-        """Generate a SKU that uniquely defines the OrderItem
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
 
-        Uses properties of the OrderItem to distinguish it from other types of items. The associated
-        course and mode will be added to the SKU if available.
+        If the OrderItem is associated with a course, additional fields will be populated with
+        course information. If a mode is available, it will be included in the SKU.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
 
         """
-        sku = type(self).__name__
+        data = super(CourseRegCodeItem, self).analytics_data()
+        sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            sku = sku + u'-' + unicode(self.course_id)
+            data['name'] = unicode(self.course_id)
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=E1101
         if self.mode:
-            sku = sku + u'-' + unicode(self.mode)
-        return sku
+            data['sku'] = sku + u'.' + unicode(self.mode)
+        return data
 
 
 class CourseRegCodeItemAnnotation(models.Model):
@@ -1306,20 +1313,24 @@ class CertificateItem(OrderItem):
                 status='purchased',
                 unit_cost__gt=(CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd')))).count()
 
-    @property
-    def sku(self):
-        """Generate a SKU that uniquely defines the OrderItem
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
 
-        Uses properties of the OrderItem to distinguish it from other types of items. A certificate
-        mode will be added to the SKU, as well as the associated course.
+        If the CertificateItem is associated with a course, additional fields will be populated with
+        course information. If there is a mode associated with the certificate, it is included in the SKU.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
 
         """
-        sku = type(self).__name__
+        data = super(CertificateItem, self).analytics_data()
+        sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
-            sku = sku + u'-' + unicode(self.course_id)
+            data['name'] = unicode(self.course_id)
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=E1101
         if self.mode:
-            sku = sku + u'-' + unicode(self.mode)
-        return sku
+            data['sku'] = sku + u'.' + unicode(self.mode)
+        return data
 
 
 class DonationConfiguration(ConfigurationModel):
@@ -1469,15 +1480,23 @@ class Donation(OrderItem):
             'receipt_has_donation_item': True,
         }
 
-    @property
-    def sku(self):
-        """Generate a SKU that uniquely defines the Donation type.
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
 
-        Uses properties of the OrderItem to distinguish it from other types of items. Donations
-        may be bound to a course, which will be added to the SKU if available.
+        If the donation is associated with a course, additional fields will be populated with
+        course information. When no name or category is specified by the implementation, the
+        platform name is used as a default value for required event fields, to declare that
+        the Order is specific to the platform, rather than a specific product name or category.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
 
         """
-        sku = type(self).__name__
+        data = super(Donation, self).analytics_data()
         if self.course_id != CourseKeyField.Empty:
-            sku = sku + u'-' + unicode(self.course_id)
-        return sku
+            data['name'] = unicode(self.course_id)
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=E1101
+        else:
+            data['name'] = settings.PLATFORM_NAME
+            data['category'] = settings.PLATFORM_NAME
+        return data
