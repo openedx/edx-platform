@@ -27,6 +27,8 @@ class LoginEnrollmentTestCase(TestCase):
     Provides support for user creation,
     activation, login, and course enrollment.
     """
+    user = None
+
     def setup_user(self):
         """
         Create a user account, activate, and log in.
