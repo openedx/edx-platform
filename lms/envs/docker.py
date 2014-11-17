@@ -12,5 +12,7 @@ LMS_BASE = os.environ.get("EDX_LMS_BASE", "")
 CMS_BASE = os.environ.get("EDX_CMS_BASE", "")
 FEATURES.update(PREVIEW_LMS_BASE=os.environ.get("EDX_PREVIEW_LMS_BASE", ""))
 
+SITE_NAME = LMS_BASE
+
 # Allows putting Intercom env variables passed from Docker into templates
 TEMPLATE_CONTEXT_PROCESSORS += ('appsembler.context_processors.intercom',)
