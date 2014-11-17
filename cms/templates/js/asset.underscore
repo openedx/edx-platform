@@ -22,7 +22,7 @@
 <td class="actions-col">
     <ul class="actions-list">
         <li class="action-item action-delete">
-            <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon-clock-os-circle"></i> <span class="sr"><%= gettext('Delete this asset') %></span></a>
+            <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon-times-circle"></i> <span class="sr"><%= gettext('Delete this asset') %></span></a>
         </li>
         <li class="action-item action-lock">
             <label for="<%= uniqueId %>"><span class="sr"><%= gettext('Lock this asset') %></span></label>
