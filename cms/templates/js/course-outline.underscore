@@ -100,7 +100,7 @@ if (xblockInfo.get('graded')) {
                     <span class="sr status-release-label"><%= gettext('Release Status:') %></span>
                     <span class="status-release-value">
                         <% if (xblockInfo.get('released_to_students')) { %>
-                            <i class="icon icon-square-o-square"></i>
+                            <i class="icon icon-check-square-o"></i>
                             <%= gettext('Released:') %>
                         <% } else if (xblockInfo.get('release_date')) { %>
                             <i class="icon icon-clock-o"></i>
