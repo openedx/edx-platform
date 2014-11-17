@@ -14,6 +14,7 @@ from xmodule.modulestore.xml import XMLModuleStore
 
 log = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     """
     Pull a git repo and import into the mongo based content database.

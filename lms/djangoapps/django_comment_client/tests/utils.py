@@ -9,6 +9,7 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class CohortedContentTestCase(ModuleStoreTestCase):
     """

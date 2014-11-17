@@ -20,7 +20,6 @@ import re
 from uuid import uuid4
 
 from bson.son import SON
-from contracts import contract, new_contract
 from datetime import datetime
 from fs.osfs import OSFS
 from mongodb_proxy import MongoProxy, autoretry_read
@@ -437,6 +436,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
     """
     A Mongodb backed ModuleStore
     """
+
+    # If no name is specified for the asset metadata collection, this name is used.
+    DEFAULT_ASSET_COLLECTION_NAME = 'assetstore'
+
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
     # pylint: disable=W0201
@@ -475,9 +478,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             self.collection = self.database[collection]
 
             # Collection which stores asset metadata.
-            self.asset_collection = None
-            if asset_collection is not None:
-                self.asset_collection = self.database[asset_collection]
+            if asset_collection is None:
+                asset_collection = self.DEFAULT_ASSET_COLLECTION_NAME
+            self.asset_collection = self.database[asset_collection]
 
             if user is not None and password is not None:
                 self.database.authenticate(user, password)
@@ -1237,10 +1240,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             # update subtree edited info for ancestors
             # don't update the subtree info for descendants of the publish root for efficiency
-            if (
-                (not isPublish or (isPublish and is_publish_root)) and
-                not self._is_in_bulk_operation(xblock.location.course_key)
-            ):
+            if not isPublish or (isPublish and is_publish_root):
                 ancestor_payload = {
                     'edit_info.subtree_edited_on': now,
                     'edit_info.subtree_edited_by': user_id
@@ -1469,9 +1469,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns:
             Asset info for the course
         """
-        if self.asset_collection is None:
-            return None
-
         # Using the course_key, find or insert the course asset metadata document.
         # A single document exists per course to store the course asset metadata.
         course_key = self.fill_in_run(course_key)
@@ -1497,9 +1494,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns:
             True if info save was successful, else False
         """
-        if self.asset_collection is None:
-            return False
-
         course_assets, asset_idx = self._find_course_asset(asset_metadata.asset_id)
         all_assets = SortedListWithKey([], key=itemgetter('filename'))
         # Assets should be pre-sorted, so add them efficiently without sorting.
@@ -1508,7 +1502,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         asset_metadata.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
 
         # Translate metadata to Mongo format.
-        metadata_to_insert = asset_metadata.to_mongo()
+        metadata_to_insert = asset_metadata.to_storable()
         if asset_idx is None:
             # Add new metadata sorted into the list.
             all_assets.add(metadata_to_insert)
@@ -1556,9 +1550,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ItemNotFoundError if no such item exists
             AttributeError is attr is one of the build in attrs.
         """
-        if self.asset_collection is None:
-            return
-
         course_assets, asset_idx = self._find_course_asset(asset_key)
         if asset_idx is None:
             raise ItemNotFoundError(asset_key)
@@ -1566,11 +1557,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Form an AssetMetadata.
         all_assets = course_assets[asset_key.block_type]
         md = AssetMetadata(asset_key, asset_key.path)
-        md.from_mongo(all_assets[asset_idx])
+        md.from_storable(all_assets[asset_idx])
         md.update(attr_dict)
 
         # Generate a Mongo doc from the metadata and update the course asset info.
-        all_assets[asset_idx] = md.to_mongo()
+        all_assets[asset_idx] = md.to_storable()
 
         self.asset_collection.update({'_id': course_assets['_id']}, {"$set": {asset_key.block_type: all_assets}})
 
@@ -1585,9 +1576,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Returns:
             Number of asset metadata entries deleted (0 or 1)
         """
-        if self.asset_collection is None:
-            return 0
-
         course_assets, asset_idx = self._find_course_asset(asset_key)
         if asset_idx is None:
             return 0
@@ -1611,9 +1599,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Arguments:
             course_key (CourseKey): course_identifier
         """
-        if self.asset_collection is None:
-            return
-
         # Using the course_id, find the course asset metadata document.
         # A single document exists per course to store the course asset metadata.
         course_assets = self._find_course_assets(course_key)

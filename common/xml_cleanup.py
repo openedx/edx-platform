@@ -86,7 +86,6 @@ def cleanup(filepath, remove_meta):
                 if attr in attrs:
                     del attrs[attr]
 
-
     with open(filepath, "w") as f:
         f.write(etree.tostring(xml))
 

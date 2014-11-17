@@ -12,7 +12,8 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
-    MODULESTORE_SETUPS, MongoContentstoreBuilder, XmlModulestoreBuilder, MixedModulestoreBuilder, MongoModulestoreBuilder
+    MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS, MongoContentstoreBuilder,
+    XmlModulestoreBuilder, MixedModulestoreBuilder, MongoModulestoreBuilder
 )
 
 
@@ -46,11 +47,13 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         """
         Make a single test asset metadata.
         """
+        now = datetime.now(pytz.utc)
         return AssetMetadata(
             asset_loc, internal_name='EKMND332DDBK',
             basename='pictures/historical', contenttype='image/jpeg',
             locked=False, fields={'md5': '77631ca4f0e08419b70726a447333ab6'},
-            edited_by=ModuleStoreEnum.UserID.test, edited_on=datetime.now(pytz.utc),
+            edited_by=ModuleStoreEnum.UserID.test, edited_on=now,
+            created_by=ModuleStoreEnum.UserID.test, created_on=now,
             curr_version='v1.0', prev_version='v0.95'
         )
 
@@ -65,17 +68,23 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         """
         Setup assets. Save in store if given
         """
-        asset_fields = ('filename', 'internal_name', 'basename', 'locked', 'edited_by', 'edited_on', 'curr_version', 'prev_version')
+        asset_fields = (
+            'filename', 'internal_name', 'basename', 'locked',
+            'edited_by', 'edited_on', 'created_by', 'created_on',
+            'curr_version', 'prev_version'
+        )
+        now = datetime.now(pytz.utc)
+        user_id = ModuleStoreEnum.UserID.test
         all_asset_data = (
-            ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, ModuleStoreEnum.UserID.test, datetime.now(pytz.utc), '14', '13'),
-            ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, ModuleStoreEnum.UserID.test, datetime.now(pytz.utc), '1', None),
-            ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, ModuleStoreEnum.UserID.test * 2, datetime.now(pytz.utc), 'AB', 'AA'),
-            ('dog.png', 'PUPY4242X', 'pictures/animals', True, ModuleStoreEnum.UserID.test * 3, datetime.now(pytz.utc), '5', '4'),
-            ('not_here.txt', 'JJJCCC747', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49'),
-            ('asset.txt', 'JJJCCC747858', '/dev/null', False, ModuleStoreEnum.UserID.test * 4, datetime.now(pytz.utc), '50', '49'),
-            ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, ModuleStoreEnum.UserID.test * 7, datetime.now(pytz.utc), '1.1', '1.01'),
-            ('weather_patterns.bmp', '928SJXX2EB', 'science', False, ModuleStoreEnum.UserID.test * 8, datetime.now(pytz.utc), '52', '51'),
-            ('demo.swf', 'DFDFGGGG14', 'demos/easy', False, ModuleStoreEnum.UserID.test * 9, datetime.now(pytz.utc), '5', '4'),
+            ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, user_id, now, user_id, now, '14', '13'),
+            ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, user_id, now, user_id, now, '1', None),
+            ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, user_id * 2, now, user_id * 2, now, 'AB', 'AA'),
+            ('dog.png', 'PUPY4242X', 'pictures/animals', True, user_id * 3, now, user_id * 3, now, '5', '4'),
+            ('not_here.txt', 'JJJCCC747', '/dev/null', False, user_id * 4, now, user_id * 4, now, '50', '49'),
+            ('asset.txt', 'JJJCCC747858', '/dev/null', False, user_id * 4, now, user_id * 4, now, '50', '49'),
+            ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, user_id * 7, now, user_id * 7, now, '1.1', '1.01'),
+            ('weather_patterns.bmp', '928SJXX2EB', 'science', False, user_id * 8, now, user_id * 8, now, '52', '51'),
+            ('demo.swf', 'DFDFGGGG14', 'demos/easy', False, user_id * 9, now, user_id * 9, now, '5', '4'),
         )
 
         for i, asset in enumerate(all_asset_data):
@@ -203,6 +212,8 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
 
     DISALLOWED_ATTRS = (
         ('asset_id', 'IAmBogus'),
+        ('created_by', 'Smith'),
+        ('created_on', datetime.now(pytz.utc)),
     )
 
     UNKNOWN_ATTRS = (
@@ -330,8 +341,6 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         Save multiple metadata in each store and retrieve it singularly, as all assets, and after deleting all.
         """
         # Temporarily only perform this test for Old Mongo - not Split.
-        if not isinstance(storebuilder, MongoModulestoreBuilder):
-            raise unittest.SkipTest
         with MongoContentstoreBuilder().build() as contentstore:
             with storebuilder.build(contentstore) as store:
                 course1 = CourseFactory.create(modulestore=store)
@@ -416,9 +425,9 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 store.get_all_asset_metadata(course_key, 'asset')
 
     @ddt.data(*MODULESTORE_SETUPS)
-    def test_copy_all_assets(self, storebuilder):
+    def test_copy_all_assets_same_modulestore(self, storebuilder):
         """
-        Create a course with assets and such, copy it all to another course, and check on it.
+        Create a course with assets, copy them all to another course in the same modulestore, and check on it.
         """
         with MongoContentstoreBuilder().build() as contentstore:
             with storebuilder.build(contentstore) as store:
@@ -430,6 +439,33 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 101)
                 self.assertEquals(len(store.get_all_asset_metadata(course1.id, 'asset')), 2)
                 all_assets = store.get_all_asset_metadata(
+                    course2.id, 'asset', sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
+                )
+                self.assertEquals(len(all_assets), 2)
+                self.assertEquals(all_assets[0].asset_id.path, 'pic1.jpg')
+                self.assertEquals(all_assets[1].asset_id.path, 'shout.ogg')
+
+    @ddt.data(
+        ('mongo', 'split'),
+        ('split', 'mongo'),
+    )
+    @ddt.unpack
+    def test_copy_all_assets_cross_modulestore(self, from_store, to_store):
+        """
+        Create a course with assets, copy them all to another course in a different modulestore, and check on it.
+        """
+        mixed_builder = MIXED_MODULESTORE_BOTH_SETUP
+        with MongoContentstoreBuilder().build() as contentstore:
+            with mixed_builder.build(contentstore) as mixed_store:
+                with mixed_store.default_store(from_store):
+                    course1 = CourseFactory.create(modulestore=mixed_store)
+                with mixed_store.default_store(to_store):
+                    course2 = CourseFactory.create(modulestore=mixed_store)
+                self.setup_assets(course1.id, None, mixed_store)
+                self.assertEquals(len(mixed_store.get_all_asset_metadata(course1.id, 'asset')), 2)
+                self.assertEquals(len(mixed_store.get_all_asset_metadata(course2.id, 'asset')), 0)
+                mixed_store.copy_all_asset_metadata(course1.id, course2.id, ModuleStoreEnum.UserID.test * 102)
+                all_assets = mixed_store.get_all_asset_metadata(
                     course2.id, 'asset', sort=('displayname', ModuleStoreEnum.SortOrder.ascending)
                 )
                 self.assertEquals(len(all_assets), 2)

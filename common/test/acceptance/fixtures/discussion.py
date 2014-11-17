@@ -42,6 +42,7 @@ class Thread(ContentFactory):
     pinned = False
     read = False
 
+
 class Comment(ContentFactory):
     thread_id = None
     depth = 0

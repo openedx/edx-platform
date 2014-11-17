@@ -142,6 +142,7 @@ class CapaFactory(object):
 
         return module
 
+
 class CapaFactoryWithFiles(CapaFactory):
     """
     A factory for creating a Capa problem with files attached.
@@ -1393,7 +1394,6 @@ class CapaModuleTest(unittest.TestCase):
         """
         Run the test for each possible rerandomize value
         """
-
 
         def _reset_and_get_seed(module):
             """

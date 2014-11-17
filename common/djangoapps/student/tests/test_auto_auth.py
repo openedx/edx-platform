@@ -11,6 +11,7 @@ from opaque_keys.edx.locator import CourseLocator
 from mock import patch
 import ddt
 
+
 @ddt.ddt
 class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
     """

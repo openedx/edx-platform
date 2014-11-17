@@ -336,7 +336,7 @@ class ModuleStoreAssetInterface(object):
         info = asset_key.block_type
         mdata = AssetMetadata(asset_key, asset_key.path, **kwargs)
         all_assets = course_assets[info]
-        mdata.from_mongo(all_assets[asset_idx])
+        mdata.from_storable(all_assets[asset_idx])
         return mdata
 
     @contract(course_key='CourseKey', start='int | None', maxresults='int | None', sort='tuple(str,(int,>=1,<=2))|None',)
@@ -364,15 +364,15 @@ class ModuleStoreAssetInterface(object):
             return None
 
         # Determine the proper sort - with defaults of ('displayname', SortOrder.ascending).
-        sort_field = 'filename'
+        key_func = itemgetter('filename')
         sort_order = ModuleStoreEnum.SortOrder.ascending
         if sort:
             if sort[0] == 'uploadDate':
-                sort_field = 'edited_on'
+                key_func = lambda x: x['edit_info']['edited_on']
             if sort[1] == ModuleStoreEnum.SortOrder.descending:
                 sort_order = ModuleStoreEnum.SortOrder.descending
 
-        all_assets = SortedListWithKey(course_assets.get(asset_type, []), key=itemgetter(sort_field))
+        all_assets = SortedListWithKey(course_assets.get(asset_type, []), key=key_func)
         num_assets = len(all_assets)
 
         start_idx = start
@@ -392,7 +392,7 @@ class ModuleStoreAssetInterface(object):
         for idx in xrange(start_idx, end_idx, step_incr):
             raw_asset = all_assets[idx]
             new_asset = AssetMetadata(course_key.make_asset_key(asset_type, raw_asset['filename']))
-            new_asset.from_mongo(raw_asset)
+            new_asset.from_storable(raw_asset)
             ret_assets.append(new_asset)
         return ret_assets
 

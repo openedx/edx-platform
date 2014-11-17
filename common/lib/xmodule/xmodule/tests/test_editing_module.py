@@ -65,4 +65,3 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         """"test get_context"""
         rendered_context = self.descriptor.get_context()
         self.assertListEqual(rendered_context['tabs'], self.tabs)
-

@@ -110,7 +110,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
     if page is not None:
         viewer_params += '&amp;page={}'.format(page)
 
-    if request.GET.get('viewer','') == 'true':
+    if request.GET.get('viewer', '') == 'true':
         template = 'pdf_viewer.html'
     else:
         template = 'static_pdfbook.html'
@@ -129,6 +129,7 @@ def pdf_index(request, course_id, book_index, chapter=None, page=None):
             'current_url': current_url,
         },
     )
+
 
 @login_required
 def html_index(request, course_id, book_index, chapter=None):

@@ -79,7 +79,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         ''' Check if the progress tab is active in the tab set '''
         for line in response.content.split('\n'):
             if tabname in line and 'active' in line:
-                raise AssertionError("assertTabInactive failed: "+tabname+" active")
+                raise AssertionError("assertTabInactive failed: " + tabname + " active")
         return
 
     def test_chrome_settings(self):

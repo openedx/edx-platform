@@ -140,6 +140,7 @@ def answer_distributions(course_key):
 
     return answer_counts
 
+
 @transaction.commit_manually
 def grade(student, request, course, keep_raw_scores=False):
     """

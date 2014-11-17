@@ -3,7 +3,7 @@
 # pylint: disable=C0111
 
 from lettuce import world, step
-from nose.tools import assert_true # pylint: disable=E0611
+from nose.tools import assert_true  # pylint: disable=E0611
 from video_editor import RequestHandlerWithSessionId, success_upload_file
 
 

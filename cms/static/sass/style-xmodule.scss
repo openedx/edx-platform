@@ -18,7 +18,7 @@
 
 // base - assets
 @import 'assets/fonts';
-@import 'assets/graphics'; // sprites, basic img/figure/svg styling
+@import 'assets/graphics'; // sprites, basic image/figure/svg styling
 @import 'assets/anims'; // animations
 
 // base - starter
@@ -29,6 +29,9 @@
 @import 'elements/icons'; // references to icons used
 @import 'elements/controls'; // buttons, link styles, sliders, etc.
 @import 'elements/navigation'; // all archetypes of navigation
+
+// base - views
+@import 'views/video-upload';
 
 // xmodule
 @import 'xmodule/modules/css/module-styles.scss';

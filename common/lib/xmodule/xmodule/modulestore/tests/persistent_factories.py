@@ -8,6 +8,7 @@ from opaque_keys.edx.keys import UsageKey
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232, C0111
 
+
 class SplitFactory(factory.Factory):
     """
     Abstracted superclass which defines modulestore so that there's no dependency on django

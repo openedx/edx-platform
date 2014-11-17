@@ -91,11 +91,7 @@ def instructor_dashboard_2(request, course_id):
     if course_mode_has_price:
         sections.append(_section_e_commerce(course, access))
 
-    enrollment_count = sections[0]['enrollment_count']['total']
-    disable_buttons = False
-    max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    if max_enrollment_for_buttons is not None:
-        disable_buttons = enrollment_count > max_enrollment_for_buttons
+    disable_buttons = not _is_small_course(course_key)
 
     analytics_dashboard_message = None
     if settings.ANALYTICS_DASHBOARD_URL:
@@ -217,11 +213,18 @@ def _section_course_info(course, access):
         'access': access,
         'course_id': course_key,
         'course_display_name': course.display_name,
-        'enrollment_count': CourseEnrollment.enrollment_counts(course_key),
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
+
+    if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
+        section_data['enrollment_count'] = CourseEnrollment.enrollment_counts(course_key)
+
+    if settings.ANALYTICS_DASHBOARD_URL:
+        dashboard_link = _get_dashboard_link(course_key)
+        message = _("Enrollment data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
+        section_data['enrollment_message'] = message
 
     try:
         advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
@@ -259,14 +262,20 @@ def _section_membership(course, access):
     return section_data
 
 
-def _section_student_admin(course, access):
-    """ Provide data for the corresponding dashboard section """
-    course_key = course.id
+def _is_small_course(course_key):
+    """ Compares against MAX_ENROLLMENT_INSTR_BUTTONS to determine if course enrollment is considered small. """
     is_small_course = False
     enrollment_count = CourseEnrollment.num_enrolled_in(course_key)
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
         is_small_course = enrollment_count <= max_enrollment_for_buttons
+    return is_small_course
+
+
+def _section_student_admin(course, access):
+    """ Provide data for the corresponding dashboard section """
+    course_key = course.id
+    is_small_course = _is_small_course(course_key)
 
     section_data = {
         'section_key': 'student_admin',
@@ -354,6 +363,14 @@ def _section_send_email(course, access):
     return section_data
 
 
+def _get_dashboard_link(course_key):
+    """ Construct a URL to the external analytics dashboard """
+    analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+    link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
+                                                              settings.ANALYTICS_DASHBOARD_NAME)
+    return link
+
+
 def _section_analytics(course, access):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
@@ -366,10 +383,7 @@ def _section_analytics(course, access):
     }
 
     if settings.ANALYTICS_DASHBOARD_URL:
-        # Construct a URL to the external analytics dashboard
-        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-        dashboard_link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
-                                                                            settings.ANALYTICS_DASHBOARD_NAME)
+        dashboard_link = _get_dashboard_link(course_key)
         message = _("Demographic data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
         section_data['demographic_message'] = message
 

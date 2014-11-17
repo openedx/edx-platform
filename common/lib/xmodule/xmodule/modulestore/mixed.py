@@ -391,11 +391,21 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             source_course_key (CourseKey): identifier of course to copy from
             dest_course_key (CourseKey): identifier of course to copy to
         """
-        # When implementing this in https://openedx.atlassian.net/browse/PLAT-78 , consider this:
-        #  Check the modulestores of both the source and dest course_keys. If in different modulestores,
-        #  export all asset data from one modulestore and import it into the dest one.
-        store = self._get_modulestore_for_courseid(source_course_key)
-        return store.copy_all_asset_metadata(source_course_key, dest_course_key, user_id)
+        source_store = self._get_modulestore_for_courseid(source_course_key)
+        dest_store = self._get_modulestore_for_courseid(dest_course_key)
+        if source_store != dest_store:
+            with self.bulk_operations(dest_course_key):
+                # Get all the asset metadata in the source course.
+                all_assets = source_store.get_all_asset_metadata(source_course_key, 'asset')
+                # Store it all in the dest course.
+                for asset in all_assets:
+                    new_asset_key = dest_course_key.make_asset_key('asset', asset.asset_id.path)
+                    copied_asset = AssetMetadata(new_asset_key)
+                    copied_asset.from_storable(asset.to_storable())
+                    dest_store.save_asset_metadata(copied_asset, user_id)
+        else:
+            # Courses in the same modulestore can be handled by the modulestore itself.
+            source_store.copy_all_asset_metadata(source_course_key, dest_course_key, user_id)
 
     @contract(asset_key='AssetKey', attr=str)
     def set_asset_metadata_attr(self, asset_key, attr, value, user_id):

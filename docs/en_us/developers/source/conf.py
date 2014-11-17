@@ -10,7 +10,6 @@ from path import path
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 
-
 sys.path.append('../../../../')
 
 from docs.shared.conf import *
@@ -82,6 +81,7 @@ copyright = u'2014, edX'
 # --- Mock modules ------------------------------------------------------------
 
 # Mock all the modules that the readthedocs build can't import
+
 
 class Mock(object):
     def __init__(self, *args, **kwargs):
@@ -185,7 +185,6 @@ def strip_tags(html):
     s = MLStripper()
     s.feed(html)
     return s.get_data()
-
 
 
 def process_docstring(app, what, name, obj, options, lines):
