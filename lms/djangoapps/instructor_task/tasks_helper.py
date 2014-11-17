@@ -637,22 +637,11 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     start_time = time()
     start_date = datetime.now()
 
-    # In order to cohort users in bulk, we expect a CSV file with the header
-    # column 'username_or_email' which identifies the user, and 'cohort_name'
-    # which identifies the cohort in which to place that user.  Additional
-    # columns are ignored.
-    first_row = next(unicode_csv_dictreader(DefaultStorage().open(task_input['file_name'], 'rU')))
-    if not first_row.get('username_or_email') or not first_row.get('cohort_name'):
-        raise ValueError(
-            'Input CSV file must contain "{username_or_email}" and "{cohort_name}" columns.'.format(
-                username_or_email='username_or_email',
-                cohort_name='cohort_name'
-            )
-        )
-    users_to_cohorts = {
-        row.get('username_or_email'): row.get('cohort_name')
+    # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
+    users_to_cohorts = [
+        {'username_or_email': row.get('email', row.get('username', '')), 'cohort': row.get('cohort')}
         for row in unicode_csv_dictreader(DefaultStorage().open(task_input['file_name'], 'rU'))
-    }
+    ]
 
     task_progress = TaskProgress(action_name, len(users_to_cohorts), start_time)
     current_step = {'step': 'Cohorting Students'}
@@ -661,10 +650,11 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     cohorts_status = add_users_to_cohorts(course_id, users_to_cohorts)
 
     for cohort_name, status_dict in cohorts_status.iteritems():
-        task_progress.succeeded += len(status_dict['added'] + status_dict['changed'])
-        task_progress.skipped += len(status_dict['present'])
-        task_progress.failed += len(status_dict['unknown'])
-        task_progress.attempted += task_progress.succeeded + task_progress.skipped + task_progress.failed
+        if status_dict['valid']:
+            task_progress.succeeded += len(status_dict['added'] + status_dict['changed'])
+            task_progress.skipped += len(status_dict['present'])
+            task_progress.failed += len(status_dict['unknown'])
+            task_progress.attempted += len(status_dict['added'] + status_dict['changed'] + status_dict['present'] + status_dict['unknown'])
     task_progress.update_task_state(extra_meta=current_step)
 
     current_step['step'] = 'Uploading CSV'
