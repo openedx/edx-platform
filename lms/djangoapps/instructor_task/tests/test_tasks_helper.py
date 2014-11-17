@@ -6,16 +6,13 @@ Tests that CSV grade report generation works with unicode emails.
 """
 import ddt
 from mock import Mock, patch
+import tempfile
 
-from django.test.testcases import TestCase
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-
+from course_groups.tests.helpers import CohortFactory
 from instructor_task.models import ReportStore
-from instructor_task.tasks_helper import upload_grades_csv, upload_students_csv
+from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 
 
@@ -104,3 +101,41 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         #This assertion simply confirms that the generation completed with no errors
         num_students = len(students)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
+
+
+class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
+    """
+    Tests that bulk student cohorting works.
+    """
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.cohort_1 = CohortFactory(course_id=self.course.id, name='Cohort 1')
+        self.cohort_2 = CohortFactory(course_id=self.course.id, name='Cohort 2')
+        self.student_1 = self.create_student(username='student_1', email='student_1@example.com')
+        self.student_2 = self.create_student(username='student_2', email='student_2@example.com')
+
+    def _cohort_students_and_upload(self, csv_rows):
+        """
+        Call `cohort_students_and_upload` with a file generated from `csv_rows`.
+        """
+        with tempfile.NamedTemporaryFile() as fp:
+            fp.write(('\n'.join([','.join(row) for row in csv_rows])).encode('utf-8'))
+            fp.flush()
+            with patch('instructor_task.tasks_helper._get_current_task'):
+                return cohort_students_and_upload(None, None, self.course.id, {'file_name': fp.name}, 'cohorted')
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_success(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            [
+                ['username_or_email', 'cohort_name'],
+                ['student_1', 'Cohort 1'],
+                ['student_2', 'Cohort 2']
+            ]
+        )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
