@@ -11,7 +11,7 @@
 
   <div class="attachment-options">
     <a class="btn" href="#" id="upload-file-btn">
-      <span class="icon-upload"></span>{% trans "Upload new file" %}
+      <span class="icon-arrow-circle-o-up"></span>{% trans "Upload new file" %}
     </a>
     <a class="btn" href="#" id="search-for-file-btn">
       <span class="icon-plus-sign"></span>{% trans "Search and add file" %}
@@ -118,7 +118,7 @@
 
               <td>
                 <a href="{% url 'wiki:attachments_history' path=urlpath.path article_id=article.id attachment_id=attachment.id %}">
-                  <span class="icon-time"></span>
+                  <span class="icon-clock"></span>
                   {% trans "File history" %} ({{ attachment.attachmentrevision_set.all.count }} {% trans "revisions" %})
                 </a>
               </td>

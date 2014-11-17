@@ -23,13 +23,13 @@
 
     % if reverifications["denied"]:
         % for item in reverifications["denied"]:
-            <li class="status-item is-denied"><i class="icon-remove-sign"></i><span class="label">${_('Denied:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
+            <li class="status-item is-denied"><i class="icon-clocks-circle"></i><span class="label">${_('Denied:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
         % endfor
     %endif
 
     % if reverifications["approved"]:
         % for item in reverifications["approved"]:
-            <li class="status-item is-approved"><i class="icon-ok"></i><span class="label">${_('Approved:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
+            <li class="status-item is-approved"><i class="icon-check"></i><span class="label">${_('Approved:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
         % endfor
     %endif
     </ul>
