@@ -21,24 +21,26 @@ var edx = edx || {};
 
         submitButton: '.js-reset',
 
-        preRender: function( data ) {
+        preRender: function() {
             this.listenTo( this.model, 'sync', this.saveSuccess );
         },
 
         toggleErrorMsg: function( show ) {
             if ( show ) {
                 this.setErrors();
-                this.toggleDisableButton(false)
+                this.toggleDisableButton(false);
             } else {
                 this.element.hide( this.$errors );
             }
         },
 
         saveSuccess: function() {
-            var $el = $(this.el);
+            var $el = $(this.el),
+                $msg = $el.find('.js-reset-success');
 
             this.element.hide( $el.find('#password-reset-form') );
-            this.element.show( $el.find('.js-reset-success') );
+            this.element.show( $msg );
+            this.element.scrollTop( $msg );
         }
     });
 
