@@ -141,6 +141,20 @@ class TestCreateOrderView(ModuleStoreTestCase):
         self.assertIn('This course doesn\'t support verified certificates', response.content)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_create_order_fail_with_get(self):
+        """
+        Test that create_order will not work if wrong http method used
+        """
+        create_order_post_data = {
+            'contribution': 50,
+            'course_id': self.course_id,
+            'face_image': ',',
+            'photo_id_image': ','
+        }
+        response = self.client.get(reverse('verify_student_create_order'), create_order_post_data)
+        self.assertEqual(response.status_code, 405)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_success(self):
         """
         Test that the order is created successfully when given valid data
