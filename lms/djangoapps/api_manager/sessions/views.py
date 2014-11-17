@@ -4,7 +4,7 @@
 import logging
 
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ObjectDoesNotExist
@@ -92,12 +92,31 @@ class SessionsList(SecureAPIView):
                     LoginFailures.clear_lockout_counter(user)
 
                 if user.is_active:
-                    login(request, user)
-                    response_data['token'] = request.session.session_key
-                    response_data['expires'] = request.session.get_expiry_age()
+                    #
+                    # Create a new session directly with the SESSION_ENGINE
+                    # We don't call the django.contrib.auth login() method
+                    # because it is bound with the HTTP request.
+                    #
+                    # Since we are a server-to-server API, we shouldn't
+                    # be stateful with respect to the HTTP request
+                    # and anything that might come with it, as it could
+                    # violate our RESTfulness
+                    #
+                    engine = import_module(settings.SESSION_ENGINE)
+                    new_session = engine.SessionStore()
+                    new_session.create()
+
+                    # These values are expected to be set in any new session
+                    new_session[SESSION_KEY] = user.id
+                    new_session[BACKEND_SESSION_KEY] = user.backend
+
+                    new_session.save()
+
+                    response_data['token'] = new_session.session_key
+                    response_data['expires'] = new_session.get_expiry_age()
                     user_dto = UserSerializer(user)
                     response_data['user'] = user_dto.data
-                    response_data['uri'] = '{}/{}'.format(base_uri, request.session.session_key)
+                    response_data['uri'] = '{}/{}'.format(base_uri, new_session.session_key)
                     response_status = status.HTTP_201_CREATED
 
                     # add to audit log
@@ -167,8 +186,7 @@ class SessionsDetail(SecureAPIView):
         if session is None or not SESSION_KEY in session:
             return Response({}, status=status.HTTP_204_NO_CONTENT)
         user_id = session[SESSION_KEY]
-        session.flush()
-        if request.user is not None and not request.user.is_anonymous():
-            logout(request)
+        session.delete()
+
         AUDIT_LOG.info(u"API::User session terminated for user-id - {0}".format(user_id))
         return Response({}, status=status.HTTP_204_NO_CONTENT)
