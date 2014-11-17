@@ -280,6 +280,9 @@ FEATURES = {
     # Enable the new dashboard, account, and profile pages
     'ENABLE_NEW_DASHBOARD': False,
 
+    # Enable the combined login/registration form
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+
     # Show a section in the membership tab of the instructor dashboard
     # to allow an upload of a CSV file that contains a list of new accounts to create
     # and register for course.
@@ -1037,7 +1040,23 @@ instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/ins
 # JavaScript used by the student account and profile pages
 # These are not courseware, so they do not need many of the courseware-specific
 # JavaScript modules.
-student_account_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_account/**/*.js'))
+student_account_js = [
+    'js/utils/rwd_header_footer.js',
+    'js/utils/edx.utils.validate.js',
+    'js/src/utility.js',
+    'js/student_account/enrollment.js',
+    'js/student_account/shoppingcart.js',
+    'js/student_account/models/LoginModel.js',
+    'js/student_account/models/RegisterModel.js',
+    'js/student_account/models/PasswordResetModel.js',
+    'js/student_account/views/FormView.js',
+    'js/student_account/views/LoginView.js',
+    'js/student_account/views/RegisterView.js',
+    'js/student_account/views/PasswordResetView.js',
+    'js/student_account/views/AccessView.js',
+    'js/student_account/accessApp.js',
+]
+
 student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
 
 PIPELINE_CSS = {
@@ -1555,6 +1574,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'mailing_address': 'optional',
     'goals': 'optional',
     'honor_code': 'required',
+    'terms_of_service': 'hidden',
     'city': 'hidden',
     'country': 'hidden',
 }

@@ -634,15 +634,15 @@ header.global-new {
   &.rwd {
     nav {
       max-width: 1180px;
-      width: 100%;
+      width: 320px;
     }
 
     .mobile-menu-button {
-      @extend %t-action1;
       display: inline;
       float: left;
       text-decoration: none;
       color: $m-gray;
+      font-size: 18px;
       margin-top: 9px;
 
       &:hover,
@@ -666,7 +666,7 @@ header.global-new {
     .nav-global,
     .nav-courseware {
       a {
-        @extend %t-action3;
+        font-size: 14px;
 
         &.nav-courseware-button {
           width: 86px;
@@ -717,12 +717,6 @@ header.global-new {
 
       div:last-child {
         margin-right: 0;
-      }
-    }
-
-    @include media( 320px ) {
-      nav {
-        width: 320px;
       }
     }
 

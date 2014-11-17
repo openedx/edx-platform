@@ -4,7 +4,6 @@ import unittest
 from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 import ddt
 from django.test.utils import override_settings
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -130,7 +129,7 @@ class LoginFormTest(ModuleStoreTestCase):
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class RegisterFormTest(TestCase):
+class RegisterFormTest(ModuleStoreTestCase):
     """Test rendering of the registration form. """
 
     def setUp(self):

@@ -31,6 +31,7 @@ class CourseModeViewTest(ModuleStoreTestCase):
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
         # is_active?, enrollment_mode, redirect?
         (True, 'verified', True),

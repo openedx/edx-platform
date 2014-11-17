@@ -53,6 +53,8 @@ FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
+FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 

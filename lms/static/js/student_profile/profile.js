@@ -4,7 +4,7 @@ var edx = edx || {};
     'use strict';
 
     edx.student = edx.student || {};
-    edx.student.profile = {};
+    edx.student.profile = edx.student.profile || {};
 
     var syncErrorMessage = gettext("The data could not be saved.");
 

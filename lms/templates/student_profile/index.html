@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! import third_party_auth %>
 <%namespace name='static' file='/static_content.html'/>
 
 <%inherit file="../main.html" />
@@ -25,6 +26,6 @@
 
 <div id="profile-container"></div>
 
-% if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+% if third_party_auth.is_enabled():
     <%include file="third_party_auth.html" />
 % endif
