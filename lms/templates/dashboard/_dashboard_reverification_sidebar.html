@@ -23,7 +23,7 @@
 
     % if reverifications["denied"]:
         % for item in reverifications["denied"]:
-            <li class="status-item is-denied"><i class="icon-clocks-circle"></i><span class="label">${_('Denied:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
+            <li class="status-item is-denied"><i class="icon-times-circle"></i><span class="label">${_('Denied:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
         % endfor
     %endif
 
