@@ -220,6 +220,26 @@ def save_child_position(seq_module, child_name):
     seq_module.save()
 
 
+def save_positions_recursively_up(user, request, field_data_cache, xmodule):
+    """
+    Recurses up the course tree starting from a leaf
+    Saving the position property based on the previous node as it goes
+    """
+    current_module = xmodule
+
+    while current_module:
+        parent_location = modulestore().get_parent_location(current_module.location)
+        parent = None
+        if parent_location:
+            parent_descriptor = modulestore().get_item(parent_location)
+            parent = get_module_for_descriptor(user, request, parent_descriptor, field_data_cache, current_module.location.course_key)
+
+        if parent and hasattr(parent, 'position'):
+            save_child_position(parent, current_module.location.name)
+
+        current_module = parent
+
+
 def chat_settings(course, user):
     """
     Returns a dict containing the settings required to connect to a
