@@ -141,6 +141,7 @@ var edx = edx || {};
             this.element.hide( this.$header );
             this.element.hide( $(this.el).find('.form-type') );
             this.loadForm('reset');
+            this.element.scrollTop( $('#password-reset-wrapper') );
         },
 
         showFormError: function() {
@@ -162,11 +163,7 @@ var edx = edx || {};
 
             this.element.hide( $(this.el).find('.form-wrapper') );
             this.element.show( $form );
-
-            // Scroll to top of selected form
-            $('html,body').animate({
-                scrollTop: $anchor.offset().top
-            },'slow');
+            this.element.scrollTop( $anchor );
         },
 
         /**
@@ -261,13 +258,20 @@ var edx = edx || {};
             }
         },
 
-        /* Helper method ot toggle display
+        /* Helper method to toggle display
          * including accessibility considerations
          */
         element: {
             hide: function( $el ) {
                 $el.addClass('hidden')
                    .attr('aria-hidden', true);
+            },
+
+            scrollTop: function( $el ) {
+                // Scroll to top of selected element
+                $('html,body').animate({
+                    scrollTop: $el.offset().top
+                },'slow');
             },
 
             show: function( $el ) {
