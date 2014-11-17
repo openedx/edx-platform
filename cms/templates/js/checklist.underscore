@@ -15,7 +15,7 @@
             <%= checklistShortDescription %></h3>
               <span class="checklist-status status">
                 <%= gettext("Tasks Completed:") %> <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
-                <i class="icon-check-square-o"></i>
+                <i class="icon-square-o"></i>
               </span>
     </header>
 
