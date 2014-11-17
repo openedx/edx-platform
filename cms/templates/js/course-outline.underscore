@@ -80,7 +80,7 @@ if (xblockInfo.get('graded')) {
                 <% } %>
                 <li class="action-item action-delete">
                     <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
-                        <i class="icon icon-trash-o-o"></i>
+                        <i class="icon icon-trash-o"></i>
                         <span class="sr action-button-text"><%= gettext('Delete') %></span>
                     </a>
                 </li>
