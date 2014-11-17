@@ -43,6 +43,7 @@ class BlockOutline(object):
                         # to be consistent with other edx-platform clients, return the defaulted display name
                         'name': block.display_name_with_default,
                         'category': block.category,
+                        'id': unicode(block.location)
                     })
             return reversed(block_path)
 
