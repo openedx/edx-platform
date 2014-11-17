@@ -77,11 +77,15 @@ class StoreUploadedFileTestCase(TestCase):
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
             store_uploaded_file(self.request, "uploaded_file", [], "stored_file")
-        verify_exception("Allowed file types are ''.")
+        verify_exception("The file must end with one of the following extensions: ''.")
+
+        with self.assertRaises(exceptions.PermissionDenied) as error:
+            store_uploaded_file(self.request, "uploaded_file", [".bar"], "stored_file")
+        verify_exception("The file must end with the extension '.bar'.")
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
             store_uploaded_file(self.request, "uploaded_file", [".xxx", ".bar"], "stored_file")
-        verify_exception("Allowed file types are '.xxx', '.bar'.")
+        verify_exception("The file must end with one of the following extensions: '.xxx', '.bar'.")
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
             store_uploaded_file(self.request, "uploaded_file", [".csv"], "stored_file", max_file_size=2)
