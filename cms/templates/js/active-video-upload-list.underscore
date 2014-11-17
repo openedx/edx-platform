@@ -1,0 +1,19 @@
+<%
+    // TODO: Add screen-reader text
+%>
+<div class="drag-drop">
+    <form class="form-drag-drop">
+        <fieldset>
+            <div class="area-drag-drop">
+                <%- gettext("Drag and drop your video files here, or") %>
+                <input type="file" class="sr js-file-input" name="file" multiple>
+            </div>
+            <div class="action-area">
+                <button class="button primary-green js-upload-button"><i class="icon-plus"></i><%- gettext("Select files") %></button>
+            </div>
+        </fieldset>
+    </form>
+</div>
+<section class="video-upload-progress-container">
+    <ul class="js-active-video-upload-list"></ul>
+</section>
