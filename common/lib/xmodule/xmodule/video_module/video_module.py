@@ -176,18 +176,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
         sources = filter(None, self.html5_sources)
 
-        # If the user comes from China use China CDN for html5 videos.
-        # 'CN' is China ISO 3166-1 country code.
-        # Video caching is disabled for Studio. User_location is always None in Studio.
-        # CountryMiddleware disabled for Studio.
-        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
-
-        if getattr(self, 'video_speed_optimizations', True) and cdn_url:
-            for index, source_url in enumerate(sources):
-                new_url = get_video_from_cdn(cdn_url, source_url)
-                if new_url:
-                    sources[index] = new_url
-
         download_video_link = None
         youtube_streams = ""
 
@@ -202,8 +190,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # VAL will always give us the keys for the profiles we asked for, but
                 # if it doesn't have an encoded video entry for that Video + Profile, the
                 # value will map to `None`
-                if val_video_urls["desktop_mp4"] and self.download_video:
-                    download_video_link = val_video_urls["desktop_mp4"]
+                if val_video_urls["desktop_mp4"]:
+                    if self.download_video:
+                        download_video_link = val_video_urls["desktop_mp4"]
+                    # add the desktop_mp4 profile to the list of alternative sources
+                    if val_video_urls["desktop_mp4"] not in sources:
+                        sources.append(val_video_urls["desktop_mp4"])
                 if val_video_urls["youtube"]:
                     youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
             except edxval_api.ValInternalError:
@@ -211,6 +203,18 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 # course data is ported to a machine that does not have the VAL data. So for now, pass on this
                 # exception and fallback to whatever we find in the VideoDescriptor.
                 log.warning("Could not retrieve information from VAL for edx Video ID: %s.", self.edx_video_id)
+
+        # If the user comes from China use China CDN for html5 videos.
+        # 'CN' is China ISO 3166-1 country code.
+        # Video caching is disabled for Studio. User_location is always None in Studio.
+        # CountryMiddleware disabled for Studio.
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
+
+        if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+            for index, source_url in enumerate(sources):
+                new_url = get_video_from_cdn(cdn_url, source_url)
+                if new_url:
+                    sources[index] = new_url
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoDescriptor
