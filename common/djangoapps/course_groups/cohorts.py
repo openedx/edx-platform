@@ -382,8 +382,10 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
     Arguments:
         course_id (course id): ID of the course in which to do the
             cohorting.
-        cohorts_to_users (dict): The keys of this dict are usernames/emails
-            and the values are names of cohorts in which to place the users.
+        users_to_cohorts (sequence): Each item of this sequence is a
+            dict representing a user to cohort.  The dict conatains
+            keys "username_or_email" and "cohort" to identify the user
+            and the cohort in which to add them.
     Returns:
         dict: Statistics regarding the cohorted users:
             {
@@ -403,7 +405,9 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
     cohort_status = {}
 
     cohorts_to_users = {}
-    for username_or_email, cohort_name in users_to_cohorts.iteritems():
+    for assignment in users_to_cohorts:
+        username_or_email = assignment.get('username_or_email')
+        cohort_name = assignment.get('cohort')
         if cohorts_to_users.get(cohort_name):
             cohorts_to_users[cohort_name].append(username_or_email)
         else:
