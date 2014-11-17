@@ -156,6 +156,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         )
         # Get the enrollment and compare it to the original.
         result = data.get_course_enrollment(self.user.username, unicode(self.course.id))
+        self.assertEqual(self.user.username, result['student'])
         self.assertEqual(enrollment, result)
 
     @raises(NonExistentCourseError)

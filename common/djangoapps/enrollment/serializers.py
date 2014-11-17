@@ -54,10 +54,15 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     """
     course = CourseField()
+    student = serializers.SerializerMethodField('get_username')
+
+    def get_username(self, model):
+        """Retrieves the username from the associated model."""
+        return model.username
 
     class Meta:  # pylint: disable=C0111
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course')
+        fields = ('created', 'mode', 'is_active', 'course', 'student')
         lookup_field = 'username'
 
 
