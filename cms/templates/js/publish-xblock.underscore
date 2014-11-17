@@ -82,7 +82,7 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
                 <% if (hasExplicitStaffLock) { %>
                     <i class="icon-check-square-o"></i>
                 <% } else { %>
-                    <i class="icon-square-o"></i>
+                    <i class="icon-check-square-o"></i>
                 <% } %>
                 <%= gettext('Hide from students') %>
             </a>
