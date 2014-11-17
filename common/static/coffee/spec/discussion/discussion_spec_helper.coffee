@@ -227,7 +227,7 @@ browser and pasting the output.  When that file changes, this one should be rege
             icon_class = "icon-comments";
             sr_text = "discussion";
         } else if (endorsed) {
-            icon_class = "icon-ok";
+            icon_class = "icon-check";
             sr_text = "answered question";
         } else {
             icon_class = "icon-question";
@@ -434,7 +434,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-unchecked">Endorse</span>
                     <span class="label-checked">Unendorse</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-ok"></i></span>
+                <span class="action-icon"><i class="icon icon-check"></i></span>
             </a>
         </li>
     </script>
@@ -448,7 +448,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <span class="label-unchecked">Mark as Answer</span>
                     <span class="label-checked">Unmark as Answer</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-ok"></i></span>
+                <span class="action-icon"><i class="icon icon-check"></i></span>
             </a>
         </li>
     </script>

@@ -29,7 +29,7 @@
 
     % if reverifications["approved"]:
         % for item in reverifications["approved"]:
-            <li class="status-item is-approved"><i class="icon-check"></i><span class="label">${_('Approved:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
+            <li class="status-item is-approved"><i class="icon-check-square-o"></i><span class="label">${_('Approved:')}</span> <span class="course-name"><a href="${reverse('verify_student_midcourse_reverify_dash')}">${item.course_name}</span></a></li>
         % endfor
     %endif
     </ul>
