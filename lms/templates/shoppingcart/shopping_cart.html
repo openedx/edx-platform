@@ -59,7 +59,7 @@ from django.utils.translation import ugettext as _
               </div>
 
             <div class="col-3 no-width">
-               <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon-remove-sign"></i></a>
+               <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon-clocks-circle"></i></a>
             </div>
         </div>
       </div>
@@ -78,7 +78,7 @@ from django.utils.translation import ugettext as _
            </div>
            % else:
            <div class="code-applied">
-              <span class="green"><i class="icon-ok"></i>${_('code has been applied')}</span>
+              <span class="green"><i class="icon-check"></i>${_('code has been applied')}</span>
               <input type="submit" value="Reset" class="blue-border" id="submit-reset-redemption">
            </div>
             %endif

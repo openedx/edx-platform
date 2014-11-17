@@ -308,7 +308,7 @@
             <li><i class="icon icon-pencil"></i><p>${_("Estimated Effort")}</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
           % endif
 
-          ##<li><i class="icon icon-time"></i><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
+          ##<li><i class="icon icon-clock"></i><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
 
           % if get_course_about_section(course, "prerequisites"):
             <li class="prerequisites"><i class="icon icon-book"></i><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
