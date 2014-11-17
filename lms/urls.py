@@ -74,7 +74,7 @@ urlpatterns = ('',  # nopep8
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
     # Enrollment API RESTful endpoints
-    url(r'^enrollment/v0/', include('enrollment.urls')),
+    url(r'^api/enrollment/v1/', include('enrollment.urls')),
 
 )
 
