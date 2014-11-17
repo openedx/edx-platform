@@ -103,6 +103,13 @@ var edx = edx || {};
                 }
             },
 
+            scrollTop: function( $el ) {
+                // Scroll to top of selected element
+                $('html,body').animate({
+                    scrollTop: $el.offset().top
+                },'slow');
+            },
+
             show: function( $el ) {
                 if ( $el ) {
                     $el.removeClass('hidden')
