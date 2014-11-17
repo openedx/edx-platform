@@ -93,37 +93,13 @@ class EnrollmentView(APIView):
         except (NonExistentCourseError, CourseEnrollmentException):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request, course_id=None):
-        """Create a new course enrollment for a student.
-
-        HTTP Endpoint for creating a course enrollment for the authenticated user.
-
-        Args:
-            request (Request): To get current course enrollment information, A POST request will create a
-                new course enrollment for the current user. If 'mode' is found in the POST parameters, the
-                mode can be modified.
-            course_id (str): URI element specifying the course location. Enrollment information will be
-                returned, created, or updated for this particular course.
-
-        Return:
-            A JSON serialized representation of the new course enrollment.
-
-        """
-        try:
-            mode = request.DATA['mode'] if 'mode' in request.DATA else 'honor'
-            return Response(api.add_enrollment(request.user.username, course_id, mode=mode))
-        except api.CourseModeNotFoundError as error:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=error.data)
-        except (NonExistentCourseError, api.EnrollmentNotFoundError, CourseEnrollmentException):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
     def put(self, request, course_id=None):
         """Update the course enrollment.
 
-        HTTP Endpoint for all modifications to an existing enrollment.
+        HTTP Endpoint for all creation and modifications to an existing enrollment.
 
         Args:
-            request (Request): A PUT request modify an existing enrollment. If 'mode' or 'deactivate'
+            request (Request): A PUT request create or modify an existing enrollment. If 'mode' or 'deactivate'
                 are found in the request parameters, the mode can be modified, or the enrollment can be
                 deactivated.
             course_id (str): URI element specifying the course location. Enrollment information will be
@@ -138,7 +114,7 @@ class EnrollmentView(APIView):
             elif 'deactivate' in request.DATA:
                 return Response(api.deactivate_enrollment(request.user.username, course_id))
             else:
-                return Response(api.get_enrollment(request.user.username, course_id))
+                return Response(api.add_enrollment(request.user.username, course_id))
         except api.CourseModeNotFoundError as error:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=error.data)
         except (NonExistentCourseError, api.EnrollmentNotFoundError, CourseEnrollmentException):
