@@ -1,0 +1,67 @@
+<form id="settings_details" class="settings-details" method="post" action="">
+<section class="group-settings schedule">
+  <header>
+    <h2 class="title-2">Course Schedule</h2>
+  </header>
+
+  <ol class="list-input">
+    <li class="field-group field-group-course-start" id="course-start">
+      <div class="field date" id="field-course-start-date">
+        <label for="course-start-date">Course Start Date</label>
+        <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">First day the course begins</span>
+      </div>
+
+      <div class="field time" id="field-course-start-time">
+        <label for="course-start-time">Course Start Time</label>
+        <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+
+    <li class="field-group field-group-course-end" id="course-end">
+      <div class="field date" id="field-course-end-date">
+        <label for="course-end-date">Course End Date</label>
+        <input type="text" class="end-date date end" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">Last day your course is active</span>
+      </div>
+
+      <div class="field time" id="field-course-end-time">
+        <label for="course-end-time">Course End Time</label>
+        <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+  </ol>
+
+  <ol class="list-input">
+    <li class="field-group field-group-enrollment-start" id="enrollment-start">
+      <div class="field date" id="field-enrollment-start-date">
+        <label for="course-enrollment-start-date">Enrollment Start Date</label>
+        <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">First day students can enroll</span>
+      </div>
+
+      <div class="field time" id="field-enrollment-start-time">
+        <label for="course-enrollment-start-time">Enrollment Start Time</label>
+        <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+
+    <li class="field-group field-group-enrollment-end" id="enrollment-end">
+      <div class="field date" id="field-enrollment-end-date">
+        <label for="course-enrollment-end-date">Enrollment End Date</label>
+        <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">Last day students can enroll</span>
+      </div>
+
+      <div class="field time" id="field-enrollment-end-time">
+        <label for="course-enrollment-end-time">Enrollment End Time</label>
+        <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+  </ol>
+</section>
+</form>
