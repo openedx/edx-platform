@@ -9,10 +9,9 @@ from mock import patch, Mock
 from django.http import HttpRequest
 from django.core.files.uploadedfile import SimpleUploadedFile
 import util.file
-from util.file import course_and_time_based_filename_generator, store_uploaded_file
+from util.file import course_and_time_based_filename_generator, store_uploaded_file, unicode_csv_dictreader
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core import exceptions
-from django.core.files.storage import get_storage_class
 
 
 class FilenameGeneratorTestCase(TestCase):
@@ -115,3 +114,20 @@ class StoreUploadedFileTestCase(TestCase):
         with self.file_storage.open(self.stored_file_name, 'r') as f:
             data = f.read()
         self.assertEqual("content", data)
+
+
+class CsvDictReaderTestCase(TestCase):
+    """
+    Tests for unicode_csv_dictreader.
+    """
+    def test_handles_utf8_data(self):
+        rows = [
+            [u'Header_1\xec', u'Header_2\xec'],
+            [u'value_1\xec', u'value_2\xec'],
+        ]
+        content = ('\n'.join([','.join(row) for row in rows])).encode('utf-8')
+        f = SimpleUploadedFile('unicode_content.csv', content, 'text/csv')
+        self.assertEqual(
+            [row for row in unicode_csv_dictreader(f)],
+            [{u'Header_1\xec': u'value_1\xec', u'Header_2\xec': u'value_2\xec'}]
+        )
