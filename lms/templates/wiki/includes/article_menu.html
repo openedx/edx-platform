@@ -25,7 +25,7 @@
 
 <li class="${"active" if selected_tab == "history" else ""}">
   <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <i class="icon-clock"></i>
+    <i class="icon-clock-o"></i>
     ${_("Changes")}
     ${_("{span_start}(active){span_end}").format(span_start="<span class='sr'>", span_end="</span>") if selected_tab == "history" else ""}
   </a>

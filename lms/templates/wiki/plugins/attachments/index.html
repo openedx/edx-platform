@@ -118,7 +118,7 @@
 
               <td>
                 <a href="{% url 'wiki:attachments_history' path=urlpath.path article_id=article.id attachment_id=attachment.id %}">
-                  <span class="icon-clock"></span>
+                  <span class="icon-clock-o"></span>
                   {% trans "File history" %} ({{ attachment.attachmentrevision_set.all.count }} {% trans "revisions" %})
                 </a>
               </td>
