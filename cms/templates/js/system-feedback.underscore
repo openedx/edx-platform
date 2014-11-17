@@ -40,7 +40,7 @@
 
     <% if(obj.closeIcon) { %>
     <a href="#" rel="view" class="action action-close action-<%= type %>-close">
-      <i class="icon-remove-sign"></i>
+      <i class="icon-clock-os-circle"></i>
       <span class="label">close <%= type %></span>
     </a>
     <% } %>
