@@ -25,7 +25,7 @@
 .login-register {
     @include box-sizing(border-box);
     @include outer-container;
-    $grid-columns: 4;
+    $grid-columns: 12;
     background: white;
 
     width: 100%;
@@ -87,7 +87,7 @@
 
     .form-type {
         @include box-sizing(border-box);
-        @include span-columns(4);
+        @include span-columns(12);
         padding: 25px 10px;
 
         &:nth-of-type(2) {
