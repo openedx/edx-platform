@@ -68,7 +68,7 @@ def _strip_value(value, lookup='exact'):
 
 
 class CourseKeyField(models.CharField):
-    description = "A SlashSeparatedCourseKey object, saved to the DB in the form of a string"
+    description = "A CourseKey object, saved to the DB in the form of a string"
 
     __metaclass__ = models.SubfieldBase
 
@@ -84,7 +84,7 @@ class CourseKeyField(models.CharField):
             return None
 
         if isinstance(value, basestring):
-            return SlashSeparatedCourseKey.from_deprecated_string(value)
+            return CourseKey.from_string(value)
         else:
             return value
 
