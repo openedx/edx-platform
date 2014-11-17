@@ -115,7 +115,7 @@
               % endif
             </li>
             <li class="action action-delete ${"is-disabled" if request.user.id == user.id else ""}">
-                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
+                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash-o"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
             </li>
           </ul>
           % endif
