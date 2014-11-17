@@ -1,13 +1,30 @@
 <%inherit file="base.html" />
+## TODO: make online help resolve correctly
 <%def name="online_help_token()"><% return "videos" %></%def>
 <%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
 %>
-<%block name="title">${_("Files &amp; Uploads")}</%block>
-<%block name="bodyclass">is-signedin course uploads view-uploads</%block>
+<%block name="title">${_("Video Uploads")}</%block>
+<%block name="bodyclass">is-signedin course view-uploads view-video-upload</%block>
+
 
 <%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% for template_name in ["active-video-upload-list", "active-video-upload"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="requirejs">
+    require(["js/views/active_video_upload_list"], function (ActiveVideoUploadListView) {
+        view = new ActiveVideoUploadListView();
+        $(".content-primary").html(view.render().$el);
+    });
+</%block>
 
 <%block name="content">
 
@@ -17,36 +34,22 @@
             <small class="subtitle">${_("Content")}</small>
             <span class="sr">&gt; </span>${_("Video Uploads")}
         </h1>
-
-        <nav class="nav-actions">
-            <h3 class="sr">${_("Page Actions")}</h3>
-            <ul>
-                <li class="nav-item">
-                    <a href="#" class="button upload-button new-button"><i class="icon-plus"></i> ${_("Upload New File")}</a>
-                </li>
-            </ul>
-        </nav>
     </header>
 </div>
 
 <div class="wrapper-content wrapper">
     <section class="content">
-        <article class="content-primary" role="main">
-            <div class="videos-wrapper"/>
-            <div class="ui-loading">
-                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading&hellip;")}</span></p>
-            </div>
-        </article>
+        <article class="content-primary" role="main"></article>
 
-        <aside class="content-supplementary" role="complimentary">
+        <aside class="content-supplementary" role="complementary">
             <div class="bit">
-                <h3 class="title-3">${_("TBD")}</h3>
+                <h3 class="title-3">${_("Adding Videos")}</h3>
 
-                <p>${_("Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec sed odio dui. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec sed odio dui.")}</p>
+                <p>${_("To submit your course videos for processing simply drag and drop the files on to this page, or select files from your computer by using the Select files button.")}</p>
             </div>
 
             <div class="bit external-help">
-                <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about managing files")}</a>
+                <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about managing videos")}</a>
             </div>
 
         </aside>
