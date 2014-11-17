@@ -286,8 +286,8 @@ class CourseFields(object):
         scope=Scope.settings
     )
     video_upload_pipeline = Dict(
-        display_name=_("Video Upload Pipeline"),
-        help=_("Enter settings for the video upload pipeline, including the secret course video token."),
+        display_name=_("Video Upload Credentials"),
+        help=_("Enter the unique identifier for your course's video files provided by edX."),
         scope=Scope.settings
     )
     no_grade = Boolean(
