@@ -99,7 +99,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         resp = self._create_enrollment()
 
         # Deactivate the enrollment in the course and verify the URL we get sent to
-        resp = self.client.post(reverse(
+        resp = self.client.put(reverse(
             'courseenrollment',
             kwargs={'course_id': (unicode(self.course.id))}
         ), {'deactivate': True})
@@ -135,7 +135,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
 
     def test_unenroll_not_enrolled_in_course(self):
         # Deactivate the enrollment in the course and verify the URL we get sent to
-        resp = self.client.post(reverse(
+        resp = self.client.put(reverse(
             'courseenrollment',
             kwargs={'course_id': (unicode(self.course.id))}
         ), {'deactivate': True})
