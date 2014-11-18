@@ -184,20 +184,26 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # stream.
         if self.edx_video_id and edxval_api:
             try:
-                val_video_urls = edxval_api.get_urls_for_profiles(
-                    self.edx_video_id, ["desktop_mp4", "youtube"]
-                )
+                val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
+                val_video_urls = edxval_api.get_urls_for_profiles(self.edx_video_id, val_profiles)
+
                 # VAL will always give us the keys for the profiles we asked for, but
                 # if it doesn't have an encoded video entry for that Video + Profile, the
                 # value will map to `None`
-                if val_video_urls["desktop_mp4"]:
-                    if self.download_video:
-                        download_video_link = val_video_urls["desktop_mp4"]
-                    # add the desktop_mp4 profile to the list of alternative sources
-                    if val_video_urls["desktop_mp4"] not in sources:
-                        sources.append(val_video_urls["desktop_mp4"])
+
+                # add the non-youtube urls to the list of alternative sources
+                # use the last non-None non-youtube url as the link to download the video
+                for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
+                    if url:
+                        if url not in sources:
+                            sources.append(url)
+                        if self.download_video:
+                            download_video_link = url
+
+                # set the youtube url
                 if val_video_urls["youtube"]:
                     youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
+
             except edxval_api.ValInternalError:
                 # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
                 # course data is ported to a machine that does not have the VAL data. So for now, pass on this
