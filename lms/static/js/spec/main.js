@@ -393,6 +393,7 @@
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
+        'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
