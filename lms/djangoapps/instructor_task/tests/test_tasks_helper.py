@@ -133,7 +133,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
 
         result = self._cohort_students_and_upload(
             [
-                ['username_or_email', 'cohort_name'],
+                ['username', 'cohort'],
                 ['student_1', 'Cohort 1'],
                 ['student_2', 'Cohort 2']
             ]
