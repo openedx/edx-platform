@@ -639,7 +639,10 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
 
     # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
     users_to_cohorts = [
-        {'username_or_email': row.get('email', row.get('username', '')), 'cohort': row.get('cohort')}
+        {
+            'username_or_email': row.get('email') or row.get('username'),
+            'cohort': row.get('cohort')
+        }
         for row in unicode_csv_dictreader(DefaultStorage().open(task_input['file_name'], 'rU'))
     ]
 
@@ -649,12 +652,20 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
 
     cohorts_status = add_users_to_cohorts(course_id, users_to_cohorts)
 
+    # Report task progress based on how users were cohorted.
     for cohort_name, status_dict in cohorts_status.iteritems():
-        if status_dict['valid']:
-            task_progress.succeeded += len(status_dict['added'] + status_dict['changed'])
-            task_progress.skipped += len(status_dict['present'])
-            task_progress.failed += len(status_dict['unknown'])
-            task_progress.attempted += len(status_dict['added'] + status_dict['changed'] + status_dict['present'] + status_dict['unknown'])
+        num_added = len(status_dict.get('added', []))
+        num_changed = len(status_dict.get('changed', []))
+        num_present = len(status_dict.get('present', []))
+        num_unknown = len(status_dict.get('unknown', []))
+        task_progress.succeeded += num_added + num_changed
+        task_progress.skipped += num_present
+        task_progress.failed += num_unknown
+        task_progress.attempted += num_added + num_changed + num_present + num_unknown
+        if not status_dict.get('valid'):
+            num_attempted = len(status_dict.get('not_added', []))
+            task_progress.attempted += num_attempted
+            task_progress.failed += num_attempted
     task_progress.update_task_state(extra_meta=current_step)
 
     current_step['step'] = 'Uploading CSV'
@@ -664,15 +675,17 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     # Since there may be many users in each of the 'added', 'changed',
     # 'present' and 'unknown' fields, only show the full user list for
     # 'unknown'.
-    output_header = ['cohort_name', 'valid', 'added', 'changed', 'present', 'unknown']
+    output_header = ['cohort_name', 'exists', 'students_added', 'students_changed', 'students_already_present', 'students_unknown']
+    status_keys = [None, 'valid', 'added', 'changed', 'present', 'unknown']
+    header_to_status_keys = zip(output_header, status_keys)
     output_rows = [
         [cohort_name]
         +
         [
-            status_dict.get(column, '') if column == 'valid'
-            else ','.join(status_dict.get(column, '')) if column == 'unknown'
-            else len(status_dict.get(column, ''))
-            for column in output_header if column != 'cohort_name'
+            status_dict.get(field_name, '') if field_name == 'valid'
+            else ','.join(status_dict.get(field_name, '')) if field_name == 'unknown'
+            else len(status_dict.get(field_name, ''))
+            for header, field_name in header_to_status_keys if header != 'cohort_name'
         ]
         for cohort_name, status_dict in cohorts_status.iteritems()
     ]

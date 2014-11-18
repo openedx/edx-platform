@@ -573,7 +573,8 @@ class TestCohorts(django.test.TestCase):
                     {"username_or_email": user_2.email, "cohort": second_cohort.name}
                 ]
             ),
-            {first_cohort.name: {"added": [user_1.username]}, second_cohort.name: {"added": [user_2.email]}})
+            {first_cohort.name: {"added": [user_1.username]}, second_cohort.name: {"added": [user_2.email]}}
+        )
 
         # Success case: Add cohorted users to new cohort
         _assert_ret_val_contains(
@@ -608,7 +609,10 @@ class TestCohorts(django.test.TestCase):
                     {"username_or_email": user_1.email, "cohort": "Non_existent_cohort_2"}
                 ]
             ),
-            {"Non_existent_cohort_1": {"valid": False}, "Non_existent_cohort_2": {"valid": False}}
+            {
+                "Non_existent_cohort_1": {"valid": False, "not_added": [user_2.username]},
+                "Non_existent_cohort_2": {"valid": False, "not_added": [user_1.email]}
+            }
         )
 
         # Failure case: Add unknown users to cohorts
@@ -620,5 +624,8 @@ class TestCohorts(django.test.TestCase):
                     {"username_or_email": "Non_existent_User_2", "cohort": second_cohort.name}
                 ]
             ),
-            {first_cohort.name: {"unknown": ["Non_existent_User_1"]}, second_cohort.name: {"unknown": ["Non_existent_User_2"]}}
+            {
+                first_cohort.name: {"unknown": ["Non_existent_User_1"]},
+                second_cohort.name: {"unknown": ["Non_existent_User_2"]}
+            }
         )
