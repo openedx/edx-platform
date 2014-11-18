@@ -512,28 +512,33 @@ class TestGetHtmlMethod(BaseTestXmodule):
         )
 
     def test_get_html_with_existing_edx_video_id(self):
-        result = create_profile(
-            dict(
-                profile_name="desktop_mp4",
-                extension="mp4",
-                width=200,
-                height=2001
+        # create test profiles and their encodings
+        encoded_videos = []
+        for profile, extension in [("desktop_webm", "webm"), ("desktop_mp4", "mp4")]:
+            result = create_profile(
+                dict(
+                    profile_name=profile,
+                    extension=extension,
+                    width=200,
+                    height=2001
+                )
             )
-        )
-        self.assertEqual(result, "desktop_mp4")
+            self.assertEqual(result, profile)
+            encoded_videos.append(
+                dict(
+                    url=u"http://fake-video.edx.org/thundercats.{}".format(extension),
+                    file_size=9000,
+                    bitrate=42,
+                    profile=profile,
+                )
+            )
+
         result = create_video(
             dict(
                 client_video_id="Thunder Cats",
                 duration=111,
                 edx_video_id="thundercats",
-                encoded_videos=[
-                    dict(
-                        url=u"http://fake-video.edx.org/thundercats.mp4",
-                        file_size=9000,
-                        bitrate=42,
-                        profile="desktop_mp4",
-                    )
-                ]
+                encoded_videos=encoded_videos
             )
         )
         self.assertEqual(result, "thundercats")
@@ -549,6 +554,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 {sources}
             </video>
         """
+
         data = {
             'download_video': 'true',
             'source': 'example_source.mp4',
@@ -559,8 +565,11 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'edx_video_id': "thundercats",
             'result': {
                 'download_video_link': u'http://fake-video.edx.org/thundercats.mp4',
-                # make sure the desktop_mp4 url is included as part of the alternative sources.
-                'sources': json.dumps([u'example.mp4', u'example.webm', u"http://fake-video.edx.org/thundercats.mp4"]),
+                # make sure the urls for the various encodings are included as part of the alternative sources.
+                'sources': json.dumps(
+                    [u'example.mp4', u'example.webm'] +
+                    [video['url'] for video in encoded_videos]
+                ),
             }
         }
 
