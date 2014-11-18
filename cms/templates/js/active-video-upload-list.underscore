@@ -1,10 +1,10 @@
 <%
     // TODO: Add screen-reader text
 %>
-<div class="drag-drop">
-    <form class="form-drag-drop">
+<div class="file-drop">
+    <form class="form-file-drop">
         <fieldset>
-            <div class="area-drag-drop">
+            <div class="area-file-drop">
                 <%- gettext("Drag and drop your video files here, or") %>
                 <input type="file" class="sr js-file-input" name="file" multiple>
             </div>

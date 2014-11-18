@@ -5,7 +5,6 @@ define(
 
         var ActiveVideoUploadListView = BaseView.extend({
             tagName: "div",
-            className: "wrapper-dnd",
             events: {
                 "click .js-upload-button": "chooseFile"
             },
@@ -16,7 +15,7 @@ define(
 
             render: function() {
                 this.$el.html(this.template());
-                this.uploadForm = this.$(".form-drag-drop");
+                this.uploadForm = this.$(".form-file-drop");
                 this.uploadForm.fileupload({
                     type: "PUT",
                     autoUpload: true,

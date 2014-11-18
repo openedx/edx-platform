@@ -14,6 +14,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
 from opaque_keys.edx.keys import CourseKey
+from edxmako.shortcuts import render_to_response
 from edxval.api import create_video, get_videos_for_ids
 
 from xmodule.modulestore.django import modulestore
@@ -65,7 +66,11 @@ def videos_handler(request, course_key_string):
         else:
             return videos_post(course, request)
 
-    return HttpResponse(status=406)
+    return videos_index_html(course)
+
+
+def videos_index_html(course):
+    return render_to_response("videos_index.html", {"context_course": course})
 
 
 def videos_index_json(course):

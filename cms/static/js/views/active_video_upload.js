@@ -4,7 +4,6 @@ define(
         "use strict";
         var ActiveVideoUploadView = BaseView.extend({
             tagName: "li",
-            className: "active-video-upload",
 
             initialize: function() {
                 this.template = this.loadTemplate("active-video-upload");
