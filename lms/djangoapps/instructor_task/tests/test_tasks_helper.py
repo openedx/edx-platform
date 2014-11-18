@@ -109,10 +109,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.cohort_1 = CohortFactory(course_id=self.course.id, name='Cohort 1')
-        self.cohort_2 = CohortFactory(course_id=self.course.id, name='Cohort 2')
-        self.student_1 = self.create_student(username='student_1', email='student_1@example.com')
-        self.student_2 = self.create_student(username='student_2', email='student_2@example.com')
+        CohortFactory(course_id=self.course.id, name='Cohort 1')
+        CohortFactory(course_id=self.course.id, name='Cohort 2')
+        self.create_student(username='student_1', email='student_1@example.com')
+        self.create_student(username='student_2', email='student_2@example.com')
 
     def _cohort_students_and_upload(self, csv_rows):
         """
@@ -139,3 +139,19 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ]
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_non_existent_cohort(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            [
+                ['username', 'cohort'],
+                ['student_1', 'Does Not Exist'],
+                ['student_2', 'Cohort 2']
+            ]
+        )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 1, 'failed': 1}, result)

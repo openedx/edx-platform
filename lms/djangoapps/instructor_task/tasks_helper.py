@@ -649,12 +649,20 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
 
     cohorts_status = add_users_to_cohorts(course_id, users_to_cohorts)
 
+    # Report task progress based on how users were cohorted.
     for cohort_name, status_dict in cohorts_status.iteritems():
-        if status_dict['valid']:
-            task_progress.succeeded += len(status_dict['added'] + status_dict['changed'])
-            task_progress.skipped += len(status_dict['present'])
-            task_progress.failed += len(status_dict['unknown'])
-            task_progress.attempted += len(status_dict['added'] + status_dict['changed'] + status_dict['present'] + status_dict['unknown'])
+        num_added = len(status_dict.get('added', []))
+        num_changed = len(status_dict.get('changed', []))
+        num_present = len(status_dict.get('present', []))
+        num_unknown = len(status_dict.get('unknown', []))
+        task_progress.succeeded += num_added + num_changed
+        task_progress.skipped += num_present
+        task_progress.failed += num_unknown
+        task_progress.attempted += num_added + num_changed + num_present + num_unknown
+        if not status_dict.get('valid'):
+            num_attempted = len(status_dict.get('not_added', []))
+            task_progress.attempted += num_attempted
+            task_progress.failed += num_attempted
     task_progress.update_task_state(extra_meta=current_step)
 
     current_step['step'] = 'Uploading CSV'

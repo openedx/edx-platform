@@ -398,6 +398,7 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
                 },
                 "cohort_b": {
                     "valid": False  # cohort with name "cohort_b" does not exist
+                    "not_added": ["user d", ...]  # lists: users not added to this non-existent cohort
                 },
                 ...
             }
@@ -406,8 +407,8 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
 
     cohorts_to_users = {}
     for assignment in users_to_cohorts:
-        username_or_email = assignment.get('username_or_email')
-        cohort_name = assignment.get('cohort')
+        username_or_email = assignment.get("username_or_email")
+        cohort_name = assignment.get("cohort")
         if cohorts_to_users.get(cohort_name):
             cohorts_to_users[cohort_name].append(username_or_email)
         else:
@@ -422,7 +423,7 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
             )
             cohorts_status[cohort_name] = {"valid": True}
         except CourseUserGroup.DoesNotExist:
-            cohorts_status[cohort_name] = {"valid": False}
+            cohorts_status[cohort_name] = {"valid": False, "not_added": usernames_or_emails}
             continue
 
         added = set()
