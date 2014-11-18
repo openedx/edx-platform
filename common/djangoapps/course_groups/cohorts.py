@@ -402,7 +402,7 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
                 ...
             }
     """
-    cohort_status = {}
+    cohorts_status = {}
 
     cohorts_to_users = {}
     for assignment in users_to_cohorts:
@@ -420,9 +420,9 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
                 group_type=CourseUserGroup.COHORT,
                 name=cohort_name
             )
-            cohort_status[cohort_name] = {"valid": True}
+            cohorts_status[cohort_name] = {"valid": True}
         except CourseUserGroup.DoesNotExist:
-            cohort_status[cohort_name] = {"valid": False}
+            cohorts_status[cohort_name] = {"valid": False}
             continue
 
         added = set()
@@ -442,9 +442,9 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
             except ValueError:
                 present.add(username_or_email)
 
-        cohort_status[cohort_name]["added"] = list(added)
-        cohort_status[cohort_name]["changed"] = list(changed)
-        cohort_status[cohort_name]["present"] = list(present)
-        cohort_status[cohort_name]["unknown"] = list(unknown)
+        cohorts_status[cohort_name]["added"] = list(added)
+        cohorts_status[cohort_name]["changed"] = list(changed)
+        cohorts_status[cohort_name]["present"] = list(present)
+        cohorts_status[cohort_name]["unknown"] = list(unknown)
 
-    return cohort_status
+    return cohorts_status

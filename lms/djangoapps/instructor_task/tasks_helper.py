@@ -664,15 +664,17 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     # Since there may be many users in each of the 'added', 'changed',
     # 'present' and 'unknown' fields, only show the full user list for
     # 'unknown'.
-    output_header = ['cohort_name', 'valid', 'added', 'changed', 'present', 'unknown']
+    output_header = ['cohort_name', 'exists', 'students_added', 'students_changed', 'students_already_present', 'students_unknown']
+    status_keys = [None, 'valid', 'added', 'changed', 'present', 'unknown']
+    header_to_status_keys = zip(output_header, status_keys)
     output_rows = [
         [cohort_name]
         +
         [
-            status_dict.get(column, '') if column == 'valid'
-            else ','.join(status_dict.get(column, '')) if column == 'unknown'
-            else len(status_dict.get(column, ''))
-            for column in output_header if column != 'cohort_name'
+            status_dict.get(field_name, '') if field_name == 'valid'
+            else ','.join(status_dict.get(field_name, '')) if field_name == 'unknown'
+            else len(status_dict.get(field_name, ''))
+            for header, field_name in header_to_status_keys if header != 'cohort_name'
         ]
         for cohort_name, status_dict in cohorts_status.iteritems()
     ]
