@@ -1203,6 +1203,43 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(ora_template.get('category'), 'openassessment')
         self.assertIsNone(ora_template.get('boilerplate_name', None))
 
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["combinedopenended", "peergrading"])
+    def test_ora1_no_advance_component_button(self):
+        """
+        Test that there will be no `Advanced` button on unit page if `combinedopenended` and `peergrading` are
+        deprecated provided that there are only 'combinedopenended', 'peergrading' modules in `Advanced Module List`
+        """
+        self.course.advanced_modules.extend(['combinedopenended', 'peergrading'])
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        self.assertNotIn('Advanced', button_names)
+
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["combinedopenended", "peergrading"])
+    def test_cannot_create_ora1_problems(self):
+        """
+        Test that we can't create ORA1 problems if `combinedopenended` and `peergrading` are deprecated
+        """
+        self.course.advanced_modules.extend(['annotatable', 'combinedopenended', 'peergrading'])
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        self.assertIn('Advanced', button_names)
+        self.assertEqual(len(templates[0]['templates']), 1)
+        template_display_names = [template['display_name'] for template in templates[0]['templates']]
+        self.assertEqual(template_display_names, ['Annotation'])
+
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
+    def test_create_ora1_problems(self):
+        """
+        Test that we can create ORA1 problems if `combinedopenended` and `peergrading` are not deprecated
+        """
+        self.course.advanced_modules.extend(['annotatable', 'combinedopenended', 'peergrading'])
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        self.assertIn('Advanced', button_names)
+        self.assertEqual(len(templates[0]['templates']), 3)
+        template_display_names = [template['display_name'] for template in templates[0]['templates']]
+        self.assertEqual(template_display_names, ['Annotation', 'Open Response Assessment', 'Peer Grading Interface'])
+
 
 class TestXBlockInfo(ItemTest):
     """
