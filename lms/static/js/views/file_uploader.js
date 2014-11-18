@@ -18,11 +18,24 @@
             this.$el.html(this.template({
                 model: this.model
             }));
+            var submitButton= this.$el.find('.submit-file-button');
+            var resultNotification = this.$el.find('.result');
             $('#upload-file-form').fileupload({
                 dataType: 'json',
                 type: 'POST',
                 done: this.successHandler.bind(this),
-                fail: this.errorHandler.bind(this)
+                fail: this.errorHandler.bind(this),
+                autoUpload: false,
+                replaceFileInput: false,
+                add: function(e, data) {
+                    var file = data.files[0];
+                    submitButton.unbind('click');
+                    submitButton.click(function(event){
+                        event.preventDefault();
+                        data.submit();
+                    });
+                    resultNotification.html("");
+                 }
             });
             return this;
         },

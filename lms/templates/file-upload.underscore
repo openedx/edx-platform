@@ -2,8 +2,10 @@
     <h2><%- model.get('title') %></h2>
     <p><%- model.get('description') %></p>
     <form id="upload-file-form" method="post" action="<%= model.get('url') %>" enctype="multipart/form-data">
-        <a href="#" class="choose-file-button"><%- gettext('Choose File') %></a>
+        <!--Note to Brian-- I saw this "a" ref in other examples we had, but I have no idea why we want both it and the input. If we do...-->
+        <!--<a href="#" class="choose-file-button"><%- gettext('Choose File') %></a>-->
         <input class="file_field" name="uploaded-file" type="file" accept="<%- model.get('extension') %>"/>
+        <button type="submit" class="submit-file-button"><%- gettext('Upload File') %></button>
     </form>
     <div class="result"></div>
 </div>
