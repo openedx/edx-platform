@@ -41,7 +41,8 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         # create a non-instructor who will be registered for the course and in the manual cohort.
         self.student_name = "student_user"
         self.student_id = AutoAuthPage(
-            self.browser, username=self.student_name, course_id=self.course_id, staff=False
+            self.browser, username=self.student_name, email="student_user@example.com",
+            course_id=self.course_id, staff=False
         ).visit().get_user_id()
         self.add_user_to_cohort(self.course_fixture, self.student_name, self.manual_cohort_id)
 
@@ -52,9 +53,9 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         ).visit().get_user_id()
 
         # go to the membership page on the instructor dashboard
-        instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
-        instructor_dashboard_page.visit()
-        self.membership_page = instructor_dashboard_page.select_membership()
+        self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        self.instructor_dashboard_page.visit()
+        self.membership_page = self.instructor_dashboard_page.select_membership()
 
     def verify_cohort_description(self, cohort_name, expected_description):
         """
@@ -255,3 +256,44 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self.membership_page.select_data_download()
         data_download_page = DataDownloadPage(self.browser)
         data_download_page.wait_for_page()
+
+    def test_cohort_by_csv(self):
+        """
+        Scenario: the instructor can upload a file with user and cohort assignments.
+
+        Given I have a course with two cohorts defined
+        When I go to the cohort management section of the instructor dashboard
+        I can upload a CSV file with assignments of users to cohorts
+        Then I can download a file with results
+        And appropriate events have been emitted
+        """
+        start_time = datetime.now()
+        self.membership_page.upload_correct_csv_file()
+        # Wait for notification message to appear, indicating file has been uploaded.
+        EmptyPromise(
+            lambda: 1 == len(self.membership_page.get_cvs_messages()), 'Waiting for notification'
+        ).fulfill()
+        messages = self.membership_page.get_cvs_messages()
+        # cohorts_users.cvs adds instructor_user to ManualCohort1 via username and student_user to AutoCohort1 via email
+        self.assertEquals("Your file 'cohort_users.csv' has been uploaded. Go check... in 5 minutes.", messages[0])
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_added",
+                "time": {"$gt": start_time},
+                "event.user_id": {"$in": [int(self.student_id)]},
+                "event.cohort_name": self.auto_cohort_name,
+            }).count(),
+            1
+        )
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_added",
+                "time": {"$gt": start_time},
+                "event.user_id": {"$in": [int(self.instructor_id)]},
+                "event.cohort_name": self.manual_cohort_name,
+            }).count(),
+            1
+        )
+        self.instructor_dashboard_page.select_data_download()
+        # TODO: verify entry appears in download table.
+

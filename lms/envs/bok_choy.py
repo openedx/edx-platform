@@ -42,6 +42,14 @@ update_module_store_settings(
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+################################# CELERY ######################################
+
+CELERY_ALWAYS_EAGER = True
+CELERY_RESULT_BACKEND = 'cache'
+BROKER_TRANSPORT = 'memory'
+
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD = {
     'STORAGE_TYPE': 'localfs',
