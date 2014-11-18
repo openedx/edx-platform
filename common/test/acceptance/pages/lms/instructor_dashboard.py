@@ -13,6 +13,7 @@ class InstructorDashboardPage(CoursePage):
     Instructor dashboard, where course staff can manage a course.
     """
     url_path = "instructor"
+
     def is_browser_on_page(self):
         return self.q(css='div.instructor-dashboard-wrapper-2').present
 
@@ -25,12 +26,21 @@ class InstructorDashboardPage(CoursePage):
         membership_section.wait_for_page()
         return membership_section
 
+    def select_data_download(self):
+        self.q(css='a[data-section=data_download]').first.click()
+        data_download_section = DataDownloadPage(self.browser)
+        data_download_section.wait_for_page()
+        return data_download_section
+
 
 class MembershipPage(PageObject):
     """
     Membership section of the Instructor dashboard.
     """
     url = None
+    cohort_csv_browse_button_selector = '.cohort-management .csv-upload input.file_field'
+    cohort_csv_upload_button_selector = '.cohort-management .csv-upload button.submit-file-button'
+
     def is_browser_on_page(self):
         return self.q(css='a[data-section=membership].active-section').present
 
@@ -129,11 +139,25 @@ class MembershipPage(PageObject):
         """
         Returns array of messages for given type.
         """
-        message_title = self.q(css="div.cohort-management-group-add .cohort-" + type + " .message-title")
+        title_css = "div.cohort-management-group-add .cohort-" + type + " .message-title"
+        detail_css = "div.cohort-management-group-add .cohort-" + type + " .summary-item"
+
+        return self._get_messages(title_css, detail_css)
+
+    def get_cvs_messages(self):
+        """
+        Returns array of messages for given type.
+        """
+        title_css = "div.csv-upload .message-title"
+        detail_css = "div.csv-upload .summary-item"
+        return self._get_messages(title_css, detail_css)
+
+    def _get_messages(self, title_css, details_css):
+        message_title = self.q(css=title_css)
         if len(message_title.results) == 0:
             return []
         messages = [message_title.first.text[0]]
-        details = self.q(css="div.cohort-management-group-add .cohort-" + type + " .summary-item").results
+        details = self.q(css=details_css).results
         for detail in details:
             messages.append(detail.text)
         return messages
@@ -157,6 +181,23 @@ class MembershipPage(PageObject):
         Click on the link to the Data Download Page.
         """
         self.q(css="a.link-cross-reference[data-section=data_download]").first.click()
+
+    def upload_correct_csv_file(self):
+        """
+        Selects the correct file and clicks the upload button.
+        """
+        correct_files_path = self.get_asset_path('cohort_users.csv')
+        # Can this be "first"?
+        file_input = self.q(css=self.cohort_csv_browse_button_selector).results[0]
+        file_input.send_keys(correct_files_path)
+        self.q(css=self.cohort_csv_upload_button_selector).results[0].click()
+
+    def get_asset_path(self, file_name):
+        """
+        Returns the full path of the file to upload.
+        These files have been placed in edx-platform/common/test/data/uploads/
+        """
+        return os.sep.join(__file__.split(os.sep)[:-5]) + '/test/data/uploads/%s' % file_name
 
 
 class MembershipPageAutoEnrollSection(PageObject):
