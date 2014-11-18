@@ -400,16 +400,17 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
                 },
                 "cohort_b": {
                     "valid": False  # cohort with name "cohort_b" does not exist
+                    "not_added": ["user d", ...]  # lists: users not added to this non-existent cohort
                 },
                 ...
             }
     """
-    cohort_status = {}
+    cohorts_status = {}
 
     cohorts_to_users = {}
     for assignment in users_to_cohorts:
-        username_or_email = assignment.get('username_or_email')
-        cohort_name = assignment.get('cohort')
+        username_or_email = assignment.get("username_or_email")
+        cohort_name = assignment.get("cohort")
         if cohorts_to_users.get(cohort_name):
             cohorts_to_users[cohort_name].append(username_or_email)
         else:
@@ -422,9 +423,9 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
                 group_type=CourseUserGroup.COHORT,
                 name=cohort_name
             )
-            cohort_status[cohort_name] = {"valid": True}
+            cohorts_status[cohort_name] = {"valid": True}
         except CourseUserGroup.DoesNotExist:
-            cohort_status[cohort_name] = {"valid": False}
+            cohorts_status[cohort_name] = {"valid": False, "not_added": usernames_or_emails}
             continue
 
         added = set()
@@ -444,9 +445,9 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
             except ValueError:
                 present.add(username_or_email)
 
-        cohort_status[cohort_name]["added"] = list(added)
-        cohort_status[cohort_name]["changed"] = list(changed)
-        cohort_status[cohort_name]["present"] = list(present)
-        cohort_status[cohort_name]["unknown"] = list(unknown)
+        cohorts_status[cohort_name]["added"] = list(added)
+        cohorts_status[cohort_name]["changed"] = list(changed)
+        cohorts_status[cohort_name]["present"] = list(present)
+        cohorts_status[cohort_name]["unknown"] = list(unknown)
 
-    return cohort_status
+    return cohorts_status
