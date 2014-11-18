@@ -1442,6 +1442,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         return new_course
 
     DEFAULT_ROOT_BLOCK_ID = 'course'
+
     def create_course(
         self, org, course, run, user_id, master_branch=None, fields=None,
         versions_dict=None, search_targets=None, root_category='course',
@@ -2181,7 +2182,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         The guts of saving a new or updated asset
         """
-        metadata_to_insert = asset_metadata.to_mongo()
+        metadata_to_insert = asset_metadata.to_storable()
 
         def _internal_method(all_assets, asset_idx):
             """
@@ -2217,11 +2218,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             # Form an AssetMetadata.
             mdata = AssetMetadata(asset_key, asset_key.path)
-            mdata.from_mongo(all_assets[asset_idx])
+            mdata.from_storable(all_assets[asset_idx])
             mdata.update(attr_dict)
 
             # Generate a Mongo doc from the metadata and update the course asset info.
-            all_assets[asset_idx] = mdata.to_mongo()
+            all_assets[asset_idx] = mdata.to_storable()
             return all_assets
 
         self._update_course_assets(user_id, asset_key, _internal_method)
@@ -2688,6 +2689,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         to be run during server startup.
         """
         self.db_connection.ensure_indexes()
+
 
 class SparseList(list):
     """

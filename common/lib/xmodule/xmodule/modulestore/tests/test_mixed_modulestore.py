@@ -1432,25 +1432,26 @@ class TestMixedModuleStore(CourseComparisonTest):
             self.assertLess(node.subtree_edited_on, subtree_before)
             self.assertEqual(node.subtree_edited_by, subtree_by)
 
-        # Create a dummy vertical & html to test against
-        component = self.store.create_child(
-            self.user_id,
-            test_course.location,
-            'vertical',
-            block_id='test_vertical'
-        )
-        child = self.store.create_child(
-            self.user_id,
-            component.location,
-            'html',
-            block_id='test_html'
-        )
-        sibling = self.store.create_child(
-            self.user_id,
-            component.location,
-            'html',
-            block_id='test_html_no_change'
-        )
+        with self.store.bulk_operations(test_course.id):
+            # Create a dummy vertical & html to test against
+            component = self.store.create_child(
+                self.user_id,
+                test_course.location,
+                'vertical',
+                block_id='test_vertical'
+            )
+            child = self.store.create_child(
+                self.user_id,
+                component.location,
+                'html',
+                block_id='test_html'
+            )
+            sibling = self.store.create_child(
+                self.user_id,
+                component.location,
+                'html',
+                block_id='test_html_no_change'
+            )
 
         after_create = datetime.datetime.now(UTC)
         # Verify that all nodes were last edited in the past by create_user
@@ -1461,7 +1462,8 @@ class TestMixedModuleStore(CourseComparisonTest):
         component.display_name = 'Changed Display Name'
 
         editing_user = self.user_id - 2
-        component = self.store.update_item(component, editing_user)
+        with self.store.bulk_operations(test_course.id):  # TNL-764 bulk ops disabled ancestor updates
+            component = self.store.update_item(component, editing_user)
         after_edit = datetime.datetime.now(UTC)
         check_node(component.location, after_create, after_edit, editing_user, after_create, after_edit, editing_user)
         # but child didn't change

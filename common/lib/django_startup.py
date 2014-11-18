@@ -5,6 +5,7 @@ Automatic execution of startup modules in Django apps.
 from importlib import import_module
 from django.conf import settings
 
+
 def autostartup():
     """
     Execute app.startup:run() for all installed django apps

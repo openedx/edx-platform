@@ -587,7 +587,7 @@ def course_info(request, course_id):
 
         # check to see if there is a required survey that must be taken before
         # the user can access the course.
-        if survey.utils.must_answer_survey(course, request.user):
+        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
             return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
         staff_access = has_access(request.user, 'staff', course)
@@ -841,6 +841,7 @@ def mktg_course_about(request, course_id):
         # Just to be safe, reset the language if we forced it to be English.
         if force_english:
             translation.deactivate()
+
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

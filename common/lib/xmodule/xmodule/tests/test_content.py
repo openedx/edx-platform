@@ -44,6 +44,7 @@ Various versions have evolved over the years, sometimes by accident, sometimes o
 injected humour and the like).
 """
 
+
 class Content:
     def __init__(self, location, content_type):
         self.location = location

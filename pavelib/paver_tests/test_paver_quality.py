@@ -8,6 +8,7 @@ import pavelib.quality
 import paver.easy
 from paver.easy import BuildFailure
 
+
 @ddt
 class TestPaverQualityViolations(unittest.TestCase):
 

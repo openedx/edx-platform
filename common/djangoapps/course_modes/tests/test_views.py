@@ -31,6 +31,7 @@ class CourseModeViewTest(ModuleStoreTestCase):
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @ddt.data(
         # is_active?, enrollment_mode, redirect?
         (True, 'verified', True),
@@ -149,7 +150,6 @@ class CourseModeViewTest(ModuleStoreTestCase):
         # Expect that this time we're redirected to the dashboard (since we're already registered)
         response = self.client.get(choose_track_url)
         self.assertRedirects(response, reverse('dashboard'))
-
 
     # Mapping of course modes to the POST parameters sent
     # when the user chooses that mode.

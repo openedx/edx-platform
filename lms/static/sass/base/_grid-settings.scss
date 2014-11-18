@@ -6,7 +6,6 @@ $max-width: 1200px;
 $border-box-sizing: false;
 
 
-
 /* Breakpoints */
 $mobile: new-breakpoint(max-width 320px 4);
 $tablet: new-breakpoint(min-width 321px max-width 768px, 8);

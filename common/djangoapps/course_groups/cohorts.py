@@ -322,6 +322,7 @@ def add_cohort(course_key, name):
     )
     return cohort
 
+
 def add_user_to_cohort(cohort, username_or_email):
     """
     Look up the given user, and if successful, add them to the specified cohort.

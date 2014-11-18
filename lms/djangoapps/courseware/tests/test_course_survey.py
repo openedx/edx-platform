@@ -106,6 +106,20 @@ class SurveyViewsTests(LoginEnrollmentTestCase):
         """
         self._assert_survey_redirect(self.course)
 
+    def test_anonymous_user_visiting_course_with_survey(self):
+        """
+        Verifies that anonymous user going to the courseware info with an unanswered survey is not
+        redirected to survery and info page renders without server error.
+        """
+        self.logout()
+        resp = self.client.get(
+            reverse(
+                'info',
+                kwargs={'course_id': unicode(self.course.id)}
+            )
+        )
+        self.assertEquals(resp.status_code, 200)
+
     def test_visiting_course_with_existing_answers(self):
         """
         Verifies that going to the courseware with an answered survey, there is no redirect

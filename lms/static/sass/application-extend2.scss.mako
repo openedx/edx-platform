@@ -7,6 +7,7 @@
 @import 'bourbon/bourbon'; // lib - bourbon
 @import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
+
 // BASE  *default edX offerings*
 // ====================
 
@@ -44,6 +45,7 @@
 @import 'elements/system-feedback';
 
 // base - specific views
+@import 'views/login-register';
 @import 'views/verification';
 @import 'views/shoppingcart';
 

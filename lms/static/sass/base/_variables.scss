@@ -22,6 +22,12 @@ $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
 $serif: $georgia;
 
+// FONT-WEIGHTS
+$font-light: 300;
+$font-regular: 400;
+$font-semibold: 600;
+$font-bold: 700;
+
 // ====================
 
 // MISC: base fonts/colors
@@ -402,9 +408,9 @@ $homepage__header--background: lighten($blue, 15%);
 // IMAGES: backgrounds
 $homepage-bg-image: none;
 
-$login-banner-image: url(../images/bg-banner-account.png);
-$register-banner-image: url(../images/bg-banner-account.png);
-$passwordreset-banner-image: url(../images/bg-banner-account.png);
+$login-banner-image: url(../images/edx-background-banner-account.png);
+$register-banner-image: url(../images/edx-background-banner-account.png);
+$passwordreset-banner-image: url(../images/edx-background-banner-account.png);
 
 $video-thumb-url: '../images/homepage-hero-video-thumb.jpg';
 

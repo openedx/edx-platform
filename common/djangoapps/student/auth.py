@@ -83,4 +83,3 @@ def _check_caller_authority(caller, role):
     elif isinstance(role, CourseRole):  # instructors can change the roles w/in their course
         if not has_access(caller, CourseInstructorRole(role.course_key)):
             raise PermissionDenied
-

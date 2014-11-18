@@ -192,10 +192,8 @@ function goto( mode)
       <div class="copy">
         <p>
           ${_("Note: some of these buttons are known to time out for larger "
-              "courses. We have temporarily disabled those features for courses "
-              "with more than {max_enrollment} students. We are urgently working on "
-              "fixing this issue. Thank you for your patience as we continue "
-              "working to improve the platform!").format(
+              "courses. We have disabled those features for courses "
+              "with more than {max_enrollment} students.").format(
               max_enrollment=settings.FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
             )}
         </p>
@@ -428,10 +426,8 @@ function goto( mode)
       <div class="copy">
         <p>
           ${_("Note: some of these buttons are known to time out for larger "
-              "courses. We have temporarily disabled those features for courses "
-              "with more than {max_enrollment} students. We are urgently working on "
-              "fixing this issue. Thank you for your patience as we continue "
-              "working to improve the platform!").format(
+              "courses. We have disabled those features for courses "
+              "with more than {max_enrollment} students.").format(
               max_enrollment=settings.FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
             )}
         </p>
@@ -461,17 +457,6 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %endif
-  <h2>${_("Batch Enrollment")}</h2>
-  <p>${_("Enroll or un-enroll one or many students: enter emails, separated by new lines or commas;")}</p>
-  <textarea rows="6" cols="70" name="multiple_students"></textarea>
-  <p>
-  <input type="checkbox" name="email_students"> ${_("Notify students by email")}
-  <p>
-  <input type="checkbox" name="auto_enroll"> ${_("Auto-enroll students when they activate")}
-  <input type="submit" name="action" value="Enroll multiple students">
-  <p>
-  <input type="submit" name="action" value="Unenroll multiple students">
-
 %endif
 
 ##-----------------------------------------------------------------------------
@@ -607,22 +592,6 @@ function goto( mode)
 
   %if not any(analytics_results.values()):
     <p>${_("No Analytics are available at this time.")}</p>
-  %endif
-
-  %if analytics_results.get("StudentsEnrolled"):
-    <p>
-      ${_("Students enrolled (historical count, includes those who have since unenrolled):")}
-      ${analytics_results["StudentsEnrolled"]['data'][0]['students']}
-      (${analytics_results["StudentsEnrolled"]['time']})
-    </p>
-  %endif
-
-  %if analytics_results.get("StudentsActive"):
-    <p>
-      ${_("Students active in the last week:")}
-      ${analytics_results["StudentsActive"]['data'][0]['active']}
-      (${analytics_results["StudentsActive"]['time']})
-    </p>
   %endif
 
   %if analytics_results.get("StudentsDropoffPerDay"):
