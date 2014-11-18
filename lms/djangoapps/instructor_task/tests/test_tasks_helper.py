@@ -109,10 +109,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.cohort_1 = CohortFactory(course_id=self.course.id, name='Cohort 1')
-        self.cohort_2 = CohortFactory(course_id=self.course.id, name='Cohort 2')
-        self.student_1 = self.create_student(username='student_1', email='student_1@example.com')
-        self.student_2 = self.create_student(username='student_2', email='student_2@example.com')
+        CohortFactory(course_id=self.course.id, name='Cohort 1')
+        CohortFactory(course_id=self.course.id, name='Cohort 2')
+        self.create_student(username='student_1', email='student_1@example.com')
+        self.create_student(username='student_2', email='student_2@example.com')
 
     def _cohort_students_and_upload(self, csv_rows):
         """
@@ -125,7 +125,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
                 return cohort_students_and_upload(None, None, self.course.id, {'file_name': fp.name}, 'cohorted')
 
     @patch('instructor_task.tasks_helper.DefaultStorage')
-    def test_success(self, mock_default_storage):
+    def test_username(self, mock_default_storage):
         # Mock out DefaultStorage's scoped `open` method with standard python
         # `open` so that we can read from /tmp/
         mock_default_storage.return_value = Mock()
@@ -133,9 +133,95 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
 
         result = self._cohort_students_and_upload(
             [
-                ['username', 'cohort'],
-                ['student_1', 'Cohort 1'],
-                ['student_2', 'Cohort 2']
+                ['username', 'email', 'cohort'],
+                ['student_1', '', 'Cohort 1'],
+                ['student_2', '', 'Cohort 2']
             ]
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_email(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            [
+                ['username', 'email', 'cohort'],
+                ['', 'student_1@example.com', 'Cohort 1'],
+                ['', 'student_2@example.com', 'Cohort 2']
+            ]
+        )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_username_and_email(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            [
+                ['username', 'email', 'cohort'],
+                ['student_1', 'student_1@example.com', 'Cohort 1'],
+                ['student_2', 'student_2@example.com', 'Cohort 2']
+            ]
+        )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_prefer_email(self, mock_default_storage):
+        """
+        Test that `cohort_students_and_upload` greedily prefers 'email' over
+        'username' when identifying the user.  This means that if a correct
+        email is present, an incorrect or non-matching username will simply be
+        ignored.
+        """
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            [
+                ['username', 'email', 'cohort'],
+                ['student_1', 'student_1@example.com', 'Cohort 1'],  # valid username and email
+                ['Invalid', 'student_2@example.com', 'Cohort 2']     # invalid username, valid email
+            ]
+        )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_non_existent_user(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            [
+                ['username', 'email', 'cohort'],
+                ['Invalid', '', 'Cohort 1'],
+                ['student_2', 'also_fake@bad.com', 'Cohort 2']
+            ]
+        )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_non_existent_cohort(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            [
+                ['username', 'email', 'cohort'],
+                ['', 'student_1@example.com', 'Does Not Exist'],
+                ['student_2', '', 'Cohort 2']
+            ]
+        )
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
