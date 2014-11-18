@@ -70,25 +70,26 @@
               border: none;
             }
 
-            progress::-webkit-progress-bar,
-            progress::-moz-progress-bar,
-            progress::-ms-progress-bar,
-            progress::-o-progress-bar {
-              background: #fff;
+            progress::-webkit-progress-bar {
+              background: $white;
               border-radius: ($baseline/5);
             }
 
-            progress::-webkit-progress-value, 
-            progress::-moz-progress-value,
-            progress::-ms-progress-value,
-            progress::-o-progress-value {
+            progress::-webkit-progress-value {
               background: $gray;
             }
-            progress.bar-error {
+          }
+
+          .progress-bar.bar-error {
+
+            progress::-webkit-progress-value {
               background: $color-error;
             }
+          }
 
-            progress.bar-success {
+          .progress-bar.bar-success {
+
+            progress::-webkit-progress-value {
               background: $color-ready;
             }
           }
@@ -154,6 +155,13 @@
         .video-detail-wrapper {
           @include transition(all $tmg-f3);
           background: $white;
+
+          .progress-bar {
+
+            progress::-webkit-progress-bar {
+              background: $gray-l5;
+            }
+          }
         }
       }
     }
