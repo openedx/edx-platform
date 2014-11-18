@@ -76,3 +76,6 @@
 
 // discussion
 @import "course/discussion/form-wmd-toolbar";
+
+// views
+@import "views/student-notes";

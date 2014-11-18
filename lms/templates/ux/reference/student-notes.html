@@ -1,0 +1,65 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Student Notes</%block>
+<%block name="nav_skip">#instructor-dashboard-content</%block>
+
+<%block name="headextra">
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-vendor-tinymce-content'/>
+  <%static:css group='style-vendor-tinymce-skin'/>
+  <%static:css group='style-course'/>
+</%block>
+
+<div class="content-wrapper">
+  <nav class="info course-material" role="navigation">
+    <div class="inner-wrapper">
+      <ol class="course-tabs">
+        <li><a href="">Courseware</a></li>
+        <li><a href="">Course Info</a></li>
+        <li><a href="">Discussion</a></li>
+        <li><a href="">Wiki</a></li>
+        <li><a href="">Progress</a></li>
+        <li><a href="">Weekly Forum Digest</a></li>
+        <li><a href="">Frequently Asked Questions</a></li>
+        <li><a class="active" href="">Notes</a></li>
+        <li><a href="">Instructor</a></li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="container wrapper-student-notes">
+    <div class="info-wrapper">
+      <section class="updates">
+        <div class="title-search-container">
+          <div class="wrapper-title">
+            <h1 class="page-title">Notes <small class="page-subtitle">Highlights and personal notes you have made within this course</small></h1>
+          </div>
+        </div>
+        
+        <section class="is-empty">
+          <article>
+            <h2>You haven not made any notes in this course yet.</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          
+            <h2>Other Students In This Course Are Using Notes To:</h2>
+            <ul>
+              <li>Add study notes to course content for exams and homework.</li>
+              <li>Highlight important concepts for later coursework or future courses</li>
+              <li>Donec id elit non mi porta gravida et eget metus.</li>
+              <li>Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</li>
+            </ul>
+
+            <div class="student-notes-cta">
+              <h3 class="sr">Start creating notes</h3>
+              <p>Get started by making a note in something you just read, like <a href="">Week 1: Introduction to Justice</a>.</p>
+            </div>
+          </article>
+        </section>
+      </section>
+    </div>
+  </section>
+</div>
