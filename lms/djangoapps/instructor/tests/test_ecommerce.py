@@ -3,6 +3,8 @@ Unit tests for Ecommerce feature flag in new instructor dashboard.
 """
 
 from django.core.urlresolvers import reverse
+import datetime
+import pytz
 from django.test.utils import override_settings
 from mock import patch
 
@@ -144,12 +146,25 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         # URL for add_coupon
         add_coupon_url = reverse('add_coupon', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        expiration_date = datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
+
         data = {
             'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
-            'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5
+            'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5,
+            'expiration_date': '{month}/{day}/{year}'.format(month=expiration_date.month, day=expiration_date.day, year=expiration_date.year)
         }
         response = self.client.post(add_coupon_url, data)
         self.assertTrue("coupon with the coupon code ({code}) added successfully".format(code=data['code']) in response.content)
+
+        #now add the coupon with the wrong value in the expiration_date
+        # server will through the ValueError Exception in the expiration_date field
+        data = {
+            'code': '213454', 'course_id': self.course.id.to_deprecated_string(),
+            'description': 'ADSADASDSAD', 'created_by': self.instructor, 'discount': 5,
+            'expiration_date': expiration_date.strftime('"%d/%m/%Y')
+        }
+        response = self.client.post(add_coupon_url, data)
+        self.assertTrue("Please enter the date in this format i-e month/day/year" in response.content)
 
         data = {
             'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
@@ -221,13 +236,15 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         coupon = Coupon(
             code='AS452', description='asdsadsa', course_id=self.course.id.to_deprecated_string(),
-            percentage_discount=10, created_by=self.instructor
+            percentage_discount=10, created_by=self.instructor,
+            expiration_date=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
         )
         coupon.save()
         # URL for edit_coupon_info
         edit_url = reverse('get_coupon_info', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(edit_url, {'id': coupon.id})
         self.assertTrue('coupon with the coupon id ({coupon_id}) updated successfully'.format(coupon_id=coupon.id) in response.content)
+        self.assertIn(coupon.display_expiry_date, response.content)
 
         response = self.client.post(edit_url, {'id': 444444})
         self.assertTrue('coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=444444) in response.content)
