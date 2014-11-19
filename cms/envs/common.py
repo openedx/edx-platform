@@ -107,6 +107,9 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': None,
+
+    # Turn off Video Upload Pipeline through Studio, by default
+    'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
 }
 ENABLE_JASMINE = False
 
@@ -549,6 +552,15 @@ YOUTUBE = {
     },
 }
 
+############################# VIDEO UPLOAD PIPELINE #############################
+
+VIDEO_UPLOAD_PIPELINE = {
+    'BUCKET': 'edx-raw-videos',
+    'ROOT_PATH': '',
+}
+AWS_ACCESS_KEY_ID = ""
+AWS_SECRET_ACCESS_KEY = ""
+
 ############################ APPS #####################################
 
 INSTALLED_APPS = (
@@ -736,7 +748,7 @@ ADVANCED_COMPONENT_TYPES = [
     'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
     'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
     'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
-    'profile',  # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
+    'profile', # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
     'split_test',
     'combinedopenended',
     'peergrading',

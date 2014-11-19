@@ -28,7 +28,6 @@ CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
 CATALOG_VISIBILITY_NONE = "none"
 
-
 class StringOrDate(Date):
     def from_json(self, value):
         """
@@ -285,7 +284,11 @@ class CourseFields(object):
         default=False,
         scope=Scope.settings
     )
-
+    video_upload_pipeline = Dict(
+        display_name=_("Video Upload Credentials"),
+        help=_("Enter the unique identifier for your course's video files provided by edX."),
+        scope=Scope.settings
+    )
     no_grade = Boolean(
         display_name=_("Course Not Graded"),
         help=_("Enter true or false. If true, the course will not be graded."),
@@ -589,7 +592,6 @@ class CourseFields(object):
             {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},
             {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]
     )
-
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
@@ -1094,3 +1096,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return self.display_organization
 
         return self.org
+
+    @property
+    def video_pipeline_configured(self):
+        """
+        Returns whether the video pipeline advanced setting is configured for this course.
+        """
+        return (
+            self.video_upload_pipeline is not None and
+            'Institute_Name' in self.video_upload_pipeline and
+            'Access_Token' in self.video_upload_pipeline
+        )

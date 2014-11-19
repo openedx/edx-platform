@@ -1,0 +1,4 @@
+<h4 class="filename"><%- fileName %></h4>
+<div class="status-message">
+    <p class="text"><%- gettext(status) %></p>
+</div>

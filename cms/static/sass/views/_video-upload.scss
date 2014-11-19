@@ -1,0 +1,209 @@
+.view-video-upload {
+
+  .hide {
+    display: none;
+  }
+
+  .file-drop {
+    margin-bottom: 1.5rem;
+    border: 2px dashed #ccc;
+    border-radius: ($baseline/5);
+    background: white;
+
+    .area-file-drop, .action-area {
+      display: table-cell;
+      float: left;
+      vertical-align: middle;
+      padding-top: ($baseline*1.5);
+      padding-bottom: ($baseline*1.5);
+    }
+
+    .area-file-drop {
+      width: 50%;
+      padding-right: 2%;
+      text-align: right;
+    }
+
+    .action-area {
+      width: 44%;
+      padding-left: 2%;
+      padding-top: $baseline;
+      padding-bottom: $baseline;
+      text-align: left;
+    }
+  }
+
+  .video-upload-progress-container {
+    margin-bottom: ($baseline*2);
+
+    ul {
+      list-style: none;
+
+      li {
+        display: block;
+        float: left;
+        width: 33%;
+
+        .video-detail-wrapper {
+          min-height: ($baseline*4);
+          margin: 2%;
+          padding: ($baseline/2);
+          border: 1px solid #ccc;
+          border-radius: ($baseline/5);
+
+          h4 {
+            margin-bottom: ($baseline/2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 90%;
+            font-weight: 600;
+          }
+
+          .progress-bar {
+            float: left;
+            width: 80%;
+            border-radius: ($baseline/5);
+
+            progress { 
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              appearance: none;
+              width: 100%;
+              height: 5px;
+              border: none;
+            }
+
+            progress::-webkit-progress-bar {
+              background: $white;
+              border-radius: ($baseline/5);
+            }
+
+            progress::-webkit-progress-value {
+              background: $gray;
+            }
+          }
+
+          .progress-bar.bar-error {
+
+            progress::-webkit-progress-value {
+              background: $color-error;
+            }
+          }
+
+          .progress-bar.bar-success {
+
+            progress::-webkit-progress-value {
+              background: $color-ready;
+            }
+          }
+
+          .video-actions {
+            float: left;
+            width: 20%;
+            margin-top: ($baseline/5);
+            text-align: right;
+
+            button {
+              border: 0;
+              background: transparent;
+
+              .icon {
+                color: $gray;
+              }
+
+              .icon-remove:hover, .icon-remove:focus, 
+              .icon-trash:hover, .icon-trash:focus {
+                color: $color-error;
+              } 
+
+              .icon-rotate-left:hover, .icon-rotate-left:focus {
+                color: $blue;
+              }
+            }
+          }
+
+          .status-message {
+            line-height: 150%;
+            font-size: 80%;
+
+            .error {
+              color: $color-error;
+            }
+
+            .success {
+              color: $color-ready;
+            }
+          }
+        }
+      }
+
+      li.is-duplicate {
+
+        h4 {
+          margin-bottom: 0;
+        }
+
+        .status-message {
+          padding-top: 0;
+        }
+
+        .progress-bar, 
+        .video-actions {
+          display: none;
+        }
+      }
+
+      li:hover, li:focus {
+
+        .video-detail-wrapper {
+          @include transition(all $tmg-f3);
+          background: $white;
+
+          .progress-bar {
+
+            progress::-webkit-progress-bar {
+              background: $gray-l5;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .assets-wrapper {
+    margin-top: 2.5rem;
+
+    .asset-library {
+
+      h3 {
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+      }
+
+      table {
+        font-size: 80%;
+
+        td.title-col {
+
+          a {
+            font-weight: 600;
+          }
+        }
+
+        td.actions-col {
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+
+  .button {
+    @extend %ui-btn;
+
+    &.primary-green {
+      @extend %btn-primary-green;
+    }
+  }
+
+}
