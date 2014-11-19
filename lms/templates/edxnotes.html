@@ -42,7 +42,7 @@
     (function (require) {
         require(['js/edxnotes/views/page_factory'], function (NotesFactory) {
             var pageView = new NotesFactory({
-                notesList: ${json.dumps(notes)},
+                notesList: ${notes},
                 debugMode: ${debug},
                 authToken: '${token}',
                 user: '${user.username}',
