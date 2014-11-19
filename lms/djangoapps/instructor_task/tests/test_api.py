@@ -1,7 +1,7 @@
 """
 Test for LMS instructor background task queue management
 """
-from mock import patch, Mock
+from mock import patch, Mock, MagicMock
 from bulk_email.models import CourseEmail, SEND_TO_ALL
 from courseware.tests.factories import UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -22,16 +22,20 @@ from instructor_task.api import (
     submit_executive_summary_report,
     submit_course_survey_report,
     generate_certificates_for_students,
-    regenerate_certificates
+    regenerate_certificates,
+    submit_export_ora2_data,
 )
 
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import InstructorTask, PROGRESS
-from instructor_task.tests.test_base import (InstructorTaskTestCase,
-                                             InstructorTaskCourseTestCase,
-                                             InstructorTaskModuleTestCase,
-                                             TestReportMixin,
-                                             TEST_COURSE_KEY)
+from instructor_task.tasks import export_ora2_data
+from instructor_task.tests.test_base import (
+    InstructorTaskTestCase,
+    InstructorTaskCourseTestCase,
+    InstructorTaskModuleTestCase,
+    TestReportMixin,
+    TEST_COURSE_KEY,
+)
 from certificates.models import CertificateStatuses, CertificateGenerationHistory
 
 
@@ -255,6 +259,16 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             file_name=u'filename.csv'
         )
         self._test_resubmission(api_call)
+
+    def test_submit_ora2_request_task(self):
+        request = self.create_task_request(self.instructor)
+
+        with patch('instructor_task.api.submit_task') as mock_submit_task:
+            mock_submit_task.return_value = MagicMock()
+            submit_export_ora2_data(request, self.course.id)
+
+            mock_submit_task.assert_called_once_with(
+                request, 'export_ora2_data', export_ora2_data, self.course.id, {}, '')
 
     def test_submit_generate_certs_students(self):
         """
