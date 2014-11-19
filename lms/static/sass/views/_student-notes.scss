@@ -4,7 +4,7 @@
     padding-bottom: $baseline;
 
     .title-search-container {
-      border-bottom: 1px solid $gray-l3;
+      border-bottom: 1px solid $gray-l4;
       margin-bottom: $baseline;
 
       .title-wrapper {
@@ -78,7 +78,7 @@
         .note {
           margin: 0;
           padding: ($baseline*1.5) 0;
-          border-bottom: 1px solid $gray-l3;
+          border-top: 1px solid $gray-l4;
 
           .excerpt {
             float: left;
@@ -86,7 +86,7 @@
 
             p {
               padding: $baseline;
-              background: tint($blue, 95%);
+              background: tint($blue, 85%);
               font-size: 90%;
             }
 
@@ -95,10 +95,11 @@
               margin: 0;
               padding: 0;
               list-style: none;
-              background: tint($blue, 85%);
+              background: tint($blue, 95%);
 
               li {
                 padding: ($baseline/2) $baseline;
+                border-bottom: 2px solid $white;
                                 
                 p {
                   padding: 0;
@@ -113,13 +114,13 @@
             .note-comments:before {
               display: block;
               position: absolute;
-              top: -12px;
-              left: 12px;
-              height: 12px;
-              width: 12px;
+              top: -13px;
+              left: 20px;
+              height: 16px;
+              width: 16px;
               font-family: "FontAwesome";
               content: "\f0d8";
-              color: tint($blue, 85%);
+              color: tint($blue, 95%);
             }
           }
 
@@ -130,7 +131,7 @@
 
             div {
               padding: 0 $baseline;
-              color: $gray-l3;
+              color: $gray-l2;
 
               h3 {
                 margin-top: $baseline;
@@ -138,7 +139,7 @@
                 font-size: 100%;
                 font-weight: 500;
                 letter-spacing: 1px;
-                color: $gray-l3;
+                color: $gray-l2;
               }
 
               h3:first-child {
@@ -150,10 +151,28 @@
               }
             }
           }
+        }
 
-          .note:last-child {
-            border-bottom: none;
+        .note-group {
+          padding-top: ($baseline*1.5);
+
+          .group-lecture {
+            padding-bottom: $baseline;
+            border-bottom: 2px solid $gray-l4;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+
+            .subtitle {
+              display: block;
+              font-size: 75%;
+              font-weight: 100;
+              color: inherit;
+            }
           }
+        }
+
+        .note.no-top-border {
+          border-top: none;
         }
       }
     }
