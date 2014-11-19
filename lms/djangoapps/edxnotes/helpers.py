@@ -13,13 +13,18 @@ from django.utils.translation import ugettext as _
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 log = logging.getLogger(__name__)
+from provider.oauth2.models import AccessToken, Client
 
 
-def get_token():
+def get_token(user):
     """
-    Returns authentication token.
+    Generates OAuth access token for a user
     """
-    return None
+    token, _ = AccessToken.objects.get_or_create(
+        client=Client.objects.get(name='edx-notes'),
+        user=user
+    )
+    return token.token
 
 
 def get_notes(user, course):
