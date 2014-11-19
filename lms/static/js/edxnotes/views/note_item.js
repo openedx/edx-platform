@@ -13,7 +13,7 @@
             },
 
             render: function () {
-                var context = this.model.toContext();
+                var context = this.model.toJSON();
                 this.$el.html(this.template(context));
                 return this;
             },
