@@ -1,3 +1,4 @@
+from uuid import uuid4
 from datetime import datetime
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -8,12 +9,11 @@ from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
 from oauth2_provider.tests.factories import ClientFactory
 
+
 class EdxNotesTest(UniqueCourseTest):
     """
     Tests for annotation inside HTML components in LMS.
     """
-    username = 'test_student'
-    email = 'student101@example.com'
 
     def setUp(self):
         """
@@ -24,15 +24,16 @@ class EdxNotesTest(UniqueCourseTest):
         self.note_unit_page = EdxNotesUnitPage(self.browser, self.course_id)
         self.notes_page = EdxNotesPage(self.browser, self.course_id)
 
+        self.username = str(uuid4().hex)[:5]
+        self.email = "{}@email.com".format(self.username)
+
+        self.selector = "annotate-id"
+        ClientFactory(name='edx-notes')
         self.edxnotes_fixture = EdxNotesFixture()
         self.course_fixture = CourseFixture(
             self.course_info["org"], self.course_info["number"],
             self.course_info["run"], self.course_info["display_name"]
         )
-        ClientFactory(name='edx-notes')
-
-
-        self.selector = "annotate-id"
 
         self.course_fixture.add_advanced_settings({
             u"edxnotes": {u"value": True}
@@ -228,9 +229,6 @@ class EdxNotesPageTest(UniqueCourseTest):
     """
     Tests for Notes page.
     """
-    username = 'test_student'
-    email = 'student101@example.com'
-
     def setUp(self):
         """
         Initialize pages and install a course fixture.
@@ -239,6 +237,10 @@ class EdxNotesPageTest(UniqueCourseTest):
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.notes_page = EdxNotesPage(self.browser, self.course_id)
 
+        self.username = str(uuid4().hex)[:5]
+        self.email = "{}@email.com".format(self.username)
+
+        ClientFactory(name='edx-notes')
         self.edxnotes_fixture = EdxNotesFixture()
         self.course_fixture = CourseFixture(
             self.course_info["org"], self.course_info["number"],
@@ -260,10 +262,12 @@ class EdxNotesPageTest(UniqueCourseTest):
                         ),
                     ),
                     XBlockFixtureDesc('vertical', 'Test Unit 2').add_children(
-                        XBlockFixtureDesc(
-                            "html",
-                            "Test HTML 2",
-                            data="""<p>Third text!</p>"""
+                        XBlockFixtureDesc('vertical', 'Test Unit 2').add_children(
+                            XBlockFixtureDesc(
+                                "html",
+                                "Test HTML 2",
+                                data="""<p>Third text!</p>"""
+                            ),
                         ),
                     ),
                 ),
@@ -286,7 +290,6 @@ class EdxNotesPageTest(UniqueCourseTest):
         Then I see only "You do not have any notes within the course." message
         """
         self.notes_page.visit()
-        self.assertEqual(len(self.notes_page.children), 0)
         self.assertEqual('You do not have any notes within the course.', self.notes_page.no_content_text)
 
     def test_recent_activity_view(self):
@@ -313,7 +316,7 @@ class EdxNotesPageTest(UniqueCourseTest):
                 course_id=self.course_fixture._course_key,
                 text="",
                 quote="First note",
-                updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat()
+                updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat()
             ),
             Note(
                 usage_id=xblocks[1].locator,
@@ -321,7 +324,7 @@ class EdxNotesPageTest(UniqueCourseTest):
                 course_id=self.course_fixture._course_key,
                 text="Third text",
                 quote="",
-                updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat()
+                updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat()
             )
         ])
 
@@ -343,23 +346,23 @@ class EdxNotesPageTest(UniqueCourseTest):
         assertContent(
             items[0],
             quote=u"First note",
-            unit_name="Test HTML 2",
-            time_updated="January 01, 2012 at 01:01AM"
+            unit_name="Test Unit 2",
+            time_updated="Jan 01, 2014 at 01:01 UTC"
         )
 
         assertContent(
             items[1],
             text="Annotate this text!",
             quote=u"Second note",
-            unit_name="Test HTML 1",
-            time_updated="January 01, 2013 at 01:01AM"
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2013 at 01:01 UTC"
         )
 
         assertContent(
             items[2],
             text=u"Third text",
-            unit_name="Test HTML 2",
-            time_updated="January 01, 2014 at 01:01AM"
+            unit_name="Test Unit 2",
+            time_updated="Jan 01, 2012 at 01:01 UTC"
         )
 
     def test_easy_access_from_notes_page(self):
