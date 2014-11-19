@@ -686,6 +686,10 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
+    'discussion': {
+        'source_filenames': ['sass/discussion-forum.css'],
+        'output_filename': 'css/cms-style-discussion-forum.css'
+    }
 }
 
 base_vendor_js = [
