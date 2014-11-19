@@ -167,6 +167,7 @@ class VerifiedView(View):
         return render_to_response('verify_student/verified.html', context)
 
 
+@require_POST
 @login_required
 def create_order(request):
     """
@@ -237,7 +238,7 @@ def create_order(request):
     params = get_signed_purchase_params(
         cart,
         callback_url=callback_url,
-        extra_data=[unicode(course_id)]
+        extra_data=[unicode(course_id), current_mode.slug]
     )
 
     params['success'] = True

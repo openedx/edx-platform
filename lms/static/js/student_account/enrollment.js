@@ -25,7 +25,7 @@ var edx = edx || {};
         enroll: function( courseKey ) {
             $.ajax({
                 url: this.courseEnrollmentUrl( courseKey ),
-                type: 'POST',
+                type: 'PUT',
                 data: {},
                 headers: this.headers,
                 context: this

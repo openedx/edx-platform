@@ -77,7 +77,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         )
 
         # Enroll in the course, this will fail if the mode is not explicitly professional.
-        resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
+        resp = self.client.put(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
         # While the enrollment wrong is invalid, the response content should have
@@ -99,7 +99,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         resp = self._create_enrollment()
 
         # Deactivate the enrollment in the course and verify the URL we get sent to
-        resp = self.client.post(reverse(
+        resp = self.client.put(reverse(
             'courseenrollment',
             kwargs={'course_id': (unicode(self.course.id))}
         ), {'deactivate': True})
@@ -114,7 +114,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         self.client.logout()
 
         # Try to enroll, this should fail.
-        resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
+        resp = self.client.put(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_user_not_activated(self):
@@ -130,12 +130,12 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         self.client.login(username="inactive", password=self.PASSWORD)
 
         # Enrollment should succeed, even though we haven't authenticated.
-        resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
+        resp = self.client.put(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
         self.assertEqual(resp.status_code, 200)
 
     def test_unenroll_not_enrolled_in_course(self):
         # Deactivate the enrollment in the course and verify the URL we get sent to
-        resp = self.client.post(reverse(
+        resp = self.client.put(reverse(
             'courseenrollment',
             kwargs={'course_id': (unicode(self.course.id))}
         ), {'deactivate': True})
@@ -143,7 +143,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
 
     def test_invalid_enrollment_mode(self):
         # Request an enrollment with verified mode, which does not exist for this course.
-        resp = self.client.post(reverse(
+        resp = self.client.put(reverse(
             'courseenrollment',
             kwargs={'course_id': (unicode(self.course.id))}),
             {'mode': 'verified'}
@@ -155,12 +155,12 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
 
     def test_with_invalid_course_id(self):
         # Create an enrollment
-        resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': 'entirely/fake/course'}))
+        resp = self.client.put(reverse('courseenrollment', kwargs={'course_id': 'entirely/fake/course'}))
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def _create_enrollment(self):
         """Enroll in the course and verify the URL we are sent to. """
-        resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
+        resp = self.client.put(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.content)
         self.assertEqual(unicode(self.course.id), data['course']['course_id'])

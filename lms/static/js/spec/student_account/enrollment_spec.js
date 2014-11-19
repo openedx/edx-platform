@@ -21,7 +21,7 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
                 EnrollmentInterface.enroll( COURSE_KEY );
 
                 // Expect that the correct request was made to the server
-                AjaxHelpers.expectRequest( requests, 'POST', ENROLL_URL );
+                AjaxHelpers.expectRequest( requests, 'PUT', ENROLL_URL );
 
                 // Simulate a successful response from the server
                 AjaxHelpers.respondWithJson(requests, {});
