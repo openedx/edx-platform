@@ -626,6 +626,10 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-xmodule-annotations.css',
     },
+    'discussion': {
+        'source_filenames': ['sass/discussion-forum.css'],
+        'output_filename': 'css/cms-style-discussion-forum.css'
+    }
 }
 
 # test_order: Determines the position of this chunk of javascript on
