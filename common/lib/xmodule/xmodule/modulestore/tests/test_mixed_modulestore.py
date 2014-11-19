@@ -22,6 +22,7 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import Mongo
 from xmodule.contentstore.content import StaticContent
 import mimetypes
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.xml_importer import import_from_xml
 
 if not settings.configured:
     settings.configure()
@@ -718,7 +719,7 @@ class TestMixedModuleStore(CourseComparisonTest):
     # Split:
     #    queries: active_versions, draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data(('draft', 8, 2), ('split', 4, 3))
+    @ddt.data(('draft', 8, 2), ('split', 2, 2))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
@@ -1871,6 +1872,51 @@ class TestMixedModuleStore(CourseComparisonTest):
             dest_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
             self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
 
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_import_edit_import(self, default):
+        """
+        Test that deleting an element after import and then re-importing restores that element in draft
+        as well as published branches (PLAT_297)
+        """
+        # set the default modulestore
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+            with self.store.default_store(default):
+                dest_course_key = self.store.make_course_key('a', 'course', 'course')
+                courses = import_from_xml(
+                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_course_id=dest_course_key,
+                    create_new_course_if_not_present=True,
+                )
+                course_id = courses[0].id
+                # no need to verify course content here as test_cross_modulestore_import_export does that
+                # delete the vertical
+                vertical_loc = course_id.make_usage_key('vertical', 'vertical_test')
+                self.assertTrue(self.store.has_item(vertical_loc))
+                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+                    self.store.delete_item(vertical_loc, self.user_id)
+                # verify it's in the published still
+                with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
+                    self.assertTrue(self.store.has_item(vertical_loc))
+
+                # now re-import
+                import_from_xml(
+                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_course_id=dest_course_key,
+                )
+                # verify it's in both published and draft
+                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+                    self.assertTrue(self.store.has_item(vertical_loc))
+                with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
+                    self.assertTrue(self.store.has_item(vertical_loc))
 
 # ============================================================================================================
 # General utils for not using django settings
