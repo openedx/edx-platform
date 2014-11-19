@@ -12,6 +12,9 @@
   }
 }
 
+#ui-datepicker-div{z-index: 12000 !important; width: 16.5em !important}
+
+
 .instructor-dashboard-wrapper-2 {
   position: relative;
   // display: table;
@@ -1325,12 +1328,13 @@ input[name="subject"] {
       th {
         text-align: left;
         border-bottom: 1px solid $border-color-1;
+        font-size: 16px;
 
         &.c_code {
-          width: 170px;
+          width: 110px;
         }
         &.c_count {
-          width: 85px;
+          width: 60px;
         }
         &.c_course_id {
           width: 320px;
@@ -1339,11 +1343,14 @@ input[name="subject"] {
         &.c_discount {
           width: 90px;
         }
+        &.c_expiry {
+          width: 150px;
+        }
         &.c_action {
-          width: 89px;
+          width: 60px;
         }
         &.c_dsc{
-          width: 260px;
+          width: 200px;
           word-wrap: break-word;
         }
       }
@@ -1361,6 +1368,16 @@ input[name="subject"] {
         }
       }
     }
+    // in_active coupon rows style
+    .expired_coupon{
+      background:  #FEEFB3 !important;
+
+      color: rgba(51,51,51,0.2);
+      border-bottom: 1px solid #fff;
+      td:nth-child(3) {
+        text-decoration: line-through;
+      }
+    }
 
     // coupon items style
     .coupons-items {
@@ -1368,6 +1385,7 @@ input[name="subject"] {
         padding: ($baseline/2) 0;
         position: relative;
         line-height: normal;
+        font-size: 14px;
         span.old-price{
           left: -75px;
           position: relative;
@@ -1613,7 +1631,15 @@ input[name="subject"] {
     }
     }
   }
-
+  #add-coupon-modal{
+  ol.list-input{
+    li{
+      input[type="checkbox"]#expiry-check , input[type="checkbox"]#expiry-check + label {display: inline-block; width: auto;margin-top: 10px;}
+      &.full-width{width: 100%;}
+      input#coupon_expiration_date{width: 278px;display: inline-block;float: right;}
+    }
+  }
+}
 }
 
 .profile-distribution-widget {
