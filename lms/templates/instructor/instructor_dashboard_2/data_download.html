@@ -39,8 +39,10 @@
 
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
     <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
-
-    <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
+    <p>
+      <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
+      <input type="button" name="ora2-response-btn" class="async-report-btn" value="${_("Download ORA2 Responses")}" data-endpoint="${ section_data['get_ora2_responses_url'] }"/>
+    </p>
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>

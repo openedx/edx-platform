@@ -424,6 +424,11 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = ENV_TOKENS.get("GRADES_DOWNLOAD", GRADES_DOWNLOAD)
 
+# ORA2 Responses Download
+ORA2_RESPONSES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+
+ORA2_RESPONSES_DOWNLOAD = ENV_TOKENS.get("ORA2_RESPONSES_DOWNLOAD", ORA2_RESPONSES_DOWNLOAD)
+
 ##### ORA2 ######
 # Prefix for uploads of example-based assessment AI classifiers
 # This can be used to separate uploads for different environments
