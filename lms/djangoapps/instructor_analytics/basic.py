@@ -30,7 +30,7 @@ SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_co
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at')
-COUPON_FEATURES = ('course_id', 'percentage_discount', 'description')
+COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date')
 
 
 def sale_order_record_features(course_id, features):
@@ -228,6 +228,7 @@ def coupon_codes_features(features, coupons_list):
         # codes csv. In the case of active and generated registration codes the redeemed_by value will be None.
         #  They have not been redeemed yet
 
+        coupon_dict['expiration_date'] = coupon.display_expiry_date
         coupon_dict['course_id'] = coupon_dict['course_id'].to_deprecated_string()
         return coupon_dict
     return [extract_coupon(coupon, features) for coupon in coupons_list]
