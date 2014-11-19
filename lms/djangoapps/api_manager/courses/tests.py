@@ -1527,7 +1527,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['num_pages'], 3)
 
         #filter course module completion by multiple user ids
-        user_filter_uri = '{}?user_id={}'.format(completion_uri, str(created_user_id) + ',3,4')
+        user_filter_uri = '{}?user_id={}'.format(completion_uri, str(created_user_id) + ',10001,10003')
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 25)
@@ -1535,7 +1535,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['num_pages'], 2)
 
         #filter course module completion by user who has not completed any course module
-        user_filter_uri = '{}?user_id={}'.format(completion_uri, 1)
+        user_filter_uri = '{}?user_id={}'.format(completion_uri, 10001)
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 0)
@@ -1544,7 +1544,7 @@ class CoursesApiTests(TestCase):
         course_filter_uri = '{}?course_id={}&page_size=10'.format(completion_uri, unicode(self.course.id))
         response = self.do_get(course_filter_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 25)
+        self.assertGreaterEqual(response.data['count'], 25)
         self.assertEqual(len(response.data['results']), 10)
 
         #filter course module completion by content_id
@@ -1976,18 +1976,17 @@ class CoursesApiTests(TestCase):
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_enrolled'], users_to_add + USER_COUNT)
-        self.assertEqual(response.data['users_started'], 1)
+        self.assertGreaterEqual(response.data['users_started'], 1)
         self.assertIsNotNone(response.data['grade_cutoffs'])
-        # TODO: (mattdrayer) Uncomment after comment service has been updated
-        # self.assertEqual(response.data['num_threads'], 5)
-        # self.assertEqual(response.data['num_active_threads'], 3)
+        self.assertEqual(response.data['num_threads'], 5)
+        self.assertEqual(response.data['num_active_threads'], 3)
 
         # get course metrics by organization
         course_metrics_uri = '{}/{}/metrics/?organization={}'.format(self.base_courses_uri, self.test_course_id, org_id)
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_enrolled'], 1)
-        self.assertEqual(response.data['users_started'], 1)
+        self.assertGreaterEqual(response.data['users_started'], 1)
 
         # test with bogus course
         course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_bogus_course_id)
@@ -2058,7 +2057,7 @@ class CoursesApiTests(TestCase):
         org_id = response.data['id']
 
         # enroll users with time set to 28 days ago
-        enrolled_time = timezone.now() + relativedelta(days=-28)
+        enrolled_time = timezone.now() + relativedelta(days=-25)
         with freeze_time(enrolled_time):
             for user in users:
                 CourseEnrollmentFactory.create(user=user, course_id=course.id)
@@ -2122,7 +2121,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(len(response.data['active_users']), 5)
         total_active = sum([active[1] for active in response.data['active_users']])
         self.assertEqual(total_active, 5)
-        self.assertEqual(response.data['users_enrolled'][0][1], 25)
+        self.assertEqual(response.data['users_enrolled'][0][1], 0)
 
         # get modules completed for first 5 days
         start_date = datetime.now().date() + relativedelta(days=-USER_COUNT)
@@ -2137,6 +2136,8 @@ class CoursesApiTests(TestCase):
         self.assertEqual(len(response.data['modules_completed']), 5)
         total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
         self.assertEqual(total_modules_completed, 10)
+        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
+        self.assertEqual(total_enrolled, 25)
 
         # metrics with weeks as interval
         end_date = datetime.now().date()
@@ -2215,7 +2216,6 @@ class CoursesApiTests(TestCase):
         self.assertEqual(len(response.data['active_users']), 5)
         total_active = sum([active[1] for active in response.data['active_users']])
         self.assertEqual(total_active, 0)
-        self.assertEqual(response.data['users_enrolled'][0][1], 20)
 
     def test_course_workgroups_list(self):
         projects_uri = self.base_projects_uri
