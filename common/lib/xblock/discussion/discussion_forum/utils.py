@@ -11,8 +11,6 @@ from mako.template import Template as MakoTemplate
 
 from rooted_paths import rooted_glob
 
-discussion_js = sorted(rooted_glob(settings.COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
-
 JS_URLS = [
     # VENDOR
     'js/vendor/URI.min.js',
@@ -30,11 +28,10 @@ JS_URLS = [
     'xblock/discussion/js/vendor/Markdown.Editor.js',
     'xblock/discussion/js/vendor/mathjax_delay_renderer.js',
     'xblock/discussion/js/vendor/customwmd.js',
-] + discussion_js
+]
 
 CSS_URLS = [
-    'xblock/discussion/css/vendor/font-awesome.css',
-    'sass/discussion-forum.css',
+    'xblock/discussion/css/vendor/font-awesome.css'
 ]
 
 
