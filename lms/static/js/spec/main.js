@@ -75,7 +75,7 @@
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
-            'js/student_profile/profile': 'js/student_profile/profile'
+            'js/student_profile/profile': 'js/student_profile/profile',
 
             // edxnotes
             'annotator': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
@@ -368,6 +368,7 @@
                     'js/student_account/enrollment',
                     'js/student_account/shoppingcart',
                 ]
+            },
             // edx notes
             'annotator': {
                 exports: 'Annotator',
@@ -391,12 +392,8 @@
         'lms/include/js/spec/student_account/password_reset_spec.js',
         'lms/include/js/spec/student_account/enrollment_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
-        'lms/include/js/spec/student_profile/profile_spec.js'
-        'lms/include/js/spec/student_account/account.js',
-        'lms/include/js/spec/student_profile/profile.js',
+        'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/edxnotes/notes_spec.js',
-        'lms/include/js/spec/edxnotes/collections/notes_spec.js',
-        'lms/include/js/spec/edxnotes/models/note_spec.js',
         'lms/include/js/spec/edxnotes/utils/logger_spec.js',
         'lms/include/js/spec/edxnotes/views/notes_page_spec.js'
     ]);

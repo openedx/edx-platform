@@ -5,6 +5,8 @@ import json
 import requests
 import logging
 from uuid import uuid4
+from json import JSONEncoder
+from datetime import datetime
 from courseware.access import has_access
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -12,15 +14,27 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext as _
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from util.date_utils import get_default_time_display
+from dateutil.parser import parse as dateutil_parse
 log = logging.getLogger(__name__)
 from provider.oauth2.models import AccessToken, Client
 
 
+class NoteJSONEncoder(JSONEncoder):
+    """
+    Custom JSON encoder that encode datetime objects to appropriate time strings.
+    """
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return get_default_time_display(obj)
+        return json.JSONEncoder.default(self, obj)
+
+
 def get_token(user):
     """
-    Generates OAuth access token for a user
+    Generates OAuth access token for a user.
     """
-    token, _ = AccessToken.objects.get_or_create(
+    token, created = AccessToken.objects.get_or_create(  # pylint: disable=unused-variable
         client=Client.objects.get(name='edx-notes'),
         user=user
     )
@@ -40,11 +54,11 @@ def get_notes(user, course):
     try:
         collection = json.loads(response.content)
     except ValueError:
-        return []
+        return None
 
     # if collection is empty, just return it.
     if not collection:
-        return collection
+        return None
 
     store = modulestore()
     filtered_collection = list()
@@ -60,16 +74,13 @@ def get_notes(user, course):
             if not has_access(user, 'load', item, course_key=course.id):
                 continue
 
-            url = get_parent_url(course, store, usage_key)
             model.update({
-                u'unit': {
-                    u'display_name': item.display_name_with_default,
-                    u'url': url,
-                }
+                u'unit': get_parent_context(course, store, usage_key),
+                u'updated': dateutil_parse(model['updated']),
             })
             filtered_collection.append(model)
 
-    return filtered_collection
+    return json.dumps(sorted(filtered_collection, key=lambda note: note['updated'], reverse=True), cls=NoteJSONEncoder)
 
 
 def get_parent(store, usage_key):
@@ -87,19 +98,27 @@ def get_parent(store, usage_key):
         return
 
 
-def get_parent_url(course, store, usage_key):
+def get_parent_context(course, store, usage_key):
     """
     Returns dispay_name and url for the parent module.
     """
     parent = get_parent(store, usage_key)
+
     if not parent:
-        return None
+        return {
+            u'display_name': None,
+            u'url': None,
+        }
+
     url = reverse('jump_to', kwargs={
         'course_id': course.id.to_deprecated_string(),
         'location': parent.location.to_deprecated_string(),
     })
 
-    return url
+    return {
+        u'display_name': parent.display_name_with_default,
+        u'url': url,
+    }
 
 
 def get_endpoint(path=""):

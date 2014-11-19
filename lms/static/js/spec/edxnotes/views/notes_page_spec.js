@@ -4,32 +4,26 @@ define(['jquery', 'underscore', 'js/common_helpers/template_helpers', 'js/edxnot
 
         describe('NotesPage', function() {
             var view,
-                // Format: December 11, 2014 at 11:10AM
-                displayTime = [
-                    'December 11, 2014 at 11:10AM',
-                    'December 11, 2014 at 11:11AM',
-                    'December 11, 2014 at 11:12AM'
-                ],
                 notes = [
-                    {
-                        created: '2014-10-10T10:10:10.012+00:00',
-                        updated: '2014-10-10T10:10:10.012+00:00',
-                        text: 'First added model',
-                        quote: 'Should be listed third'
-                    },
-                    {
-                        created: '2014-10-10T10:10:10.010+00:00',
-                        updated: '2014-10-10T10:10:10.010+00:00',
-                        text: 'Second added model',
-                        quote: 'Should be listed first'
-                    },
-                    {
-                        created: '2014-10-10T10:10:10.011+00:00',
-                        updated: '2014-10-10T10:10:10.011+00:00',
-                        text: 'Third added model',
-                        quote: 'Should be listed second'
-                    }
-                ];
+                {
+                    created: 'December 11, 2014 at 11:10AM',
+                    updated: 'December 11, 2014 at 11:10AM',
+                    text: 'Second added model',
+                    quote: 'Should be listed first'
+                },
+                {
+                    created: 'December 11, 2014 at 11:11AM',
+                    updated: 'December 11, 2014 at 11:11AM',
+                    text: 'Third added model',
+                    quote: 'Should be listed second'
+                },
+                {
+                    created: 'December 11, 2014 at 11:12AM',
+                    updated: 'December 11, 2014 at 11:12AM',
+                    text: 'First added model',
+                    quote: 'Should be listed third'
+                }
+            ];
 
             beforeEach(function() {
                 setFixtures('<div class="edx-notes-page-wrapper"><div class="course-info"></div></div>');
@@ -50,14 +44,13 @@ define(['jquery', 'underscore', 'js/common_helpers/template_helpers', 'js/edxnot
                 });
 
                 it('should order notes by ascending date of their last update', function() {
-                    var pageItems = $('article.edx-notes-page-item'),
-                        sortedNotes = _.sortBy(notes, function(note){return note.updated;});
+                    var pageItems = $('article.edx-notes-page-item');
                     // Make sure we have exactly 3 page items created
                     expect(pageItems.length).toEqual(3);
                     // Check that the ordering is correct and each model's text and quote are rendered
                     _.each(pageItems, function(el, index) {
-                        expect(pageItems.eq(index).find('.edx-notes-item-text').text()).toContain(sortedNotes[index].text);
-                        expect(pageItems.eq(index).find('.edx-notes-item-quote').text()).toContain(sortedNotes[index].quote);
+                        expect(pageItems.eq(index).find('.edx-notes-item-text').text()).toContain(notes[index].text);
+                        expect(pageItems.eq(index).find('.edx-notes-item-quote').text()).toContain(notes[index].quote);
                     });
                 });
 
@@ -66,7 +59,7 @@ define(['jquery', 'underscore', 'js/common_helpers/template_helpers', 'js/edxnot
 
                     _.each(pageItems, function(el, index) {
                         expect(pageItems.eq(index).find('dl>dt').last().text()).toBe('Last Edited:');
-                        expect(pageItems.eq(index).find('dl>dd').last().text()).toBe(displayTime[index]);
+                        expect(pageItems.eq(index).find('dl>dd').last().text()).toBe(notes[index].updated);
                     });
                 });
             });
