@@ -4,8 +4,7 @@
         'backbone', 'js/edxnotes/models/note'
     ], function (Backbone, NoteModel) {
         var NotesCollection = Backbone.Collection.extend({
-            model: NoteModel,
-            comparator: 'updated'
+            model: NoteModel
         });
 
         return NotesCollection;
