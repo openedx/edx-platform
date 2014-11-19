@@ -34,6 +34,8 @@ if Backbone?
       if @isQuestion()
         @markedAnswers = new Comments()
 
+      @options = options
+
     rerender: () ->
       if @showView?
         @showView.undelegateEvents()
