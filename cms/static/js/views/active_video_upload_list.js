@@ -1,6 +1,6 @@
 define(
-    ["jquery", "underscore", "js/models/active_video_upload", "js/views/baseview", "js/views/active_video_upload", "jquery.fileupload"],
-    function($, _, ActiveVideoUpload, BaseView, ActiveVideoUploadView) {
+    ["jquery", "underscore", "backbone", "js/models/active_video_upload", "js/views/baseview", "js/views/active_video_upload", "jquery.fileupload"],
+    function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView) {
         "use strict";
 
         var ActiveVideoUploadListView = BaseView.extend({
@@ -11,6 +11,8 @@ define(
 
             initialize: function() {
                 this.template = this.loadTemplate("active-video-upload-list");
+                this.collection = new Backbone.Collection();
+                this.listenTo(this.collection, "add", this.renderUpload);
             },
 
             render: function() {
@@ -21,11 +23,16 @@ define(
                     autoUpload: true,
                     singleFileUploads: false,
                     add: this.fileUploadAdd.bind(this),
-                    send: this.fileUploadSend,
-                    done: this.fileUploadDone,
-                    fail: this.fileUploadFail
+                    send: this.fileUploadSend.bind(this),
+                    done: this.fileUploadDone.bind(this),
+                    fail: this.fileUploadFail.bind(this)
                 });
                 return this;
+            },
+
+            renderUpload: function(model) {
+                var itemView = new ActiveVideoUploadView({model: model});
+                this.$(".js-active-video-upload-list").append(itemView.render().$el);
             },
 
             chooseFile: function(event) {
@@ -43,10 +50,9 @@ define(
                 var view = this;
                 if (uploadData.redirected) {
                     var model = new ActiveVideoUpload({fileName: uploadData.files[0].name});
-                    uploadData.model = model;
+                    this.collection.add(model);
+                    uploadData.cid = model.cid;
                     uploadData.submit();
-                    var itemView = new ActiveVideoUploadView({model: model});
-                    view.$(".js-active-video-upload-list").append(itemView.render().$el);
                 } else {
                     $.ajax({
                         contentType: "application/json",
@@ -75,15 +81,15 @@ define(
             },
 
             fileUploadSend: function(event, data) {
-                data.model.uploadStarted();
+                this.collection.get(data.cid).set("status", ActiveVideoUpload.STATUS_UPLOADING);
             },
 
             fileUploadDone: function(event, data) {
-                data.model.uploadCompleted();
+                this.collection.get(data.cid).set("status", ActiveVideoUpload.STATUS_COMPLETED);
             },
 
             fileUploadFail: function(event, data) {
-                data.model.uploadFailed();
+                this.collection.get(data.cid).set("status", ActiveVideoUpload.STATUS_FAILED);
             }
         });
 

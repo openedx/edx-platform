@@ -1,7 +1,7 @@
+"use strict";
 define(
     ["backbone", "i18n"],
     function(Backbone, i18n) {
-        "use strict";
 
         var STATUS_QUEUED = i18n.gettext_noop("Queued");
         var STATUS_UPLOADING = i18n.gettext_noop("Uploading");
@@ -12,18 +12,6 @@ define(
             {
                 defaults: {
                     status: STATUS_QUEUED
-                },
-
-                uploadStarted: function() {
-                    this.set("status", STATUS_UPLOADING);
-                },
-
-                uploadCompleted: function() {
-                    this.set("status", STATUS_COMPLETED);
-                },
-
-                uploadFailed: function() {
-                    this.set("status", STATUS_FAILED);
                 }
             },
             {

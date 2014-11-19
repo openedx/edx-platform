@@ -12,18 +12,10 @@ define(
 
             render: function() {
                 this.$el.html(this.template(this.model.attributes));
-                var statusClass;
-                switch (this.model.get("status")) {
-                    case ActiveVideoUpload.STATUS_COMPLETED:
-                        statusClass = "success";
-                        break;
-                    case ActiveVideoUpload.STATUS_FAILED:
-                        statusClass = "error";
-                        break;
-                }
-                if (statusClass) {
-                    this.$el.find(".status-message .text").addClass(statusClass);
-                }
+                var $statusEl = this.$el.find(".status-message .text");
+                var status = this.model.get("status");
+                $statusEl.toggleClass("success", status == ActiveVideoUpload.STATUS_COMPLETED);
+                $statusEl.toggleClass("error", status == ActiveVideoUpload.STATUS_FAILED);
                 return this;
             },
         });
