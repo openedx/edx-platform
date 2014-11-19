@@ -31,7 +31,7 @@ def edxnotes(request, course_id):
         "course": course,
         "endpoint": get_endpoint(),
         "notes": notes,
-        "token": get_token(),
+        "token": get_token(request.user),
         "debug": json.dumps(settings.DEBUG),
     }
 
