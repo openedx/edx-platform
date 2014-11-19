@@ -3,13 +3,10 @@ Views related to the video upload feature
 """
 
 from boto import s3
-from pytz import UTC
 from uuid import uuid4
-from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
@@ -21,7 +18,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.assetstore import AssetMetadata
 from util.json_request import expect_json, JsonResponse
 
-from contentstore.utils import reverse_course_url
 from .course import get_course_and_check_access
 
 
@@ -70,6 +66,9 @@ def videos_handler(request, course_key_string):
 
 
 def videos_index_html(course):
+    """
+    Returns an HTML rendering of the list of uplaoded videos.
+    """
     return render_to_response("videos_index.html", {"context_course": course})
 
 
@@ -102,8 +101,8 @@ def videos_index_json(course):
         v.asset_id.path
         for v in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE)
     ]
-    VAL_videos = get_videos_for_ids(edx_videos_ids)
-    return JsonResponse({'videos': list(VAL_videos)}, status=200)
+    val_videos = get_videos_for_ids(edx_videos_ids)
+    return JsonResponse({'videos': list(val_videos)}, status=200)
 
 
 def videos_post(course, request):
