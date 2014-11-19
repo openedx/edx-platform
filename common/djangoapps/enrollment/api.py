@@ -194,55 +194,7 @@ def add_enrollment(student_id, course_id, mode='honor', is_active=True):
     return _data_api().update_course_enrollment(student_id, course_id, mode=mode, is_active=is_active)
 
 
-def deactivate_enrollment(student_id, course_id):
-    """Un-enrolls a student in a course
-
-    Deactivate the enrollment of a student in a course. We will not remove the enrollment data, but simply flag it
-    as inactive.
-
-    Args:
-        student_id (str): The student associated with the deactivated enrollment.
-        course_id (str): The course associated with the deactivated enrollment.
-
-    Returns:
-        A serializable dictionary representing the deactivated course enrollment for the student.
-
-    Example:
-        >>> deactivate_enrollment("Bob", "edX/DemoX/2014T2")
-        {
-            "created": "2014-10-20T20:18:00Z",
-            "mode": "honor",
-            "is_active": False,
-            "student": "Bob",
-            "course": {
-                "course_id": "edX/DemoX/2014T2",
-                "enrollment_end": 2014-12-20T20:18:00Z,
-                "course_modes": [
-                    {
-                        "slug": "honor",
-                        "name": "Honor Code Certificate",
-                        "min_price": 0,
-                        "suggested_prices": "",
-                        "currency": "usd",
-                        "expiration_datetime": null,
-                        "description": null
-                    }
-                ],
-                "enrollment_start": 2014-10-15T20:18:00Z,
-                "invite_only": False
-            }
-        }
-    """
-    # Check to see if there is an enrollment. We do not want to create a deactivated enrollment.
-    if not _data_api().get_course_enrollment(student_id, course_id):
-        raise EnrollmentNotFoundError(
-            u"No enrollment was found for student {student} in course {course}"
-            .format(student=student_id, course=course_id)
-        )
-    return _data_api().update_course_enrollment(student_id, course_id, is_active=False)
-
-
-def update_enrollment(student_id, course_id, mode):
+def update_enrollment(student_id, course_id, mode=None, is_active=None):
     """Updates the course mode for the enrolled user.
 
     Update a course enrollment for the given student and course.
@@ -283,7 +235,7 @@ def update_enrollment(student_id, course_id, mode):
 
     """
     _validate_course_mode(course_id, mode)
-    return _data_api().update_course_enrollment(student_id, course_id, mode)
+    return _data_api().update_course_enrollment(student_id, course_id, mode=mode, is_active=is_active)
 
 
 def get_course_enrollment_details(course_id):

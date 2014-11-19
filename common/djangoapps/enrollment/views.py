@@ -3,9 +3,12 @@ The Enrollment API Views should be simple, lean HTTP endpoints for API access. T
 consist primarily of authentication, request validation, and serialization.
 
 """
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
+from django.views.generic import RedirectView, View
 from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
@@ -28,7 +31,7 @@ class SessionAuthenticationAllowInactiveUser(SessionAuthentication):
     on session authentication that requires an active account.
 
     You should use this authentication class ONLY for end-points that
-    it's safe for an unactived user to access.  For example,
+    it's safe for an unactivated user to access.  For example,
     we can allow a user to update his/her own enrollments without
     activating an account.
 
@@ -69,10 +72,10 @@ class EnrollmentView(APIView):
     """ Enrollment API View for creating, updating, and viewing course enrollments. """
 
     authentication_classes = OAuth2Authentication, SessionAuthenticationAllowInactiveUser
-    permission_classes = IsAuthenticated,
+    permission_classes = permissions.IsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
-    def get(self, request, course_id=None):
+    def get(self, request, course_id=None, student=None):
         """Create, read, or update enrollment information for a student.
 
         HTTP Endpoint for all CRUD operations for a student course enrollment. Allows creation, reading, and
@@ -83,17 +86,33 @@ class EnrollmentView(APIView):
                 information for the current user and the specified course.
             course_id (str): URI element specifying the course location. Enrollment information will be
                 returned, created, or updated for this particular course.
+            student (str): The Student username associated with this enrollment request.
 
         Return:
             A JSON serialized representation of the course enrollment.
 
         """
+        if request.user.username != student:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            return Response(api.get_enrollment(request.user.username, course_id))
+            return Response(api.get_enrollment(student, course_id))
         except (NonExistentCourseError, CourseEnrollmentException):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, course_id=None):
+    def post(self, request, course_id=None, student=None):
+        """Create a new enrollment"""
+        if student != request.user.username:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            kwargs = self._get_parameters(request)
+            return Response(api.add_enrollment(student, course_id, **kwargs))
+        except api.CourseModeNotFoundError as error:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=error.data)
+        except (NonExistentCourseError, api.EnrollmentNotFoundError, CourseEnrollmentException):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, course_id=None, student=None):
         """Update the course enrollment.
 
         HTTP Endpoint for all creation and modifications to an existing enrollment.
@@ -104,40 +123,80 @@ class EnrollmentView(APIView):
                 deactivated.
             course_id (str): URI element specifying the course location. Enrollment information will be
                 returned, created, or updated for this particular course.
+            student (str): The Student's username associated with the enrollment.
 
         Return:
             A JSON serialized representation of the course enrollment, including all modifications.
         """
+        if student != request.user.username:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         try:
-            if 'mode' in request.DATA:
-                return Response(api.update_enrollment(request.user.username, course_id, request.DATA['mode']))
-            elif 'deactivate' in request.DATA:
-                return Response(api.deactivate_enrollment(request.user.username, course_id))
-            else:
-                return Response(api.add_enrollment(request.user.username, course_id))
+            kwargs = self._get_parameters(request)
+            return Response(api.update_enrollment(student, course_id, **kwargs))
         except api.CourseModeNotFoundError as error:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=error.data)
         except (NonExistentCourseError, api.EnrollmentNotFoundError, CourseEnrollmentException):
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def _get_parameters(self, request):
+        """Simple function to get parameters from the request for use with the API.
+
+        Check the request DATA for any expected arguments related to course enrollment, and
+        construct a dictionary of known attributes that may be modified.
+
+        Args:
+            request (Request): The request to the API.
+
+        Return:
+            A dictionary of values that may be modified on a course enrollment.
+
+        """
+        kwargs = {}
+        if 'mode' in request.DATA:
+            kwargs['mode'] = request.DATA['mode']
+        if 'is_active' in request.DATA:
+            kwargs['is_active'] = request.DATA['is_active']
+        return kwargs
 
 
 class EnrollmentListView(APIView):
     """ Enrollment API List View for viewing all course enrollments for a student. """
 
     authentication_classes = OAuth2Authentication, SessionAuthenticationAllowInactiveUser
-    permission_classes = IsAuthenticated,
+    permission_classes = permissions.IsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
-    def get(self, request):
+    def get(self, request, student=None):
         """List out all the enrollments for the current student
 
         Returns a JSON response with all the course enrollments for the current student.
 
         Args:
             request (Request): The GET request for course enrollment listings.
+            student (str): Get all enrollments for the specified student's username.
 
         Returns:
             A JSON serialized representation of the student's course enrollments.
 
         """
-        return Response(api.get_enrollments(request.user.username))
+        if request.user.username != student:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        return Response(api.get_enrollments(student))
+
+
+class EnrollmentListRedirectView(View):
+    """Redirect to the EnrollmentListView when no student is specified in the URL."""
+
+    def get(self, request, *args, **kwargs):
+        """Returns the redirect URL with the student's username specified."""
+        return redirect(reverse('courseenrollments', args=[request.user.username]))
+
+
+class EnrollmentRedirectView(RedirectView):
+    """Redirect to the EnrollmentView when no student is specified in the URL."""
+
+    def get(self, request, *args, **kwargs):
+        """Returns the redirect URL with the student's username specified."""
+        return redirect(reverse('courseenrollment', args=[request.user.username, kwargs['course_id']]))

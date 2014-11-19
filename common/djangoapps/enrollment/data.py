@@ -54,6 +54,27 @@ def get_course_enrollment(student_id, course_id):
         return None
 
 
+def create_course_enrollment(student_id, course_id, mode, is_active):
+    """Create a new course enrollment for the given student.
+
+    Creates a new course enrollment for the specified student username.
+
+    Args:
+        student_id (str): The name of the student to create a new course enrollment for.
+        course_id (str): The course to create the course enrollment for.
+        mode (str): (Optional) The mode for the new enrollment.
+        is_active (boolean): (Optional) Determines if the enrollment is active.
+
+    Returns:
+        A serializable dictionary representing the new course enrollment.
+
+    """
+    course_key = CourseKey.from_string(course_id)
+    student = User.objects.get(username=student_id)
+    enrollment = CourseEnrollment.enroll(student, course_key, check_access=True)
+    return _update_enrollment(enrollment, is_active=is_active, mode=mode)
+
+
 def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
     """Modify a course enrollment for a student.
 
@@ -62,7 +83,7 @@ def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
     Args:
         student_id (str): The name of the student to retrieve course enrollment information for.
         course_id (str): The course to retrieve course enrollment information for.
-        mode (str): (Optional) The mode for the new enrollment.
+        mode (str): (Optional) If specified, modify the mode for this enrollment.
         is_active (boolean): (Optional) Determines if the enrollment is active.
 
     Returns:
@@ -71,11 +92,11 @@ def update_course_enrollment(student_id, course_id, mode=None, is_active=None):
     """
     course_key = CourseKey.from_string(course_id)
     student = User.objects.get(username=student_id)
-    if not CourseEnrollment.is_enrolled(student, course_key):
-        enrollment = CourseEnrollment.enroll(student, course_key, check_access=True)
-    else:
-        enrollment = CourseEnrollment.objects.get(user=student, course_id=course_key)
+    enrollment = CourseEnrollment.objects.get(user=student, course_id=course_key)
+    return _update_enrollment(enrollment, is_active=is_active, mode=mode)
 
+
+def _update_enrollment(enrollment, is_active=None, mode=None):
     enrollment.update_enrollment(is_active=is_active, mode=mode)
     enrollment.save()
     return CourseEnrollmentSerializer(enrollment).data  # pylint: disable=no-member
