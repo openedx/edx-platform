@@ -36,7 +36,7 @@ def edxnotes(cls):
                     # Use camelCase to name keys.
                     'usageId': unicode(self.scope_ids.usage_id).encode('utf-8'),
                     'courseId': unicode(self.runtime.course_id).encode('utf-8'),
-                    'token': get_token(),
+                    'token': get_token(self.runtime.get_real_user(self.runtime.anonymous_student_id)),
                     'endpoint': get_endpoint(),
                     'debug': settings.DEBUG,
                 },

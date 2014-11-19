@@ -6,7 +6,7 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
-
+from oauth2_provider.tests.factories import ClientFactory
 
 class EdxNotesTest(UniqueCourseTest):
     """
@@ -29,6 +29,8 @@ class EdxNotesTest(UniqueCourseTest):
             self.course_info["org"], self.course_info["number"],
             self.course_info["run"], self.course_info["display_name"]
         )
+        ClientFactory(name='edx-notes')
+
 
         self.selector = "annotate-id"
 
