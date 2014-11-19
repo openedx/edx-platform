@@ -1,8 +1,8 @@
-;(function (define, $, _, undefined) {
+;(function (define, undefined) {
     'use strict';
     define([
-        'annotator', 'js/edxnotes/utils/logger', 'js/edxnotes/views/shim'
-    ], function (Annotator, Logger) {
+         'jquery', 'underscore', 'annotator', 'js/edxnotes/utils/logger', 'js/edxnotes/views/shim'
+    ], function ($, _, Annotator, Logger) {
         var plugins = ['Store'],
             getOptions, setupPlugins, getAnnotator;
 
@@ -76,4 +76,4 @@
             factory: getAnnotator
         };
     });
-}).call(this, define || RequireJS.define, jQuery, _);
+}).call(this, define || RequireJS.define);
