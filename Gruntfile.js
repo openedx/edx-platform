@@ -12,6 +12,10 @@ module.exports = function (grunt) {
                     ]
                 },
                 files: {
+                    'lms/static/sass/application-extend1-rtl.css': 'lms/static/sass/application-extend1-rtl.scss',
+                    'lms/static/sass/application-extend1.css': 'lms/static/sass/application-extend1.scss',
+                    'lms/static/sass/application-extend2-rtl.css': 'lms/static/sass/application-extend2-rtl.scss',
+                    'lms/static/sass/application-extend2.css': 'lms/static/sass/application-extend2.scss',
                     'lms/static/sass/application.css': 'lms/static/sass/application.scss'
                 }
             }
