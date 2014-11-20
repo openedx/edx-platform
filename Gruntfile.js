@@ -5,6 +5,19 @@ module.exports = function (grunt) {
     require('time-grunt')(grunt);
 
     grunt.initConfig({
+        watch: {
+            lms_sass: {
+                files: [
+                    'lms/static/sass/{,*/}*.scss',
+                    'common/static/sass/{,*/}*.scss'
+                ],
+                tasks: [
+                    'sass:lms',
+                    'concat:lms'
+                ]
+            }
+        },
+
         clean: {
             lms: {
                 src: [
@@ -118,6 +131,8 @@ module.exports = function (grunt) {
     grunt.registerTask('lms', [
         'clean:lms',
         'sass:lms',
-        'concat:lms'
+        'concat:lms',
+
+        'watch:lms_sass'
     ]);
 };
