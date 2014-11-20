@@ -3,16 +3,21 @@
 Run these tests @ Devstack:
     paver test_system -s lms --test_id=lms/djangoapps/gradebook/tests.py
 """
-from mock import MagicMock
+from mock import MagicMock, patch
 import uuid
 
+from datetime import datetime
+from django.utils.timezone import UTC
+
+from django.conf import settings
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.model_data import FieldDataCache
-from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import UserFactory, AdminFactory
+from courseware.tests.factories import StaffFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from gradebook.models import StudentGradebook, StudentGradebookHistory
@@ -42,7 +47,11 @@ class GradebookTests(ModuleStoreTestCase):
         self.user = UserFactory()
         self.score = 0.75
 
-        self.course = CourseFactory.create()
+    def _create_course(self, start=None, end=None):
+        self.course = CourseFactory.create(
+            start=start,
+            end=end
+        )
         self.course.always_recalculate_grades = True
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         chapter1 = ItemFactory.create(
@@ -114,6 +123,7 @@ class GradebookTests(ModuleStoreTestCase):
         )
 
     def test_receiver_on_score_changed(self):
+        self._create_course()
         module = self.get_module_for_user(self.user, self.course, self.problem)
         grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
@@ -139,3 +149,101 @@ class GradebookTests(ModuleStoreTestCase):
 
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 5)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    def test_open_course(self):
+        self._create_course(start=datetime(2010,1,1, tzinfo=UTC()), end=datetime(3000, 1, 1, tzinfo=UTC()))
+
+        module = self.get_module_for_user(self.user, self.course, self.problem)
+        grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        module = self.get_module_for_user(self.user, self.course, self.problem2)
+        grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.all()
+        self.assertEqual(len(gradebook), 1)
+
+        history = StudentGradebookHistory.objects.all()
+        self.assertEqual(len(history), 2)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    def test_not_yet_started_course(self):
+        self._create_course(start=datetime(3000,1,1, tzinfo=UTC()), end=datetime(3000, 1, 1, tzinfo=UTC()))
+
+        module = self.get_module_for_user(self.user, self.course, self.problem)
+        grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        module = self.get_module_for_user(self.user, self.course, self.problem2)
+        grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.all()
+        self.assertEqual(len(gradebook), 1)
+
+        history = StudentGradebookHistory.objects.all()
+        self.assertEqual(len(history), 2)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    def test_closed_course_student(self):
+        self._create_course(start=datetime(2010,1,1, tzinfo=UTC()), end=datetime(2011, 1, 1, tzinfo=UTC()))
+
+        module = self.get_module_for_user(self.user, self.course, self.problem)
+        grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        module = self.get_module_for_user(self.user, self.course, self.problem2)
+        grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.all()
+        self.assertEqual(len(gradebook), 0)
+
+        history = StudentGradebookHistory.objects.all()
+        self.assertEqual(len(history), 0)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    def test_closed_course_admin(self):
+        """
+        Users marked as Admin should be able to submit grade events to a closed course
+        """
+        self.user = AdminFactory()
+        self._create_course(start=datetime(2010,1,1, tzinfo=UTC()), end=datetime(2011, 1, 1, tzinfo=UTC()))
+
+        module = self.get_module_for_user(self.user, self.course, self.problem)
+        grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        module = self.get_module_for_user(self.user, self.course, self.problem2)
+        grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.all()
+        self.assertEqual(len(gradebook), 0)
+
+        history = StudentGradebookHistory.objects.all()
+        self.assertEqual(len(history), 0)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    def test_closed_course_staff(self):
+        """
+        Users marked as course staff should be able to submit grade events to a closed course
+        """
+        self._create_course(start=datetime(2010,1,1, tzinfo=UTC()), end=datetime(2011, 1, 1, tzinfo=UTC()))
+        self.user = StaffFactory(course_key=self.course.id)
+
+        module = self.get_module_for_user(self.user, self.course, self.problem)
+        grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        module = self.get_module_for_user(self.user, self.course, self.problem2)
+        grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.all()
+        self.assertEqual(len(gradebook), 0)
+
+        history = StudentGradebookHistory.objects.all()
+        self.assertEqual(len(history), 0)
