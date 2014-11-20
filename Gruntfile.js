@@ -70,7 +70,9 @@ module.exports = function (grunt) {
             lms: {
                 options: {
                     includePaths: [
-                        'bower_components'
+                        'bower_components',
+                        'common/static',
+                        'common/static/sass'
                     ]
                 },
                 files: {
@@ -78,7 +80,10 @@ module.exports = function (grunt) {
                     'lms/static/sass/application-extend1.css': 'lms/static/sass/application-extend1.scss',
                     'lms/static/sass/application-extend2-rtl.css': 'lms/static/sass/application-extend2-rtl.scss',
                     'lms/static/sass/application-extend2.css': 'lms/static/sass/application-extend2.scss',
-                    'lms/static/sass/application.css': 'lms/static/sass/application.scss'
+                    'lms/static/sass/application.css': 'lms/static/sass/application.scss',
+                    'lms/static/sass/course-rtl.css': 'lms/static/sass/course-rtl.scss',
+                    'lms/static/sass/course.css': 'lms/static/sass/course.scss',
+                    'lms/static/sass/ie.css': 'lms/static/sass/ie.scss',
                 }
             },
             studio: {
