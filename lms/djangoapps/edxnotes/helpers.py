@@ -24,6 +24,7 @@ class NoteJSONEncoder(JSONEncoder):
     """
     Custom JSON encoder that encode datetime objects to appropriate time strings.
     """
+    # pylint: disable=method-hidden
     def default(self, obj):
         if isinstance(obj, datetime):
             return get_default_time_display(obj)

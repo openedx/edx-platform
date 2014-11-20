@@ -7,7 +7,7 @@
          * Factory method for the Notes page.
          * @param {Object} params Params for the Notes page.
          * @param {Array} params.notesList A list of note models.
-         * @param {Boolean} params.debugMode The flag
+         * @param {Boolean} params.debugMode Enable the flag to see debug information.
          * @param {String} params.authToken An authentication token for the edx-notes-api.
          * @param {String} params.user User id of notes owner.
          * @param {String} params.courseId Course id.
