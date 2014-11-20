@@ -61,36 +61,5 @@ XBlockAuthoring.Server.prototype = {
                 defer.rejectWith(this, ['Could not contact server.']);
             });
         }).promise();
-    },
-
-    /**
-    Update the XBlock's XML definition on the server.
-    Returns:
-        A JQuery promise, which resolves with no arguments
-        and fails with an error message.
-    Example usage:
-        server.updateXml(xml).done(
-            function() {}
-        ).fail(
-            function(err) { console.log(err); }
-        );
-    **/
-    updateXml: function(xml) {
-        var url = this.url('update_xml');
-        var payload = JSON.stringify({xml: xml});
-        return $.Deferred(function(defer) {
-            $.ajax({
-                type: "POST", url: url, data: payload
-            }).done(function(data) {
-                if (data.success) {
-                    defer.resolve();
-                }
-                else {
-                    defer.rejectWith(this, [data.msg]);
-                }
-            }).fail(function(data) {
-                defer.rejectWith(this, ['Could not contact server.']);
-            });
-        }).promise();
     }
 };
