@@ -1,6 +1,7 @@
 """
 TODO: something smart here
 """
+import copy
 import logging
 from django.utils.translation import ugettext as _
 import defusedxml.ElementTree as safe_etree
@@ -134,32 +135,28 @@ class AuthoringMixin(XBlockMixin):
         self.add_xml_to_node(root)
         return {'success': True, 'msg': '', 'xml': etree.tostring(root, pretty_print=True)}
 
-    def render_editor_tab_views(self, fragment, context):
-        """
-        Renders the views for each of the xblock's tab and returns them as a single HTML string. In addition, any
-        dependencies are added to the specified fragment.
-        """
-        html = ""
-        for editor_tab in self.editor_tabs:
-            view_name = editor_tab['id'] + '_tab_view'
-            rendered_child = self.render(view_name, context)
-            fragment.add_frag_resources(rendered_child)
-            html = html + rendered_child.content
-
-        return html
-
     def render_tabbed_editor(self, context):
         """
         Renders the Studio preview by rendering each tab desired by the xblock and then rendering
         a view for each one. The client will ensure that only one view is visible at a time.
         """
         fragment = Fragment()
-        tab_views = self.render_editor_tab_views(fragment, context)
+        if self.editor_tabs and len(self.editor_tabs) > 0:
+            tabs = copy.deepcopy(self.editor_tabs)
+            current_tab = tabs[0]
+            for tab in tabs:
+                view_name = tab['id'] + '_tab_view'
+                rendered_child = self.render(view_name, context)
+                fragment.add_frag_resources(rendered_child)
+                tab['rendered_view'] = rendered_child.content
 
-        fragment.add_content(self.system.render_template('studio_xblock_tabbed_editor.html', {
-            'xblock': self,
-            'tab_views': tab_views,
-        }))
+            fragment.add_content(self.system.render_template('studio_xblock_tabbed_editor.html', {
+                'xblock': self,
+                'tabs': tabs,
+                'current_tab_id': current_tab['id']
+            }))
+        else:
+            raise Exception("Unable to render tabs for xblock")
 
         return fragment
 

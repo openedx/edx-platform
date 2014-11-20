@@ -1,22 +1,21 @@
-<div>
-    <div class="modal-header">
-        <h2 class="title modal-window-title">Editing: Text</h2>
-        <ul class="editor-modes action-list action-modes">
-
-            <li class="action-item" data-mode="editor">
-                <a href="#" class="editor-button is-set">Editor</a>
-            </li>
-
-
-            <li class="action-item" data-mode="settings">
-                <a href="#" class="settings-button">Settings</a>
-            </li>
-
-        </ul>
-    </div>
-    <div class="modal-content">
-        <div class="xblock-editor" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
-            ${tab_views}
+<div class="xblock-editor">
+    <div class="editor-with-tabs">
+        <div class="edit-header">
+            <span class="component-name"></span>
+            <ul class="${'editor-tabs' if (len(tabs) != 1) else 'editor-single-tab-name' }">
+                % for tab in tabs:
+                <li class="inner_tab_wrap"><a href="#tab-editor-${loop.index}" class="tab ${'current' if tab['id'] == current_tab_id else ''}" data-tab_name="${tab['id']}">${tab['display_name']}</a></li>
+                % endfor
+            </ul>
+        </div>
+        <div class="tabs-wrapper">
+            <div class="xblock-editor" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
+                % for tab in tabs:
+                <div class="component-tab ${'is-inactive' if not (tab['id'] == current_tab_id) else ''}" id="tab-editor-${loop.index}">
+                    ${tab['rendered_view']}
+                </div>
+                % endfor
+            </div>
         </div>
     </div>
 </div>
