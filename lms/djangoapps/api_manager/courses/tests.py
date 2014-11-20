@@ -18,7 +18,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import Client
 from django.test.utils import override_settings
 
-
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.tests.factories import StudentModuleFactory
