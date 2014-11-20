@@ -5,6 +5,7 @@ define([
     function( $, AccessView ) {
         'use strict';
 
+        debugger;
         return new AccessView({
             mode: $('#login-and-registration-container').data('initial-mode'),
             thirdPartyAuth: $('#login-and-registration-container').data('third-party-auth'),
