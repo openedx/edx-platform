@@ -947,16 +947,16 @@ class UsersCoursesGradesDetail(SecureAPIView):
         progress_summary = grades.progress_summary(student, request, course_descriptor)  # pylint: disable=W0612
         grade_summary = grades.grade(student, request, course_descriptor)
         grading_policy = course_descriptor.grading_policy
-        current_grade = 0
-        proforma_grade = 0
 
         queryset = StudentGradebook.objects.filter(
             user=student,
             course_id__exact=course_key,
         )
+        current_grade = 0
+        proforma_grade = 0
         if len(queryset):
             current_grade = queryset[0].grade
-            proforma_grade = grades.calculate_proforma_grade(grade_summary, grading_policy)
+            proforma_grade = queryset[0].proforma_grade
 
         response_data = {
             'courseware_summary': progress_summary,
