@@ -29,9 +29,12 @@
 -e git+https://github.com/edx/bok-choy.git@4a259e3548a19e41cc39433caf68ea58d10a27ba#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@df1a7f0cae46567c251d507b8c72168aed8ec042#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2014-10-27T19.33#egg=edx-ora2
+-e git+https://github.com/edx/edx-ora2.git@1aaa021445f24e96943b8337c0be812d944525a2#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@0.1.2#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.3.1#egg=oauth2-provider
 -e git+https://github.com/edx/edx-val.git@a3c54afe30375f7a5755ba6f6412a91de23c3b86#egg=edx-val
+
+# hack hack hack
+-e git+https://github.com/Stanford-Online/xblock-image-modal.git@f87f0c58cfd1cfb7b28477130172c1d01f1c27c2#egg=ImageModal
