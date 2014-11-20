@@ -46,26 +46,11 @@ XBlockAuthoring.StudioView.prototype = {
     },
 
     /**
-    Save the updated XML definition to the server.
+    Collect the XML configuration.
     **/
-    updateXml: function() {
-        // Notify the client-side runtime that we are starting
-        // to save so it can show the "Saving..." notification
-        this.runtime.notify('save', {state: 'start'});
-
-        // Send the updated XML to the server
+    collectXmlData: function() {
         var xml = this.codeBox.getValue();
-        var view = this;
-        this.server.updateXml(xml).done(function() {
-            // Notify the client-side runtime that we finished saving
-            // so it can hide the "Saving..." notification.
-            view.runtime.notify('save', {state: 'end'});
-
-            // Reload the XML definition in the editor
-            view.load();
-        }).fail(function(msg) {
-            view.showError(msg);
-        });
+        return {"xml": xml};
     }
 };
 
