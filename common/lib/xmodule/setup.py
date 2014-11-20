@@ -49,11 +49,6 @@ XBLOCKS = [
     "wrapper = xmodule.wrapper_module:WrapperBlock",
 ]
 
-XBLOCKS = [
-    "vertical = xmodule.vertical_module:VerticalModule",
-    "wrapper = xmodule.wrapper_module:WrapperModule",
-]
-
 setup(
     name="XModule",
     version="0.1",
