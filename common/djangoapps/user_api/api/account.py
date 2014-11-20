@@ -76,7 +76,7 @@ class AccountNotAuthorized(AccountRequestError):
 
 
 @intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
-@transaction.commit_on_success
+@transaction.atomic
 def create_account(username, password, email):
     """Create a new user account.
 
@@ -269,7 +269,7 @@ def request_email_change(username, new_email, password):
 
 
 @intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
-@transaction.commit_on_success
+@transaction.atomic
 def confirm_email_change(activation_key):
     """Confirm an email change.
 

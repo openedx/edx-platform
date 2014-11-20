@@ -17,7 +17,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError
 from django.core.mail.message import EmailMessage
-from django.db import IntegrityError
+from django.db import transaction, IntegrityError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
@@ -328,7 +328,8 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=R0915
                     password = generate_unique_password(generated_passwords)
 
                     try:
-                        create_and_enroll_user(email, username, name, country, password, course_id)
+                        with transaction.atomic():
+                            create_and_enroll_user(email, username, name, country, password, course_id)
                     except IntegrityError:
                         row_errors.append({
                             'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)})
@@ -1009,7 +1010,8 @@ def save_registration_code(user, course_id, invoice=None, order=None):
         code=code, course_id=course_id.to_deprecated_string(), created_by=user, invoice=invoice, order=order
     )
     try:
-        course_registration.save()
+        with transaction.atomic():
+            course_registration.save()
         return course_registration
     except IntegrityError:
         return save_registration_code(user, course_id, invoice, order)
