@@ -95,6 +95,11 @@ CC_PROCESSOR = {
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
+################################# DJANGO-REQUIRE ###############################
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = DEBUG
+
 #####################################################################
 # See if the developer has any local overrides.
 try:

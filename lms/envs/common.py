@@ -979,7 +979,7 @@ X_FRAME_OPTIONS = 'ALLOW'
 
 ############################### Pipeline #######################################
 
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
 from rooted_paths import rooted_glob
 
@@ -1026,27 +1026,6 @@ staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
-
-# JavaScript used by the student account and profile pages
-# These are not courseware, so they do not need many of the courseware-specific
-# JavaScript modules.
-student_account_js = [
-    'js/utils/rwd_header_footer.js',
-    'js/utils/edx.utils.validate.js',
-    'js/src/utility.js',
-    'js/student_account/enrollment.js',
-    'js/student_account/emailoptin.js',
-    'js/student_account/shoppingcart.js',
-    'js/student_account/models/LoginModel.js',
-    'js/student_account/models/RegisterModel.js',
-    'js/student_account/models/PasswordResetModel.js',
-    'js/student_account/views/FormView.js',
-    'js/student_account/views/LoginView.js',
-    'js/student_account/views/RegisterView.js',
-    'js/student_account/views/PasswordResetView.js',
-    'js/student_account/views/AccessView.js',
-    'js/student_account/accessApp.js',
-]
 
 student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
 
@@ -1221,10 +1200,6 @@ PIPELINE_JS = {
         'source_filenames': rwd_header_footer_js,
         'output_filename': 'js/rwd_header_footer.js'
     },
-    'student_account': {
-        'source_filenames': student_account_js,
-        'output_filename': 'js/student_account.js'
-    },
     'student_profile': {
         'source_filenames': student_profile_js,
         'output_filename': 'js/student_profile.js'
@@ -1269,6 +1244,53 @@ PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
+
+################################# DJANGO-REQUIRE ###############################
+
+# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
+REQUIRE_BASE_URL = "./"
+
+# The name of a build profile to use for your project, relative to REQUIRE_BASE_URL.
+# A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
+# Set to False to disable running the default profile (e.g. if only using it to build Standalone
+# Modules)
+REQUIRE_BUILD_PROFILE = "lms-build.js"
+
+# The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
+REQUIRE_JS = "js/vendor/require.js"
+
+# A dictionary of standalone modules to build with almond.js.
+REQUIRE_STANDALONE_MODULES = {}
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = False
+
+# A tuple of files to exclude from the compilation result of r.js.
+REQUIRE_EXCLUDE = ("build.txt",)
+
+# The execution environment in which to run r.js: auto, node or rhino.
+# auto will autodetect the environment and make use of node if available and rhino if not.
+# It can also be a path to a custom class that subclasses require.environments.Environment and defines some "args" function that returns a list with the command arguments to execute.
+REQUIRE_ENVIRONMENT = "node"
+
+# In production, the Django pipeline appends a file hash to JavaScript file names.
+# This makes it difficult for RequireJS to load its requirements, since module names
+# specified in JavaScript code do not include the hash.
+# For this reason, we calculate the actual path including the hash on the server
+# when rendering the page.  We then override the default paths provided to RequireJS
+# so it can resolve the module name to the correct URL.
+#
+# If you want to load JavaScript dependencies using RequireJS
+# but you don't want to include those dependencies in the JS bundle for the page,
+# then you need to add the module and URL path to this dictionary.
+REQUIRE_JS_PATH_OVERRIDES = {
+    'jquery': 'js/vendor/jquery.min.js',
+    'jquery.cookie': 'js/vendor/jquery.cookie.js',
+    'underscore': 'js/vendor/underscore-min.js',
+    'underscore.string': 'js/vendor/underscore.string.min.js',
+    'backbone': 'js/vendor/backbone-min.js',
+    'text': 'js/vendor/text.js'
+}
 
 ################################# CELERY ######################################
 
@@ -1403,6 +1425,7 @@ INSTALLED_APPS = (
     'pipeline',
     'staticfiles',
     'static_replace',
+    'require',
 
     # Our courseware
     'circuit',

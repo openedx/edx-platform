@@ -1,11 +1,10 @@
 define([
     'jquery',
     'underscore',
-    'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
     'js/student_account/models/LoginModel',
     'js/student_account/views/LoginView'
-], function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView) {
+], function($, _, AjaxHelpers, LoginModel, LoginView) {
     'use strict';
     describe('edx.student.account.LoginView', function() {
 
@@ -124,8 +123,6 @@ define([
 
         beforeEach(function() {
             setFixtures('<div id="login-form"></div>');
-            TemplateHelpers.installTemplate('templates/student_account/login');
-            TemplateHelpers.installTemplate('templates/student_account/form_field');
         });
 
         it('logs the user in', function() {

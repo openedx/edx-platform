@@ -15,9 +15,12 @@
     % if responsive:
     <meta name="viewport" content="width=device-width, initial-scale=1">
     % endif
-<%! from django.utils.translation import ugettext as _ %>
-<%! from microsite_configuration import microsite %>
-<%! from microsite_configuration import page_title_breadcrumbs %>
+<%!
+from django.utils.translation import ugettext as _
+from pipeline_mako import render_require_js_path_overrides
+from microsite_configuration import microsite
+from microsite_configuration import page_title_breadcrumbs
+%>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils.http import urlquote_plus %>
@@ -59,7 +62,9 @@
     })(this);
   </script>
 
-  <script type="text/javascript" src="/jsi18n/"></script>
+  % if not enable_require_js:
+  <script type="text/javascript" src="/i18n.js"></script>
+  % endif
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
@@ -68,10 +73,15 @@
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
 
-  % if disable_courseware_js:
-    <%static:js group='base_vendor'/>
+  % if enable_require_js:
+    <script type="text/javascript" src="${static.url("lms-require-config.js")}"></script>
+    ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
   % else:
-    <%static:js group='main_vendor'/>
+    % if disable_courseware_js:
+      <%static:js group='base_vendor'/>
+    % else:
+      <%static:js group='main_vendor'/>
+    % endif
   % endif
 
   <script>
@@ -166,7 +176,7 @@
   </div>
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
-  % if not disable_courseware_js:
+  % if not enable_require_js and not disable_courseware_js:
     <%static:js group='application'/>
     <%static:js group='module-js'/>
   % endif

@@ -54,6 +54,7 @@
             'xblock/lms.runtime.v1': 'coffee/src/xblock/lms.runtime.v1',
             'capa/display': 'xmodule_js/src/capa/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
+            'text': 'xmodule_js/common_static/js/vendor/text',
 
             // Manually specify LMS files that are not converted to RequireJS
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
@@ -68,14 +69,6 @@
             'js/views/notification': 'js/views/notification',
             'js/models/notification': 'js/models/notification',
             'js/student_account/account': 'js/student_account/account',
-            'js/student_account/views/FormView': 'js/student_account/views/FormView',
-            'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
-            'js/student_account/views/LoginView': 'js/student_account/views/LoginView',
-            'js/student_account/models/PasswordResetModel': 'js/student_account/models/PasswordResetModel',
-            'js/student_account/views/PasswordResetView': 'js/student_account/views/PasswordResetView',
-            'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
-            'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
-            'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
             'js/student_profile/profile': 'js/student_profile/profile'
         },
         shim: {
@@ -147,7 +140,7 @@
             },
             'jquery.url': {
                 deps: ['jquery'],
-                exports: 'jQuery.fn.url'
+                exports: 'jQuery.url'
             },
             'datepair': {
                 deps: ['jquery.ui', 'jquery.timepicker']
@@ -296,6 +289,7 @@
             'js/views/notification': {
                 exports: 'NotificationView',
                 deps: ['backbone', 'jquery', 'underscore']
+<<<<<<< HEAD
             },
             'js/views/file_uploader': {
                 exports: 'FileUploaderView',
@@ -406,6 +400,7 @@
         'lms/include/js/spec/student_account/enrollment_spec.js',
         'lms/include/js/spec/student_account/emailoptin_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
+        'lms/include/js/spec/student_account/validation_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js'
     ]);
 
