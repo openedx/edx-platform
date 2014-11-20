@@ -10,6 +10,7 @@ from xblock.core import XBlock
 
 from xblock.fields import XBlockMixin
 from xblock.fragment import Fragment
+from lxml import etree
 
 logger = logging.getLogger(__name__)
 
@@ -131,4 +132,5 @@ class AuthoringMixin(XBlockMixin):
         Returns:
             dict with keys 'success' (bool), 'message' (unicode), and 'xml' (unicode)
         """
-        return self.add_xml_to_node(self)
+        root = etree.Element('root')
+        return self.add_xml_to_node(root)
