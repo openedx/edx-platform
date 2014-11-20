@@ -9,7 +9,7 @@ from xmodule.tests.xml import factories as xml
 from xmodule.x_module import STUDENT_VIEW, AUTHOR_VIEW
 
 
-class BaseVerticalModuleTest(XModuleXmlImportTest):
+class BaseVerticalBlockTest(XModuleXmlImportTest):
     test_html_1 = 'Test HTML 1'
     test_html_2 = 'Test HTML 2'
 
@@ -35,7 +35,7 @@ class BaseVerticalModuleTest(XModuleXmlImportTest):
         self.vertical.xmodule_runtime = self.module_system
 
 
-class VerticalModuleTestCase(BaseVerticalModuleTest):
+class VerticalModuleTestCase(BaseVerticalBlockTest):
     def test_render_student_view(self):
         """
         Test the rendering of the student view.

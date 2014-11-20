@@ -42,8 +42,8 @@ from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
-from xmodule.vertical_module import VerticalDescriptor
-from xmodule.wrapper_module import WrapperDescriptor
+from xmodule.vertical_module import VerticalBlock
+from xmodule.wrapper_module import WrapperBlock
 from xmodule.tests import get_test_descriptor_system, get_test_system
 
 
@@ -74,8 +74,8 @@ CONTAINER_XMODULES = {
     CrowdsourceHinterDescriptor: [{}],
     RandomizeDescriptor: [{}],
     SequenceDescriptor: [{}],
-    VerticalDescriptor: [{}],
-    WrapperDescriptor: [{}],
+    VerticalBlock: [{}],
+    WrapperBlock: [{}],
 }
 
 # These modules are editable in studio yet
@@ -141,7 +141,7 @@ class ContainerModuleRuntimeFactory(ModuleSystemFactory):
         if depth == 0:
             self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
         else:
-            self.get_module.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalDescriptor, depth=depth - 1)
+            self.get_module.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalBlock, depth=depth - 1)
 
     @post_generation
     def position(self, create, position=2, **kwargs):  # pylint: disable=unused-argument, method-hidden
@@ -166,7 +166,7 @@ class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
         if depth == 0:
             self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
         else:
-            self.load_item.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalDescriptor, depth=depth - 1)
+            self.load_item.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalBlock, depth=depth - 1)
 
     @post_generation
     def position(self, create, position=2, **kwargs):  # pylint: disable=unused-argument, method-hidden

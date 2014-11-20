@@ -1,5 +1,6 @@
+from xblock.core import XBlock
 from xblock.fragment import Fragment
-from xmodule.x_module import XModule, STUDENT_VIEW
+from xmodule.x_module import STUDENT_VIEW
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
@@ -12,12 +13,10 @@ from copy import copy
 class_priority = ['video', 'problem']
 
 
-class VerticalFields(object):
-    has_children = True
-
-
-class VerticalModule(VerticalFields, XModule, StudioEditableModule):
+class VerticalBlock(XBlock):
     ''' Layout module for laying out submodules vertically.'''
+
+    has_children = True
 
     def student_view(self, context):
         fragment = Fragment()
@@ -71,23 +70,14 @@ class VerticalModule(VerticalFields, XModule, StudioEditableModule):
                 new_class = c
         return new_class
 
-
-class VerticalDescriptor(VerticalFields, SequenceDescriptor, StudioEditableDescriptor):
-    """
-    Descriptor class for editing verticals.
-    """
-    module_class = VerticalModule
-
-    js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
-    js_module_name = "VerticalDescriptor"
-
     # TODO (victor): Does this need its own definition_to_xml method?  Otherwise it looks
     # like verticals will get exported as sequentials...
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(VerticalDescriptor, self).non_editable_metadata_fields
+        non_editable_fields = super(VerticalBlock, self).non_editable_metadata_fields
         non_editable_fields.extend([
-            VerticalDescriptor.due,
+            VerticalBlock.due,
         ])
         return non_editable_fields
+
