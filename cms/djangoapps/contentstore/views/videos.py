@@ -68,7 +68,7 @@ def videos_handler(request, course_key_string):
 
 def videos_index_html(course):
     """
-    Returns an HTML rendering of the list of uplaoded videos.
+    Returns an HTML rendering of the list of uploaded videos.
     """
     return render_to_response(
         "videos_index.html",
@@ -182,7 +182,7 @@ def generate_edx_video_id():
     """
     Generates and returns an edx-video-id to uniquely identify a new logical video.
     """
-    return "edx-vid-v1:{}".format(uuid4())
+    return "edx-vid-v1-{}".format(uuid4())
 
 
 def storage_service_bucket():

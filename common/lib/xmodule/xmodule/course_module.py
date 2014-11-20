@@ -288,6 +288,7 @@ class CourseFields(object):
     video_upload_pipeline = Dict(
         display_name=_("Video Upload Credentials"),
         help=_("Enter the unique identifier for your course's video files provided by edX."),
+        default=False,
         scope=Scope.settings
     )
     no_grade = Boolean(
