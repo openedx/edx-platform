@@ -6,8 +6,9 @@ from django.dispatch import receiver
 from courseware import grades
 from courseware.signals import score_changed
 from util.request import RequestMockWithoutMiddleware
+from util.signals import course_deleted
 
-from gradebook.models import StudentGradebook
+from gradebook.models import StudentGradebook, StudentGradebookHistory
 
 
 @receiver(score_changed)
@@ -33,3 +34,14 @@ def on_score_changed(sender, **kwargs):
             gradebook_entry.save()
     except StudentGradebook.DoesNotExist:
         StudentGradebook.objects.create(user=user, course_id=course_key, grade=grade, proforma_grade=proforma_grade)
+
+
+@receiver(course_deleted)
+def on_course_deleted(sender, **kwargs):  # pylint: disable=W0613
+    """
+    Listens for a 'course_deleted' signal and when observed
+    removes model entries for the specified course
+    """
+    course_key = kwargs['course_key']
+    StudentGradebook.objects.filter(course_id=course_key).delete()
+    StudentGradebookHistory.objects.filter(course_id=course_key).delete()

@@ -21,7 +21,7 @@ from courseware.tests.factories import StaffFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from gradebook.models import StudentGradebook, StudentGradebookHistory
-
+from util.signals import course_deleted
 
 @override_settings(STUDENT_GRADEBOOK=True)
 class GradebookTests(ModuleStoreTestCase):
@@ -241,6 +241,26 @@ class GradebookTests(ModuleStoreTestCase):
         module = self.get_module_for_user(self.user, self.course, self.problem2)
         grade_dict = {'value': 0.95, 'max_value': 1, 'user_id': self.user.id}
         module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.all()
+        self.assertEqual(len(gradebook), 0)
+
+        history = StudentGradebookHistory.objects.all()
+        self.assertEqual(len(history), 0)
+
+    def test_receiver_on_course_deleted(self):
+        self._create_course(start=datetime(2010, 1, 1, tzinfo=UTC()), end=datetime(2020, 1, 1, tzinfo=UTC()))
+        module = self.get_module_for_user(self.user, self.course, self.problem)
+        grade_dict = {'value': 0.75, 'max_value': 1, 'user_id': self.user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        gradebook = StudentGradebook.objects.all()
+        self.assertEqual(len(gradebook), 1)
+
+        history = StudentGradebookHistory.objects.all()
+        self.assertEqual(len(history), 1)
+
+        course_deleted.send(sender=None, course_key=self.course.id)
 
         gradebook = StudentGradebook.objects.all()
         self.assertEqual(len(gradebook), 0)
