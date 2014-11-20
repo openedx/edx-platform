@@ -7,7 +7,6 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
-from oauth2_provider.tests.factories import ClientFactory
 
 
 class EdxNotesTest(UniqueCourseTest):
