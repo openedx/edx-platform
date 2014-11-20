@@ -73,7 +73,7 @@ class AuthoringMixin(XBlockMixin):
                     ),
                     input_value=value,
                     help_text=self.fields[key].help,
-                    key=key,
+                    key=self.fields[key].display_name or key,
                 )
                 html_strings.append(li)
         html_strings.append('</ul>')
