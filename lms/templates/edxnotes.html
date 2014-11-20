@@ -35,9 +35,8 @@
 </script>
 % endfor
 </%block>
-
-% if notes:
 <%block name="js_extra">
+% if notes:
 <script type="text/javascript">
     (function (require) {
         require(['js/edxnotes/views/page_factory'], function (NotesFactory) {
@@ -52,5 +51,5 @@
         });
     }).call(this, require || RequireJS.require);
 </script>
-</%block>
 % endif
+</%block>
