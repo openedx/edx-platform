@@ -153,6 +153,7 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
         self.assertEqual(len(current_entries), 1)
         user0_entry = StudentGradebook.objects.get(user=self.users[0])
         self.assertEqual(user0_entry.grade, 0.24)
+        self.assertEqual(user0_entry.proforma_grade, 0.28575)
 
         # Enable the signalling mechanism
         settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
@@ -170,6 +171,13 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
         self.assertEqual(len(current_entries), 2)
         user0_entry = StudentGradebook.objects.get(user=self.users[0])
         self.assertEqual(user0_entry.grade, 0.50)
+        self.assertEqual(user0_entry.proforma_grade, 0.54975)
+
+        # Alter the user's grade and proforma grade to ensure we trigger the update logic
+        user0_entry = StudentGradebook.objects.get(user=self.users[0])
+        user0_entry.grade = 0.25
+        user0_entry.proforma_grade = 0.55
+        user0_entry.save()
 
         # Run the command across all users, but just for the specified course
         generate_gradebook_entries.Command().handle(course_ids=course_ids)
@@ -178,10 +186,13 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
         current_entries = StudentGradebook.objects.all()
         self.assertEqual(len(current_entries), 3)
         current_entries = StudentGradebookHistory.objects.all()
-        self.assertEqual(len(current_entries), 4)
+        self.assertEqual(len(current_entries), 6)
         user0_entry = StudentGradebook.objects.get(user=self.users[0])
         self.assertEqual(user0_entry.grade, 0.50)
+        self.assertEqual(user0_entry.proforma_grade, 0.54975)
         user1_entry = StudentGradebook.objects.get(user=self.users[1])
         self.assertEqual(user1_entry.grade, 0.48)
+        self.assertEqual(user1_entry.proforma_grade, 0.5715)
         user2_entry = StudentGradebook.objects.get(user=self.users[2])
         self.assertEqual(user2_entry.grade, 0.72)
+        self.assertEqual(user2_entry.proforma_grade, 0.85725)
