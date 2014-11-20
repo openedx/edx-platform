@@ -87,28 +87,6 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         self.assertEqual(1, len(data['course_modes']))
         self.assertEqual('professional', data['course_modes'][0]['slug'])
 
-    def test_unenroll(self):
-        # Create a course mode.
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug='honor',
-            mode_display_name='Honor',
-        )
-
-        # Create an enrollment
-        resp = self._create_enrollment()
-
-        # Deactivate the enrollment in the course and verify the URL we get sent to
-        resp = self.client.post(reverse(
-            'courseenrollment',
-            kwargs={'course_id': (unicode(self.course.id))}
-        ), {'deactivate': True})
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.content)
-        self.assertEqual(unicode(self.course.id), data['course']['course_id'])
-        self.assertEqual('honor', data['mode'])
-        self.assertFalse(data['is_active'])
-
     def test_user_not_authenticated(self):
         # Log out, so we're no longer authenticated
         self.client.logout()
@@ -132,26 +110,6 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         # Enrollment should succeed, even though we haven't authenticated.
         resp = self.client.post(reverse('courseenrollment', kwargs={'course_id': (unicode(self.course.id))}))
         self.assertEqual(resp.status_code, 200)
-
-    def test_unenroll_not_enrolled_in_course(self):
-        # Deactivate the enrollment in the course and verify the URL we get sent to
-        resp = self.client.post(reverse(
-            'courseenrollment',
-            kwargs={'course_id': (unicode(self.course.id))}
-        ), {'deactivate': True})
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_invalid_enrollment_mode(self):
-        # Request an enrollment with verified mode, which does not exist for this course.
-        resp = self.client.post(reverse(
-            'courseenrollment',
-            kwargs={'course_id': (unicode(self.course.id))}),
-            {'mode': 'verified'}
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-        data = json.loads(resp.content)
-        self.assertEqual(unicode(self.course.id), data['course_id'])
-        self.assertEqual('honor', data['course_modes'][0]['slug'])
 
     def test_with_invalid_course_id(self):
         # Create an enrollment

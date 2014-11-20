@@ -108,11 +108,7 @@ def get_course_enrollment(request, course_id=None):
 
     """
     try:
-        if 'mode' in request.DATA:
-            return Response(api.update_enrollment(request.user.username, course_id, request.DATA['mode']))
-        elif 'deactivate' in request.DATA:
-            return Response(api.deactivate_enrollment(request.user.username, course_id))
-        elif course_id and request.method == 'POST':
+        if course_id and request.method == 'POST':
             return Response(api.add_enrollment(request.user.username, course_id))
         else:
             return Response(api.get_enrollment(request.user.username, course_id))
