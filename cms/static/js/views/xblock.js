@@ -40,28 +40,44 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
 
                 fragmentsRendered = this.renderXBlockFragment(fragment, wrapper);
                 fragmentsRendered.always(function() {
-                    xblockElement = self.$('.xblock').first();
-                    try {
-                        xblock = XBlock.initializeBlock(xblockElement);
-                        self.xblock = xblock;
-                        self.xblockReady(xblock);
+
+                    var xblockElements = self.$('.xblock');
+                    var continueInitializing = true;
+
+                    self.xblockElements = [];
+
+                    xblockElements.each(function (index, xblockElement) {
+                        if (continueInitializing) {
+                            try {
+                                xblock = XBlock.initializeBlock(xblockElement);
+                                self.xblockElements.push(xblock);
+                            } catch (e) {
+                                console.error(e.stack);
+                                continueInitializing = false;
+                                // Add 'xblock-initialization-failed' class to every xblock??
+                                self.$('.xblock').addClass('xblock-initialization-failed');
+                            }
+                        }
+                    });
+
+                    if (continueInitializing) {
+                        self.xblock = self.xblockElements[0];
+                        self.xblockReady(self.xblock);
                         if (successCallback) {
                             successCallback(xblock);
                         }
-                    } catch (e) {
-                        console.error(e.stack);
-                        // Add 'xblock-initialization-failed' class to every xblock
-                        self.$('.xblock').addClass('xblock-initialization-failed');
-
+                    }
+                    else {
                         // If the xblock was rendered but failed then still call xblockReady to allow
                         // drag-and-drop to be initialized.
-                        if (xblockElement) {
+                        if (xblockElements.length > 0) {
                             self.xblockReady(null);
                         }
                         if (errorCallback) {
                             errorCallback();
                         }
                     }
+
                 });
             },
 

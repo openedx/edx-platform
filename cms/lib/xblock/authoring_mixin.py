@@ -28,12 +28,6 @@ class AuthoringMixin(XBlockMixin):
             {"display_name": "Settings", "id": "settings"}
         ]
 
-    def save_editor(self, context=None):
-        """
-        TODO:
-        """
-        pass
-
     def settings_tab_view(self, context=None):
         """
         TODO:
@@ -168,3 +162,22 @@ class AuthoringMixin(XBlockMixin):
         }))
 
         return fragment
+
+    @XBlock.json_handler
+    def save_tab_data(self, data, suffix=''):
+
+        # TODO: try/catch in appropriate place
+        for tab in self.editor_tabs:
+            tab_data = data[tab[id]]
+            if 'fields' in tab_data:
+                for key, value in tab_data["fields"]:
+                    if key in self.fields:
+                        setatrr(self, key, value)
+                    else:
+                        # TODO: log error
+                        pass
+            elif 'xml' in tab_data:
+                xml = tab_data["xml"]
+
+        self.save()
+        return {'success': True, 'msg': _('Successfully saved XBlock')}

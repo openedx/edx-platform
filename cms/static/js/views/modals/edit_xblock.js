@@ -156,6 +156,14 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                             self.onSave();
                         });
                 }
+//                else { TODO:
+//                    ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+//                        function() {
+//
+//                        }).done(function() {
+//                            self.onSave();
+//                        });
+//                }
             },
 
             onSave: function() {
