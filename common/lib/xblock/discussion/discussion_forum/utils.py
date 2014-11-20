@@ -16,7 +16,6 @@ JS_URLS = [
     'js/vendor/jquery.leanModal.min.js',
     'js/vendor/jquery.timeago.js',
     'js/vendor/underscore-min.js',
-    'js/vendor/backbone-min.js',
     'js/vendor/mustache.js',
     'js/vendor/mathjax-MathJax-c9db6ac/MathJax.js?config=TeX-MML-AM_HTMLorMML-full',
 
