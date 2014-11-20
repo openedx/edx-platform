@@ -150,16 +150,27 @@ def xblock_handler(request, usage_key_string):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            return _save_xblock(
-                request.user,
-                _get_xblock(usage_key, request.user),
-                data=request.json.get('data'),
-                children_strings=request.json.get('children'),
-                metadata=request.json.get('metadata'),
-                nullout=request.json.get('nullout'),
-                grader_type=request.json.get('graderType'),
-                publish=request.json.get('publish'),
-            )
+            publish=request.json.get('publish')
+            xblock = _get_xblock(usage_key, request.user)
+            if not publish and _get_editor_tabs(xblock):
+                xblock.save_editor()
+                result = {
+                    'id': unicode(xblock.location),
+                }
+
+                # Note that children aren't being returned until we have a use case.
+                return JsonResponse(result, encoder=EdxJSONEncoder)
+            else:
+                return _save_xblock(
+                    request.user,
+                    _get_xblock(usage_key, request.user),
+                    data=request.json.get('data'),
+                    children_strings=request.json.get('children'),
+                    metadata=request.json.get('metadata'),
+                    nullout=request.json.get('nullout'),
+                    grader_type=request.json.get('graderType'),
+                    publish=publish,
+                )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
             parent_usage_key = usage_key_with_run(request.json['parent_locator'])
@@ -655,6 +666,17 @@ def _get_module_info(xblock, rewrite_static_links=True):
         return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
 
 
+def _get_editor_tabs(xblock):
+    """
+    Returns None if xblock should display the legacy (XModuleDescriptor) editor.
+    """
+    if isinstance(xblock, XModuleDescriptor) or hasattr(xblock, "studio_view"):
+        editor_tabs = None
+    else:
+        editor_tabs = xblock.editor_tabs
+    return editor_tabs
+
+
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None):
     """
@@ -716,11 +738,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         visibility_state = None
     published = modulestore().has_published_version(xblock)
-    editor_tabs = None
-    if isinstance(xblock, XModuleDescriptor) or hasattr(xblock, "studio_view"):
-        editor_tabs = None
-    else:
-        editor_tabs = xblock.editor_tabs
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
@@ -741,7 +758,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
         "use_legacy_editor": True,
-        "editor_tabs": editor_tabs
+        "editor_tabs": _get_editor_tabs(xblock)
     }
     if data is not None:
         xblock_info["data"] = data
