@@ -18,6 +18,7 @@ define([
         PasswordResetView, PasswordResetModel,
         RegisterView, RegisterModel,
         EnrollmentInterface, ShoppingCartInterface ) {
+
         'use strict';
 
         return Backbone.View.extend({

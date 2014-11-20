@@ -1,64 +1,67 @@
-var edx = edx || {};
+define([
+        'gettext',
+        'jquery',
+        'underscore',
+        'FormView'
+    ],
+    function( gettext, $, _, FormView ) {
 
-(function($, _, gettext) {
-    'use strict';
+        'use strict';
 
-    edx.student = edx.student || {};
-    edx.student.account = edx.student.account || {};
+        return FormView.extend({
+            el: '#register-form',
 
-    edx.student.account.RegisterView = edx.student.account.FormView.extend({
-        el: '#register-form',
+            tpl: '#register-tpl',
 
-        tpl: '#register-tpl',
+            events: {
+                'click .js-register': 'submitForm',
+                'click .login-provider': 'thirdPartyAuth'
+            },
 
-        events: {
-            'click .js-register': 'submitForm',
-            'click .login-provider': 'thirdPartyAuth'
-        },
+            formType: 'register',
 
-        formType: 'register',
+            submitButton: '.js-register',
 
-        submitButton: '.js-register',
+            preRender: function( data ) {
+                this.providers = data.thirdPartyAuth.providers || [];
+                this.currentProvider = data.thirdPartyAuth.currentProvider || '';
+                this.platformName = data.platformName;
 
-        preRender: function( data ) {
-            this.providers = data.thirdPartyAuth.providers || [];
-            this.currentProvider = data.thirdPartyAuth.currentProvider || '';
-            this.platformName = data.platformName;
+                this.listenTo( this.model, 'sync', this.saveSuccess );
+            },
 
-            this.listenTo( this.model, 'sync', this.saveSuccess );
-        },
+            render: function( html ) {
+                var fields = html || '';
 
-        render: function( html ) {
-            var fields = html || '';
+                $(this.el).html( _.template( this.tpl, {
+                    /* We pass the context object to the template so that
+                     * we can perform variable interpolation using sprintf
+                     */
+                    context: {
+                        fields: fields,
+                        currentProvider: this.currentProvider,
+                        providers: this.providers,
+                        platformName: this.platformName
+                    }
+                }));
 
-            $(this.el).html( _.template( this.tpl, {
-                /* We pass the context object to the template so that
-                 * we can perform variable interpolation using sprintf
-                 */
-                context: {
-                    fields: fields,
-                    currentProvider: this.currentProvider,
-                    providers: this.providers,
-                    platformName: this.platformName
+                this.postRender();
+
+                return this;
+            },
+
+            thirdPartyAuth: function( event ) {
+                var providerUrl = $(event.target).data('provider-url') || '';
+
+                if ( providerUrl ) {
+                    window.location.href = providerUrl;
                 }
-            }));
+            },
 
-            this.postRender();
-
-            return this;
-        },
-
-        thirdPartyAuth: function( event ) {
-            var providerUrl = $(event.target).data('provider-url') || '';
-
-            if ( providerUrl ) {
-                window.location.href = providerUrl;
+            saveSuccess: function() {
+                this.trigger('auth-complete');
             }
-        },
 
-        saveSuccess: function() {
-            this.trigger('auth-complete');
-        }
-        
-    });
-})(jQuery, _, gettext);
+        });
+    }
+);
