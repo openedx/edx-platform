@@ -29,7 +29,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
+from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, XModuleDescriptor
 
 from xmodule.course_module import DEFAULT_START_DATE
 from django.contrib.auth.models import User
@@ -716,7 +716,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         visibility_state = None
     published = modulestore().has_published_version(xblock)
-
+    editor_tabs = None
+    if isinstance(xblock, XModuleDescriptor) or hasattr(xblock, "studio_view"):
+        editor_tabs = None
+    else:
+        editor_tabs = xblock.editor_tabs
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
@@ -736,6 +740,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
+        "use_legacy_editor": True,
+        "editor_tabs": editor_tabs
     }
     if data is not None:
         xblock_info["data"] = data
