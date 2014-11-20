@@ -919,6 +919,7 @@ def _config_course_advanced_components(request, course_module):
  # pylint: disable=invalid-name
 def _config_course_settings(request, course_module, filter_tabs=True):
     """
+    Check to see if the user enabled some advanced settings (boolean).
     This is a hack that does the following :
     1) adds/removes the edx notes panel tab to a course automatically if
     the user has indicated that they want the notes module enabled in
