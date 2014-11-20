@@ -162,3 +162,11 @@ def install_prereqs():
     install_ruby_prereqs()
     install_node_prereqs()
     install_python_prereqs()
+
+@task
+def reinstall_python_prereqs():
+    """
+    Force reinstallation of the python prerequisites.
+    """
+
+    prereq_cache("Python prereqs", PYTHON_REQ_FILES + [sysconfig.get_python_lib()], python_prereqs_installation)
