@@ -25,7 +25,7 @@ class AuthoringMixin(XBlockMixin):
     def editor_tabs(self):
         return [
             {"display_name": "XML", "id": "xml"},
-            # {"display_name": "Settings", "id": "settings"}
+            {"display_name": "Settings", "id": "settings"}
         ]
 
     def save_editor(self, context=None):
@@ -79,7 +79,7 @@ class AuthoringMixin(XBlockMixin):
                     key=key,
                 )
                 html_strings.append(li)
-        html_string = '\n'.join(html_strings)
+        html_string = unicode('\n'.join(html_strings))
         fragment = Fragment(html_string)
         # fragment.add_javascript('')
         # fragment.initialize_js('')
@@ -96,7 +96,7 @@ class AuthoringMixin(XBlockMixin):
         frag = Fragment(XML_EDITOR_HTML)
         frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/authoring.js"))
         frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/server.js"))
-        frag.initialize_js('XmlAuthoring')
+        frag.initialize_js('XBlockXMLEditor')
         return frag
 
     @XBlock.json_handler
