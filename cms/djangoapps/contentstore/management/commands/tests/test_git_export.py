@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
+import sys
 
 from contentstore.tests.utils import CourseTestCase
 import contentstore.git_export_utils as git_export_utils
@@ -64,55 +65,27 @@ class TestGitExport(CourseTestCase):
             call_command('git_export', stderr=StringIO.StringIO())
 
         # Send bad url to get course not exported
-        with self.assertRaisesRegexp(CommandError, str(GitExportError.URL_BAD)):
+        with self.assertRaisesRegexp(CommandError, unicode(GitExportError.URL_BAD)):
             call_command('git_export', 'foo/bar/baz', 'silly', stderr=StringIO.StringIO())
 
         # Send bad course_id to get course not exported
-        with self.assertRaisesRegexp(CommandError, str(GitExportError.BAD_COURSE)):
+        with self.assertRaisesRegexp(CommandError, unicode(GitExportError.BAD_COURSE)):
             call_command('git_export', 'foo/bar:baz', 'silly',
                          stderr=StringIO.StringIO())
-
-    def test_error_output(self):
-        """
-        Verify that error output is actually resolved as the correct string
-        """
-        output = StringIO.StringIO()
-        with self.assertRaises(SystemExit):
-            with self.assertRaisesRegexp(CommandError, GitExportError.BAD_COURSE):
-                call_command(
-                    'git_export', 'foo/bar:baz', 'silly',
-                    stdout=output, stderr=output
-                )
-        self.assertIn('Bad course location provided', output.getvalue())
-        output.close()
-
-        output = StringIO.StringIO()
-        with self.assertRaises(SystemExit):
-            with self.assertRaisesRegexp(CommandError, GitExportError.URL_BAD):
-                call_command(
-                    'git_export', 'foo/bar/baz', 'silly',
-                    stdout=output, stderr=output
-                )
-        self.assertIn(
-            'Non writable git url provided. Expecting something like:'
-            ' git@github.com:mitocw/edx4edx_lite.git',
-            output.getvalue()
-        )
-        output.close()
 
     def test_bad_git_url(self):
         """
         Test several bad URLs for validation
         """
         course_key = SlashSeparatedCourseKey('org', 'course', 'run')
-        with self.assertRaisesRegexp(GitExportError, str(GitExportError.URL_BAD)):
+        with self.assertRaisesRegexp(GitExportError, unicode(GitExportError.URL_BAD)):
             git_export_utils.export_to_git(course_key, 'Sillyness')
 
-        with self.assertRaisesRegexp(GitExportError, str(GitExportError.URL_BAD)):
+        with self.assertRaisesRegexp(GitExportError, unicode(GitExportError.URL_BAD)):
             git_export_utils.export_to_git(course_key, 'example.com:edx/notreal')
 
         with self.assertRaisesRegexp(GitExportError,
-                                     str(GitExportError.URL_NO_AUTH)):
+                                     unicode(GitExportError.URL_NO_AUTH)):
             git_export_utils.export_to_git(course_key, 'http://blah')
 
     def test_bad_git_repos(self):
@@ -124,7 +97,7 @@ class TestGitExport(CourseTestCase):
         course_key = SlashSeparatedCourseKey('foo', 'blah', '100-')
         # Test bad clones
         with self.assertRaisesRegexp(GitExportError,
-                                     str(GitExportError.CANNOT_PULL)):
+                                     unicode(GitExportError.CANNOT_PULL)):
             git_export_utils.export_to_git(
                 course_key,
                 'https://user:blah@example.com/test_repo.git')
@@ -132,14 +105,14 @@ class TestGitExport(CourseTestCase):
 
         # Setup good repo with bad course to test xml export
         with self.assertRaisesRegexp(GitExportError,
-                                     str(GitExportError.XML_EXPORT_FAIL)):
+                                     unicode(GitExportError.XML_EXPORT_FAIL)):
             git_export_utils.export_to_git(
                 course_key,
                 'file://{0}'.format(self.bare_repo_dir))
 
         # Test bad git remote after successful clone
         with self.assertRaisesRegexp(GitExportError,
-                                     str(GitExportError.CANNOT_PULL)):
+                                     unicode(GitExportError.CANNOT_PULL)):
             git_export_utils.export_to_git(
                 course_key,
                 'https://user:blah@example.com/r.git')
@@ -196,6 +169,6 @@ class TestGitExport(CourseTestCase):
         )
 
         with self.assertRaisesRegexp(GitExportError,
-                                     str(GitExportError.CANNOT_COMMIT)):
+                                     unicode(GitExportError.CANNOT_COMMIT)):
             git_export_utils.export_to_git(
                 self.course.id, 'file://{0}'.format(self.bare_repo_dir))
