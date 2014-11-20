@@ -1,6 +1,6 @@
 define(
-    ['backbone', 'underscore', 'underscore.string', 'js/utils/module'],
-function(Backbone, _, str, ModuleUtils) {
+    ['backbone', 'underscore', 'underscore.string', 'js/utils/module', 'js/models/tab_info'],
+function(Backbone, _, str, ModuleUtils, TabInfo) {
     'use strict';
     var XBlockInfo = Backbone.Model.extend({
 
@@ -120,7 +120,15 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * True iff this xblock should display a "Contains staff only content" message.
              */
-            'staff_only_message': null
+            'staff_only_message': null,
+            /**
+             * The tabs that the xblock has requested be shown in the editor.
+             */
+            'editor_tabs': null,
+            /**
+             * The tabs that the xblock has requested be shown in the editor.
+             */
+            'tab_info': null
         },
 
         initialize: function () {
@@ -135,12 +143,22 @@ function(Backbone, _, str, ModuleUtils) {
             if (response.child_info) {
                 response.child_info.children = this.parseXBlockInfoList(response.child_info.children);
             }
+            if (response.editor_tabs) {
+                response.editor_tabs = this.parseTabInfo(response.editor_tabs);
+                response.editor_tabs = this.parseTabInfo(response.editor_tabs);
+            }
             return response;
         },
 
         parseXBlockInfoList: function(list) {
             return _.map(list, function(item) {
                 return this.createChild(item);
+            }, this);
+        },
+
+        parseTabInfo: function(editor_tabs) {
+            return _.map(editor_tabs, function(item) {
+                return new TabInfo(item, { parse: true });
             }, this);
         },
 
