@@ -93,7 +93,7 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         self.assertGreater(len(components), 0)
         index = offset
         for component in components:
-            for note in component.create_note(".annotate-id"):
+            for note in component.create_note(".{}".format(self.selector)):
                 note.text = "TEST TEXT {}".format(index)
                 index += 1
 
@@ -402,7 +402,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
     def setUp(self):
         super(EdxNotesToggleSingleNoteTest, self).setUp()
         self._add_notes()
-        self.note_page.visit()
+        self.note_unit_page.visit()
 
     def test_can_toggle_by_clicking_on_highlighted_text(self):
         """
@@ -414,12 +414,12 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         When I click outside the note
         Then I see the the note is closed
         """
-        note = self.note_page.notes[0]
+        note = self.note_unit_page.notes[0]
 
         note.click_on_highlight()
-        self.note_page.move_mouse_to('body')
+        self.note_unit_page.move_mouse_to('body')
         self.assertTrue(note.is_visible)
-        self.note_page.click('body')
+        self.note_unit_page.click('body')
         self.assertFalse(note.is_visible)
 
     def test_can_toggle_by_clicking_on_the_note(self):
@@ -432,12 +432,12 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         When I click outside the note
         Then I see the the note is closed
         """
-        note = self.note_page.notes[0]
+        note = self.note_unit_page.notes[0]
 
         note.show().click_on_viewer()
-        self.note_page.move_mouse_to('body')
+        self.note_unit_page.move_mouse_to('body')
         self.assertTrue(note.is_visible)
-        self.note_page.click('body')
+        self.note_unit_page.click('body')
         self.assertFalse(note.is_visible)
 
     def test_interaction_between_notes(self):
@@ -452,11 +452,11 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         When I click again on highlighted text in the second component
         Then I see appropriate note
         """
-        note_1 = self.note_page.notes[0]
-        note_2 = self.note_page.notes[1]
+        note_1 = self.note_unit_page.notes[0]
+        note_2 = self.note_unit_page.notes[1]
 
         note_1.click_on_highlight()
-        self.note_page.move_mouse_to('body')
+        self.note_unit_page.move_mouse_to('body')
         self.assertTrue(note_1.is_visible)
 
         note_2.click_on_highlight()

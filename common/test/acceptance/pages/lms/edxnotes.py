@@ -212,6 +212,8 @@ class EdxNoteHighlight(NoteChild):
     """
     BODY_SELECTOR = ""
     ADDER_SELECTOR = ".annotator-adder"
+    VIEWER_SELECTOR = ".annotator-viewer"
+    EDITOR_SELECTOR = ".annotator-editor"
 
     def __init__(self, browser, element, parent_id):
         super(EdxNoteHighlight, self).__init__(browser, parent_id)
@@ -224,8 +226,8 @@ class EdxNoteHighlight(NoteChild):
         """
         Returns True if the note is visible.
         """
-        viewer_is_visible = self.q(css=self._bounded_selector(".annotator-viewer")).visible
-        editor_is_visible = self.q(css=self._bounded_selector(".annotator-editor")).visible
+        viewer_is_visible = self.q(css=self._bounded_selector(self.VIEWER_SELECTOR)).visible
+        editor_is_visible = self.q(css=self._bounded_selector(self.EDITOR_SELECTOR)).visible
         return viewer_is_visible or editor_is_visible
 
     def wait_for_adder_visibility(self):
@@ -241,7 +243,7 @@ class EdxNoteHighlight(NoteChild):
         Waiting for visibility of note viewer.
         """
         self.wait_for_element_visibility(
-            self._bounded_selector(".annotator-viewer"), "Note Viewer is visible."
+            self._bounded_selector(self.VIEWER_SELECTOR), "Note Viewer is visible."
         )
 
     def wait_for_editor_visibility(self):
@@ -249,7 +251,7 @@ class EdxNoteHighlight(NoteChild):
         Waiting for visibility of note editor.
         """
         self.wait_for_element_visibility(
-            self._bounded_selector(".annotator-editor"), "Note Editor is visible."
+            self._bounded_selector(self.EDITOR_SELECTOR), "Note Editor is visible."
         )
 
     def wait_for_notes_invisibility(self, text="Notes are hidden"):
@@ -278,9 +280,9 @@ class EdxNoteHighlight(NoteChild):
 
     def click_on_viewer(self):
         """
-        Clicks on the highlighted text.
+        Clicks on the note viewer.
         """
-        self.q(css=self._bounded_selector(".annotator-editor")).first.click()
+        self.q(css=self._bounded_selector(self.VIEWER_SELECTOR)).first.click()
         return self
 
     def show(self):
