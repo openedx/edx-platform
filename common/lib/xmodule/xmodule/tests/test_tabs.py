@@ -413,10 +413,14 @@ class InstructorTestCase(TabTestCase):
 
 
 class EdxNotesTestCase(TabTestCase):
-    """Test cases for Notes Tab."""
+    """
+    Test cases for Notes Tab.
+    """
 
     def check_edxnotes_tab(self):
-        """Helper function for verifying the edxnotes tab."""
+        """
+        Helper function for verifying the edxnotes tab.
+        """
         return self.check_tab(
             tab_class=tabs.EdxNotesTab,
             dict_tab={'type': tabs.EdxNotesTab.type, 'name': 'same'},
@@ -426,11 +430,17 @@ class EdxNotesTestCase(TabTestCase):
         )
 
     def test_edxnotes_tabs_enabled(self):
+        """
+        Test that check if edxnotes tab can be enabled correctly.
+        """
         self.settings.FEATURES['ENABLE_EDXNOTES'] = True
         tab = self.check_edxnotes_tab()
         self.check_can_display_results(tab, for_authenticated_users_only=True)
 
     def test_edxnotes_tabs_disabled(self):
+        """
+        Test that check if edxnotes tab doewn't work when feature is disabled.
+        """
         self.settings.FEATURES['ENABLE_EDXNOTES'] = False
         tab = self.check_edxnotes_tab()
         self.check_can_display_results(tab, expected_value=False)
