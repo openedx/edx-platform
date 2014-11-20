@@ -1,14 +1,13 @@
-var edx = edx || {};
+define([
+        'jquery',
+        'views/AccessView'
+    ],
+    function( $, AccessView ) {
+        'use strict';
 
-(function($) {
-    'use strict';
-
-    edx.student = edx.student || {};
-    edx.student.account = edx.student.account || {};
-
-    return new edx.student.account.AccessView({
-        mode: $('#login-and-registration-container').data('initial-mode'),
-        thirdPartyAuth: $('#login-and-registration-container').data('third-party-auth'),
-        platformName: $('#login-and-registration-container').data('platform-name')
+        return new AccessView({
+            mode: $('#login-and-registration-container').data('initial-mode'),
+            thirdPartyAuth: $('#login-and-registration-container').data('third-party-auth'),
+            platformName: $('#login-and-registration-container').data('platform-name')
+        });
     });
-})(jQuery);
