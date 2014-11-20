@@ -32,7 +32,6 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
             handleXBlockFragment: function(fragment, options) {
                 var self = this,
                     wrapper = this.$el,
-                    xblockElement,
                     successCallback = options ? options.success || options.done : null,
                     errorCallback = options ? options.error || options.done : null,
                     xblock,
@@ -41,6 +40,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                 fragmentsRendered = this.renderXBlockFragment(fragment, wrapper);
                 fragmentsRendered.always(function() {
 
+                    // With tabbed xblock editor support, there will be multiple "xblock" elements.
                     var xblockElements = self.$('.xblock');
                     var continueInitializing = true;
 
@@ -61,6 +61,8 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                     });
 
                     if (continueInitializing) {
+                        // Some code (but I think only xmodule code) assumes self.xblock will exist.
+                        // Assign to the first xblockElements item for now. TODO: make more elegant.
                         self.xblock = self.xblockElements[0];
                         self.xblockReady(self.xblock);
                         if (successCallback) {
@@ -77,7 +79,6 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                             errorCallback();
                         }
                     }
-
                 });
             },
 
