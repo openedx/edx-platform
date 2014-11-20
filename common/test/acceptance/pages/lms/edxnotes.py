@@ -160,7 +160,7 @@ class AnnotatableComponent(NoteChild):
         notes = self.q(css=self._bounded_selector(".annotator-hl"))
         return [EdxNoteHighlight(self.browser, note, self.item_id) for note in notes]
 
-    def create_note(self, selector=".annotate-id"):
+    def create_note(self, selector=".annotator-hl"):
         """
         Create the note by the selector, return a context manager that will
         show and save the note popup.
