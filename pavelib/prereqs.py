@@ -117,6 +117,8 @@ def python_prereqs_installation():
     for req_file in PYTHON_REQ_FILES:
         sh("pip install -q --exists-action w -r {req_file}".format(req_file=req_file))
 
+    # DO NOT MERGE THIS
+    sh("pip uninstall django-staticfiles -y")
 
 @task
 def install_ruby_prereqs():
