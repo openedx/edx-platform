@@ -19,7 +19,6 @@ from django.test import TestCase, Client
 from django.test.utils import override_settings
 from django.utils import timezone
 
-
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.tests.factories import StudentModuleFactory
