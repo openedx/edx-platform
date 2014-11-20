@@ -4,12 +4,16 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
-        watch: {
-        },
-
         sass: {
             lms: {
-                // TODO
+                options: {
+                    loadPath: [
+                        'bower_components'
+                    ]
+                },
+                files: {
+                    'lms/static/sass/application.css': 'lms/static/sass/application.scss'
+                }
             }
         }
     });
