@@ -142,6 +142,10 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 }
             },
 
+            usingTabbedEditor: function () {
+                return this.$('.xblock-tabbed-editor').length > 0;
+            },
+
             save: function(event) {
                 var self = this,
                     editorView = this.editorView,
