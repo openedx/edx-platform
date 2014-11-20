@@ -293,7 +293,7 @@ class XMLModuleStore(ModuleStoreReadBase):
     """
     def __init__(
         self, data_dir, default_class=None, course_dirs=None, course_ids=None,
-        load_error_modules=True, i18n_service=None, fs_service=None, **kwargs
+        load_error_modules=True, i18n_service=None, fs_service=None, user_service=None, **kwargs
     ):
         """
         Initialize an XMLModuleStore from data_dir
@@ -331,6 +331,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         self.i18n_service = i18n_service
         self.fs_service = fs_service
+        self.user_service = user_service
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -478,6 +479,9 @@ class XMLModuleStore(ModuleStoreReadBase):
 
             if self.fs_service:
                 services['fs'] = self.fs_service
+
+            if self.user_service:
+                services['user'] = self.user_service
 
             system = ImportSystem(
                 xmlstore=self,

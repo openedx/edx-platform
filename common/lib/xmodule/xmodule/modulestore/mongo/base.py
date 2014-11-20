@@ -498,6 +498,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  error_tracker=null_error_tracker,
                  i18n_service=None,
                  fs_service=None,
+                 user_service=None,
                  retry_wait_time=0.1,
                  **kwargs):
         """
@@ -551,6 +552,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.render_template = render_template
         self.i18n_service = i18n_service
         self.fs_service = fs_service
+        self.user_service = user_service
 
         self._course_run_cache = {}
 
@@ -849,6 +851,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         if self.fs_service:
             services["fs"] = self.fs_service
+
+        if self.user_service:
+            services["user"] = self.user_service
 
         system = CachingDescriptorSystem(
             modulestore=self,
@@ -1149,6 +1154,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             if self.fs_service:
                 services["fs"] = self.fs_service
+
+            if self.user_service:
+                services["user"] = self.user_service
 
             runtime = CachingDescriptorSystem(
                 modulestore=self,
