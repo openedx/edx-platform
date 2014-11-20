@@ -1,3 +1,6 @@
+"""
+Enables interactivity for CLI operations
+"""
 import sys
 
 
@@ -11,13 +14,8 @@ def query_yes_no(question, default="yes"):
 
     The "answer" return value is one of "yes" or "no".
     """
-    valid = {
-        "yes": True,
-        "y": True,
-        "ye": True,
-        "no": False,
-        "n": False,
-    }
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
     if default is None:
         prompt = " [y/n] "
     elif default == "yes":
