@@ -2,7 +2,7 @@
 TODO: something smart here
 """
 
-from xblock.core import XBlockMixin
+from xblock.fields import XBlockMixin
 
 
 class AuthoringMixin(XBlockMixin):
