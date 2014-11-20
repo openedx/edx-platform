@@ -29,7 +29,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
-from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW, XModuleDescriptor
+from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
 
 from xmodule.course_module import DEFAULT_START_DATE
 from django.contrib.auth.models import User
@@ -41,7 +41,7 @@ from .access import has_course_access
 from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
     ancestor_has_staff_lock
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
-    xblock_type_display_name, get_parent_xblock
+    xblock_type_display_name, get_parent_xblock, get_editor_tabs
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -152,7 +152,7 @@ def xblock_handler(request, usage_key_string):
         else:  # Since we have a usage_key, we are updating an existing xblock.
             publish=request.json.get('publish')
             xblock = _get_xblock(usage_key, request.user)
-            if not publish and _get_editor_tabs(xblock):
+            if not publish and get_editor_tabs(xblock):
                 xblock.save_editor()
                 result = {
                     'id': unicode(xblock.location),
@@ -666,17 +666,6 @@ def _get_module_info(xblock, rewrite_static_links=True):
         return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
 
 
-def _get_editor_tabs(xblock):
-    """
-    Returns None if xblock should display the legacy (XModuleDescriptor) editor.
-    """
-    if isinstance(xblock, XModuleDescriptor) or hasattr(xblock, "studio_view"):
-        editor_tabs = None
-    else:
-        editor_tabs = xblock.editor_tabs
-    return editor_tabs
-
-
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None):
     """
@@ -757,8 +746,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
-        "use_legacy_editor": True,
-        "editor_tabs": _get_editor_tabs(xblock)
+        "use_legacy_editor": True
     }
     if data is not None:
         xblock_info["data"] = data

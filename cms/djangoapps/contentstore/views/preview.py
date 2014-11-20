@@ -30,7 +30,7 @@ from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
 import static_replace
 from .session_kv_store import SessionKeyValueStore
-from .helpers import render_from_lms
+from .helpers import render_from_lms, get_editor_tabs
 
 from contentstore.views.access import get_user_role
 
@@ -210,6 +210,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'content': frag.content,
             'is_root': is_root,
             'is_reorderable': is_reorderable,
+            'editor_tabs': get_editor_tabs(xblock)
         }
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)
