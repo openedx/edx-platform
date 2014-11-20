@@ -3,7 +3,8 @@
 */
 
 define([
-        'jquery'
+        'jquery',
+        'jquery.cookie'
     ],
     function( $ ) {
         'use strict';

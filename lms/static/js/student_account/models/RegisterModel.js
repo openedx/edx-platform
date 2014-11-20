@@ -1,6 +1,7 @@
 define([
         'backbone',
-        'jquery'
+        'jquery',
+        'jquery.cookie'
     ],
     function( Backbone, $ ) {
         'use strict';
