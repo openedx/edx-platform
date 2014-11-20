@@ -43,6 +43,11 @@ XMODULES = [
     "lti = xmodule.lti_module:LTIDescriptor",
 ]
 
+XBLOCKS = [
+    "vertical = xmodule.vertical_module:VerticalModule",
+    "wrapper = xmodule.wrapper_module:WrapperModule",
+]
+
 setup(
     name="XModule",
     version="0.1",
@@ -62,7 +67,7 @@ setup(
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points
     entry_points={
-        'xblock.v1': XMODULES,
+        'xblock.v1': XMODULES + XBLOCKS,
         'xmodule.v1': XMODULES,
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',
