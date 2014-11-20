@@ -24,55 +24,11 @@ def path_to_location(modulestore, usage_key):
     of this location under that sequence.
     '''
 
-    def flatten(xs):
-        '''Convert lisp-style (a, (b, (c, ()))) list into a python list.
-        Not a general flatten function. '''
-        p = []
-        while xs != ():
-            p.append(xs[0])
-            xs = xs[1]
-        return p
-
-    def find_path_to_course():
-        '''Find a path up the location graph to a node with the
-        specified category.
-
-        If no path exists, return None.
-
-        If a path exists, return it as a list with target location first, and
-        the starting location last.
-        '''
-        # Standard DFS
-
-        # To keep track of where we came from, the work queue has
-        # tuples (location, path-so-far).  To avoid lots of
-        # copying, the path-so-far is stored as a lisp-style
-        # list--nested hd::tl tuples, and flattened at the end.
-        queue = [(usage_key, ())]
-        while len(queue) > 0:
-            (next_usage, path) = queue.pop()  # Takes from the end
-
-            # get_parent_location raises ItemNotFoundError if location isn't found
-            parent = modulestore.get_parent_location(next_usage)
-
-            # print 'Processing loc={0}, path={1}'.format(next_usage, path)
-            if next_usage.block_type == "course":
-                # Found it!
-                path = (next_usage, path)
-                return flatten(path)
-            elif parent is None:
-                # Orphaned item.
-                return None
-
-            # otherwise, add parent locations at the end
-            newpath = (next_usage, path)
-            queue.append((parent, newpath))
-
     with modulestore.bulk_operations(usage_key.course_key):
         if not modulestore.has_item(usage_key):
             raise ItemNotFoundError(usage_key)
 
-        path = find_path_to_course()
+        path = _find_path_to_course(modulestore, usage_key)
         if path is None:
             raise NoPathToItem(usage_key)
 
@@ -105,3 +61,64 @@ def path_to_location(modulestore, usage_key):
             position = "_".join(position_list)
 
         return (course_id, chapter, section, position)
+
+
+def path_to_root(modulestore, usage_key, course_key):
+    '''Traverse the location graph upward from a node anywhere within a course,
+    parent by parent, up to the course itself, and return a list of items
+    (including the starting node and the course node).
+    '''
+    with modulestore.bulk_operations(course_key):
+        if not modulestore.has_item(usage_key):
+            raise ItemNotFoundError(usage_key)
+
+        path = _find_path_to_course(modulestore, usage_key)
+        if path is None:
+            raise NoPathToItem(usage_key)
+
+        return [modulestore.get_item(locator) for locator in reversed(path)]
+
+def _flatten(xs):
+    '''Convert lisp-style (a, (b, (c, ()))) list into a python list.
+    Not a general flatten function. '''
+    p = []
+    while xs != ():
+        p.append(xs[0])
+        xs = xs[1]
+    return p
+
+def _find_path_to_course(modulestore, usage_key):
+    '''Find a path up the location graph to a node with the
+    specified category.
+
+    If no path exists, return None.
+
+    If a path exists, return it as a list with target location first, and
+    the starting location last.
+    '''
+    # Standard DFS
+
+    # To keep track of where we came from, the work queue has
+    # tuples (location, path-so-far).  To avoid lots of
+    # copying, the path-so-far is stored as a lisp-style
+    # list--nested hd::tl tuples, and flattened at the end.
+    queue = [(usage_key, ())]
+    while len(queue) > 0:
+        (next_usage, path) = queue.pop()  # Takes from the end
+
+        # get_parent_location raises ItemNotFoundError if location isn't found
+        parent = modulestore.get_parent_location(next_usage)
+
+        # print 'Processing loc={0}, path={1}'.format(next_usage, path)
+        if next_usage.block_type == "course":
+            # Found it!
+            path = (next_usage, path)
+            return _flatten(path)
+        elif parent is None:
+            # Orphaned item.
+            return None
+
+        # otherwise, add parent locations at the end
+        newpath = (next_usage, path)
+        queue.append((parent, newpath))
+

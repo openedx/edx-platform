@@ -13,6 +13,9 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT)
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import path_to_root
+from xmodule.modulestore.exceptions import NoPathToItem, ItemNotFoundError, ReferentialIntegrityError
 
 from xblock.core import XBlock
 
@@ -265,6 +268,38 @@ def _has_access_error_desc(user, action, descriptor, course_key):
     return _dispatch(checkers, action, user, descriptor)
 
 
+def _get_merged_group_access(block, course_key=None):
+    """
+    """
+    # the merge logic is: 1) union of all partition IDs
+    # from this block up to the root block; 2) intersection of all
+    # non-empty group ID lists for each partition ID.
+    #
+    # if the intersection of groups across blocks in a partition
+    # is empty, False is returned instead of an empty list.  This is
+    # used to indicate that the merged rules for this block effectively
+    # render the block inaccessible to all students.
+    merged_access = {}
+    try:
+        blocks_to_root = path_to_root(modulestore(), block.location, course_key or block.location.course_key)
+    except (NoPathToItem, ItemNotFoundError, ReferentialIntegrityError):  # TODO detached category, or an unexpected orphan
+        log.warning('no path to item for block: {}'.format(block), exc_info=True)
+        blocks_to_root = [block, modulestore().get_course(course_key or block.location.course_key)]
+    for check_block in blocks_to_root:
+        if check_block.group_access:
+            for partition_id, group_ids in check_block.group_access.items():
+                if group_ids:
+                    if partition_id in merged_access:
+                        merged_access[partition_id] = list(
+                            set(merged_access[partition_id]).intersection(group_ids)
+                        )
+                    else:
+                        merged_access[partition_id] = group_ids
+
+    # swap False for empty list in dict values.
+    return {k:merged_access[k] or False for k in merged_access}
+
+
 def _has_access_descriptor(user, action, descriptor, course_key=None):
     """
     Check if user has access to this descriptor.
@@ -285,6 +320,57 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         don't have to hit the enrollments table on every module load.
         """
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
+            return False
+
+        # enforce group access:
+
+        # first merge group_access specifications for this block and its ancestors
+        merged_access = _get_merged_group_access(descriptor, course_key or descriptor.location.course_key)
+        # check for False in merged_access, which indicates that at least one
+        # partition's group list excludes all students.
+        if False in merged_access.values():
+            return False
+
+        # resolve the partition IDs in group_access to actual
+        # partition objects, skipping those which cannot be found or which
+        # contain empty group directives.
+        partitions = filter(
+            None,
+            [
+                descriptor._get_user_partition(partition_id)
+                for partition_id, group_ids in merged_access.items()
+                if group_ids is not None
+            ]
+        )
+
+        # next resolve the group IDs specified within each partition,
+        # skipping those which cannot be found
+        partition_groups = []
+        for partition in partitions:
+            groups = filter(
+                None,
+                [
+                    partition.get_group(group_id)
+                    for group_id in merged_access[partition.id]
+                ]
+            )
+            if groups:
+                partition_groups.append((partition, groups))
+
+        # look up the user's group for each partition
+        user_groups = {}
+        for partition, groups in partition_groups:
+            user_groups[partition.id] = partition.scheme.get_group_for_user(
+                course_key,
+                user,
+                partition,
+            )
+
+        # finally: check that the user has a satisfactory group assignment
+        # for each partition.
+        if not all(
+            [user_groups.get(partition.id) in groups for partition, groups in partition_groups]
+        ):
             return False
 
         # If start dates are off, can always load
