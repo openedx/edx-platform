@@ -18,6 +18,7 @@ from util.date_utils import get_default_time_display
 from dateutil.parser import parse as dateutil_parse
 log = logging.getLogger(__name__)
 from provider.oauth2.models import AccessToken, Client
+from provider.utils import now
 
 
 class NoteJSONEncoder(JSONEncoder):
@@ -35,10 +36,15 @@ def get_token(user):
     """
     Generates OAuth access token for a user.
     """
-    token, created = AccessToken.objects.get_or_create(  # pylint: disable=unused-variable
-        client=Client.objects.get(name='edx-notes'),
-        user=user
-    )
+    try:
+        token = AccessToken.objects.get(
+            client=Client.objects.get(name='edx-notes'),
+            user=user,
+            expires__gt=now()
+        )
+    except AccessToken.DoesNotExist:
+        token = AccessToken(client=Client.objects.get(name='edx-notes'), user=user)
+        token.save()
     return token.token
 
 

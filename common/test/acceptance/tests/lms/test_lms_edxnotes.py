@@ -27,7 +27,6 @@ class EdxNotesTest(UniqueCourseTest):
         self.email = "{}@email.com".format(self.username)
 
         self.selector = "annotate-id"
-        ClientFactory(name='edx-notes')
         self.edxnotes_fixture = EdxNotesFixture()
         self.course_fixture = CourseFixture(
             self.course_info["org"], self.course_info["number"],
@@ -239,7 +238,6 @@ class EdxNotesPageTest(UniqueCourseTest):
         self.username = str(uuid4().hex)[:5]
         self.email = "{}@email.com".format(self.username)
 
-        ClientFactory(name='edx-notes')
         self.edxnotes_fixture = EdxNotesFixture()
         self.course_fixture = CourseFixture(
             self.course_info["org"], self.course_info["number"],
