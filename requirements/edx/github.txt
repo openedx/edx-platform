@@ -37,4 +37,4 @@
 -e git+https://github.com/edx/edx-val.git@a3c54afe30375f7a5755ba6f6412a91de23c3b86#egg=edx-val
 
 # hack hack hack
--e git+https://github.com/Stanford-Online/xblock-image-modal.git#egg=ImageModal
+-e git+https://github.com/Stanford-Online/xblock-image-modal.git@hackathon#egg=ImageModal
