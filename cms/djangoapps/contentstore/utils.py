@@ -22,6 +22,7 @@ from opaque_keys.edx.keys import UsageKey, CourseKey
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.models import CourseEnrollment
 from student import auth
+from util.signals import course_deleted
 
 
 log = logging.getLogger(__name__)
@@ -76,9 +77,17 @@ def delete_course_and_groups(course_key, user_id):
         # in the django layer, we need to remove all the user permissions groups associated with this course
         try:
             remove_all_instructors(course_key)
+            print 'User permissions removed, continuing...'
         except Exception as err:
             log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
 
+        # Broadcast the deletion event to CMS listeners
+        print 'Notifying CMS system components...'
+        course_deleted.send(sender=None, course_key=course_key)
+
+        print 'CMS Course Cleanup Complete!'
+        print 'You must now execute this same command in LMS to clean up orphaned records'
+        print 'COMMAND: ./manage.py lms delete_course_references <course_id> commit'
 
 def get_lms_link_for_item(location, preview=False):
     """
