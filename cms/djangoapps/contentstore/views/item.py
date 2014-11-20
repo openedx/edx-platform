@@ -228,7 +228,12 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         if view_name == STUDIO_VIEW:
             try:
-                fragment = xblock.render(STUDIO_VIEW)
+                editor_tabs = get_editor_tabs(xblock)
+                if editor_tabs:
+                    context = {}
+                    fragment = xblock.render_tabbed_editor(context)
+                else:
+                    fragment = xblock.render(STUDIO_VIEW)
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.

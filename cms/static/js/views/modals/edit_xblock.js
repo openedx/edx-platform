@@ -4,8 +4,8 @@
  * and upon save an optional refresh function can be invoked to update the display.
  */
 define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/views/utils/view_utils",
-    "js/models/xblock_info", "js/views/xblock_editor", 'js/models/tab_info', "js/views/xblock_tabbed_editor"],
-    function($, _, gettext, BaseModal, ViewUtils, XBlockInfo, XBlockEditorView, TabInfo, XBlockTabbedEditorView) {
+    "js/models/xblock_info", "js/views/xblock_editor"],
+    function($, _, gettext, BaseModal, ViewUtils, XBlockInfo, XBlockEditorView) {
         var EditXBlockModal = BaseModal.extend({
             events : {
                 "click .action-save": "save",
@@ -54,17 +54,10 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
             },
 
             displayXBlock: function() {
-                if (this.xblockInfo.get('editor_tabs')) {
-                    this.editorView = new XBlockTabbedEditorView({
-                        el: this.$('.xblock-editor'),
-                        model: this.xblockInfo
-                    });
-                } else {
-                    this.editorView = new XBlockEditorView({
-                        el: this.$('.xblock-editor'),
-                        model: this.xblockInfo
-                    });
-                }
+                this.editorView = new XBlockEditorView({
+                    el: this.$('.xblock-editor'),
+                    model: this.xblockInfo
+                });
                 this.editorView.render({
                     success: _.bind(this.onDisplayXBlock, this)
                 });
@@ -95,9 +88,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 // If the xblock is not using custom buttons then choose which buttons to show
                 if (!editorView.hasCustomButtons()) {
                     // If the xblock does not support save then disable the save button
-//                    if (!editorView.xblock.save) {
-//                        this.disableSave();
-//                    }
+                    if (!editorView.xblock.save) {
+                        this.disableSave();
+                    }
                     this.getActionBar().show();
                 }
 
@@ -183,10 +176,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
             findXBlockInfo: function(xblockWrapperElement, defaultXBlockInfo) {
                 var xblockInfo = defaultXBlockInfo,
                     xblockElement,
-                    displayName,
-                    editorTabs;
+                    displayName;
                 if (xblockWrapperElement.length > 0) {
-                    editorTabs = null;
                     xblockElement = xblockWrapperElement.find('.xblock');
                     displayName = xblockWrapperElement.find('.xblock-header .header-details .xblock-display-name').text().trim();
                     // If not found, try looking for the old unit page style rendering.
@@ -194,28 +185,14 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                     if (!displayName) {
                         displayName = this.xblockElement.find('.component-header').text().trim();
                     }
-                    // TODO: remove this hack when everything is wired up properly
-                    if (!editorTabs && xblockElement.data('block-type') === 'imagemodal') {
-                        editorTabs = [
-                            { id: "xml", display_name: "XML"},
-                            { id: "settings", display_name: "Settings"}
-                        ];
-                    }
                     xblockInfo = new XBlockInfo({
                         id: xblockWrapperElement.data('locator'),
                         courseKey: xblockWrapperElement.data('course-key'),
                         category: xblockElement.data('block-type'),
-                        display_name: displayName,
-                        editor_tabs: editorTabs && this.parseTabInfo(editorTabs)
+                        display_name: displayName
                     });
                 }
                 return xblockInfo;
-            },
-
-            parseTabInfo: function(editorTabs) {
-                return _.map(editorTabs, function(item) {
-                    return new TabInfo(item, { parse: true });
-                }, this);
             },
 
             addModeButton: function(mode, displayName) {

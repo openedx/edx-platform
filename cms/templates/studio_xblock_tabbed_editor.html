@@ -1,0 +1,22 @@
+<div>
+    <div class="modal-header">
+        <h2 class="title modal-window-title">Editing: Text</h2>
+        <ul class="editor-modes action-list action-modes">
+
+            <li class="action-item" data-mode="editor">
+                <a href="#" class="editor-button is-set">Editor</a>
+            </li>
+
+
+            <li class="action-item" data-mode="settings">
+                <a href="#" class="settings-button">Settings</a>
+            </li>
+
+        </ul>
+    </div>
+    <div class="modal-content">
+        <div class="xblock-editor" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
+            ${tab_views}
+        </div>
+    </div>
+</div>

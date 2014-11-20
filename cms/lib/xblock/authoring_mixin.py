@@ -14,7 +14,7 @@ from lxml import etree
 
 logger = logging.getLogger(__name__)
 
-XML_EDITOR_HTML = '<div id="xml-edit"><textarea class="xml-editor"></textarea></div>'
+XML_EDITOR_HTML = u'<div id="xml-edit"><textarea class="xml-editor"></textarea></div>'
 
 
 class AuthoringMixin(XBlockMixin):
@@ -25,7 +25,7 @@ class AuthoringMixin(XBlockMixin):
     def editor_tabs(self):
         return [
             {"display_name": "XML", "id": "xml"},
-            {"display_name": "Settings", "id": "settings"}
+            # {"display_name": "Settings", "id": "settings"}
         ]
 
     def save_editor(self, context=None):
@@ -134,3 +134,32 @@ class AuthoringMixin(XBlockMixin):
         """
         root = etree.Element('root')
         return self.add_xml_to_node(root)
+
+    def render_editor_tab_views(self, fragment, context):
+        """
+        Renders the views for each of the xblock's tab and returns them as a single HTML string. In addition, any
+        dependencies are added to the specified fragment.
+        """
+        html = ""
+        for editor_tab in self.editor_tabs:
+            view_name = editor_tab['id'] + '_tab_view'
+            rendered_child = self.render(view_name, context)
+            fragment.add_frag_resources(rendered_child)
+            html = html + rendered_child.content
+
+        return html
+
+    def render_tabbed_editor(self, context):
+        """
+        Renders the Studio preview by rendering each tab desired by the xblock and then rendering
+        a view for each one. The client will ensure that only one view is visible at a time.
+        """
+        fragment = Fragment()
+        tab_views = self.render_editor_tab_views(fragment, context)
+
+        fragment.add_content(self.system.render_template('studio_xblock_tabbed_editor.html', {
+            'xblock': self,
+            'tab_views': tab_views,
+        }))
+
+        return fragment
