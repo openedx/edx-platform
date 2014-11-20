@@ -4,6 +4,6 @@
   "homepage": "https://github.com/edx/edx-platform",
   "dependencies": {
     "bourbon": "~4.0.2",
-    "neat": "~1.7.0"
+    "neat": "~1.5.1"
   }
 }
