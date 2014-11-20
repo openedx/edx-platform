@@ -315,6 +315,8 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         ('edx.video.loaded', 'load_video'),
         ('edx.video.transcript.shown', 'show_transcript'),
         ('edx.video.transcript.hidden', 'hide_transcript'),
+        ('edx.video.closedcaptions.shown', 'show_closed_captions'),
+        ('edx.video.closedcaptions.hidden', 'hide_closed_captions'),
     )
     @unpack
     def test_video_event(self, name, event_type):

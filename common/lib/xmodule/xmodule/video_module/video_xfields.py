@@ -108,6 +108,12 @@ class VideoFields(object):
         scope=Scope.settings,
         default=True
     )
+    show_closed_captions = Boolean(
+        help=_("Specify whether the closed captions appear with the video by default."),
+        display_name=_("Show Closed Captions"),
+        scope=Scope.settings,
+        default=True
+    )
     # Data format: {'de': 'german_translation', 'uk': 'ukrainian_translation'}
     transcripts = Dict(
         help=_("Add transcripts in different languages. Click below to specify a language and upload an .srt transcript file for that language."),
