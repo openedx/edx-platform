@@ -6,6 +6,13 @@ from __future__ import absolute_import
 import hashlib
 import json
 import logging
+import mimetypes
+
+import static_replace
+
+from datetime import datetime
+from django.utils.timezone import UTC
+
 from collections import OrderedDict
 from functools import partial
 
@@ -507,6 +514,14 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         """
         Manages the workflow for recording and updating of student module grade state
         """
+
+        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register grading events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
         user_id = user.id
 
         grade = event.get('value')
@@ -549,6 +564,14 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         """
         tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
         """
+
+        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register progress events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
         user_id = event.get('user_id', user.id)
         if not user_id:
             return
