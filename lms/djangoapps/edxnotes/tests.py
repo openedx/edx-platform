@@ -10,12 +10,14 @@ from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
+from oauth2_provider.tests.factories import ClientFactory
 
 from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from student.tests.factories import UserFactory
+
 from . import helpers
 
 
@@ -37,7 +39,8 @@ class TestProblem(object):
     def __init__(self, course):
         self.system = MagicMock(is_author_mode=False)
         self.scope_ids = MagicMock(usage_id="test_usage_id")
-        self.runtime = MagicMock(course_id=course.id)
+        self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
+        self.runtime = MagicMock(course_id=course.id, get_real_user=lambda anon_id: self.user)
         self.descriptor = MagicMock()
         self.descriptor.runtime.modulestore.get_course.return_value = course
 
@@ -55,6 +58,7 @@ class EdxNotesDecoratorTest(TestCase):
     """
 
     def setUp(self):
+        ClientFactory(name='edx-notes')
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
@@ -326,6 +330,7 @@ class EdxNotesViewsTest(TestCase):
     Tests for EdxNotes views.
     """
     def setUp(self):
+        ClientFactory(name='edx-notes')
         super(EdxNotesViewsTest, self).setUp()
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
