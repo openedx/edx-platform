@@ -3,8 +3,8 @@ TODO: something smart here
 """
 import logging
 from django.utils.translation import ugettext as _
-import pkg_resources
 import defusedxml.ElementTree as safe_etree
+import pkg_resources
 
 from xblock.core import XBlock
 
@@ -48,7 +48,8 @@ class AuthoringMixin(XBlockMixin):
             (Fragment): An HTML fragment for editing the configuration of this XBlock.
         """
         frag = Fragment(XML_EDITOR_HTML)
-        # frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/authoring.min.js"))
+        frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/authoring.js"))
+        frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/server.js"))
         frag.initialize_js('XMLEditor')
         return frag
 
