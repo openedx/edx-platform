@@ -8,7 +8,7 @@
          * done.
          */
         modules: [
-            "js/student_account/accessApp"
+            { name: "js/student_account/accessApp" }
         ],
 
         /**
@@ -34,7 +34,9 @@
          * http: URL when running in the browser and during an optimization that
          * file should be skipped because it has no dependencies.
          */
-        paths: {},
+        paths: {
+            'gettext': 'empty:'
+        },
 
         /**
          * If shim config is used in the app during runtime, duplicate the config
@@ -107,6 +109,6 @@
          * SILENT: 4
          * Default is 0.
          */
-        logLevel: 4
+        logLevel: 0
     };
 } ())

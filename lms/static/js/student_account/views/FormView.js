@@ -3,7 +3,7 @@ define([
         'gettext',
         'jquery',
         'underscore',
-        'underscore-string'
+        'underscore.string'
     ],
     function( Backbone, gettext, $, _ ) {
 

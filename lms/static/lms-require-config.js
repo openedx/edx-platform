@@ -1,5 +1,4 @@
 require.config({
-    baseUrl: '',
     waitSeconds: 60,
     paths: {
         'backbone':             'js/vendor/backbone-min',

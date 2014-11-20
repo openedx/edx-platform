@@ -1,6 +1,6 @@
 define([
         'jquery',
-        'views/AccessView'
+        './views/AccessView'
     ],
     function( $, AccessView ) {
         'use strict';

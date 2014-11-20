@@ -2,7 +2,7 @@ define([
         'gettext',
         'jquery',
         'underscore',
-        'FormView'
+        './FormView'
     ],
     function( gettext, $, _, FormView ) {
 
