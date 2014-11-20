@@ -9,10 +9,12 @@ define(
                 "click .js-upload-button": "chooseFile"
             },
 
-            initialize: function() {
+            initialize: function(options) {
                 this.template = this.loadTemplate("active-video-upload-list");
                 this.collection = new Backbone.Collection();
                 this.listenTo(this.collection, "add", this.renderUpload);
+                this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
+                this.postUrl = options.postUrl;
             },
 
             render: function() {
@@ -22,6 +24,7 @@ define(
                     type: "PUT",
                     autoUpload: true,
                     singleFileUploads: false,
+                    limitConcurrentUploads: this.concurrentUploadLimit,
                     add: this.fileUploadAdd.bind(this),
                     send: this.fileUploadSend.bind(this),
                     done: this.fileUploadDone.bind(this),
@@ -55,6 +58,7 @@ define(
                     uploadData.submit();
                 } else {
                     $.ajax({
+                        url: view.postUrl,
                         contentType: "application/json",
                         data: JSON.stringify({
                             files: _.map(

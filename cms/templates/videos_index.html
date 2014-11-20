@@ -21,7 +21,10 @@
 
 <%block name="requirejs">
     require(["js/views/active_video_upload_list"], function (ActiveVideoUploadListView) {
-        view = new ActiveVideoUploadListView();
+        view = new ActiveVideoUploadListView({
+            postUrl: "${post_url}",
+            concurrentUploadLimit: ${concurrent_upload_limit}
+        });
         $(".content-primary").html(view.render().$el);
     });
 </%block>

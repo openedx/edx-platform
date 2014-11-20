@@ -557,7 +557,8 @@ YOUTUBE = {
 VIDEO_UPLOAD_PIPELINE = {
     'BUCKET': 'edx_videos',
     'ROOT_PATH': '',
-    'FOLDER': 'studio_upload_videos'
+    'FOLDER': 'studio_upload_videos',
+    'CONCURRENT_UPLOAD_LIMIT': 4,
 }
 AWS_ACCESS_KEY_ID = ""
 AWS_SECRET_ACCESS_KEY = ""

@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
@@ -69,7 +70,17 @@ def videos_index_html(course):
     """
     Returns an HTML rendering of the list of uplaoded videos.
     """
-    return render_to_response("videos_index.html", {"context_course": course})
+    return render_to_response(
+        "videos_index.html",
+        {
+            "context_course": course,
+            "post_url": reverse(
+                "contentstore.views.videos_handler",
+                kwargs={"course_key_string": unicode(course.id)}
+            ),
+            "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
+        }
+    )
 
 
 def videos_index_json(course):

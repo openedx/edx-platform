@@ -2,6 +2,7 @@
 define(
     ["jquery", "js/models/active_video_upload", "js/views/active_video_upload_list", "mock-ajax", "jasmine-jquery"],
     function($, ActiveVideoUpload, ActiveVideoUploadListView) {
+        var concurrentUploadLimit = 2;
         var activeVideoUploadTpl = readFixtures("active-video-upload.underscore");
         var activeVideoUploadListTpl = readFixtures("active-video-upload-list.underscore");
 
@@ -10,11 +11,18 @@ define(
                 setFixtures($("<script>", {id: "active-video-upload-tpl", type: "text/template"}).text(activeVideoUploadTpl));
                 appendSetFixtures($("<script>", {id: "active-video-upload-list-tpl", type: "text/template"}).text(activeVideoUploadListTpl));
                 appendSetFixtures(sandbox());
-                this.view = new ActiveVideoUploadListView({el: $("#sandbox")});
+                this.postUrl = "/test/post/url";
+                this.view = new ActiveVideoUploadListView({
+                    el: $("#sandbox"),
+                    concurrentUploadLimit: concurrentUploadLimit,
+                    postUrl: this.postUrl
+                });
                 this.view.render();
+                jasmine.Ajax.useMock();
+                clearAjaxRequests();
             });
 
-            it("upload button should trigger file selection", function() {
+            it("should trigger file selection when the upload button is clicked", function() {
                 var clickSpy = jasmine.createSpy();
                 clickSpy.andCallFake(function(event) { event.preventDefault(); });
                 this.view.$(".js-file-input").on("click", clickSpy);
@@ -22,95 +30,175 @@ define(
                 expect(clickSpy).toHaveBeenCalled();
             });
 
-            describe("on file selection", function() {
-                beforeEach(function() {
-                    jasmine.Ajax.useMock();
-                    // The files property cannot be set on a file input for
-                    // security reasons, so we must mock the access mechanism
-                    // that jQuery-File-Upload uses to retrieve it.
-                    var realProp = $.prop;
-                    spyOn($, "prop").andCallFake(function(el, propName) {
-                        if (arguments.length == 2 && propName == "files") {
-                            return [{name: "test_video.mp4"}]
-                        } else {
-                            realProp.apply(this, arguments);
-                        }
-                    });
-                    this.view.$(".js-file-input").change()
-                    this.request = mostRecentAjaxRequest();
-                });
+            var makeUploadUrl = function(fileName) {
+                return "http://www.example.com/test_url/" + fileName;
+            }
 
-                it("the correct request is triggered", function() {
-                    expect(this.request.url).toEqual(window.location.href);
-                    expect(this.request.method).toEqual("POST");
-                    expect(this.request.requestHeaders["Content-Type"]).toEqual("application/json");
-                    expect(this.request.requestHeaders["Accept"]).toContain("application/json");
-                    expect(JSON.parse(this.request.params)).toEqual({
-                        "files": [{"file-name": "test_video.mp4"}]
-                    });
-                });
+            var getSentRequests = function() {
+                return _.filter(
+                    ajaxRequests,
+                    function(request) { return request.readyState > 0; }
+                );
+            }
 
-                it("server failure should trigger the global AJAX error handler", function() {
-                    var globalAjaxError = jasmine.createSpy();
-                    $(document).ajaxError(globalAjaxError);
-                    this.request.response({status: 500});
-                    expect(globalAjaxError).toHaveBeenCalled();
-                });
+            _.each(
+                [
+                    {desc: "a single file", numFiles: 1},
+                    {desc: "multiple files", numFiles: 2},
+                    {desc: "more files than upload limit", numFiles: 3},
+                ],
+                function(caseInfo) {
+                    var fileNames = _.map(
+                        _.range(caseInfo.numFiles),
+                        function(i) { return "test" + i + ".mp4";}
+                    );
 
-                describe("and successful server response", function() {
-                    beforeEach(function() {
-                        this.request.response({
-                            status: 200,
-                            responseText: JSON.stringify({
-                                files: [{"upload-url": "https://www.example.com/test_url"}]
-                            })
+                    describe("on selection of " + caseInfo.desc, function() {
+                        beforeEach(function() {
+                            // The files property cannot be set on a file input for
+                            // security reasons, so we must mock the access mechanism
+                            // that jQuery-File-Upload uses to retrieve it.
+                            var realProp = $.prop;
+                            spyOn($, "prop").andCallFake(function(el, propName) {
+                                if (arguments.length == 2 && propName == "files") {
+                                    return _.map(
+                                        fileNames,
+                                        function(fileName) { return {name: fileName}; }
+                                    );
+                                } else {
+                                    realProp.apply(this, arguments);
+                                }
+                            });
+                            this.view.$(".js-file-input").change()
+                            this.request = mostRecentAjaxRequest();
                         });
-                        this.uploadRequest = mostRecentAjaxRequest();
-                        this.$uploadEl = this.view.$(".js-active-video-upload-list > li");
-                    });
 
-                    it("should start upload, update its collection, and show status", function() {
-                        expect(this.uploadRequest.url).toEqual("https://www.example.com/test_url");
-                        expect(this.uploadRequest.method).toEqual("PUT");
-                        expect(this.view.collection.length).toEqual(1);
-                        expect(this.view.collection.at(0).get("status")).toEqual(
-                            ActiveVideoUpload.STATUS_UPLOADING
-                        );
-                        expect(this.$uploadEl.length).toEqual(1);
-                        expect($.trim(this.$uploadEl.find(".status-message").text())).toEqual(
-                            ActiveVideoUpload.STATUS_UPLOADING
-                        );
-                        expect(this.$uploadEl.find(".success")).not.toExist();
-                        expect(this.$uploadEl.find(".error")).not.toExist();
-                    });
+                        it("should trigger the correct request", function() {
+                            expect(this.request.url).toEqual(this.postUrl);
+                            expect(this.request.method).toEqual("POST");
+                            expect(this.request.requestHeaders["Content-Type"]).toEqual("application/json");
+                            expect(this.request.requestHeaders["Accept"]).toContain("application/json");
+                            expect(JSON.parse(this.request.params)).toEqual({
+                                "files": _.map(
+                                    fileNames,
+                                    function(fileName) { return {"file-name": fileName}; }
+                                )
+                            });
+                        });
 
-                    it("should update status to completed on upload completion", function() {
-                        this.uploadRequest.response({status: 204});
-                        expect(this.view.collection.at(0).get("status")).toEqual(
-                            ActiveVideoUpload.STATUS_COMPLETED
-                        );
-                        expect(this.$uploadEl.length).toEqual(1);
-                        expect($.trim(this.$uploadEl.find(".status-message").text())).toEqual(
-                            ActiveVideoUpload.STATUS_COMPLETED
-                        );
-                        expect(this.$uploadEl.find(".success")).toExist();
-                        expect(this.$uploadEl.find(".error")).not.toExist();
-                    });
+                        it("should trigger the global AJAX error handler on server error", function() {
+                            var globalAjaxError = jasmine.createSpy();
+                            $(document).ajaxError(globalAjaxError);
+                            this.request.response({status: 500});
+                            expect(globalAjaxError).toHaveBeenCalled();
+                        });
 
-                    it("should update status to failed on upload failure", function() {
-                        this.uploadRequest.response({status: 500});
-                        expect(this.view.collection.at(0).get("status")).toEqual(
-                            ActiveVideoUpload.STATUS_FAILED
-                        );
-                        expect(this.$uploadEl.length).toEqual(1);
-                        expect($.trim(this.$uploadEl.find(".status-message").text())).toEqual(
-                            ActiveVideoUpload.STATUS_FAILED
-                        );
-                        expect(this.$uploadEl.find(".success")).not.toExist();
-                        expect(this.$uploadEl.find(".error")).toExist();
+                        describe("and successful server response", function() {
+                            beforeEach(function() {
+                                clearAjaxRequests();
+                                this.request.response({
+                                    status: 200,
+                                    responseText: JSON.stringify({
+                                        files: _.map(
+                                            fileNames,
+                                            function(fileName) {
+                                                return {
+                                                    "file-name": fileName,
+                                                    "upload-url": makeUploadUrl(fileName)
+                                                };
+                                            }
+                                        )
+                                    })
+                                });
+                                this.$uploadElems = this.view.$(".js-active-video-upload-list > li");
+                            });
+
+                            it("should start uploads", function() {
+                                var spec = this;
+                                var sentRequests = getSentRequests();
+                                expect(sentRequests.length).toEqual(
+                                    _.min([concurrentUploadLimit, caseInfo.numFiles])
+                                );
+                                _.each(
+                                    sentRequests,
+                                    function(uploadRequest, i) {
+                                        expect(uploadRequest.url).toEqual(
+                                            makeUploadUrl(fileNames[i])
+                                        );
+                                        expect(uploadRequest.method).toEqual("PUT");
+                                    }
+                                );
+                            });
+
+                            it("should display status", function() {
+                                var spec = this;
+                                expect(this.$uploadElems.length).toEqual(caseInfo.numFiles);
+                                this.$uploadElems.each(function(i, uploadElem) {
+                                    var $uploadElem = $(uploadElem);
+                                    expect($.trim($uploadElem.find(".filename").text())).toEqual(
+                                        fileNames[i]
+                                    );
+                                    expect($.trim($uploadElem.find(".status-message").text())).toEqual(
+                                        i >= concurrentUploadLimit ?
+                                            ActiveVideoUpload.STATUS_QUEUED :
+                                            ActiveVideoUpload.STATUS_UPLOADING
+                                    );
+                                    expect($uploadElem.find(".success")).not.toExist();
+                                    expect($uploadElem.find(".error")).not.toExist();
+                                });
+                            });
+
+                            _.each(
+                                [
+                                    {
+                                        desc: "completion",
+                                        responseStatus: 204,
+                                        statusText: ActiveVideoUpload.STATUS_COMPLETED,
+                                        presentSelector: ".success",
+                                        absentSelector: ".error"
+                                    },
+                                    {
+                                        desc: "failure",
+                                        responseStatus: 500,
+                                        statusText: ActiveVideoUpload.STATUS_FAILED,
+                                        presentSelector: ".error",
+                                        absentSelector: ".success"
+                                    },
+                                ],
+                                function(subCaseInfo) {
+                                    describe("and upload " + subCaseInfo.desc, function() {
+                                        beforeEach(function() {
+                                            getSentRequests()[0].response({status: subCaseInfo.responseStatus});
+                                        });
+
+                                        it("should update status", function() {
+                                            var $uploadElem = $(".js-active-video-upload-list > li:first");
+                                            expect($uploadElem.length).toEqual(1);
+                                            expect($.trim($uploadElem.find(".status-message").text())).toEqual(
+                                                subCaseInfo.statusText
+                                            );
+                                            expect($uploadElem.find(subCaseInfo.presentSelector)).toExist();
+                                            expect($uploadElem.find(subCaseInfo.absentSelector)).not.toExist();
+                                        });
+
+                                        if (caseInfo.numFiles > concurrentUploadLimit) {
+                                            it("should start a new upload", function() {
+                                                expect(getSentRequests().length).toEqual(
+                                                    concurrentUploadLimit + 1
+                                                );
+                                                var $uploadElem = $(this.$uploadElems[concurrentUploadLimit]);
+                                                expect($.trim($uploadElem.find(".status-message").text())).toEqual(
+                                                    ActiveVideoUpload.STATUS_UPLOADING
+                                                );
+                                            });
+                                        }
+                                    });
+                                }
+                            );
+                        });
                     });
-                });
-            });
+                }
+            );
         });
     }
 );
