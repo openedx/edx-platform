@@ -1,4 +1,6 @@
 require.config({
+    baseUrl: "",
+    waitSeconds: 60,
     paths: {
         jquery:         '../../common/static/js/vendor/jquery.min',
         underscore:     '../../common/static/js/vendor/underscore-min',
