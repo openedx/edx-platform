@@ -62,6 +62,7 @@ from xmodule_modifiers import (
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
+from xblock_django.user_service import DjangoXBlockUserService
 from progress.models import CourseModuleCompletion
 
 from util.json_request import JsonResponse
@@ -652,6 +653,7 @@ def get_module_system_for_user(user, field_data_cache,
         'i18n': ModuleI18nService(),
         'fs': xblock.reference.plugins.FSService(),
         'field-data': field_data,
+        'user': DjangoXBlockUserService(user),
         'settings': SettingsService(),
         'courseware_parent_info': CoursewareParentInfoService(),
     }

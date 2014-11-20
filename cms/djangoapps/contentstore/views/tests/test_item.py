@@ -12,7 +12,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
-from contentstore.views.preview import StudioUserService
 
 from contentstore.views.component import (
     component_handler, get_component_templates
@@ -30,6 +29,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
+from xblock_django.user_service import DjangoXBlockUserService
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
@@ -1170,7 +1170,7 @@ class TestEditSplitModule(ItemTest):
         # (CachingDescriptorSystem is used in tests, PreviewModuleSystem in Studio).
         # CachingDescriptorSystem doesn't have user service, that's needed for
         # SplitTestModule. So, in this line of code we add this service manually.
-        split_test.runtime._services['user'] = StudioUserService(self.request)  # pylint: disable=protected-access
+        split_test.runtime._services['user'] = DjangoXBlockUserService(self.user)  # pylint: disable=protected-access
 
         # Call add_missing_groups method to add the missing group.
         split_test.add_missing_groups(self.request)

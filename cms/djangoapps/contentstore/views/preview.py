@@ -25,6 +25,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 from xmodule.services import SettingsService, NotificationsService, CoursewareParentInfoService
 from student.auth import has_studio_read_access, has_studio_write_access
+from xblock_django.user_service import DjangoXBlockUserService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -113,20 +114,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         ]
 
 
-class StudioUserService(object):
-    """
-    Provides a Studio implementation of the XBlock user service.
-    """
-
-    def __init__(self, request):
-        super(StudioUserService, self).__init__()
-        self._request = request
-
-    @property
-    def user_id(self):
-        return self._request.user.id
-
-
 def get_available_xblock_services():
     """
     Returns a dict of available services for xBlocks
@@ -196,13 +183,13 @@ def _preview_module_system(request, descriptor, field_data):
         _studio_wrap_xblock,
     ]
 
-    descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
     descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     services = get_available_xblock_services()
     services.update({
         "field-data": field_data,
         "library_tools": LibraryToolsService(modulestore()),
+        "user": DjangoXBlockUserService(request.user),
     })
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
