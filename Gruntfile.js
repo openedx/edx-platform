@@ -4,16 +4,36 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
 
+    var config = {
+        bower: 'bower_components',
+        lms: 'lms/static',
+        studio: 'cms/static',
+        common: 'common/static'
+    };
+
     grunt.initConfig({
+        c: config,
+
         watch: {
-            lms_sass: {
+            'sass_lms': {
                 files: [
-                    'lms/static/sass/{,*/}*.scss',
-                    'common/static/sass/{,*/}*.scss'
+                    '<%= c.lms %>/sass/**/*.scss',
+                    '<%= c.common %>/sass/**/*.scss'
                 ],
                 tasks: [
                     'sass:lms',
                     'concat:lms'
+                ]
+            },
+
+            'sass_studio': {
+                files: [
+                    '<%= c.studio %>/sass/**/*.scss',
+                    '<%= c.common %>/sass/**/*.scss'
+                ],
+                tasks: [
+                    'sass:studio',
+                    'concat:studio'
                 ]
             }
         },
@@ -22,46 +42,50 @@ module.exports = function (grunt) {
             lms: {
                 src: [
                     // Sass-generated files
-                    'lms/static/sass/application-extend1-rtl.css',
-                    'lms/static/sass/application-extend1.css',
-                    'lms/static/sass/application-extend2-rtl.css',
-                    'lms/static/sass/application-extend2.css',
-                    'lms/static/sass/application.css',
+                    '<%= c.lms %>/sass/application-extend1-rtl.css',
+                    '<%= c.lms %>/sass/application-extend1.css',
+                    '<%= c.lms %>/sass/application-extend2-rtl.css',
+                    '<%= c.lms %>/sass/application-extend2.css',
+                    '<%= c.lms %>/sass/application.css',
+                    '<%= c.lms %>/sass/course-rtl.css',
+                    '<%= c.lms %>/sass/course.css',
+                    '<%= c.lms %>/sass/ie.css',
+
 
                     // Concat-generated files
-                    'lms/static/css/lms-style-vendor.css',
-                    'lms/static/css/lms-style-vendor-tinymce-content.css',
-                    'lms/static/css/lms-style-vendor-tinymce-skin.css',
-                    'lms/static/css/lms-style-app.css',
-                    'lms/static/css/lms-style-app-extend2.css',
-                    'lms/static/css/lms-style-app-rtl.css',
-                    'lms/static/css/lms-style-app-extend2-rtl.css',
-                    'lms/static/css/lms-style-course-vendor.css',
-                    'lms/static/css/lms-style-course.css',
-                    'lms/static/css/lms-style-course-rtl.css',
-                    'lms/static/css/lms-style-xmodule-annotations.css'
+                    '<%= c.lms %>/css/lms-style-vendor.css',
+                    '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css',
+                    '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css',
+                    '<%= c.lms %>/css/lms-style-app.css',
+                    '<%= c.lms %>/css/lms-style-app-extend2.css',
+                    '<%= c.lms %>/css/lms-style-app-rtl.css',
+                    '<%= c.lms %>/css/lms-style-app-extend2-rtl.css',
+                    '<%= c.lms %>/css/lms-style-course-vendor.css',
+                    '<%= c.lms %>/css/lms-style-course.css',
+                    '<%= c.lms %>/css/lms-style-course-rtl.css',
+                    '<%= c.lms %>/css/lms-style-xmodule-annotations.css'
                 ]
             },
             studio: {
                 src: [
                     // Sass-generated files
-                    'cms/static/sass/style-app.css',
-                    'cms/static/sass/style-app-extend1.css',
-                    'cms/static/sass/style-app-rtl.css',
-                    'cms/static/sass/style-app-extend1-rtl.css',
-                    'cms/static/sass/style-xmodule.css',
-                    'cms/static/sass/style-xmodule-rtl.css',
+                    '<%= c.studio %>/sass/style-app.css',
+                    '<%= c.studio %>/sass/style-app-extend1.css',
+                    '<%= c.studio %>/sass/style-app-rtl.css',
+                    '<%= c.studio %>/sass/style-app-extend1-rtl.css',
+                    '<%= c.studio %>/sass/style-xmodule.css',
+                    '<%= c.studio %>/sass/style-xmodule-rtl.css',
 
                     // Concat-generated files
-                    'cms/static/css/cms-style-vendor.css',
-                    'cms/static/css/cms-style-vendor-tinymce-content.css',
-                    'cms/static/css/cms-style-vendor-tinymce-skin.css',
-                    'cms/static/css/cms-style-app.css',
-                    'cms/static/css/cms-style-app-extend1.css',
-                    'cms/static/css/cms-style-app-rtl.css',
-                    'cms/static/css/cms-style-xmodule.css',
-                    'cms/static/css/cms-style-xmodule-rtl.css',
-                    'cms/static/css/cms-style-xmodule-annotations.css'
+                    '<%= c.studio %>/css/cms-style-vendor.css',
+                    '<%= c.studio %>/css/cms-style-vendor-tinymce-content.css',
+                    '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css',
+                    '<%= c.studio %>/css/cms-style-app.css',
+                    '<%= c.studio %>/css/cms-style-app-extend1.css',
+                    '<%= c.studio %>/css/cms-style-app-rtl.css',
+                    '<%= c.studio %>/css/cms-style-xmodule.css',
+                    '<%= c.studio %>/css/cms-style-xmodule-rtl.css',
+                    '<%= c.studio %>/css/cms-style-xmodule-annotations.css'
                 ]
             }
         },
@@ -70,37 +94,39 @@ module.exports = function (grunt) {
             lms: {
                 options: {
                     includePaths: [
-                        'bower_components',
-                        'common/static',
-                        'common/static/sass'
+                        '<%= c.bower %>',
+                        // This is for xmodule sass files
+                        '<%= c.common %>',
+                        '<%= c.common %>/sass'
                     ]
-                },
+               },
                 files: {
-                    'lms/static/sass/application-extend1-rtl.css': 'lms/static/sass/application-extend1-rtl.scss',
-                    'lms/static/sass/application-extend1.css': 'lms/static/sass/application-extend1.scss',
-                    'lms/static/sass/application-extend2-rtl.css': 'lms/static/sass/application-extend2-rtl.scss',
-                    'lms/static/sass/application-extend2.css': 'lms/static/sass/application-extend2.scss',
-                    'lms/static/sass/application.css': 'lms/static/sass/application.scss',
-                    'lms/static/sass/course-rtl.css': 'lms/static/sass/course-rtl.scss',
-                    'lms/static/sass/course.css': 'lms/static/sass/course.scss',
-                    'lms/static/sass/ie.css': 'lms/static/sass/ie.scss',
+                    '<%= c.lms %>/sass/application-extend1-rtl.css': '<%= c.lms %>/sass/application-extend1-rtl.scss',
+                    '<%= c.lms %>/sass/application-extend1.css': '<%= c.lms %>/sass/application-extend1.scss',
+                    '<%= c.lms %>/sass/application-extend2-rtl.css': '<%= c.lms %>/sass/application-extend2-rtl.scss',
+                    '<%= c.lms %>/sass/application-extend2.css': '<%= c.lms %>/sass/application-extend2.scss',
+                    '<%= c.lms %>/sass/application.css': '<%= c.lms %>/sass/application.scss',
+                    '<%= c.lms %>/sass/course-rtl.css': '<%= c.lms %>/sass/course-rtl.scss',
+                    '<%= c.lms %>/sass/course.css': '<%= c.lms %>/sass/course.scss',
+                    '<%= c.lms %>/sass/ie.css': '<%= c.lms %>/sass/ie.scss',
                 }
             },
             studio: {
                 options: {
                     includePaths: [
-                        'bower_components',
-                        'common/static',
-                        'common/static/sass'
+                        '<%= c.bower %>',
+                        // This is for xmodule sass files
+                        '<%= c.common %>',
+                        '<%= c.common %>/sass'
                     ]
                 },
                 files: {
-                    'cms/static/sass/style-app.css': 'cms/static/sass/style-app.scss',
-                    'cms/static/sass/style-app-extend1.css': 'cms/static/sass/style-app-extend1.scss',
-                    'cms/static/sass/style-app-rtl.css': 'cms/static/sass/style-app-rtl.scss',
-                    'cms/static/sass/style-app-extend1-rtl.css': 'cms/static/sass/style-app-extend1-rtl.scss',
-                    'cms/static/sass/style-xmodule.css': 'cms/static/sass/style-xmodule.scss',
-                    'cms/static/sass/style-xmodule-rtl.css': 'cms/static/sass/style-xmodule-rtl.scss'
+                    '<%= c.studio %>/sass/style-app-extend1-rtl.css': '<%= c.studio %>/sass/style-app-extend1-rtl.scss',
+                    '<%= c.studio %>/sass/style-app-extend1.css': '<%= c.studio %>/sass/style-app-extend1.scss',
+                    '<%= c.studio %>/sass/style-app-rtl.css': '<%= c.studio %>/sass/style-app-rtl.scss',
+                    '<%= c.studio %>/sass/style-app.css': '<%= c.studio %>/sass/style-app.scss',
+                    '<%= c.studio %>/sass/style-xmodule-rtl.css': '<%= c.studio %>/sass/style-xmodule-rtl.scss',
+                    '<%= c.studio %>/sass/style-xmodule.css': '<%= c.studio %>/sass/style-xmodule.scss'
                 }
             }
         },
@@ -108,131 +134,151 @@ module.exports = function (grunt) {
         concat: {
             lms: {
                 files: {
-                    'lms/static/css/lms-style-vendor.css': [
-                        'lms/static/css/vendor/font-awesome.css',
-                        'lms/static/css/vendor/jquery.qtip.min.css',
-                        'lms/static/css/vendor/responsive-carousel/responsive-carousel.css',
-                        'lms/static/css/vendor/responsive-carousel/responsive-carousel.slide.css'
+                    '<%= c.lms %>/css/lms-style-vendor.css': [
+                        '<%= c.lms %>/css/vendor/font-awesome.css',
+                        '<%= c.lms %>/css/vendor/jquery.qtip.min.css',
+                        '<%= c.lms %>/css/vendor/responsive-carousel/responsive-carousel.css',
+                        '<%= c.lms %>/css/vendor/responsive-carousel/responsive-carousel.slide.css'
                     ],
-                    'lms/static/css/lms-style-vendor-tinymce-content.css': [
-                        'lms/static/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css'
+                    '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css': [
+                        '<%= c.lms %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css'
                     ],
-                    'lms/static/css/lms-style-vendor-tinymce-skin.css': [
-                        'lms/static/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+                    '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css': [
+                        '<%= c.lms %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
                     ],
-                    'lms/static/css/lms-style-app.css': [
-                        'lms/static/sass/application.css',
-                        'lms/static/sass/ie.css'
+                    '<%= c.lms %>/css/lms-style-app.css': [
+                        '<%= c.lms %>/sass/application.css',
+                        '<%= c.lms %>/sass/ie.css'
                     ],
-                    'lms/static/css/lms-style-app-extend1.css': [
-                        'lms/static/sass/application-extend1.css'
+                    '<%= c.lms %>/css/lms-style-app-extend1.css': [
+                        '<%= c.lms %>/sass/application-extend1.css'
                     ],
-                    'lms/static/css/lms-style-app-extend2.css': [
-                        'lms/static/sass/application-extend2.css'
+                    '<%= c.lms %>/css/lms-style-app-extend2.css': [
+                        '<%= c.lms %>/sass/application-extend2.css'
                     ],
-                    'lms/static/css/lms-style-app-rtl.css': [
-                        'lms/static/sass/application-rtl.css',
-                        'lms/static/sass/ie-rtl.css'
+                    '<%= c.lms %>/css/lms-style-app-rtl.css': [
+                        '<%= c.lms %>/sass/application-rtl.css',
+                        '<%= c.lms %>/sass/ie-rtl.css'
                     ],
-                    'lms/static/css/lms-style-app-extend1-rtl.css': [
-                        'lms/static/sass/application-extend1-rtl.css'
+                    '<%= c.lms %>/css/lms-style-app-extend1-rtl.css': [
+                        '<%= c.lms %>/sass/application-extend1-rtl.css'
                     ],
-                    'lms/static/css/lms-style-app-extend2-rtl.css': [
-                        'lms/static/sass/application-extend2-rtl.css'
+                    '<%= c.lms %>/css/lms-style-app-extend2-rtl.css': [
+                        '<%= c.lms %>/sass/application-extend2-rtl.css'
                     ],
-                    'lms/static/css/lms-style-course-vendor.css': [
-                        'lms/static/js/vendor/CodeMirror/codemirror.css',
-                        'lms/static/css/vendor/jquery.treeview.css',
-                        'lms/static/css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css'
+                    '<%= c.lms %>/css/lms-style-course-vendor.css': [
+                        '<%= c.lms %>/js/vendor/CodeMirror/codemirror.css',
+                        '<%= c.lms %>/css/vendor/jquery.treeview.css',
+                        '<%= c.lms %>/css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css'
                     ],
-                    'lms/static/css/lms-style-course.css': [
-                        'lms/static/sass/course.css',
-                        'lms/static/xmodule/modules.css'
+                    '<%= c.lms %>/css/lms-style-course.css': [
+                        '<%= c.lms %>/sass/course.css',
+                        '<%= c.lms %>/xmodule/modules.css'
                     ],
-                    'lms/static/css/lms-style-course-rtl.css': [
-                        'lms/static/sass/course-rtl.css',
-                        'lms/static/xmodule/modules.css'
+                    '<%= c.lms %>/css/lms-style-course-rtl.css': [
+                        '<%= c.lms %>/sass/course-rtl.css',
+                        '<%= c.lms %>/xmodule/modules.css'
                     ],
-                    'lms/static/css/lms-style-xmodule-annotations.css': [
-                        'lms/static/css/vendor/ova/annotator.css',
-                        'lms/static/css/vendor/ova/edx-annotator.css',
-                        'lms/static/css/vendor/ova/video-js.min.css',
-                        'lms/static/css/vendor/ova/rangeslider.css',
-                        'lms/static/css/vendor/ova/share-annotator.css',
-                        'lms/static/css/vendor/ova/richText-annotator.css',
-                        'lms/static/css/vendor/ova/tags-annotator.css',
-                        'lms/static/css/vendor/ova/flagging-annotator.css',
-                        'lms/static/css/vendor/ova/diacritic-annotator.css',
-                        'lms/static/css/vendor/ova/grouping-annotator.css',
-                        'lms/static/css/vendor/ova/ova.css',
-                        'lms/static/js/vendor/ova/catch/css/main.css'
+                    '<%= c.lms %>/css/lms-style-xmodule-annotations.css': [
+                        '<%= c.lms %>/css/vendor/ova/annotator.css',
+                        '<%= c.lms %>/css/vendor/ova/edx-annotator.css',
+                        '<%= c.lms %>/css/vendor/ova/video-js.min.css',
+                        '<%= c.lms %>/css/vendor/ova/rangeslider.css',
+                        '<%= c.lms %>/css/vendor/ova/share-annotator.css',
+                        '<%= c.lms %>/css/vendor/ova/richText-annotator.css',
+                        '<%= c.lms %>/css/vendor/ova/tags-annotator.css',
+                        '<%= c.lms %>/css/vendor/ova/flagging-annotator.css',
+                        '<%= c.lms %>/css/vendor/ova/diacritic-annotator.css',
+                        '<%= c.lms %>/css/vendor/ova/grouping-annotator.css',
+                        '<%= c.lms %>/css/vendor/ova/ova.css',
+                        '<%= c.lms %>/js/vendor/ova/catch/css/main.css'
                     ]
                 }
             },
             studio: {
                 files: {
-                    'cms/static/css/cms-style-vendor.css': [
-                        'common/static/css/vendor/normalize.css',
-                        'common/static/css/vendor/font-awesome.css',
-                        'common/static/css/vendor/html5-input-polyfills/number-polyfill.css',
-                        'common/static/js/vendor/CodeMirror/codemirror.css',
-                        'common/static/css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-                        'common/static/css/vendor/jquery.qtip.min.css',
-                        'common/static/js/vendor/markitup/skins/simple/style.css',
-                        'common/static/js/vendor/markitup/sets/wiki/style.css',
+                    '<%= c.studio %>/css/cms-style-vendor.css': [
+                        '<%= c.common %>/css/vendor/normalize.css',
+                        '<%= c.common %>/css/vendor/font-awesome.css',
+                        '<%= c.common %>/css/vendor/html5-input-polyfills/number-polyfill.css',
+                        '<%= c.common %>/js/vendor/CodeMirror/codemirror.css',
+                        '<%= c.common %>/css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
+                        '<%= c.common %>/css/vendor/jquery.qtip.min.css',
+                        '<%= c.common %>/js/vendor/markitup/skins/simple/style.css',
+                        '<%= c.common %>/js/vendor/markitup/sets/wiki/style.css',
                     ],
-                    'cms/static/css/cms-style-vendor-tinymce-content.css': [
-                        'common/static/css/tinymce-studio-content-fonts.css',
-                        'common/static/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
-                        'common/static/css/tinymce-studio-content.css'
+                    '<%= c.studio %>/css/cms-style-vendor-tinymce-content.css': [
+                        '<%= c.common %>/css/tinymce-studio-content-fonts.css',
+                        '<%= c.common %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
+                        '<%= c.common %>/css/tinymce-studio-content.css'
                     ],
-                    'cms/static/css/cms-style-vendor-tinymce-skin.css': [
-                        'common/static/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+                    '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css': [
+                        '<%= c.common %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
                     ],
-                    'cms/static/css/cms-style-app.css': [
-                        'cms/static/sass/style-app.css'
+                    '<%= c.studio %>/css/cms-style-app.css': [
+                        '<%= c.studio %>/sass/style-app.css'
                     ],
-                    'cms/static/css/cms-style-app-extend1.css': [
-                        'cms/static/sass/style-app-extend1.css'
+                    '<%= c.studio %>/css/cms-style-app-extend1.css': [
+                        '<%= c.studio %>/sass/style-app-extend1.css'
                     ],
-                    'cms/static/css/cms-style-app-rtl.css': [
-                        'cms/static/sass/style-app-rtl.css'
+                    '<%= c.studio %>/css/cms-style-app-rtl.css': [
+                        '<%= c.studio %>/sass/style-app-rtl.css'
                     ],
-                    'cms/static/css/cms-style-xmodule.css': [
-                        'cms/static/sass/style-xmodule.css'
+                    '<%= c.studio %>/css/cms-style-xmodule.css': [
+                        '<%= c.studio %>/sass/style-xmodule.css'
                     ],
-                    'cms/static/css/cms-style-xmodule-rtl.css': [
-                        'cms/static/sass/style-xmodule-rtl.css'
+                    '<%= c.studio %>/css/cms-style-xmodule-rtl.css': [
+                        '<%= c.studio %>/sass/style-xmodule-rtl.css'
                     ],
-                    'cms/static/css/cms-style-xmodule-annotations.css': [
-                        'common/static/css/vendor/ova/annotator.css',
-                        'common/static/css/vendor/ova/edx-annotator.css',
-                        'common/static/css/vendor/ova/video-js.min.css',
-                        'common/static/css/vendor/ova/rangeslider.css',
-                        'common/static/css/vendor/ova/share-annotator.css',
-                        'common/static/css/vendor/ova/richText-annotator.css',
-                        'common/static/css/vendor/ova/tags-annotator.css',
-                        'common/static/css/vendor/ova/flagging-annotator.css',
-                        'common/static/css/vendor/ova/diacritic-annotator.css',
-                        'common/static/css/vendor/ova/grouping-annotator.css',
-                        'common/static/css/vendor/ova/ova.css',
-                        'common/static/js/vendor/ova/catch/css/main.css'
+                    '<%= c.studio %>/css/cms-style-xmodule-annotations.css': [
+                        '<%= c.common %>/css/vendor/ova/annotator.css',
+                        '<%= c.common %>/css/vendor/ova/edx-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/video-js.min.css',
+                        '<%= c.common %>/css/vendor/ova/rangeslider.css',
+                        '<%= c.common %>/css/vendor/ova/share-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/richText-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/tags-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/flagging-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/diacritic-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/grouping-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/ova.css',
+                        '<%= c.common %>/js/vendor/ova/catch/css/main.css'
                     ]
                 }
             }
         }
     });
 
+    // LMS tasks
     grunt.registerTask('lms', [
         'clean:lms',
         'sass:lms',
-        'concat:lms',
-        'watch:lms_sass'
+        'concat:lms'
     ]);
 
+    grunt.registerTask('lms:dev', [
+        'lms',
+        'watch:sass_lms'
+    ]);
+
+    grunt.registerTask('lms:dist', [
+        'lms'
+    ]);
+
+
+    // Studio tasks
     grunt.registerTask('studio', [
         'clean:studio',
         'sass:studio',
         'concat:studio'
+    ]);
+
+    grunt.registerTask('studio:dev', [
+        'studio',
+        'watch:sass_studio'
+    ]);
+
+    grunt.registerTask('studio:dist', [
+        'studio'
     ]);
 };
