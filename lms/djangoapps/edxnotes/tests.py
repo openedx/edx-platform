@@ -105,6 +105,7 @@ class EdxNotesHelpersTest(TestCase):
         """
         Setup a dummy course content.
         """
+        ClientFactory(name='edx-notes')
         self.course = CourseFactory.create()
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
