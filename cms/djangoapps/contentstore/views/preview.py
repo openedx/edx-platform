@@ -21,6 +21,7 @@ from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
+from xblock_django.user_service import DjangoXBlockUserService
 
 from lms.lib.xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -96,20 +97,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return local_resource_url(block, uri)
 
 
-class StudioUserService(object):
-    """
-    Provides a Studio implementation of the XBlock user service.
-    """
-
-    def __init__(self, request):
-        super(StudioUserService, self).__init__()
-        self._request = request
-
-    @property
-    def user_id(self):
-        return self._request.user.id
-
-
 def _preview_module_system(request, descriptor):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -138,8 +125,6 @@ def _preview_module_system(request, descriptor):
         _studio_wrap_xblock,
     ]
 
-    descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
-
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -163,6 +148,7 @@ def _preview_module_system(request, descriptor):
         descriptor_runtime=descriptor.runtime,
         services={
             "i18n": ModuleI18nService(),
+            "user": DjangoXBlockUserService(request.user, course_id),
         },
     )
 
