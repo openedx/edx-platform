@@ -20,6 +20,8 @@ define(
                 this.view.render();
                 jasmine.Ajax.useMock();
                 clearAjaxRequests();
+                this.globalAjaxError = jasmine.createSpy();
+                $(document).ajaxError(this.globalAjaxError);
             });
 
             it("should trigger file selection when the upload button is clicked", function() {
@@ -87,10 +89,8 @@ define(
                         });
 
                         it("should trigger the global AJAX error handler on server error", function() {
-                            var globalAjaxError = jasmine.createSpy();
-                            $(document).ajaxError(globalAjaxError);
                             this.request.response({status: 500});
-                            expect(globalAjaxError).toHaveBeenCalled();
+                            expect(this.globalAjaxError).toHaveBeenCalled();
                         });
 
                         describe("and successful server response", function() {
@@ -179,6 +179,10 @@ define(
                                             );
                                             expect($uploadElem.find(subCaseInfo.presentSelector)).toExist();
                                             expect($uploadElem.find(subCaseInfo.absentSelector)).not.toExist();
+                                        });
+
+                                        it("should not trigger the global AJAX error handler", function() {
+                                            expect(this.globalAjaxError).not.toHaveBeenCalled();
                                         });
 
                                         if (caseInfo.numFiles > concurrentUploadLimit) {
