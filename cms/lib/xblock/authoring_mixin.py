@@ -37,7 +37,52 @@ class AuthoringMixin(XBlockMixin):
         """
         TODO:
         """
-        pass
+        DEFAULT_FIELDS = [
+            'parent',
+            'tags',
+        ]
+        li_template = """
+        <li class="field comp-setting-entry is-set">
+            <div class="wrapper-comp-setting">
+                <label
+                    class="label setting-label"
+                    for="{input_id}"
+                >
+                    {key}
+                </label>
+                <input
+                    class="input setting-input"
+                    id="{input_id}"
+                    value="{input_value}"
+                    type="text"
+                    tabindex="1"
+                >
+            </div>
+            <span
+                class="tip setting-help"
+            >
+                {help_text}
+            </span>
+        </li>
+        """
+        html_strings = []
+        for key in self.fields:
+            if key not in DEFAULT_FIELDS:
+                value = getattr(self, key)
+                li = li_template.format(
+                    input_id='settings_tab_input__{key}'.format(
+                        key=key,
+                    ),
+                    input_value=key,
+                    help_text="This name appears in the horizontal navigation at the top of the page.",
+                    key=key,
+                )
+                html_strings.append(li)
+        html_string = '\n'.join(html_strings)
+        fragment = Fragment(html_string)
+        # fragment.add_javascript('')
+        # fragment.initialize_js('')
+        return fragment
 
     def xml_tab_view(self, context=None):
         """
