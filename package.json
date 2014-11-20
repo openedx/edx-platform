@@ -17,6 +17,9 @@
     "load-grunt-tasks": "^1.0.0",
     "time-grunt": "^1.0.0"
   },
+  "scripts": {
+    "postinstall": "bower install"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/edx/edx-platform.git"
