@@ -70,3 +70,15 @@ function XBlockXMLEditor(runtime, element) {
 function SettingsTabView(runtime, element) {
     // initialize settings tab
 }
+SettingsTabView.collectFieldData = function collectFieldData(element) {
+    var $element = $(element);
+    var items = $element.find('.settings-list .wrapper-comp-setting');
+    var data = {};
+    items.each(function (index, item) {
+        var $item = $(item);
+        var label = $($item.find('label')[0]).text();
+        var input = $($item.find('input')[0]).val();
+        data[label] = input;
+    });
+    return data;
+};
