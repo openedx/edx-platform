@@ -7,7 +7,9 @@
          * dependencies will be included in the module's file when the build is
          * done.
          */
-        modules: [],
+        modules: [
+            "js/student_account/accessApp"
+        ],
 
         /**
          * By default all the configuration for optimization happens from the command
