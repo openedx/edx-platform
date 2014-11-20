@@ -5,7 +5,7 @@ Middleware to serve assets.
 import logging
 
 from django.http import (
-    StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden
+    StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden, HttpResponse
 )
 from student.models import CourseEnrollment
 
