@@ -67,6 +67,8 @@ class AuthoringMixin(XBlockMixin):
         </li>
         """
         html_strings = []
+        html_strings.append('<div class="wrapper-comp-settings is-active editor-with-buttons imagemodal_edit" id="settings-tab">')
+        html_strings.append('<ul class="list-input settings-list">')
         for key in self.fields:
             if key not in DEFAULT_FIELDS:
                 value = getattr(self, key)
@@ -74,11 +76,13 @@ class AuthoringMixin(XBlockMixin):
                     input_id='settings_tab_input__{key}'.format(
                         key=key,
                     ),
-                    input_value=key,
-                    help_text="This name appears in the horizontal navigation at the top of the page.",
+                    input_value=value,
+                    help_text=self.fields[key].help,
                     key=key,
                 )
                 html_strings.append(li)
+        html_strings.append('</ul>')
+        html_strings.append('</div>')
         html_string = unicode('\n'.join(html_strings))
         fragment = Fragment(html_string)
         # fragment.add_javascript('')
