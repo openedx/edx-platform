@@ -1,7 +1,7 @@
 define([
         'gettext',
         'jquery',
-        './FormView'
+        'js/student_account/views/FormView'
     ],
     function( gettext, $, FormView ) {
 
