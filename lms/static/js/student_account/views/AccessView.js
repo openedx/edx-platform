@@ -3,7 +3,7 @@ define([
         'gettext',
         'jquery',
         'underscore',
-        'underscore-string',
+        'underscore.string',
         'LoginView',
         '../models/LoginModal',
         'PasswordResetView',
