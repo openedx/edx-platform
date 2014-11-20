@@ -96,7 +96,7 @@ def _write_styles(selector, output_root, classes):
             css_imports[class_].add(fragment_name)
 
     module_styles_lines = []
-    module_styles_lines.append("@import 'bourbon/bourbon';")
+    module_styles_lines.append("@import 'bourbon/dist/bourbon';")
     module_styles_lines.append("@import 'bourbon/addons/button';")
     module_styles_lines.append("@import 'assets/anims';")
     for class_, fragment_names in css_imports.items():
