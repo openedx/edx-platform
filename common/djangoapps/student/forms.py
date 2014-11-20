@@ -2,13 +2,16 @@
 Utility functions for validating forms
 """
 from django import forms
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
-
+from django.contrib.auth.models import User
+from django.contrib.sites.models import get_current_site
+from django.template import loader
+from django.utils.http import urlsafe_base64_encode
 
 class PasswordResetFormNoActive(PasswordResetForm):
     """
-    This is a literal copy from Django 1.4.5's django.contrib.auth.forms.PasswordResetForm
+    This is a literal copy from Django 1.6.8's django.contrib.auth.forms.PasswordResetForm
     except removing the requirement of active users.
     """
     def save(self, domain_override=None,
