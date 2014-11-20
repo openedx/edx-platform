@@ -10,11 +10,11 @@
 // --------------------
 
 // xmodule editor tab font-weight override
-.xblock-editor .editor-with-tabs .editor-tabs .inner_tab_wrap a.tab {
+.xblock-tabbed-editor .editor-with-tabs .editor-tabs .inner_tab_wrap a.tab {
   font-weight: normal !important;
 }
 
-.xblock-editor .editor-with-tabs {
+.xblock-tabbed-editor .editor-with-tabs {
 
   .edit-header {
     border: 0;
