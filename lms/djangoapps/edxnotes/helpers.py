@@ -53,10 +53,16 @@ def get_notes(user, course):
     Returns all notes for the user.
     """
     url = get_endpoint("/annotations")
-    response = requests.get(url, params={
-        'user': user.username,
-        'course_id': unicode(course.id).encode('utf-8'),
-    })
+    response = requests.get(
+        url,
+        params={
+            'user': user.username,
+            'course_id': unicode(course.id).encode('utf-8'),
+        },
+        headers={
+            'x-annotator-auth-token': get_token(user)
+        }
+    )
 
     try:
         collection = json.loads(response.content)
