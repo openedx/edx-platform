@@ -1,8 +1,24 @@
 {
-    "name": "edx",
-    "version": "0.1.0",
-    "dependencies": {
-      "coffee-script": "1.6.1",
-      "uglify-js": "2.4.15"
-    }
+  "name": "edx",
+  "version": "0.1.0",
+  "private": true,
+  "description": "This is the main edX platform which consists of LMS and Studio.",
+  "dependencies": {
+    "coffee-script": "1.6.1",
+    "uglify-js": "2.4.15"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-sass": "^0.8.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "load-grunt-tasks": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edx/edx-platform.git"
+  },
+  "bugs": {
+    "url": "https://openedx.atlassian.net/"
+  },
+  "homepage": "http://openedx.org/"
 }
