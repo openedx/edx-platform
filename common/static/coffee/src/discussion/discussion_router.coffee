@@ -1,10 +1,9 @@
 if Backbone?
   class @DiscussionRouter extends Backbone.Router
-    routes:
-      "": "allThreads"
-      ":forum_name/threads/:thread_id" : "showThread"
-
     initialize: (options) ->
+        @route("#{DiscussionUtil.route_prefix}", "allThreads")
+        @route("#{DiscussionUtil.route_prefix}:forum_name/threads/:thread_id", "showThread")
+
         @discussion = options['discussion']
         @course_settings = options['course_settings']
 
@@ -14,7 +13,7 @@ if Backbone?
             courseSettings: @course_settings
         )
         @nav.on "thread:selected", @navigateToThread
-        @nav.on "thread:removed", @navigateToAllThreads
+        @nav.on "thread:deselected", @navigateToAllThreads
         @nav.on "threads:rendered", @setActiveThread
         @nav.on "thread:created", @navigateToThread
         @nav.render()
@@ -59,6 +58,7 @@ if Backbone?
 
       @main = new DiscussionThreadView(
         el: $(".forum-content"),
+
         model: @thread,
         mode: "tab",
         course_settings: @course_settings,
@@ -70,10 +70,10 @@ if Backbone?
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
-      @navigate("#{thread.get("commentable_id")}/threads/#{thread_id}", trigger: true)
+      @navigate("#{DiscussionUtil.route_prefix}#{thread.get("commentable_id")}/threads/#{thread_id}", trigger: true)
 
     navigateToAllThreads: =>
-      @navigate("", trigger: true)
+      @navigate("#{DiscussionUtil.route_prefix}", trigger: true)
 
     showNewPost: (event) =>
       $('.forum-content').fadeOut(

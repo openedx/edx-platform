@@ -7,7 +7,10 @@ function DiscussionInlineBlock(runtime, element) {
   if (testUrl.match(/^(http|https):\/\//)) {
     var hostname = testUrl.match(/^(.*:\/\/[a-z0-9:\-.]+)\//)[1];
     DiscussionUtil.setBaseUrl(hostname);
-    DiscussionUtil.force_async = true;
+  }
+
+  if (runtime.local_overrides && runtime.local_overrides.discussion) {
+      runtime.local_overrides.discussion(element, DiscussionUtil);
   }
 
   new DiscussionModuleView({ el: el });
