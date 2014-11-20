@@ -98,27 +98,16 @@ class AuthoringMixin(XBlockMixin):
         frag.initialize_js('XBlockXMLEditor')
         return frag
 
-    @XBlock.json_handler
-    def update_xml(self, data, suffix=''):
+    def update_from_xml(self, xml):
         """
         Update the XBlock's XML.
         Args:
-            data (dict): Data from the request; should have a value for the key 'xml'
-                containing the XML for this XBlock.
-        Kwargs:
-            suffix (str): Not used
-        Returns:
-            dict with keys 'success' (bool) and 'msg' (str)
+            xml (str): XML String representation used to update the XBlock's field.
         """
-        if 'xml' in data:
-            root = safe_etree.fromstring(data['xml'.encode('utf-8')])
-            for key in root.attrib.keys:
-                if key in self.fields:
-                    setattr(self, key, root.attrib[key])
-
-            return {'success': True, 'msg': _('Successfully updated XBlock')}
-        else:
-            return {'success': False, 'msg': _('Must specify "xml" in request JSON dict.')}
+        root = safe_etree.fromstring(xml.encode('utf-8'))
+        for key in root.attrib.keys:
+            if key in self.fields:
+                setattr(self, key, root.attrib[key])
 
     @XBlock.json_handler
     def xml(self, data, suffix=''):
@@ -169,12 +158,13 @@ class AuthoringMixin(XBlockMixin):
             if 'fields' in tab_data:
                 for key, value in tab_data["fields"]:
                     if key in self.fields:
-                        setatrr(self, key, value)
+                        setattr(self, key, value)
                     else:
-                        # TODO: log error
-                        pass
+                        logger.error(
+                            "Field {field} not a valid field for XBlock.".format(field=key)
+                        )
             elif 'xml' in tab_data:
-                xml = tab_data["xml"]
+                self.update_from_xml(tab_data["xml"])
 
         self.save()
         return {'success': True, 'msg': _('Successfully saved XBlock')}
