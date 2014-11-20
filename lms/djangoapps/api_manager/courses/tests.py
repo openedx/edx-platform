@@ -2122,7 +2122,6 @@ class CoursesApiTests(ModuleStoreTestCase):
                     start_date,
                     end_date,
                     org_id)
-
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['users_not_started']), 5)

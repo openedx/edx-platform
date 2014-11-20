@@ -2,12 +2,12 @@
 ### Script for cloning a course
 ###
 from django.core.management.base import BaseCommand, CommandError
-from .prompt import query_yes_no
 from contentstore.utils import delete_course_and_groups
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
+from util.prompt import query_yes_no
 
 
 class Command(BaseCommand):
@@ -28,6 +28,7 @@ class Command(BaseCommand):
 
         if commit:
             print('Actually going to delete the course from DB....')
+            print('Note: There is a corresponding LMS cleanup command you should run afterwards')
 
             if query_yes_no("Deleting course {0}. Confirm?".format(course_key), default="no"):
                 if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
