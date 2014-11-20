@@ -117,7 +117,7 @@ class EdxNotesTest(UniqueCourseTest):
             actual = [note.text for note in component.notes]
             expected = ["TEST TEXT {}".format(i + index) for i in xrange(len(actual))]
             index += len(actual)
-            self.assertItemsEqual(expected, actual)
+            self.assertEqual(set(expected), set(actual))
 
     def test_can_create_notes(self):
         """
