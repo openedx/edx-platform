@@ -88,7 +88,7 @@ class EdxNotesTest(UniqueCourseTest):
         self.assertGreater(len(components), 0)
         index = offset
         for component in components:
-            for note in component.create_note(".annotator-hl"):
+            for note in component.create_note(".annotate-id"):
                 note.text = "TEST TEXT {}".format(index)
                 index += 1
 
