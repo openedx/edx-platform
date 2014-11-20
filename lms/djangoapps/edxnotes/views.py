@@ -18,7 +18,9 @@ from edxnotes.helpers import (
 
 @login_required
 def edxnotes(request, course_id):
-    """ Displays the EdxNotes page. """
+    """
+    Displays the EdxNotes page.
+    """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, "load", course_key)
 
