@@ -137,7 +137,8 @@ class AuthoringMixin(XBlockMixin):
             dict with keys 'success' (bool), 'message' (unicode), and 'xml' (unicode)
         """
         root = etree.Element('root')
-        return self.add_xml_to_node(root)
+        self.add_xml_to_node(root)
+        return {'success': True, 'msg': '', 'xml': etree.tostring(root, pretty_print=True)}
 
     def render_editor_tab_views(self, fragment, context):
         """

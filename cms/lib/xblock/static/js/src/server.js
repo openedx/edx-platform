@@ -23,6 +23,17 @@ XBlockAuthoring.Server = function(runtime, element) {
 XBlockAuthoring.Server.prototype = {
 
     /**
+    Construct the URL for the handler, specific to one instance of the XBlock on the page.
+    Args:
+        handler (string): The name of the XBlock handler.
+    Returns:
+        URL (string)
+    **/
+    url: function(handler) {
+        return this.runtime.handlerUrl(this.element, handler);
+    },
+
+    /**
     Load the XBlock's XML definition from the server.
     Returns:
         A JQuery promise, which resolves with the XML definition
@@ -40,8 +51,12 @@ XBlockAuthoring.Server.prototype = {
             $.ajax({
                 type: "POST", url: url, data: "\"\""
             }).done(function(data) {
-                if (data.success) { defer.resolveWith(this, [data.xml]); }
-                else { defer.rejectWith(this, [data.msg]); }
+                if (data.success) {
+                    defer.resolveWith(this, [data.xml]);
+                }
+                else {
+                    defer.rejectWith(this, [data.msg]);
+                }
             }).fail(function(data) {
                 defer.rejectWith(this, ['Could not contact server.']);
             });
@@ -67,8 +82,12 @@ XBlockAuthoring.Server.prototype = {
             $.ajax({
                 type: "POST", url: url, data: payload
             }).done(function(data) {
-                if (data.success) { defer.resolve(); }
-                else { defer.rejectWith(this, [data.msg]); }
+                if (data.success) {
+                    defer.resolve();
+                }
+                else {
+                    defer.rejectWith(this, [data.msg]);
+                }
             }).fail(function(data) {
                 defer.rejectWith(this, ['Could not contact server.']);
             });
