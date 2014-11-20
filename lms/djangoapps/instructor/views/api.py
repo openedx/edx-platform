@@ -888,6 +888,9 @@ def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=
         'unit_cost', 'purchase_time', 'orderitem_id',
         'order_id',
     ]
+    string_features = [
+        'list_price', 'unit_cost'
+    ]
 
     student_data = instructor_analytics.basic.purchase_transactions(course_id, query_features)
 
