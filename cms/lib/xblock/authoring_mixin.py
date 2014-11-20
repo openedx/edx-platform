@@ -61,7 +61,7 @@ class AuthoringMixin(XBlockMixin):
         </li>
         """
         html_strings = []
-        html_strings.append('<div class="wrapper-comp-settings is-active editor-with-buttons imagemodal_edit" id="settings-tab">')
+        html_strings.append('<div class="wrapper-comp-settings is-active" id="settings-tab">')
         html_strings.append('<ul class="list-input settings-list">')
         for key in self.fields:
             if key not in DEFAULT_FIELDS:
