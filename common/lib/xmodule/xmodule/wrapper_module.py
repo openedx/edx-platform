@@ -1,7 +1,7 @@
 # Same as vertical,
 # But w/o css delimiters between children
 
-from xmodule.vertical_module import VerticalModule, VerticalDescriptor
+from xmodule.vertical_module import VerticalModule
 from pkg_resources import resource_string
 
 # HACK: This shouldn't be hard-coded to two types
@@ -15,8 +15,3 @@ class WrapperModule(VerticalModule):
     has_children = True
     css = {'scss': [resource_string(__name__, 'css/wrapper/display.scss')]}
 
-
-class WrapperDescriptor(VerticalDescriptor):
-    module_class = WrapperModule
-
-    has_children = True

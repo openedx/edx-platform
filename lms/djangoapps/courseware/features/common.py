@@ -228,7 +228,7 @@ def get_courseware_with_tabs(course_id):
             'section_name': s.display_name_with_default,
             'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,
             'tabs': [{
-                'children_count': len(t.get_children()) if (type(t) == vertical_module.VerticalDescriptor) else 0,
+                'children_count': len(t.get_children()) if (type(t) == vertical_module.VerticalModule) else 0,
                 'class': t.__class__.__name__} for t in s.get_children()
             ]
         } for s in c.get_children() if not s.hide_from_toc]
