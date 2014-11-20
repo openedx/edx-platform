@@ -21,9 +21,9 @@ built on mongoDB. For information about mongoDB, see the `mongoDB website`_.
 The "split" in Split Mongo refers to how a course is split into three types of
 information:
 
-* The course identity, referred to as the `course index <Course Index>`_.
-* The `course structure <Course Structures>`_.
-* The course content, referred to as `XBlock definitions <XBlock Definitions>`_.
+* The course identity, referred to as the course index
+* The course structure
+* The course content, referred to as XBlock definitions.
 
 This separation of identity, structure, and content enables course authors to
 use more advanced capabilities when developing and managing courses.
