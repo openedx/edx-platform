@@ -30,7 +30,7 @@ class MoveOrganizationEntriesTests(TestCase):
         workgroup.save()
 
         for i in xrange(1, 9):
-            org = self.organization()
+            org = Organization()
             org.name = 'test_and_company {}'.format(i)
             org.display_name = 'test display name {}'.format(i)
             org.contact_name = 'test contact name {}'.format(i)
