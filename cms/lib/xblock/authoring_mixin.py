@@ -95,7 +95,7 @@ class AuthoringMixin(XBlockMixin):
         frag = Fragment(XML_EDITOR_HTML)
         frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/authoring.js"))
         frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/server.js"))
-        frag.initialize_js('XMLEditor')
+        frag.initialize_js('XmlAuthoring')
         return frag
 
     @XBlock.json_handler
