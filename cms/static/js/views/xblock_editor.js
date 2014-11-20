@@ -79,6 +79,12 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                 return metadataView;
             },
 
+            saveEditorTabs: function () {
+                var elements = this.xblockElements();
+
+
+            },
+
             getDataEditor: function() {
                 var editor = this.$('.wrapper-comp-editor');
                 return editor.length === 1 ? editor : null;

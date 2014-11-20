@@ -88,9 +88,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 // If the xblock is not using custom buttons then choose which buttons to show
                 if (!editorView.hasCustomButtons()) {
                     // If the xblock does not support save then disable the save button
-                    if (!editorView.xblock.save) {
-                        this.disableSave();
-                    }
+                   // if (!editorView.xblock.save) {
+                   //     this.disableSave();
+                   // }
                     this.getActionBar().show();
                 }
 
@@ -148,11 +148,21 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
 
             save: function(event) {
                 var self = this,
-                    editorView = this.editorView,
                     xblockInfo = this.xblockInfo,
-                    data = editorView.getXModuleData();
+                    editorView = this.editorView;
+
                 event.preventDefault();
-                if (data) {
+                if (self.usingTabbedEditor) {
+                    ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+                        function() {
+                            return editorView.saveEditorTabs();
+                        }).done(function() {
+                            self.onSave();
+                        });
+                }
+                else {
+                    var data = editorView.getXModuleData();
+
                     ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
                         function() {
                             return xblockInfo.save(data);
@@ -160,14 +170,6 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                             self.onSave();
                         });
                 }
-//                else { TODO:
-//                    ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
-//                        function() {
-//
-//                        }).done(function() {
-//                            self.onSave();
-//                        });
-//                }
             },
 
             onSave: function() {
