@@ -246,6 +246,37 @@ module.exports = function (grunt) {
                     ]
                 }
             }
+        },
+
+        cssmin: {
+            lms: {
+                files: {
+                    '<%= c.lms %>/css/lms-style-vendor.css': '<%= c.lms %>/css/lms-style-vendor.css',
+                    '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css': '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css',
+                    '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css': '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css',
+                    '<%= c.lms %>/css/lms-style-app.css': '<%= c.lms %>/css/lms-style-app.css',
+                    '<%= c.lms %>/css/lms-style-app-extend2.css': '<%= c.lms %>/css/lms-style-app-extend2.css',
+                    '<%= c.lms %>/css/lms-style-app-rtl.css': '<%= c.lms %>/css/lms-style-app-rtl.css',
+                    '<%= c.lms %>/css/lms-style-app-extend2-rtl.css': '<%= c.lms %>/css/lms-style-app-extend2-rtl.css',
+                    '<%= c.lms %>/css/lms-style-course-vendor.css': '<%= c.lms %>/css/lms-style-course-vendor.css',
+                    '<%= c.lms %>/css/lms-style-course.css': '<%= c.lms %>/css/lms-style-course.css',
+                    '<%= c.lms %>/css/lms-style-course-rtl.css': '<%= c.lms %>/css/lms-style-course-rtl.css',
+                    '<%= c.lms %>/css/lms-style-xmodule-annotations.css': '<%= c.lms %>/css/lms-style-xmodule-annotations.css'
+                }
+            },
+            studio: {
+                files: {
+                    '<%= c.studio %>/css/cms-style-vendor.css': '<%= c.studio %>/css/cms-style-vendor.css',
+                    '<%= c.studio %>/css/cms-style-vendor-tinymce-content.css': '<%= c.studio %>/css/cms-style-vendor-tinymce-content.css',
+                    '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css': '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css',
+                    '<%= c.studio %>/css/cms-style-app.css': '<%= c.studio %>/css/cms-style-app.css',
+                    '<%= c.studio %>/css/cms-style-app-extend1.css': '<%= c.studio %>/css/cms-style-app-extend1.css',
+                    '<%= c.studio %>/css/cms-style-app-rtl.css': '<%= c.studio %>/css/cms-style-app-rtl.css',
+                    '<%= c.studio %>/css/cms-style-xmodule.css': '<%= c.studio %>/css/cms-style-xmodule.css',
+                    '<%= c.studio %>/css/cms-style-xmodule-rtl.css': '<%= c.studio %>/css/cms-style-xmodule-rtl.css',
+                    '<%= c.studio %>/css/cms-style-xmodule-annotations.css': '<%= c.studio %>/css/cms-style-xmodule-annotations.css'
+                }
+            }
         }
     });
 
@@ -262,7 +293,8 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('lms:dist', [
-        'lms'
+        'lms',
+        'cssmin:lms'
     ]);
 
 
@@ -279,6 +311,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('studio:dist', [
-        'studio'
+        'studio',
+        'cssmin:studio'
     ]);
 };
