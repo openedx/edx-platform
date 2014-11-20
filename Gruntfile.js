@@ -5,6 +5,32 @@ module.exports = function (grunt) {
     require('time-grunt')(grunt);
 
     grunt.initConfig({
+        clean: {
+            lms: {
+                src: [
+                    // Sass-generated files
+                    'lms/static/sass/application-extend1-rtl.css',
+                    'lms/static/sass/application-extend1.css',
+                    'lms/static/sass/application-extend2-rtl.css',
+                    'lms/static/sass/application-extend2.css',
+                    'lms/static/sass/application.css',
+
+                    // Concat-generated files
+                    'lms/static/css/lms-style-vendor.css',
+                    'lms/static/css/lms-style-vendor-tinymce-content.css',
+                    'lms/static/css/lms-style-vendor-tinymce-skin.css',
+                    'lms/static/css/lms-style-app.css',
+                    'lms/static/css/lms-style-app-extend2.css',
+                    'lms/static/css/lms-style-app-rtl.css',
+                    'lms/static/css/lms-style-app-extend2-rtl.css',
+                    'lms/static/css/lms-style-course-vendor.css',
+                    'lms/static/css/lms-style-course.css',
+                    'lms/static/css/lms-style-course-rtl.css',
+                    'lms/static/css/lms-style-xmodule-annotations.css'
+                ]
+            }
+        },
+
         sass: {
             lms: {
                 options: {
@@ -90,6 +116,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('lms', [
+        'clean:lms',
         'sass:lms',
         'concat:lms'
     ]);
