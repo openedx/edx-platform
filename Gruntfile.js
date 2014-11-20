@@ -107,6 +107,7 @@ module.exports = function (grunt) {
                     '<%= c.lms %>/sass/application-extend2-rtl.css': '<%= c.lms %>/sass/application-extend2-rtl.scss',
                     '<%= c.lms %>/sass/application-extend2.css': '<%= c.lms %>/sass/application-extend2.scss',
                     '<%= c.lms %>/sass/application.css': '<%= c.lms %>/sass/application.scss',
+                    '<%= c.lms %>/sass/application-rtl.css': '<%= c.lms %>/sass/application-rtl.scss',
                     '<%= c.lms %>/sass/course-rtl.css': '<%= c.lms %>/sass/course-rtl.scss',
                     '<%= c.lms %>/sass/course.css': '<%= c.lms %>/sass/course.scss',
                     '<%= c.lms %>/sass/ie.css': '<%= c.lms %>/sass/ie.scss',
