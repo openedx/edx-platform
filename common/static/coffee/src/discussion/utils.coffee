@@ -19,6 +19,7 @@ class @DiscussionUtil
   @localUrls: []
 
   @force_async = false
+  @route_prefix = ''
 
   @getTemplate: (id) ->
     $("script##{id}").html()
