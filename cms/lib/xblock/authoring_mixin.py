@@ -9,10 +9,12 @@ class AuthoringMixin(XBlockMixin):
     """
     TODO:
     """
-
-    editor_tabs = [
-        # list things here
-    ]
+    @property
+    def editor_tabs(self):
+        return [
+            {"display_name": "XML", "id": "xml"},
+            {"display_name": "Settings", "id": "settings"}
+        ]
 
     def save_editor(self, context=None):
         """
