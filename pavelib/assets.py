@@ -133,7 +133,7 @@ def compile_sass(debug=False):
     Compile Sass to CSS.
     """
     sh(cmd(
-        'sass', '' if debug else '--style compressed',
+        'sassc', '' if debug else '--style compressed',
         "--sourcemap" if debug else '',
         "--cache-location {cache}".format(cache=SASS_CACHE_PATH),
         "--load-path", " ".join(SASS_LOAD_PATHS + THEME_SASS_PATHS),

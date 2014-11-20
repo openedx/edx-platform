@@ -34,7 +34,7 @@ module.exports = function (grunt) {
         sass: {
             lms: {
                 options: {
-                    loadPath: [
+                    includePaths: [
                         'bower_components'
                     ]
                 },
