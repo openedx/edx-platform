@@ -9,21 +9,21 @@ require.config({
         'underscore.string':    'js/vendor/underscore.string.min'
     },
     shim: {
-        backbone: {
+        'backbone': {
             deps: ['underscore', 'jquery'],
             exports: 'Backbone'
         },
 
-        gettext: {
+        'gettext': {
             exports: 'gettext'
         },
 
-        jquery.cookie: {
+        'jquery.cookie': {
             deps: ['jquery'],
             exports: 'jQuery.fn.cookie'
         },
 
-        underscore: {
+        'underscore': {
             exports: '_'
         }
     }
