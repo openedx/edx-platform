@@ -66,3 +66,7 @@ function XBlockXMLEditor(runtime, element) {
         view.load();
     });
 }
+
+function SettingsTabView(runtime, element) {
+    // initialize settings tab
+}

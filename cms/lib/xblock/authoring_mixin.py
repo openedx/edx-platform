@@ -79,8 +79,8 @@ class AuthoringMixin(XBlockMixin):
         html_strings.append('</div>')
         html_string = unicode('\n'.join(html_strings))
         fragment = Fragment(html_string)
-        # fragment.add_javascript('')
-        # fragment.initialize_js('')
+        fragment.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/authoring.js"))
+        fragment.initialize_js('SettingsTabView')
         return fragment
 
     def xml_tab_view(self, context=None):
