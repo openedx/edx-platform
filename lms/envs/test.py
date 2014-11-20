@@ -57,6 +57,7 @@ FEATURES['EMBARGO'] = True
 
 # Toggles API on for testing
 FEATURES['API'] = True
+FEATURES['ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE'] = False
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
