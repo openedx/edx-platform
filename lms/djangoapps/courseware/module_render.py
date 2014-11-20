@@ -10,6 +10,9 @@ import mimetypes
 
 import static_replace
 
+from datetime import datetime
+from django.utils.timezone import UTC
+
 from collections import OrderedDict
 from functools import partial
 from requests.auth import HTTPBasicAuth
@@ -430,6 +433,14 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         """
         Manages the workflow for recording and updating of student module grade state
         """
+
+        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register grading events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
         user_id = event.get('user_id', user.id)
 
         grade = event.get('value')
@@ -463,6 +474,26 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
             course_id,
             descriptor.location,
         )
+        # we can treat a grading event as a indication that a user
+        # "completed" an xBlock
+        if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
+            handle_progress_event(block, event_type, event)
+
+    def handle_progress_event(block, event_type, event):
+        """
+        tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
+        """
+
+        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register progress events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
+        user_id = event.get('user_id', user.id)
+        if not user_id:
+            return
 
         # Send a signal out to any listeners who are waiting for score change
         # events.
