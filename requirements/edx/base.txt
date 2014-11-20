@@ -34,8 +34,10 @@ django-ses==0.4.1
 django-storages==1.1.5
 django-threaded-multihost==1.4-1
 django-method-override==0.1.0
+# https://github.com/django-wiki/django-wiki is just wiki on PyPI
+wiki==0.0.23
 djangorestframework==2.3.14
-django==1.5.12
+django==1.6.10
 elasticsearch==0.4.5
 feedparser==5.1.3
 firebase-token-generator==1.3.2

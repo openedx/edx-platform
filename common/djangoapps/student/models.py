@@ -282,7 +282,7 @@ class UserProfile(models.Model):
         self.set_meta(meta)
         self.save()
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def update_name(self, new_name):
         """Update the user's name, storing the old name in the history.
 

@@ -117,6 +117,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "cms.db",
+        'ATOMIC_REQUESTS': True,
     },
 }
 

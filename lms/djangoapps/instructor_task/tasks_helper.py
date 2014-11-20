@@ -13,7 +13,7 @@ from celery import Task, current_task
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.files.storage import DefaultStorage
-from django.db import transaction, reset_queries
+from django.db import reset_queries
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 
@@ -430,7 +430,6 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     )
 
 
-@transaction.autocommit
 def rescore_problem_module_state(xmodule_instance_args, module_descriptor, student_module):
     '''
     Takes an XModule descriptor and a corresponding StudentModule object, and
@@ -480,7 +479,6 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
         return UPDATE_STATUS_SUCCEEDED
 
 
-@transaction.autocommit
 def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, student_module):
     """
     Resets problem attempts to zero for specified `student_module`.
@@ -507,7 +505,6 @@ def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, stude
     return update_status
 
 
-@transaction.autocommit
 def delete_problem_module_state(xmodule_instance_args, _module_descriptor, student_module):
     """
     Delete the StudentModule entry.

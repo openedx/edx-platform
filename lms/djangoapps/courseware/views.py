@@ -29,7 +29,6 @@ from edxmako.shortcuts import render_to_response, render_to_string, marketing_li
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
-from functools import wraps
 from markupsafe import escape
 
 from courseware import grades
@@ -956,18 +955,17 @@ def mktg_course_about(request, course_id):
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@transaction.commit_manually
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
     """
-    Wraps "_progress" with the manual_transaction context manager just in case
+    Wraps "_progress" with the atomic context manager just in case
     there are unanticipated errors.
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        with grades.manual_transaction():
+        with transaction.atomic():
             return _progress(request, course_key, student_id)
 
 
@@ -1030,7 +1028,7 @@ def _progress(request, course_key, student_id):
     if show_generate_cert_btn:
         context.update(certificate_downloadable_status(student, course_key))
 
-    with grades.manual_transaction():
+    with transaction.atomic():
         response = render_to_response('courseware/progress.html', context)
 
     return response

@@ -13,5 +13,6 @@ from courses import *
 for class_id, db_name in CLASSES_TO_DBS.items():
     DATABASES[class_id] = {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': path_for_db(db_name)
+        'NAME': path_for_db(db_name),
+        'ATOMIC_REQUESTS': True,
     }

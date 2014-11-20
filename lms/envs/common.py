@@ -702,6 +702,7 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
 SESSION_COOKIE_SECURE = False
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # CMS base
 CMS_BASE = 'localhost:8001'
@@ -1017,7 +1018,6 @@ MIDDLEWARE_CLASSES = (
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',

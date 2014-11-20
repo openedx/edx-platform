@@ -1361,7 +1361,8 @@ def _do_create_account(form):
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     try:
-        user.save()
+        with transaction.atomic():
+            user.save()
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=user.username)) > 0:

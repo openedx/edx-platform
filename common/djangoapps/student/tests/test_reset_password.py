@@ -10,7 +10,6 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
 
@@ -39,7 +38,7 @@ class ResetPasswordTests(TestCase):
 
         self.user_bad_passwd = UserFactory.create()
         self.user_bad_passwd.is_active = False
-        self.user_bad_passwd.password = UNUSABLE_PASSWORD
+        self.user_bad_passwd.set_unusable_password()
         self.user_bad_passwd.save()
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))

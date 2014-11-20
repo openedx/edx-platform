@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
-from unittest import SkipTest, skipUnless
+from unittest import skipUnless
 import ddt
 from pytz import UTC
 import mock
@@ -168,6 +168,7 @@ class UserApiTestCase(ApiTestCase):
         ]
 
 
+@ddt.ddt
 class RoleTestCase(UserApiTestCase):
     course_id = SlashSeparatedCourseKey.from_deprecated_string("org/course/run")
     LIST_URI = ROLE_LIST_URI + "?course_id=" + course_id.to_deprecated_string()
@@ -184,17 +185,9 @@ class RoleTestCase(UserApiTestCase):
     def test_options_list(self):
         self.assertAllowedMethods(self.LIST_URI, ["OPTIONS", "GET", "HEAD"])
 
-    def test_post_list_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("post", self.LIST_URI))
-
-    def test_put_list_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.LIST_URI))
-
-    def test_patch_list_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
-
-    def test_delete_list_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
+    @ddt.data("post", "put", "patch", "delete")
+    def test_method_list_not_allowed(self, method):
+        self.assertHttpMethodNotAllowed(self.request_with_auth(method, self.LIST_URI))
 
     def test_list_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.LIST_URI))
@@ -254,6 +247,7 @@ class RoleTestCase(UserApiTestCase):
         self.assertEqual(len(set(all_user_uris)), 5)
 
 
+@ddt.ddt
 class UserViewSetTest(UserApiTestCase):
     LIST_URI = USER_LIST_URI
 
@@ -266,17 +260,9 @@ class UserViewSetTest(UserApiTestCase):
     def test_options_list(self):
         self.assertAllowedMethods(self.LIST_URI, ["OPTIONS", "GET", "HEAD"])
 
-    def test_post_list_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("post", self.LIST_URI))
-
-    def test_put_list_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.LIST_URI))
-
-    def test_patch_list_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
-
-    def test_delete_list_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
+    @ddt.data("post", "put", "patch", "delete")
+    def test_method_list_not_allowed(self, method):
+        self.assertHttpMethodNotAllowed(self.request_with_auth(method, self.LIST_URI))
 
     def test_list_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.LIST_URI))
@@ -333,17 +319,9 @@ class UserViewSetTest(UserApiTestCase):
     def test_options_detail(self):
         self.assertAllowedMethods(self.detail_uri, ["OPTIONS", "GET", "HEAD"])
 
-    def test_post_detail_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("post", self.detail_uri))
-
-    def test_put_detail_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.detail_uri))
-
-    def test_patch_detail_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
-
-    def test_delete_detail_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.detail_uri))
+    @ddt.data("post", "put", "patch", "delete")
+    def test_method_detail_not_allowed(self, method):
+        self.assertHttpMethodNotAllowed(self.request_with_auth(method, self.detail_uri))
 
     def test_get_detail_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.detail_uri))
@@ -368,6 +346,7 @@ class UserViewSetTest(UserApiTestCase):
         )
 
 
+@ddt.ddt
 class UserPreferenceViewSetTest(UserApiTestCase):
     LIST_URI = USER_PREFERENCE_LIST_URI
 
@@ -380,14 +359,9 @@ class UserPreferenceViewSetTest(UserApiTestCase):
     def test_options_list(self):
         self.assertAllowedMethods(self.LIST_URI, ["OPTIONS", "GET", "HEAD"])
 
-    def test_put_list_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.LIST_URI))
-
-    def test_patch_list_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
-
-    def test_delete_list_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
+    @ddt.data("put", "patch", "delete")
+    def test_method_list_not_allowed(self, method):
+        self.assertHttpMethodNotAllowed(self.request_with_auth(method, self.LIST_URI))
 
     def test_list_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.LIST_URI))
@@ -468,17 +442,9 @@ class UserPreferenceViewSetTest(UserApiTestCase):
     def test_options_detail(self):
         self.assertAllowedMethods(self.detail_uri, ["OPTIONS", "GET", "HEAD"])
 
-    def test_post_detail_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("post", self.detail_uri))
-
-    def test_put_detail_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.detail_uri))
-
-    def test_patch_detail_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
-
-    def test_delete_detail_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.detail_uri))
+    @ddt.data("post", "put", "patch", "delete")
+    def test_method_detail_not_allowed(self, method):
+        self.assertHttpMethodNotAllowed(self.request_with_auth(method, self.detail_uri))
 
     def test_detail_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.detail_uri))
@@ -508,20 +474,16 @@ class UserPreferenceViewSetTest(UserApiTestCase):
         )
 
 
+@ddt.ddt
 class PreferenceUsersListViewTest(UserApiTestCase):
     LIST_URI = "/user_api/v1/preferences/key0/users/"
 
     def test_options(self):
         self.assertAllowedMethods(self.LIST_URI, ["OPTIONS", "GET", "HEAD"])
 
-    def test_put_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("put", self.LIST_URI))
-
-    def test_patch_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
-
-    def test_delete_not_allowed(self):
-        self.assertHttpMethodNotAllowed(self.request_with_auth("delete", self.LIST_URI))
+    @ddt.data("put", "patch", "delete")
+    def test_method_list_not_allowed(self, method):
+        self.assertHttpMethodNotAllowed(self.request_with_auth(method, self.LIST_URI))
 
     def test_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.LIST_URI))
@@ -584,16 +546,10 @@ class LoginSessionViewTest(ApiTestCase):
     def test_allowed_methods(self):
         self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
 
-    def test_put_not_allowed(self):
-        response = self.client.put(self.url)
+    @ddt.data("put", "patch", "delete")
+    def test_method_not_allowed(self, method):
+        response = getattr(self.client, method)(self.url)
         self.assertHttpMethodNotAllowed(response)
-
-    def test_delete_not_allowed(self):
-        response = self.client.delete(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_patch_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
 
     def test_login_form(self):
         # Retrieve the login form
@@ -735,16 +691,10 @@ class PasswordResetViewTest(ApiTestCase):
     def test_allowed_methods(self):
         self.assertAllowedMethods(self.url, ["GET", "HEAD", "OPTIONS"])
 
-    def test_put_not_allowed(self):
-        response = self.client.put(self.url)
+    @ddt.data("put", "patch", "delete")
+    def test_method_not_allowed(self, method):
+        response = getattr(self.client, method)(self.url)
         self.assertHttpMethodNotAllowed(response)
-
-    def test_delete_not_allowed(self):
-        response = self.client.delete(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_patch_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
 
     def test_password_reset_form(self):
         # Retrieve the password reset form
@@ -802,16 +752,10 @@ class RegistrationViewTest(ApiTestCase):
     def test_allowed_methods(self):
         self.assertAllowedMethods(self.url, ["GET", "POST", "HEAD", "OPTIONS"])
 
-    def test_put_not_allowed(self):
-        response = self.client.put(self.url)
+    @ddt.data("put", "patch", "delete")
+    def test_method_not_allowed(self, method):
+        response = getattr(self.client, method)(self.url)
         self.assertHttpMethodNotAllowed(response)
-
-    def test_delete_not_allowed(self):
-        response = self.client.delete(self.url)
-        self.assertHttpMethodNotAllowed(response)
-
-    def test_patch_not_allowed(self):
-        raise SkipTest("Django 1.4's test client does not support patch")
 
     def test_register_form_default_fields(self):
         no_extra_fields_setting = {}
