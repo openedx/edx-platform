@@ -541,6 +541,7 @@ def get_module_system_for_user(user, field_data_cache,
         services={
             'i18n': ModuleI18nService(),
             'fs': xblock.reference.plugins.FSService(),
+            'user': xblock.reference.plugins.UserService()
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
