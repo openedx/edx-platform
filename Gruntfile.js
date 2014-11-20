@@ -95,6 +95,7 @@ module.exports = function (grunt) {
                 options: {
                     includePaths: [
                         '<%= c.bower %>',
+                        '<%= c.bower %>/bi-app-sass',
                         // This is for xmodule sass files
                         '<%= c.common %>',
                         '<%= c.common %>/sass'
@@ -115,6 +116,7 @@ module.exports = function (grunt) {
                 options: {
                     includePaths: [
                         '<%= c.bower %>',
+                        '<%= c.bower %>/bi-app-sass',
                         // This is for xmodule sass files
                         '<%= c.common %>',
                         '<%= c.common %>/sass'
