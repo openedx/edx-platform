@@ -159,7 +159,7 @@ def test(options):
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
-    ("compare_branch", "b", "Branch to compare against, defaults to origin/master"),
+    ("compare_branch=", "b", "Branch to compare against, defaults to origin/master"),
 ])
 def coverage(options):
     """
