@@ -57,7 +57,7 @@ def run_server(system, settings=None, port=None, skip_assets=False, watch_assets
     ("settings=", "s", "Django settings"),
     ("port=", "p", "Port"),
     ("fast", "f", "Skip updating assets"),
-    ("watch", "w", "Watch assets modifications")
+    ("watch", None, "Watch assets modifications")
 ])
 def lms(options):
     """
@@ -76,7 +76,7 @@ def lms(options):
     ("settings=", "s", "Django settings"),
     ("port=", "p", "Port"),
     ("fast", "f", "Skip updating assets"),
-    ("watch", "w", "Watch assets modifications")
+    ("watch", None, "Watch assets modifications")
 ])
 def studio(options):
     """
@@ -130,7 +130,7 @@ def celery(options):
     ("settings=", "s", "Django settings for both LMS and Studio"),
     ("worker_settings=", "w", "Celery worker Django settings"),
     ("fast", "f", "Skip updating assets"),
-    ("watch", "w", "Watch assets modifications"),
+    ("watch", None, "Watch assets modifications"),
     ("settings_lms=", "l", "Set LMS only, overriding the value from --settings (if provided)"),
     ("settings_cms=", "c", "Set Studio only, overriding the value from --settings (if provided)"),
 ])
