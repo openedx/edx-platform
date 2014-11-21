@@ -42,6 +42,9 @@ from lms.lib.xblock.runtime import quote_slashes
 from xmodule.modulestore import ModuleStoreEnum
 
 
+@XBlock.needs("i18n")
+@XBlock.needs("fs")
+@XBlock.needs("user")
 class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
@@ -1055,3 +1058,34 @@ class TestRebindModule(TestSubmittingProblems):
         module = self.get_module_for_user(self.anon_user)
         module.system.rebind_noauth_module_to_user(module, self.anon_user)
         self.assertFalse(psycho_handler.called)
+
+
+@ddt.ddt
+class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
+    """
+    Tests for the 'View in Studio' link visiblity.
+    """
+    def setUp(self):
+        """ Set up the user and request that will be used. """
+        self.user = UserFactory()
+        self.field_data_cache = Mock()
+        self.course = CourseFactory.create()
+        self.track_function = Mock()
+        self.xqueue_callback_url_prefix = Mock()
+        self.request_token = Mock()
+
+    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
+    @ddt.data("user", "i18n", "fs")
+    def test_expected_services_exist(self, expected_service):
+        descriptor = ItemFactory(category="pure", parent=self.course)
+        runtime, field_data = render.get_module_system_for_user(
+            self.user,
+            self.field_data_cache,
+            descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token
+        )
+        service = runtime.service(descriptor, expected_service)
+        self.assertIsNotNone(service)
