@@ -136,6 +136,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                     buttonSelector;
                 editorView.selectMode(mode);
                 this.$('.editor-modes a').removeClass('is-set');
+                this.$('.action-modes a').removeClass('is-set');
                 if (mode) {
                     buttonSelector = '.' + mode + '-button';
                     this.$(buttonSelector).addClass('is-set');

@@ -148,18 +148,26 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                 var showEditor = mode === 'editor',
                     dataEditor = this.getDataEditor(),
                     metadataEditor = this.getMetadataEditor();
-                if (dataEditor) {
-                    this.setEditorActivation(dataEditor, showEditor);
-                }
-                if (metadataEditor) {
-                    this.setEditorActivation(metadataEditor.$el, !showEditor);
+                if (dataEditor || metadataEditor) {
+                    if (dataEditor) {
+                        this.setTabViewActivation(dataEditor, showEditor);
+                    }
+                    if (metadataEditor) {
+                        this.setTabViewActivation(metadataEditor.$el, !showEditor);
+                    }
+                } else {
+                    this.setTabViewActivation(this.$('.tab-view-' + this.mode), false);
+                    this.setTabViewActivation(this.$('.tab-view-' + mode), true);
                 }
                 this.mode = mode;
             },
 
-            setEditorActivation: function(editor, isActive) {
-                editor.removeClass('is-active').removeClass('is-inactive');
+            setTabViewActivation: function(editor, isActive) {
+                editor.removeClass('is-active').removeClass('is-inactive').removeClass('is-hidden');
                 editor.addClass(isActive ? 'is-active' : 'is-inactive');
+                if (!isActive) {
+                    editor.addClass('is-hidden');
+                }
             }
         });
 

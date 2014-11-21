@@ -14,6 +14,10 @@
   font-weight: normal !important;
 }
 
+.xblock-tabbed-editor .is-hidden {
+  display: none;
+}
+
 .xblock-tabbed-editor .editor-with-tabs {
 
   .edit-header {
@@ -58,7 +62,7 @@
           padding: ($baseline/4) ($baseline/2);
           text-transform: uppercase;
 
-          &.current {
+          &.current, &.is-set {
             background-color: $gray-d1;
             color: $white;
           }
