@@ -153,7 +153,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                     editorView = this.editorView;
 
                 event.preventDefault();
-                if (self.usingTabbedEditor) {
+                if (self.usingTabbedEditor()) {
                     ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
                         function() {
                             return editorView.saveEditorTabs();
