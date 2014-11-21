@@ -290,7 +290,6 @@ module.exports = function (grunt) {
 
     // LMS tasks
     grunt.registerTask('lms', [
-        'clean:lms',
         'sass:lms',
         'concat:lms'
     ]);
@@ -305,6 +304,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('lms:dist', [
+        'clean:lms',
         'lms',
         'cssmin:lms'
     ]);
@@ -312,7 +312,6 @@ module.exports = function (grunt) {
 
     // Studio tasks
     grunt.registerTask('studio', [
-        'clean:studio',
         'sass:studio',
         'concat:studio'
     ]);
@@ -327,6 +326,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('studio:dist', [
+        'clean:studio',
         'studio',
         'cssmin:studio'
     ]);
