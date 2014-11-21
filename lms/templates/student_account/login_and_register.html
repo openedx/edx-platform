@@ -6,6 +6,7 @@
 <%block name="pagetitle">${_("Log in or Register")}</%block>
 
 <%block name="js_extra">
+  <script type="text/javascript" src="${static.url("lms-require-config.js")}"></script>
   <%static:require_module module='student_account/accessApp'/>
 </%block>
 
