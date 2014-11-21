@@ -303,6 +303,8 @@ def update_thread(request, course_id, thread_id):
             return JsonError(_("Topic doesn't exist"))
         else:
             thread.commentable_id = commentable_id
+        else:
+            thread.commentable_id = commentable_id
 
     thread.save()
 
