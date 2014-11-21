@@ -60,11 +60,10 @@ function XBlockXMLEditor(runtime, element) {
     /**
     Initialize the editing interface on page load.
     **/
-    $(function($) {
-        var server = new XBlockAuthoring.Server(runtime, element);
-        var view = new XBlockAuthoring.StudioView(runtime, element, server);
-        view.load();
-    });
+    var server = new XBlockAuthoring.Server(runtime, element);
+    var view = new XBlockAuthoring.StudioView(runtime, element, server);
+    view.load();
+    return view;
 }
 
 function SettingsTabView(runtime, element) {
