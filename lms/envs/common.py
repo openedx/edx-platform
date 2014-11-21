@@ -1330,8 +1330,7 @@ CELERY_QUEUES = {
 CELERYD_HIJACK_ROOT_LOGGER = False
 
 # For the Result Store, use the django cache named 'celery'
-CELERY_RESULT_BACKEND = 'cache'
-CELERY_CACHE_BACKEND = 'celery'
+CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
 ################################ Bulk Email ###################################
 
