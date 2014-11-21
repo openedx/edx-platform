@@ -1063,10 +1063,12 @@ class TestRebindModule(TestSubmittingProblems):
 @ddt.ddt
 class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
     """
-    Tests for the 'View in Studio' link visiblity.
+    Tests that the LMS Module System (XBlock Runtime) provides an expected set of services.
     """
     def setUp(self):
-        """ Set up the user and request that will be used. """
+        """
+        Set up the user and other fields that will be used to instantiate the runtime.
+        """
         self.user = UserFactory()
         self.field_data_cache = Mock()
         self.course = CourseFactory.create()
@@ -1077,6 +1079,9 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     @ddt.data("user", "i18n", "fs")
     def test_expected_services_exist(self, expected_service):
+        """
+        Tests that the 'user', 'i18n', and 'fs' services are provided by the LMS runtime.
+        """
         descriptor = ItemFactory(category="pure", parent=self.course)
         runtime, field_data = render.get_module_system_for_user(
             self.user,
