@@ -50,6 +50,42 @@ module.exports = function (grunt) {
                     'sass:studio',
                     'concat:studio'
                 ]
+            },
+
+            'coffee_common': {
+                files: [
+                    '<%= c.common %>/coffee/**/*.coffee',
+                    '<%= c.common %>/xmodule/**/*.coffee'
+                ],
+                tasks: [
+                    'coffee:common'
+                ]
+            },
+
+            'coffee_lms': {
+                files: function () {
+                    var paths = [
+                        '<%= c.lms %>/coffee/**/*.coffee'
+                    ];
+
+                    if (config.theme) {
+                        paths.push('<%= c.theme %>/coffee/**/*.coffee');
+                    }
+
+                    return paths;
+                }(),
+                tasks: [
+                    'coffee:lms'
+                ]
+            },
+
+            'coffee_studio': {
+                files: [
+                    '<%= c.studio %>/coffee/**/*.coffee'
+                ],
+                tasks: [
+                    'coffee:studio'
+                ]
             }
         },
 
@@ -301,17 +337,102 @@ module.exports = function (grunt) {
                     '<%= c.studio %>/css/cms-style-xmodule-annotations.css': '<%= c.studio %>/css/cms-style-xmodule-annotations.css'
                 }
             }
+        },
+
+        coffee: {
+            common: {
+                expand: true,
+                src: [
+                    '<%= c.common %>/coffee/**/*.coffee',
+                    '<%= c.common %>/xmodule/**/*.coffee'
+                ],
+                extDot: 'last',
+                ext: '.js'
+            },
+            lms: {
+                expand: true,
+                src: function () {
+                    var paths = [
+                        '<%= c.lms %>/coffee/**/*.coffee'
+                    ];
+
+                    if (config.theme) {
+                        paths.push('<%= c.theme %>/coffee/**/*.coffee');
+                    }
+
+                    return paths;
+                }(),
+                extDot: 'last',
+                ext: '.js'
+            },
+
+            studio: {
+                expand: true,
+                src: [
+                    '<%= c.studio %>/coffee/**/*.coffee'
+                ],
+                extDot: 'last',
+                ext: '.js'
+            }
+        },
+
+        concurrent: {
+            'watch_lms': {
+                options: {
+                    logConcurrentOutput: true
+                },
+                tasks: [
+                    'watch:sass_lms',
+                    'watch:coffee_common',
+                    'watch:coffee_lms'
+                ]
+            },
+
+            'watch_studio': {
+                options: {
+                    logConcurrentOutput: true
+                },
+                tasks: [
+                    'watch:sass_studio',
+                    'watch:coffee_common',
+                    'watch:coffee_studio'
+                ]
+            },
+
+            'build_lms': {
+                tasks: [
+                    'lms:css',
+                    'lms:js'
+                ]
+            },
+
+            'build_studio': {
+                tasks: [
+                    'studio:css',
+                    'studio:js'
+                ]
+            }
+
         }
     });
 
     // LMS tasks
     grunt.registerTask('lms', [
+        'concurrent:build_lms'
+    ]);
+
+    grunt.registerTask('lms:css', [
         'sass:lms',
         'concat:lms'
     ]);
 
+    grunt.registerTask('lms:js', [
+        'coffee:common',
+        'coffee:lms'
+    ]);
+
     grunt.registerTask('lms:watch', [
-        'watch:sass_lms'
+        'concurrent:watch_lms'
     ]);
 
     grunt.registerTask('lms:dev', [
@@ -328,12 +449,21 @@ module.exports = function (grunt) {
 
     // Studio tasks
     grunt.registerTask('studio', [
+        'concurrent:build_studio'
+    ]);
+
+    grunt.registerTask('studio:css', [
         'sass:studio',
         'concat:studio'
     ]);
 
+    grunt.registerTask('studio:js', [
+        'coffee:common',
+        'coffee:studio'
+    ]);
+
     grunt.registerTask('studio:watch', [
-        'watch:sass_studio'
+        'concurrent:watch_studio'
     ]);
 
     grunt.registerTask('studio:dev', [
