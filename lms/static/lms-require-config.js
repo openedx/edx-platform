@@ -1,4 +1,4 @@
-require.config({
+var require = {
     waitSeconds: 60,
     paths: {
         'backbone':             'js/vendor/backbone-min',
@@ -27,4 +27,4 @@ require.config({
             exports: '_'
         }
     }
-});
+};

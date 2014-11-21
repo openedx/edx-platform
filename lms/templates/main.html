@@ -67,10 +67,12 @@
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
 
-  % if disable_courseware_js:
-    <%static:js group='base_vendor'/>
-  % else:
-    <%static:js group='main_vendor'/>
+  % if not enable_require_js:
+    % if disable_courseware_js:
+      <%static:js group='base_vendor'/>
+    % else:
+      <%static:js group='main_vendor'/>
+    % endif
   % endif
 
   <%block name="headextra"/>
