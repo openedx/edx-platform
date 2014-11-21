@@ -19,7 +19,7 @@ class TestSocial(APITestCase):
         self.client.login(username=self.user.username, password='test')
 
     def test_one(self):
-        # url = reverse('course-about-detail')
+        url = reverse('app-secret')
         # response = self.client.get(url)
         # self.assertEqual(response.status_code, 200)
         self.assertTrue(True)  # pylint: disable=E1103

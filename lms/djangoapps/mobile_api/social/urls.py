@@ -9,7 +9,7 @@ from .views import Social
 urlpatterns = patterns(
     'mobile_api.social.views',
     url(
-        r'^{}/app-secret',
+        r'^/app-secret/$',
         Social.as_view(),
         name='app-secret'
     ),
