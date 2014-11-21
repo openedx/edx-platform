@@ -3,7 +3,7 @@ define([
         'jquery',
         'underscore',
         'js/student_account/views/FormView'
-    ]
+    ],
     function( gettext, $, _, FormView ) {
 
         'use strict';
