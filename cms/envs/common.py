@@ -529,6 +529,10 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
+# For the Result Store, use the django cache named 'celery'
+CELERY_RESULT_BACKEND = 'cache'
+CELERY_CACHE_BACKEND = 'celery'
+
 
 ############################## Video ##########################################
 

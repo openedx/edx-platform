@@ -1330,6 +1330,10 @@ CELERY_QUEUES = {
 # let logging work as configured:
 CELERYD_HIJACK_ROOT_LOGGER = False
 
+# For the Result Store, use the django cache named 'celery'
+CELERY_RESULT_BACKEND = 'cache'
+CELERY_CACHE_BACKEND = 'celery'
+
 ################################ Bulk Email ###################################
 
 # Suffix used to construct 'from' email address for bulk emails.
