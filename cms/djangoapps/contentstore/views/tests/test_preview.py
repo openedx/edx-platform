@@ -60,6 +60,7 @@ class GetPreviewHtmlTestCase(TestCase):
 
 @XBlock.needs("i18n")
 @XBlock.needs("user")
+@XBlock.needs("course")
 class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
@@ -81,10 +82,10 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         self.request = Mock()
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
-    @ddt.data("user", "i18n")
+    @ddt.data("course", "user", "i18n")
     def test_expected_services_exist(self, expected_service):
         """
-        Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
+        Tests that the 'course', 'user' and 'i18n' services are provided by the Studio runtime.
         """
         descriptor = ItemFactory(category="pure", parent=self.course)
         runtime = _preview_module_system(

@@ -27,6 +27,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
 from xblock_django.user_service import DjangoXBlockUserService
+from xblock_django.course_service import DjangoXBlockCourseService
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
@@ -1060,6 +1061,7 @@ class TestEditSplitModule(ItemTest):
         # CachingDescriptorSystem doesn't have user service, that's needed for
         # SplitTestModule. So, in this line of code we add this service manually.
         split_test.runtime._services['user'] = DjangoXBlockUserService(self.user)  # pylint: disable=protected-access
+        split_test.runtime._services['course'] = DjangoXBlockCourseService(self.course_key)  # pylint: disable=protected-access
 
         # Call add_missing_groups method to add the missing group.
         split_test.add_missing_groups(self.request)

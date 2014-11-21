@@ -45,6 +45,7 @@ from xmodule.modulestore import ModuleStoreEnum
 @XBlock.needs("i18n")
 @XBlock.needs("fs")
 @XBlock.needs("user")
+@XBlock.needs("course")
 class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
@@ -1077,10 +1078,10 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
         self.request_token = Mock()
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
-    @ddt.data("user", "i18n", "fs")
+    @ddt.data("course", "user", "i18n", "fs")
     def test_expected_services_exist(self, expected_service):
         """
-        Tests that the 'user', 'i18n', and 'fs' services are provided by the LMS runtime.
+        Tests that the 'course', 'user', 'i18n', and 'fs' services are provided by the LMS runtime.
         """
         descriptor = ItemFactory(category="pure", parent=self.course)
         runtime, field_data = render.get_module_system_for_user(
