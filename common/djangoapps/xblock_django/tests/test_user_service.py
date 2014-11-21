@@ -6,6 +6,7 @@ import unittest
 from xblock_django.user_service import DjangoXBlockUserService
 from student.tests.factories import UserFactory, AnonymousUserFactory
 
+
 class UserServiceTestCase(unittest.TestCase):
     """
     Tests for the DjangoXBlockUserService.
@@ -24,8 +25,6 @@ class UserServiceTestCase(unittest.TestCase):
             'full_name',
             'username',
             'user_id',
-            'course_anon_id',
-            'global_anon_id',
         ]
         self.assertFalse(xb_user.is_authenticated)
         for prop in properties:
