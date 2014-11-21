@@ -1,4 +1,8 @@
 var require = {
+    /* The baseURL is overridden when using RequireJS optimizer,
+    * but is necessary for local development.
+    */
+    baseUrl: "/static/",
     waitSeconds: 60,
     paths: {
         'backbone':             'js/vendor/backbone-min',
