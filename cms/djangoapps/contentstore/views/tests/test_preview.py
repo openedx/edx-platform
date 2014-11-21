@@ -77,6 +77,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         """
         Set up the user and request that will be used.
         """
+        super(StudioXBlockServiceBindingTest, self).setUp()
         self.user = UserFactory()
         self.course = CourseFactory.create()
         self.request = Mock()

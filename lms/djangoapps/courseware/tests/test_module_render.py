@@ -1070,6 +1070,7 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
         """
         Set up the user and other fields that will be used to instantiate the runtime.
         """
+        super(LMSXBlockServiceBindingTest, self).setUp()
         self.user = UserFactory()
         self.field_data_cache = Mock()
         self.course = CourseFactory.create()
@@ -1084,7 +1085,7 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
         Tests that the 'course', 'user', 'i18n', and 'fs' services are provided by the LMS runtime.
         """
         descriptor = ItemFactory(category="pure", parent=self.course)
-        runtime, field_data = render.get_module_system_for_user(
+        runtime, _ = render.get_module_system_for_user(
             self.user,
             self.field_data_cache,
             descriptor,
