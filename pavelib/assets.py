@@ -76,13 +76,13 @@ def watch_assets(options):
     systems = getattr(options, 'systems', [])
     background = getattr(options, 'background', True)
 
-    for system in systems:
+    for sys in systems:
         command = [
             # grunt should be installed globally
             # for now here as we don't want to
             # break tests & people's devstacks.
             './node_modules/grunt-cli/bin/grunt',
-            system + ':watch'
+            sys + ':watch'
         ]
 
         if theme_enabled:
