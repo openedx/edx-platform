@@ -11,24 +11,13 @@ import traceback
 import os
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
+from .utils.process import run_background_process
 
 # setup baseline paths
 
 COFFEE_DIRS = ['lms', 'cms', 'common']
-SASS_LOAD_PATHS = ['./common/static/sass']
-SASS_UPDATE_DIRS = ['*/static']
-
-# If running at Solano labs, multiple builds could be running on the
-# same VM, so do not hard code the path to /tmp.
-# Instead use the thread-safe temp dir.
-if os.getenv('TDDIUM'):
-    SASS_CACHE_PATH = os.path.join(os.getenv('TDDIUM_TMPDIR'), 'sass-cache')
-else:
-    SASS_CACHE_PATH = '/tmp/sass-cache'
-
 
 THEME_COFFEE_PATHS = []
-THEME_SASS_PATHS = []
 
 edxapp_env = Env()
 if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
@@ -36,7 +25,6 @@ if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
     parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
     theme_root = parent_dir / "themes" / theme_name
     THEME_COFFEE_PATHS = [theme_root]
-    THEME_SASS_PATHS = [theme_root / "static" / "sass"]
 
 
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
@@ -64,56 +52,6 @@ class CoffeeScriptWatcher(PatternMatchingEventHandler):
             traceback.print_exc()
 
 
-class SassWatcher(PatternMatchingEventHandler):
-    """
-    Watches for sass file changes
-    """
-    ignore_directories = True
-    patterns = ['*.scss']
-    ignore_patterns = ['common/static/xmodule/*']
-
-    def register(self, observer):
-        """
-        register files with observer
-        """
-        for dirname in SASS_LOAD_PATHS + SASS_UPDATE_DIRS + THEME_SASS_PATHS:
-            paths = []
-            if '*' in dirname:
-                paths.extend(glob.glob(dirname))
-            else:
-                paths.append(dirname)
-            for dirname in paths:
-                observer.schedule(self, dirname, recursive=True)
-
-    def on_modified(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            compile_sass()
-        except Exception:  # pylint: disable=W0703
-            traceback.print_exc()
-
-
-class XModuleSassWatcher(SassWatcher):
-    """
-    Watches for sass file changes
-    """
-    ignore_directories = True
-    ignore_patterns = []
-
-    def register(self, observer):
-        """
-        register files with observer
-        """
-        observer.schedule(self, 'common/lib/xmodule/', recursive=True)
-
-    def on_modified(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            process_xmodule_assets()
-        except Exception:  # pylint: disable=W0703
-            traceback.print_exc()
-
-
 def coffeescript_files():
     """
     return find command for paths containing coffee files
@@ -135,17 +73,12 @@ def compile_coffeescript(*files):
     ))
 
 
-def compile_sass(debug=False):
+def compile_assets(systems):
     """
-    Compile Sass to CSS.
+    Compile all assets.
     """
-    sh(cmd(
-        'sassc', '' if debug else '--style compressed',
-        "--sourcemap" if debug else '',
-        "--cache-location {cache}".format(cache=SASS_CACHE_PATH),
-        "--load-path", " ".join(SASS_LOAD_PATHS + THEME_SASS_PATHS),
-        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + THEME_SASS_PATHS),
-    ))
+    for sys in systems:
+        sh(cmd('grunt', sys))
 
 
 def compile_templated_sass(systems, settings):
@@ -176,28 +109,24 @@ def collect_assets(systems, settings):
 
 
 @task
-@cmdopts([('background', 'b', 'Background mode')])
+@cmdopts([
+    ('background', 'b', 'Background mode'),
+    ('systems', 's', 'Systems to run on')
+])
 def watch_assets(options):
     """
     Watch for changes to asset files, and regenerate js/css
     """
-    observer = Observer()
+    systems = getattr(options, 'systems', [])
+    background = getattr(options, 'background', True)
 
-    CoffeeScriptWatcher().register(observer)
-    SassWatcher().register(observer)
-    XModuleSassWatcher().register(observer)
+    for system in systems:
+        command = cmd('grunt', system + ':watch')
 
-    print("Starting asset watcher...")
-    observer.start()
-    if not getattr(options, 'background', False):
-        # when running as a separate process, the main thread needs to loop
-        # in order to allow for shutdown by contrl-c
-        try:
-            while True:
-                observer.join(2)
-        except KeyboardInterrupt:
-            observer.stop()
-        print("\nStopped asset watcher.")
+        if background:
+            run_background_process(command)
+        else:
+            sh(command)
 
 
 @task
@@ -226,18 +155,12 @@ def update_assets(args):
         '--skip-collect', dest='collect', action='store_false', default=True,
         help="Skip collection of static assets",
     )
-    parser.add_argument(
-        '--watch', action='store_true', default=False,
-        help="Watch files for changes",
-    )
     args = parser.parse_args(args)
 
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     compile_coffeescript()
+    compile_assets(args.system)
 
     if args.collect:
         collect_assets(args.system, args.settings)
-
-    if args.watch:
-        call_task('watch_assets', options={'background': not args.debug})
