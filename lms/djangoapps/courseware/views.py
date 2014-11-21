@@ -492,7 +492,9 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
             # which will prefetch the children more efficiently than doing a recursive load
-            section_descriptor = modulestore().get_item(section_descriptor.location, depth=None)
+            section_descriptor = get_module(
+                request.user, request, section_descriptor.location, field_data_cache, static_asset_path=course.static_asset_path
+            )
 
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
