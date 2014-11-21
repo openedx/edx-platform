@@ -672,8 +672,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 
-%if course_stats and modeflag.get('Psychometrics') is None:
-
+%if modeflag.get('Admin') and course_stats:
     <br/>
     <br/>
     <p>
@@ -693,6 +692,13 @@ function goto( mode)
           </tr>
         %endfor
       </table>
+    </p>
+%else:
+    <br/>
+    <br/>
+    <h2>${_("Course Statistics At A Glance")}</h2>
+    <p class="deprecated">
+      ${_("These statistics can be viewed under the 'Admin' tab of the legacy instructor dashboard.")}
     </p>
 %endif
 
