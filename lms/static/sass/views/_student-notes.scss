@@ -1,42 +1,48 @@
 .student-notes {
 
-  .updates {
+  .info-wrapper {
+    @include clearfix;
     padding-bottom: $baseline;
 
-    .title-search-container {
-      border-bottom: 1px solid $gray-l4;
-      margin-bottom: $baseline;
+    .updates {
+      @include clearfix;
 
-      .title-wrapper {
-        display: inline-block;
-        width: flex-grid(7,12);
+      .title-search-container {
+        border-bottom: 1px solid $gray-l4;
+        margin-bottom: $baseline;
 
-        h1 {
-          font-weight: 100;
+        .wrapper-title {
+          display: inline-block;
+          width: flex-grid(7,12);
 
-          small {
-            display: block;
-            line-height: 100%;
-            font-size: 60%;
+          h1 {
+            font-weight: 100;
+
+            small {
+              display: block;
+              line-height: 100%;
+              font-size: 60%;
+            }
           }
         }
-      }
 
-      .search-wrapper {
-        display: inline-block;
-        width: flex-grid(5,12);
-        text-align: right;
+        .wrapper-notes-search {
+          display: inline-block;
+          width: flex-grid(5,12);
+          text-align: right;
 
-        .search-input {
-          width: 55%;
-          padding: ($baseline/3);
+          .search-notes-input {
+            width: 55%;
+            padding: ($baseline/3);
+          }
         }
       }
     }
 
-    .tabs-wrapper {
+    .wrapper-tabs {
 
       .tab-list {
+        @include clearfix;
         position: relative;
 
         .tabs-label {
@@ -49,6 +55,7 @@
         }
 
         .tabs {
+          @include clearfix;
           float: left;
           margin: 0;
           padding: 0;
@@ -76,11 +83,12 @@
       .tab-panel {
 
         .note {
+          @include clearfix;
           margin: 0;
           padding: ($baseline*1.5) 0;
           border-top: 1px solid $gray-l4;
 
-          .excerpt {
+          .note-excerpt {
             float: left;
             width: flex-grid(9, 12);
 
@@ -124,16 +132,16 @@
             }
           }
 
-          .references {
+          .reference {
             float: left;
             width: flex-grid(3, 12);
             font-size: 90%;
 
-            div {
+            .wrapper-reference-content {
               padding: 0 $baseline;
               color: $gray-l2;
 
-              h3 {
+              .reference-title {
                 margin-top: $baseline;
                 text-transform: uppercase;
                 font-size: 100%;
@@ -142,7 +150,7 @@
                 color: $gray-l2;
               }
 
-              h3:first-child {
+              .reference-title:first-child {
                 margin-top: 0;
               }
 
@@ -171,10 +179,16 @@
           }
         }
 
-        .note.no-top-border {
-          border-top: none;
+        .note:first-child {
+          // Created global class/extend
+          // Move to global area.
+          @extend .no-border-top;
         }
       }
     }
   }  
+}
+
+.no-border-top {
+  border-top: none;
 }

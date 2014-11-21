@@ -32,94 +32,69 @@
   </nav>
 
   <section class="container student-notes"> <div class="info-wrapper">
-    <section class="updates clearfix">
+    <section class="updates">
       <div class="title-search-container">
-        <div class="title-wrapper">
-          <h1>Notes <small class="subtitle">Highlights and personal notes you have made within this course</small></h1>
+        <div class="wrapper-title">
+          <h1 class="page-title">Notes <small class="subtitle">Highlights and personal notes you have made within this course</small></h1>
         </div>
 
-        <div class="search-wrapper">
+        <div class="wrapper-notes-search">
           <form role="search">
-            <label for="keywords" class="sr">Search notes for:</label>
-            <input type="search" class="search-input" name="s" id="keywords" placeholder="Search Notes for...">
-            <button type="submit" class="search-submit"><i class="icon-search"></i> Search</button>
+            <label for="search-notes-for" class="sr">Search notes for:</label>
+            <input type="search" class="search-notes-input" name="note" id="search-notes-for" placeholder="Search Notes for...">
+            <button type="submit" class="search-notes-submit"><i class="icon-search"></i> Search</button>
           </form>
         </div>
       </div>
 
-      <section class="tabs-wrapper">
-        <div class="tab-list clearfix">
+      <section class="wrapper-tabs">
+        <div class="tab-list">
           <h2 id="tab-view" class="tabs-label">View Notes By:</h2>
-          <ul class="tabs clearfix" role="tablist">
-            <li id="recent" class="tab" role="tab" aria-selected="false" aria-controls="recent_panel"><a href="student-notes-recent.html"><i class="icon icon-clock-o"></i> Recent Activity</a></li>
-            <li id="structure" class="tab active" role="tab" aria-selected="true" aria-controls="structure_panel"><a href=""><i class="icon icon-list-ul"></i> Course Structure</a></li>
+          <ul class="tabs" role="tablist">
+            <li id="view-recent-notes" class="tab" role="tab" aria-selected="false" aria-controls="recent-panel"><a href="student-notes-recent.html"><i class="icon icon-clock-o"></i> Recent Activity</a></li>
+            <li id="view-course-structure" class="tab active" role="tab" aria-selected="true" aria-controls="structure-panel"><a href=""><i class="icon icon-list-ul"></i> Course Structure</a></li>
           </ul>
         </div>
-        <section id="recent_panel" class="tab-panel sr" aria-labelledby="recent" role="tabpanel" aria-hidden="true">
+        <section id="recent-panel" class="tab-panel sr" aria-labelledby="view-recent-notes" role="tabpanel" aria-hidden="true">
           <h2 class="sr">Recent Activity</h2>
           
-          <section class="note no-top-border clearfix">
-            <div class="excerpt">
-              <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="excerpt-more-link">More</a></p>
+          <article class="note">
+            <div class="note-excerpt">
+              <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="note-excerpt-more-link">More</a></p>
             </div>
-            <aside class="references" role="complementary">
-              <div>
-                <h3>Highlighted &amp; Noted In:</h3>
+            <aside class="reference" role="complementary">
+              <div class="wrapper-reference-content">
+                <h3 class="reference-title">Highlighted &amp; Noted In:</h3>
                 <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
-                <h3>Added:</h3>
-                September 24, 2014 at 10:01PM
+                <h3 class="reference-title">Added:</h3>
+                <span class="reference-date">September 24, 2014 at 10:01PM</span>
               </div>
             </aside>
-          </section>
+          </article>
 
-          <section class="note clearfix">
-            <div class="excerpt">
-              <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="excerpt-more-link">More</a></p>
+          <article class="note">
+            <div class="note-excerpt">
+              <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="note-excerpt-more-link">More</a></p>
               <ol class="note-comments">
                 <li>
                   <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                 </li>
               </ol>
             </div>
-            <aside class="references"  role="complementary">
-              <div>
-                <h3>Highlighted &amp; Noted In:</h3>
+            <aside class="reference"  role="complementary">
+              <div class="wrapper-reference-content">
+                <h3 class="reference-title">Highlighted &amp; Noted In:</h3>
                 <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
-                <h3>Last Edited:</h3>
-                September 24, 2014 at 10:01PM
+                <h3 class="reference-title">Last Edited:</h3>
+                <span class="reference-date">September 24, 2014 at 10:01PM</span>
               </div>
             </aside>
-          </section>
+          </article>
 
-          <section class="note clearfix">
-            <div class="excerpt">
-              <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="excerpt-more-link">More</a></p>
+          <article class="note">
+            <div class="note-excerpt">
+              <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="note-excerpt-more-link">More</a></p>
               <ol class="note-comments">
-                <li>
-                  <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </li>
-                <li>
-                  <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </li>
-              </ol>
-            </div>
-            <aside class="references"  role="complementary">
-              <div>
-                <h3>Highlighted &amp; Noted In:</h3>
-                <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
-                <h3>Last Edited:</h3>
-                September 24, 2014 at 10:01PM
-              </div>
-            </aside>
-          </section>
-
-          <section class="note clearfix">
-            <div class="excerpt">
-              <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="excerpt-more-link">More</a></p>
-              <ol class="note-comments">
-                <li>
-                  <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </li>
                 <li>
                   <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                 </li>
@@ -128,18 +103,43 @@
                 </li>
               </ol>
             </div>
-            <aside class="references"  role="complementary">
-              <div>
-                <h3>Highlighted &amp; Noted In:</h3>
+            <aside class="reference"  role="complementary">
+              <div class="wrapper-reference-content">
+                <h3 class="reference-title">Highlighted &amp; Noted In:</h3>
                 <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
-                <h3>Last Edited:</h3>
-                September 24, 2014 at 10:01PM
+                <h3 class="reference-title">Last Edited:</h3>
+                <span class="reference-date">September 24, 2014 at 10:01PM</span>
               </div>
             </aside>
-          </section>
+          </article>
+
+          <article class="note">
+            <div class="note-excerpt">
+              <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="note-excerpt-more-link">More</a></p>
+              <ol class="note-comments">
+                <li>
+                  <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </li>
+                <li>
+                  <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </li>
+                <li>
+                  <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </li>
+              </ol>
+            </div>
+            <aside class="reference"  role="complementary">
+              <div class="wrapper-reference-content">
+                <h3 class="reference-title">Highlighted &amp; Noted In:</h3>
+                <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
+                <h3 class="reference-title">Last Edited:</h3>
+                <span class="reference-date">September 24, 2014 at 10:01PM</span>
+              </div>
+            </aside>
+          </article>
 
         </section>
-        <section id="structure_panel" class="tab-panel" aria-labelledby="structure" role="tabpanel" aria-hidden="true">
+        <section id="structure-panel" class="tab-panel" aria-labelledby="view-course-structure" role="tabpanel" aria-hidden="true">
           <h2 class="sr">Course Structure</h2>
           <section class="note-group">
             <h3 class="group-lecture"><a href="">
@@ -147,35 +147,35 @@
               <span class="subtitle">The Queen Vs Dudley and Stephens (1884)</span>
             </a></h3>
 
-            <section class="note no-top-border clearfix">
-              <div class="excerpt">
-                <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="excerpt-more-link">More</a></p>
+            <section class="note no-top-border">
+              <div class="note-excerpt">
+                <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="note-excerpt-more-link">More</a></p>
               </div>
-              <aside class="references" role="complementary">
-                <div>
-                  <h3>Highlighted &amp; Noted In:</h3>
+              <aside class="reference" role="complementary">
+                <div class="wrapper-reference-content">
+                  <h3 class="reference-title">Highlighted &amp; Noted In:</h3>
                   <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
                   <h3>Added:</h3>
-                  September 24, 2014 at 10:01PM
+                  <span class="reference-date">September 24, 2014 at 10:01PM</span>
                 </div>
               </aside>
             </section>
 
-            <section class="note clearfix">
-              <div class="excerpt">
-                <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="excerpt-more-link">More</a></p>
+            <section class="note">
+              <div class="note-excerpt">
+                <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="note-excerpt-more-link">More</a></p>
                 <ol class="note-comments">
                   <li>
                     <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                   </li>
                 </ol>
               </div>
-              <aside class="references"  role="complementary">
-                <div>
-                  <h3>Highlighted &amp; Noted In:</h3>
+              <aside class="reference"  role="complementary">
+                <div class="wrapper-reference-content">
+                  <h3 class="reference-title">Highlighted &amp; Noted In:</h3>
                   <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
-                  <h3>Last Edited:</h3>
-                  September 24, 2014 at 10:01PM
+                  <h3 class="reference-title">Last Edited:</h3>
+                  <span class="reference-date">September 24, 2014 at 10:01PM</span>
                 </div>
               </aside>
             </section>
@@ -187,9 +187,9 @@
               <span class="subtitle">Subsection Name That's A Child of the Section Can Be Placed Here And Go On For Quite A While</span>
             </a></h3>
 
-            <section class="note clearfix">
-              <div class="excerpt">
-                <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="excerpt-more-link">More</a></p>
+            <section class="note">
+              <div class="note-excerpt">
+                <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="note-excerpt-more-link">More</a></p>
                 <ol class="note-comments">
                   <li>
                     <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
@@ -199,19 +199,19 @@
                   </li>
                 </ol>
               </div>
-              <aside class="references"  role="complementary">
-                <div>
-                  <h3>Highlighted &amp; Noted In:</h3>
+              <aside class="reference"  role="complementary">
+                <div class="wrapper-reference-content">
+                  <h3 class="reference-title">Highlighted &amp; Noted In:</h3>
                   <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
-                  <h3>Last Edited:</h3>
-                  September 24, 2014 at 10:01PM
+                  <h3 class="reference-title">Last Edited:</h3>
+                  <span class="reference-date">September 24, 2014 at 10:01PM</span>
                 </div>
               </aside>
             </section>
 
-            <section class="note clearfix">
-              <div class="excerpt">
-                <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="excerpt-more-link">More</a></p>
+            <section class="note">
+              <div class="note-excerpt">
+                <p>...Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris ... <a href="" class="note-excerpt-more-link">More</a></p>
                 <ol class="note-comments">
                   <li>
                     <p>Adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
@@ -224,12 +224,12 @@
                   </li>
                 </ol>
               </div>
-              <aside class="references"  role="complementary">
-                <div>
-                  <h3>Highlighted &amp; Noted In:</h3>
+              <aside class="reference"  role="complementary">
+                <div class="wrapper-reference-content">
+                  <h3 class="reference-title">Highlighted &amp; Noted In:</h3>
                   <a href="">Reading 1: The Queen vs. Dudley and Stephens (1884) (The Lifeboat Case)</a>
-                  <h3>Last Edited:</h3>
-                  September 24, 2014 at 10:01PM
+                  <h3 class="reference-title">Last Edited:</h3>
+                  <span class="reference-date">September 24, 2014 at 10:01PM</span>
                 </div>
               </aside>
             </section>
@@ -239,76 +239,4 @@
       </section>
     </section>
   </section>
-</div>
-
-<div class="wrapper wrapper-footer edx-footer-new">
-  <footer id="footer-global" class="footer-global" role="contentinfo">
-    <div class="footer-about">
-      <h2 class="sr footer-about-title">About edX</h2>
-      
-      <div class="footer-about-logo">
-        <img alt="edX logo" src="https://d37djvu3ytnwxt.cloudfront.net/static/images/header-logo.517a627deaad.png">
-      </div>
-      
-      <div class="footer-about-copy">
-        <p>EdX offers interactive online classes and MOOCs from the world best universities. Online courses from MITx, HarvardX, BerkeleyX, UTx and many other universities. Topics include biology, business, chemistry, computer science, economics, finance, electronics, engineering, food and nutrition, history, humanities, law, literature, math, medicine, music, philosophy, physics, science, statistics and more. EdX is a non-profit online initiative created by founding partners Harvard and MIT.</p>
-      </div>
-
-      <div class="footer-about-copyright">
-        <p>&copy; 2014 edX, some rights reserved.</p>
-      </div>
-
-      <div class="footer-about-links">
-        <a href="https://www.edx.org/edx-terms-service"><span class="copy">Terms of Service and Honor Code</span></a>
-        <a href="https://www.edx.org/edx-privacy-policy"><span class="copy">Privacy Policy</span> <span class="note">(Revised 4/16/2014)</span></a>
-      </div>
-    </div>
-
-    <nav class="footer-nav" role="navigation" aria-label="About Us">
-      <h2 class="footer-nav-title">About &amp; Company Info</h2>
-
-      <div class="footer-nav-links">
-        <a href="https://www.edx.org/about-us"><span class="copy">About</span></a>
-        <a href="https://www.edx.org/news"><span class="copy">News</span></a>
-        <a href="https://www.edx.org/contact"><span class="copy">Contact</span></a>
-      </div>
-
-      <div class="footer-nav-links">
-        <a href="https://www.edx.org/student-faq"><span class="copy">FAQ</span></a>
-        <a href="https://www.edx.org/edx-blog"><span class="copy">edX Blog</span></a>
-      </div>
-
-      <div class="footer-nav-links">
-        <a href="https://www.edx.org/donate" class="has-emphasis"><span class="copy">Donate to edX</span></a>
-        <a href="https://www.edx.org/jobs" class="has-emphasis"><span class="copy">Jobs at edX</span></a>
-      </div>
-    </nav>
-
-    <div class="footer-follow">
-      <h2 class="footer-follow-title">Follow Us</h2>
-
-      <div class="footer-follow-links">
-        <a href="https://twitter.com/edXOnline" title="Twitter">
-          <i class="icon icon-twitter element-invisible"></i>
-          <span class="copy">Twitter</span>
-        </a>
-        <a href="http://www.facebook.com/EdxOnline" title="Facebook">
-          <i class="icon icon-facebook-sign element-invisible"></i>
-          <span class="copy">Facebook</span>
-        </a>
-        <a href="http://www.meetup.com/edX-Global-Community" title="Meetup">
-          <i class="icon icon-calendar element-invisible"></i>
-          <span class="copy">Meetup</span>
-        </a>
-        <a href="http://www.linkedin.com/company/edx" title="LinkedIn">
-          <i class="icon icon-linkedin-sign element-invisible"></i>
-          <span class="copy">LinkedIn</span>
-        </a>
-        <a href="https://plus.google.com/+edXOnline" title="Google+">
-          <i class="icon icon-google-plus-sign element-invisible"></i>
-          <span class="copy">Google+</span>
-        </a>
-      </div>
-    </div>
-  </footer>
 </div>
