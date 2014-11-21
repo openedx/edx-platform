@@ -9,66 +9,78 @@
 
 // --------------------
 
-// xmodule editor tab font-weight override
-.xblock-tabbed-editor .editor-with-tabs .editor-tabs .inner_tab_wrap a.tab {
-  font-weight: normal !important;
+.modal-lg.modal-editor .edit-xblock-modal .modal-content {
+  height: 417px;
 }
 
-.xblock-tabbed-editor .is-hidden {
-  display: none;
-}
+.xblock-tabbed-editor {
+  .action-item {
+    display: inline-block;
+  }
 
-.xblock-tabbed-editor .action-item {
-  display: inline-block;
-}
+  .is-hidden {
+    display: none;
+  }
 
-.xblock-tabbed-editor .editor-with-tabs {
-
-  .edit-header {
-    border: 0;
-    background-color: $gray-l4;
-    padding: ($baseline/2);
-
-    .component-name {
-      @extend %t-title5;
-      @extend %t-strong;
-      display: inline-block;
-      vertical-align: middle;
-      width: 48%;
-      margin-left: ($baseline/2);
-      color: $black;
-
-      em {
-        color: inherit;
-        display: inline;
-      }
+  .editor-with-tabs {
+    .editor-tabs .inner_tab_wrap a.tab {
+      font-weight: normal !important;
     }
 
-    .editor-tabs {
-      display: inline-block;
-      width: 48%;
-      position: relative;
-      top: auto;
-      right: auto;
-      padding: 0;
-      text-align: right;
+    .component-tab {
+      height: 365px;
+    }
 
-      .inner_tab_wrap {
+    .edit-header {
+      border: 0;
+      background-color: $gray-l4;
+      padding: ($baseline/2);
+
+      .component-name {
+        @extend %t-title5;
+        @extend %t-strong;
+        display: inline-block;
+        vertical-align: middle;
+        width: 48%;
+        margin-left: ($baseline/2);
+        color: $black;
+
+        em {
+          color: inherit;
+          display: inline;
+        }
+      }
+
+      .editor-tabs {
+        display: inline-block;
+        width: 48%;
+        position: relative;
+        top: auto;
+        right: auto;
         padding: 0;
+        text-align: right;
 
-        a.tab {
-          @extend %btn-secondary-gray;
-          @extend %t-copy-sub1;
-          @extend %t-regular;
-          background-image: none;
-          box-shadow: none;
-          border: 0;
-          padding: ($baseline/4) ($baseline/2);
-          text-transform: uppercase;
+        .settings-list {
+          max-height: 365px;
+        }
 
-          &.current, &.is-set {
-            background-color: $gray-d1;
-            color: $white;
+        .inner_tab_wrap {
+          padding: 0;
+
+          a.tab {
+            @extend %btn-secondary-gray;
+            @extend %t-copy-sub1;
+            @extend %t-regular;
+            background-image: none;
+            box-shadow: none;
+            border: 0;
+            padding: ($baseline/4) ($baseline/2);
+            text-transform: uppercase;
+
+            &.current, &.is-set {
+              background-color: $gray-d1;
+              color: $white;
+            }
           }
         }
       }
@@ -76,7 +88,6 @@
   }
 
   .tabs-wrapper {
-    height: ($baseline*24);
     overflow-y: scroll;
     border: 1px solid $gray-l2;
 
