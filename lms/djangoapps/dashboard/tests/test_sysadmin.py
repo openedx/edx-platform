@@ -115,13 +115,6 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
         os.mkdir(path)
         self.addCleanup(shutil.rmtree, path)
 
-    def _get_streaming_content(self, response):
-        content = ""
-
-        for line in response.streaming_content:
-            content += line
-
-        return content
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
@@ -255,8 +248,7 @@ class TestSysadmin(SysadminBaseTestCase):
         self.assertIn('attachment', response['Content-Disposition'])
         self.assertEqual('text/csv', response['Content-Type'])
 
-        content = self._get_streaming_content(response)
-        self.assertIn('test_user', content)
+        self.assertIn('test_user', ''.join(content))
         self.assertTrue(num_test_users + 2, len(content.splitlines()))
 
         # Clean up
@@ -401,7 +393,7 @@ class TestSysadmin(SysadminBaseTestCase):
                    'email', 'full_name', ]
 
         self.assertIn(','.join('"' + c + '"' for c in columns),
-                      self._get_streaming_content(response))
+                      ''.join(response))
 
         self._rm_edx4edx()
 
