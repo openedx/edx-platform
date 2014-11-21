@@ -70,7 +70,6 @@ class AuthoringMixin(MetadataEditingMixin, XBlockMixin):
         xml = etree.tostring(root, pretty_print=True)
         frag = Fragment(XML_EDITOR_HTML.format(xml=xml))
         frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/authoring.js"))
-        frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/server.js"))
         frag.initialize_js('XBlockXMLEditor')
         return frag
 

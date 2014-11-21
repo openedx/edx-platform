@@ -13,13 +13,11 @@ The constructor initializes the DOM for editing.
 Args:
     runtime (Runtime): an XBlock runtime instance.
     element (DOM element): The DOM element representing this XBlock.
-    server (XBlockAuthoring.Server): The interface to the XBlock server.
 Returns:
     XBlockAuthoring.StudioView
 **/
-XBlockAuthoring.StudioView = function(runtime, element, server) {
+XBlockAuthoring.StudioView = function(runtime, element) {
     this.runtime = runtime;
-    this.server = server;
 
     // Initialize the code box
     this.codeBox = CodeMirror.fromTextArea(
@@ -44,8 +42,7 @@ function XBlockXMLEditor(runtime, element) {
     /**
     Initialize the editing interface on page load.
     **/
-    var server = new XBlockAuthoring.Server(runtime, element);
-    return new XBlockAuthoring.StudioView(runtime, element, server);
+    return new XBlockAuthoring.StudioView(runtime, element);
 }
 
 function SettingsTabViewInit(runtime, element) {
