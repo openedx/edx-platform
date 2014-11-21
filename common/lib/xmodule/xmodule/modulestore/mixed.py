@@ -262,9 +262,9 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
     @strip_key
     def get_libraries(self, **kwargs):
-        '''
+        """
         Returns a list containing the top level XModuleDescriptors of the libraries in this modulestore.
-        '''
+        """
         libraries = {}
         for store in self.modulestores:
             if not hasattr(store, 'get_libraries'):

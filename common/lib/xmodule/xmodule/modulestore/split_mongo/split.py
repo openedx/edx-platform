@@ -797,7 +797,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
     @autoretry_read()
     def get_courses(self, branch, **kwargs):
-        '''
+        """
         Returns a list of course descriptors matching any given qualifiers.
 
         qualifiers should be a dict of keywords matching the db fields or any
@@ -807,7 +807,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         To get specific versions via guid use get_course.
 
         :param branch: the branch for which to return courses.
-        '''
+        """
         # get the blocks for each course index (s/b the root)
         result = []
         for entry, course_info in self._get_structures_for_branch(branch):
@@ -827,11 +827,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         return result
 
     def get_libraries(self, branch="library", **kwargs):
-        '''
+        """
         Returns a list of "library" root blocks matching any given qualifiers.
 
         TODO: better way of identifying library index entry vs. course index entry.
-        '''
+        """
         result = []
         for entry, course_info in self._get_structures_for_branch(branch):
             envelope = CourseEnvelope(
@@ -871,9 +871,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         return result[0]
 
     def get_library(self, library_id, depth=0, **kwargs):
-        '''
+        """
         Gets the 'library' root block for the library identified by the locator
-        '''
+        """
         if not isinstance(library_id, LibraryLocator):
             # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
             raise ItemNotFoundError(library_id)
