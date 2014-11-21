@@ -22,6 +22,7 @@ from xblock.django.request import webob_to_django_response, django_to_webob_requ
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 from xblock_django.user_service import DjangoXBlockUserService
+from xblock_django.course_service import DjangoXBlockCourseService
 
 from lms.lib.xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -149,6 +150,7 @@ def _preview_module_system(request, descriptor):
         services={
             "i18n": ModuleI18nService(),
             "user": DjangoXBlockUserService(request.user, course_id),
+            "course": DjangoXBlockCourseService(course_id)
         },
     )
 
