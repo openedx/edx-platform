@@ -1,6 +1,6 @@
 define(
-    ['backbone', 'underscore', 'underscore.string', 'js/utils/module', 'js/models/tab_info'],
-function(Backbone, _, str, ModuleUtils, TabInfo) {
+    ['backbone', 'underscore', 'underscore.string', 'js/utils/module'],
+function(Backbone, _, str, ModuleUtils) {
     'use strict';
     var XBlockInfo = Backbone.Model.extend({
 
@@ -120,15 +120,7 @@ function(Backbone, _, str, ModuleUtils, TabInfo) {
             /**
              * True iff this xblock should display a "Contains staff only content" message.
              */
-            'staff_only_message': null,
-            /**
-             * The tabs that the xblock has requested be shown in the editor.
-             */
-            'editor_tabs': null,
-            /**
-             * The tabs that the xblock has requested be shown in the editor.
-             */
-            'tab_info': null
+            'staff_only_message': null
         },
 
         initialize: function () {
