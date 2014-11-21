@@ -8,7 +8,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
-from django.utils import simplejson
 from django.utils.timezone import UTC
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
@@ -231,7 +230,7 @@ class JsonError(HttpResponse):
     def __init__(self, error_messages=[], status=400):
         if isinstance(error_messages, basestring):
             error_messages = [error_messages]
-        content = simplejson.dumps({'errors': error_messages},
+        content = json.dumps({'errors': error_messages},
                                    indent=2,
                                    ensure_ascii=False)
         super(JsonError, self).__init__(content,

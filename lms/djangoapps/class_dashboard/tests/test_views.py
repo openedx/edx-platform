@@ -1,17 +1,15 @@
 """
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
+import json
 from mock import patch
 from django.test.utils import override_settings
-
-from django.test import TestCase
 from django.test.client import RequestFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import AdminFactory
-from django.utils import simplejson
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+from student.tests.factories import AdminFactory
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from class_dashboard import views
 
 
@@ -36,7 +34,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.all_problem_grade_distribution(self.request, 'test/test/test')
 
-        self.assertEqual(simplejson.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content)
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_problem_grade_distribution_no_access(self, has_access):
@@ -56,7 +54,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.all_sequential_open_distrib(self.request, 'test/test/test')
 
-        self.assertEqual(simplejson.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content)
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_all_sequential_open_distribution_no_access(self, has_access):
@@ -76,7 +74,7 @@ class TestViews(ModuleStoreTestCase):
         has_access.return_value = True
         response = views.section_problem_grade_distrib(self.request, 'test/test/test', '1')
 
-        self.assertEqual(simplejson.dumps(self.simple_data), response.content)
+        self.assertEqual(json.dumps(self.simple_data), response.content)
 
     @patch('class_dashboard.views.has_instructor_access_for_class')
     def test_section_problem_grade_distribution_no_access(self, has_access):
