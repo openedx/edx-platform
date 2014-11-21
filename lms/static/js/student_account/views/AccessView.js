@@ -40,7 +40,6 @@ define([
             activeForm: '',
 
             initialize: function( obj ) {
-                debugger;
                 /* Mix non-conflicting functions from underscore.string
                  * (all but include, contains, and reverse) into the
                  * Underscore namespace

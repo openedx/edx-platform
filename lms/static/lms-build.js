@@ -98,7 +98,7 @@
          * mode to minify the code. Only available if REQUIRE_ENVIRONMENT is "rhino" (the default).
          * - "none": No minification will be done.
          */
-        optimize: 'none',
+        optimize: 'uglify2',
 
         /**
          * Sets the logging level. It is a number:
