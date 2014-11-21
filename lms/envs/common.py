@@ -1440,7 +1440,7 @@ INSTALLED_APPS = (
 
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
-    'django_notify',
+    'django_nyt',
     'course_wiki',  # Our customizations
     'mptt',
     'sekizai',
