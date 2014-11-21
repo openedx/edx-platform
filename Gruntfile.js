@@ -295,9 +295,13 @@ module.exports = function (grunt) {
         'concat:lms'
     ]);
 
+    grunt.registerTask('lms:watch', [
+        'watch:sass_lms'
+    ]);
+
     grunt.registerTask('lms:dev', [
         'lms',
-        'watch:sass_lms'
+        'lms:watch'
     ]);
 
     grunt.registerTask('lms:dist', [
@@ -313,9 +317,13 @@ module.exports = function (grunt) {
         'concat:studio'
     ]);
 
+    grunt.registerTask('studio:watch', [
+        'watch:sass_studio'
+    ]);
+
     grunt.registerTask('studio:dev', [
         'studio',
-        'watch:sass_studio'
+        'studio:watch'
     ]);
 
     grunt.registerTask('studio:dist', [
