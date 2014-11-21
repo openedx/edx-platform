@@ -86,7 +86,7 @@ class CourseActionUIState(CourseActionState):
     # FIELDS
 
     # Whether or not the status should be displayed to users
-    should_display = models.BooleanField()
+    should_display = models.BooleanField(default=False)
 
     # Message related to the status
     message = models.CharField(max_length=1000)
