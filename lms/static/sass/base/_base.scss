@@ -315,6 +315,11 @@ mark {
   display: none;
 }
 
+// UI - is deprecated
+.is-deprecated {
+  @extend %ui-deprecated;
+}
+
 // UI - semantically hide text
 .sr {
   @extend %text-sr;
