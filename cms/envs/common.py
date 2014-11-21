@@ -229,7 +229,6 @@ MIDDLEWARE_CLASSES = (
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware',
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
 
