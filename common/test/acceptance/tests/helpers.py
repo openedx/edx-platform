@@ -184,6 +184,15 @@ def select_ddl_by_value(browser_query, value):
     select.select_by_value(value)
 
 
+def is_ddl_value_selected(browser_query, value):
+    """
+    return true if given value is selected in ddl, else return false.
+    """
+    select = Select(browser_query.first.results[0])
+    ddl_selected_value = select.first_selected_option.get_attribute('value')
+    return ddl_selected_value == value
+
+
 class UniqueCourseTest(WebAppTest):
     """
     Test that provides a unique course ID.

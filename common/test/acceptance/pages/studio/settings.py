@@ -28,3 +28,9 @@ class SettingsPage(CoursePage):
         Clicks save button.
         """
         press_the_notification_button(self, "save")
+
+    def refresh_page(self):
+        """
+        Reload the page.
+        """
+        self.browser.refresh()
