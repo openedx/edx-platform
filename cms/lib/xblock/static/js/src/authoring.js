@@ -76,7 +76,7 @@ SettingsTabView.collectFieldData = function collectFieldData(element) {
     var data = {};
     items.each(function (index, item) {
         var $item = $(item);
-        var label = $($item.find('label')[0]).text();
+        var label = $($item.find('label')[0]).data('key');
         var input = $($item.find('input')[0]).val();
         data[label] = input;
     });

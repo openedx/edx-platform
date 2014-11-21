@@ -43,8 +43,9 @@ class AuthoringMixin(XBlockMixin):
                 <label
                     class="label setting-label"
                     for="{input_id}"
+                    data-key="{key}"
                 >
-                    {key}
+                    {key_display}
                 </label>
                 <input
                     class="input setting-input"
@@ -75,7 +76,8 @@ class AuthoringMixin(XBlockMixin):
                     ),
                     input_value=value,
                     help_text=self.fields[key].help,
-                    key=key_display,
+                    key_display=key_display,
+                    key=key,
                 )
                 html_kvp[key_display] = li
         keys = sorted(html_kvp.keys())
