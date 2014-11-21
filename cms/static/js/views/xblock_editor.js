@@ -80,8 +80,15 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
             },
 
             saveEditorTabs: function () {
-                var elements = this.xblockElements;
-                // this.xblockElements[1].collectedFieldData(this.xblockElements[1].element)
+                var payload = {};
+                _.each(this.xblockElements, function(element) {
+                    if (element.collectFieldData) {
+                        payload["tab id..."] = {"fields": element.collectFieldData(element.element)};
+                    }
+                });
+
+                var handler_url = this.xblock.runtime.handlerUrl(this.xblock.element, "save_tab_data");
+                $.post(handler_url, JSON.stringify(payload)); //.success()
 
             },
 

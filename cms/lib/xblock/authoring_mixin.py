@@ -160,8 +160,9 @@ class AuthoringMixin(XBlockMixin):
     def save_tab_data(self, data, suffix=''):
 
         # TODO: try/catch in appropriate place
-        for tab in self.editor_tabs:
-            tab_data = data[tab[id]]
+        # for tab in self.editor_tabs:
+        for tab in data:
+            tab_data = data[tab]
             if 'fields' in tab_data:
                 for key, value in tab_data["fields"]:
                     if key in self.fields:
