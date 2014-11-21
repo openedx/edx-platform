@@ -68,21 +68,21 @@ def export_to_git(course_id, repo, user='', rdir=None):
     # pylint: disable=R0915
 
     if not GIT_REPO_EXPORT_DIR:
-        raise GitExportError(GitExportError.NO_EXPORT_DIR)
+        raise GitExportError(unicode(GitExportError.NO_EXPORT_DIR))
 
     if not os.path.isdir(GIT_REPO_EXPORT_DIR):
-        raise GitExportError(GitExportError.NO_EXPORT_DIR)
+        raise GitExportError(unicode(GitExportError.NO_EXPORT_DIR))
 
     # Check for valid writable git url
     if not (repo.endswith('.git') or
             repo.startswith(('http:', 'https:', 'file:'))):
-        raise GitExportError(GitExportError.URL_BAD)
+        raise GitExportError(unicode(GitExportError.URL_BAD))
 
     # Check for username and password if using http[s]
     if repo.startswith('http:') or repo.startswith('https:'):
         parsed = urlparse(repo)
         if parsed.username is None or parsed.password is None:
-            raise GitExportError(GitExportError.URL_NO_AUTH)
+            raise GitExportError(unicode(GitExportError.URL_NO_AUTH))
     if rdir:
         rdir = os.path.basename(rdir)
     else:
@@ -104,7 +104,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             branch = cmd_log(cmd, cwd).strip('\n')
         except subprocess.CalledProcessError as ex:
             log.exception('Failed to get branch: %r', ex.output)
-            raise GitExportError(GitExportError.DETACHED_HEAD)
+            raise GitExportError(unicode(GitExportError.DETACHED_HEAD))
 
         cmds = [
             ['git', 'remote', 'set-url', 'origin', repo],
@@ -123,7 +123,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             cmd_log(cmd, cwd)
         except subprocess.CalledProcessError as ex:
             log.exception('Failed to pull git repository: %r', ex.output)
-            raise GitExportError(GitExportError.CANNOT_PULL)
+            raise GitExportError(unicode(GitExportError.CANNOT_PULL))
 
     # export course as xml before commiting and pushing
     root_dir = os.path.dirname(rdirp)
@@ -133,7 +133,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
                       root_dir, course_dir)
     except (EnvironmentError, AttributeError):
         log.exception('Failed export to xml')
-        raise GitExportError(GitExportError.XML_EXPORT_FAIL)
+        raise GitExportError(unicode(GitExportError.XML_EXPORT_FAIL))
 
     # Get current branch if not already set
     if not branch:
@@ -143,7 +143,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
         except subprocess.CalledProcessError as ex:
             log.exception('Failed to get branch from freshly cloned repo: %r',
                           ex.output)
-            raise GitExportError(GitExportError.MISSING_BRANCH)
+            raise GitExportError(unicode(GitExportError.MISSING_BRANCH))
 
     # Now that we have fresh xml exported, set identity, add
     # everything to git, commit, and push to the right branch.
@@ -163,15 +163,15 @@ def export_to_git(course_id, repo, user='', rdir=None):
         cmd_log(['git', 'config', 'user.name', ident['name']], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception('Error running git configure commands: %r', ex.output)
-        raise GitExportError(GitExportError.CONFIG_ERROR)
+        raise GitExportError(unicode((GitExportError.CONFIG_ERROR)))
     try:
         cmd_log(['git', 'add', '.'], cwd)
         cmd_log(['git', 'commit', '-a', '-m', commit_msg], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception('Unable to commit changes: %r', ex.output)
-        raise GitExportError(GitExportError.CANNOT_COMMIT)
+        raise GitExportError(unicode(GitExportError.CANNOT_COMMIT))
     try:
         cmd_log(['git', 'push', '-q', 'origin', branch], cwd)
     except subprocess.CalledProcessError as ex:
         log.exception('Error running git push command: %r', ex.output)
-        raise GitExportError(GitExportError.CANNOT_PUSH)
+        raise GitExportError(unicode(GitExportError.CANNOT_PUSH))
