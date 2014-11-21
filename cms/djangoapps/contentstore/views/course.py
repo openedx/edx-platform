@@ -74,6 +74,11 @@ from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
 from xmodule.split_test_module import get_split_user_partitions
 
+from util.milestones_helpers import (
+    set_prerequisite_courses,
+    is_valid_course_key
+)
+
 MINIMUM_GROUP_ID = 100
 
 # Note: the following content group configuration strings are not
@@ -368,36 +373,9 @@ def _accessible_libraries_list(user):
 def course_listing(request):
     """
     List all courses available to the logged in user
-    Try to get all courses by first reversing django groups and fallback to old method if it fails
-    Note: overhead of pymongo reads will increase if getting courses from django groups fails
     """
-    if GlobalStaff().has_user(request.user):
-        # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_list(request)
-    else:
-        try:
-            courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
-        except AccessListFallback:
-            # user have some old groups or there was some error getting courses from django groups
-            # so fallback to iterating through all courses
-            courses, in_process_course_actions = _accessible_courses_list(request)
-
+    courses, in_process_course_actions = get_courses_accessible_to_user(request)
     libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
-
-    def format_course_for_view(course):
-        """
-        Return a dict of the data which the view requires for each course
-        """
-        return {
-            'display_name': course.display_name,
-            'course_key': unicode(course.location.course_key),
-            'url': reverse_course_url('course_handler', course.id),
-            'lms_link': get_lms_link_for_item(course.location),
-            'rerun_link': _get_rerun_link_for_item(course.id),
-            'org': course.display_org_with_default,
-            'number': course.display_number_with_default,
-            'run': course.location.run
-        }
 
     def format_in_process_course_view(uca):
         """
@@ -433,14 +411,7 @@ def course_listing(request):
             'can_edit': has_studio_write_access(request.user, library.location.library_key),
         }
 
-    # remove any courses in courses that are also in the in_process_course_actions list
-    in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
-    courses = [
-        format_course_for_view(c)
-        for c in courses
-        if not isinstance(c, ErrorDescriptor) and (c.id not in in_process_action_course_keys)
-    ]
-
+    courses = _remove_in_process_courses(courses, in_process_course_actions)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
     return render_to_response('index.html', {
@@ -506,6 +477,53 @@ def course_index(request, course_key):
                 },
             ) if current_action else None,
         })
+
+
+def get_courses_accessible_to_user(request):
+    """
+    Try to get all courses by first reversing django groups and fallback to old method if it fails
+    Note: overhead of pymongo reads will increase if getting courses from django groups fails
+    """
+    if GlobalStaff().has_user(request.user):
+        # user has global access so no need to get courses from django groups
+        courses, in_process_course_actions = _accessible_courses_list(request)
+    else:
+        try:
+            courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
+        except AccessListFallback:
+            # user have some old groups or there was some error getting courses from django groups
+            # so fallback to iterating through all courses
+            courses, in_process_course_actions = _accessible_courses_list(request)
+    return courses, in_process_course_actions
+
+
+def _remove_in_process_courses(courses, in_process_course_actions):
+    """
+    removes any in-process courses in courses list. in-process actually refers to courses
+    that are in the process of being generated for re-run
+    """
+    def format_course_for_view(course):
+        """
+        Return a dict of the data which the view requires for each course
+        """
+        return {
+            'display_name': course.display_name,
+            'course_key': unicode(course.location.course_key),
+            'url': reverse_course_url('course_handler', course.id),
+            'lms_link': get_lms_link_for_item(course.location),
+            'rerun_link': _get_rerun_link_for_item(course.id),
+            'org': course.display_org_with_default,
+            'number': course.display_number_with_default,
+            'run': course.location.run
+        }
+
+    in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
+    courses = [
+        format_course_for_view(c)
+        for c in courses
+        if not isinstance(c, ErrorDescriptor) and (c.id not in in_process_action_course_keys)
+    ]
+    return courses
 
 
 def course_outline_initial_state(locator_to_show, course_structure):
@@ -783,6 +801,7 @@ def settings_handler(request, course_key_string):
         json: update the Course and About xblocks through the CourseDetails model
     """
     course_key = CourseKey.from_string(course_key_string)
+    prerequisite_course_enabled = settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -797,8 +816,7 @@ def settings_handler(request, course_key_string):
             )
 
             short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
-
-            return render_to_response('settings.html', {
+            settings_context = {
                 'context_course': course_module,
                 'course_locator': course_key,
                 'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
@@ -807,15 +825,31 @@ def settings_handler(request, course_key_string):
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
                 'upload_asset_url': upload_asset_url
-            })
+            }
+            if prerequisite_course_enabled:
+                courses, in_process_course_actions = get_courses_accessible_to_user(request)
+                # exclude current course from the list of available courses
+                courses = [course for course in courses if course.id != course_key]
+                if courses:
+                    courses = _remove_in_process_courses(courses, in_process_course_actions)
+                settings_context.update({'possible_pre_requisite_courses': courses})
+
+            return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
+                course_details = CourseDetails.fetch(course_key)
                 return JsonResponse(
-                    CourseDetails.fetch(course_key),
+                    course_details,
                     # encoder serializes dates, old locations, and instances
                     encoder=CourseSettingsEncoder
                 )
             else:  # post or put, doesn't matter.
+                # if pre-requisite course feature is enabled set pre-requisite course
+                if prerequisite_course_enabled:
+                    prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
+                    if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
+                        return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
+                    set_prerequisite_courses(course_key, prerequisite_course_keys)
                 return JsonResponse(
                     CourseDetails.update_from_json(course_key, request.json, request.user),
                     encoder=CourseSettingsEncoder

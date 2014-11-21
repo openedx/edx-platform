@@ -89,7 +89,9 @@ import dogstats_wrapper as dog_stats_api
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
-
+from util.milestones_helpers import (
+    get_pre_requisite_courses_not_completed,
+)
 from microsite_configuration import microsite
 
 from util.password_policy_validators import (
@@ -540,8 +542,11 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
-                                          if has_access(request.user, 'load', course))
+    show_courseware_links_for = frozenset(
+        course.id for course, _enrollment in course_enrollment_pairs
+        if has_access(request.user, 'load', course)
+        and has_access(request.user, 'view_courseware_with_prerequisites', course)
+    )
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -652,6 +657,11 @@ def dashboard(request):
     # Populate the Order History for the side-bar.
     order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
 
+    # get list of courses having pre-requisites yet to be completed
+    courses_having_prerequisites = frozenset(course.id for course, _enrollment in course_enrollment_pairs
+                                             if course.pre_requisite_courses)
+    courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
+
     context = {
         'enrollment_message': enrollment_message,
         'course_enrollment_pairs': course_enrollment_pairs,
@@ -681,7 +691,8 @@ def dashboard(request):
         'platform_name': settings.PLATFORM_NAME,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
-        'order_history_list': order_history_list
+        'order_history_list': order_history_list,
+        'courses_requirements_not_met': courses_requirements_not_met,
     }
 
     if third_party_auth.is_enabled():

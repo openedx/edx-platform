@@ -1,4 +1,4 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status" />
+<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements" />
 
 <%!
 from django.utils.translation import ugettext as _
@@ -324,6 +324,19 @@ from student.helpers import (
 
 
   </section>
+  % if course_requirements:
+  ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
+  <% prc_target = reverse('about_course', args=[unicode(course_requirements['courses'][0]['key'])]) %>
+  <section class="prerequisites">
+    <p class="tip">
+      ${_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.").format(
+          link_start='<a href="{}">'.format(prc_target),
+          link_end='</a>',
+          prc_display=course_requirements['courses'][0]['display'],
+        )}
+    </p>
+  </section>
+  % endif
 </article>
 </article>
 </li>
