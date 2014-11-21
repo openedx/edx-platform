@@ -151,15 +151,3 @@ def xblock_primary_child_category(xblock):
     elif category == 'sequential':
         return 'vertical'
     return None
-
-
-def get_editor_tabs(xblock):
-    """
-    Returns None if xblock should display the legacy (XModuleDescriptor) editor.
-    """
-    if hasattr(xblock, "descriptor") or hasattr(xblock, "studio_view"):
-        editor_tabs = None
-    else:
-        editor_tabs = xblock.editor_tabs
-    return editor_tabs
-

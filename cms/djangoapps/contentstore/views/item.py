@@ -41,7 +41,7 @@ from .access import has_course_access
 from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
     ancestor_has_staff_lock
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
-    xblock_type_display_name, get_parent_xblock, get_editor_tabs
+    xblock_type_display_name, get_parent_xblock
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -150,27 +150,16 @@ def xblock_handler(request, usage_key_string):
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
-            publish=request.json.get('publish')
-            xblock = _get_xblock(usage_key, request.user)
-            if not publish and get_editor_tabs(xblock):
-                xblock.save_editor()
-                result = {
-                    'id': unicode(xblock.location),
-                }
-
-                # Note that children aren't being returned until we have a use case.
-                return JsonResponse(result, encoder=EdxJSONEncoder)
-            else:
-                return _save_xblock(
-                    request.user,
-                    _get_xblock(usage_key, request.user),
-                    data=request.json.get('data'),
-                    children_strings=request.json.get('children'),
-                    metadata=request.json.get('metadata'),
-                    nullout=request.json.get('nullout'),
-                    grader_type=request.json.get('graderType'),
-                    publish=publish,
-                )
+            return _save_xblock(
+                request.user,
+                _get_xblock(usage_key, request.user),
+                data=request.json.get('data'),
+                children_strings=request.json.get('children'),
+                metadata=request.json.get('metadata'),
+                nullout=request.json.get('nullout'),
+                grader_type=request.json.get('graderType'),
+                publish=request.json.get('publish'),
+            )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
             parent_usage_key = usage_key_with_run(request.json['parent_locator'])
@@ -749,8 +738,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "due": xblock.fields['due'].to_json(xblock.due),
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
-        "has_changes": has_changes,
-        "use_legacy_editor": True
+        "has_changes": has_changes
     }
     if data is not None:
         xblock_info["data"] = data
