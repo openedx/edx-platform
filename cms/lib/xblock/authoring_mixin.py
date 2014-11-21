@@ -9,7 +9,14 @@ import pkg_resources
 
 from xblock.core import XBlock
 
-from xblock.fields import XBlockMixin, String
+from xblock.fields import String
+from xblock.fields import Scope
+from xblock.fields import Integer
+from xblock.fields import Float
+from xblock.fields import List
+from xblock.fields import Dict
+from xmodule.fields import RelativeTime
+from xblock.fields import XBlockMixin
 from xblock.fragment import Fragment
 from lxml import etree
 
@@ -18,10 +25,15 @@ logger = logging.getLogger(__name__)
 XML_EDITOR_HTML = u'<div id="xml-edit"><textarea class="xml-editor"></textarea></div>'
 
 
+@XBlock.needs("i18n")
 class AuthoringMixin(XBlockMixin):
     """
     TODO:
     """
+    _services_requested = {
+        "i18n": "need",
+    }
+
     @property
     def editor_tabs(self):
         return [
@@ -66,7 +78,7 @@ class AuthoringMixin(XBlockMixin):
         html_strings.append('<div class="wrapper-comp-settings is-active" id="settings-tab">')
         html_strings.append('<ul class="list-input settings-list">')
         html_kvp = {}
-        for key in self.fields:
+        for key in self.editable_metadata_fields:
             if key not in DEFAULT_FIELDS:
                 value = getattr(self, key)
                 key_display = self.fields[key].display_name or key
@@ -176,3 +188,74 @@ class AuthoringMixin(XBlockMixin):
 
         self.save()
         return {'success': True, 'msg': _('Successfully saved XBlock')}
+
+    @property
+    def editable_metadata_fields(self):
+        """
+        Returns the metadata fields to be edited in Studio. These are fields with scope `Scope.settings`.
+
+        Can be limited by extending `non_editable_metadata_fields`.
+        """
+        metadata_fields = {}
+
+        # Only use the fields from this class, not mixins
+        fields = getattr(self, 'unmixed_class', self.__class__).fields
+
+        for field in fields.values():
+            # if field.scope == Scope.settings and field in self.non_editable_metadata_fields:
+            if field.scope == Scope.settings:
+                metadata_fields[field.name] = self._create_metadata_editor_info(field)
+        return metadata_fields
+
+    def _create_metadata_editor_info(self, field):
+        """
+        Creates the information needed by the metadata editor for a specific field.
+        """
+        def jsonify_value(field, json_choice):
+            if isinstance(json_choice, dict):
+                json_choice = dict(json_choice)  # make a copy so below doesn't change the original
+                if 'display_name' in json_choice:
+                    json_choice['display_name'] = get_text(json_choice['display_name'])
+                if 'value' in json_choice:
+                    json_choice['value'] = field.to_json(json_choice['value'])
+            else:
+                json_choice = field.to_json(json_choice)
+            return json_choice
+
+        def get_text(value):
+            """Localize a text value that might be None."""
+            if value is None:
+                return None
+            else:
+                return self.runtime.service(self, "i18n").ugettext(value)
+
+        # gets the 'default_value' and 'explicitly_set' attrs
+        metadata_field_editor_info = self.runtime.get_field_provenance(self, field)
+        metadata_field_editor_info['field_name'] = field.name
+        metadata_field_editor_info['display_name'] = get_text(field.display_name)
+        metadata_field_editor_info['help'] = get_text(field.help)
+        metadata_field_editor_info['value'] = field.read_json(self)
+
+        # We support the following editors:
+        # 1. A select editor for fields with a list of possible values (includes Booleans).
+        # 2. Number editors for integers and floats.
+        # 3. A generic string editor for anything else (editing JSON representation of the value).
+        editor_type = "Generic"
+        values = field.values
+        if isinstance(values, (tuple, list)) and len(values) > 0:
+            editor_type = "Select"
+            values = [jsonify_value(field, json_choice) for json_choice in values]
+        elif isinstance(field, Integer):
+            editor_type = "Integer"
+        elif isinstance(field, Float):
+            editor_type = "Float"
+        elif isinstance(field, List):
+            editor_type = "List"
+        elif isinstance(field, Dict):
+            editor_type = "Dict"
+        elif isinstance(field, RelativeTime):
+            editor_type = "RelativeTime"
+        metadata_field_editor_info['type'] = editor_type
+        metadata_field_editor_info['options'] = [] if values is None else values
+
+        return metadata_field_editor_info
