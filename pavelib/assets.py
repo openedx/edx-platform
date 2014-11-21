@@ -19,12 +19,12 @@ COFFEE_DIRS = ['lms', 'cms', 'common']
 THEME_COFFEE_PATHS = []
 
 edxapp_env = Env()
-if edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False):
+theme_enabled = edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False)
+if theme_enabled:
     theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
     parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
     theme_root = parent_dir / "themes" / theme_name
     THEME_COFFEE_PATHS = [theme_root]
-
 
 class CoffeeScriptWatcher(PatternMatchingEventHandler):
     """
@@ -77,10 +77,15 @@ def compile_assets(systems, production):
     Compile all assets.
     """
     for sys in systems:
-        if production:
-            sh(cmd('grunt', sys + ':dist'))
-        else:
-            sh(cmd('grunt', sys))
+        command = [
+            'grunt',
+            sys + ':dist' if production else sys
+        ]
+
+        if theme_enabled:
+            command += [u'--theme={}'.format(theme_root)]
+
+        sh(cmd(*command))
 
 
 def compile_templated_sass(systems, settings):
@@ -123,12 +128,18 @@ def watch_assets(options):
     background = getattr(options, 'background', True)
 
     for system in systems:
-        command = cmd('grunt', system + ':watch')
+        command = [
+            'grunt',
+            system + ':watch'
+        ]
+
+        if theme_enabled:
+            command += [u'--theme={}'.format(theme_root)]
 
         if background:
-            run_background_process(command)
+            run_background_process(cmd(*command))
         else:
-            sh(command)
+            sh(cmd(*command))
 
 
 @task
