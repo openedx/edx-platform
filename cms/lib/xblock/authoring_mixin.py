@@ -9,7 +9,7 @@ import pkg_resources
 
 from xblock.core import XBlock
 
-from xblock.fields import XBlockMixin
+from xblock.fields import XBlockMixin, String
 from xblock.fragment import Fragment
 from lxml import etree
 
@@ -164,8 +164,8 @@ class AuthoringMixin(XBlockMixin):
         for tab in data:
             tab_data = data[tab]
             if 'fields' in tab_data:
-                for key, value in tab_data["fields"]:
-                    if key in self.fields:
+                for key, value in tab_data["fields"].iteritems():
+                    if key in self.fields and isinstance(self.fields[key], String):
                         setattr(self, key, value)
                     else:
                         logger.error(
