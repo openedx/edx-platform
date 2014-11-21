@@ -33,12 +33,18 @@ import json
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
 
-    <%static:css group='style-vendor'/>
-    <%static:css group='style-vendor-tinymce-content'/>
-    <%static:css group='style-vendor-tinymce-skin'/>
-    <%static:css group='style-app'/>
-    <%static:css group='style-app-extend1'/>
-    <%static:css group='style-xmodule'/>
+    <link rel="stylesheet" href="${static.url('css/cms-style-vendor.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${static.url('css/cms-style-vendor-tinymce-content.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${static.url('css/cms-style-vendor-tinymce-skin.css')}" type="text/css" media="all" />
+    %if dir_rtl == 'rtl':
+      <link rel="stylesheet" href="${static.url('css/cms-style-app-rtl.css')}" type="text/css" media="all" />
+      <link rel="stylesheet" href="${static.url('css/cms-style-app-extend1-rtl.css')}" type="text/css" media="all" />
+      <link rel="stylesheet" href="${static.url('css/cms-style-xmodule-rtl.css')}" type="text/css" media="all" />
+    %else:
+      <link rel="stylesheet" href="${static.url('css/cms-style-app.css')}" type="text/css" media="all" />
+      <link rel="stylesheet" href="${static.url('css/cms-style-app-extend1.css')}" type="text/css" media="all" />
+      <link rel="stylesheet" href="${static.url('css/cms-style-xmodule.css')}" type="text/css" media="all" />
+    %endif
 
     <%include file="widgets/segment-io.html" />
 

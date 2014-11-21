@@ -70,8 +70,8 @@ module.exports = function (grunt) {
                 src: [
                     // Sass-generated files
                     '<%= c.studio %>/sass/style-app.css',
-                    '<%= c.studio %>/sass/style-app-extend1.css',
                     '<%= c.studio %>/sass/style-app-rtl.css',
+                    '<%= c.studio %>/sass/style-app-extend1.css',
                     '<%= c.studio %>/sass/style-app-extend1-rtl.css',
                     '<%= c.studio %>/sass/style-xmodule.css',
                     '<%= c.studio %>/sass/style-xmodule-rtl.css',
@@ -81,8 +81,9 @@ module.exports = function (grunt) {
                     '<%= c.studio %>/css/cms-style-vendor-tinymce-content.css',
                     '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css',
                     '<%= c.studio %>/css/cms-style-app.css',
-                    '<%= c.studio %>/css/cms-style-app-extend1.css',
                     '<%= c.studio %>/css/cms-style-app-rtl.css',
+                    '<%= c.studio %>/css/cms-style-app-extend1.css',
+                    '<%= c.studio %>/css/cms-style-app-extend1-rtl.css',
                     '<%= c.studio %>/css/cms-style-xmodule.css',
                     '<%= c.studio %>/css/cms-style-xmodule-rtl.css',
                     '<%= c.studio %>/css/cms-style-xmodule-annotations.css'
@@ -124,12 +125,12 @@ module.exports = function (grunt) {
                     ]
                 },
                 files: {
-                    '<%= c.studio %>/sass/style-app-extend1-rtl.css': '<%= c.studio %>/sass/style-app-extend1-rtl.scss',
-                    '<%= c.studio %>/sass/style-app-extend1.css': '<%= c.studio %>/sass/style-app-extend1.scss',
-                    '<%= c.studio %>/sass/style-app-rtl.css': '<%= c.studio %>/sass/style-app-rtl.scss',
                     '<%= c.studio %>/sass/style-app.css': '<%= c.studio %>/sass/style-app.scss',
-                    '<%= c.studio %>/sass/style-xmodule-rtl.css': '<%= c.studio %>/sass/style-xmodule-rtl.scss',
-                    '<%= c.studio %>/sass/style-xmodule.css': '<%= c.studio %>/sass/style-xmodule.scss'
+                    '<%= c.studio %>/sass/style-app-rtl.css': '<%= c.studio %>/sass/style-app-rtl.scss',
+                    '<%= c.studio %>/sass/style-app-extend1.css': '<%= c.studio %>/sass/style-app-extend1.scss',
+                    '<%= c.studio %>/sass/style-app-extend1-rtl.css': '<%= c.studio %>/sass/style-app-extend1-rtl.scss',
+                    '<%= c.studio %>/sass/style-xmodule.css': '<%= c.studio %>/sass/style-xmodule.scss',
+                    '<%= c.studio %>/sass/style-xmodule-rtl.css': '<%= c.studio %>/sass/style-xmodule-rtl.scss'
                 }
             }
         },
@@ -221,11 +222,14 @@ module.exports = function (grunt) {
                     '<%= c.studio %>/css/cms-style-app.css': [
                         '<%= c.studio %>/sass/style-app.css'
                     ],
+                    '<%= c.studio %>/css/cms-style-app-rtl.css': [
+                        '<%= c.studio %>/sass/style-app-rtl.css'
+                    ],
                     '<%= c.studio %>/css/cms-style-app-extend1.css': [
                         '<%= c.studio %>/sass/style-app-extend1.css'
                     ],
-                    '<%= c.studio %>/css/cms-style-app-rtl.css': [
-                        '<%= c.studio %>/sass/style-app-rtl.css'
+                    '<%= c.studio %>/css/cms-style-app-extend1-rtl.css': [
+                        '<%= c.studio %>/sass/style-app-extend1-rtl.css'
                     ],
                     '<%= c.studio %>/css/cms-style-xmodule.css': [
                         '<%= c.studio %>/sass/style-xmodule.css'
@@ -273,8 +277,9 @@ module.exports = function (grunt) {
                     '<%= c.studio %>/css/cms-style-vendor-tinymce-content.css': '<%= c.studio %>/css/cms-style-vendor-tinymce-content.css',
                     '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css': '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css',
                     '<%= c.studio %>/css/cms-style-app.css': '<%= c.studio %>/css/cms-style-app.css',
-                    '<%= c.studio %>/css/cms-style-app-extend1.css': '<%= c.studio %>/css/cms-style-app-extend1.css',
                     '<%= c.studio %>/css/cms-style-app-rtl.css': '<%= c.studio %>/css/cms-style-app-rtl.css',
+                    '<%= c.studio %>/css/cms-style-app-extend1.css': '<%= c.studio %>/css/cms-style-app-extend1.css',
+                    '<%= c.studio %>/css/cms-style-app-extend1-rtl.css': '<%= c.studio %>/css/cms-style-app-extend1-rtl.css',
                     '<%= c.studio %>/css/cms-style-xmodule.css': '<%= c.studio %>/css/cms-style-xmodule.css',
                     '<%= c.studio %>/css/cms-style-xmodule-rtl.css': '<%= c.studio %>/css/cms-style-xmodule-rtl.css',
                     '<%= c.studio %>/css/cms-style-xmodule-annotations.css': '<%= c.studio %>/css/cms-style-xmodule-annotations.css'
