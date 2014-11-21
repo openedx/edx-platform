@@ -80,8 +80,8 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
             },
 
             saveEditorTabs: function () {
-                var elements = this.xblockElements();
-
+                var elements = this.xblockElements;
+                // this.xblockElements[1].collectedFieldData(this.xblockElements[1].element)
 
             },
 
