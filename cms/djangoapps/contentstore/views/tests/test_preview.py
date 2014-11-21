@@ -70,10 +70,12 @@ class PureXBlock(XBlock):
 @ddt.ddt
 class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
     """
-    Tests for the 'View in Studio' link visiblity.
+    Tests that the Studio Module System (XBlock Runtime) provides an expected set of services.
     """
     def setUp(self):
-        """ Set up the user and request that will be used. """
+        """
+        Set up the user and request that will be used.
+        """
         self.user = UserFactory()
         self.course = CourseFactory.create()
         self.request = Mock()
@@ -81,6 +83,9 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     @ddt.data("user", "i18n")
     def test_expected_services_exist(self, expected_service):
+        """
+        Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
+        """
         descriptor = ItemFactory(category="pure", parent=self.course)
         runtime = _preview_module_system(
             self.request,
