@@ -1,5 +1,8 @@
 'use strict';
 
+var fs = require('fs');
+var util = require('util');
+
 module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     require('time-grunt')(grunt);
@@ -8,8 +11,19 @@ module.exports = function (grunt) {
         bower: 'bower_components',
         lms: 'lms/static',
         studio: 'cms/static',
-        common: 'common/static'
+        common: 'common/static',
+        theme: grunt.option('theme')
     };
+
+    if (config.theme) {
+        if (fs.existsSync(config.theme)) {
+            grunt.log.writeln(util.format('Theme configured in: %s', config.theme));
+            config.theme += '/static';
+        }
+        else {
+            grunt.fail.warn(util.format('The theme directory (%s) does not exist', config.theme));
+        }
+    }
 
     grunt.initConfig({
         c: config,
@@ -18,7 +32,8 @@ module.exports = function (grunt) {
             'sass_lms': {
                 files: [
                     '<%= c.lms %>/sass/**/*.scss',
-                    '<%= c.common %>/sass/**/*.scss'
+                    '<%= c.common %>/sass/**/*.scss',
+                    '<%= c.theme %>/sass/**/*.scss'
                 ],
                 tasks: [
                     'sass:lms',
@@ -99,7 +114,8 @@ module.exports = function (grunt) {
                         '<%= c.bower %>/bi-app-sass',
                         // This is for xmodule sass files
                         '<%= c.common %>',
-                        '<%= c.common %>/sass'
+                        '<%= c.common %>/sass',
+                        '<%= c.theme %>/sass'
                     ]
                },
                 files: {
