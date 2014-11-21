@@ -36,8 +36,7 @@ class AuthoringMixin(MetadataEditingMixin, XBlockMixin):
     def editor_tabs(self):
         return [
             # TODO: internationalize
-           # {"display_name": "XML", "id": "xml"},
-          {"display_name": "Settings", "id": "settings"}
+            {"display_name": "Settings", "id": "settings"},
         ]
 
     def settings_tab_view(self, context=None):

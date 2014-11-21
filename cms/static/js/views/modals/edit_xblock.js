@@ -88,7 +88,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 // If the xblock is not using custom buttons then choose which buttons to show
                 if (!editorView.hasCustomButtons()) {
                     // If the xblock does not support save then disable the save button
-                   if (!this.usingTabbedEditor() && !editorView.xblock.save) {
+                   if (!this.usingTabbedEditor() && (editorView.xblock && !editorView.xblock.save)) {
                         this.disableSave();
                    }
                     this.getActionBar().show();
