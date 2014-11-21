@@ -376,29 +376,6 @@ def instructor_dashboard(request, course_id):
         return return_csv(course_key.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', datatable)
 
     #----------------------------------------
-    # Group management
-
-    elif 'List beta testers' in action:
-        role = CourseBetaTesterRole(course.id)
-        datatable = _role_members_table(role, _("List of Beta Testers"), course_key)
-        track.views.server_track(request, "list-beta-testers", {}, page="idashboard")
-
-    elif action == 'Add beta testers':
-        users = request.POST['betausers']
-        log.debug("users: {0!r}".format(users))
-        role = CourseBetaTesterRole(course.id)
-        for username_or_email in split_by_comma_and_whitespace(users):
-            msg += "<p>{0}</p>".format(
-                add_user_to_role(request, username_or_email, role, 'beta testers', 'beta-tester'))
-
-    elif action == 'Remove beta testers':
-        users = request.POST['betausers']
-        role = CourseBetaTesterRole(course.id)
-        for username_or_email in split_by_comma_and_whitespace(users):
-            msg += "<p>{0}</p>".format(
-                remove_user_from_role(request, username_or_email, role, 'beta testers', 'beta-tester'))
-
-    #----------------------------------------
     # enrollment
 
     elif action == 'List students who may enroll but may not have yet signed up':
