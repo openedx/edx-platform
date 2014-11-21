@@ -58,7 +58,9 @@
     })(this);
   </script>
 
-  <script type="text/javascript" src="/jsi18n/"></script>
+  % if not enable_require_js:
+  <script type="text/javascript" src="/i18n.js"></script>
+  % endif
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
