@@ -82,8 +82,12 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
             saveEditorTabs: function () {
                 var payload = {};
                 _.each(this.xblockElements, function(element) {
+                    var tab_id = element.element.parentElement.getAttribute('data-tab-id');
                     if (element.collectFieldData) {
-                        payload["tab id..."] = {"fields": element.collectFieldData()};
+                        payload[tab_id] = {"fields": element.collectFieldData()};
+                    }
+                    else if (element.collectXmlData) {
+                        payload[tab_id] = {"xml": element.collectXmlData()};
                     }
                 });
 
@@ -162,15 +166,14 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                         this.setTabViewActivation(metadataEditor.$el, !showEditor);
                     }
                 } else {
-                    this.$('.component-tab').removeClass('is-active');
-                    this.$('.component-tab').addClass('is-inactive is-hidden');
+                    this.setTabViewActivation(this.$('.tab-view-' + this.mode), false);
                     this.setTabViewActivation(this.$('.tab-view-' + mode), true);
                 }
                 this.mode = mode;
             },
 
             setTabViewActivation: function(editor, isActive) {
-                editor.removeClass('is-active is-inactive is-hidden');
+                editor.removeClass('is-active').removeClass('is-inactive').removeClass('is-hidden');
                 editor.addClass(isActive ? 'is-active' : 'is-inactive');
                 if (!isActive) {
                     editor.addClass('is-hidden');

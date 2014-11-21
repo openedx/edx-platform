@@ -120,7 +120,7 @@ class AuthoringMixin(XBlockMixin):
             xml (str): XML String representation used to update the XBlock's field.
         """
         root = safe_etree.fromstring(xml.encode('utf-8'))
-        for key in root.attrib.keys:
+        for key in root.attrib.keys():
             if key in self.fields:
                 setattr(self, key, root.attrib[key])
 

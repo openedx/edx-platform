@@ -13,7 +13,7 @@
         <div class="tabs-wrapper">
             <div class="xblock-editor" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
                 % for tab in tabs:
-                <div class="component-tab tab-view-${tab['id']} ${'is-hidden is-inactive' if not (tab['id'] == current_tab_id) else 'is-active'}">
+                <div data-tab-id="${tab['id']}" class="component-tab tab-view-${tab['id']} ${'is-hidden is-inactive' if not (tab['id'] == current_tab_id) else 'is-active'}">
                     ${tab['rendered_view']}
                 </div>
                 % endfor

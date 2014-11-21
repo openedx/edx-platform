@@ -49,8 +49,7 @@ XBlockAuthoring.StudioView.prototype = {
     Collect the XML configuration.
     **/
     collectXmlData: function() {
-        var xml = this.codeBox.getValue();
-        return {"xml": xml};
+        return this.codeBox.getValue();
     }
 };
 
