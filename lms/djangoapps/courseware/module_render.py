@@ -836,10 +836,26 @@ def _get_module_by_usage_id(request, course_id, usage_id):
         tracking_context['module']['original_usage_key'] = unicode(descriptor_orig_usage_key)
         tracking_context['module']['original_usage_version'] = unicode(descriptor_orig_version)
 
+    # Why make a zero-depth cache below? If it's full-depth, it raises an exception in the call
+    # below due to having a None module_runtime when constructing a PureSystem(), which causes
+    # a later AttributeError - here's the backtrace:
+    #
+    # File "/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/model_data.py", line 114, in cache_for_descriptor_descendents
+    #   descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
+    # File "/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/model_data.py", line 108, in get_child_descriptors
+    #   for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
+    # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 342, in get_children
+    #   child = runtime_for_child.get_block(child_loc)
+    # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 1405, in get_block
+    #   return self.get_module(self.descriptor_runtime.get_block(block_id))
+    # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 1444, in __getattr__
+    #   raise AttributeError
+
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
         user,
-        descriptor
+        descriptor,
+        depth=0
     )
     setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='ajax')
