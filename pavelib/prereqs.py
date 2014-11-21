@@ -116,7 +116,8 @@ def python_prereqs_installation():
     """
     for req_file in PYTHON_REQ_FILES:
         sh("pip install -q --exists-action w -r {req_file}".format(req_file=req_file))
-        sh("pip uninstall -q django-wiki")
+
+    sh("pip uninstall -q django-wiki", ignore_error=True)
 
 
 @task
