@@ -30,21 +30,6 @@ XBlockAuthoring.StudioView = function(runtime, element, server) {
 
 
 XBlockAuthoring.StudioView.prototype = {
-
-    /**
-    Load the XBlock XML definition from the server and display it in the view.
-    **/
-    load: function() {
-        var view = this;
-        this.server.loadXml().done(
-            function(xml) {
-                view.codeBox.setValue(xml);
-            }).fail(function(msg) {
-                view.showError(msg);
-            }
-        );
-    },
-
     /**
     Collect the XML configuration.
     **/
@@ -60,9 +45,7 @@ function XBlockXMLEditor(runtime, element) {
     Initialize the editing interface on page load.
     **/
     var server = new XBlockAuthoring.Server(runtime, element);
-    var view = new XBlockAuthoring.StudioView(runtime, element, server);
-    view.load();
-    return view;
+    return new XBlockAuthoring.StudioView(runtime, element, server);
 }
 
 function SettingsTabViewInit(runtime, element) {

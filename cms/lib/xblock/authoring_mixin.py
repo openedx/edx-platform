@@ -22,7 +22,7 @@ from lxml import etree
 
 logger = logging.getLogger(__name__)
 
-XML_EDITOR_HTML = u'<div id="xml-edit"><textarea class="xml-editor"></textarea></div>'
+XML_EDITOR_HTML = u'<div id="xml-edit"><textarea class="xml-editor">{xml}</textarea></div>'
 
 
 @XBlock.needs("i18n")
@@ -39,7 +39,7 @@ class AuthoringMixin(XBlockMixin):
         return [
             # TODO: internationalize
             {"display_name": "XML", "id": "xml"},
-            {"display_name": "Settings", "id": "settings"}
+            # {"display_name": "Settings", "id": "settings"}
         ]
 
     def settings_tab_view(self, context=None):
@@ -107,7 +107,10 @@ class AuthoringMixin(XBlockMixin):
         Returns:
             (Fragment): An HTML fragment for editing the configuration of this XBlock.
         """
-        frag = Fragment(XML_EDITOR_HTML)
+        root = etree.Element('root')
+        self.add_xml_to_node(root)
+        xml = etree.tostring(root, pretty_print=True)
+        frag = Fragment(XML_EDITOR_HTML.format(xml=xml))
         frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/authoring.js"))
         frag.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/server.js"))
         frag.initialize_js('XBlockXMLEditor')
@@ -123,21 +126,6 @@ class AuthoringMixin(XBlockMixin):
         for key in root.attrib.keys():
             if key in self.fields:
                 setattr(self, key, root.attrib[key])
-
-    @XBlock.json_handler
-    def xml(self, data, suffix=''):
-        """
-        Retrieve the XBlock's content definition, serialized as XML.
-        Args:
-            data (dict): Not used
-        Kwargs:
-            suffix (str): Not used
-        Returns:
-            dict with keys 'success' (bool), 'message' (unicode), and 'xml' (unicode)
-        """
-        root = etree.Element('root')
-        self.add_xml_to_node(root)
-        return {'success': True, 'msg': '', 'xml': etree.tostring(root, pretty_print=True)}
 
     def render_tabbed_editor(self, context):
         """
