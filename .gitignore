@@ -67,7 +67,6 @@ test_root/uploads/*.txt
 .vagrant/
 node_modules/
 bower_components/
-.bundle/
 bin/
 
 ### Static assets pipeline artifacts
