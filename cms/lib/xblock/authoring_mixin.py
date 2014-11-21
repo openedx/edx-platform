@@ -42,65 +42,22 @@ class AuthoringMixin(XBlockMixin):
     def editor_tabs(self):
         return [
             # TODO: internationalize
-            {"display_name": "XML", "id": "xml"},
-            {"display_name": "Settings", "id": "settings"}
+           # {"display_name": "XML", "id": "xml"},
+          {"display_name": "Settings", "id": "settings"}
         ]
 
     def settings_tab_view(self, context=None):
         """
         TODO:
         """
-        li_template = """
-        <li class="field comp-setting-entry is-set">
-            <div class="wrapper-comp-setting">
-                <label
-                    class="label setting-label"
-                    for="{input_id}"
-                    data-key="{key}"
-                >
-                    {key_display}
-                </label>
-                <input
-                    class="input setting-input"
-                    id="{input_id}"
-                    value="{input_value}"
-                    type="text"
-                    tabindex="1"
-                >
-            </div>
-            <span
-                class="tip setting-help"
-            >
-                {help_text}
-            </span>
-        </li>
-        """
-        html_strings = []
-        # TODO: do we need to worry about "| h "? For example, data-metadata='${json.dumps(metadata_field_copy, cls=EdxJSONEncoder) | h}'
-        data = json.dumps(self.editable_metadata_fields, cls=EdxJSONEncoder)
-        html_strings.append('<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata="' + data + '/>')
-        html_strings.append('<ul class="list-input settings-list">')
-        html_kvp = {}
-        for key in self.editable_metadata_fields:
-            value = getattr(self, key)
-            key_display = self.fields[key].display_name or key
-            li = li_template.format(
-                input_id='settings_tab_input__{key}'.format(
-                    key=key,
-                ),
-                input_value=value,
-                help_text=self.fields[key].help,
-                key_display=key_display,
-                key=key,
-            )
-            html_kvp[key_display] = li
-        keys = sorted(html_kvp.keys())
-        for key in keys:
-            html_strings.append(html_kvp[key])
-        html_strings.append('</ul>')
-        html_strings.append('</div>')
-        html_string = unicode('\n'.join(html_strings))
-        fragment = Fragment(html_string)
+        settings_template = Template("""
+        <%!
+        import json
+        from xmodule.modulestore import EdxJSONEncoder
+        %>
+        <div class="wrapper-comp-settings metadata_edit is-active" id="settings-tab" data-metadata='${json.dumps(metadata_fields, cls=EdxJSONEncoder) | h}'/>
+        """)
+        fragment = Fragment(settings_template.render(metadata_fields=self.editable_metadata_fields))
         fragment.add_javascript(pkg_resources.resource_string(__name__, "static/js/src/authoring.js"))
         fragment.initialize_js('SettingsTabViewInit')
         return fragment

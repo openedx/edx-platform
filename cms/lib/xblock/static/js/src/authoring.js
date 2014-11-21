@@ -52,38 +52,25 @@ function SettingsTabViewInit(runtime, element) {
     var view = new SettingsTabView(runtime, element);
     return view;
 }
+
 function SettingsTabView(runtime, element) {
     this.runtime = runtime;
     this.element = element;
-    debugger
-    require(["js/views/metadata", "js/collections/metadata"],
-        function (MetadataView, MetadataCollection) {
-            debugger
-            var metadataEditor = $(element).find('.metadata_edit');
-            var models = [];
-            var metadataData = metadataEditor.data('metadata');
-            for (var key in metadataData) {
-                if (metadataData.hasOwnProperty(key)) {
-                    models.push(metadataData[key]);
-                }
-            }
-            var metadataView = new MetadataView.Editor({
-                el: metadataEditor,
-                collection: new MetadataCollection(models)
-            });
-            metadataView.render();
+    var metadataEditor = $(element).find('.metadata_edit');
+    var models = [];
+    var metadataData = metadataEditor.data('metadata');
+    for (var key in metadataData) {
+        if (metadataData.hasOwnProperty(key)) {
+            models.push(metadataData[key]);
         }
-    );
+    }
+    this.metadataView = new window.MetadataView.Editor({
+        el: metadataEditor,
+        collection: new window.MetadataCollection(models)
+    });
+    this.metadataView.render();
 }
 SettingsTabView.prototype.collectFieldData = function collectFieldData() {
-    var $element = $(this.element);
-    var items = $element.find('.settings-list .wrapper-comp-setting');
-    var data = {};
-    items.each(function (index, item) {
-        var $item = $(item);
-        var label = $($item.find('label')[0]).data('key');
-        var input = $($item.find('input')[0]).val();
-        data[label] = input;
-    });
+    var data = this.metadataView.getModifiedMetadataValues();
     return data;
 };
