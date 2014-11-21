@@ -191,6 +191,8 @@ def i18n_robot_pull():
 
     if con.lower() == 'y':
         sh('git add conf/locale')
+        # Explicitly add dummy translations
+        sh('git add -f conf/locale/eo/')
 
         sh(
             'git commit --message="Update translations '
