@@ -37,6 +37,7 @@ class AuthoringMixin(XBlockMixin):
     @property
     def editor_tabs(self):
         return [
+            # TODO: internationalize
             {"display_name": "XML", "id": "xml"},
             {"display_name": "Settings", "id": "settings"}
         ]
@@ -45,10 +46,6 @@ class AuthoringMixin(XBlockMixin):
         """
         TODO:
         """
-        DEFAULT_FIELDS = [
-            'parent',
-            'tags',
-        ]
         li_template = """
         <li class="field comp-setting-entry is-set">
             <div class="wrapper-comp-setting">
@@ -79,19 +76,18 @@ class AuthoringMixin(XBlockMixin):
         html_strings.append('<ul class="list-input settings-list">')
         html_kvp = {}
         for key in self.editable_metadata_fields:
-            if key not in DEFAULT_FIELDS:
-                value = getattr(self, key)
-                key_display = self.fields[key].display_name or key
-                li = li_template.format(
-                    input_id='settings_tab_input__{key}'.format(
-                        key=key,
-                    ),
-                    input_value=value,
-                    help_text=self.fields[key].help,
-                    key_display=key_display,
+            value = getattr(self, key)
+            key_display = self.fields[key].display_name or key
+            li = li_template.format(
+                input_id='settings_tab_input__{key}'.format(
                     key=key,
-                )
-                html_kvp[key_display] = li
+                ),
+                input_value=value,
+                help_text=self.fields[key].help,
+                key_display=key_display,
+                key=key,
+            )
+            html_kvp[key_display] = li
         keys = sorted(html_kvp.keys())
         for key in keys:
             html_strings.append(html_kvp[key])
@@ -187,6 +183,7 @@ class AuthoringMixin(XBlockMixin):
                 self.update_from_xml(tab_data["xml"])
 
         self.save()
+        # TODO: return validation messages.
         return {'success': True, 'msg': _('Successfully saved XBlock')}
 
     @property
@@ -202,10 +199,19 @@ class AuthoringMixin(XBlockMixin):
         fields = getattr(self, 'unmixed_class', self.__class__).fields
 
         for field in fields.values():
-            # if field.scope == Scope.settings and field in self.non_editable_metadata_fields:
-            if field.scope == Scope.settings:
+            if field.scope == Scope.settings and field not in self.non_editable_metadata_fields:
                 metadata_fields[field.name] = self._create_metadata_editor_info(field)
         return metadata_fields
+
+    @property
+    def non_editable_metadata_fields(self):
+        """
+        Return the list of fields that should not be editable in Studio.
+
+        When overriding, be sure to append to the superclasses' list.
+        """
+        # We are not allowing editing of xblock tag and name fields at this time (for any component).
+        return [XBlock.tags, XBlock.name]
 
     def _create_metadata_editor_info(self, field):
         """
