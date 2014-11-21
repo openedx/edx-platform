@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TO
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
-def mixed_store_config(data_dir, mappings, include_xml=True):
+def mixed_store_config(data_dir, mappings, include_xml=False):
     """
     Return a `MixedModuleStore` configuration, which provides
     access to both Mongo- and XML-backed courses.
