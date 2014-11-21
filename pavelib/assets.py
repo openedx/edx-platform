@@ -3,20 +3,12 @@ Asset compilation and collection.
 """
 from __future__ import print_function
 import argparse
-from paver.easy import sh, path, task, cmdopts, needs, consume_args, call_task, no_help
-from watchdog.events import PatternMatchingEventHandler
-import glob
-import traceback
-import os
+from paver.easy import sh, path, task, cmdopts, needs, consume_args
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 from .utils.process import run_background_process
 
 # setup baseline paths
-
-COFFEE_DIRS = ['lms', 'cms', 'common']
-
-THEME_COFFEE_PATHS = []
 
 edxapp_env = Env()
 theme_enabled = edxapp_env.feature_flags.get('USE_CUSTOM_THEME', False)
@@ -24,52 +16,6 @@ if theme_enabled:
     theme_name = edxapp_env.env_tokens.get('THEME_NAME', '')
     parent_dir = path(edxapp_env.REPO_ROOT).abspath().parent
     theme_root = parent_dir / "themes" / theme_name
-    THEME_COFFEE_PATHS = [theme_root]
-
-class CoffeeScriptWatcher(PatternMatchingEventHandler):
-    """
-    Watches for coffeescript changes
-    """
-    ignore_directories = True
-    patterns = ['*.coffee']
-
-    def register(self, observer):
-        """
-        register files with observer
-        """
-        dirnames = set()
-        for filename in sh(coffeescript_files(), capture=True).splitlines():
-            dirnames.add(path(filename).dirname())
-        for dirname in dirnames:
-            observer.schedule(self, dirname)
-
-    def on_modified(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            compile_coffeescript(event.src_path)
-        except Exception:  # pylint: disable=broad-except
-            traceback.print_exc()
-
-
-def coffeescript_files():
-    """
-    return find command for paths containing coffee files
-    """
-    dirs = " ".join(THEME_COFFEE_PATHS + [Env.REPO_ROOT / coffee_dir for coffee_dir in COFFEE_DIRS])
-    return cmd('find', dirs, '-type f', '-name \"*.coffee\"')
-
-
-@task
-@no_help
-def compile_coffeescript(*files):
-    """
-    Compile CoffeeScript to JavaScript.
-    """
-    if not files:
-        files = ["`{}`".format(coffeescript_files())]
-    sh(cmd(
-        "node_modules/.bin/coffee", "--compile", *files
-    ))
 
 
 def compile_assets(systems, production):
@@ -176,7 +122,6 @@ def update_assets(args):
 
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
-    compile_coffeescript()
     compile_assets(args.system, args.production)
 
     if args.collect:

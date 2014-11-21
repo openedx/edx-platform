@@ -4,7 +4,6 @@
   "private": true,
   "description": "This is the main edX platform which consists of LMS and Studio.",
   "dependencies": {
-    "coffee-script": "1.6.1",
     "uglify-js": "2.4.15"
   },
   "devDependencies": {
@@ -13,6 +12,8 @@
     "grunt-contrib-concat": "^0.5.0",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-cssmin": "^0.10.0",
+    "grunt-contrib-coffee": "^0.12.0",
+    "grunt-concurrent": "^1.0.0",
     "grunt-sass": "^0.16.1",
     "load-grunt-tasks": "^1.0.0",
     "time-grunt": "^1.0.0"
