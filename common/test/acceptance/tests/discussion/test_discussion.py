@@ -324,23 +324,6 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
-    def test_mathjax_rendering(self):
-        thread_id = "test_thread_{}".format(uuid4().hex)
-
-        thread_fixture = SingleThreadViewFixture(
-            Thread(
-                id=thread_id,
-                body=THREAD_CONTENT_WITH_LATEX,
-                commentable_id=self.discussion_id,
-                thread_type="discussion"
-            )
-        )
-        thread_fixture.push()
-        self.setup_thread_page(thread_id)
-        self.assertTrue(self.thread_page.is_discussion_body_visible())
-        self.thread_page.verify_mathjax_preview_available()
-        self.thread_page.verify_mathjax_rendered()
-
     def test_markdown_reference_link(self):
         """
         Check markdown editor renders reference link correctly
