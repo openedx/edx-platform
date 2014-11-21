@@ -1,4 +1,4 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status" />
+<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements" />
 
 <%! from django.utils.translation import ugettext as _ %>
 <%!
@@ -292,6 +292,18 @@
 
 
   </section>
+  % if course_requirements:
+  <% prc_target = reverse('about_course', args=[course_requirements['prc_id'].to_deprecated_string()]) %>
+  <section class="prerequisites">
+    <p class="tip">
+      ${_("In order to access this course, you must first successfully complete {link_start}{prc_display}{link_end}").format(
+          link_start='<a href="{}">'.format(prc_target),
+          link_end='</a>',
+          prc_display=' '.join([course_requirements['prc_id'].org, course_requirements['prc_id'].course]),
+        )}
+    </p>
+  </section>
+  % endif
 </article>
 </article>
 </li>

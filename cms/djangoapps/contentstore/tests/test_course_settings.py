@@ -243,6 +243,33 @@ class CourseDetailsViewTest(CourseTestCase):
         elif field in encoded and encoded[field] is not None:
             self.fail(field + " included in encoding but missing from details at " + context)
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {'MILESTONES_APP': True,
+                                                       'ENABLE_PREREQUISITE_COURSES': True})
+    def test_pre_requisite_course_update_and_fetch(self):
+        url = get_url(self.course.id)
+        resp = self.client.get_json(url)
+        course_detail_json = json.loads(resp.content)
+        # assert pre_requisite_course is initialized
+        self.assertIsNone(course_detail_json['pre_requisite_course'])
+
+        # update pre requisite course with a new course key
+        pre_requisite_course = CourseFactory.create(org='edX', course='900', display_name='pre requisite course')
+        pre_requisite_course_key = unicode(pre_requisite_course.id)
+        course_detail_json['pre_requisite_course'] = pre_requisite_course_key
+        self.client.ajax_post(url, course_detail_json)
+
+        # fetch updated course to assert course key updated
+        resp = self.client.get_json(url)
+        course_detail_json = json.loads(resp.content)
+        self.assertEqual(pre_requisite_course_key, course_detail_json['pre_requisite_course'])
+
+        # remove pre requisite course
+        course_detail_json['pre_requisite_course'] = ''
+        self.client.ajax_post(url, course_detail_json)
+        resp = self.client.get_json(url)
+        course_detail_json = json.loads(resp.content)
+        self.assertEqual('', course_detail_json['pre_requisite_course'])
+
 
 @ddt.ddt
 class CourseGradingTest(CourseTestCase):

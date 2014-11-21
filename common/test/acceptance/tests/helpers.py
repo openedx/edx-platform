@@ -9,6 +9,7 @@ import os
 from path import path
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
+from selenium.webdriver.support.select import Select
 
 
 def skip_if_browser(browser):
@@ -165,6 +166,22 @@ def enable_css_animations(page):
 
         head.removeChild(styles)
     """)
+
+
+def generate_course_key(org, number, run):
+    """
+    Makes a CourseLocator from org, number and run
+    """
+    default_store = os.environ.get('DEFAULT_STORE', 'draft')
+    return CourseLocator(org, number, run, deprecated=(default_store == 'draft'))
+
+
+def select_ddl_by_value(browser_query, value):
+    """
+    Selects a html select element by matching value attribute
+    """
+    select = Select(browser_query.first.results[0])
+    select.select_by_value(value)
 
 
 class UniqueCourseTest(WebAppTest):

@@ -1608,6 +1608,16 @@ if FEATURES.get('AUTH_USE_CAS'):
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
 
+############## Milestones ##############
+# Turn off milestones app by default
+FEATURES['MILESTONES_APP'] = False
+if FEATURES['MILESTONES_APP']:
+    INSTALLED_APPS += ('milestones',)
+
+############## Pre-requisite Courses ##############
+# Turn of pre-requisite course by default. This feature depends on milestones app
+FEATURES['ENABLE_PREREQUISITE_COURSES'] = False
+
 ###################### Registration ##################################
 
 # For each of the fields, give one of the following values:
