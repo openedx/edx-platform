@@ -51,5 +51,5 @@ class Social(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         return Response(
-            {"app secret": "This is the app secret"}
+            {"app-secret": "This is the app secret"}
         )

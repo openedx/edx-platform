@@ -14,22 +14,17 @@ class TestSocial(APITestCase):
     """
     def setUp(self):
         pass 
+
+    def test_user_signed_in(self):
         self.user = UserFactory.create()
-        # self.course = CourseFactory.create(mobile_available=True)
         self.client.login(username=self.user.username, password='test')
-
-    def test_one(self):
         url = reverse('app-secret')
-        # response = self.client.get(url)
-        # self.assertEqual(response.status_code, 200)
-        self.assertTrue(True)  # pylint: disable=E1103
+        response = self.client.get(url)
+        self.assertTrue('This is the app secret' in response.data.get('app-secret'))
 
-    def test_two(self):
-        # url = reverse('course-handouts-list', kwargs={'course_id': unicode(self.course.id)})
-        # response = self.client.get(url)
-        self.assertTrue(True)
-
-    def test_three(self):
-        # url = reverse('course-updates-list', kwargs={'course_id': unicode(self.course.id)})
-        # response = self.client.get(url)
-        self.assertTrue(True)
+    def test_user_not_signed_in(self):
+        self.user = UserFactory.create()
+        url = reverse('app-secret')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 401)
+        # self.assertTrue(False)
