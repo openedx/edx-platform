@@ -386,20 +386,7 @@ function goto( mode)
 
 %if modeflag.get('Manage Groups'):
   %if instructor_access:
-    <hr width="40%" style="align:left">
-    <p>
-    <input type="submit" name="action" value="List beta testers">
-    <p>
-    ## Translators: days_early_for_beta should not be translated
-    ${_("Enter usernames or emails for students who should be beta-testers, one per line, or separated by commas.  They will get to "
-        "see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.")}
-    </p>
-    <p>
-    <textarea cols="50" row="30" name="betausers"></textarea>
-    <input type="submit" name="action" value="Remove beta testers">
-    <input type="submit" name="action" value="Add beta testers">
-    </p>
-    <hr width="40%" style="align:left">
+    <p class="deprecated">${_("To manage beta tester roles, please visit the 'Membership' section of the instructor dashboard.")}</p>
 
     %if course.is_cohorted:
     <%include file="/course_groups/cohort_management.html" />
