@@ -33,8 +33,8 @@ ${page_title_breadcrumbs(course_name())}
 </%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+<link rel="stylesheet" href="${static.url('css/lms-style-course-vendor.css')}" type="text/css" media="all" />
+<link rel="stylesheet" href="${static.url('css/lms-style-course.css')}" type="text/css" media="all" />
 ## Utility: Notes
 % if is_edxnotes_enabled(course):
 <%static:css group='style-student-notes'/>
