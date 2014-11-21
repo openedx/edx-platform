@@ -26,8 +26,6 @@
         block = initFn(runtime, element, data) ? {}
       else
         block = initFn(runtime, element) ? {}
-      if initFn.collectFieldData
-        block.collectFieldData = initFn.collectFieldData
       block.runtime = runtime
     else
       elementTag = $('<div>').append($element.clone()).html();

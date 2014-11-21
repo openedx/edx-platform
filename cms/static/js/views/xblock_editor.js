@@ -83,7 +83,7 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                 var payload = {};
                 _.each(this.xblockElements, function(element) {
                     if (element.collectFieldData) {
-                        payload["tab id..."] = {"fields": element.collectFieldData(element.element)};
+                        payload["tab id..."] = {"fields": element.collectFieldData()};
                     }
                 });
 

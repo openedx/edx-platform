@@ -66,11 +66,16 @@ function XBlockXMLEditor(runtime, element) {
     return view;
 }
 
-function SettingsTabView(runtime, element) {
-    // initialize settings tab
+function SettingsTabViewInit(runtime, element) {
+    var view = new SettingsTabView(runtime, element);
+    return view;
 }
-SettingsTabView.collectFieldData = function collectFieldData(element) {
-    var $element = $(element);
+function SettingsTabView(runtime, element) {
+    this.runtime = runtime;
+    this.element = element;
+}
+SettingsTabView.prototype.collectFieldData = function collectFieldData() {
+    var $element = $(this.element);
     var items = $element.find('.settings-list .wrapper-comp-setting');
     var data = {};
     items.each(function (index, item) {
