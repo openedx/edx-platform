@@ -138,7 +138,7 @@ module.exports = function (grunt) {
             lms: {
                 files: {
                     '<%= c.lms %>/css/lms-style-vendor.css': [
-                        '<%= c.lms %>/css/vendor/font-awesome.css',
+                        '<%= c.bower %>/font-awesome/css/font-awesome.css',
                         '<%= c.lms %>/css/vendor/jquery.qtip.min.css',
                         '<%= c.lms %>/css/vendor/responsive-carousel/responsive-carousel.css',
                         '<%= c.lms %>/css/vendor/responsive-carousel/responsive-carousel.slide.css'
@@ -202,7 +202,7 @@ module.exports = function (grunt) {
                 files: {
                     '<%= c.studio %>/css/cms-style-vendor.css': [
                         '<%= c.common %>/css/vendor/normalize.css',
-                        '<%= c.common %>/css/vendor/font-awesome.css',
+                        '<%= c.bower %>/font-awesome/css/font-awesome.css',
                         '<%= c.common %>/css/vendor/html5-input-polyfills/number-polyfill.css',
                         '<%= c.common %>/js/vendor/CodeMirror/codemirror.css',
                         '<%= c.common %>/css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',

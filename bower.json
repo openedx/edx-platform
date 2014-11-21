@@ -5,6 +5,7 @@
   "dependencies": {
     "bourbon": "~4.0.2",
     "neat": "~1.5.1",
-    "bi-app-sass": "*"
+    "bi-app-sass": "*",
+    "font-awesome": "~3.2.1"
   }
 }

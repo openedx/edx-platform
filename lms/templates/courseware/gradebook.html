@@ -11,8 +11,8 @@
 </%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+<link rel="stylesheet" href="${static.url('css/lms-style-course-vendor.css')}" type="text/css" media="all" />
+<link rel="stylesheet" href="${static.url('css/lms-style-course.css')}" type="text/css" media="all" />
 
   <style type="text/css">
   % for (grade, _), color in zip(ordered_grades, ['green', 'Chocolate']):
