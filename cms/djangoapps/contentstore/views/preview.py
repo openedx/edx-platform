@@ -149,7 +149,7 @@ def _preview_module_system(request, descriptor):
         descriptor_runtime=descriptor.runtime,
         services={
             "i18n": ModuleI18nService(),
-            "user": DjangoXBlockUserService(request.user, course_id),
+            "user": DjangoXBlockUserService(request.user),
             "course": DjangoXBlockCourseService(course_id)
         },
     )
