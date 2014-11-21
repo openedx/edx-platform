@@ -82,7 +82,7 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
             saveEditorTabs: function () {
                 var payload = {};
                 _.each(this.xblockElements, function(element) {
-                    var tab_id = element.element.parentElement.getAttribute('data-tab-id');
+                    var tab_id = element.element.parent().attr("data-tab-id");
                     if (element.collectFieldData) {
                         payload[tab_id] = {"fields": element.collectFieldData()};
                     }
