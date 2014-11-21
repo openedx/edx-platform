@@ -40,10 +40,3 @@ window.rewriteStaticLinks = function(content, from, to) {
     var regex = new RegExp("(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_\+.~#?&//=]*))?"+fromRe, 'g');
     return content.replace(regex, replacer);
 };
-
-window.identifyUser = function(userID, email, username) {
-    analytics.identify(userID, {
-        email: email,
-        username: username
-    });    
-};
