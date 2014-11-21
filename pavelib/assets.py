@@ -73,12 +73,15 @@ def compile_coffeescript(*files):
     ))
 
 
-def compile_assets(systems):
+def compile_assets(systems, production):
     """
     Compile all assets.
     """
     for sys in systems:
-        sh(cmd('grunt', sys))
+        if production:
+            sh(cmd('grunt', sys + ':dist'))
+        else:
+            sh(cmd('grunt', sys))
 
 
 def compile_templated_sass(systems, settings):
@@ -152,6 +155,10 @@ def update_assets(args):
         help="Disable Sass compression",
     )
     parser.add_argument(
+        '--production', action='store_true', default=False,
+        help="Minify and optimize assets for production environment",
+    )
+    parser.add_argument(
         '--skip-collect', dest='collect', action='store_false', default=True,
         help="Skip collection of static assets",
     )
@@ -160,7 +167,7 @@ def update_assets(args):
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     compile_coffeescript()
-    compile_assets(args.system)
+    compile_assets(args.system, args.production)
 
     if args.collect:
         collect_assets(args.system, args.settings)
