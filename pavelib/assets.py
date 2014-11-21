@@ -24,7 +24,10 @@ def compile_assets(systems, production):
     """
     for sys in systems:
         command = [
-            'grunt',
+            # grunt should be installed globally
+            # for now here as we don't want to
+            # break tests & people's devstacks.
+            './node_modules/grunt-cli/bin/grunt',
             sys + ':dist' if production else sys
         ]
 
@@ -75,7 +78,10 @@ def watch_assets(options):
 
     for system in systems:
         command = [
-            'grunt',
+            # grunt should be installed globally
+            # for now here as we don't want to
+            # break tests & people's devstacks.
+            './node_modules/grunt-cli/bin/grunt',
             system + ':watch'
         ]
 
