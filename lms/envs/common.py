@@ -594,14 +594,6 @@ MODULESTORE = {
                     }
                 },
                 {
-                    'NAME': 'xml',
-                    'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-                    'OPTIONS': {
-                        'data_dir': DATA_DIR,
-                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-                    }
-                },
-                {
                     'NAME': 'split',
                     'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
