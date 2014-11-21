@@ -315,31 +315,6 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # DataDump
 
-    elif 'Download CSV of all student profile data' in action:
-        enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course_key,
-            courseenrollment__is_active=1,
-        ).order_by('username').select_related("profile")
-        profkeys = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education',
-                    'mailing_address', 'goals']
-        datatable = {'header': ['username', 'email'] + profkeys}
-
-        def getdat(user):
-            """
-            Return a list of profile data for the given user.
-            """
-            profile = user.profile
-            return [user.username, user.email] + [getattr(profile, xkey, '') for xkey in profkeys]
-
-        datatable['data'] = [getdat(u) for u in enrolled_students]
-        datatable['title'] = _('Student profile data for course {course_id}').format(
-            course_id=course_key.to_deprecated_string()
-        )
-        return return_csv(
-            'profiledata_{course_id}.csv'.format(course_id=course_key.to_deprecated_string()),
-            datatable
-        )
-
     elif 'Download CSV of all responses to problem' in action:
         problem_to_dump = request.POST.get('problem_to_dump', '')
 
@@ -365,15 +340,6 @@ def instructor_dashboard(request, course_id):
             datatable['data'] = [[x.student.username, x.state] for x in smdat]
             datatable['title'] = _('Student state for problem {problem}').format(problem=problem_to_dump)
             return return_csv('student_state_from_{problem}.csv'.format(problem=problem_to_dump), datatable)
-
-    elif 'Download CSV of all student anonymized IDs' in action:
-        students = User.objects.filter(
-            courseenrollment__course_id=course_key,
-        ).order_by('id')
-
-        datatable = {'header': ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']}
-        datatable['data'] = [[s.id, unique_id_for_user(s, save=False), anonymous_id_for_user(s, course_key, save=False)] for s in students]
-        return return_csv(course_key.to_deprecated_string().replace('/', '-') + '-anon-ids.csv', datatable)
 
     #----------------------------------------
     # enrollment

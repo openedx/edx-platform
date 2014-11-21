@@ -369,15 +369,17 @@ function goto( mode)
 
 %if modeflag.get('Data'):
     <hr width="40%" style="align:left">
-    <p>
-    <input type="submit" name="action" value="Download CSV of all student profile data">
+    <p class="deprecated">
+      ${_("To download student profile data, please visit the 'Data Download' section of the instructor dashboard.")}
     </p>
+
     <p> ${_("Problem urlname:")}
         <input type="text" name="problem_to_dump" size="40">
         <input type="submit" name="action" value="Download CSV of all responses to problem">
     </p>
-    <p>
-    <input type="submit" name="action" value="Download CSV of all student anonymized IDs">
+
+    <p class="deprecated">
+      ${_("To download student anonymized IDs, please visit the 'Data Download' section of the instructor dashboard.")}
     </p>
     <hr width="40%" style="align:left">
 %endif
