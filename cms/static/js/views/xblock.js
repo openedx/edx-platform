@@ -49,7 +49,7 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
                     xblockElements.each(function (index, xblockElement) {
                         if (continueInitializing) {
                             try {
-                                xblock = XBlock.initializeBlock(xblockElement);
+                                xblock = XBlock.initializeBlock($(xblockElement));
                                 self.xblockElements.push(xblock);
                             } catch (e) {
                                 console.error(e.stack);
