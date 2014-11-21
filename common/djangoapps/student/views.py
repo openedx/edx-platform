@@ -90,7 +90,7 @@ from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.milestones_helpers import (
-    get_prc_not_completed,
+    get_pre_requisite_courses_not_completed,
 )
 from microsite_configuration import microsite
 
@@ -646,9 +646,8 @@ def dashboard(request):
     # Populate the Order History for the side-bar.
     order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
 
-    # if milestones app and pre-requisite course feature is enabled compute list of courses having pre-requisites
-    courses_having_pre_requisites = [course.id for course, __ in course_enrollment_pairs if course.pre_requisite_course]
-    courses_requirements_not_met = get_prc_not_completed(user, courses_having_pre_requisites)
+    # get list of courses having pre-requisites yet to be completed
+    courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, course_enrollment_pairs)
 
     context = {
         'enrollment_message': enrollment_message,

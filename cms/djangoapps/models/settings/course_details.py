@@ -39,7 +39,7 @@ class CourseDetails(object):
         self.effort = None  # int hours/week
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
-        self.pre_requisite_course = ""  # pre-requisite course course key
+        self.pre_requisite_courses = []  # pre-requisite courses
 
     @classmethod
     def _fetch_about_attribute(cls, course_key, attribute):
@@ -65,7 +65,7 @@ class CourseDetails(object):
         course_details.end_date = descriptor.end
         course_details.enrollment_start = descriptor.enrollment_start
         course_details.enrollment_end = descriptor.enrollment_end
-        course_details.pre_requisite_course = descriptor.pre_requisite_course
+        course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
 
@@ -157,8 +157,9 @@ class CourseDetails(object):
             descriptor.course_image = jsondict['course_image_name']
             dirty = True
 
-        if 'pre_requisite_course' in jsondict and jsondict['pre_requisite_course'] != descriptor.pre_requisite_course:
-            descriptor.pre_requisite_course = jsondict['pre_requisite_course']
+        if 'pre_requisite_courses' in jsondict \
+                and sorted(jsondict['pre_requisite_courses']) != sorted(descriptor.pre_requisite_courses):
+            descriptor.pre_requisite_courses = jsondict['pre_requisite_courses']
             dirty = True
 
         if dirty:

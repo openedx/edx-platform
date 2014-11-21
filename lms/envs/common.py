@@ -1608,12 +1608,6 @@ if FEATURES.get('AUTH_USE_CAS'):
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
 
-############## Milestones ##############
-# Turn off milestones app by default
-FEATURES['MILESTONES_APP'] = False
-if FEATURES['MILESTONES_APP']:
-    INSTALLED_APPS += ('milestones',)
-
 ############## Pre-requisite Courses ##############
 # Turn of pre-requisite course by default. This feature depends on milestones app
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = False
@@ -1896,7 +1890,8 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+    'milestones'
 )
 
 for app_name in OPTIONAL_APPS:

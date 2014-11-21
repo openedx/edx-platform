@@ -16,7 +16,7 @@ var CourseDetails = Backbone.Model.extend({
         effort: null,	// an int or null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
-        pre_requisite_course: ''
+        pre_requisite_courses: []
     },
 
     validate: function(newattrs) {

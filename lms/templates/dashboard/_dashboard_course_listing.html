@@ -293,13 +293,13 @@
 
   </section>
   % if course_requirements:
-  <% prc_target = reverse('about_course', args=[course_requirements['prc_id'].to_deprecated_string()]) %>
+  <% prc_target = reverse('about_course', args=[unicode(course_requirements['courses'][0]['key'])]) %>
   <section class="prerequisites">
     <p class="tip">
-      ${_("In order to access this course, you must first successfully complete {link_start}{prc_display}{link_end}").format(
+      ${_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.").format(
           link_start='<a href="{}">'.format(prc_target),
           link_end='</a>',
-          prc_display=' '.join([course_requirements['prc_id'].org, course_requirements['prc_id'].course]),
+          prc_display=course_requirements['courses'][0]['display'],
         )}
     </p>
   </section>

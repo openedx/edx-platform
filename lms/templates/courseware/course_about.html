@@ -319,12 +319,12 @@
             </li>
           % endif
 
-          % if pre_requisite_course:
+          % if pre_requisite_courses:
           <li class="prerequisite-course important-dates-item">
             <i class="icon icon-list-ul"></i>
             <p class="important-dates-item-title">${_("Requirements")}</p>
-            <span class="important-dates-item-text pre-requisite">${pre_requisite_course}</span>
-            <p class="tip">${_("Access to this course requires the successful completion of ")}${pre_requisite_course}.</p>
+            <span class="important-dates-item-text pre-requisite">${pre_requisite_courses[0]}</span>
+            <p class="tip">${_("You must successfully complete {course} before you begin this course").format(course=pre_requisite_courses[0])}.</p>
           </li>
           % endif
           % if get_course_about_section(course, "prerequisites"):

@@ -64,7 +64,9 @@ var DetailsView = ValidatingView.extend({
         var imageURL = this.model.get('course_image_asset_path');
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
-        this.$el.find('#' + this.fieldToSelectorMap['pre_requisite_course']).val(this.model.get('pre_requisite_course'));
+        var pre_requisite_courses = this.model.get('pre_requisite_courses');
+        pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
+        this.$el.find('#' + this.fieldToSelectorMap['pre_requisite_courses']).val(pre_requisite_courses);
 
         return this;
     },
@@ -78,7 +80,7 @@ var DetailsView = ValidatingView.extend({
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
         'course_image_asset_path': 'course-image-url',
-        'pre_requisite_course': 'pre-requisite-course'
+        'pre_requisite_courses': 'pre-requisite-course'
     },
 
     updateTime : function(e) {
@@ -158,7 +160,9 @@ var DetailsView = ValidatingView.extend({
             this.setField(event);
             break;
         case 'pre-requisite-course':
-            this.setField(event);
+            var value = $(event.currentTarget).val();
+            value = value == "" ? [] : [value];
+            this.model.set('pre_requisite_courses', value);
             break;
         // Don't make the user reload the page to check the Youtube ID.
         // Wait for a second to load the video, avoiding egregious AJAX calls.

@@ -715,7 +715,8 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+    'milestones'
 )
 
 
@@ -731,12 +732,6 @@ for app_name in OPTIONAL_APPS:
         except ImportError:
             continue
     INSTALLED_APPS += (app_name,)
-
-############## Milestones ##############
-# Turn off milestones app by default
-FEATURES['MILESTONES_APP'] = False
-if FEATURES['MILESTONES_APP']:
-    INSTALLED_APPS += ('milestones',)
 
 ############## Pre-requisite Courses ##############
 # Turn of pre-requisite course by default. This feature depends on milestones app

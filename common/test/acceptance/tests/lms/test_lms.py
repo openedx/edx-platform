@@ -13,7 +13,7 @@ from ..helpers import (
     UniqueCourseTest,
     load_data_str,
     generate_course_key,
-    select_ddl_by_value,
+    select_option_by_value,
 )
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
@@ -654,10 +654,15 @@ class PreRequisiteCourseTest(UniqueCourseTest):
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-    def test_dashaboad_message(self):
+    def test_dashboard_message(self):
         """
-        Verify that pre-requisite messages are displayed.
+         Scenario: Any course where there is a Pre-Requisite course Student dashboard should have
+         appropriate messaging.
+            Given that I am on the Student dashboard
+            When I view a course with a pre-requisite course set
+            Then At the bottom of course I should see course requirements message.'
         """
+
         # visit dashboard page and make sure there is not pre-requisite course message
         self.dashboard_page.visit()
         self.assertFalse(self.dashboard_page.pre_requisite_message_displayed())
@@ -683,7 +688,7 @@ class PreRequisiteCourseTest(UniqueCourseTest):
         """
         set pre-requisite course
         """
-        select_ddl_by_value(self.settings_page.pre_requisite_course, self.pre_requisite_course_id)
+        select_option_by_value(self.settings_page.pre_requisite_course, self.pre_requisite_course_id)
         self.settings_page.save_changes()
 
 

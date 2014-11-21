@@ -68,7 +68,8 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
 from util.milestones_helpers import (
-    set_prerequisite_course
+    set_prerequisite_courses,
+    is_valid_course_key
 )
 
 
@@ -761,7 +762,6 @@ def settings_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     prerequisite_course_enabled = settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False)
-    milestones_app_enabled = settings.FEATURES.get('MILESTONES_APP', False)
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -786,7 +786,7 @@ def settings_handler(request, course_key_string):
                 'short_description_editable': short_description_editable,
                 'upload_asset_url': upload_asset_url
             }
-            if prerequisite_course_enabled and milestones_app_enabled:
+            if prerequisite_course_enabled:
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
                 # exclude current course from the list of available courses
                 courses = [course for course in courses if course.id != course_key]
@@ -805,9 +805,11 @@ def settings_handler(request, course_key_string):
                 )
             else:  # post or put, doesn't matter.
                 # if pre-requisite course feature is enabled set pre-requisite course
-                if prerequisite_course_enabled and milestones_app_enabled:
-                    prerequisite_course_key = request.json.get('pre_requisite_course', None)
-                    set_prerequisite_course(course_key, prerequisite_course_key)
+                if prerequisite_course_enabled:
+                    prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
+                    if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
+                        return JsonResponseBadRequest({_("error"): _("Invalid prerequisite course key")})
+                    set_prerequisite_courses(course_key, prerequisite_course_keys)
                 return JsonResponse(
                     CourseDetails.update_from_json(course_key, request.json, request.user),
                     encoder=CourseSettingsEncoder
