@@ -60,7 +60,10 @@ def has_forum_access(uname, course_id, rolename):
 
 
 def _get_discussion_modules(course):
-    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    discussion_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    discussion_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion-forum'})
+
+    all_discussions = discussion_modules + discussion_xblocks
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
@@ -69,7 +72,7 @@ def _get_discussion_modules(course):
                 return False
         return True
 
-    return filter(has_required_keys, all_modules)
+    return filter(has_required_keys, all_discussions)
 
 
 def get_discussion_id_map(course):

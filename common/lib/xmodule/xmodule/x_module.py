@@ -1466,6 +1466,7 @@ class DiscussionService(object):
         course_settings = make_course_settings(course)
 
         context = {
+            'user': user,
             'course': course,
             'course_id': course_id,
             'staff_access': has_access(user, 'staff', course),
@@ -1482,11 +1483,7 @@ class DiscussionService(object):
             'sort_preference': user_info['default_sort_key'],
             'cohorted_commentables': cohorted_commentables,
             'is_course_cohorted': course_settings['is_cohorted'],
-            'course_settings': saxutils.escape(json.dumps(course_settings), escapedict),
-            'has_permission_to_create_thread': cached_has_permission(user, "create_thread", course_id),
-            'has_permission_to_create_comment': cached_has_permission(user, "create_comment", course_id),
-            'has_permission_to_create_subcomment': cached_has_permission(user, "create_subcomment", course_id),
-            'has_permission_to_openclose_thread': cached_has_permission(user, "openclose_thread", course_id)
+            'course_settings': saxutils.escape(json.dumps(course_settings), escapedict)
         }
 
         return context

@@ -79,7 +79,9 @@ describe "NewPostView", ->
         @view.render()
         expectedGroupId = null
         DiscussionSpecHelper.makeAjaxSpy(
-          (params) -> expect(params.data.group_id).toEqual(expectedGroupId)
+          (params) =>
+            expect(params.data.group_id).toEqual(expectedGroupId)
+            @view.$(".forum-new-post-form").removeAttr("disabled")
         )
 
         _.each(

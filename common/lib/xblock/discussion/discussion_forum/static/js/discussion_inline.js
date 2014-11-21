@@ -5,12 +5,13 @@ function DiscussionInlineBlock(runtime, element) {
 
   var testUrl = runtime.handlerUrl(element, 'test');
   if (testUrl.match(/^(http|https):\/\//)) {
-    var hostname = testUrl.match(/^(.*:\/\/[a-z\-.]+)\//)[1];
+    var hostname = testUrl.match(/^(.*:\/\/[a-z0-9:\-.]+)\//)[1];
     DiscussionUtil.setBaseUrl(hostname);
   }
 
-  new DiscussionModuleView({
-    el: el,
-    async_thread_views: true
-  });
+  if (runtime.local_overrides && runtime.local_overrides.discussion) {
+      runtime.local_overrides.discussion(element, DiscussionUtil);
+  }
+
+  new DiscussionModuleView({ el: el });
 }

@@ -1247,6 +1247,10 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-xmodule-annotations.css',
     },
+    'discussion': {
+        'source_filenames': ['sass/discussion-forum.css'],
+        'output_filename': 'css/lms-style-discussion-forum.css'
+    }
 }
 
 

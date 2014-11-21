@@ -60,7 +60,9 @@ if Backbone?
           url: DiscussionUtil.urlFor('update_thread', @model.id),
           type: 'POST',
           dataType: 'json',
-          async: false, # @TODO when the rest of the stuff below is made to work properly..
+          # TODO when the rest of the stuff below is made to work properly.
+          # Note it can be forced to true on global basis via DiscussionUtils.force_async
+          async: false,
           data: postData,
           error: DiscussionUtil.formErrorHandler(@$('.post-errors')),
           success: =>

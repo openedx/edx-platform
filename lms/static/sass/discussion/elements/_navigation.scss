@@ -1,13 +1,31 @@
 // discussion - elements - navigation
 // ====================
 
-.forum-nav {
-  @include box-sizing(border-box);
-  @include float(left);
-  position: relative;
-  width: 31%;
-  border: 1px solid #aaa;
-  border-radius: 3px;
+div.discussion-course, div.content-wrapper {
+  section.discussion {
+    div.forum-nav {
+      @include box-sizing(border-box);
+      float: left;
+      position: relative;
+      width: 31%;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+
+      ul, ol {
+        list-style: none;
+        padding-left: 0;
+
+        li.forum-nav-thread {
+          margin-bottom: 0;
+        }
+
+        &.forum-nav-browse-submenu {
+          padding-left: $baseline;
+          list-style: none;
+        }
+      }
+    }
+  }
 }
 
 // ------
@@ -96,11 +114,6 @@
 .forum-nav-browse-menu {
   @include font-size(14);
   overflow-y: scroll;
-  list-style: none;
-}
-
-.forum-nav-browse-submenu {
-  padding-left: $baseline;
   list-style: none;
 }
 
