@@ -12,7 +12,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
-from contentstore.views.preview import StudioUserService
 
 from contentstore.views.component import (
     component_handler, get_component_templates
@@ -1059,7 +1058,7 @@ class TestEditSplitModule(ItemTest):
         # (CachingDescriptorSystem is used in tests, PreviewModuleSystem in Studio).
         # CachingDescriptorSystem doesn't have user service, that's needed for
         # SplitTestModule. So, in this line of code we add this service manually.
-        split_test.runtime._services['user'] = StudioUserService(self.request)  # pylint: disable=protected-access
+        # split_test.runtime._services['user'] = StudioUserService(self.request)  # pylint: disable=protected-access
 
         # Call add_missing_groups method to add the missing group.
         split_test.add_missing_groups(self.request)

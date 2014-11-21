@@ -49,7 +49,7 @@ from xmodule_modifiers import (
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
-
+from xblock_django.user_service import DjangoXBlockUserService
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
@@ -541,6 +541,7 @@ def get_module_system_for_user(user, field_data_cache,
         services={
             'i18n': ModuleI18nService(),
             'fs': xblock.reference.plugins.FSService(),
+            'user': DjangoXBlockUserService(user, course_id),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
