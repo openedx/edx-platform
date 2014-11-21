@@ -43,6 +43,7 @@ def course_db_for(course_id):
     return {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': path_for_db(db_name)
+            'NAME': path_for_db(db_name),
+            'ATOMIC_REQUESTS': True,
         }
     }

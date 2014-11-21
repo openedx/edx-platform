@@ -12,13 +12,12 @@ import csv
 from courseware.courses import get_course_by_id
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from django.dispatch import receiver
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
-from django.db import transaction
 from django.db.models import Sum
 from django.core.urlresolvers import reverse
 from model_utils.managers import InheritanceManager
@@ -190,7 +189,7 @@ class Order(models.Model):
         """
         self.orderitem_set.all().delete()  # pylint: disable=E1101
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def start_purchase(self):
         """
         Start the purchase process.  This will set the order status to "paying",
@@ -516,7 +515,7 @@ class OrderItem(TimeStampedModel):
         if order.currency != currency and order.orderitem_set.exists():
             raise InvalidCartItem(_("Trying to add a different currency into the cart"))
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def purchase_item(self):
         """
         This is basically a wrapper around purchased_callback that handles
@@ -641,7 +640,7 @@ class CourseRegistrationCode(models.Model):
     invoice = models.ForeignKey(Invoice, null=True)
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def free_user_enrollment(cls, cart):
         """
         Here we enroll the user free for all courses available in shopping cart
@@ -841,7 +840,7 @@ class PaidCourseRegistration(OrderItem):
         return total_cost
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -986,7 +985,7 @@ class CourseRegCodeItem(OrderItem):
         return total_cost
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=W0221
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -1181,7 +1180,7 @@ class CertificateItem(OrderItem):
         return target_cert
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, course_id, cost, mode, currency='usd'):
         """
         Add a CertificateItem to an order
@@ -1360,7 +1359,7 @@ class Donation(OrderItem):
     course_id = CourseKeyField(max_length=255, db_index=True)
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_to_order(cls, order, donation_amount, course_id=None, currency='usd'):
         """Add a donation to an order.
 
