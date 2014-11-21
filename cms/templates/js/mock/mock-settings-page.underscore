@@ -62,6 +62,19 @@
         <span class="tip tip-stacked timezone">(UTC)</span>
       </div>
     </li>
+    <li>
+    <li class="field field-select" id="field-pre-requisite-course">
+                    <label for="pre-requisite-course" class="">Prerequisite Course</label>
+                    <select class="input" id="pre-requisite-course">
+                        <option value="">None</option>
+                        <option value="test/CSS101/2012_T1">[Test] Communicating for Impact</option>
+                        <option value="Test/3423/2014_T2">CohortAverageTesting</option>
+                        <option value="edX/Open_DemoX/edx_demo_course">edX Demonstration Course</option>
+                    </select>
+                    <span class="tip tip-inline">Course that students must complete before beginning this course</span>
+                    <button type="submit" class="sr" name="submit" value="submit">set pre-requisite course</button>
+    </li>
+    </li>
   </ol>
 </section>
 </form>

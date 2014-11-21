@@ -196,6 +196,31 @@ def get_options(select_browser_query):
     return Select(select_browser_query.first.results[0]).options
 
 
+def generate_course_key(org, number, run):
+    """
+    Makes a CourseLocator from org, number and run
+    """
+    default_store = os.environ.get('DEFAULT_STORE', 'draft')
+    return CourseLocator(org, number, run, deprecated=(default_store == 'draft'))
+
+
+def select_option_by_value(browser_query, value):
+    """
+    Selects a html select element by matching value attribute
+    """
+    select = Select(browser_query.first.results[0])
+    select.select_by_value(value)
+
+
+def is_option_value_selected(browser_query, value):
+    """
+    return true if given value is selected in html select element, else return false.
+    """
+    select = Select(browser_query.first.results[0])
+    ddl_selected_value = select.first_selected_option.get_attribute('value')
+    return ddl_selected_value == value
+
+
 class UniqueCourseTest(WebAppTest):
     """
     Test that provides a unique course ID.

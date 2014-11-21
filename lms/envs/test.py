@@ -443,8 +443,12 @@ MONGODB_LOG = {
     'db': 'xlog',
 }
 
+
 # Enable EdxNotes for tests.
 FEATURES['ENABLE_EDXNOTES'] = True
+
+# Add milestones to Installed apps for testing
+INSTALLED_APPS += ('milestones', )
 
 ########################## SECURITY #######################
 

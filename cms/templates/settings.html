@@ -307,6 +307,21 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                   <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
                   <span class="tip tip-inline">${_("Time spent on all course work")}</span>
                 </li>
+                % if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES'):
+                <li class="field field-select" id="field-pre-requisite-course">
+                  <form action="#" class="pre-requisite-course-form" method="post">
+                    <label for="pre-requisite-course">${_("Prerequisite Course")}</label>
+                    <select class="input" id="pre-requisite-course">
+                        <option value="">${_("None")}</option>
+                        % for course_info in sorted(possible_pre_requisite_courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+                        <option value="${course_info['course_key']}">${course_info['display_name']}</option>
+                        % endfor
+                    </select>
+                    <span class="tip tip-inline">${_("Course that students must complete before beginning this course")}</span>
+                    <button type="submit" class="sr" name="submit" value="submit">${_("set pre-requisite course")}</button>
+                   </form>
+                </li>
+                % endif
               </ol>
             </section>
           % endif

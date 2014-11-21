@@ -11,8 +11,8 @@ data: |
     </section>
 
     <section class="prerequisites">
-      <h2>Prerequisites</h2>
-      <p>Add information about course prerequisites here.</p>
+      <h2>Requirements</h2>
+      <p>Add information about the skills and knowledge students need to take this course.</p>
     </section>
 
     <section class="course-staff">

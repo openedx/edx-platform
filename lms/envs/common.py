@@ -335,6 +335,12 @@ FEATURES = {
     # let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
 
+    # Milestones application flag
+    'MILESTONES_APP': False,
+
+    # Prerequisite courses feature flag
+    'ENABLE_PREREQUISITE_COURSES': False,
+
     # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
     'MARK_PROGRESS_ON_GRADING_EVENT': False,
 
@@ -1700,6 +1706,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS'):
     CORS_ORIGIN_REGEX_WHITELIST = ('^http?://(\w+\.)?devstack\.local$',)
 
 
+
 ###################### Registration ##################################
 
 # For each of the fields, give one of the following values:
@@ -1969,7 +1976,8 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+    'milestones'
 )
 
 for app_name in OPTIONAL_APPS:

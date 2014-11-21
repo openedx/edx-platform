@@ -33,6 +33,7 @@ class CourseMetadata(object):
         'tags',  # from xblock
         'visible_to_staff_only',
         'group_access',
+        'pre_requisite_courses'
     ]
 
     @classmethod

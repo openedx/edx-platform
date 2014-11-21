@@ -28,6 +28,7 @@ from student.roles import (
 )
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from util.milestones_helpers import get_pre_requisite_courses_not_completed
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -267,8 +268,24 @@ def _has_access_course_desc(user, action, course):
             _has_staff_access_to_descriptor(user, course, course.id)
         )
 
+    def can_view_courseware_with_prerequisites():  # pylint: disable=invalid-name
+        """
+        Checks if prerequisite courses feature is enabled and course has prerequisites
+        and user is neither staff nor anonymous then it returns False if user has not
+        passed prerequisite courses otherwise return True.
+        """
+        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
+                and not _has_staff_access_to_descriptor(user, course, course.id) \
+                and course.pre_requisite_courses \
+                and not user.is_anonymous() \
+                and get_pre_requisite_courses_not_completed(user, [course.id]):
+            return False
+        else:
+            return True
+
     checkers = {
         'load': can_load,
+        'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
         'load_forum': can_load_forum,
         'load_mobile': can_load_mobile,
         'load_mobile_no_enrollment_check': can_load_mobile_no_enroll_check,

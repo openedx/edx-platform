@@ -129,6 +129,12 @@ FEATURES = {
     # and libraries created with split.
     'ENABLE_CONTENT_LIBRARIES': False,
 
+    # Milestones application flag
+    'MILESTONES_APP': False,
+
+    # Prerequisite courses feature flag
+    'ENABLE_PREREQUISITE_COURSES': False,
+
     # edx-notifications subsystem
     'ENABLE_NOTIFICATIONS': False,
 
@@ -754,7 +760,8 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+    'milestones'
 )
 
 
