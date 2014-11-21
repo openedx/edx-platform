@@ -55,6 +55,25 @@ function SettingsTabViewInit(runtime, element) {
 function SettingsTabView(runtime, element) {
     this.runtime = runtime;
     this.element = element;
+    debugger
+    require(["js/views/metadata", "js/collections/metadata"],
+        function (MetadataView, MetadataCollection) {
+            debugger
+            var metadataEditor = $(element).find('.metadata_edit');
+            var models = [];
+            var metadataData = metadataEditor.data('metadata');
+            for (var key in metadataData) {
+                if (metadataData.hasOwnProperty(key)) {
+                    models.push(metadataData[key]);
+                }
+            }
+            var metadataView = new MetadataView.Editor({
+                el: metadataEditor,
+                collection: new MetadataCollection(models)
+            });
+            metadataView.render();
+        }
+    );
 }
 SettingsTabView.prototype.collectFieldData = function collectFieldData() {
     var $element = $(this.element);

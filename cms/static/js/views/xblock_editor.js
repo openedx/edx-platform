@@ -26,9 +26,12 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
             initializeEditors: function() {
                 var metadataEditor,
                     defaultMode = 'editor';
-                metadataEditor = this.createMetadataEditor();
-                this.metadataEditor = metadataEditor;
+
                 if (!this.hasCustomTabs()) {
+                    // TODO does this cause any problems with the video player?
+                    // Don't want to go into createMetadataEditor because tabbed editor
+                    // will be using a metadata editor, and there will be conflicts.
+                    this.metadataEditor = this.createMetadataEditor();
                     if (this.getDataEditor()) {
                         defaultMode = 'editor';
                     } else if (metadataEditor) {

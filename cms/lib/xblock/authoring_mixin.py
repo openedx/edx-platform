@@ -19,10 +19,14 @@ from xmodule.fields import RelativeTime
 from xblock.fields import XBlockMixin
 from xblock.fragment import Fragment
 from lxml import etree
+import json
 
 logger = logging.getLogger(__name__)
 
 XML_EDITOR_HTML = u'<div id="xml-edit"><textarea class="xml-editor">{xml}</textarea></div>'
+
+# Uck, don't really want this import
+from xmodule.modulestore import EdxJSONEncoder
 
 
 @XBlock.needs("i18n")
@@ -72,7 +76,9 @@ class AuthoringMixin(XBlockMixin):
         </li>
         """
         html_strings = []
-        html_strings.append('<div class="wrapper-comp-settings is-active" id="settings-tab">')
+        # TODO: do we need to worry about "| h "? For example, data-metadata='${json.dumps(metadata_field_copy, cls=EdxJSONEncoder) | h}'
+        data = json.dumps(self.editable_metadata_fields, cls=EdxJSONEncoder)
+        html_strings.append('<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata="' + data + '/>')
         html_strings.append('<ul class="list-input settings-list">')
         html_kvp = {}
         for key in self.editable_metadata_fields:
