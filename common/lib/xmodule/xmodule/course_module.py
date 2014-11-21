@@ -184,6 +184,11 @@ class CourseFields(object):
         help=_("Enter the date you want to advertise as the course start date, if this date is different from the set start date. To advertise the set start date, enter null."),
         scope=Scope.settings
     )
+    pre_requisite_courses = List(
+        display_name=_("Pre-Requisite Courses"),
+        help=_("Pre-Requisite Course key if this course has a pre-requisite course"),
+        scope=Scope.settings
+    )
     grading_policy = Dict(
         help="Grading policy definition for this class",
         default={

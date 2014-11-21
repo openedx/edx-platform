@@ -120,6 +120,19 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         info_url = reverse('info', args=[self.course.id.to_deprecated_string()])
         self.assertTrue(target_url.endswith(info_url))
 
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_pre_requisite_course(self):
+        pre_requisite_course = CourseFactory.create(org='edX', course='900', display_name='pre requisite course')
+        course = CourseFactory.create(pre_requisite_courses=[unicode(pre_requisite_course.id)])
+        self.setup_user()
+        url = reverse('about_course', args=[unicode(course.id)])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("<span class=\"important-dates-item-text pre-requisite\">{} {}</span>"
+                      .format(pre_requisite_course.display_org_with_default,
+                              pre_requisite_course.display_number_with_default),
+                      resp.content.strip('\n'))
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):

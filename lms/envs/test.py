@@ -425,3 +425,6 @@ MONGODB_LOG = {
     'password': '',
     'db': 'xlog',
 }
+
+# Add milestones to Installed apps for testing
+INSTALLED_APPS += ('milestones', )

@@ -319,8 +319,17 @@
             </li>
           % endif
 
+          % if pre_requisite_courses:
+          <li class="prerequisite-course important-dates-item">
+            <i class="icon fa fa-list-ul"></i>
+            <p class="important-dates-item-title">${_("Prerequisites")}</p>
+            ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
+            <span class="important-dates-item-text pre-requisite">${pre_requisite_courses[0]}</span>
+            <p class="tip">${_("You must successfully complete {course} before you begin this course").format(course=pre_requisite_courses[0])}.</p>
+          </li>
+          % endif
           % if get_course_about_section(course, "prerequisites"):
-            <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Prerequisites")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
+            <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
         </ol>
       </section>

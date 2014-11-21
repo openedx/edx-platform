@@ -564,6 +564,20 @@
           font-weight: 700;
         }
       }
+
+      .prerequisite-course {
+        .pre-requisite {
+          max-width: 39%;
+          @extend %text-truncated;
+        }
+        .tip {
+          float: left;
+          margin: $baseline 0 ($baseline/2);
+          font-size: 0.8em;
+          color: $lighter-base-font-color;
+          font-family: $sans-serif;
+        }
+      }
     }
   }
 }

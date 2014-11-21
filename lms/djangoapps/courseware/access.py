@@ -26,6 +26,7 @@ from student.roles import (
 )
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from util.milestones_helpers import get_pre_requisite_courses_not_completed
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -321,6 +322,14 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         don't have to hit the enrollments table on every module load.
         """
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
+            return False
+
+        # if course has pre-requisite course not passed by user
+        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
+                and not _has_staff_access_to_descriptor(user, descriptor, course_key) \
+                and hasattr(descriptor, 'pre_requisite_courses') and descriptor.pre_requisite_courses \
+                and not user.is_anonymous() \
+                and get_pre_requisite_courses_not_completed(user, [(descriptor, None)]):
             return False
 
         # If start dates are off, can always load

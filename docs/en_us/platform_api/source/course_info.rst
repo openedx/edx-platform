@@ -138,8 +138,8 @@ Get the HTML for the course about page.
                      <p>This is paragraph 2 of the long course description. Add more paragraphs as needed. Make sure to enclose them in paragraph tags.</p>
                      </section>\n\n 
                      <section class=\"prerequisites\">\n   
-                     <h2>Prerequisites</h2>\n   
-                     <p>Add information about course prerequisites here.</p>\n </section>\n\n 
+                     <h2>Requirements</h2>\n
+                     <p>Add information about the skills and knowledge students need to take this course.</p>\n </section>\n\n
                      <section class=\"course-staff\">\n   
                      <h2>Course Staff</h2>\n   
                      <article class=\"teacher\">\n     

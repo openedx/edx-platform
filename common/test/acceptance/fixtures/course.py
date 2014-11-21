@@ -334,8 +334,8 @@ class CourseFixture(StudioApiFixture):
 
         if not response.ok:
             raise CourseFixtureError(
-                "Could not retrieve course details.  Status was {0}".format(
-                    response.status_code))
+                "Could not retrieve course details located at {0}.  Status was {1}".format(
+                    url, response.status_code))
 
         try:
             details = response.json()

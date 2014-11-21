@@ -89,7 +89,9 @@ import dogstats_wrapper as dog_stats_api
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
-
+from util.milestones_helpers import (
+    get_pre_requisite_courses_not_completed,
+)
 from microsite_configuration import microsite
 
 from util.password_policy_validators import (
@@ -652,6 +654,9 @@ def dashboard(request):
     # Populate the Order History for the side-bar.
     order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
 
+    # get list of courses having pre-requisites yet to be completed
+    courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, course_enrollment_pairs)
+
     context = {
         'enrollment_message': enrollment_message,
         'course_enrollment_pairs': course_enrollment_pairs,
@@ -681,7 +686,8 @@ def dashboard(request):
         'platform_name': settings.PLATFORM_NAME,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
-        'order_history_list': order_history_list
+        'order_history_list': order_history_list,
+        'courses_requirements_not_met': courses_requirements_not_met,
     }
 
     if third_party_auth.is_enabled():
