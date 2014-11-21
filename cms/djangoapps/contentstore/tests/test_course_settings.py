@@ -243,6 +243,52 @@ class CourseDetailsViewTest(CourseTestCase):
         elif field in encoded and encoded[field] is not None:
             self.fail(field + " included in encoding but missing from details at " + context)
 
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_pre_requisite_course_list_present(self):
+        settings_details_url = get_url(self.course.id)
+        response = self.client.get_html(settings_details_url)
+        self.assertContains(response, "Prerequisite Course")
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_pre_requisite_course_update_and_fetch(self):
+        url = get_url(self.course.id)
+        resp = self.client.get_json(url)
+        course_detail_json = json.loads(resp.content)
+        # assert pre_requisite_courses is initialized
+        self.assertEqual([], course_detail_json['pre_requisite_courses'])
+
+        # update pre requisite courses with a new course keys
+        pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
+        pre_requisite_course2 = CourseFactory.create(org='edX', course='902', run='test_run')
+        pre_requisite_course_keys = [unicode(pre_requisite_course.id), unicode(pre_requisite_course2.id)]
+        course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
+        self.client.ajax_post(url, course_detail_json)
+
+        # fetch updated course to assert pre_requisite_courses has new values
+        resp = self.client.get_json(url)
+        course_detail_json = json.loads(resp.content)
+        self.assertEqual(pre_requisite_course_keys, course_detail_json['pre_requisite_courses'])
+
+        # remove pre requisite course
+        course_detail_json['pre_requisite_courses'] = []
+        self.client.ajax_post(url, course_detail_json)
+        resp = self.client.get_json(url)
+        course_detail_json = json.loads(resp.content)
+        self.assertEqual([], course_detail_json['pre_requisite_courses'])
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_invalid_pre_requisite_course(self):
+        url = get_url(self.course.id)
+        resp = self.client.get_json(url)
+        course_detail_json = json.loads(resp.content)
+
+        # update pre requisite courses one valid and one invalid key
+        pre_requisite_course = CourseFactory.create(org='edX', course='900', run='test_run')
+        pre_requisite_course_keys = [unicode(pre_requisite_course.id), 'invalid_key']
+        course_detail_json['pre_requisite_courses'] = pre_requisite_course_keys
+        response = self.client.ajax_post(url, course_detail_json)
+        self.assertEqual(400, response.status_code)
+
 
 @ddt.ddt
 class CourseGradingTest(CourseTestCase):

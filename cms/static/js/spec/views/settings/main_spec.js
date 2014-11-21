@@ -4,7 +4,7 @@ define([
 ], function($, CourseDetailsModel, MainView, AjaxHelpers) {
     'use strict';
     describe('Settings/Main', function () {
-        var urlRoot = '/course-details',
+        var urlRoot = '/course/settings/org/DemoX/Demo_Course',
             modelData = {
                 start_date: "2014-10-05T00:00:00Z",
                 end_date: "2014-11-05T20:00:00Z",
@@ -19,7 +19,8 @@ define([
                 intro_video : null,
                 effort : null,
                 course_image_name : '',
-                course_image_asset_path : ''
+                course_image_asset_path : '',
+                pre_requisite_courses : []
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
@@ -47,7 +48,6 @@ define([
                     // Expect to see changes just in `start_date` field.
                     start_date: "2014-10-05T22:00:00.000Z"
                 });
-
             this.view.$el.find('#course-start-time')
                 .val('22:00')
                 .trigger('input');
@@ -56,8 +56,25 @@ define([
             // It sends `POST` request, because the model doesn't have `id`. In
             // this case, it is considered to be new according to Backbone documentation.
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', '/course-details', expectedJson
+                requests, 'POST', urlRoot, expectedJson
             );
+        });
+
+        it('Selecting a course in pre-requisite drop down should save it as part of course details', function () {
+            var pre_requisite_courses = ['test/CSS101/2012_T1'];
+            var requests = AjaxHelpers.requests(this),
+                expectedJson = $.extend(true, {}, modelData, {
+                    pre_requisite_courses: pre_requisite_courses
+                });
+            this.view.$el.find('#pre-requisite-course')
+                .val(pre_requisite_courses[0])
+                .trigger('change');
+
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(
+                requests, 'POST', urlRoot, expectedJson
+            );
+            AjaxHelpers.respondWithJson(requests, expectedJson);
         });
     });
 });

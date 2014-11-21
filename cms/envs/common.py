@@ -121,6 +121,9 @@ FEATURES = {
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
+
+    # pre_requisite courses feature flag should be consistent with lms
+    'ENABLE_PREREQUISITE_COURSES': lms.envs.common.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False)
 }
 ENABLE_JASMINE = False
 
@@ -731,7 +734,8 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+    'milestones'
 )
 
 

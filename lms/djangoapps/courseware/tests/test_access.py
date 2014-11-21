@@ -12,6 +12,11 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE
 )
+from xmodule.modulestore.tests.factories import CourseFactory
+from util.milestones_helpers import (
+    set_prerequisite_courses,
+    fulfill_course_milestone,
+)
 
 # pylint: disable=missing-docstring
 # pylint: disable=protected-access
@@ -241,6 +246,35 @@ class AccessTestCase(TestCase):
         self.assertFalse(access._has_access_course_desc(user, 'see_about_page', course))
         self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
         self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_access_on_course_with_pre_requisites(self):
+        """
+        Test course access when a course has pre-requisite course yet to be completed
+        """
+        user = UserFactory.create()
+
+        pre_requisite_course = CourseFactory.create(
+            org='test_org', number='788', run='test_run'
+        )
+
+        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        course = CourseFactory.create(
+            org='test_org', number='786', run='test_run', pre_requisite_courses=pre_requisite_courses
+        )
+        set_prerequisite_courses(course.id, pre_requisite_courses)
+
+        #user should not be able to load course even if enrolled
+        CourseEnrollmentAllowedFactory(email=user.email, course_id=course.id)
+        self.assertFalse(access._has_access_course_desc(user, 'load', course))
+
+        # Staff can always access course
+        staff = StaffFactory.create(course_key=course.id)
+        self.assertTrue(access._has_access_course_desc(staff, 'load', course))
+
+        # User should be able access after completing required course
+        fulfill_course_milestone(pre_requisite_course.id, user)
+        self.assertTrue(access._has_access_course_desc(user, 'load', course))
 
 
 class UserRoleTestCase(TestCase):
