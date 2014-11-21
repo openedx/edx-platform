@@ -88,8 +88,7 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                 });
 
                 var handler_url = this.xblock.runtime.handlerUrl(this.xblock.element, "save_tab_data");
-                $.post(handler_url, JSON.stringify(payload)); //.success()
-
+                return $.post(handler_url, JSON.stringify(payload)); //.success()
             },
 
             getDataEditor: function() {
