@@ -62,12 +62,11 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def get_accessible_discussion_modules(course, user, include_all=False):  # pylint: disable=invalid-name
-    """
-    Return a list of all valid discussion modules in this course that
-    are accessible to the given user.
-    """
-    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+def get_accessible_discussion_modules(course):
+    discussion_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    discussion_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion-forum'})
+
+    all_discussions = discussion_modules + discussion_xblocks
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
@@ -76,10 +75,7 @@ def get_accessible_discussion_modules(course, user, include_all=False):  # pylin
                 return False
         return True
 
-    return [
-        module for module in all_modules
-        if has_required_keys(module) and (include_all or has_access(user, 'load', module, course.id))
-    ]
+    return filter(has_required_keys, all_discussions)
 
 
 def get_discussion_id_map(course, user):
