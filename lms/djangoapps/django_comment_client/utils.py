@@ -57,7 +57,10 @@ def has_forum_access(uname, course_id, rolename):
 
 
 def _get_discussion_modules(course):
-    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    discussion_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    discussion_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion-forum'})
+
+    all_discussions = discussion_modules + discussion_xblocks
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
@@ -66,7 +69,7 @@ def _get_discussion_modules(course):
                 return False
         return True
 
-    return filter(has_required_keys, all_modules)
+    return filter(has_required_keys, all_discussions)
 
 
 def _get_discussion_id_map(course):
@@ -198,6 +201,23 @@ def get_discussion_category_map(course):
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
     return _filter_unstarted_categories(category_map)
+
+
+def get_discussion_categories_ids(course):
+    """
+    Returns a list of available ids of categories for the course.
+    """
+    ids = []
+    queue = [get_discussion_category_map(course)]
+    while queue:
+        category_map = queue.pop()
+        for child in category_map["children"]:
+            if child in category_map["entries"]:
+                ids.append(category_map["entries"][child]["id"])
+            else:
+                queue.append(category_map["subcategories"][child])
+
+    return ids
 
 
 class JsonResponse(HttpResponse):

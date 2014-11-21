@@ -7,10 +7,10 @@ from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
 
-from .helpers import UniqueCourseTest
-from ..pages.lms.auto_auth import AutoAuthPage
-from ..pages.lms.courseware import CoursewarePage
-from ..pages.lms.discussion import (
+from ..helpers import UniqueCourseTest
+from ...pages.lms.auto_auth import AutoAuthPage
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.discussion import (
     DiscussionTabSingleThreadPage,
     InlineDiscussionPage,
     InlineDiscussionThreadPage,
@@ -18,8 +18,8 @@ from ..pages.lms.discussion import (
     DiscussionTabHomePage,
     DiscussionSortPreferencePage,
 )
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.discussion import (
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...fixtures.discussion import (
     SingleThreadViewFixture,
     UserProfileViewFixture,
     SearchResultFixture,
@@ -29,28 +29,14 @@ from ..fixtures.discussion import (
     SearchResult,
 )
 
+from .helpers import BaseDiscussionMixin
 
-class DiscussionResponsePaginationTestMixin(object):
+
+class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
     """
     A mixin containing tests for response pagination for use by both inline
     discussion and the discussion tab
     """
-
-    def setup_thread(self, num_responses, **thread_kwargs):
-        """
-        Create a test thread with the given number of responses, passing all
-        keyword arguments through to the Thread fixture, then invoke
-        setup_thread_page.
-        """
-        thread_id = "test_thread_{}".format(uuid4().hex)
-        thread_fixture = SingleThreadViewFixture(
-            Thread(id=thread_id, commentable_id=self.discussion_id, **thread_kwargs)
-        )
-        for i in range(num_responses):
-            thread_fixture.addResponse(Response(id=str(i), body=str(i)))
-        thread_fixture.push()
-        self.setup_thread_page(thread_id)
-
     def assert_response_display_correct(self, response_total, displayed_responses):
         """
         Assert that various aspects of the display of responses are all correct:
@@ -300,24 +286,34 @@ class DiscussionCommentEditTest(UniqueCourseTest):
         self.assertTrue(page.is_add_comment_visible("response1"))
 
 
-@attr('shard_1')
-class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+class InlineDiscussionTestMixin(BaseDiscussionMixin):
     """
     Tests for inline discussions
     """
+    def _get_xblock_fixture_desc(self):
+        """ Returns Discussion XBlockFixtureDescriptor """
+        raise NotImplementedError()
+
+    def _initial_discussion_id(self):
+        """ Returns initial discussion_id for InlineDiscussionPage """
+        raise NotImplementedError()
+
+    @property
+    def discussion_id(self):
+        """ Returns selected discussion_id """
+        raise NotImplementedError()
+
+    def __init__(self, *args, **kwargs):
+        self._discussion_id = None
+        super(InlineDiscussionTestMixin, self).__init__(*args, **kwargs)
 
     def setUp(self):
-        super(InlineDiscussionTest, self).setUp()
-        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
+        super(InlineDiscussionTestMixin, self).setUp()
         self.course_fix = CourseFixture(**self.course_info).add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection").add_children(
                     XBlockFixtureDesc("vertical", "Test Unit").add_children(
-                        XBlockFixtureDesc(
-                            "discussion",
-                            "Test Discussion",
-                            metadata={"discussion_id": self.discussion_id}
-                        )
+                        self._get_xblock_fixture_desc()
                     )
                 )
             )
@@ -327,7 +323,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.courseware_page.visit()
-        self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
+        self.discussion_page = InlineDiscussionPage(self.browser, self._initial_discussion_id())
 
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
@@ -388,6 +384,49 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.thread_page.is_comment_editable("comment2"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
+
+
+@attr('shard_1')
+class DiscussionXModuleInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+    """ Discussion XModule inline mode tests """
+    def _get_xblock_fixture_desc(self):
+        """ Returns Discussion XBlockFixtureDescriptor """
+        return XBlockFixtureDesc(
+            'discussion',
+            "Test Discussion",
+            metadata={"discussion_id": self.discussion_id}
+        )
+
+    def _initial_discussion_id(self):
+        """ Returns initial discussion_id for InlineDiscussionPage """
+        return self.discussion_id
+
+    @property
+    def discussion_id(self):
+        """ Returns selected discussion_id """
+        if getattr(self, '_discussion_id', None) is None:
+            self._discussion_id = "test_discussion_{}".format(uuid4().hex)
+        return self._discussion_id
+
+
+@attr('shard_1')
+class DiscussionXBlockInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+    """ Discussion XBlock inline mode tests """
+    def _get_xblock_fixture_desc(self):
+        """ Returns Discussion XBlockFixtureDescriptor """
+        return XBlockFixtureDesc(
+            'discussion-forum',
+            "Test Discussion"
+        )
+
+    def _initial_discussion_id(self):
+        """ Returns initial discussion_id for InlineDiscussionPage """
+        return None
+
+    @property
+    def discussion_id(self):
+        """ Returns selected discussion_id """
+        return self.discussion_page.get_discussion_id()
 
 
 @attr('shard_1')
