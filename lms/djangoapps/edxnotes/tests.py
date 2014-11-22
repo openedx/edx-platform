@@ -14,11 +14,12 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from oauth2_provider.tests.factories import ClientFactory
 from provider.oauth2.models import Client
-
 from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
 from student.tests.factories import UserFactory
 
 from .exceptions import EdxNotesParseError
@@ -86,6 +87,7 @@ class EdxNotesDecoratorTest(TestCase):
         expected_context = {
             "content": "original_get_html",
             "uid": "uid",
+            "edxnotes_visibility": "true",
             "params": {
                 "usageId": u"test_usage_id",
                 "courseId": unicode(self.course.id).encode("utf-8"),
@@ -520,6 +522,14 @@ class EdxNotesViewsTest(TestCase):
         self.notes_page_url = reverse("edxnotes", args=[unicode(self.course.id)])
         self.search_url = reverse("search_notes", args=[unicode(self.course.id)])
         self.get_token_url = reverse("get_token", args=[unicode(self.course.id)])
+        self.visibility_url = reverse("edxnotes_visibility", args=[unicode(self.course.id)])
+
+    def _get_course_module(self):
+        """
+        Returns the course module.
+        """
+        field_data_cache = FieldDataCache([self.course], self.course.id, self.user)
+        return get_module_for_descriptor(self.user, MagicMock(), self.course, field_data_cache, self.course.id)
 
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
@@ -532,7 +542,6 @@ class EdxNotesViewsTest(TestCase):
         response = self.client.get(self.notes_page_url)
         self.assertContains(response, "<h1>Notes</h1>")
 
-    # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_view_is_disabled(self):
         """
@@ -617,3 +626,51 @@ class EdxNotesViewsTest(TestCase):
         self.client.logout()
         response = self.client.get(self.get_token_url)
         self.assertEqual(response.status_code, 302)
+
+    def test_edxnotes_visibility(self):
+        """
+        Can update edxnotes_visibility value successfully.
+        """
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        response = self.client.post(
+            self.visibility_url,
+            data=json.dumps({"visibility": False}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        course_module = self._get_course_module()
+        self.assertFalse(course_module.edxnotes_visibility)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
+    def test_edxnotes_visibility_if_feature_is_disabled(self):
+        """
+        Tests that 404 response is received if EdxNotes feature is disabled.
+        """
+        response = self.client.post(self.visibility_url)
+        self.assertEqual(response.status_code, 404)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    def test_edxnotes_visibility_invalid_json(self):
+        """
+        Tests that 400 response is received if invalid JSON is sent.
+        """
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        response = self.client.post(
+            self.visibility_url,
+            data="string",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    def test_edxnotes_visibility_key_error(self):
+        """
+        Tests that 400 response is received if invalid data structure is sent.
+        """
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        response = self.client.post(
+            self.visibility_url,
+            data=json.dumps({'test_key': 1}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
