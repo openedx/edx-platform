@@ -1,0 +1,28 @@
+<% collection.each(function (model) { %>
+<article id="edx-notes-page-item-<%=_.uniqueId()%>" class="edx-notes-page-item">
+    <div class="col-left">
+    <% if (model.get('quote')) { %>
+        <div class="edx-notes-item-quote"><%= model.escape('quote') %></div>
+    <% } %>
+    <% if (model.get('text')) { %>
+        <div class="edx-notes-item-text"><%= model.escape('text') %></div>
+    <% } %>
+    </div>
+    <div class="col-right">
+        <dl>
+        <% if (model.get('text') && model.get('quote')) { %>
+            <dt class="edx-notes-item-highlight-title"><%- gettext("Highlighted & Noted in:") %></dt>
+        <% } else if (model.get('text')) { %>
+            <dt class="edx-notes-item-highlight-title"><%- gettext("Highlighted in:") %></dt>
+        <% } else if (model.get('quote')) { %>
+            <dt class="edx-notes-item-highlight-title"><%- gettext("Noted in:") %></dt>
+        <% } %>
+            <dd><a class="edx-notes-item-unit-link" href="<%= model.get('unit').url %>" title="<%- gettext('Visit the unit.') %>"><%- model.get('unit').display_name %></a></dd>
+        <% if (model.get('updated')) { %>
+            <dt class="edx-notes-item-last-edited-title"><%- gettext("Last Edited:") %></dt>
+            <dd class="edx-notes-item-last-edited-value"><%- model.get('updated') %></dd>
+        <% } %>
+        </dl>
+    </div>
+</article>
+<% }) %>
