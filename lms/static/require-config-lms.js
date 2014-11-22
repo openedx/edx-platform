@@ -13,6 +13,11 @@
     } else {
         paths.jquery = "js/vendor/underscore-min";
     }
+    if (window.gettext) {
+        define("gettext", [], function() {return window.gettext;});
+    } else {
+        paths.gettext = "/i18n";
+    }
 
     config = {
         // NOTE: baseUrl has been previously set in lms/static/templates/main.html
@@ -20,7 +25,8 @@
         paths: {
           "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
           "date": "js/vendor/date",
-          "backbone": "js/vendor/backbone-min"
+          "backbone": "js/vendor/backbone-min",
+          "jquery.highlight": "js/vendor/jquery.highlight"
         },
         shim: {
           "annotator_1.2.9": {
@@ -32,6 +38,10 @@
           "jquery": {
               exports: "$"
           },
+          "jquery.highlight": {
+              deps: ["jquery"],
+              exports: "jQuery.fn.highlight"
+          },
           "underscore": {
               exports: "_"
           },
@@ -41,7 +51,7 @@
           }
         },
         map: {
-          "js/edxnotes/views/notes": {
+          "js/edxnotes/views/notes_factory": {
             "annotator": "annotator_1.2.9"
           },
           "js/edxnotes/views/shim": {
