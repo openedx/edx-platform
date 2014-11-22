@@ -70,6 +70,15 @@
   }
 }
 
+/* Added to avoid having to set these in Annotator._setupDynamicStyle via an expensive Util.maxZIndex(...) call. */
+.annotator-adder, .annotator-outer, .annotator-notice {
+  z-index: 999999;
+}
+
+.annotator-filter {
+  z-index: 99999;
+}
+
 // rotate clockwise
 @include keyframes(rotateCW) {
   0% {
