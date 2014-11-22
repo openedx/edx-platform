@@ -1,11 +1,12 @@
-.student-notes {
+.wrapper-student-notes {
 
   .info-wrapper {
-    @include clearfix;
+    @include clearfix();
     padding-bottom: $baseline;
 
     .updates {
-      @include clearfix;
+      @include clearfix();
+      width: 100%;
 
       .title-search-container {
         border-bottom: 1px solid $gray-l4;
@@ -15,13 +16,13 @@
           display: inline-block;
           width: flex-grid(7,12);
 
-          h1 {
-            font-weight: 100;
+          h1.page-title {
+            font-weight: $font-light;
 
-            small {
+            .page-subtitle {
+              @include line-height(18);
+              @extend %t-title6;
               display: block;
-              line-height: 100%;
-              font-size: 60%;
             }
           }
         }
@@ -33,162 +34,155 @@
 
           .search-notes-input {
             width: 55%;
-            padding: ($baseline/3);
+            padding: 5px;
           }
         }
       }
     }
 
-    .wrapper-tabs {
+    .note {
+      @include clearfix();
+      margin: 0;
+      padding: ($baseline*1.5) 0;
+      border-top: 1px solid $gray-l4;
 
-      .tab-list {
-        @include clearfix;
-        position: relative;
+      .note-excerpt {
+        float: left;
+        width: flex-grid(9, 12);
 
-        .tabs-label {
-          float: left;
-          margin-bottom: 0;
-          padding: ($baseline/2) $baseline;
-          padding-left: 0;
-          font-size: 90%;
-          font-weight: 700;          
+        p {
+          @extend %t-copy-base;
+          padding: $baseline;
+          background: tint($blue, 85%);
         }
 
-        .tabs {
-          @include clearfix;
-          float: left;
+        .note-comments {
+          position: relative;
           margin: 0;
           padding: 0;
           list-style: none;
+          background: tint($blue, 95%);
 
-          .tab {
-            float: left;
-
-            a {
-              display: block;
-              padding: ($baseline/2) $baseline;
-            }
-          }
-
-          .tab.active {
-
-            a {
-              color: $gray-d3;
-              border-bottom: ($baseline/5) solid $gray-d3;
-            }
-          }
-        }
-      }
-
-      .tab-panel {
-
-        .note {
-          @include clearfix;
-          margin: 0;
-          padding: ($baseline*1.5) 0;
-          border-top: 1px solid $gray-l4;
-
-          .note-excerpt {
-            float: left;
-            width: flex-grid(9, 12);
-
+          li {
+            padding: ($baseline/2) $baseline;
+            border-bottom: 2px solid $white;
+                            
             p {
-              padding: $baseline;
-              background: tint($blue, 85%);
-              font-size: 90%;
-            }
-
-            .note-comments {
-              position: relative;
-              margin: 0;
+              @extend %t-copy-sub1;
               padding: 0;
-              list-style: none;
-              background: tint($blue, 95%);
-
-              li {
-                padding: ($baseline/2) $baseline;
-                border-bottom: 2px solid $white;
-                                
-                p {
-                  padding: 0;
-                  margin: 0;
-                  font-size: 90%;
-                  font-weight: 500;
-                  background: transparent;
-                }
-              }
-            }
-
-            .note-comments:before {
-              display: block;
-              position: absolute;
-              top: -13px;
-              left: 20px;
-              height: 16px;
-              width: 16px;
-              font-family: "FontAwesome";
-              content: "\f0d8";
-              color: tint($blue, 95%);
-            }
-          }
-
-          .reference {
-            float: left;
-            width: flex-grid(3, 12);
-            font-size: 90%;
-
-            .wrapper-reference-content {
-              padding: 0 $baseline;
-              color: $gray-l2;
-
-              .reference-title {
-                margin-top: $baseline;
-                text-transform: uppercase;
-                font-size: 100%;
-                font-weight: 500;
-                letter-spacing: 1px;
-                color: $gray-l2;
-              }
-
-              .reference-title:first-child {
-                margin-top: 0;
-              }
-
-              a {
-                font-weight: 500;
-              }
+              margin: 0;
+              font-weight: $font-regular;
+              background: transparent;
             }
           }
         }
 
-        .note-group {
-          padding-top: ($baseline*1.5);
-
-          .group-lecture {
-            padding-bottom: $baseline;
-            border-bottom: 2px solid $gray-l4;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-
-            .subtitle {
-              display: block;
-              font-size: 75%;
-              font-weight: 100;
-              color: inherit;
-            }
-          }
-        }
-
-        .note:first-child {
-          // Created global class/extend
-          // Move to global area.
-          @extend .no-border-top;
+        .note-comments:before {
+          display: block;
+          position: absolute;
+          top: -13px;
+          left: 20px;
+          height: 16px;
+          width: 16px;
+          font-family: "FontAwesome";
+          content: "\f0d8";
+          color: tint($blue, 95%);
         }
       }
+
+      .reference {
+        @extend %t-copy-sub1;
+        float: left;
+        width: flex-grid(3, 12);
+
+        .wrapper-reference-content {
+          padding: 0 $baseline;
+          color: $gray-l2;
+
+          .reference-title {
+            @extend %t-copy-sub1;
+            margin-top: $baseline;
+            text-transform: uppercase;
+            font-weight: $font-regular;
+            letter-spacing: 1px;
+            color: $gray-l2;
+          }
+
+          .reference-title:first-child {
+            margin-top: 0;
+          }
+
+          a.reference-meta {
+            font-weight: $font-regular;
+          }
+        }
+      }
+    }
+
+    .note-group {
+      padding-top: ($baseline*1.5);
+
+      .group-lecture {
+        border-bottom: 2px solid $gray-l4;
+        padding-bottom: $baseline;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+
+        .course-title {}
+
+        .course-subtitle {
+          @extend %t-copy-sub1;
+          display: block;
+          font-weight: $font-light;
+          color: inherit;
+        }
+      }
+    }
+
+    .note:first-child {
+      @extend %no-border-top;
     }
   }  
 }
 
-.no-border-top {
-  border-top: none;
+.wrapper-tabs {
+
+  .tab-list {
+    @include clearfix();
+
+    .tabs-label {
+      @extend %t-copy-base;
+      @include line-height(14);
+      float: left;
+      margin-bottom: 0;
+      padding: ($baseline/2) $baseline;
+      padding-left: 0;
+      font-weight: $font-bold;          
+    }
+
+    .tabs {
+      @include clearfix();
+      float: left;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      .tab {
+        float: left;
+
+        a.tab-label {
+          display: block;
+          padding: ($baseline/2) $baseline;
+        }
+        
+        &.is-active {
+
+          a.tab-label {
+            color: $gray-d3;
+            border-bottom: ($baseline/5) solid $gray-d3;
+          }
+        }
+      }      
+    }
+  }
 }
