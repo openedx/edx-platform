@@ -39,7 +39,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
 
         self.course_fixture.add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
-                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection 1").add_children(
                     XBlockFixtureDesc("vertical", "Test Vertical").add_children(
                         XBlockFixtureDesc(
                             "html",
@@ -59,6 +59,18 @@ class EdxNotesTestMixin(UniqueCourseTest):
                         "html",
                         "Test HTML 3",
                         data="""<p><span class="{}">Annotate this text!</span></p>""".format(self.selector)
+                    ),
+                ),
+                XBlockFixtureDesc("sequential", "Test Subsection 2").add_children(
+                    XBlockFixtureDesc("vertical", "Test Vertical").add_children(
+                        XBlockFixtureDesc(
+                            "html",
+                            "Test HTML 4",
+                            data="""
+                                <p><span class="{0}">Annotate</span> this text!</p>
+                                <p>Annotate this text</p>
+                            """.format(self.selector)
+                        ),
                     ),
                 ),
             )).install()
@@ -521,3 +533,60 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
 
         note_2.click_on_highlight()
         self.assertTrue(note_2.is_visible)
+
+
+class EdxNotesToggleNotesTest(EdxNotesTestMixin):
+    """
+    Tests for toggling visibility of all notes.
+    """
+
+    def setUp(self):
+        super(EdxNotesToggleNotesTest, self).setUp()
+        self._add_notes()
+        self.note_unit_page.visit()
+
+    def test_can_disable_all_notes(self):
+        """
+        Scenario: User can disable all notes.
+        Given I have a course with components with notes
+        And I open the unit with annotatable components
+        When I click on "Show notes" checkbox
+        Then I do not see any notes on the sequential position
+        When I change sequential position to "2"
+        Then I still do not see any notes on the sequential position
+        When I go to "Test Subsection 2" subsection
+        Then I do not see any notes on the subsection
+        """
+        # Disable all notes
+        self.note_unit_page.toggle_visibility()
+        self.assertEqual(len(self.note_unit_page.notes), 0)
+        self.course_nav.go_to_sequential_position(2)
+        self.assertEqual(len(self.note_unit_page.notes), 0)
+        self.course_nav.go_to_section(u"Test Section", u"Test Subsection 2")
+        self.assertEqual(len(self.note_unit_page.notes), 0)
+
+    def test_can_reenable_all_notes(self):
+        """
+        Scenario: User can toggle notes visibility.
+        Given I have a course with components with notes
+        And I open the unit with annotatable components
+        When I click on "Show notes" checkbox
+        Then I do not see any notes on the sequential position
+        When I click on "Show notes" checkbox again
+        Then I see that all notes appear
+        When I change sequential position to "2"
+        Then I still can see all notes on the sequential position
+        When I go to "Test Subsection 2" subsection
+        Then I can see all notes on the subsection
+        """
+        # Disable notes
+        self.note_unit_page.toggle_visibility()
+        self.assertEqual(len(self.note_unit_page.notes), 0)
+        # Enable notes to make sure that I can enable notes without refreshing
+        # the page.
+        self.note_unit_page.toggle_visibility()
+        self.assertGreater(len(self.note_unit_page.notes), 0)
+        self.course_nav.go_to_sequential_position(2)
+        self.assertGreater(len(self.note_unit_page.notes), 0)
+        self.course_nav.go_to_section(u"Test Section", u"Test Subsection 2")
+        self.assertGreater(len(self.note_unit_page.notes), 0)
