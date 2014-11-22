@@ -18,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from student.tests.factories import UserFactory
 
+from .exceptions import EdxNotesParseError
 from . import helpers
 
 
@@ -48,52 +49,52 @@ class TestProblem(object):
         """
         Imitate get_html in module.
         """
-        return 'original_get_html'
+        return "original_get_html"
 
 
-@skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], 'EdxNotes feature needs to be enabled.')
+@skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 class EdxNotesDecoratorTest(TestCase):
     """
     Tests for edxnotes decorator.
     """
 
     def setUp(self):
-        ClientFactory(name='edx-notes')
+        ClientFactory(name="edx-notes")
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
         self.problem = TestProblem(self.course)
 
-    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_edxnotes_enabled(self):
         """
         Tests if get_html is wrapped when feature flag is on and edxnotes are
         enabled for the course.
         """
         enable_edxnotes_for_the_course(self.course, self.user.id)
-        self.assertIn('edx-notes-wrapper', self.problem.get_html())
+        self.assertIn("edx-notes-wrapper", self.problem.get_html())
 
-    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_edxnotes_disabled_if_edxnotes_flag_is_false(self):
         """
         Tests if get_html is wrapped when feature flag is on, but edxnotes are
         disabled for the course.
         """
-        self.assertEqual('original_get_html', self.problem.get_html())
+        self.assertEqual("original_get_html", self.problem.get_html())
 
-    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': False})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_disabled(self):
         """
         Tests if get_html is not wrapped when feature flag is off.
         """
-        self.assertEqual('original_get_html', self.problem.get_html())
+        self.assertEqual("original_get_html", self.problem.get_html())
 
     def test_edxnotes_studio(self):
         """
         Tests if get_html is not wrapped when problem is rendered in Studio.
         """
         self.problem.system.is_author_mode = True
-        self.assertEqual('original_get_html', self.problem.get_html())
+        self.assertEqual("original_get_html", self.problem.get_html())
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
@@ -105,65 +106,24 @@ class EdxNotesHelpersTest(TestCase):
         """
         Setup a dummy course content.
         """
-        ClientFactory(name='edx-notes')
+        ClientFactory(name="edx-notes")
         self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
-        self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
-        self.vertical = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
-        self.html_module_1 = ItemFactory.create(category='html', parent_location=self.vertical.location)
-        self.html_module_2 = ItemFactory.create(category='html', parent_location=self.vertical.location)
+        self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+        self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
+        self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
+        self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+        self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
-        self.datetimes = [
-            datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
-            datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
-        ]
-        self.datetimes_str = [
-            "Nov 19, 2014 at 08:05 UTC",
-            "Nov 19, 2014 at 08:06 UTC",
-        ]
 
     def _get_jump_to_url(self, vertical):
         """
         Returns `jump_to` url for the `vertical`.
         """
-        return reverse('jump_to', kwargs={
-            'course_id': self.course.id.to_deprecated_string(),
-            'location': vertical.location.to_deprecated_string(),
+        return reverse("jump_to", kwargs={
+            "course_id": self.course.id.to_deprecated_string(),
+            "location": vertical.location.to_deprecated_string(),
         })
-
-    def _get_dummy_model(self, module, fields_to_update=None):
-        """
-        Returns dummy model for the `module`.
-        """
-        dummy_model = {
-            u'quote': u'quote text',
-            u'text': u'text',
-            u'usage_id': unicode(module.location),
-            u'updated': self.datetimes[0],
-        }
-        if fields_to_update:
-            dummy_model.update(fields_to_update)
-        return dummy_model
-
-    def _get_dummy_note(self, module, vertical, fields_to_update=None):
-        """
-        Returns dummy note for the `module`.
-        """
-        dummy_note = {
-            u'quote': u'quote text',
-            u'text': u'text',
-            u'unit': {
-                u'url': self._get_jump_to_url(vertical),
-                u'display_name': vertical.display_name_with_default,
-            },
-            u'usage_id': unicode(module.location),
-            u'updated': self.datetimes_str[0],
-        }
-
-        if fields_to_update:
-            dummy_note.update(fields_to_update)
-        return dummy_note
 
     def test_edxnotes_not_enabled(self):
         """
@@ -189,19 +149,19 @@ class EdxNotesHelpersTest(TestCase):
         """
         # url ends with "/"
         with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com/"}):
-            self.assertEqual("http://example.com/api/v1", helpers.get_endpoint())
+            self.assertEqual("http://example.com/", helpers.get_endpoint())
 
         # url doesn't have "/" at the end
         with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/api/v1", helpers.get_endpoint())
+            self.assertEqual("http://example.com/", helpers.get_endpoint())
 
         # url with path that starts with "/"
         with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/api/v1/some_path", helpers.get_endpoint("/some_path"))
+            self.assertEqual("http://example.com/some_path/", helpers.get_endpoint("/some_path"))
 
         # url with path without "/"
         with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"}):
-            self.assertEqual("http://example.com/api/v1/some_path", helpers.get_endpoint("some_path"))
+            self.assertEqual("http://example.com/some_path/", helpers.get_endpoint("some_path/"))
 
         # url is not configured
         with patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": None}):
@@ -213,14 +173,42 @@ class EdxNotesHelpersTest(TestCase):
         Tests the result if correct data is received.
         """
         mock_get.return_value.content = json.dumps([
-            self._get_dummy_model(self.html_module_1),
-            self._get_dummy_model(self.html_module_2, fields_to_update={"updated": self.datetimes[1]}),
+            {
+                u"quote": u"quote text",
+                u"text": u"text",
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
+            },
+            {
+                u"quote": u"quote text",
+                u"text": u"text",
+                u"usage_id": unicode(self.html_module_2.location),
+                u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
+            }
         ])
 
         self.assertItemsEqual(
             [
-                self._get_dummy_note(self.html_module_2, self.vertical, fields_to_update={"updated": self.datetimes_str[1]}),
-                self._get_dummy_note(self.html_module_1, self.vertical),
+                {
+                    u"quote": u"quote text",
+                    u"text": u"text",
+                    u"unit": {
+                        u"url": self._get_jump_to_url(self.vertical),
+                        u"display_name": self.vertical.display_name_with_default,
+                    },
+                    u"usage_id": unicode(self.html_module_2.location),
+                    u"updated": "Nov 19, 2014 at 08:06 UTC",
+                },
+                {
+                    u"quote": u"quote text",
+                    u"text": u"text",
+                    u"unit": {
+                        u"url": self._get_jump_to_url(self.vertical),
+                        u"display_name": self.vertical.display_name_with_default,
+                    },
+                    u"usage_id": unicode(self.html_module_1.location),
+                    u"updated": "Nov 19, 2014 at 08:05 UTC",
+                },
             ],
             json.loads(helpers.get_notes(self.user, self.course))
         )
@@ -242,77 +230,195 @@ class EdxNotesHelpersTest(TestCase):
         self.assertIsNone(helpers.get_notes(self.user, self.course))
 
     @patch("edxnotes.helpers.requests.get")
-    def test_get_notes_no_item(self, mock_get):
+    def test_search_correct_data(self, mock_get):
         """
-        Tests the result if appropriate module is not found.
+        Tests the result if correct data is received.
         """
-        module = MagicMock()
-        module.location = self.course.id.make_usage_key("html", "test_item")
-        mock_get.return_value.content = json.dumps([
-            self._get_dummy_model(self.html_module_1),
-            self._get_dummy_model(module),
-        ])
+        mock_get.return_value.content = json.dumps({
+            "total": 2,
+            "rows": [
+                {
+                    u"quote": u"quote text",
+                    u"text": u"text",
+                    u"usage_id": unicode(self.html_module_1.location),
+                    u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
+                },
+                {
+                    u"quote": u"quote text",
+                    u"text": u"text",
+                    u"usage_id": unicode(self.html_module_2.location),
+                    u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
+                }
+            ]
+        })
 
         self.assertItemsEqual(
-            [self._get_dummy_note(self.html_module_1, self.vertical)],
-            json.loads(helpers.get_notes(self.user, self.course))
+            {
+                "total": 2,
+                "rows": [
+                    {
+                        u"quote": u"quote text",
+                        u"text": u"text",
+                        u"unit": {
+                            u"url": self._get_jump_to_url(self.vertical),
+                            u"display_name": self.vertical.display_name_with_default,
+                        },
+                        u"usage_id": unicode(self.html_module_2.location),
+                        u"updated": "Nov 19, 2014 at 08:06 UTC",
+                    },
+                    {
+                        u"quote": u"quote text",
+                        u"text": u"text",
+                        u"unit": {
+                            u"url": self._get_jump_to_url(self.vertical),
+                            u"display_name": self.vertical.display_name_with_default,
+                        },
+                        u"usage_id": unicode(self.html_module_1.location),
+                        u"updated": "Nov 19, 2014 at 08:05 UTC",
+                    },
+                ]
+            },
+            json.loads(helpers.search(self.user, self.course, "test"))
         )
 
     @patch("edxnotes.helpers.requests.get")
-    def test_get_notes_has_access(self, mock_get):
+    def test_search_json_error(self, mock_get):
+        """
+        Tests the result if incorrect json is received.
+        """
+        mock_get.return_value.content = "Error"
+        self.assertRaises(EdxNotesParseError, helpers.search, self.user, self.course, "test")
+
+    @patch("edxnotes.helpers.requests.get")
+    def test_search_wrong_data_format(self, mock_get):
+        """
+        Tests the result if incorrect data structure is received.
+        """
+        mock_get.return_value.content = json.dumps({"1": 2})
+        self.assertRaises(EdxNotesParseError, helpers.search, self.user, self.course, "test")
+
+    @patch("edxnotes.helpers.requests.get")
+    def test_search_empty_collection(self, mock_get):
+        """
+        Tests no results.
+        """
+        mock_get.return_value.content = json.dumps({
+            "total": 0,
+            "rows": []
+        })
+        self.assertItemsEqual(
+            {
+                "total": 0,
+                "rows": []
+            },
+            json.loads(helpers.search(self.user, self.course, "test"))
+        )
+
+    def test_preprocess_collection_no_item(self):
+        """
+        Tests the result if appropriate module is not found.
+        """
+        initial_collection = [
+            {
+                u"quote": u"quote text",
+                u"text": u"text",
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat()
+            },
+            {
+                u"quote": u"quote text",
+                u"text": u"text",
+                u"usage_id": unicode(self.course.id.make_usage_key("html", "test_item")),
+                u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat()
+            },
+        ]
+
+        self.assertItemsEqual(
+            [{
+                u"quote": u"quote text",
+                u"text": u"text",
+                u"unit": {
+                    u"url": self._get_jump_to_url(self.vertical),
+                    u"display_name": self.vertical.display_name_with_default,
+                },
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
+            }],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
+        )
+
+    def test_preprocess_collection_has_access(self):
         """
         Tests the result if the user do not has access to some modules.
         """
+        initial_collection = [
+            {
+                u"quote": u"quote text",
+                u"text": u"text",
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
+            },
+            {
+                u"quote": u"quote text",
+                u"text": u"text",
+                u"usage_id": unicode(self.html_module_2.location),
+                u"updated": datetime(2014, 11, 19, 8, 6, 16, 00000).isoformat(),
+            },
+        ]
         self.html_module_2.visible_to_staff_only = True
         modulestore().update_item(self.html_module_2, self.user.id)
-
-        mock_get.return_value.content = json.dumps([
-            self._get_dummy_model(self.html_module_1),
-            self._get_dummy_model(self.html_module_2),
-        ])
         self.assertItemsEqual(
-            [self._get_dummy_note(self.html_module_1, self.vertical)],
-            json.loads(helpers.get_notes(self.user, self.course))
+            [{
+                u"quote": u"quote text",
+                u"text": u"text",
+                u"unit": {
+                    u"url": self._get_jump_to_url(self.vertical),
+                    u"display_name": self.vertical.display_name_with_default,
+                },
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
+            }],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
-    def test_get_parent(self):
+    def test_get_ancestor(self):
         """
-        Tests `test_get_parent` method for the successful result.
+        Tests `test_get_ancestor` method for the successful result.
         """
-        parent = helpers.get_parent(modulestore(), self.html_module_1.location)
+        parent = helpers.get_ancestor(modulestore(), self.html_module_1.location)
         self.assertEqual(parent.location, self.vertical.location)
 
-    def test_get_parent_no_location(self):
+    def test_get_ancestor_no_location(self):
         """
         Tests the result if parent location is not found.
         """
         store = MagicMock()
         store.get_parent_location.return_value = None
-        self.assertEqual(helpers.get_parent(store, self.html_module_1.location), None)
+        self.assertEqual(helpers.get_ancestor(store, self.html_module_1.location), None)
 
-    def test_get_parent_no_parent(self):
+    def test_get_ancestor_no_parent(self):
         """
-        Tests the result if parent module is not found.
+        Tests the result if ancestor module is not found.
         """
         store = MagicMock()
         store.get_item.side_effect = ItemNotFoundError
-        self.assertEqual(helpers.get_parent(store, self.html_module_1.location), None)
+        self.assertEqual(helpers.get_ancestor(store, self.html_module_1.location), None)
 
-    def test_get_parent_context(self):
+    def test_get_ancestor_context(self):
         """
-        Tests `test_get_parent_context` method for the successful result.
+        Tests `test_get_ancestor_context` method for the successful result.
         """
         self.assertDictEqual(
             {
                 u"url": self._get_jump_to_url(self.vertical),
                 u"display_name": self.vertical.display_name_with_default,
             },
-            helpers.get_parent_context(self.course, modulestore(), self.html_module_1.location)
+            helpers.get_ancestor_context(self.course, modulestore(), self.html_module_1.location)
         )
 
     # pylint: disable=unused-argument
-    @patch('edxnotes.helpers.get_parent', return_value=None)
-    def test_get_parent_context_no_parent(self, mock_get_parent):
+    @patch("edxnotes.helpers.get_ancestor", return_value=None)
+    def test_get_ancestor_context_no_parent(self, mock_get_ancestor):
         """
         Tests the result if parent module is not found.
         """
@@ -321,7 +427,52 @@ class EdxNotesHelpersTest(TestCase):
                 u"url": None,
                 u"display_name": None,
             },
-            helpers.get_parent_context(self.course, modulestore(), self.html_module_1.location)
+            helpers.get_ancestor_context(self.course, modulestore(), self.html_module_1.location)
+        )
+
+    @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
+    @patch("edxnotes.helpers.get_token")
+    @patch("edxnotes.helpers.requests.get")
+    def test_send_request_with_query_string(self, mock_get, get_token):
+        """
+        Tests that requests are send with correct information.
+        """
+        get_token.return_value = "test_token"
+        helpers.send_request(
+            self.user, self.course.id, path="test", query_string="text"
+        )
+        mock_get.assert_called_with(
+            "http://example.com/test/",
+            headers={
+                "x-annotator-auth-token": "test_token"
+            },
+            params={
+                "user": self.user.username,
+                "course_id": unicode(self.course.id),
+                "text": "text",
+            }
+        )
+
+    @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
+    @patch("edxnotes.helpers.get_token")
+    @patch("edxnotes.helpers.requests.get")
+    def test_send_request_without_query_string(self, mock_get, get_token):
+        """
+        Tests that requests are send with correct information.
+        """
+        get_token.return_value = "test_token"
+        helpers.send_request(
+            self.user, self.course.id, path="test"
+        )
+        mock_get.assert_called_with(
+            "http://example.com/test/",
+            headers={
+                "x-annotator-auth-token": "test_token"
+            },
+            params={
+                "user": self.user.username,
+                "course_id": unicode(self.course.id),
+            }
         )
 
 
@@ -331,12 +482,13 @@ class EdxNotesViewsTest(TestCase):
     Tests for EdxNotes views.
     """
     def setUp(self):
-        ClientFactory(name='edx-notes')
+        ClientFactory(name="edx-notes")
         super(EdxNotesViewsTest, self).setUp()
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
         self.notes_page_url = reverse("edxnotes", args=[unicode(self.course.id)])
+        self.search_url = reverse("search_notes", args=[unicode(self.course.id)])
 
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
@@ -353,7 +505,65 @@ class EdxNotesViewsTest(TestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_view_is_disabled(self):
         """
-        Tests that 404 response is received if EdxNotes feature is disabled.
+        Tests that 404 status code is received if EdxNotes feature is disabled.
         """
         response = self.client.get(self.notes_page_url)
         self.assertEqual(response.status_code, 404)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    @patch("edxnotes.views.search")
+    def test_search_notes_successfully_respond(self, mock_search):
+        """
+        Tests that `search_notes` successfully respond if EdxNotes feature is enabled.
+        """
+        mock_search.return_value = json.dumps({
+            "total": 0,
+            "rows": [],
+        })
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        response = self.client.get(self.search_url, {"text": "test"})
+        self.assertEqual(json.loads(response.content), {
+            "total": 0,
+            "rows": [],
+        })
+        self.assertEqual(response.status_code, 200)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
+    @patch("edxnotes.views.search")
+    def test_search_notes_is_disabled(self, mock_search):
+        """
+        Tests that 404 status code is received if EdxNotes feature is disabled.
+        """
+        mock_search.return_value = json.dumps({
+            "total": 0,
+            "rows": [],
+        })
+        response = self.client.get(self.search_url, {"text": "test"})
+        self.assertEqual(response.status_code, 404)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    @patch("edxnotes.views.search")
+    def test_search_notes_without_required_parameters(self, mock_search):
+        """
+        Tests that 400 status code is received if the required parameters were not sent.
+        """
+        mock_search.return_value = json.dumps({
+            "total": 0,
+            "rows": [],
+        })
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        response = self.client.get(self.search_url)
+        self.assertEqual(response.status_code, 400)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    @patch("edxnotes.views.search")
+    def test_search_notes_exception(self, mock_search):
+        """
+        Tests that 500 status code is received if invalid data was received from
+        EdXNotes service.
+        """
+        mock_search.side_effect = EdxNotesParseError
+        enable_edxnotes_for_the_course(self.course, self.user.id)
+        response = self.client.get(self.search_url, {"text": "test"})
+        self.assertEqual(response.status_code, 500)
+        self.assertIn("error", response.content)

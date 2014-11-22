@@ -232,5 +232,5 @@ FEATURES['ENABLE_CONTENT_LIBRARIES'] = True
 
 FEATURES['ENABLE_EDXNOTES'] = True
 EDXNOTES_INTERFACE = {
-    'url': 'http://localhost:8042/',
+    'url': 'http://localhost:8042/api/v1',
 }

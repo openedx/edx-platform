@@ -8,7 +8,7 @@
 </div>
 <script type="text/javascript">
     (function (require) {
-        require(['js/edxnotes/views/notes'], function (Notes) {
+        require(['js/edxnotes/views/notes_factory'], function (Notes) {
             var element = document.getElementById('edx-notes-wrapper-${uid}');
             Notes.factory(element, ${json.dumps(params)});
         });
