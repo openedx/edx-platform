@@ -1,4 +1,5 @@
-from bok_choy.page_object import PageObject
+from bok_choy.page_object import PageObject, PageLoadError, unguarded
+from bok_choy.promise import BrokenPromise
 from .course_page import CoursePage
 from ...tests.helpers import disable_animations
 from selenium.webdriver.common.action_chains import ActionChains
@@ -26,49 +27,164 @@ class NoteChild(PageObject):
         )
 
 
+class EdxNotesPageView(PageObject):
+    """
+    Base class for EdxNotes views: Recent Activity, Course Structure, Search Results.
+    """
+    url = None
+    BODY_SELECTOR = ".edx-notes-page-items-list"
+    TAB_SELECTOR = ".tab-item"
+    CHILD_SELECTOR = ".edx-notes-page-item"
+
+    @unguarded
+    def visit(self):
+        """
+        Open the page containing this page object in the browser.
+
+        Raises:
+            PageLoadError: The page did not load successfully.
+
+        Returns:
+            PageObject
+        """
+        self.q(css=self.TAB_SELECTOR).first.click()
+        try:
+            return self.wait_for_page()
+        except (BrokenPromise):
+            raise PageLoadError("Timed out waiting to load page '{!r}'".format(self))
+
+    def is_browser_on_page(self):
+        return all([
+            self.q(css="{}".format(self.BODY_SELECTOR)).present,
+            self.q(css="{}.is-active".format(self.TAB_SELECTOR)).present,
+            not self.q(css=".ui-loading").visible,
+        ])
+
+    @property
+    def is_closable(self):
+        """
+        Indicates if tab is closable or not.
+        """
+        return self.q(css="{} .btn-close".format(self.TAB_SELECTOR)).present
+
+    def close(self):
+        """
+        Closes the tab.
+        """
+        self.q(css="{} .btn-close".format(self.TAB_SELECTOR)).first.click()
+
+    @property
+    def children(self):
+        """
+        Returns all notes on the page.
+        """
+        children = self.q(css=self.CHILD_SELECTOR)
+        return [EdxNotesPageItem(self.browser, child.get_attribute("id")) for child in children]
+
+
+class RecentActivityView(EdxNotesPageView):
+    """
+    Helper class for Recent Activity view.
+    """
+    BODY_SELECTOR = "#edx-notes-page-recent-activity"
+    TAB_SELECTOR = ".tab-item.tab-recent-activity"
+
+
+class SearchResultsView(EdxNotesPageView):
+    """
+    Helper class for Search Results view.
+    """
+    BODY_SELECTOR = "#edx-notes-page-search-results"
+    TAB_SELECTOR = ".tab-item.tab-search-results"
+
+
 class EdxNotesPage(CoursePage):
     """
     EdxNotes page.
     """
     url_path = "edxnotes"
+    MAPPING = {
+        "recent": RecentActivityView,
+        "search": SearchResultsView,
+    }
 
     def __init__(self, *args, **kwargs):
         super(EdxNotesPage, self).__init__(*args, **kwargs)
-        self.current_view = EdxNotesPageView(self.browser, "edx-notes-page-recent-activity")
+        self.current_view = self.MAPPING["recent"](self.browser)
 
     def is_browser_on_page(self):
         return self.q(css=".edx-notes-page-wrapper").present
 
+    def switch_to_tab(self, tab_name):
+        """
+        Switches to the appropriate tab `tab_name(str)`.
+        """
+        self.current_view = self.MAPPING[tab_name](self.browser)
+        self.current_view.visit()
+
+    def close_tab(self, tab_name):
+        """
+        Closes the tab `tab_name(str)`.
+        """
+        self.current_view.close()
+        self.current_view = self.MAPPING["recent"](self.browser)
+
+    def search(self, text):
+        """
+        Runs search with `text(str)` query.
+        """
+        self.q(css=".search-box #search-field").first.fill(text)
+        self.q(css='.search-box button').first.click()
+        # Frontend will automatically switch to Search results tab when search
+        # is running, so the view also needs to be changed.
+        self.current_view = self.MAPPING["search"](self.browser)
+
+    @property
+    def tabs(self):
+        """
+        Returns all tabs on the page.
+        """
+        tabs = self.q(css=".tabs .tab-item-name")
+        if tabs:
+            return tabs.text
+        else:
+            return None
+
+    @property
+    def is_error_visible(self):
+        """
+        Indicates whether error message is visible or not.
+        """
+        return self.q(css=".inline-error").visible
+
+    @property
+    def error_text(self):
+        """
+        Returns error message.
+        """
+        element = self.q(css=".inline-error").first
+        if element and self.is_error_visible:
+            return element.text[0]
+        else:
+            return None
+
     @property
     def children(self):
+        """
+        Returns all notes on the page.
+        """
         return self.current_view.children
 
     @property
     def no_content_text(self):
+        """
+        Returns no content message.
+        """
         element = self.q(css=".no-content").first
         if element:
             return element.text[0]
         else:
             return None
-
-
-class EdxNotesPageView(NoteChild):
-    """
-    Base class for EdxNotes views: Recent Activity, Course Structure.
-    """
-    BODY_SELECTOR = ".edx-notes-page-items-list"
-    CHILD_SELECTOR = ".edx-notes-page-item"
-
-    def is_browser_on_page(self):
-        return all([
-            self.q(css="{}#{}".format(self.BODY_SELECTOR, self.item_id)).present,
-            not self.q(css=".ui-loading").visible,
-        ])
-
-    @property
-    def children(self):
-        children = self.q(css=self._bounded_selector(self.CHILD_SELECTOR))
-        return [EdxNotesPageItem(self.browser, child.get_attribute("id")) for child in children]
 
 
 class EdxNotesPageItem(NoteChild):

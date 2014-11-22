@@ -142,7 +142,7 @@
             // End of needed by OVA
         },
         map: {
-          "js/edxnotes/views/notes": {
+          "js/edxnotes/views/notes_factory": {
               "annotator": "annotator_1.2.9"
           },
           "js/edxnotes/views/shim": {

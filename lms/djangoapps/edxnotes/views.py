@@ -3,16 +3,18 @@ Views related to EdxNotes.
 """
 import json
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.conf import settings
+from util.json_request import JsonResponseBadRequest
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
+from edxnotes.exceptions import EdxNotesParseError
 from edxnotes.helpers import (
-    get_endpoint,
-    get_token,
     get_notes,
-    is_feature_enabled
+    is_feature_enabled,
+    search
 )
 
 
@@ -29,12 +31,33 @@ def edxnotes(request, course_id):
 
     notes = get_notes(request.user, course)
     context = {
-        # Use camelCase to name keys.
         "course": course,
-        "endpoint": get_endpoint(),
+        "search_endpoint": reverse("search_notes", kwargs={"course_id": course_id}),
         "notes": notes,
-        "token": get_token(request.user),
         "debug": json.dumps(settings.DEBUG),
     }
 
-    return render_to_response("edxnotes.html", context)
+    return render_to_response("edxnotes/edxnotes.html", context)
+
+
+@login_required
+def search_notes(request, course_id):
+    """
+    Handles search requests.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, "load", course_key)
+
+    if not is_feature_enabled(course):
+        raise Http404
+
+    if not "text" in request.GET:
+        return HttpResponseBadRequest()
+
+    query_string = request.GET["text"]
+    try:
+        search_results = search(request.user, course, query_string)
+    except EdxNotesParseError as err:
+        return JsonResponseBadRequest({"error": err.message}, status=500)
+
+    return HttpResponse(search_results)

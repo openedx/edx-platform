@@ -198,6 +198,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
         user = self.get_params.get("user", None)
         usage_id = self.get_params.get("usage_id", None)
         course_id = self.get_params.get("course_id", None)
+        text = self.get_params.get("text", None)
 
         if user is None:
             self.respond(400, "Bad Request")
@@ -209,6 +210,8 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
             results = self.server.filter_by_course_id(results, course_id)
         if usage_id is not None:
             results = self.server.filter_by_usage_id(results, usage_id)
+        if text:
+            results = self.server.search(results, text)
         self.respond(content={
             "total": len(results),
             "rows": results,
@@ -247,7 +250,9 @@ class StubEdxNotesService(StubHttpService):
         """
         Returns a list of all notes.
         """
-        return deepcopy(self.notes)
+        notes = deepcopy(self.notes)
+        notes.reverse()
+        return notes
 
     def add_notes(self, notes):
         """
@@ -318,3 +323,9 @@ class StubEdxNotesService(StubHttpService):
         Filters provided `data(list)` by the `field_name(str)` with `value`.
         """
         return [note for note in data if note.get(field_name) == value]
+
+    def search(self, data, query):
+        """
+        Search the `query(str)` text in the provided `data(list)`.
+        """
+        return [note for note in data if unicode(query).strip() in note.get("text")]
