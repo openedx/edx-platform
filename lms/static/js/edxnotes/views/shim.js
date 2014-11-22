@@ -13,12 +13,20 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
      * so we add it here if necessary.
      **/
     if (!$.fn.addBack) {
-        $.fn.addBack = function(selector) {
-            return this.add(selector === null ?
-                    this.prevObject : this.prevObject.filter(selector)
+        $.fn.addBack = function (selector) {
+            return this.add(
+              selector === null ? this.prevObject : this.prevObject.filter(selector)
             );
         };
     }
+
+    /**
+     * The original _setupDynamicStyle uses a very expensive call to
+     * Util.maxZIndex(...) that sets the z-index of .annotator-adder,
+     * .annotator-outer, .annotator-notice, .annotator-filter. We set these
+     * values in annotator.min.css instead and do nothing here.
+     */
+    Annotator.prototype._setupDynamicStyle = function() { };
 
     Annotator.frozenSrc = null;
 
@@ -90,17 +98,17 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
      **/
     Annotator.Viewer.prototype.html.item = [
         '<li class="annotator-annotation annotator-item">',
-          '<span class="annotator-controls">',
-            '<a href="#" title="', _t('View as webpage'), '" class="annotator-link">',
-                _t('View as webpage'),
-            '</a>',
-            '<button title="', _t('Edit'), '" class="annotator-edit">',
-                _t('Edit'),
-            '</button>',
-            '<button title="', _t('Delete'), '" class="annotator-delete">',
-                _t('Delete'),
-            '</button>',
-          '</span>',
+            '<span class="annotator-controls">',
+                '<a href="#" title="', _t('View as webpage'), '" class="annotator-link">',
+                    _t('View as webpage'),
+                '</a>',
+                '<button title="', _t('Edit'), '" class="annotator-edit">',
+                    _t('Edit'),
+                '</button>',
+                '<button title="', _t('Delete'), '" class="annotator-delete">',
+                    _t('Delete'),
+                '</button>',
+            '</span>',
         '</li>'
     ].join('');
 
@@ -133,7 +141,7 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
             }
         },
 
-        freeze: function() {
+        freeze: function () {
             if (!this.isFrozen) {
                 // Remove default events
                 this.removeEvents();
@@ -144,7 +152,7 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
             }
         },
 
-        unfreeze: function() {
+        unfreeze: function () {
             if (this.isFrozen) {
                 // Add default events
                 this.addEvents();
