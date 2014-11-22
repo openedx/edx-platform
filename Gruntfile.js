@@ -92,18 +92,6 @@ module.exports = function (grunt) {
         clean: {
             lms: {
                 src: [
-                    // Sass-generated files
-                    '<%= c.lms %>/sass/application-extend1-rtl.css',
-                    '<%= c.lms %>/sass/application-extend1.css',
-                    '<%= c.lms %>/sass/application-extend2-rtl.css',
-                    '<%= c.lms %>/sass/application-extend2.css',
-                    '<%= c.lms %>/sass/application.css',
-                    '<%= c.lms %>/sass/course-rtl.css',
-                    '<%= c.lms %>/sass/course.css',
-                    '<%= c.lms %>/sass/ie.css',
-
-
-                    // Concat-generated files
                     '<%= c.lms %>/css/lms-style-vendor.css',
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css',
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css',
@@ -155,15 +143,20 @@ module.exports = function (grunt) {
                     ]
                },
                 files: {
-                    '<%= c.lms %>/sass/application-extend1-rtl.css': '<%= c.lms %>/sass/application-extend1-rtl.scss',
-                    '<%= c.lms %>/sass/application-extend1.css': '<%= c.lms %>/sass/application-extend1.scss',
-                    '<%= c.lms %>/sass/application-extend2-rtl.css': '<%= c.lms %>/sass/application-extend2-rtl.scss',
-                    '<%= c.lms %>/sass/application-extend2.css': '<%= c.lms %>/sass/application-extend2.scss',
-                    '<%= c.lms %>/sass/application.css': '<%= c.lms %>/sass/application.scss',
-                    '<%= c.lms %>/sass/application-rtl.css': '<%= c.lms %>/sass/application-rtl.scss',
-                    '<%= c.lms %>/sass/course-rtl.css': '<%= c.lms %>/sass/course-rtl.scss',
-                    '<%= c.lms %>/sass/course.css': '<%= c.lms %>/sass/course.scss',
-                    '<%= c.lms %>/sass/ie.css': '<%= c.lms %>/sass/ie.scss',
+                    '<%= c.lms %>/css/lms-style-app-extend1.css': '<%= c.lms %>/sass/application-extend1.scss',
+                    '<%= c.lms %>/css/lms-style-app-extend1-rtl.css': '<%= c.lms %>/sass/application-extend1-rtl.scss',
+                    '<%= c.lms %>/css/lms-style-app-extend2.css': '<%= c.lms %>/sass/application-extend2.scss',
+                    '<%= c.lms %>/css/lms-style-app-extend2-rtl.css': '<%= c.lms %>/sass/application-extend2-rtl.scss',
+                    '<%= c.lms %>/css/lms-style-app.css': [
+                        '<%= c.lms %>/sass/application.scss',
+                        '<%= c.lms %>/sass/ie.scss'
+                    ],
+                    '<%= c.lms %>/css/lms-style-app-rtl.css': [
+                        '<%= c.lms %>/sass/application-rtl.scss',
+                        '<%= c.lms %>/sass/ie-rtl.scss'
+                    ],
+                    '<%= c.lms %>/css/lms-style-course.css': '<%= c.lms %>/sass/course.scss',
+                    '<%= c.lms %>/css/lms-style-course-rtl.css': '<%= c.lms %>/sass/course-rtl.scss'
                 }
             },
             studio: {
@@ -202,38 +195,10 @@ module.exports = function (grunt) {
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css': [
                         '<%= c.lms %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
                     ],
-                    '<%= c.lms %>/css/lms-style-app.css': [
-                        '<%= c.lms %>/sass/application.css',
-                        '<%= c.lms %>/sass/ie.css'
-                    ],
-                    '<%= c.lms %>/css/lms-style-app-extend1.css': [
-                        '<%= c.lms %>/sass/application-extend1.css'
-                    ],
-                    '<%= c.lms %>/css/lms-style-app-extend2.css': [
-                        '<%= c.lms %>/sass/application-extend2.css'
-                    ],
-                    '<%= c.lms %>/css/lms-style-app-rtl.css': [
-                        '<%= c.lms %>/sass/application-rtl.css',
-                        '<%= c.lms %>/sass/ie-rtl.css'
-                    ],
-                    '<%= c.lms %>/css/lms-style-app-extend1-rtl.css': [
-                        '<%= c.lms %>/sass/application-extend1-rtl.css'
-                    ],
-                    '<%= c.lms %>/css/lms-style-app-extend2-rtl.css': [
-                        '<%= c.lms %>/sass/application-extend2-rtl.css'
-                    ],
                     '<%= c.lms %>/css/lms-style-course-vendor.css': [
                         '<%= c.lms %>/js/vendor/CodeMirror/codemirror.css',
                         '<%= c.lms %>/css/vendor/jquery.treeview.css',
                         '<%= c.lms %>/css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css'
-                    ],
-                    '<%= c.lms %>/css/lms-style-course.css': [
-                        '<%= c.lms %>/sass/course.css',
-                        '<%= c.lms %>/xmodule/modules.css'
-                    ],
-                    '<%= c.lms %>/css/lms-style-course-rtl.css': [
-                        '<%= c.lms %>/sass/course-rtl.css',
-                        '<%= c.lms %>/xmodule/modules.css'
                     ],
                     '<%= c.lms %>/css/lms-style-xmodule-annotations.css': [
                         '<%= c.lms %>/css/vendor/ova/annotator.css',
