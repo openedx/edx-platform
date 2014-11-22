@@ -1,3 +1,9 @@
+.edx-notes-visibility {
+  .error {
+    color: $red;
+  }
+}
+
 .edx-notes-page-wrapper {
   header {
     @include clearfix;

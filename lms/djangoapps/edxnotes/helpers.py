@@ -22,6 +22,7 @@ from provider.oauth2.models import AccessToken, Client
 import oauth2_provider.oidc as oidc
 from provider.utils import now
 from .exceptions import EdxNotesParseError
+
 log = logging.getLogger(__name__)
 
 

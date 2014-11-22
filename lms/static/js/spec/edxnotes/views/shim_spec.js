@@ -1,5 +1,6 @@
-define(['jquery', 'underscore', 'js/edxnotes/views/notes_factory', 'jasmine-jquery'],
-function($, _, Notes) {
+define([
+    'jquery', 'underscore', 'annotator', 'js/edxnotes/views/notes_factory', 'jasmine-jquery'
+], function($, _, Annotator, NotesFactory) {
     'use strict';
     describe('EdxNotes Shim', function() {
         var annotators, highlights;
@@ -28,10 +29,10 @@ function($, _, Notes) {
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             highlights = [];
             annotators = [
-                Notes.factory($('div#edx-notes-wrapper-123').get(0), {
+                NotesFactory.factory($('div#edx-notes-wrapper-123').get(0), {
                     endpoint: 'http://example.com/'
                 }),
-                Notes.factory($('div#edx-notes-wrapper-456').get(0), {
+                NotesFactory.factory($('div#edx-notes-wrapper-456').get(0), {
                     endpoint: 'http://example.com/'
                 })
             ];
@@ -41,6 +42,10 @@ function($, _, Notes) {
                 spyOn(annotator, 'onHighlightMouseover').andCallThrough();
                 spyOn(annotator, 'startViewerHideTimer').andCallThrough();
             });
+        });
+
+        afterEach(function () {
+            _.invoke(Annotator._instances, 'destroy');
         });
 
         it('clicking a highlight freezes mouseover and mouseout in all highlighted text', function() {
