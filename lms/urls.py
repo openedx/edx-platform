@@ -379,7 +379,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^profile/', include('student_profile.urls')),
 
         # Student Notes
-        url(r'^courses/{}/edxnotes$'.format(settings.COURSE_ID_PATTERN), 'edxnotes.views.edxnotes', name='edxnotes'),
+        url(r'^courses/{}/edxnotes'.format(settings.COURSE_ID_PATTERN), include('edxnotes.urls'), name="edxnotes_endpoints"),
     )
 
     # allow course staff to change to student view of courseware
