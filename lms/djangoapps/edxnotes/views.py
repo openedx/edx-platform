@@ -2,14 +2,17 @@
 Views related to EdxNotes.
 """
 import json
+import logging
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.conf import settings
-from util.json_request import JsonResponseBadRequest
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
+from util.json_request import JsonResponse, JsonResponseBadRequest
 from edxnotes.exceptions import EdxNotesParseError
 from edxnotes.helpers import (
     get_notes,
@@ -17,6 +20,8 @@ from edxnotes.helpers import (
     is_feature_enabled,
     search
 )
+
+log = logging.getLogger(__name__)
 
 
 @login_required
@@ -71,3 +76,27 @@ def get_token(request, course_id):
     Get JWT ID-Token, in case you need new one.
     """
     return HttpResponse(get_id_token(request.user), content_type='text/plain')
+
+
+def edxnotes_visibility(request, course_id):
+    """
+    Handle ajax call from "Show notes" checkbox.
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, "load", course_key)
+    field_data_cache = FieldDataCache([course], course_key, request.user)
+    course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
+
+    if not is_feature_enabled(course):
+        raise Http404
+
+    try:
+        visibility = json.loads(request.body)["visibility"]
+        course_module.edxnotes_visibility = visibility
+        course_module.save()
+        return JsonResponse(status=200)
+    except (ValueError, KeyError):
+        log.warning(
+            "Could not decode request body as JSON and find a boolean visibility field: '{0}'".format(request.body)
+        )
+        return JsonResponseBadRequest()

@@ -2,6 +2,7 @@
 Decorators related to edXNotes.
 """
 from django.conf import settings
+import json
 from edxnotes.helpers import (
     get_endpoint,
     get_id_token,
@@ -33,6 +34,9 @@ def edxnotes(cls):
             return render_to_string("edxnotes_wrapper.html", {
                 "content": original_get_html(self, *args, **kwargs),
                 "uid": generate_uid(),
+                "edxnotes_visibility": json.dumps(
+                    getattr(self, 'edxnotes_visibility', course.edxnotes_visibility)
+                ),
                 "params": {
                     # Use camelCase to name keys.
                     "usageId": unicode(self.scope_ids.usage_id).encode("utf-8"),
