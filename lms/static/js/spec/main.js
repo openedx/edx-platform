@@ -1,5 +1,4 @@
 (function(requirejs, define) {
-
     // TODO: how can we share the vast majority of this config that is in common with CMS?
     requirejs.config({
         paths: {
@@ -404,9 +403,9 @@
         'lms/include/js/spec/student_account/emailoptin_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js',
-        'lms/include/js/spec/edxnotes/notes_factory_spec.js',
-        'lms/include/js/spec/edxnotes/shim_spec.js',
         'lms/include/js/spec/edxnotes/utils/logger_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_factory_spec.js',
+        'lms/include/js/spec/edxnotes/views/shim_spec.js',
         'lms/include/js/spec/edxnotes/views/notes_page_spec.js',
         'lms/include/js/spec/edxnotes/views/search_box_spec.js',
         'lms/include/js/spec/edxnotes/views/tabs_list_spec.js',
@@ -414,6 +413,8 @@
         'lms/include/js/spec/edxnotes/views/tab_view_spec.js',
         'lms/include/js/spec/edxnotes/views/tabs/search_results_spec.js',
         'lms/include/js/spec/edxnotes/views/tabs/recent_activity_spec.js',
+        'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
+        'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
         'lms/include/js/spec/edxnotes/models/tab_spec.js'
     ]);
 

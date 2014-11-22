@@ -169,6 +169,12 @@ class InheritanceMixin(XBlockMixin):
         default=False,
         scope=Scope.settings
     )
+    edxnotes_visibility = Boolean(
+        display_name=_("Enable visibility of Notes"),
+        help=_("Enter true or false. If true, Notes for HTML components will be visible."),
+        default=True,
+        scope=Scope.user_info
+    )
 
 
 def compute_inherited_metadata(descriptor):
