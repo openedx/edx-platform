@@ -1,8 +1,4 @@
-define([
-    'jquery', 'js/edxnotes/views/notes_factory', 'js/common_helpers/ajax_helpers',
-    'jasmine-jquery'
-],
-function($, Notes, AjaxHelpers) {
+define([], function() {
     'use strict';
     var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
         base64Encode, makeToken;
@@ -51,38 +47,8 @@ function($, Notes, AjaxHelpers) {
         return 'header.' + base64Encode(JSON.stringify(rawToken)) + '.signature';
     };
 
-    describe('EdxNotes Notes', function() {
-        var wrapper;
-
-        beforeEach(function() {
-            loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
-            wrapper = $('div#edx-notes-wrapper-123');
-        });
-
-        it('Tests that annotator is initialized with options correctly', function() {
-            var requests = AjaxHelpers.requests(this),
-                token = makeToken(),
-                annotationData = {
-                    user: 'a user',
-                    usage_id : 'an usage',
-                    course_id: 'a course'
-                },
-                annotator = Notes.factory(wrapper[0], {
-                    endpoint: '/test_endpoint',
-                    user: 'a user',
-                    usageId : 'an usage',
-                    courseId: 'a course',
-                    token: token,
-                    tokenUrl: '/test_token_url'
-                }),
-                request = requests[0];
-
-            expect(requests.length).toBe(1);
-            expect(request.requestHeaders['x-annotator-auth-token']).toBe(token);
-            expect(annotator.options.auth.tokenUrl).toBe('/test_token_url');
-            expect(annotator.options.store.prefix).toBe('/test_endpoint');
-            expect(annotator.options.store.annotationData).toEqual(annotationData);
-            expect(annotator.options.store.loadFromSearch).toEqual(annotationData);
-        });
-    });
+    return {
+        base64Encode: base64Encode,
+        makeToken: makeToken
+    }
 });
