@@ -914,7 +914,7 @@ MOCK_STAFF_GRADING = False
 
 # Configure the LMS to use our stub EdxNotes implementation
 EDXNOTES_INTERFACE = {
-    'url': 'http://localhost:8042/',
+    'url': 'http://localhost:8042/api/v1',
 }
 
 ################################# Jasmine ##################################
