@@ -46,7 +46,7 @@ class EdxNotesTestMixin(UniqueCourseTest):
                             "Test HTML 1",
                             data="""
                                 <p><span class="{0}">Annotate</span> this text!</p>
-                                <p>Annotate this <span class="{0}">text</span></p>
+                                <p>Annotate this text</p>
                             """.format(self.selector)
                         ),
                         XBlockFixtureDesc(
@@ -116,13 +116,10 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         for component in components:
             self.assertEqual(0, len(component.notes))
 
-    def assert_text_in_notes(self, components, offset=0):
-        index = offset
-        for component in components:
-            actual = [note.text for note in component.notes]
-            expected = ["TEST TEXT {}".format(i + index) for i in xrange(len(actual))]
-            index += len(actual)
-            self.assertEqual(set(expected), set(actual))
+    def assert_text_in_notes(self, notes):
+        actual = [note.text for note in notes]
+        expected = ["TEST TEXT {}".format(i) for i in xrange(len(notes))]
+        self.assertEqual(expected, actual)
 
     def test_can_create_notes(self):
         """
@@ -143,20 +140,18 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
 
         components = self.note_unit_page.components
         self.create_notes(components)
-        self.assert_text_in_notes(components)
-        offset = len(self.note_unit_page.notes)
+        self.assert_text_in_notes(self.note_unit_page.notes)
 
         self.course_nav.go_to_sequential_position(2)
         components = self.note_unit_page.components
-        self.create_notes(components, offset)
-        self.assert_text_in_notes(components, offset)
+        self.create_notes(components)
 
         components = self.note_unit_page.refresh()
-        self.assert_text_in_notes(components, offset)
+        self.assert_text_in_notes(self.note_unit_page.notes)
 
         self.course_nav.go_to_sequential_position(1)
         components = self.note_unit_page.components
-        self.assert_text_in_notes(components)
+        self.assert_text_in_notes(self.note_unit_page.notes)
 
     def test_can_edit_notes(self):
         """
@@ -178,20 +173,19 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
 
         components = self.note_unit_page.components
         self.edit_notes(components)
-        self.assert_text_in_notes(components)
-        offset = len(self.note_unit_page.notes)
+        self.assert_text_in_notes(self.note_unit_page.notes)
 
         self.course_nav.go_to_sequential_position(2)
         components = self.note_unit_page.components
-        self.edit_notes(components, offset)
-        self.assert_text_in_notes(components, offset)
+        self.edit_notes(components)
+        self.assert_text_in_notes(self.note_unit_page.notes)
 
         components = self.note_unit_page.refresh()
-        self.assert_text_in_notes(components, offset)
+        self.assert_text_in_notes(self.note_unit_page.notes)
 
         self.course_nav.go_to_sequential_position(1)
         components = self.note_unit_page.components
-        self.assert_text_in_notes(components)
+        self.assert_text_in_notes(self.note_unit_page.notes)
 
     def test_can_delete_notes(self):
         """
@@ -256,15 +250,15 @@ class EdxNotesPageTest(UniqueCourseTest):
         self.course_fixture.add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection").add_children(
-                    XBlockFixtureDesc('vertical', 'Test Unit 1').add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit 1").add_children(
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 1",
                             data="""<p>Annotate this text!</p>"""
                         ),
                     ),
-                    XBlockFixtureDesc('vertical', 'Test Unit 2').add_children(
-                        XBlockFixtureDesc('vertical', 'Test Unit 2').add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit 2").add_children(
+                        XBlockFixtureDesc("vertical", "Test Unit 2").add_children(
                             XBlockFixtureDesc(
                                 "html",
                                 "Test HTML 2",
@@ -284,6 +278,36 @@ class EdxNotesPageTest(UniqueCourseTest):
         self.edxnotes_fixture.create_notes(notes_list)
         self.edxnotes_fixture.install()
 
+    def _add_default_notes(self):
+        xblocks = self.course_fixture.get_nested_xblocks(category="html")
+        self._add_notes([
+            Note(
+                usage_id=xblocks[1].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="Third text",
+                quote="",
+                updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
+            ),
+            Note(
+                usage_id=xblocks[0].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="Annotate this text!",
+                quote="Second note",
+                updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat(),
+                ranges=[Range(startOffset=0, endOffset=19)],
+            ),
+            Note(
+                usage_id=xblocks[1].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="",
+                quote="First note",
+                updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat(),
+            ),
+        ])
+
     def test_no_content(self):
         """
         Scenario: User can see `No content` message.
@@ -292,43 +316,17 @@ class EdxNotesPageTest(UniqueCourseTest):
         Then I see only "You do not have any notes within the course." message
         """
         self.notes_page.visit()
-        self.assertEqual('You do not have any notes within the course.', self.notes_page.no_content_text)
+        self.assertEqual("You do not have any notes within the course.", self.notes_page.no_content_text)
 
     def test_recent_activity_view(self):
         """
-        Scenario: User can view all notes.
+        Scenario: User can view all notes by recent activity.
         Given I have a course with 3 notes
         When I open Notes page
         Then I see 3 notes sorted by the day
         And I see correct content in the notes
         """
-        xblocks = self.course_fixture.get_nested_xblocks(category="html")
-        self._add_notes([
-            Note(
-                usage_id=xblocks[0].locator,
-                user=self.username,
-                course_id=self.course_fixture._course_key,
-                text="Annotate this text!",
-                quote="Second note",
-                updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat()
-            ),
-            Note(
-                usage_id=xblocks[1].locator,
-                user=self.username,
-                course_id=self.course_fixture._course_key,
-                text="",
-                quote="First note",
-                updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat()
-            ),
-            Note(
-                usage_id=xblocks[1].locator,
-                user=self.username,
-                course_id=self.course_fixture._course_key,
-                text="Third text",
-                quote="",
-                updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat()
-            )
-        ])
+        self._add_default_notes()
 
         def assertContent(item, text=None, quote=None, unit_name=None, time_updated=None):
             self.assertEqual(item.text, text)
@@ -370,28 +368,86 @@ class EdxNotesPageTest(UniqueCourseTest):
     def test_easy_access_from_notes_page(self):
         """
         Scenario: Ensure that the link to the Unit works correctly.
-        Given I have a course with a note
+        Given I have a course with 3 notes
         When I open Notes page
-        And I click on the unit link
+        And I click on the second unit link
         Then I see correct text on the unit page
         """
-        xblocks = self.course_fixture.get_nested_xblocks(category="html")
-        self._add_notes([
-            Note(
-                usage_id=xblocks[0].locator,
-                user=self.username,
-                course_id=self.course_fixture._course_key,
-                text="Annotate this text!",
-                ranges=[Range(startOffset=0, endOffset=20)]
-            ),
-        ])
-
+        self._add_default_notes()
         self.notes_page.visit()
-        item = self.notes_page.children[0]
+        item = self.notes_page.children[1]
         text = item.text
         item.go_to_unit()
         self.courseware_page.wait_for_page()
         self.assertIn(text, self.courseware_page.xblock_component_html_content())
+
+    def test_search_behaves_correctly(self):
+        """
+        Scenario: Searching behaves correctly.
+        Given I have a course with 3 notes
+        When I open Notes page
+        When I run the search with "   " query
+        Then I see the following error message "Search field cannot be blank."
+        And I still can see only "Recent Activity" tab
+        When I run the search with "text" query
+        Then I see that error message disappears
+        And I see that "Search Results" tab appears with 2 notes found
+        """
+        self._add_default_notes()
+        self.notes_page.visit()
+        # Run the search with whitespaces only
+        self.notes_page.search("   ")
+        # Displays error message
+        self.assertTrue(self.notes_page.is_error_visible)
+        self.assertEqual(self.notes_page.error_text, u"Search field cannot be blank.")
+        # Search results tab does not appear
+        self.assertEqual(len(self.notes_page.tabs), 1)
+        # Run the search with correct query
+        self.notes_page.search("text")
+        # Error message disappears
+        self.assertFalse(self.notes_page.is_error_visible)
+        self.assertIn(u"Search Results", self.notes_page.tabs)
+        self.assertEqual(len(self.notes_page.children), 2)
+
+    def test_tabs_behaves_correctly(self):
+        """
+        Scenario: Tabs behaves correctly.
+        Given I have a course with 3 notes
+        When I open Notes page
+        Then I see only "Recent Activity" tab with 3 notes
+        When I run the search with "text" query
+        And I see that "Search Results" tab appears with 2 notes found
+        Then I switch to "Recent Activity" tab
+        And I see all 3 notes
+        When I switch back to "Search Results" tab
+        Then I can still see 2 notes found
+        When I close "Search Results" tab
+        Then I see that "Recent Activity" tab becomes active
+        And "Search Results" tab disappears
+        And I see all 3 notes
+        """
+        self._add_default_notes()
+        self.notes_page.visit()
+
+        # We're on Recent Activity tab.
+        self.assertEqual(len(self.notes_page.tabs), 1)
+        self.assertIn(u"Recent Activity", self.notes_page.tabs)
+        self.assertEqual(len(self.notes_page.children), 3)
+        self.notes_page.search("text")
+        # We're on Search Results tab
+        self.assertEqual(len(self.notes_page.tabs), 2)
+        self.assertIn(u"Search Results", self.notes_page.tabs)
+        self.assertEqual(len(self.notes_page.children), 2)
+        # We can switch on Recent Activity tab and back.
+        self.notes_page.switch_to_tab("recent")
+        self.assertEqual(len(self.notes_page.children), 3)
+        self.notes_page.switch_to_tab("search")
+        self.assertEqual(len(self.notes_page.children), 2)
+        # Can close search results page
+        self.notes_page.close_tab("search")
+        self.assertEqual(len(self.notes_page.tabs), 1)
+        self.assertIn(u"Recent Activity", self.notes_page.tabs)
+        self.assertEqual(len(self.notes_page.children), 3)
 
 
 class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
@@ -417,9 +473,9 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         note = self.note_unit_page.notes[0]
 
         note.click_on_highlight()
-        self.note_unit_page.move_mouse_to('body')
+        self.note_unit_page.move_mouse_to("body")
         self.assertTrue(note.is_visible)
-        self.note_unit_page.click('body')
+        self.note_unit_page.click("body")
         self.assertFalse(note.is_visible)
 
     def test_can_toggle_by_clicking_on_the_note(self):
@@ -435,9 +491,9 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         note = self.note_unit_page.notes[0]
 
         note.show().click_on_viewer()
-        self.note_unit_page.move_mouse_to('body')
+        self.note_unit_page.move_mouse_to("body")
         self.assertTrue(note.is_visible)
-        self.note_unit_page.click('body')
+        self.note_unit_page.click("body")
         self.assertFalse(note.is_visible)
 
     def test_interaction_between_notes(self):
@@ -456,7 +512,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         note_2 = self.note_unit_page.notes[1]
 
         note_1.click_on_highlight()
-        self.note_unit_page.move_mouse_to('body')
+        self.note_unit_page.move_mouse_to("body")
         self.assertTrue(note_1.is_visible)
 
         note_2.click_on_highlight()

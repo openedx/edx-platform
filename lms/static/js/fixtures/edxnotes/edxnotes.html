@@ -1,6 +1,23 @@
-<div id="edx-notes-wrapper-123" class="edx-notes-wrapper">
-    Annotate it!
-</div>
-<div id="edx-notes-wrapper-456" class="edx-notes-wrapper">
-    Annotate it!
+<div class="edx-notes-page-wrapper">
+    <header>
+        <div class="page-title">
+            <h1>Notes</h1>
+            <small>Highlights and personal notes you've made within the course</small>
+        </div>
+        <form method="GET" action="/search_endpoint" class="is-hidden search-box">
+            <button type="submit">Search</button>
+            <input name="text" id="search-field" required placeholder="Search Notes for..." />
+        </form>
+    </header>
+    <nav class="edx-notes-page-views is-hidden">
+        <h4>View notes by:</h4>
+    </nav>
+    <div class="container">
+        <div class="course-info">
+            <div class="inline-error is-hidden"></div>
+            <div class="ui-loading">
+                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">Loading...</span></p>
+            </div>
+        </div>
+    </div>
 </div>
