@@ -20,8 +20,8 @@ from django.core.urlresolvers import reverse
       </h1>
 
       <nav class="nav-actions">
-        <h3 class="sr">Page Actions</h3>
-        <ul>
+        <h3 class="nav-actions-title sr">Page Actions</h3>
+        <ul class="nav-actions-list">
           <li class="nav-item">
             <a href="#" class="button button-new" data-category="chapter" data-parent="" data-default-name="">
               <i class="icon-plus"></i>Upload New File
@@ -34,20 +34,21 @@ from django.core.urlresolvers import reverse
 
   <div class="wrapper-content wrapper">
     <section class="content">
-      <h2 class="hide">Content</h2>
+      <h2 class="is-hidden">Content</h2>
       <article class="content-primary" role="main">
-        <h3 class="hide">Video Uploads</h3>
+        <h3 class="is-hidden">Video Uploads</h3>
         <article data-locator="" data-course-key="">
           <div class="file-drop">
-            <form id="form-file-drop" action="upload.php" method="POST" enctype="multipart/form-data">
-              <input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
-              <fieldset>
-                <legend class="sr">Upload your videos</legend>
+            <form class="file-drop-upload-form" id="form-file-drop" action="upload.php" method="POST" enctype="multipart/form-data">
+              <label for="file-drop-filename" class="file-drop-filename-label sr">
+              <input class="file-drop-filename" type="hidden" id="file-drop-filename" name="file" />
+              <fieldset class="file-drop-fieldset">
+                <legend class="file-drop-legend sr">Upload your videos</legend>
                 <div class="area-file-drop">
                   Drag and drop your video files here, or...
 
-                  <label for="video-files" class="sr">Files to upload:</label>
-                  <input type="file" class="sr" id="video-files" name="video-files[]" multiple="multiple" />
+                  <label for="video-files" class="video-files-label sr">Files to upload:</label>
+                  <input type="file" class="video-files-filename sr" id="video-files" name="video-files[]" multiple="multiple" />
                 </div>
                 <div class="action-area">
                   <button type="button" class="button primary-green"><i class="icon-plus"></i>Select files</button>
@@ -58,11 +59,11 @@ from django.core.urlresolvers import reverse
         </article>
 
         <section class="video-upload-progress-container clearfix">
-          <h3 class="sr">Video Upload Progress</h3>
-          <ul class="clearfix">
-            <li>
+          <h3 class="video-upload-progress-title sr">Video Upload Progress</h3>
+          <ul class="video-upload-progress-list clearfix">
+            <li class="video-upload-item">
               <div class="video-detail-wrapper">
-                <h4 id="video-upload-001">Something random that's supposed to be uploading</h4>
+                <h4 class="" id="video-upload-001">Something random that's supposed to be uploading</h4>
                 <div class="progress-bar">
                   <progress class="bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-001"></progress>
                 </div>
@@ -72,7 +73,7 @@ from django.core.urlresolvers import reverse
                 <div class="status-message"></div>
               </div>
             </li>
-            <li>
+            <li class="video-upload-item">
               <div class="video-detail-wrapper">
                 <h4 id="video-upload-002">Something random that's supposed to be uploading</h4>
                 <div class="progress-bar bar-error">
@@ -86,7 +87,7 @@ from django.core.urlresolvers import reverse
                 </div>
               </div>
             </li>
-            <li>
+            <li class="video-upload-item">
               <div class="video-detail-wrapper">
                 <h4 id="video-upload-003">Something random that's supposed to be uploading</h4>
                 <div class="progress-bar bar-success">
@@ -100,7 +101,7 @@ from django.core.urlresolvers import reverse
                 </div>
               </div>
             </li>
-            <li>
+            <li class="video-upload-item">
               <div class="video-detail-wrapper">
                 <h4 id="video-upload-004">Something random that's supposed to be uploading</h4>
                 <div class="progress-bar">
@@ -112,7 +113,7 @@ from django.core.urlresolvers import reverse
                 <div class="status-message"></div>
               </div>
             </li>
-            <li>
+            <li class="video-upload-item">
               <div class="video-detail-wrapper">
                 <h4 id="video-upload-005">Something random that's supposed to be uploading</h4>
                 <div class="progress-bar">
@@ -124,7 +125,7 @@ from django.core.urlresolvers import reverse
                 <div class="status-message"></div>
               </div>
             </li>
-            <li class="is-duplicate">
+            <li class="video-upload-item is-duplicate">
               <div class="video-detail-wrapper">
                 <h4 id="video-upload-006">Something random that's supposed to be uploading</h4>
                 <div class="progress-bar">
@@ -138,7 +139,7 @@ from django.core.urlresolvers import reverse
                 </div>
               </div>
             </li>
-            <li>
+            <li class="video-upload-item">
               <div class="video-detail-wrapper">
                 <h4 id="video-upload-007">Something random that's supposed to be uploading</h4>
                 <div class="progress-bar">
@@ -150,7 +151,7 @@ from django.core.urlresolvers import reverse
                 <div class="status-message"></div>
               </div>
             </li>
-            <li>
+            <li class="video-upload-item">
               <div class="video-detail-wrapper">
                 <h4 id="video-upload-008">Something random that's supposed to be uploading</h4>
                 <div class="progress-bar">
