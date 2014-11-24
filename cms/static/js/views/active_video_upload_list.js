@@ -63,7 +63,7 @@ define(
                         data: JSON.stringify({
                             files: _.map(
                                 uploadData.files,
-                                function(file) { return {"file-name": file.name}; }
+                                function(file) { return {"file_name": file.name}; }
                             )
                         }),
                         dataType: "json",
