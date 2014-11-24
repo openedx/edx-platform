@@ -29,7 +29,8 @@ class CourseMetadata(object):
                      'pdf_textbooks',
                      'name',  # from xblock
                      'tags',  # from xblock
-                     'visible_to_staff_only'
+                     'visible_to_staff_only',
+                     'group_access',
     ]
 
     @classmethod
