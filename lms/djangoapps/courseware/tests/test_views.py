@@ -3,6 +3,7 @@
 Tests courseware views.py
 """
 import unittest
+import cgi
 from datetime import datetime
 
 from mock import MagicMock, patch, create_autospec
@@ -98,6 +99,10 @@ class ViewsTestCase(TestCase):
         self.request_factory = RequestFactory()
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
+
+        # For marketing email opt-in
+        self.organization_full_name = u"𝖀𝖒𝖇𝖗𝖊𝖑𝖑𝖆 𝕮𝖔𝖗𝖕𝖔𝖗𝖆𝖙𝖎𝖔𝖓"
+        self.organization_html = "<p>'+Umbrella/Corporation+'</p>"
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
@@ -256,17 +261,26 @@ class ViewsTestCase(TestCase):
         #       generate/store a real password.
         self.assertEqual(chat_settings['password'], "johndoe@%s" % domain)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
     def test_course_mktg_about_coming_soon(self):
-        # we should not be able to find this course
+        # We should not be able to find this course
         url = reverse('mktg_about_course', kwargs={'course_id': 'no/course/here'})
-        response = self.client.get(url)
+        response = self.client.get(url, {'organization_full_name': self.organization_full_name})
         self.assertIn('Coming Soon', response.content)
 
+        # Verify that the checkbox is not displayed
+        self._email_opt_in_checkbox(response)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
     def test_course_mktg_register(self):
-        response = self._load_mktg_about()
+        response = self._load_mktg_about(organization_full_name=self.organization_full_name)
         self.assertIn('Enroll in', response.content)
         self.assertNotIn('and choose your student track', response.content)
 
+        # Verify that the checkbox is displayed
+        self._email_opt_in_checkbox(response, self.organization_full_name)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
     def test_course_mktg_register_multiple_modes(self):
         CourseMode.objects.get_or_create(
             mode_slug='honor',
@@ -279,11 +293,41 @@ class ViewsTestCase(TestCase):
             course_id=self.course_key
         )
 
-        response = self._load_mktg_about()
+        response = self._load_mktg_about(organization_full_name=self.organization_full_name)
         self.assertIn('Enroll in', response.content)
         self.assertIn('and choose your student track', response.content)
+
+        # Verify that the checkbox is displayed
+        self._email_opt_in_checkbox(response, self.organization_full_name)
+
         # clean up course modes
         CourseMode.objects.all().delete()
+
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
+    def test_course_mktg_no_organization_name(self):
+        # Don't pass an organization name as a GET parameter, even though the email
+        # opt-in feature is enabled.
+        response = response = self._load_mktg_about()
+
+        # Verify that the checkbox is not displayed
+        self._email_opt_in_checkbox(response)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': False})
+    def test_course_mktg_opt_in_disabled(self):
+        # Pass an organization name as a GET parameter, even though the email
+        # opt-in feature is disabled.
+        response = self._load_mktg_about(organization_full_name=self.organization_full_name)
+
+        # Verify that the checkbox is not displayed
+        self._email_opt_in_checkbox(response)
+
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
+    def test_course_mktg_organization_html(self):
+        response = self._load_mktg_about(organization_full_name=self.organization_html)
+
+        # Verify that the checkbox is displayed with the organization name
+        # in the label escaped as expected.
+        self._email_opt_in_checkbox(response, cgi.escape(self.organization_html))
 
     @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
     def test_mktg_about_language_edx_domain(self):
@@ -340,9 +384,8 @@ class ViewsTestCase(TestCase):
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
 
-    def _load_mktg_about(self, language=None):
-        """
-        Retrieve the marketing about button (iframed into the marketing site)
+    def _load_mktg_about(self, language=None, organization_full_name=None):
+        """Retrieve the marketing about button (iframed into the marketing site)
         and return the HTTP response.
 
         Keyword Args:
@@ -362,7 +405,22 @@ class ViewsTestCase(TestCase):
             headers['HTTP_ACCEPT_LANGUAGE'] = language
 
         url = reverse('mktg_about_course', kwargs={'course_id': unicode(self.course_key)})
-        return self.client.get(url, **headers)
+        if organization_full_name:
+            return self.client.get(url, {'organization_full_name': organization_full_name}, **headers)
+        else:
+            return self.client.get(url, **headers)
+
+    def _email_opt_in_checkbox(self, response, organization_full_name=None):
+        """Check if the email opt-in checkbox appears in the response content."""
+        checkbox_html = '<input id="email-opt-in" type="checkbox" name="opt-in" class="email-opt-in" value="true" checked>'
+        if organization_full_name:
+            # Verify that the email opt-in checkbox appears, and that the expected
+            # organization name is displayed.
+            self.assertContains(response, checkbox_html, html=True)
+            self.assertContains(response, organization_full_name)
+        else:
+            # Verify that the email opt-in checkbox does not appear
+            self.assertNotContains(response, checkbox_html, html=True)
 
 
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly

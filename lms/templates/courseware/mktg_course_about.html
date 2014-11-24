@@ -16,6 +16,14 @@
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
+      if ( !$("#email-opt-in").prop("checked") ) {
+        $("input[name='email_opt_in']").val("false");
+      }
+
+      var email_opt_in = $("input[name='email_opt_in']").val(),
+        current_href = $("a.register").attr("href");
+      $("a.register").attr("href", current_href + "&email_opt_in=" + email_opt_in)
+
       $("#class_enroll_form").submit();
       event.preventDefault();
     });
@@ -29,7 +37,9 @@
           window.top.location.href = "${reverse('dashboard')}";
         }
       } else if (xhr.status == 403) {
-        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
+        var email_opt_in = $("input[name='email_opt_in']").val();
+        ## Ugh.
+        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll&email_opt_in=" + email_opt_in;
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
@@ -71,6 +81,23 @@
             </span>
             %endif
         </a>
+
+        % if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
+          ## We only display the email opt-in checkbox if we've been given a valid full name (i.e., not None)
+          % if organization_full_name:
+            <p class="form-field">
+              <input id="email-opt-in" type="checkbox" name="opt-in" class="email-opt-in" value="true" checked>
+              <label for="email-opt-in">
+                ## Translators: This line appears next a checkbox which users can leave checked or uncheck in order
+                ## to indicate whether they want to receive emails from the organization offering the course.
+                ${_("I would like to receive email about other {organization_full_name} programs and offers.").format(
+                  organization_full_name=organization_full_name
+                )}
+              </label>
+            </p>
+          % endif
+        % endif
+
         %else:
           <div class="action registration-closed is-disabled">${_("Enrollment Is Closed")}</div>
         %endif
@@ -83,6 +110,7 @@
       <fieldset class="enroll_fieldset">
         <input name="course_id" type="hidden" value="${course.id | h}">
         <input name="enrollment_action" type="hidden" value="enroll">
+        <input name="email_opt_in" type="hidden" value="true">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>
       <div class="submit">

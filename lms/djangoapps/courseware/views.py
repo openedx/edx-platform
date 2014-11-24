@@ -5,6 +5,7 @@ Courseware views functions
 import logging
 import urllib
 import json
+import cgi
 
 from datetime import datetime
 from collections import defaultdict
@@ -93,7 +94,7 @@ def user_groups(user):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
+@cache_if_anonymous()
 def courses(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
@@ -713,7 +714,7 @@ def registered_for_course(course, user):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
+@cache_if_anonymous()
 def course_about(request, course_id):
     """
     Display the course's about page.
@@ -802,13 +803,10 @@ def course_about(request, course_id):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
+@cache_if_anonymous('organization_full_name')
 @ensure_valid_course_key
 def mktg_course_about(request, course_id):
-    """
-    This is the button that gets put into an iframe on the Drupal site
-    """
-
+    """This is the button that gets put into an iframe on the Drupal site."""
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
@@ -818,8 +816,7 @@ def mktg_course_about(request, course_id):
         )
         course = get_course_with_access(request.user, permission_name, course_key)
     except (ValueError, Http404):
-        # if a course does not exist yet, display a coming
-        # soon button
+        # If a course does not exist yet, display a "Coming Soon" button
         return render_to_response(
             'courseware/mktg_coming_soon.html', {'course_id': course_key.to_deprecated_string()}
         )
@@ -845,6 +842,12 @@ def mktg_course_about(request, course_id):
         'show_courseware_link': show_courseware_link,
         'course_modes': course_modes,
     }
+
+    if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
+        # Drupal will pass the organization's full name as a GET parameter. If no full name
+        # is provided, the marketing iframe won't show the email opt-in checkbox.
+        organization_full_name = request.GET.get('organization_full_name')
+        context['organization_full_name'] = cgi.escape(organization_full_name) if organization_full_name else organization_full_name
 
     # The edx.org marketing site currently displays only in English.
     # To avoid displaying a different language in the register / access button,
