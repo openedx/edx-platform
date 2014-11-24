@@ -32,6 +32,28 @@ class InstructorDashboardPage(CoursePage):
         data_download_section.wait_for_page()
         return data_download_section
 
+    @staticmethod
+    def get_asset_path(file_name):
+        """
+        Returns the full path of the file to upload.
+        These files have been placed in edx-platform/common/test/data/uploads/
+        """
+
+        # Separate the list of folders in the path reaching to the current file,
+        # e.g.  '... common/test/acceptance/pages/lms/instructor_dashboard.py' will result in
+        #       [..., 'common', 'test', 'acceptance', 'pages', 'lms', 'instructor_dashboard.py']
+        folders_list_in_path = __file__.split(os.sep)
+
+        # Get rid of the last 4 elements: 'acceptance', 'pages', 'lms', and 'instructor_dashboard.py'
+        # to point to the 'test' folder, a shared point in the path's tree.
+        folders_list_in_path = folders_list_in_path[:-4]
+
+        # Append the folders in the asset's path
+        folders_list_in_path.extend(['data', 'uploads', file_name])
+
+        # Return the joined path of the required asset.
+        return os.sep.join(folders_list_in_path)
+
 
 class MembershipPage(PageObject):
     """
@@ -182,22 +204,12 @@ class MembershipPage(PageObject):
         """
         self.q(css="a.link-cross-reference[data-section=data_download]").first.click()
 
-    def upload_correct_csv_file(self):
-        """
-        Selects the correct file and clicks the upload button.
-        """
-        correct_files_path = self.get_asset_path('cohort_users.csv')
+    def upload_cohort_file(self, filename):
+        path = InstructorDashboardPage.get_asset_path(filename)
         # Can this be "first"?
         file_input = self.q(css=self.cohort_csv_browse_button_selector).results[0]
-        file_input.send_keys(correct_files_path)
+        file_input.send_keys(path)
         self.q(css=self.cohort_csv_upload_button_selector).results[0].click()
-
-    def get_asset_path(self, file_name):
-        """
-        Returns the full path of the file to upload.
-        These files have been placed in edx-platform/common/test/data/uploads/
-        """
-        return os.sep.join(__file__.split(os.sep)[:-5]) + '/test/data/uploads/%s' % file_name
 
 
 class MembershipPageAutoEnrollSection(PageObject):
@@ -254,49 +266,28 @@ class MembershipPageAutoEnrollSection(PageObject):
         self.wait_for_element_presence(error_message_selector, "%s message" % section_type.title())
         return self.q(css=error_message_selector).text[0]
 
-    def get_asset_path(self, file_name):
-        """
-        Returns the full path of the file to upload.
-        These files have been placed in edx-platform/common/test/data/uploads/
-        """
-
-        # Separate the list of folders in the path reaching to the current file,
-        # e.g.  '... common/test/acceptance/pages/lms/instructor_dashboard.py' will result in
-        #       [..., 'common', 'test', 'acceptance', 'pages', 'lms', 'instructor_dashboard.py']
-        folders_list_in_path = __file__.split(os.sep)
-
-        # Get rid of the last 4 elements: 'acceptance', 'pages', 'lms', and 'instructor_dashboard.py'
-        # to point to the 'test' folder, a shared point in the path's tree.
-        folders_list_in_path = folders_list_in_path[:-4]
-
-        # Append the folders in the asset's path
-        folders_list_in_path.extend(['data', 'uploads', file_name])
-
-        # Return the joined path of the required asset.
-        return os.sep.join(folders_list_in_path)
-
     def upload_correct_csv_file(self):
         """
         Selects the correct file and clicks the upload button.
         """
-        correct_files_path = self.get_asset_path('auto_reg_enrollment.csv')
-        self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(correct_files_path)
-        self.click_upload_file_button()
+        self._upload_file('auto_reg_enrollment.csv')
 
     def upload_csv_file_with_errors_warnings(self):
         """
         Selects the file which will generate errors and warnings and clicks the upload button.
         """
-        errors_warnings_files_path = self.get_asset_path('auto_reg_enrollment_errors_warnings.csv')
-        self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(errors_warnings_files_path)
-        self.click_upload_file_button()
+        self._upload_file('auto_reg_enrollment_errors_warnings.csv')
 
     def upload_non_csv_file(self):
         """
         Selects an image file and clicks the upload button.
         """
-        errors_warnings_files_path = self.get_asset_path('image.jpg')
-        self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(errors_warnings_files_path)
+        self._upload_file('image.jpg')
+
+    def _upload_file(self, filename):
+        """ Helper method to upload a file """
+        file_path = InstructorDashboardPage.get_asset_path(filename)
+        self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(file_path)
         self.click_upload_file_button()
 
 
