@@ -263,11 +263,11 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
 
     def test_cohort_by_csv_both_columns(self):
         """
-        Scenario: the instructor can upload a file with user and cohort assignments.
+        Scenario: the instructor can upload a file with user and cohort assignments, using both emails and usernames.
 
         Given I have a course with two cohorts defined
         When I go to the cohort management section of the instructor dashboard
-        I can upload a CSV file with assignments of users to cohorts
+        I can upload a CSV file with assignments of users to cohorts via both usernames and emails
         Then I can download a file with results
         And appropriate events have been emitted
         """
@@ -277,11 +277,11 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
 
     def test_cohort_by_csv_only_email(self):
         """
-        Scenario: the instructor can upload a file with user and cohort assignments.
+        Scenario: the instructor can upload a file with user and cohort assignments, using only emails.
 
         Given I have a course with two cohorts defined
         When I go to the cohort management section of the instructor dashboard
-        I can upload a CSV file with assignments of users to cohorts
+        I can upload a CSV file with assignments of users to cohorts via only emails
         Then I can download a file with results
         And appropriate events have been emitted
         """
@@ -290,11 +290,11 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
 
     def test_cohort_by_csv_only_username(self):
         """
-        Scenario: the instructor can upload a file with user and cohort assignments.
+        Scenario: the instructor can upload a file with user and cohort assignments, using only usernames.
 
         Given I have a course with two cohorts defined
         When I go to the cohort management section of the instructor dashboard
-        I can upload a CSV file with assignments of users to cohorts
+        I can upload a CSV file with assignments of users to cohorts via only usernames
         Then I can download a file with results
         And appropriate events have been emitted
         """
@@ -303,13 +303,16 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self._verify_csv_upload_acceptable_file("cohort_users_only_username.csv")
 
     def _verify_csv_upload_acceptable_file(self, filename):
+        """
+        Helper method to verify cohort assignments after a successful CSV upload.
+        """
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
             "Your file '{}' has been uploaded. Go check... in 5 minutes.".format(filename)
         )
 
-        # cohorts_users.cvs adds instructor_user to ManualCohort1 via username and student_user to AutoCohort1 via email
+        # student_user is moved from manual cohort group to auto cohort group
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -319,6 +322,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
+        # instructor_user (previously unassigned) is added to manual cohort group
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -328,12 +332,13 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
-        data_download = self.instructor_dashboard_page.select_data_download()
 
+        # Verify the results can be downloaded.
+        data_download = self.instructor_dashboard_page.select_data_download()
         EmptyPromise(
-            lambda: 1 == len(data_download.get_available_report_for_download()), 'Waiting for downloadable report'
+            lambda: 1 == len(data_download.get_available_reports_for_download()), 'Waiting for downloadable report'
         ).fulfill()
-        report = data_download.get_available_report_for_download()[0]
+        report = data_download.get_available_reports_for_download()[0]
         base_file_name = "cohort_results_"
         self.assertIn("{}_{}".format(
             urllib.quote(unicode(self.course_id).replace("/", "_")), base_file_name
@@ -342,38 +347,61 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             report[report.index(base_file_name)+len(base_file_name):-len(".csv")],
             "%Y-%m-%d-%H%M"
         )
-        utc_report_date = utc.localize(report_datetime)
-        self.assertLessEqual(start_time.replace(second=0, microsecond=0), utc_report_date)
+        self.assertLessEqual(start_time.replace(second=0, microsecond=0), utc.localize(report_datetime))
 
     def test_cohort_by_csv_wrong_file_type(self):
         """
-        Try uploading a non-csv file.
+        Scenario: if the instructor uploads a non-csv file, an error message is presented.
+
+        Given I have a course with cohorting enabled
+        When I go to the cohort management section of the instructor dashboard
+        And I upload a file without the CSV extension
+        Then I get an error message stating that the file must have a CSV extension
         """
         self.cohort_management_page.upload_cohort_file("image.jpg")
         self._verify_cohort_by_csv_notification("The file must end with the extension '.csv'.")
 
     def test_cohort_by_csv_missing_cohort(self):
         """
-        Try uploading a non-csv file.
+        Scenario: if the instructor uploads a csv file with no cohort column, an error message is presented.
+
+        Given I have a course with cohorting enabled
+        When I go to the cohort management section of the instructor dashboard
+        And I upload a CSV file that is missing the cohort column
+        Then I get an error message stating that the file must have a cohort column
         """
         self.cohort_management_page.upload_cohort_file("cohort_users_missing_cohort_column.csv")
         # self._verify_cohort_by_csv_notification("Missing cohort column.")
 
     def test_cohort_by_csv_missing_user(self):
         """
-        Try uploading a non-csv file.
+        Scenario: if the instructor uploads a csv file with no username or email column, an error message is presented.
+
+        Given I have a course with cohorting enabled
+        When I go to the cohort management section of the instructor dashboard
+        And I upload a CSV file that is missing both the username and email columns
+        Then I get an error message stating that the file must have either a username or email column
         """
         self.cohort_management_page.upload_cohort_file("cohort_users_missing_user_columns.csv")
         # self._verify_cohort_by_csv_notification("Missing both email and username.")
 
     def test_cohort_by_csv_inconsistent_columns(self):
         """
-        Try uploading a non-csv file.
+        Scenario: if the instructor uploads a csv file with an inconsistent number of columns, an error message is
+            presented.
+
+        Given I have a course with cohorting enabled
+        When I go to the cohort management section of the instructor dashboard
+        And I upload a CSV file with an inconsistent number of columns per row
+        Then I get an error message stating that the file is not properly formatted
         """
         self.cohort_management_page.upload_cohort_file("cohort_users_inconsistent_columns.csv")
         # self._verify_cohort_by_csv_notification("Wrong number of columns.")
 
     def _verify_cohort_by_csv_notification(self, expected_message):
+        """
+        Helper method to check the CSV file upload notification message.
+        """
         # Wait for notification message to appear, indicating file has been uploaded.
         EmptyPromise(
             lambda: 1 == len(self.cohort_management_page.get_cvs_messages()), 'Waiting for notification'

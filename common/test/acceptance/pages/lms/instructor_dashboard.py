@@ -28,7 +28,7 @@ class InstructorDashboardPage(CoursePage):
 
     def select_data_download(self):
         """
-        Selects the data management tab and returns a DataDownloadPage.
+        Selects the data download tab and returns a DataDownloadPage.
         """
         self.q(css='a[data-section=data_download]').first.click()
         data_download_section = DataDownloadPage(self.browser)
@@ -93,7 +93,7 @@ class MembershipPageCohortManagementSection(PageObject):
 
     def _bounded_selector(self, selector):
         """
-        Return `selector`, but limited to the cohort management context
+        Return `selector`, but limited to the cohort management context.
         """
         return '.cohort-management.membership-section {}'.format(selector)
 
@@ -186,7 +186,7 @@ class MembershipPageCohortManagementSection(PageObject):
 
     def _get_cohort_messages(self, type):
         """
-        Returns array of messages for given type.
+        Returns array of messages related to manipulating cohorts directly through the UI for the given type.
         """
         title_css = "div.cohort-management-group-add .cohort-" + type + " .message-title"
         detail_css = "div.cohort-management-group-add .cohort-" + type + " .summary-item"
@@ -195,13 +195,16 @@ class MembershipPageCohortManagementSection(PageObject):
 
     def get_cvs_messages(self):
         """
-        Returns array of messages for given type.
+        Returns array of messages related to a CSV upload of cohort assignmentse.
         """
         title_css = "div.csv-upload .message-title"
         detail_css = "div.csv-upload .summary-item"
         return self._get_messages(title_css, detail_css)
 
     def _get_messages(self, title_css, details_css):
+        """
+        Helper method to get messages given title and details CSS.
+        """
         message_title = self.q(css=self._bounded_selector(title_css))
         if len(message_title.results) == 0:
             return []
@@ -232,6 +235,9 @@ class MembershipPageCohortManagementSection(PageObject):
         self.q(css=self._bounded_selector("a.link-cross-reference[data-section=data_download]")).first.click()
 
     def upload_cohort_file(self, filename):
+        """
+        Uploads a file with cohort assignment information.
+        """
         path = InstructorDashboardPage.get_asset_path(filename)
         file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector)).results[0]
         file_input.send_keys(path)
@@ -312,7 +318,7 @@ class MembershipPageAutoEnrollSection(PageObject):
 
     def _upload_file(self, filename):
         """
-        Helper method to upload a file.
+        Helper method to upload a file with registration and enrollment information.
         """
         file_path = InstructorDashboardPage.get_asset_path(filename)
         self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(file_path)
@@ -328,9 +334,9 @@ class DataDownloadPage(PageObject):
     def is_browser_on_page(self):
         return self.q(css='a[data-section=data_download].active-section').present
 
-    def get_available_report_for_download(self):
+    def get_available_reports_for_download(self):
         """
-        Returns a list of all the available report downloads.
+        Returns a list of all the available reports for download.
         """
         reports = self.q(css="#report-downloads-table .file-download-link>a").map(lambda el: el.text)
         return reports.results
