@@ -1,18 +1,17 @@
 """
 Tests for the DjangoXBlockUserService.
 """
-import unittest
-
+from django.test import TestCase
 from xblock_django.user_service import DjangoXBlockUserService
 from student.tests.factories import UserFactory, AnonymousUserFactory
 
 
-class UserServiceTestCase(unittest.TestCase):
+class UserServiceTestCase(TestCase):
     """
     Tests for the DjangoXBlockUserService.
     """
     def setUp(self):
-        self.user = UserFactory(username="tester", email="tester@tester.com")
+        self.user = UserFactory(username="tester", email="test@tester.com")
         self.user.profile.name = "Test Tester"
         self.anon_user = AnonymousUserFactory()
 
