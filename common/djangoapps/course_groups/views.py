@@ -8,15 +8,12 @@ import json
 import logging
 import re
 import csv
-from django.core import exceptions
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
-from instructor_task.api import submit_cohort_students
 from util.json_request import JsonResponse
-from util.file import store_uploaded_file, course_and_time_based_filename_generator
 from django.utils.translation import ugettext as _
 from . import cohorts
 from .models import CourseUserGroup
@@ -153,38 +150,6 @@ def users_in_cohort(request, course_key_string, cohort_id):
                                'page': page,
                                'num_pages': paginator.num_pages,
                                'users': user_info})
-
-
-@ensure_csrf_cookie
-@require_POST
-def add_users_to_cohorts(request, course_key_string):
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
-    get_course_with_access(request.user, 'staff', course_key)
-
-    try:
-        def validator(uploaded_file):
-            reader = csv.DictReader(uploaded_file)
-            fieldnames = reader.fieldnames
-            msg = None
-            if "cohort" not in fieldnames:
-                msg = _("The file must contain a 'cohort' column containing cohort names.")
-            elif "email" not in fieldnames and "username" not in fieldnames:
-                msg = _("The file must contain a 'username' column, an 'email' column, or both.")
-            if msg:
-                raise exceptions.PermissionDenied(msg)
-
-        # TODO: what is the maximum filesize we want to enforce?
-        file_storage, filename = store_uploaded_file(
-            request, 'uploaded-file', ['.csv'],
-            course_and_time_based_filename_generator(course_key, "cohorts"),
-            validator=validator
-        )
-        submit_cohort_students(request, course_key, filename)
-    except Exception as err:
-        return JsonResponse({"error": str(err)}, status=400)
-
-    return json_http_response()
-
 
 
 @ensure_csrf_cookie
