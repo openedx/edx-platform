@@ -76,7 +76,7 @@ class VideoUploadTestCase(CourseTestCase):
     @skip("disable testing with live servers, but can enable locally with real values")
     @override_settings(AWS_ACCESS_KEY_ID="PUT_IN_TEST_ACCESS_KEY_ID_HERE")
     @override_settings(AWS_SECRET_ACCESS_KEY="PUT_IN_TEST_SECRET_ACCESS_KEY_HERE")
-    @override_settings(VIDEO_UPLOAD_PIPELINE={'BUCKET': 'edx-sandbox-test', 'ROOT_PATH': '', 'FOLDER': 'videos'})
+    @override_settings(VIDEO_UPLOAD_PIPELINE={'BUCKET': 'edx-sandbox-test', 'ROOT_PATH': 'edx-videos', 'CONCURRENT_UPLOAD_LIMIT': 4})
     @patch('contentstore.views.videos.KEY_EXPIRATION_IN_SECONDS', 60)
     def test_success_test_storage_service(self):
         response = self.setup_and_post_video_uploads()
@@ -86,9 +86,9 @@ class VideoUploadTestCase(CourseTestCase):
             returned_file = self.find_in_list(file_name, returned_files, 'file_name')
             self.assertRegexpMatches(
                 returned_file['upload-url'],
-                'https://{bucket}.s3.amazonaws.com/{folder}/.*{file}.*'.format(
+                'https://{bucket}.s3.amazonaws.com/{root_path}/.*{file}.*'.format(
                     bucket=settings.VIDEO_UPLOAD_PIPELINE['BUCKET'],
-                    folder=settings.VIDEO_UPLOAD_PIPELINE['FOLDER'],
+                    root_path=settings.VIDEO_UPLOAD_PIPELINE['ROOT_PATH'],
                     file=file_name,
                 ),
             )

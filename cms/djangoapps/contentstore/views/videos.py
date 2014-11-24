@@ -142,17 +142,13 @@ def videos_post(course, request):
         edx_video_id = generate_edx_video_id()
 
         # 2. generate key for uploading file
-        key = storage_service_key(
-            bucket,
-            folder_name=settings.VIDEO_UPLOAD_PIPELINE['FOLDER'],
-            file_name=edx_video_id,
-        )
+        key = storage_service_key(bucket, file_name=edx_video_id)
 
         # 3. set meta data for the file
         for metadata_name, value in [
             ('course_video_upload_token', course_video_upload_token),
             ('user_supplied_file_name', file_name),
-            ('course_key', course.id),
+            ('course_key', unicode(course.id)),
         ]:
             key.set_metadata(metadata_name, value)
 
@@ -196,13 +192,12 @@ def storage_service_bucket():
     return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['BUCKET'])
 
 
-def storage_service_key(bucket, folder_name, file_name):
+def storage_service_key(bucket, file_name):
     """
     Returns a key to the given file in the given folder in the given bucket for video uploads.
     """
-    key_name = "{}/{}/{}".format(
+    key_name = "{}/{}".format(
         settings.VIDEO_UPLOAD_PIPELINE['ROOT_PATH'],
-        folder_name,
         file_name
     )
     return s3.key.Key(bucket, key_name)
