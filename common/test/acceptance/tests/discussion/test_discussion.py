@@ -345,6 +345,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def setUp(self):
         super(InlineDiscussionTest, self).setUp()
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
+        self.additional_discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.course_fix = CourseFixture(**self.course_info).add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection").add_children(
@@ -353,6 +354,11 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
                             "discussion",
                             "Test Discussion",
                             metadata={"discussion_id": self.discussion_id}
+                        ),
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion 1",
+                            metadata={"discussion_id": self.additional_discussion_id}
                         )
                     )
                 )
@@ -364,6 +370,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.courseware_page.visit()
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
+        self.additional_discussion_page = InlineDiscussionPage(self.browser, self.additional_discussion_id)
 
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
@@ -424,6 +431,35 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.thread_page.is_comment_editable("comment2"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
+
+    def test_dual_discussion_module(self):
+        """
+        Scenario: Two discussion module in one unit shouldn't override their actions
+        Given that I'm on courseware page where there are two inline discussion
+        When I click on one discussion module new post button
+        Then it should add new post form of that module in DOM
+        And I should be shown new post form of that module
+        And I shouldn't be shown second discussion module new post form
+        And I click on second discussion module new post button
+        Then it should add new post form of second module in DOM
+        And I should be shown second discussion new post form
+        And I shouldn't be shown first discussion module new post form
+        And I have two new post form in the DOM
+        When I click back on first module new post button
+        And I should be shown new post form of that module
+        And I shouldn't be shown second discussion module new post form
+        """
+        self.discussion_page.wait_for_page()
+        self.additional_discussion_page.wait_for_page()
+        self.discussion_page.click_new_post_button()
+        with self.discussion_page.handle_alert():
+            self.discussion_page.click_cancel_new_post()
+        self.additional_discussion_page.click_new_post_button()
+        self.assertFalse(self.discussion_page._is_element_visible(".new-post-article"))
+        with self.additional_discussion_page.handle_alert():
+            self.additional_discussion_page.click_cancel_new_post()
+        self.discussion_page.click_new_post_button()
+        self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
 
 
 @attr('shard_1')
