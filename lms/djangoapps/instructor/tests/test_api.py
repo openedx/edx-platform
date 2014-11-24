@@ -3010,6 +3010,30 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
             )
             registration_code_redemption.save()
 
+    @override_settings(FINANCE_EMAIL='finance@example.com')
+    def test_finance_email_in_recipient_list_when_generating_registration_codes(self):
+        """
+        Test to verify that the invoice will also be sent to the FINANCE_EMAIL when
+        generating registration codes
+        """
+        url_reg_code = reverse('generate_registration_codes',
+                               kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {
+            'total_registration_codes': 5, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 121.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': 'True'
+        }
+
+        response = self.client.post(url_reg_code, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        # check for the last mail.outbox, The FINANCE_EMAIL has been appended at the
+        # very end, when generating registration codes
+        self.assertEqual(mail.outbox[-1].to[0], 'finance@example.com')
+
     def test_user_invoice_copy_preference(self):
         """
         Test to remember user invoice copy preference
