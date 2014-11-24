@@ -16,6 +16,7 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 
+import urllib
 import uuid
 
 
@@ -334,8 +335,8 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         ).fulfill()
         report = data_download.get_available_report_for_download()[0]
         base_file_name = "cohort_results_"
-        self.assertIn("{}_{}_{}_{}".format(
-            self.course_info['org'], self.course_info['number'], self.course_info['run'], base_file_name
+        self.assertIn("{}_{}".format(
+            urllib.quote(unicode(self.course_id).replace("/", "_")), base_file_name
         ), report)
         report_datetime = datetime.strptime(
             report[report.index(base_file_name)+len(base_file_name):-len(".csv")],
