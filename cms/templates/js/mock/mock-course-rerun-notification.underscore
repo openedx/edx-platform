@@ -14,7 +14,7 @@
             <ul class="nav-actions">
                 <li class="action action-dismiss">
                     <a href="#" class="button dismiss-button" data-dismiss-link="dummy_dismiss_url">
-                        <i class="icon icon-remove-sign"></i>
+                        <i class="icon icon-times-circle"></i>
                         <span class="button-copy">Dismiss</span>
                     </a>
                 </li>

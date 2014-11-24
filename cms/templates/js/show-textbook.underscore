@@ -40,7 +40,7 @@
         <button class="edit"><%= gettext("Edit") %></button>
     </li>
     <li class="action action-delete">
-        <button class="delete action-icon"><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
+        <button class="delete action-icon"><i class="icon-trash-o"></i><span><%= gettext("Delete") %></span></button>
     </li>
 </ul>
 

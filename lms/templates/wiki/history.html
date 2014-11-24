@@ -130,7 +130,7 @@
                       document.revisions_form.action='{% url 'wiki:preview_revision' article.id %}';
                       $('#previewRevisionModal .switch-to-revision').attr('href', '{% url 'wiki:change_revision' path=urlpath.path article_id=article.id revision_id=revision.id %}');
                       document.revisions_form.submit();">
-                  <i class="icon-eye-open"></i>
+                  <i class="icon-eye"></i>
                   {% trans "Preview this revision" %}
                 </a>
 

@@ -36,7 +36,7 @@
         <div class="wrapper-xblock-header-secondary">
             <% if (xblockInfo.get('release_date')) { %>
                 <div class="meta-info">
-                    <i class="icon-time"></i>
+                    <i class="icon-clock-o"></i>
                     <%= gettext('Released:') %> <%= xblockInfo.get('release_date') %>
                 </div>
             <% } %>

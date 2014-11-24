@@ -415,7 +415,7 @@ describe "DiscussionThreadListView", ->
 
       it "for answered question", ->
         renderSingleThreadWithProps({thread_type: "question", endorsed: true})
-        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-ok")
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-check")
         expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("answered question")
 
       it "for unanswered question", ->
