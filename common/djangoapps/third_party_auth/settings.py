@@ -50,7 +50,7 @@ _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next', 'enroll_course_id', 'email_op
 _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
 )
-_SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/dashboard'
+_SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 _SOCIAL_AUTH_NEW_ASSOCIATION_REDIRECT_URL = '/profile'
 _SOCIAL_AUTH_DISCONNECT_REDIRECT_URL = '/profile'
 
@@ -105,14 +105,13 @@ def _set_global_settings(django_settings):
     # Inject our customized auth pipeline. All auth backends must work with
     # this pipeline.
     django_settings.SOCIAL_AUTH_PIPELINE = (
-        'third_party_auth.pipeline.parse_query_params',
         'social.pipeline.social_auth.social_details',
         'social.pipeline.social_auth.social_uid',
         'social.pipeline.social_auth.auth_allowed',
         'social.pipeline.social_auth.social_user',
         'social.pipeline.user.get_username',
-        'third_party_auth.pipeline.ensure_user_information',
         'social.pipeline.user.create_user',
+        'third_party_auth.pipeline.create_user_from_oauth',
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',

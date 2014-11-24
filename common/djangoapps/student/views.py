@@ -1212,11 +1212,7 @@ def logout_user(request):
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
     logout(request)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        target = reverse('cas-logout')
-    else:
-        target = '/'
-    response = redirect(target)
+    response = redirect(settings.IONISX_AUTH.get('LOGOUT_URL'))
     response.delete_cookie(
         settings.EDXMKTG_COOKIE_NAME,
         path='/', domain=settings.SESSION_COOKIE_DOMAIN,

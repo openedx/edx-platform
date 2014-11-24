@@ -62,6 +62,7 @@ import string  # pylint: disable-msg=deprecated-module
 from collections import OrderedDict
 import urllib
 import analytics
+import logging
 from eventtracking import tracker
 
 from django.contrib.auth.models import User
@@ -71,6 +72,10 @@ from django.shortcuts import redirect
 from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
+from django.db import IntegrityError, transaction
+from student.models import (
+    Registration, UserProfile, create_comments_service_user
+)
 
 import student
 from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=import-error
@@ -87,6 +92,7 @@ from logging import getLogger
 
 from . import provider
 
+log = logging.getLogger(__file__)
 
 # These are the query string params you can pass
 # to the URL that starts the authentication process.
@@ -455,6 +461,20 @@ def parse_query_params(strategy, response, *args, **kwargs):
         # Whether the auth pipeline entered from an API
         'is_api': auth_entry == AUTH_ENTRY_API,
     }
+
+
+def create_user_from_oauth(strategy, details, user, is_new, *args, **kwargs):
+    if is_new:
+        profile = UserProfile(user=user)
+        profile.name = details.get('fullname')
+
+        try:
+            profile.save()
+        except Exception:
+            log.error("UserProfile creation failed for user {id}.".format(id=user.id))
+            raise
+
+        create_comments_service_user(user)
 
 
 @partial.partial
