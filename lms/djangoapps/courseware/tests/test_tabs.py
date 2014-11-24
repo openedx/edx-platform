@@ -15,7 +15,7 @@ from xmodule.tabs import CourseTabList
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE, TEST_DATA_MIXED_XML_MODULESTORE
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -69,7 +69,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", static_tab)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that tabs still appear when
