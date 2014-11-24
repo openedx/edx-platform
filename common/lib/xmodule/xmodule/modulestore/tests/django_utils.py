@@ -260,7 +260,7 @@ class ModuleStoreTestCase(TestCase):
         """
 
         # Flush the Mongo modulestore
-        self.drop_mongo_collections()
+        # self.drop_mongo_collections()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()
@@ -269,7 +269,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Flush the ModuleStore after each test.
         """
-        self.drop_mongo_collections()
+        # self.drop_mongo_collections()
         # Clear out the existing modulestores,
         # which will cause them to be re-created
         # the next time they are accessed.

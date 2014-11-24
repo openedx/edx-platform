@@ -124,6 +124,7 @@ django_nose==1.2
 factory_boy==2.2.1
 freezegun==0.1.11
 mock==1.0.1
+mongomock==2.0.0
 nose-exclude
 nose-ignore-docstring
 nosexcover==1.0.7
