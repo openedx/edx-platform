@@ -16,6 +16,7 @@
             this.selectorTemplate = _.template($('#cohort-selector-tpl').text());
             this.addCohortFormTemplate = _.template($('#add-cohort-form-tpl').text());
             this.advanced_settings_url = options.advanced_settings_url;
+            this.upload_cohorts_csv_url = options.upload_cohorts_csv_url;
             this.model.on('sync', this.onSync, this);
         },
 
@@ -32,7 +33,7 @@
                 title: gettext("Assign students to cohorts via a CSV file"),
                 description: gettext("Upload a CSV file, then download your results."),
                 extension: ".csv",
-                url: this.model.url + "/add_users_to_cohorts"
+                url: this.upload_cohorts_csv_url
             });
             var fileUploaderView = new FileUploaderView({
                 model: fileUploaderModel,

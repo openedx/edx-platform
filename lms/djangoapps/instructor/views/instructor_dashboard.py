@@ -256,6 +256,7 @@ def _section_membership(course, access):
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': course_key.to_deprecated_string()}),
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': course_key.to_deprecated_string()}),
         'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
+        'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data
 
