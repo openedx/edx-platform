@@ -12,6 +12,7 @@ import datetime
 import pytz
 from request_cache.middleware import RequestCache
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
@@ -237,8 +238,13 @@ class ModuleStoreTestCase(TestCase):
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
         module_store = modulestore()
-        if hasattr(module_store, '_drop_database'):
-            module_store._drop_database()  # pylint: disable=protected-access
+
+        if not isinstance(module_store, XMLModuleStore):
+            for store in module_store.modulestores:
+                if hasattr(store, 'database'):
+                    name = store.database.name
+                    store.database.connection.drop_database(name)
+
         _CONTENTSTORE.clear()
         if hasattr(module_store, 'close_connections'):
             module_store.close_connections()
@@ -260,7 +266,7 @@ class ModuleStoreTestCase(TestCase):
         """
 
         # Flush the Mongo modulestore
-        # self.drop_mongo_collections()
+        self.drop_mongo_collections()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()
@@ -269,7 +275,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Flush the ModuleStore after each test.
         """
-        # self.drop_mongo_collections()
+        self.drop_mongo_collections()
         # Clear out the existing modulestores,
         # which will cause them to be re-created
         # the next time they are accessed.
