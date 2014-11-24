@@ -311,16 +311,15 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
-        # TODO: currently failing
-        # self.assertEqual(
-        #     self.event_collection.find({
-        #         "name": "edx.cohort.user_added",
-        #         "time": {"$gt": start_time},
-        #         "event.user_id": {"$in": [int(self.instructor_id)]},
-        #         "event.cohort_name": self.manual_cohort_name,
-        #     }).count(),
-        #     1
-        # )
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_added",
+                "time": {"$gt": start_time},
+                "event.user_id": {"$in": [int(self.instructor_id)]},
+                "event.cohort_name": self.manual_cohort_name,
+            }).count(),
+            1
+        )
         self.instructor_dashboard_page.select_data_download()
         # TODO: verify entry appears in download table.
 
