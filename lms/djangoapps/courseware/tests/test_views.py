@@ -89,6 +89,7 @@ class ViewsTestCase(TestCase):
         self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
 
         self.course_key = self.course.id
+        self.organization_full_name = "Test Organization"
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
@@ -257,15 +258,19 @@ class ViewsTestCase(TestCase):
         self.assertEqual(chat_settings['password'], "johndoe@%s" % domain)
 
     def test_course_mktg_about_coming_soon(self):
-        # we should not be able to find this course
+        # We should not be able to find this course
         url = reverse('mktg_about_course', kwargs={'course_id': 'no/course/here'})
-        response = self.client.get(url)
+        response = self.client.get(url, {'organization_full_name': self.organization_full_name})
         self.assertIn('Coming Soon', response.content)
+
+        self._email_opt_in_checkbox(response, False)
 
     def test_course_mktg_register(self):
         response = self._load_mktg_about()
         self.assertIn('Enroll in', response.content)
         self.assertNotIn('and choose your student track', response.content)
+
+        self._email_opt_in_checkbox(response, True)
 
     def test_course_mktg_register_multiple_modes(self):
         CourseMode.objects.get_or_create(
@@ -282,6 +287,9 @@ class ViewsTestCase(TestCase):
         response = self._load_mktg_about()
         self.assertIn('Enroll in', response.content)
         self.assertIn('and choose your student track', response.content)
+        
+        self._email_opt_in_checkbox(response, True)
+
         # clean up course modes
         CourseMode.objects.all().delete()
 
@@ -362,7 +370,20 @@ class ViewsTestCase(TestCase):
             headers['HTTP_ACCEPT_LANGUAGE'] = language
 
         url = reverse('mktg_about_course', kwargs={'course_id': unicode(self.course_key)})
-        return self.client.get(url, **headers)
+        return self.client.get(url, {'organization_full_name': self.organization_full_name}, **headers)
+
+    def _email_opt_in_checkbox(self, response, checkbox_is_present):
+        checkbox_html = '<input id="email-opt-in" type="checkbox" name="opt-in" class="email-opt-in" value="true" checked>'
+        if checkbox_is_present:
+            # Verify that the email opt-in checkbox appears, and that the organization
+            # full name is displayed.
+            self.assertContains(response, checkbox_html, html=True)
+            self.assertContains(response, self.organization_full_name)
+        else:
+            # Verify that the email opt-in checkbox does not appear, and that the organization
+            # full name is not displayed.
+            self.assertNotContains(response, checkbox_html, html=True)
+            self.assertNotContains(response, self.organization_full_name)
 
 
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly

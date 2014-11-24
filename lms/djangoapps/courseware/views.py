@@ -785,10 +785,7 @@ def course_about(request, course_id):
 @cache_if_anonymous
 @ensure_valid_course_key
 def mktg_course_about(request, course_id):
-    """
-    This is the button that gets put into an iframe on the Drupal site
-    """
-
+    """This is the button that gets put into an iframe on the Drupal site."""
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
@@ -798,8 +795,7 @@ def mktg_course_about(request, course_id):
         )
         course = get_course_with_access(request.user, permission_name, course_key)
     except (ValueError, Http404):
-        # if a course does not exist yet, display a coming
-        # soon button
+        # If a course does not exist yet, display a "Coming Soon" button
         return render_to_response(
             'courseware/mktg_coming_soon.html', {'course_id': course_key.to_deprecated_string()}
         )
@@ -817,6 +813,9 @@ def mktg_course_about(request, course_id):
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
     course_modes = CourseMode.modes_for_course_dict(course.id)
 
+    # Drupal will pass the organization's full name as a GET parameter
+    organization_full_name = request.GET.get('organization_full_name')
+
     context = {
         'course': course,
         'registered': registered,
@@ -824,6 +823,7 @@ def mktg_course_about(request, course_id):
         'course_target': course_target,
         'show_courseware_link': show_courseware_link,
         'course_modes': course_modes,
+        'organization_full_name': organization_full_name,
     }
 
     # The edx.org marketing site currently displays only in English.
