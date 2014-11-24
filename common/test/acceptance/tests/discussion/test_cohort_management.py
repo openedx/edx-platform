@@ -371,7 +371,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then I get an error message stating that the file must have a cohort column
         """
         self.cohort_management_page.upload_cohort_file("cohort_users_missing_cohort_column.csv")
-        # self._verify_cohort_by_csv_notification("Missing cohort column.")
+        self._verify_cohort_by_csv_notification("The file must contain a 'cohort' column containing cohort names.")
 
     def test_cohort_by_csv_missing_user(self):
         """
@@ -383,7 +383,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then I get an error message stating that the file must have either a username or email column
         """
         self.cohort_management_page.upload_cohort_file("cohort_users_missing_user_columns.csv")
-        # self._verify_cohort_by_csv_notification("Missing both email and username.")
+        self._verify_cohort_by_csv_notification("The file must contain a 'username' column, an 'email' column, or both.")
 
     def test_cohort_by_csv_inconsistent_columns(self):
         """
@@ -396,6 +396,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then I get an error message stating that the file is not properly formatted
         """
         self.cohort_management_page.upload_cohort_file("cohort_users_inconsistent_columns.csv")
+        # TODO: is there a way for us to test this?
         # self._verify_cohort_by_csv_notification("Wrong number of columns.")
 
     def _verify_cohort_by_csv_notification(self, expected_message):
