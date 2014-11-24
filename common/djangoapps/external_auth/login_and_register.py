@@ -56,7 +56,18 @@ def login(request):
     # is not handling the request.
     response = None
 
-    if settings.FEATURES['AUTH_USE_CERTIFICATES'] and external_auth.views.ssl_get_cert_from_request(request):
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        # Redirect to IONISx, we don't want the registration form.
+        get = request.GET.copy()
+
+        if 'course_id' in request.GET:
+            request.session['enroll_course_id'] = request.GET.get('course_id')
+            get.update({'next': reverse('about_course', kwargs={'course_id': unicode(request.GET.get('course_id'))})})
+
+        redirect_uri = reverse('social:begin', args=('portal-oauth2',))
+        response = external_auth.views.redirect_with_get(redirect_uri, get, do_reverse=False)
+
+    elif settings.FEATURES['AUTH_USE_CERTIFICATES'] and external_auth.views.ssl_get_cert_from_request(request):
         # SSL login doesn't require a view, so redirect
         # branding and allow that to process the login if it
         # is enabled and the header is in the request.
@@ -85,7 +96,18 @@ def register(request):
 
     """
     response = None
-    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        # Redirect to IONISx, we don't want the registration form.
+        get = request.GET.copy()
+
+        if 'course_id' in request.GET:
+            request.session['enroll_course_id'] = request.GET.get('course_id')
+            get.update({'next': reverse('about_course', kwargs={'course_id': unicode(request.GET.get('course_id'))})})
+
+        redirect_uri = reverse('social:begin', args=('portal-oauth2',))
+        response = external_auth.views.redirect_with_get(redirect_uri, get, do_reverse=False)
+
+    elif settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to branding to process their certificate if SSL is enabled
         # and registration is disabled.
         response = external_auth.views.redirect_with_get('root', request.GET)

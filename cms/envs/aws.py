@@ -11,6 +11,7 @@ This is the default template for our main set of AWS servers.
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
+import datetime
 import json
 
 from .common import *
@@ -317,6 +318,27 @@ SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = AUTH_TOKENS.get("SESSION_INACTIVITY_TIME
 
 ##### X-Frame-Options response header settings #####
 X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
+
+##### Third-party auth options ################################################
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    AUTHENTICATION_BACKENDS = (
+        ENV_TOKENS.get('THIRD_PARTY_AUTH_BACKENDS', [
+            'social.backends.google.GoogleOAuth2',
+            'social.backends.linkedin.LinkedinOAuth2',
+            'social.backends.facebook.FacebookOAuth2',
+            'third_party_auth.saml.SAMLAuthBackend'
+        ]) + list(AUTHENTICATION_BACKENDS)
+    )
+
+    MIDDLEWARE_CLASSES += ('third_party_auth.middleware.PortalSynchronizerMiddleware',)
+
+    # The reduced session expiry time during the third party login pipeline. (Value in seconds)
+    SOCIAL_AUTH_PIPELINE_TIMEOUT = ENV_TOKENS.get('SOCIAL_AUTH_PIPELINE_TIMEOUT', 600)
+
+    # third_party_auth config moved to ConfigurationModels. This is for data migration only:
+    THIRD_PARTY_AUTH_OLD_CONFIG = AUTH_TOKENS.get('THIRD_PARTY_AUTH', None)
+
+IONISX_AUTH = AUTH_TOKENS.get('IONISX_AUTH')
 
 ##### ADVANCED_SECURITY_CONFIG #####
 ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})

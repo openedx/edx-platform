@@ -548,6 +548,8 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         ]) + list(AUTHENTICATION_BACKENDS)
     )
 
+    MIDDLEWARE_CLASSES += ('third_party_auth.middleware.PortalSynchronizerMiddleware',)
+
     # The reduced session expiry time during the third party login pipeline. (Value in seconds)
     SOCIAL_AUTH_PIPELINE_TIMEOUT = ENV_TOKENS.get('SOCIAL_AUTH_PIPELINE_TIMEOUT', 600)
 
@@ -559,6 +561,8 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
             'task': 'third_party_auth.fetch_saml_metadata',
             'schedule': datetime.timedelta(hours=ENV_TOKENS.get('THIRD_PARTY_AUTH_SAML_FETCH_PERIOD_HOURS', 24)),
         }
+
+IONISX_AUTH = AUTH_TOKENS.get('IONISX_AUTH')
 
 ##### OAUTH2 Provider ##############
 if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):

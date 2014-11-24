@@ -62,6 +62,7 @@ import string  # pylint: disable-msg=deprecated-module
 from collections import OrderedDict
 import urllib
 import analytics
+import logging
 from eventtracking import tracker
 
 from django.contrib.auth.models import User
@@ -73,6 +74,9 @@ from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
 from social.pipeline.social_auth import associate_by_email
+from student.models import (
+    Registration, UserProfile, create_comments_service_user
+)
 
 import student
 
@@ -83,6 +87,7 @@ from . import provider
 # Note that this lives in openedx, so this dependency should be refactored.
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
+log = logging.getLogger(__file__)
 
 # These are the query string params you can pass
 # to the URL that starts the authentication process.
@@ -441,7 +446,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
     """Reads whitelisted query params, transforms them into pipeline args."""
     auth_entry = strategy.session.get(AUTH_ENTRY_KEY)
     if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
-        raise AuthEntryError(strategy.request.backend, 'auth_entry missing or invalid')
+        auth_entry = AUTH_ENTRY_LOGIN
 
     return {'auth_entry': auth_entry}
 
@@ -474,6 +479,20 @@ def set_pipeline_timeout(strategy, user, *args, **kwargs):
         # code must occur during the subsequent ensure_user_information step, and those methods
         # will change the session timeout to the "normal" value according to the "Remember Me"
         # choice of the user.
+
+
+def create_user_from_oauth(strategy, details, user, is_new, *args, **kwargs):
+    if is_new:
+        profile = UserProfile(user=user)
+        profile.name = details.get('fullname')
+
+        try:
+            profile.save()
+        except Exception:
+            log.error("UserProfile creation failed for user {id}.".format(id=user.id))
+            raise
+
+        create_comments_service_user(user)
 
 
 @partial.partial

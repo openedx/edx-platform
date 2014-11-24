@@ -52,8 +52,12 @@ def apply_settings(django_settings):
         'third_party_auth.pipeline.associate_by_email_if_login_api',
         'social.pipeline.user.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
-        'third_party_auth.pipeline.ensure_user_information',
+
+        # IONISx: Disable as we always have enough information. :)
+        # 'third_party_auth.pipeline.ensure_user_information',
+
         'social.pipeline.user.create_user',
+        'third_party_auth.pipeline.create_user_from_oauth',
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',
