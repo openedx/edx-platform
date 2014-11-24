@@ -25,16 +25,23 @@ module.exports = function (grunt) {
         }
     }
 
+    var addThemed = function (default_, add) {
+        if (config.theme) {
+            default_.push(add);
+        }
+
+        return default_;
+    };
+
     grunt.initConfig({
         c: config,
 
         watch: {
             'sass_lms': {
-                files: [
+                files: addThemed([
                     '<%= c.lms %>/sass/**/*.scss',
                     '<%= c.common %>/sass/**/*.scss',
-                    '<%= c.theme %>/sass/**/*.scss'
-                ],
+                ],  '<%= c.theme %>/sass/**/*.scss'),
                 tasks: [
                     'sass:lms',
                     'concat:lms'
@@ -63,17 +70,9 @@ module.exports = function (grunt) {
             },
 
             'coffee_lms': {
-                files: function () {
-                    var paths = [
-                        '<%= c.lms %>/coffee/**/*.coffee'
-                    ];
-
-                    if (config.theme) {
-                        paths.push('<%= c.theme %>/coffee/**/*.coffee');
-                    }
-
-                    return paths;
-                }(),
+                files: addThemed([
+                    '<%= c.lms %>/coffee/**/*.coffee'
+                ],  '<%= c.theme %>/coffee/**/*.coffee'),
                 tasks: [
                     'coffee:lms'
                 ]
@@ -96,8 +95,10 @@ module.exports = function (grunt) {
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css',
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css',
                     '<%= c.lms %>/css/lms-style-app.css',
-                    '<%= c.lms %>/css/lms-style-app-extend2.css',
                     '<%= c.lms %>/css/lms-style-app-rtl.css',
+                    '<%= c.lms %>/css/lms-style-app-extend1.css',
+                    '<%= c.lms %>/css/lms-style-app-extend1-rtl.css',
+                    '<%= c.lms %>/css/lms-style-app-extend2.css',
                     '<%= c.lms %>/css/lms-style-app-extend2-rtl.css',
                     '<%= c.lms %>/css/lms-style-course-vendor.css',
                     '<%= c.lms %>/css/lms-style-course.css',
@@ -107,15 +108,6 @@ module.exports = function (grunt) {
             },
             studio: {
                 src: [
-                    // Sass-generated files
-                    '<%= c.studio %>/sass/style-app.css',
-                    '<%= c.studio %>/sass/style-app-rtl.css',
-                    '<%= c.studio %>/sass/style-app-extend1.css',
-                    '<%= c.studio %>/sass/style-app-extend1-rtl.css',
-                    '<%= c.studio %>/sass/style-xmodule.css',
-                    '<%= c.studio %>/sass/style-xmodule-rtl.css',
-
-                    // Concat-generated files
                     '<%= c.studio %>/css/cms-style-vendor.css',
                     '<%= c.studio %>/css/cms-style-vendor-tinymce-content.css',
                     '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css',
@@ -133,14 +125,12 @@ module.exports = function (grunt) {
         sass: {
             lms: {
                 options: {
-                    includePaths: [
+                    includePaths: addThemed([
                         '<%= c.bower %>',
-                        '<%= c.bower %>/bi-app-sass',
-                        // This is for xmodule sass files
-                        '<%= c.common %>',
                         '<%= c.common %>/sass',
-                        '<%= c.theme %>/sass'
-                    ]
+                        // This is for xmodule sass files
+                        '<%= c.common %>'
+                    ],  '<%= c.theme %>/sass')
                },
                 files: {
                     '<%= c.lms %>/css/lms-style-app-extend1.css': '<%= c.lms %>/sass/application-extend1.scss',
@@ -163,19 +153,18 @@ module.exports = function (grunt) {
                 options: {
                     includePaths: [
                         '<%= c.bower %>',
-                        '<%= c.bower %>/bi-app-sass',
+                        '<%= c.common %>/sass',
                         // This is for xmodule sass files
-                        '<%= c.common %>',
-                        '<%= c.common %>/sass'
+                        '<%= c.common %>'
                     ]
                 },
                 files: {
-                    '<%= c.studio %>/sass/style-app.css': '<%= c.studio %>/sass/style-app.scss',
-                    '<%= c.studio %>/sass/style-app-rtl.css': '<%= c.studio %>/sass/style-app-rtl.scss',
-                    '<%= c.studio %>/sass/style-app-extend1.css': '<%= c.studio %>/sass/style-app-extend1.scss',
-                    '<%= c.studio %>/sass/style-app-extend1-rtl.css': '<%= c.studio %>/sass/style-app-extend1-rtl.scss',
-                    '<%= c.studio %>/sass/style-xmodule.css': '<%= c.studio %>/sass/style-xmodule.scss',
-                    '<%= c.studio %>/sass/style-xmodule-rtl.css': '<%= c.studio %>/sass/style-xmodule-rtl.scss'
+                    '<%= c.studio %>/css/cms-style-app.css': '<%= c.studio %>/sass/style-app.scss',
+                    '<%= c.studio %>/css/cms-style-app-rtl.css': '<%= c.studio %>/sass/style-app-rtl.scss',
+                    '<%= c.studio %>/css/cms-style-app-extend1.css': '<%= c.studio %>/sass/style-app-extend1.scss',
+                    '<%= c.studio %>/css/cms-style-app-extend1-rtl.css': '<%= c.studio %>/sass/style-app-extend1-rtl.scss',
+                    '<%= c.studio %>/css/cms-style-xmodule.css': '<%= c.studio %>/sass/style-xmodule.scss',
+                    '<%= c.studio %>/css/cms-style-xmodule-rtl.css': '<%= c.studio %>/sass/style-xmodule-rtl.scss'
                 }
             }
         },
@@ -185,15 +174,15 @@ module.exports = function (grunt) {
                 files: {
                     '<%= c.lms %>/css/lms-style-vendor.css': [
                         '<%= c.bower %>/font-awesome/css/font-awesome.css',
-                        '<%= c.lms %>/css/vendor/jquery.qtip.min.css',
+                        '<%= c.common %>/css/vendor/jquery.qtip.min.css',
                         '<%= c.lms %>/css/vendor/responsive-carousel/responsive-carousel.css',
                         '<%= c.lms %>/css/vendor/responsive-carousel/responsive-carousel.slide.css'
                     ],
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css': [
-                        '<%= c.lms %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css'
+                        '<%= c.common %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css'
                     ],
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css': [
-                        '<%= c.lms %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
+                        '<%= c.common %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
                     ],
                     '<%= c.lms %>/css/lms-style-course-vendor.css': [
                         '<%= c.lms %>/js/vendor/CodeMirror/codemirror.css',
@@ -201,18 +190,18 @@ module.exports = function (grunt) {
                         '<%= c.lms %>/css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css'
                     ],
                     '<%= c.lms %>/css/lms-style-xmodule-annotations.css': [
-                        '<%= c.lms %>/css/vendor/ova/annotator.css',
-                        '<%= c.lms %>/css/vendor/ova/edx-annotator.css',
-                        '<%= c.lms %>/css/vendor/ova/video-js.min.css',
-                        '<%= c.lms %>/css/vendor/ova/rangeslider.css',
-                        '<%= c.lms %>/css/vendor/ova/share-annotator.css',
-                        '<%= c.lms %>/css/vendor/ova/richText-annotator.css',
-                        '<%= c.lms %>/css/vendor/ova/tags-annotator.css',
-                        '<%= c.lms %>/css/vendor/ova/flagging-annotator.css',
-                        '<%= c.lms %>/css/vendor/ova/diacritic-annotator.css',
-                        '<%= c.lms %>/css/vendor/ova/grouping-annotator.css',
-                        '<%= c.lms %>/css/vendor/ova/ova.css',
-                        '<%= c.lms %>/js/vendor/ova/catch/css/main.css'
+                        '<%= c.common %>/css/vendor/ova/annotator.css',
+                        '<%= c.common %>/css/vendor/ova/edx-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/video-js.min.css',
+                        '<%= c.common %>/css/vendor/ova/rangeslider.css',
+                        '<%= c.common %>/css/vendor/ova/share-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/richText-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/tags-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/flagging-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/diacritic-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/grouping-annotator.css',
+                        '<%= c.common %>/css/vendor/ova/ova.css',
+                        '<%= c.common %>/js/vendor/ova/catch/css/main.css'
                     ]
                 }
             },
@@ -235,24 +224,6 @@ module.exports = function (grunt) {
                     ],
                     '<%= c.studio %>/css/cms-style-vendor-tinymce-skin.css': [
                         '<%= c.common %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
-                    ],
-                    '<%= c.studio %>/css/cms-style-app.css': [
-                        '<%= c.studio %>/sass/style-app.css'
-                    ],
-                    '<%= c.studio %>/css/cms-style-app-rtl.css': [
-                        '<%= c.studio %>/sass/style-app-rtl.css'
-                    ],
-                    '<%= c.studio %>/css/cms-style-app-extend1.css': [
-                        '<%= c.studio %>/sass/style-app-extend1.css'
-                    ],
-                    '<%= c.studio %>/css/cms-style-app-extend1-rtl.css': [
-                        '<%= c.studio %>/sass/style-app-extend1-rtl.css'
-                    ],
-                    '<%= c.studio %>/css/cms-style-xmodule.css': [
-                        '<%= c.studio %>/sass/style-xmodule.css'
-                    ],
-                    '<%= c.studio %>/css/cms-style-xmodule-rtl.css': [
-                        '<%= c.studio %>/sass/style-xmodule-rtl.css'
                     ],
                     '<%= c.studio %>/css/cms-style-xmodule-annotations.css': [
                         '<%= c.common %>/css/vendor/ova/annotator.css',
@@ -279,8 +250,10 @@ module.exports = function (grunt) {
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css': '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css',
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css': '<%= c.lms %>/css/lms-style-vendor-tinymce-skin.css',
                     '<%= c.lms %>/css/lms-style-app.css': '<%= c.lms %>/css/lms-style-app.css',
-                    '<%= c.lms %>/css/lms-style-app-extend2.css': '<%= c.lms %>/css/lms-style-app-extend2.css',
                     '<%= c.lms %>/css/lms-style-app-rtl.css': '<%= c.lms %>/css/lms-style-app-rtl.css',
+                    '<%= c.lms %>/css/lms-style-app-extend1.css': '<%= c.lms %>/css/lms-style-app-extend1.css',
+                    '<%= c.lms %>/css/lms-style-app-extend1-rtl.css': '<%= c.lms %>/css/lms-style-app-extend1-rtl.css',
+                    '<%= c.lms %>/css/lms-style-app-extend2.css': '<%= c.lms %>/css/lms-style-app-extend2.css',
                     '<%= c.lms %>/css/lms-style-app-extend2-rtl.css': '<%= c.lms %>/css/lms-style-app-extend2-rtl.css',
                     '<%= c.lms %>/css/lms-style-course-vendor.css': '<%= c.lms %>/css/lms-style-course-vendor.css',
                     '<%= c.lms %>/css/lms-style-course.css': '<%= c.lms %>/css/lms-style-course.css',
@@ -316,17 +289,9 @@ module.exports = function (grunt) {
             },
             lms: {
                 expand: true,
-                src: function () {
-                    var paths = [
-                        '<%= c.lms %>/coffee/**/*.coffee'
-                    ];
-
-                    if (config.theme) {
-                        paths.push('<%= c.theme %>/coffee/**/*.coffee');
-                    }
-
-                    return paths;
-                }(),
+                src: addThemed([
+                    '<%= c.lms %>/coffee/**/*.coffee'
+                ],  '<%= c.theme %>/coffee/**/*.coffee'),
                 extDot: 'last',
                 ext: '.js'
             },
