@@ -299,3 +299,7 @@ class DataDownloadPage(PageObject):
 
     def is_browser_on_page(self):
         return self.q(css='a[data-section=data_download].active-section').present
+
+    def get_available_report_for_download(self):
+        reports = self.q(css="#report-downloads-table .file-download-link>a").map(lambda el: el.text)
+        return reports.results
