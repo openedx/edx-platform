@@ -15,7 +15,7 @@ from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
 from django.db import IntegrityError
 from django.core.urlresolvers import reverse
@@ -26,6 +26,7 @@ from django.utils.html import strip_tags
 import string  # pylint: disable=W0402
 import random
 import urllib
+from util.file import store_uploaded_file, course_and_time_based_filename_generator, unicode_csv_dictreader
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -971,6 +972,38 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         except AlreadyRunningError:
             already_running_status = _("An enrolled student profile report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
             return JsonResponse({"status": already_running_status})
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_POST
+@require_level('staff')
+def add_users_to_cohorts(request, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    try:
+        def validator(uploaded_file):
+            reader = unicode_csv_dictreader(uploaded_file)
+            fieldnames = reader.fieldnames
+            msg = None
+            if "cohort" not in fieldnames:
+                msg = _("The file must contain a 'cohort' column containing cohort names.")
+            elif "email" not in fieldnames and "username" not in fieldnames:
+                msg = _("The file must contain a 'username' column, an 'email' column, or both.")
+            if msg:
+                raise PermissionDenied(msg)
+
+        # TODO: what is the maximum filesize we want to enforce?
+        file_storage, filename = store_uploaded_file(
+            request, 'uploaded-file', ['.csv'],
+            course_and_time_based_filename_generator(course_key, "cohorts"),
+            validator=validator
+        )
+        instructor_task.api.submit_cohort_students(request, course_key, filename)
+    except Exception as err:
+        return JsonResponse({"error": str(err)}, status=400)
+
+    return JsonResponse()
 
 
 @ensure_csrf_cookie
