@@ -7,31 +7,31 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
--e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
--e git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
--e git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-2#egg=django-oauth2-provider
--e git+https://github.com/edx/MongoDBProxy.git@efe14679c9263ab491916ed960f5930127e05faf#egg=mongodb_proxy
--e git+https://github.com/gabrielfalcao/lettuce.git@cccc3978ad2df82a78b6f9648fe2e9baddd22f88#egg=lettuce
--e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
--e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
--e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
--e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
--e git+https://github.com/jazkarta/edx-jsme.git@c5bfa5d361d6685d8c643838fc0055c25f8b7999#egg=edx-jsme
--e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
+git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
+git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
+git+https://github.com/edx/django-wiki.git@cd0b2b31997afccde519fe5b3365e61a9edb143f#egg=django-wiki
+git+https://github.com/edx/django-oauth2-provider.git@0.2.7-fork-edx-2#egg=django-oauth2-provider
+git+https://github.com/edx/MongoDBProxy.git@efe14679c9263ab491916ed960f5930127e05faf#egg=mongodb_proxy
+git+https://github.com/gabrielfalcao/lettuce.git@cccc3978ad2df82a78b6f9648fe2e9baddd22f88#egg=lettuce
+git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
+git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
+git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
+git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
+git+https://github.com/jazkarta/edx-jsme.git@c5bfa5d361d6685d8c643838fc0055c25f8b7999#egg=edx-jsme
+git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@2029af2a4b524310847decfb34ef39da8a30dc4e#egg=XBlock
--e git+https://github.com/edx/codejail.git@66dd5a45e5072666ff9a70c768576e9ffd1daa4b#egg=codejail
--e git+https://github.com/edx/diff-cover.git@v0.7.2#egg=diff_cover
--e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
--e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
--e git+https://github.com/edx/bok-choy.git@4a259e3548a19e41cc39433caf68ea58d10a27ba#egg=bok_choy
--e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
--e git+https://github.com/edx/acid-block.git@df1a7f0cae46567c251d507b8c72168aed8ec042#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@release-2014-10-27T19.33#egg=edx-ora2
--e git+https://github.com/edx/opaque-keys.git@0.1.2#egg=opaque-keys
--e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
--e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
--e git+https://github.com/edx/edx-oauth2-provider.git@0.3.1#egg=oauth2-provider
--e git+https://github.com/edx/edx-val.git@a3c54afe30375f7a5755ba6f6412a91de23c3b86#egg=edx-val
+git+https://github.com/edx/XBlock.git@2029af2a4b524310847decfb34ef39da8a30dc4e#egg=XBlock
+git+https://github.com/edx/codejail.git@66dd5a45e5072666ff9a70c768576e9ffd1daa4b#egg=codejail
+git+https://github.com/edx/diff-cover.git@v0.7.2#egg=diff_cover
+git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
+git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
+git+https://github.com/edx/bok-choy.git@4a259e3548a19e41cc39433caf68ea58d10a27ba#egg=bok_choy
+git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
+git+https://github.com/edx/acid-block.git@df1a7f0cae46567c251d507b8c72168aed8ec042#egg=acid-xblock
+git+https://github.com/edx/edx-ora2.git@release-2014-10-27T19.33#egg=edx-ora2
+git+https://github.com/edx/opaque-keys.git@0.1.2#egg=opaque-keys
+git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
+git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
+git+https://github.com/edx/edx-oauth2-provider.git@0.3.1#egg=oauth2-provider
+git+https://github.com/edx/edx-val.git@a3c54afe30375f7a5755ba6f6412a91de23c3b86#egg=edx-val
