@@ -41,7 +41,8 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         # create a non-instructor who will be registered for the course and in the manual cohort.
         self.student_name = "student_user"
         self.student_id = AutoAuthPage(
-            self.browser, username=self.student_name, course_id=self.course_id, staff=False
+            self.browser, username=self.student_name, email="student_user@example.com",
+            course_id=self.course_id, staff=False
         ).visit().get_user_id()
         self.add_user_to_cohort(self.course_fixture, self.student_name, self.manual_cohort_id)
 
@@ -273,13 +274,23 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             lambda: 1 == len(self.membership_page.get_cvs_messages()), 'Waiting for notification'
         ).fulfill()
         messages = self.membership_page.get_cvs_messages()
+        # cohorts_users.cvs adds instructor_user to ManualCohort1 via username and student_user to AutoCohort1 via email
         self.assertEquals("Your file 'cohort_users.csv' has been uploaded. Go check... in 5 minutes.", messages[0])
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
                 "time": {"$gt": start_time},
-                "event.user_id": {"$in": [int(self.instructor_id)]},
+                "event.user_id": {"$in": [int(self.student_id)]},
                 "event.cohort_name": self.auto_cohort_name,
+            }).count(),
+            1
+        )
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_added",
+                "time": {"$gt": start_time},
+                "event.user_id": {"$in": [int(self.instructor_id)]},
+                "event.cohort_name": self.manual_cohort_name,
             }).count(),
             1
         )
