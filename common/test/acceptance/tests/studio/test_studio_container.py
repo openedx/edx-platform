@@ -8,7 +8,7 @@ from nose.plugins.attrib import attr
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.html_component_editor import HtmlComponentEditorView
-from ...pages.studio.utils import add_discussion, drag
+from ...pages.studio.utils import add_discussion, drag, click_css
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.staff_view import StaffPage
 
@@ -298,6 +298,45 @@ class EditContainerTest(NestedVerticalTest):
         component = unit.xblocks[1]
         empty_string = '  '
         self.modify_display_name_and_verify(component, modified_name=empty_string, original_value=component.name)
+
+    def test_set_display_name(self):
+        """
+        Scenario: I can set the display name of a component
+        Given I am in Studio editing a new unit
+        When I add a "Discussion" component
+        Then I see the display name is "Discussion"
+        When I change the display name to "I'm the Cuddliest!"
+        Then I see the display name is "I'm the Cuddliest!"
+        """
+        unit = self.go_to_unit_page()
+        add_discussion(unit)
+        component = unit.xblocks[2]
+        self.assertEqual(component.name, "Discussion")
+        test_string = "I'm the Cuddliest!"
+        self.modify_display_name_and_verify(component, test_string)
+
+    def test_component_displayed_with_no_display_name(self):
+        """
+        Scenario: If a component has no display name, the category is displayed
+        Given I am in Studio editing a new unit
+        When I add a "Discussion" component
+        Then I see the display name is "Discussion"
+        When I change the display name to ""
+        Then I see the display name is "Discussion"
+        When I unset the display name
+        Then I see the display name is "Discussion"
+        """
+        unit = self.go_to_unit_page()
+        add_discussion(unit)
+        component = unit.xblocks[2]
+        self.assertEqual(component.name, "Discussion")
+        empty_string = ""
+        self.modify_display_name_and_verify(component, modified_name=empty_string, original_value="discussion")
+        component.edit()
+        component_editor = ComponentEditorView(self.browser, component.locator)
+        click_css(component_editor, 'button.setting-clear', require_notification=False)
+        component_editor.save()
+        self.assertEqual(component.name, "Discussion")
 
 
 @attr('shard_1')
