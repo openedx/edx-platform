@@ -27,6 +27,9 @@ class InstructorDashboardPage(CoursePage):
         return membership_section
 
     def select_data_download(self):
+        """
+        Selects the data management tab and returns a DataDownloadPage.
+        """
         self.q(css='a[data-section=data_download]').first.click()
         data_download_section = DataDownloadPage(self.browser)
         data_download_section.wait_for_page()
@@ -60,23 +63,45 @@ class MembershipPage(PageObject):
     Membership section of the Instructor dashboard.
     """
     url = None
-    cohort_csv_browse_button_selector = '.cohort-management .csv-upload input.file_field'
-    cohort_csv_upload_button_selector = '.cohort-management .csv-upload button.submit-file-button'
 
     def is_browser_on_page(self):
         return self.q(css='a[data-section=membership].active-section').present
 
     def select_auto_enroll_section(self):
         """
-        returns the MembershipPageAutoEnrollSection
+        Returns the MembershipPageAutoEnrollSection page object.
         """
         return MembershipPageAutoEnrollSection(self.browser)
+
+    def select_cohort_management_section(self):
+        """
+        Returns the MembershipPageCohortManagementSection page object.
+        """
+        return MembershipPageCohortManagementSection(self.browser)
+
+
+class MembershipPageCohortManagementSection(PageObject):
+    """
+    The cohort management subsection of the Membership section of the Instructor dashboard.
+    """
+    url = None
+    csv_browse_button_selector = '.csv-upload input.file_field'
+    csv_upload_button_selector = '.csv-upload button.submit-file-button'
+
+    def is_browser_on_page(self):
+        return self.q(css='.cohort-management.membership-section').present
+
+    def _bounded_selector(self, selector):
+        """
+        Return `selector`, but limited to the cohort management context
+        """
+        return '.cohort-management.membership-section {}'.format(selector)
 
     def _get_cohort_options(self):
         """
         Returns the available options in the cohort dropdown, including the initial "Select a cohort group".
         """
-        return self.q(css=".cohort-management #cohort-select option")
+        return self.q(css=self._bounded_selector("#cohort-select option"))
 
     def _cohort_name(self, label):
         """
@@ -119,7 +144,7 @@ class MembershipPage(PageObject):
         """
         Selects the given cohort in the drop-down.
         """
-        self.q(css=".cohort-management #cohort-select option").filter(
+        self.q(css=self._bounded_selector("#cohort-select option")).filter(
             lambda el: self._cohort_name(el.text) == cohort_name
         ).first.click()
 
@@ -127,35 +152,37 @@ class MembershipPage(PageObject):
         """
         Adds a new manual cohort with the specified name.
         """
-        self.q(css="div.cohort-management-nav .action-create").first.click()
-        textinput = self.q(css="#cohort-create-name").results[0]
+        self.q(css=self._bounded_selector("div.cohort-management-nav .action-create")).first.click()
+        textinput = self.q(css=self._bounded_selector("#cohort-create-name")).results[0]
         textinput.send_keys(cohort_name)
-        self.q(css="div.form-actions .action-save").first.click()
+        self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
 
     def get_cohort_group_setup(self):
         """
         Returns the description of the current cohort
         """
-        return self.q(css='.cohort-management-group-setup .setup-value').first.text[0]
+        return self.q(css=self._bounded_selector('.cohort-management-group-setup .setup-value')).first.text[0]
 
     def select_edit_settings(self):
-        self.q(css=".action-edit").first.click()
+        self.q(css=self._bounded_selector(".action-edit")).first.click()
 
     def add_students_to_selected_cohort(self, users):
         """
         Adds a list of users (either usernames or email addresses) to the currently selected cohort.
         """
-        textinput = self.q(css="#cohort-management-group-add-students").results[0]
+        textinput = self.q(css=self._bounded_selector("#cohort-management-group-add-students")).results[0]
         for user in users:
             textinput.send_keys(user)
             textinput.send_keys(",")
-        self.q(css="div.cohort-management-group-add .action-primary").first.click()
+        self.q(css=self._bounded_selector("div.cohort-management-group-add .action-primary")).first.click()
 
     def get_cohort_student_input_field_value(self):
         """
         Returns the contents of the input field where students can be added to a cohort.
         """
-        return self.q(css="#cohort-management-group-add-students").results[0].get_attribute("value")
+        return self.q(
+            css=self._bounded_selector("#cohort-management-group-add-students")
+        ).results[0].get_attribute("value")
 
     def _get_cohort_messages(self, type):
         """
@@ -175,11 +202,11 @@ class MembershipPage(PageObject):
         return self._get_messages(title_css, detail_css)
 
     def _get_messages(self, title_css, details_css):
-        message_title = self.q(css=title_css)
+        message_title = self.q(css=self._bounded_selector(title_css))
         if len(message_title.results) == 0:
             return []
         messages = [message_title.first.text[0]]
-        details = self.q(css=details_css).results
+        details = self.q(css=self._bounded_selector(details_css)).results
         for detail in details:
             messages.append(detail.text)
         return messages
@@ -202,14 +229,13 @@ class MembershipPage(PageObject):
         """
         Click on the link to the Data Download Page.
         """
-        self.q(css="a.link-cross-reference[data-section=data_download]").first.click()
+        self.q(css=self._bounded_selector("a.link-cross-reference[data-section=data_download]")).first.click()
 
     def upload_cohort_file(self, filename):
         path = InstructorDashboardPage.get_asset_path(filename)
-        # Can this be "first"?
-        file_input = self.q(css=self.cohort_csv_browse_button_selector).results[0]
+        file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector)).results[0]
         file_input.send_keys(path)
-        self.q(css=self.cohort_csv_upload_button_selector).results[0].click()
+        self.q(css=self._bounded_selector(self.csv_upload_button_selector)).first.click()
 
 
 class MembershipPageAutoEnrollSection(PageObject):
@@ -285,7 +311,9 @@ class MembershipPageAutoEnrollSection(PageObject):
         self._upload_file('image.jpg')
 
     def _upload_file(self, filename):
-        """ Helper method to upload a file """
+        """
+        Helper method to upload a file.
+        """
         file_path = InstructorDashboardPage.get_asset_path(filename)
         self.q(css=self.auto_enroll_browse_button_selector).results[0].send_keys(file_path)
         self.click_upload_file_button()
@@ -301,5 +329,8 @@ class DataDownloadPage(PageObject):
         return self.q(css='a[data-section=data_download].active-section').present
 
     def get_available_report_for_download(self):
+        """
+        Returns a list of all the available report downloads.
+        """
         reports = self.q(css="#report-downloads-table .file-download-link>a").map(lambda el: el.text)
         return reports.results
