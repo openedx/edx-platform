@@ -1,0 +1,15 @@
+<div class="asset-library clear">
+    <h3>Previous Uploads</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Date Added</th>
+                <th>Video ID</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody class="js-table-body"></tbody>
+    </table>
+</div>

@@ -66,6 +66,14 @@ def videos_handler(request, course_key_string):
     return videos_index_html(course)
 
 
+def _get_videos(course):
+    edx_videos_ids = [
+        v.asset_id.path
+        for v in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE)
+    ]
+    return list(get_videos_for_ids(edx_videos_ids))
+
+
 def videos_index_html(course):
     """
     Returns an HTML rendering of the list of uploaded videos.
@@ -78,6 +86,7 @@ def videos_index_html(course):
                 "contentstore.views.videos_handler",
                 kwargs={"course_key_string": unicode(course.id)}
             ),
+            "previous_uploads": _get_videos(course),
             "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
         }
     )
@@ -108,12 +117,7 @@ def videos_index_json(course):
         ]
     }
     """
-    edx_videos_ids = [
-        v.asset_id.path
-        for v in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE)
-    ]
-    val_videos = get_videos_for_ids(edx_videos_ids)
-    return JsonResponse({'videos': list(val_videos)}, status=200)
+    return JsonResponse({'videos': _get_videos(course)}, status=200)
 
 
 def videos_post(course, request):
