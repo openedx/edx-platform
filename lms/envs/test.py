@@ -367,6 +367,7 @@ MICROSITE_CONFIGURATION = {
         "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
+        "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
     },
     "default": {
         "university": "default_university",
