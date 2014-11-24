@@ -56,7 +56,7 @@ set -e
 ###############################################################################
 
 # Violations thresholds for failing the build
-PYLINT_THRESHOLD=4725
+PYLINT_THRESHOLD=4600
 PEP8_THRESHOLD=150
 
 source $HOME/jenkins_env
