@@ -20,8 +20,9 @@ except Exception:
     cache = cache.cache
 
 
-def cache_if_anonymous(view_func):
-    """
+def cache_if_anonymous(*get_parameters):
+    """Cache a page for anonymous users.
+
     Many of the pages in edX are identical when the user is not logged
     in, but should not be cached when the user is logged in (because
     of the navigation bar at the top with the username).
@@ -31,32 +32,46 @@ def cache_if_anonymous(view_func):
     the cookie to the vary header, and so every page is cached seperately
     for each user (because each user has a different csrf token).
 
+    Optionally, provide a series of GET parameters as arguments to cache
+    pages with these GET parameters separately.
+
     Note that this decorator should only be used on views that do not
     contain the csrftoken within the html. The csrf token can be included
     in the header by ordering the decorators as such:
 
     @ensure_csrftoken
-    @cache_if_anonymous
+    @cache_if_anonymous()
     def myView(request):
     """
 
-    @wraps(view_func)
-    def _decorated(request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            #Use the cache
-            # same view accessed through different domain names may
-            # return different things, so include the domain name in the key.
-            domain = str(request.META.get('HTTP_HOST')) + '.'
-            cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
-            response = cache.get(cache_key)
-            if not response:
-                response = view_func(request, *args, **kwargs)
-                cache.set(cache_key, response, 60 * 3)
+    def decorator(view_func):
+        """The outer wrapper, used to allow the decorator to take optional
+        arguments.
+        """
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            """The inner wrapper, which wraps the view function."""
+            if not request.user.is_authenticated():
+                #Use the cache
+                # same view accessed through different domain names may
+                # return different things, so include the domain name in the key.
+                domain = str(request.META.get('HTTP_HOST')) + '.'
+                cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
 
-            return response
+                # Include the values of GET parameters in the cache key.
+                for get_parameter in get_parameters:
+                    cache_key = cache_key + '.' + unicode(request.GET.get(get_parameter))
 
-        else:
-            #Don't use the cache
-            return view_func(request, *args, **kwargs)
+                response = cache.get(cache_key)  # pylint: disable=maybe-no-member
+                if not response:
+                    response = view_func(request, *args, **kwargs)
+                    cache.set(cache_key, response, 60 * 3)  # pylint: disable=maybe-no-member
 
-    return _decorated
+                return response
+
+            else:
+                #Don't use the cache
+                return view_func(request, *args, **kwargs)
+
+        return wrapper
+    return decorator
