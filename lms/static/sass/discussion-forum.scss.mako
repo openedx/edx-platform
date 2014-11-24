@@ -6,6 +6,7 @@
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
 // BASE  *default edX offerings*
 // ====================

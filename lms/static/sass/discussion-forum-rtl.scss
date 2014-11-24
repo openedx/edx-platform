@@ -1,7 +1,7 @@
 /*
  * This file is dynamically generated and ignored by Git.
  * DO NOT MAKE CHANGES HERE. Instead, go edit its template:
- * /edx/app/edxapp/edx-platform/lms/static/sass/discussion-forum.scss.mako
+ * /edx/app/edxapp/edx-platform/lms/static/sass/discussion-forum-rtl.scss.mako
  */
 
 
@@ -10,7 +10,7 @@
 
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
-@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 // BASE  *default edX offerings*
 // ====================

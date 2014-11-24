@@ -471,6 +471,10 @@ PIPELINE_CSS = {
     'discussion': {
         'source_filenames': ['sass/discussion-forum.css'],
         'output_filename': 'css/cms-style-discussion-forum.css'
+    },
+    'discussion-rtl': {
+        'source_filenames': ['sass/discussion-forum-rtl.css'],
+        'output_filename': 'css/cms-style-discussion-forum-rtl.css'
     }
 }
 
