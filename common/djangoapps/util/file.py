@@ -10,7 +10,9 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 
 
-def store_uploaded_file(request, file_key, allowed_file_types, base_storage_filename, max_file_size=10240000):
+def store_uploaded_file(
+        request, file_key, allowed_file_types, base_storage_filename, max_file_size=10240000, validator=None,
+):
     """
     Stores an uploaded file to django file storage.
 
@@ -27,6 +29,10 @@ def store_uploaded_file(request, file_key, allowed_file_types, base_storage_file
         max_file_size (int): the maximum file size in bytes that the uploaded file can be. If the uploaded file
             is larger than this size, a `PermissionDenied` exception will be thrown. Default value is 10240000 bytes
             (10,000 KB).
+        validator (function): an optional validation method that, if defined, will be passed the InMemoryUploadedFile
+            that the user has uploaded. This method can do validation on the contents of the file and throw
+            an exception if the file is not properly formatted. Note that the InMemoryUploadedFile will be closed
+            in a finally block at the end of this method (so the validator need not worry about closing it).
 
     Returns:
         Storage: the file storage object where the file can be retrieved from
@@ -38,21 +44,29 @@ def store_uploaded_file(request, file_key, allowed_file_types, base_storage_file
         raise ValueError(_("No file uploaded with key '" + file_key + "'."))
 
     uploaded_file = request.FILES[file_key]
-    file_extension = os.path.splitext(uploaded_file.name)[1].lower()
-    if not file_extension in allowed_file_types:
-        file_types = "', '".join(allowed_file_types)
-        msg = ungettext(
-            "The file must end with the extension '{file_types}'.",
-            "The file must end with one of the following extensions: '{file_types}'.",
-            len(allowed_file_types)).format(file_types=file_types
-        )
-        raise exceptions.PermissionDenied(msg)
+    try:
+        file_extension = os.path.splitext(uploaded_file.name)[1].lower()
+        if not file_extension in allowed_file_types:
+            file_types = "', '".join(allowed_file_types)
+            msg = ungettext(
+                "The file must end with the extension '{file_types}'.",
+                "The file must end with one of the following extensions: '{file_types}'.",
+                len(allowed_file_types)).format(file_types=file_types
+            )
+            raise exceptions.PermissionDenied(msg)
 
-    stored_file_name = base_storage_filename + file_extension
+        if validator:
+            validator(uploaded_file)
 
-    file_storage = get_storage_class()()
-    # use default storage to store file
-    file_storage.save(stored_file_name, uploaded_file)
+        stored_file_name = base_storage_filename + file_extension
+
+        file_storage = get_storage_class()()
+        # use default storage to store file
+        file_storage.save(stored_file_name, uploaded_file)
+
+    finally:
+        uploaded_file.close()
+
     # check file size
     size = file_storage.size(stored_file_name)
     if size > max_file_size:
