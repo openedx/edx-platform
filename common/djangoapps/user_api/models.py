@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
+from model_utils.models import TimeStampedModel
 
 from xmodule_django.models import CourseKeyField
 
@@ -47,7 +48,7 @@ class UserPreference(models.Model):
             return default
 
 
-class UserCourseTag(models.Model):
+class UserCourseTag(TimeStampedModel):
     """
     Per-course user tags, to be used by various things that want to store tags about
     the user.  Added initially to store assignment to experimental groups.
