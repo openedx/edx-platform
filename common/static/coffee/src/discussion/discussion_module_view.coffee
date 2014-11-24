@@ -98,7 +98,7 @@ if Backbone?
       else
         @$el.append($discussion)
 
-      @newPostForm = $('.new-post-article')
+      @newPostForm = this.$el.find('.new-post-article')
       @threadviews = @discussion.map (thread) =>
         view = new DiscussionThreadView(
           el: @$("article#thread_#{thread.id}"),
