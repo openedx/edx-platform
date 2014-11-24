@@ -635,7 +635,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     using a `ReportStore`.
     """
     start_time = time()
-    start_date = datetime.now()
+    start_date = datetime.now(UTC)
 
     # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
     users_to_cohorts = [

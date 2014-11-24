@@ -63,32 +63,47 @@ class StoreUploadedFileTestCase(TestCase):
         if self.file_storage and self.stored_file_name:
             self.file_storage.delete(self.stored_file_name)
 
+    def verify_exception(self, expected_message, error):
+        """
+        Helper method to verify exception text.
+        """
+        self.assertEqual(expected_message, error.exception.message)
+
     def test_error_conditions(self):
         """
         Verifies that exceptions are thrown in the expected cases.
         """
-        def verify_exception(expected_message):
-            self.assertEqual(expected_message, error.exception.message)
-
         with self.assertRaises(ValueError) as error:
             store_uploaded_file(self.request, "wrong_key", [".txt", ".csv"], "stored_file")
-        verify_exception("No file uploaded with key 'wrong_key'.")
+        self.verify_exception("No file uploaded with key 'wrong_key'.", error)
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
             store_uploaded_file(self.request, "uploaded_file", [], "stored_file")
-        verify_exception("The file must end with one of the following extensions: ''.")
+        self.verify_exception("The file must end with one of the following extensions: ''.", error)
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
             store_uploaded_file(self.request, "uploaded_file", [".bar"], "stored_file")
-        verify_exception("The file must end with the extension '.bar'.")
+        self.verify_exception("The file must end with the extension '.bar'.", error)
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
             store_uploaded_file(self.request, "uploaded_file", [".xxx", ".bar"], "stored_file")
-        verify_exception("The file must end with one of the following extensions: '.xxx', '.bar'.")
+        self.verify_exception("The file must end with one of the following extensions: '.xxx', '.bar'.", error)
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
             store_uploaded_file(self.request, "uploaded_file", [".csv"], "stored_file", max_file_size=2)
-        verify_exception("Maximum upload file size is 2 bytes.")
+        self.verify_exception("Maximum upload file size is 2 bytes.", error)
+
+    def test_validator(self):
+        """
+        Verify that a validator function can throw an exception.
+        """
+        def validator(file):
+            self.assertEqual(self.request.FILES["uploaded_file"], file)
+            raise exceptions.PermissionDenied("validation failed")
+
+        with self.assertRaises(exceptions.PermissionDenied) as error:
+            store_uploaded_file(self.request, "uploaded_file", [".csv"], "stored_file", validator=validator)
+        self.verify_exception("validation failed", error)
 
     def test_file_upload_lower_case_extension(self):
         """

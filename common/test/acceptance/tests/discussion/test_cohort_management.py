@@ -7,6 +7,7 @@ from datetime import datetime
 
 from pymongo import MongoClient
 
+from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
 from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest
@@ -15,6 +16,7 @@ from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 
+import urllib
 import uuid
 
 
@@ -49,21 +51,23 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         # login as an instructor
         self.instructor_name = "instructor_user"
         self.instructor_id = AutoAuthPage(
-            self.browser, username=self.instructor_name, course_id=self.course_id, staff=True
+            self.browser, username=self.instructor_name, email="instructor_user@example.com",
+            course_id=self.course_id, staff=True
         ).visit().get_user_id()
 
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
-        self.membership_page = self.instructor_dashboard_page.select_membership()
+        membership_page = self.instructor_dashboard_page.select_membership()
+        self.cohort_management_page = membership_page.select_cohort_management_section()
 
     def verify_cohort_description(self, cohort_name, expected_description):
         """
         Selects the cohort with the given name and verifies the expected description is presented.
         """
-        self.membership_page.select_cohort(cohort_name)
-        self.assertEquals(self.membership_page.get_selected_cohort(), cohort_name)
-        self.assertIn(expected_description, self.membership_page.get_cohort_group_setup())
+        self.cohort_management_page.select_cohort(cohort_name)
+        self.assertEquals(self.cohort_management_page.get_selected_cohort(), cohort_name)
+        self.assertIn(expected_description, self.cohort_management_page.get_cohort_group_setup())
 
     def test_cohort_description(self):
         """
@@ -94,8 +98,8 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         When I view the cohort in the LMS instructor dashboard
         There is a link to take me to the Studio Advanced Settings for the course
         """
-        self.membership_page.select_cohort(self.manual_cohort_name)
-        self.membership_page.select_edit_settings()
+        self.cohort_management_page.select_cohort(self.manual_cohort_name)
+        self.cohort_management_page.select_edit_settings()
         advanced_settings_page = AdvancedSettingsPage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
@@ -115,19 +119,19 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         And the user input field is empty
         And appropriate events have been emitted
         """
-        start_time = datetime.now()
-        self.membership_page.select_cohort(self.auto_cohort_name)
-        self.assertEqual(0, self.membership_page.get_selected_cohort_count())
-        self.membership_page.add_students_to_selected_cohort([self.student_name, self.instructor_name])
+        start_time = datetime.now(UTC)
+        self.cohort_management_page.select_cohort(self.auto_cohort_name)
+        self.assertEqual(0, self.cohort_management_page.get_selected_cohort_count())
+        self.cohort_management_page.add_students_to_selected_cohort([self.student_name, self.instructor_name])
         # Wait for the number of users in the cohort to change, indicating that the add operation is complete.
         EmptyPromise(
-            lambda: 2 == self.membership_page.get_selected_cohort_count(), 'Waiting for added students'
+            lambda: 2 == self.cohort_management_page.get_selected_cohort_count(), 'Waiting for added students'
         ).fulfill()
-        confirmation_messages = self.membership_page.get_cohort_confirmation_messages()
+        confirmation_messages = self.cohort_management_page.get_cohort_confirmation_messages()
         self.assertEqual(2, len(confirmation_messages))
         self.assertEqual("2 students have been added to this cohort group", confirmation_messages[0])
         self.assertEqual("1 student was removed from " + self.manual_cohort_name, confirmation_messages[1])
-        self.assertEqual("", self.membership_page.get_cohort_student_input_field_value())
+        self.assertEqual("", self.cohort_management_page.get_cohort_student_input_field_value())
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -179,27 +183,27 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         And I get a notification that one user is unknown
         And the user input field still contains the incorrect email addresses
         """
-        self.membership_page.select_cohort(self.manual_cohort_name)
-        self.assertEqual(1, self.membership_page.get_selected_cohort_count())
-        self.membership_page.add_students_to_selected_cohort([self.student_name, "unknown_user"])
+        self.cohort_management_page.select_cohort(self.manual_cohort_name)
+        self.assertEqual(1, self.cohort_management_page.get_selected_cohort_count())
+        self.cohort_management_page.add_students_to_selected_cohort([self.student_name, "unknown_user"])
         # Wait for notification messages to appear, indicating that the add operation is complete.
         EmptyPromise(
-            lambda: 2 == len(self.membership_page.get_cohort_confirmation_messages()), 'Waiting for notification'
+            lambda: 2 == len(self.cohort_management_page.get_cohort_confirmation_messages()), 'Waiting for notification'
         ).fulfill()
-        self.assertEqual(1, self.membership_page.get_selected_cohort_count())
+        self.assertEqual(1, self.cohort_management_page.get_selected_cohort_count())
 
-        confirmation_messages = self.membership_page.get_cohort_confirmation_messages()
+        confirmation_messages = self.cohort_management_page.get_cohort_confirmation_messages()
         self.assertEqual(2, len(confirmation_messages))
         self.assertEqual("0 students have been added to this cohort group", confirmation_messages[0])
         self.assertEqual("1 student was already in the cohort group", confirmation_messages[1])
 
-        error_messages = self.membership_page.get_cohort_error_messages()
+        error_messages = self.cohort_management_page.get_cohort_error_messages()
         self.assertEqual(2, len(error_messages))
         self.assertEqual("There was an error when trying to add students:", error_messages[0])
         self.assertEqual("Unknown user: unknown_user", error_messages[1])
         self.assertEqual(
             self.student_name + ",unknown_user,",
-            self.membership_page.get_cohort_student_input_field_value()
+            self.cohort_management_page.get_cohort_student_input_field_value()
         )
 
     def test_add_new_cohort(self):
@@ -213,19 +217,19 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then the cohort has 1 user
         And appropriate events have been emitted
         """
-        start_time = datetime.now()
+        start_time = datetime.now(UTC)
         new_cohort = str(uuid.uuid4().get_hex()[0:20])
-        self.assertFalse(new_cohort in self.membership_page.get_cohorts())
-        self.membership_page.add_cohort(new_cohort)
+        self.assertFalse(new_cohort in self.cohort_management_page.get_cohorts())
+        self.cohort_management_page.add_cohort(new_cohort)
         # After adding the cohort, it should automatically be selected
         EmptyPromise(
-            lambda: new_cohort == self.membership_page.get_selected_cohort(), "Waiting for new cohort to appear"
+            lambda: new_cohort == self.cohort_management_page.get_selected_cohort(), "Waiting for new cohort to appear"
         ).fulfill()
-        self.assertEqual(0, self.membership_page.get_selected_cohort_count())
-        self.membership_page.add_students_to_selected_cohort([self.instructor_name])
+        self.assertEqual(0, self.cohort_management_page.get_selected_cohort_count())
+        self.cohort_management_page.add_students_to_selected_cohort([self.instructor_name])
         # Wait for the number of users in the cohort to change, indicating that the add operation is complete.
         EmptyPromise(
-            lambda: 1 == self.membership_page.get_selected_cohort_count(), 'Waiting for student to be added'
+            lambda: 1 == self.cohort_management_page.get_selected_cohort_count(), 'Waiting for student to be added'
         ).fulfill()
         self.assertEqual(
             self.event_collection.find({
@@ -253,29 +257,62 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         When I view the cohort in the LMS instructor dashboard
         There is a link to take me to the Data Download section of the Instructor Dashboard.
         """
-        self.membership_page.select_data_download()
+        self.cohort_management_page.select_data_download()
         data_download_page = DataDownloadPage(self.browser)
         data_download_page.wait_for_page()
 
-    def test_cohort_by_csv(self):
+    def test_cohort_by_csv_both_columns(self):
         """
-        Scenario: the instructor can upload a file with user and cohort assignments.
+        Scenario: the instructor can upload a file with user and cohort assignments, using both emails and usernames.
 
         Given I have a course with two cohorts defined
         When I go to the cohort management section of the instructor dashboard
-        I can upload a CSV file with assignments of users to cohorts
+        I can upload a CSV file with assignments of users to cohorts via both usernames and emails
         Then I can download a file with results
         And appropriate events have been emitted
         """
-        start_time = datetime.now()
-        self.membership_page.upload_correct_csv_file()
-        # Wait for notification message to appear, indicating file has been uploaded.
-        EmptyPromise(
-            lambda: 1 == len(self.membership_page.get_cvs_messages()), 'Waiting for notification'
-        ).fulfill()
-        messages = self.membership_page.get_cvs_messages()
-        # cohorts_users.cvs adds instructor_user to ManualCohort1 via username and student_user to AutoCohort1 via email
-        self.assertEquals("Your file 'cohort_users.csv' has been uploaded. Go check... in 5 minutes.", messages[0])
+        # cohort_users_both_columns.cvs adds instructor_user to ManualCohort1 via username and
+        # student_user to AutoCohort1 via email
+        self._verify_csv_upload_acceptable_file("cohort_users_both_columns.csv")
+
+    def test_cohort_by_csv_only_email(self):
+        """
+        Scenario: the instructor can upload a file with user and cohort assignments, using only emails.
+
+        Given I have a course with two cohorts defined
+        When I go to the cohort management section of the instructor dashboard
+        I can upload a CSV file with assignments of users to cohorts via only emails
+        Then I can download a file with results
+        And appropriate events have been emitted
+        """
+        # cohort_users_only_email.cvs adds instructor_user to ManualCohort1 and student_user to AutoCohort1 via email
+        self._verify_csv_upload_acceptable_file("cohort_users_only_email.csv")
+
+    def test_cohort_by_csv_only_username(self):
+        """
+        Scenario: the instructor can upload a file with user and cohort assignments, using only usernames.
+
+        Given I have a course with two cohorts defined
+        When I go to the cohort management section of the instructor dashboard
+        I can upload a CSV file with assignments of users to cohorts via only usernames
+        Then I can download a file with results
+        And appropriate events have been emitted
+        """
+        # cohort_users_only_username.cvs adds instructor_user to ManualCohort1 and
+        # student_user to AutoCohort1 via username
+        self._verify_csv_upload_acceptable_file("cohort_users_only_username.csv")
+
+    def _verify_csv_upload_acceptable_file(self, filename):
+        """
+        Helper method to verify cohort assignments after a successful CSV upload.
+        """
+        start_time = datetime.now(UTC)
+        self.cohort_management_page.upload_cohort_file(filename)
+        self._verify_cohort_by_csv_notification(
+            "Your file '{}' has been uploaded. Go check... in 5 minutes.".format(filename)
+        )
+
+        # student_user is moved from manual cohort group to auto cohort group
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -285,6 +322,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
+        # instructor_user (previously unassigned) is added to manual cohort group
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -294,6 +332,80 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
-        self.instructor_dashboard_page.select_data_download()
-        # TODO: verify entry appears in download table.
 
+        # Verify the results can be downloaded.
+        data_download = self.instructor_dashboard_page.select_data_download()
+        EmptyPromise(
+            lambda: 1 == len(data_download.get_available_reports_for_download()), 'Waiting for downloadable report'
+        ).fulfill()
+        report = data_download.get_available_reports_for_download()[0]
+        base_file_name = "cohort_results_"
+        self.assertIn("{}_{}".format(
+            urllib.quote(unicode(self.course_id).replace("/", "_")), base_file_name
+        ), report)
+        report_datetime = datetime.strptime(
+            report[report.index(base_file_name)+len(base_file_name):-len(".csv")],
+            "%Y-%m-%d-%H%M"
+        )
+        self.assertLessEqual(start_time.replace(second=0, microsecond=0), utc.localize(report_datetime))
+
+    def test_cohort_by_csv_wrong_file_type(self):
+        """
+        Scenario: if the instructor uploads a non-csv file, an error message is presented.
+
+        Given I have a course with cohorting enabled
+        When I go to the cohort management section of the instructor dashboard
+        And I upload a file without the CSV extension
+        Then I get an error message stating that the file must have a CSV extension
+        """
+        self.cohort_management_page.upload_cohort_file("image.jpg")
+        self._verify_cohort_by_csv_notification("The file must end with the extension '.csv'.")
+
+    def test_cohort_by_csv_missing_cohort(self):
+        """
+        Scenario: if the instructor uploads a csv file with no cohort column, an error message is presented.
+
+        Given I have a course with cohorting enabled
+        When I go to the cohort management section of the instructor dashboard
+        And I upload a CSV file that is missing the cohort column
+        Then I get an error message stating that the file must have a cohort column
+        """
+        self.cohort_management_page.upload_cohort_file("cohort_users_missing_cohort_column.csv")
+        self._verify_cohort_by_csv_notification("The file must contain a 'cohort' column containing cohort names.")
+
+    def test_cohort_by_csv_missing_user(self):
+        """
+        Scenario: if the instructor uploads a csv file with no username or email column, an error message is presented.
+
+        Given I have a course with cohorting enabled
+        When I go to the cohort management section of the instructor dashboard
+        And I upload a CSV file that is missing both the username and email columns
+        Then I get an error message stating that the file must have either a username or email column
+        """
+        self.cohort_management_page.upload_cohort_file("cohort_users_missing_user_columns.csv")
+        self._verify_cohort_by_csv_notification("The file must contain a 'username' column, an 'email' column, or both.")
+
+    def test_cohort_by_csv_inconsistent_columns(self):
+        """
+        Scenario: if the instructor uploads a csv file with an inconsistent number of columns, an error message is
+            presented.
+
+        Given I have a course with cohorting enabled
+        When I go to the cohort management section of the instructor dashboard
+        And I upload a CSV file with an inconsistent number of columns per row
+        Then I get an error message stating that the file is not properly formatted
+        """
+        self.cohort_management_page.upload_cohort_file("cohort_users_inconsistent_columns.csv")
+        # TODO: is there a way for us to test this?
+        # self._verify_cohort_by_csv_notification("Wrong number of columns.")
+
+    def _verify_cohort_by_csv_notification(self, expected_message):
+        """
+        Helper method to check the CSV file upload notification message.
+        """
+        # Wait for notification message to appear, indicating file has been uploaded.
+        EmptyPromise(
+            lambda: 1 == len(self.cohort_management_page.get_cvs_messages()), 'Waiting for notification'
+        ).fulfill()
+        messages = self.cohort_management_page.get_cvs_messages()
+        self.assertEquals(expected_message, messages[0])
