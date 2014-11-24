@@ -26,7 +26,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbi
 from django.shortcuts import redirect
 from django.utils.translation import ungettext
 from django_future.csrf import ensure_csrf_cookie
-from django.utils.http import cookie_date, base36_to_int
+from django.utils.http import cookie_date, base36_to_int, urlquote
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
@@ -103,6 +103,8 @@ from student.helpers import (
     auth_pipeline_urls, set_logged_in_cookie,
     check_verify_status_by_course
 )
+from student.helpers import auth_pipeline_urls, set_logged_in_cookie
+from social.apps.django_app.default import models
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
 from openedx.core.djangoapps.user_api.api import profile as profile_api
@@ -355,6 +357,20 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
+    if request.user.is_authenticated():
+        return redirect(reverse('dashboard'))
+
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        # Redirect to IONISx, we don't want the registration form.
+        get = request.GET.copy()
+
+        if 'course_id' in request.GET:
+            request.session['enroll_course_id'] = request.GET.get('course_id')
+            get.update({'next': reverse('about_course', kwargs={'course_id': unicode(request.GET.get('course_id'))})})
+
+        redirect_uri = reverse('social:begin', args=('portal-oauth2',))
+        return external_auth.views.redirect_with_get(redirect_uri, get, do_reverse=False)
+
     if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
             external_auth.views.ssl_get_cert_from_request(request)):
         # SSL login doesn't require a view, so redirect
@@ -364,8 +380,6 @@ def signin_user(request):
     if settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         return redirect(reverse('cas-login'))
-    if request.user.is_authenticated():
-        return redirect(reverse('dashboard'))
 
     course_id = request.GET.get('course_id')
     email_opt_in = request.GET.get('email_opt_in')
@@ -394,6 +408,18 @@ def register_user(request, extra_context=None):
     """
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
+
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+        # Redirect to IONISx, we don't want the registration form.
+        get = request.GET.copy()
+
+        if 'course_id' in request.GET:
+            request.session['enroll_course_id'] = request.GET.get('course_id')
+            get.update({'next': reverse('about_course', kwargs={'course_id': unicode(request.GET.get('course_id'))})})
+
+        redirect_uri = reverse('social:begin', args=('portal-oauth2',))
+        return external_auth.views.redirect_with_get(redirect_uri, get, do_reverse=False)
+
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to branding to process their certificate if SSL is enabled
         # and registration is disabled.
@@ -938,6 +964,13 @@ def _get_course_enrollment_domain(course_id):
 
 @never_cache
 @ensure_csrf_cookie
+def auth_with_no_login(request):
+    redirect_uri = reverse('social:begin', args=('portal-oauth2',))
+    return external_auth.views.redirect_with_get(redirect_uri, request.GET, do_reverse=False)
+
+
+@never_cache
+@ensure_csrf_cookie
 def accounts_login(request):
     """
     This view is mainly used as the redirect from the @login_required decorator.  I don't believe that
@@ -1211,11 +1244,7 @@ def logout_user(request):
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
     logout(request)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        target = reverse('cas-logout')
-    else:
-        target = '/'
-    response = redirect(target)
+    response = redirect(settings.IONISX_AUTH.get('LOGOUT_URL'))
     response.delete_cookie(
         settings.EDXMKTG_COOKIE_NAME,
         path='/', domain=settings.SESSION_COOKIE_DOMAIN,
