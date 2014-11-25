@@ -17,7 +17,7 @@ from xmodule.tests.test_util_open_ended import (
 
 from courseware.courses import get_course_with_access
 from courseware.tests.factories import StudentModuleFactory, UserFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE, TEST_DATA_MIXED_XML_MODULESTORE
 from student.models import anonymous_id_for_user
 
 from instructor.management.commands.openended_post import post_submission_for_student
@@ -27,7 +27,7 @@ from instructor.utils import get_module_for_student
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class OpenEndedPostTest(ModuleStoreTestCase):
     """Test the openended_post management command."""
 
@@ -123,7 +123,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
         self.assertFalse(result)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class OpenEndedStatsTest(ModuleStoreTestCase):
     """Test the openended_stats management command."""
 

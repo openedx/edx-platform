@@ -22,6 +22,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey, CourseLocator
 from xmodule.modulestore.django import modulestore
 from xmodule.error_module import ErrorDescriptor
 from course_action_state.models import CourseRerunState
+from unittest import skip
 
 TOTAL_COURSES_COUNT = 500
 USER_COURSES_COUNT = 50
@@ -154,6 +155,7 @@ class TestCourseListing(ModuleStoreTestCase):
         courses_list, __ = _accessible_courses_list(self.request)
         self.assertEqual(len(courses_list), 0)
 
+    @skip
     def test_course_listing_performance(self):
         """
         Create large number of courses and give access of some of these courses to the user and

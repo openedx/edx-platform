@@ -11,7 +11,7 @@ from django.conf import settings
 
 from .helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE, TEST_DATA_MIXED_XML_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
@@ -120,7 +120,7 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertTrue(target_url.endswith(info_url))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that an about page still appears when

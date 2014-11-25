@@ -5,6 +5,8 @@ Modulestore configuration for test cases.
 from uuid import uuid4
 from django.test import TestCase
 from django.contrib.auth.models import User
+from student.tests.factories import UserFactory
+
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore import ModuleStoreEnum
@@ -12,6 +14,7 @@ import datetime
 import pytz
 from request_cache.middleware import RequestCache
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
@@ -191,7 +194,7 @@ class ModuleStoreTestCase(TestCase):
 
         if kwargs.pop('create_user', True):
             # Create the user so we can log them in.
-            self.user = User.objects.create_user(uname, email, password)
+            self.user = UserFactory.create(username=uname, email=email, password=password)
 
             # Note that we do not actually need to do anything
             # for registration if we directly mark them active.
@@ -210,7 +213,7 @@ class ModuleStoreTestCase(TestCase):
         """
         uname = 'teststudent'
         password = 'foo'
-        nonstaff_user = User.objects.create_user(uname, 'test+student@edx.org', password)
+        nonstaff_user = UserFactory.create(username=uname, email='test+student@edx.org', password=password)
 
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.
@@ -237,8 +240,13 @@ class ModuleStoreTestCase(TestCase):
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
         module_store = modulestore()
-        if hasattr(module_store, '_drop_database'):
-            module_store._drop_database()  # pylint: disable=protected-access
+
+        if not isinstance(module_store, XMLModuleStore):
+            for store in module_store.modulestores:
+                if hasattr(store, 'database'):
+                    name = store.database.name
+                    store.database.connection.drop_database(name)
+
         _CONTENTSTORE.clear()
         if hasattr(module_store, 'close_connections'):
             module_store.close_connections()

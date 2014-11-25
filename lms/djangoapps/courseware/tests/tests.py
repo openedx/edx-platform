@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_DIR, \
     TEST_DATA_MONGO_MODULESTORE, \
-    TEST_DATA_MIXED_MODULESTORE
+    TEST_DATA_MIXED_MODULESTORE, TEST_DATA_MIXED_XML_MODULESTORE
 from lms.lib.xblock.field_data import LmsFieldData
 
 
@@ -116,7 +116,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from XML.

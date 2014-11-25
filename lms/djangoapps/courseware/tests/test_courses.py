@@ -18,7 +18,7 @@ from courseware.courses import (
     get_course_info_section, get_course_about_section, get_cms_block_link
 )
 from courseware.tests.helpers import get_request_for_user
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE, TEST_DATA_MIXED_XML_MODULESTORE
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -144,7 +144,7 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
     toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')

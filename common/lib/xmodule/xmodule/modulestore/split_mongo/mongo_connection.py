@@ -17,6 +17,7 @@ from xmodule.modulestore.split_mongo import BlockKey
 import datetime
 import pytz
 
+import mongomock
 
 def structure_from_mongo(structure):
     """
@@ -81,8 +82,8 @@ class MongoConnection(object):
         Create & open the connection, authenticate, and provide pointers to the collections
         """
         self.database = MongoProxy(
-            pymongo.database.Database(
-                pymongo.MongoClient(
+            mongomock.database.Database(
+                mongomock.MongoClient(
                     host=host,
                     port=port,
                     tz_aware=tz_aware,

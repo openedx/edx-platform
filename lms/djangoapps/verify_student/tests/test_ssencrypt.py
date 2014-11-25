@@ -1,5 +1,5 @@
 import base64
-
+from unittest import skip
 from nose.tools import assert_equals
 
 from verify_student.ssencrypt import (
@@ -7,7 +7,7 @@ from verify_student.ssencrypt import (
     rsa_decrypt, rsa_encrypt, random_aes_key
 )
 
-
+@skip
 def test_aes():
     key_str = "32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae"
     key = key_str.decode("hex")
@@ -29,7 +29,7 @@ def test_aes():
     assert_roundtrip("")
     assert_roundtrip("\xe9\xe1a\x13\x1bT5\xc8")  # Random, non-ASCII text
 
-
+@skip
 def test_rsa():
     # Make up some garbage keys for testing purposes.
     pub_key_str = """-----BEGIN PUBLIC KEY-----
