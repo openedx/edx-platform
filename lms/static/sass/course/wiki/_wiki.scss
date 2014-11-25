@@ -278,30 +278,33 @@ section.wiki {
           color: $link-color;
           font-weight: bold;
           background-color: $gray-l4;
+<<<<<<< HEAD
+=======
 
-          .icon-view,
-          .icon-home {
-            background-position: -25px 0;
-          }
+          // .icon-view,
+          // .icon-home {
+          //   background-position: -25px 0;
+          // }
 
-          .icon-edit {
-            background-position: -25px -25px;
-          }
+          // .icon-edit {
+          //   background-position: -25px -25px;
+          // }
 
-          .icon-changes,
-          .icon-clock-o {
-            background-position: -25px -49px;
-          }
+          // .icon-changes,
+          // .icon-clock-o {
+          //   background-position: -25px -49px;
+          // }
 
-          .icon-attachments,
-          .icon-file {
-            background-position: -25px -73px;
-          }
+          // .icon-attachments,
+          // .icon-file {
+          //   background-position: -25px -73px;
+          // }
 
-          .icon-settings {
-            background-position: -25px -99px;
-          }
+          // .icon-settings {
+          //   background-position: -25px -99px;
+          // }
 
+>>>>>>> a781bb4... Cleanup after Font Awesome upgrade
         }
       }
     }
@@ -318,9 +321,15 @@ section.wiki {
         float: left;
         display: block;
         width: 25px;
-        height: 25px;
+<<<<<<< HEAD
         margin-right: 3px;
-        background: url(../images/wiki-icons.png) no-repeat;
+        margin-top: 5px;
+=======
+        // height: 25px;
+        margin-right: 3px;
+        margin-top: 5px;
+        // background: url(../images/wiki-icons.png) no-repeat;
+>>>>>>> a781bb4... Cleanup after Font Awesome upgrade
       }
 
       [class^="icon-"] {
@@ -715,6 +724,7 @@ section.wiki {
     }
 
     label {
+      display: inline-block;
       margin-left: 15px;
     }
 
