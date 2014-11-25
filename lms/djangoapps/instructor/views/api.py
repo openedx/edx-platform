@@ -63,6 +63,7 @@ import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
+import codecs
 from user_api.models import UserPreference
 from instructor.views import INVOICE_KEY
 
@@ -982,18 +983,17 @@ def add_users_to_cohorts(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
-        def validator(uploaded_file):
-            uploaded_file = open(uploaded_file.name, 'rU')
-            reader = csv.DictReader(uploaded_file)
-            fieldnames = reader.fieldnames
-            msg = None
-            if "cohort" not in fieldnames:
-                msg = _("The file must contain a 'cohort' column containing cohort names.")
-            elif "email" not in fieldnames and "username" not in fieldnames:
-                msg = _("The file must contain a 'username' column, an 'email' column, or both.")
-            if msg:
-                raise PermissionDenied(msg)
-            uploaded_file.close()
+        def validator(file_storage, filename):
+            with file_storage.open(filename, 'rU') as f:
+                reader = csv.DictReader(codecs.EncodedFile(f,"utf-8"))
+                fieldnames = reader.fieldnames
+                msg = None
+                if "cohort" not in fieldnames:
+                    msg = _("The file must contain a 'cohort' column containing cohort names.")
+                elif "email" not in fieldnames and "username" not in fieldnames:
+                    msg = _("The file must contain a 'username' column, an 'email' column, or both.")
+                if msg:
+                    raise PermissionDenied(msg)
 
         # TODO: what is the maximum filesize we want to enforce?
         file_storage, filename = store_uploaded_file(
@@ -1001,6 +1001,7 @@ def add_users_to_cohorts(request, course_id):
             course_and_time_based_filename_generator(course_key, "cohorts"),
             validator=validator
         )
+        # TODO: Dan-- can you pass the file_storage and use that to read the file?
         instructor_task.api.submit_cohort_students(request, course_key, filename)
     except Exception as err:
         return JsonResponse({"error": str(err)}, status=400)
