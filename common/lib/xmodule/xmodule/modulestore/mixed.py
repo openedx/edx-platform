@@ -325,14 +325,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def get_courselike(self, key, depth=0, **kwargs):
-        """
-        Fetch a course or a library
-        """
-        if isinstance(key, LibraryLocator):
-            return self.get_library(key, depth, **kwargs)
-        return self.get_course(key, depth, **kwargs)
-
     @strip_key
     def has_course(self, course_id, ignore_case=False, **kwargs):
         """

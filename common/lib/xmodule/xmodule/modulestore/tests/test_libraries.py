@@ -8,7 +8,7 @@ from bson.objectid import ObjectId
 import ddt
 from opaque_keys.edx.locator import LibraryLocator
 from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
@@ -141,19 +141,6 @@ class TestLibraries(MixedSplitTestCase):
         self.assertEqual(len(lib_list), len(libraries))
         for lib in lib_list:
             self.assertIn(lib.location.library_key, lib_dict)
-
-    def test_get_courselike(self):
-        """
-        Test the get_courselike() method, which accepts a course or library key
-        """
-        lib_key = LibraryFactory.create(modulestore=self.store).location.library_key
-        course_key = CourseFactory.create(modulestore=self.store).location.course_key
-
-        lib = self.store.get_courselike(lib_key)
-        self.assertEqual(lib.location.library_key, lib_key)
-
-        course = self.store.get_courselike(course_key)
-        self.assertEqual(course.location.course_key, course_key)
 
     def test_strip(self):
         """

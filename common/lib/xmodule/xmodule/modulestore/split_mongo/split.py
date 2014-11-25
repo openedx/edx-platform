@@ -883,15 +883,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         result = self._load_items(course_entry, [root], depth, lazy=True, **kwargs)
         return result[0]
 
-    def get_courselike(self, locator, depth=0, **kwargs):
-        """
-        Gets a course or a library.
-        """
-        if isinstance(locator, LibraryLocator):
-            return self.get_library(locator, depth, **kwargs)
-        else:
-            return self.get_course(locator, depth, **kwargs)
-
     def has_course(self, course_id, ignore_case=False, **kwargs):
         '''
         Does this course exist in this modulestore. This method does not verify that the branch &/or
@@ -1609,10 +1600,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 new_fields.update(definition_fields)
                 definition_id = self._update_definition_from_data(locator, old_def, new_fields, user_id).definition_id
                 root_block['definition'] = definition_id
-                root_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-                root_block['edit_info']['edited_by'] = user_id
-                root_block['edit_info']['previous_version'] = root_block['edit_info'].get('update_version')
-                root_block['edit_info']['update_version'] = new_id
+                root_block['edit_info'].update({
+                    'edited_on': datetime.datetime.now(UTC),
+                    'edited_by': user_id,
+                    'previous_version': root_block['edit_info'].get('update_version'),
+                    'update_version': new_id,
+                })
 
             versions_dict[master_branch] = new_id
         else:  # Pointing to an existing course structure
@@ -1639,7 +1632,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self.insert_course_index(locator, index_entry)
 
             # expensive hack to persist default field values set in __init__ method (e.g., wiki_slug)
-            course = self.get_courselike(locator, **kwargs)
+            if isinstance(locator, LibraryLocator):
+                course = self.get_library(locator, **kwargs)
+            else:
+                course = self.get_course(locator, **kwargs)
             return self.update_item(course, user_id, **kwargs)
 
     def create_library(self, org, library, user_id, fields, **kwargs):
