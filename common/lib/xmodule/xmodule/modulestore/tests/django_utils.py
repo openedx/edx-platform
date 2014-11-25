@@ -213,7 +213,7 @@ class ModuleStoreTestCase(TestCase):
         """
         uname = 'teststudent'
         password = 'foo'
-        nonstaff_user = UserFactory.create_user(username=uname, email='test+student@edx.org', password=password)
+        nonstaff_user = UserFactory.create(username=uname, email='test+student@edx.org', password=password)
 
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.
