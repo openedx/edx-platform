@@ -994,7 +994,7 @@ def add_users_to_cohorts(request, course_id):
             Verifies that the expected columns are present.
             """
             with file_storage.open(file_to_validate, 'rU') as f:
-                reader = unicodecsv.DictReader(f)
+                reader = unicodecsv.DictReader(f, encoding='utf-8')
                 fieldnames = reader.fieldnames
                 msg = None
                 if "cohort" not in fieldnames:
