@@ -146,7 +146,7 @@ class LibraryContentFields(object):
     display_name = String(
         display_name=_("Display Name"),
         help=_("Display name for this module"),
-        default="Library Content",
+        default="Randomized Content Block",
         scope=Scope.settings,
     )
     source_libraries = LibraryList(
