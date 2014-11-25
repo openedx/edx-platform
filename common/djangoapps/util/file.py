@@ -29,10 +29,11 @@ def store_uploaded_file(
         max_file_size (int): the maximum file size in bytes that the uploaded file can be. If the uploaded file
             is larger than this size, a `PermissionDenied` exception will be thrown. Default value is 10240000 bytes
             (10,000 KB).
-        validator (function): an optional validation method that, if defined, will be passed the InMemoryUploadedFile
-            that the user has uploaded. This method can do validation on the contents of the file and throw
-            an exception if the file is not properly formatted. Note that the InMemoryUploadedFile will be closed
-            in a finally block at the end of this method (so the validator need not worry about closing it).
+        validator (function): an optional validation method that, if defined, will be passed the stored file (which
+            is copied from the uploaded file). This method can do validation on the contents of the file and throw
+            an exception if the file is not properly formatted. If an exception is thrown, the stored file will
+            be deleted before the exception is re-raised. Note that the implementor of the validator function should
+            take care to close the stored file if they open it for reading.
 
     Returns:
         Storage: the file storage object where the file can be retrieved from
@@ -55,14 +56,18 @@ def store_uploaded_file(
             )
             raise exceptions.PermissionDenied(msg)
 
-        if validator:
-            validator(uploaded_file)
-
         stored_file_name = base_storage_filename + file_extension
 
         file_storage = get_storage_class()()
         # use default storage to store file
         file_storage.save(stored_file_name, uploaded_file)
+
+        if validator:
+            try:
+                validator(file_storage, stored_file_name)
+            except Exception as e:
+                file_storage.delete(stored_file_name)
+                raise e
 
     finally:
         uploaded_file.close()

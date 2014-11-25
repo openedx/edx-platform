@@ -48,6 +48,12 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         ).visit().get_user_id()
         self.add_user_to_cohort(self.course_fixture, self.student_name, self.manual_cohort_id)
 
+        # create a user with unicode characters in their username
+        self.unicode_student_id = AutoAuthPage(
+            self.browser, username="Ωπ", email="unicode_student_user@example.com",
+            course_id=self.course_id, staff=False
+        ).visit().get_user_id()
+
         # login as an instructor
         self.instructor_name = "instructor_user"
         self.instructor_id = AutoAuthPage(
@@ -322,12 +328,31 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_removed",
+                "time": {"$gt": start_time},
+                "event.user_id": int(self.student_id),
+                "event.cohort_name": self.manual_cohort_name,
+            }).count(),
+            1
+        )
         # instructor_user (previously unassigned) is added to manual cohort group
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
                 "time": {"$gt": start_time},
                 "event.user_id": {"$in": [int(self.instructor_id)]},
+                "event.cohort_name": self.manual_cohort_name,
+            }).count(),
+            1
+        )
+        # unicode_student_user (previously unassigned) is added to manual cohort group
+        self.assertEqual(
+            self.event_collection.find({
+                "name": "edx.cohort.user_added",
+                "time": {"$gt": start_time},
+                "event.user_id": {"$in": [int(self.unicode_student_id)]},
                 "event.cohort_name": self.manual_cohort_name,
             }).count(),
             1
@@ -384,20 +409,6 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         """
         self.cohort_management_page.upload_cohort_file("cohort_users_missing_user_columns.csv")
         self._verify_cohort_by_csv_notification("The file must contain a 'username' column, an 'email' column, or both.")
-
-    def test_cohort_by_csv_inconsistent_columns(self):
-        """
-        Scenario: if the instructor uploads a csv file with an inconsistent number of columns, an error message is
-            presented.
-
-        Given I have a course with cohorting enabled
-        When I go to the cohort management section of the instructor dashboard
-        And I upload a CSV file with an inconsistent number of columns per row
-        Then I get an error message stating that the file is not properly formatted
-        """
-        self.cohort_management_page.upload_cohort_file("cohort_users_inconsistent_columns.csv")
-        # TODO: is there a way for us to test this?
-        # self._verify_cohort_by_csv_notification("Wrong number of columns.")
 
     def _verify_cohort_by_csv_notification(self, expected_message):
         """
