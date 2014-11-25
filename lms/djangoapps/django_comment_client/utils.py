@@ -123,7 +123,7 @@ def _filter_unstarted_categories(category_map):
 def _sort_map_entries(category_map, sort_alpha):
     things = []
     for title, entry in category_map["entries"].items():
-        if entry["sort_key"] == None and sort_alpha:
+        if entry["sort_key"] is None and sort_alpha:
             entry["sort_key"] = title
         things.append((title, entry))
     for title, category in category_map["subcategories"].items():

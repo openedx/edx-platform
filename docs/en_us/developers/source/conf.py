@@ -4,8 +4,9 @@
 # pylint: disable=W0212
 # pylint: disable=W0613
 
-import sys, os
+import os
 from path import path
+import sys
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 

@@ -1036,8 +1036,8 @@ class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 404)
         content = json.loads(response.content)
-        self.assertTrue(content.has_key("errors"))
-        self.assertFalse(content.has_key("users"))
+        self.assertIn("errors", content)
+        self.assertNotIn("users", content)
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def test_requires_matched_user_has_forum_content(self, mock_request):
