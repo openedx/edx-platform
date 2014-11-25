@@ -317,6 +317,9 @@ FEATURES = {
     # Enable display of enrollment counts in instructor and legacy analytics dashboard
     'DISPLAY_ANALYTICS_ENROLLMENTS': True,
 
+    # Separate the verification flow from the payment flow
+    'SEPARATE_VERIFICATION_FROM_PAYMENT': False,
+
     # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
     'MARK_PROGRESS_ON_GRADING_EVENT': False,
 

@@ -10,6 +10,7 @@ import pytz
 import ddt
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from django.test import TestCase
 from course_modes.models import CourseMode, Mode
 
@@ -163,3 +164,45 @@ class CourseModeModelTest(TestCase):
 
         # Verify that we can or cannot auto enroll
         self.assertEqual(CourseMode.can_auto_enroll(self.course_key), can_auto_enroll)
+
+    def test_all_modes_for_courses(self):
+        now = datetime.now(pytz.UTC)
+        future = now + timedelta(days=1)
+        past = now - timedelta(days=1)
+
+        # Unexpired, no expiration date
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_display_name="Honor No Expiration",
+            mode_slug="honor_no_expiration",
+            expiration_datetime=None
+        )
+
+        # Unexpired, expiration date in future
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_display_name="Honor Not Expired",
+            mode_slug="honor_not_expired",
+            expiration_datetime=future
+        )
+
+        # Expired
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_display_name="Verified Expired",
+            mode_slug="verified_expired",
+            expiration_datetime=past
+        )
+
+        # We should get all of these back when querying for *all* course modes,
+        # including ones that have expired.
+        other_course_key = CourseLocator(org="not", course="a", run="course")
+        all_modes = CourseMode.all_modes_for_courses([self.course_key, other_course_key])
+        self.assertEqual(len(all_modes[self.course_key]), 3)
+        self.assertEqual(all_modes[self.course_key][0].name, "Honor No Expiration")
+        self.assertEqual(all_modes[self.course_key][1].name, "Honor Not Expired")
+        self.assertEqual(all_modes[self.course_key][2].name, "Verified Expired")
+
+        # Check that we get a default mode for when no course mode is available
+        self.assertEqual(len(all_modes[other_course_key]), 1)
+        self.assertEqual(all_modes[other_course_key][0], CourseMode.DEFAULT_MODE)
