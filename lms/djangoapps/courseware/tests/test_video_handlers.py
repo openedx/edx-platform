@@ -153,7 +153,7 @@ class TestVideo(BaseTestXmodule):
         self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
         self.assertEqual(self.item_descriptor.transcript_language, 'uk')
 
-        response = self.item_descriptor.handle_ajax('save_user_state', {'demoo�': "sample"})
+        response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
         self.assertEqual(json.loads(response)['success'], True)
 
 
