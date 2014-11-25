@@ -7,11 +7,11 @@ from django_comment_client.permissions import has_permission
 <%namespace name='static' file='../static_content.html'/>
 
 <%block name="js_extra">
-    <%static:js group='discussion'/>
+    <%static:js group='discussion' raw='true'/>
 </%block>
 
 <%block name="css_extra">
-    <%static:css group='discussion'/>
+    <%static:css group='discussion' raw='true'/>
 </%block>
 
 <div class="discussion-module" data-discussion-id="${discussion_id | h}">
