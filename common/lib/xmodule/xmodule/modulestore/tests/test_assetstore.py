@@ -3,17 +3,17 @@ Tests for assetstore using any of the modulestores for metadata. May extend to t
 too.
 """
 from datetime import datetime, timedelta
+import ddt
+from nose.plugins.attrib import attr
 import pytz
 import unittest
-import ddt
 
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
-
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
     MIXED_MODULESTORE_BOTH_SETUP, MODULESTORE_SETUPS, MongoContentstoreBuilder,
-    XmlModulestoreBuilder, MixedModulestoreBuilder, MongoModulestoreBuilder
+    XmlModulestoreBuilder, MixedModulestoreBuilder
 )
 
 
@@ -43,6 +43,7 @@ class AssetStoreTestData(object):
     )
 
 
+@attr('mongo')
 @ddt.ddt
 class TestMongoAssetMetadataStorage(unittest.TestCase):
     """

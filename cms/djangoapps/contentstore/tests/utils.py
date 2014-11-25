@@ -2,23 +2,24 @@
 '''
 Utilities for contentstore tests
 '''
-
 import json
 
-from django.test.client import Client
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.test.client import Client
+from django.test.utils import override_settings
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 
+from contentstore.utils import reverse_url
+from student.models import Registration
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml_importer import import_from_xml
-from student.models import Registration
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from contentstore.utils import reverse_url
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from django.conf import settings
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -66,7 +67,12 @@ class AjaxEnabledTestClient(Client):
         return self.get(path, data or {}, follow, HTTP_ACCEPT="application/json", **extra)
 
 
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CourseTestCase(ModuleStoreTestCase):
+    """
+    Base class for Studio tests that require a logged in user and a course.
+    Also provides helper methods for manipulating and verifying the course.
+    """
     def setUp(self):
         """
         These tests need a user in the DB so that the django Test Client can log them in.

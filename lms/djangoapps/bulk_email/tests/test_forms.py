@@ -2,25 +2,23 @@
 """
 Unit tests for bulk-email-related forms.
 """
-from django.test.utils import override_settings
 from django.conf import settings
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
-
+from django.test.utils import override_settings
 from mock import patch
 
 from bulk_email.models import CourseAuthorization, CourseEmailTemplate
 from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
+)
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CourseAuthorizationFormTest(ModuleStoreTestCase):
     """Test the CourseAuthorizationAdminForm form for Mongo-backed courses."""
 
@@ -124,7 +122,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
             form.save()
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
     """Check that XML courses cannot be authorized for email."""
 
@@ -147,7 +145,7 @@ class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
             form.save()
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CourseEmailTemplateFormTest(ModuleStoreTestCase):
     """Test the CourseEmailTemplateForm that is used in the Django admin subsystem."""
 

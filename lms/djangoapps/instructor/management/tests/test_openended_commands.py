@@ -5,34 +5,41 @@ import json
 from mock import patch
 from pytz import UTC
 
+from django.conf import settings
 from django.test.utils import override_settings
+from opaque_keys.edx.locations import Location
 
 import capa.xqueue_interface as xqueue_interface
-from opaque_keys.edx.locations import Location
+from courseware.courses import get_course_with_access
+from courseware.tests.factories import StudentModuleFactory, UserFactory
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.tests.test_util_open_ended import (
     STATE_INITIAL, STATE_ACCESSING, STATE_POST_ASSESSMENT
 )
-
-from courseware.courses import get_course_with_access
-from courseware.tests.factories import StudentModuleFactory, UserFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.models import anonymous_id_for_user
 
 from instructor.management.commands.openended_post import post_submission_for_student
 from instructor.management.commands.openended_stats import calculate_task_statistics
 from instructor.utils import get_module_for_student
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class OpenEndedPostTest(ModuleStoreTestCase):
     """Test the openended_post management command."""
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey("edX", "open_ended", "2012_Fall")
+        self.user = UserFactory()
+        store = modulestore()
+        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member
+        self.course = course_items[0]
+        self.course_id = self.course.id
+
         self.problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
         self.self_assessment_task_number = 0
         self.open_ended_task_number = 1
@@ -87,7 +94,7 @@ class OpenEndedPostTest(ModuleStoreTestCase):
             mock_send_to_queue.return_value = (0, "Successfully queued")
 
             module = get_module_for_student(self.student_on_accessing, self.problem_location)
-            task = module.child_module.get_task_number(self.open_ended_task_number)
+            module.child_module.get_task_number(self.open_ended_task_number)
 
             student_response = "Here is an answer."
             student_anonymous_id = anonymous_id_for_user(self.student_on_accessing, None)
@@ -123,12 +130,17 @@ class OpenEndedPostTest(ModuleStoreTestCase):
         self.assertFalse(result)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class OpenEndedStatsTest(ModuleStoreTestCase):
     """Test the openended_stats management command."""
 
     def setUp(self):
-        self.course_id = SlashSeparatedCourseKey("edX", "open_ended", "2012_Fall")
+        self.user = UserFactory()
+        store = modulestore()
+        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member
+        self.course = course_items[0]
+
+        self.course_id = self.course.id
         self.problem_location = Location("edX", "open_ended", "2012_Fall", "combinedopenended", "SampleQuestion")
         self.task_number = 1
         self.invalid_task_number = 3

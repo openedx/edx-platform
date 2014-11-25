@@ -1,19 +1,17 @@
-import courseware.access as access
 import datetime
-
-import mock
-from mock import Mock
+import pytz
 
 from django.test import TestCase
-
-from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
-from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
-import pytz
+from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+import courseware.access as access
+from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
+from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_ABOUT,
-    CATALOG_VISIBILITY_NONE)
+    CATALOG_VISIBILITY_NONE
+)
 
 # pylint: disable=C0111
 # pylint: disable=W0212
@@ -115,7 +113,7 @@ class AccessTestCase(TestCase):
         with self.assertRaises(ValueError):
             access._has_access_descriptor(user, 'not_load_or_staff', descriptor)
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test__has_access_descriptor_staff_lock(self):
         """
         Tests that "visible_to_staff_only" overrides start date.

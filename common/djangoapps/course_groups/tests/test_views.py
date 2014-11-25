@@ -1,25 +1,31 @@
+"""
+Tests for course group views
+"""
+from collections import namedtuple
 import json
 
+from django.contrib.auth.models import User
+from django.http import Http404
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from course_groups.tests.helpers import config_course_cohorts, CohortFactory
-from collections import namedtuple
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from django.http import Http404
-from django.contrib.auth.models import User
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from course_groups.cohorts import (
+    get_cohort, CohortAssignmentType, get_cohort_by_name, DEFAULT_COHORT_NAME
+)
+from course_groups.models import CourseUserGroup
+from course_groups.tests.helpers import config_course_cohorts, CohortFactory
+from course_groups.views import (
+    list_cohorts, add_cohort, users_in_cohort, add_users_to_cohort, remove_user_from_cohort
+)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
-from course_groups.models import CourseUserGroup
-from course_groups.views import list_cohorts, add_cohort, users_in_cohort, add_users_to_cohort, remove_user_from_cohort
-from course_groups.cohorts import get_cohort, CohortAssignmentType, get_cohort_by_name, DEFAULT_COHORT_NAME
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CohortViewsTestCase(ModuleStoreTestCase):
     """
     Base class which sets up a course and staff/non-staff users.

@@ -14,7 +14,7 @@ from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, \
 from django_comment_client.utils import has_forum_access
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -32,7 +32,7 @@ def action_name(operation, rolename):
         return '{0} forum {1}'.format(operation, FORUM_ADMIN_ACTION_SUFFIX[rolename])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check for change in forum admin role memberships

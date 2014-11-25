@@ -1,23 +1,22 @@
 """
 Tests for support dashboard
 """
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from django.test.client import Client
-from django.test.utils import override_settings
-from django.contrib.auth.models import Permission
-from shoppingcart.models import CertificateItem, Order
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-
-from student.models import CourseEnrollment
-from course_modes.models import CourseMode
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory
 import datetime
 
+from django.contrib.auth.models import Permission
+from django.test.client import Client
+from django.test.utils import override_settings
 
-@override_settings(
-    MODULESTORE=TEST_DATA_MONGO_MODULESTORE
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from course_modes.models import CourseMode
+from shoppingcart.models import CertificateItem, Order
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class RefundTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page
