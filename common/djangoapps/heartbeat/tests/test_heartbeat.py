@@ -22,6 +22,7 @@ class HeartbeatTestCase(TestCase):
     def tearDown(self):
         return super(HeartbeatTestCase, self).tearDown()
 
+    @skip
     def test_success(self):
         response = self.client.get(self.heartbeat_url)
         self.assertEqual(response.status_code, 200)
