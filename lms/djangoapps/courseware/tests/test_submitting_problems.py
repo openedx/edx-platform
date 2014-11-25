@@ -27,7 +27,7 @@ from capa.tests.response_xml_factory import (
     CodeResponseXMLFactory,
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE, TEST_DATA_MIXED_XML_MODULESTORE
 from lms.lib.xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
@@ -650,7 +650,7 @@ class ProblemWithUploadedFilesTest(TestSubmittingProblems):
         self.assertItemsEqual(kwargs.keys(), ["files", "data"])
         self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
-
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
