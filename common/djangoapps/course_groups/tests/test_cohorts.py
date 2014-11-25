@@ -542,7 +542,7 @@ class TestCohorts(django.test.TestCase):
             Assert that the return value of `add_users_to_cohorts` contains the fields we expect it to.
             Fields that aren't explicitly passed in default to empty values.
             """
-            for cohort_name, expected_fields in expected_val.iteritems():
+            for _, expected_fields in expected_val.iteritems():
                 if expected_fields.get("valid", True):
                     defaults = {
                         "valid": True,

@@ -981,11 +981,19 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 @require_POST
 @require_level('staff')
 def add_users_to_cohorts(request, course_id):
+    """
+    View method that accepts an uploaded file (using key "uploaded-file")
+    containing cohort assignments for users. This method spawns a celery task
+    to do the assignments, and a CSV file with results is provided via data downloads.
+    """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
-        def validator(file_storage, filename):
-            with file_storage.open(filename, 'rU') as f:
+        def validator(file_storage, file_to_validate):
+            """
+            Verifies that the expected columns are present.
+            """
+            with file_storage.open(file_to_validate, 'rU') as f:
                 reader = unicodecsv.DictReader(f)
                 fieldnames = reader.fieldnames
                 msg = None
@@ -997,14 +1005,14 @@ def add_users_to_cohorts(request, course_id):
                     raise PermissionDenied(msg)
 
         # TODO: what is the maximum filesize we want to enforce?
-        file_storage, filename = store_uploaded_file(
+        __, filename = store_uploaded_file(
             request, 'uploaded-file', ['.csv'],
             course_and_time_based_filename_generator(course_key, "cohorts"),
             validator=validator
         )
-        # TODO: Dan-- can you pass the file_storage and use that to read the file?
+        # The task will assume the default file storage.
         instructor_task.api.submit_cohort_students(request, course_key, filename)
-    except Exception as err:
+    except Exception as err:  # pylint: disable=broad-except
         return JsonResponse({"error": str(err)}, status=400)
 
     return JsonResponse()

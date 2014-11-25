@@ -235,6 +235,7 @@ def submit_calculate_students_features_csv(request, course_key, features):
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
+
 def submit_cohort_students(request, course_key, file_name):
     """
     Request to have students cohorted in bulk.

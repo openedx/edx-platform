@@ -433,7 +433,7 @@ def add_users_to_cohorts(course_key, users_to_cohorts):
 
         for username_or_email in usernames_or_emails:
             try:
-                user, previous_cohort_name = add_user_to_cohort(cohort, username_or_email)
+                __, previous_cohort_name = add_user_to_cohort(cohort, username_or_email)
                 if previous_cohort_name:
                     changed.add(username_or_email)
                 else:
