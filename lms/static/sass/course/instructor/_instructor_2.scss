@@ -744,7 +744,7 @@ section.instructor-dashboard-content-2 {
       display: none;
       position: absolute;
       top: 15px;
-      right: 0;
+      left: ($baseline*10);
       padding: ($baseline/2);
       width: 50%;
       background-color: $light-gray;
