@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.tests import TEST_DATA_MIXED_XML_MODULESTORE
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory
 
@@ -44,7 +44,7 @@ class MockCourseEmailResult(object):
         return mock_update_subtask_status
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestEmailSendFromDashboard(ModuleStoreTestCase):
     """
