@@ -55,10 +55,11 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.uname, password=self.password)
 
-        resp = self.client.get_html('/course/',
-                               {},
-                               HTTP_ACCEPT_LANGUAGE='en'
-                               )
+        resp = self.client.get_html(
+            '/course/',
+            {},
+            HTTP_ACCEPT_LANGUAGE='en',
+        )
 
         self.assertContains(resp,
                             '<h1 class="page-header">My Courses</h1>',

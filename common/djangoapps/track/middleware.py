@@ -59,8 +59,10 @@ class TrackMiddleware(object):
                 if string in get_dict:
                     get_dict[string] = '*' * 8
 
-            event = {'GET': dict(get_dict),
-                      'POST': dict(post_dict)}
+            event = {
+                'GET': dict(get_dict),
+                'POST': dict(post_dict),
+            }
 
             # TODO: Confirm no large file uploads
             event = json.dumps(event)

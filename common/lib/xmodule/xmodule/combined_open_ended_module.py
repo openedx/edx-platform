@@ -259,10 +259,12 @@ class CombinedOpenEndedFields(object):
         scope=Scope.settings
     )
     extended_due = Date(
-        help=_("Date that this problem is due by for a particular student. This "
-             "can be set by an instructor, and will override the global due "
-             "date if it is set to a date that is later than the global due "
-             "date."),
+        help=_(
+            "Date that this problem is due by for a particular student. This "
+            "can be set by an instructor, and will override the global due "
+            "date if it is set to a date that is later than the global due "
+            "date."
+        ),
         default=None,
         scope=Scope.user_state,
     )
@@ -315,9 +317,11 @@ class CombinedOpenEndedFields(object):
     )
     peer_grade_finished_submissions_when_none_pending = Boolean(
         display_name=_('Allow "overgrading" of peer submissions'),
-        help=_("EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, "
-              "but ONLY WHEN all submissions they are eligible to grade already have enough graders.  "
-              "This is intended for use when settings for `Required Peer Grading` > `Peer Graders per Response`"),
+        help=_(
+            "EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, "
+            "but ONLY WHEN all submissions they are eligible to grade already have enough graders.  "
+            "This is intended for use when settings for `Required Peer Grading` > `Peer Graders per Response`"
+        ),
         default=False,
         scope=Scope.settings,
     )

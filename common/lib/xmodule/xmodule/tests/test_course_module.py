@@ -75,9 +75,16 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
          </course>
-         '''.format(org=ORG, course=COURSE, start=start, is_new=is_new,
-        announcement=announcement, advertised_start=advertised_start, end=end,
-        certs=certs)
+     '''.format(
+        org=ORG,
+        course=COURSE,
+        start=start,
+        is_new=is_new,
+        announcement=announcement,
+        advertised_start=advertised_start,
+        end=end,
+        certs=certs,
+    )
 
     return system.process_xml(start_xml)
 
