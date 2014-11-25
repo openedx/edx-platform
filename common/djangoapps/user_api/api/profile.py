@@ -16,6 +16,7 @@ from user_api.helpers import intercept_errors
 
 log = logging.getLogger(__name__)
 
+
 class ProfileRequestError(Exception):
     """ The request to the API was not valid. """
     pass

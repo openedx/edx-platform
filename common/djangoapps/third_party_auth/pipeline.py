@@ -452,6 +452,7 @@ def parse_query_params(strategy, response, *args, **kwargs):
         'is_register_2': auth_entry == AUTH_ENTRY_REGISTER_2,
     }
 
+
 # TODO (ECOM-369): Once the A/B test of the combined login/registration
 # form completes, we will be able to remove the extra login/registration
 # end-points.  HOWEVER, users who used the new forms during the A/B
