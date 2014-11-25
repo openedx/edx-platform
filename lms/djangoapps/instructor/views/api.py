@@ -983,7 +983,8 @@ def add_users_to_cohorts(request, course_id):
 
     try:
         def validator(uploaded_file):
-            reader = unicode_csv_dictreader(uploaded_file)
+            uploaded_file = open(uploaded_file.name, 'rU')
+            reader = csv.DictReader(uploaded_file)
             fieldnames = reader.fieldnames
             msg = None
             if "cohort" not in fieldnames:
@@ -992,6 +993,7 @@ def add_users_to_cohorts(request, course_id):
                 msg = _("The file must contain a 'username' column, an 'email' column, or both.")
             if msg:
                 raise PermissionDenied(msg)
+            uploaded_file.close()
 
         # TODO: what is the maximum filesize we want to enforce?
         file_storage, filename = store_uploaded_file(
