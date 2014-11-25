@@ -2,17 +2,20 @@
 Tests for users API
 """
 
+import datetime
 import ddt
+import json
+
 from rest_framework.test import APITestCase
-from unittest import skip
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
 from courseware.tests.factories import UserFactory
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from mobile_api.users.serializers import CourseEnrollmentSerializer
+from mobile_api import errors
 from student.models import CourseEnrollment
-from student import auth
 from mobile_api.tests import ROLE_CASES
 
 
@@ -135,3 +138,175 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=E1101
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
         self.assertEqual(serialized['course']['org'], self.course.display_organization)
+
+# Tests for user-course-status
+
+    def _course_status_url(self):
+        """
+        Convenience to fetch the url for our user and course
+        """
+        return reverse('user-course-status', kwargs={'username': self.username, 'course_id': unicode(self.course.id)})
+
+    def _setup_course_skeleton(self):
+        """
+        Creates a basic course structure for our course
+        """
+        section = ItemFactory.create(
+            parent_location=self.course.location,
+        )
+        sub_section = ItemFactory.create(
+            parent_location=section.location,
+        )
+        unit = ItemFactory.create(
+            parent_location=sub_section.location,
+        )
+        other_unit = ItemFactory.create(
+            parent_location=sub_section.location,
+        )
+
+        return section, sub_section, unit, other_unit
+
+    def test_course_status_course_not_found(self):
+        self.client.login(username=self.username, password=self.password)
+        url = reverse('user-course-status', kwargs={'username': self.username, 'course_id': 'a/b/c'})
+        response = self.client.get(url)
+        json_data = json.loads(response.content)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(json_data, errors.ERROR_INVALID_COURSE_ID)
+
+    def test_course_status_wrong_user(self):
+        url = reverse('user-course-status', kwargs={'username': 'other_user', 'course_id': unicode(self.course.id)})
+        self.client.login(username=self.username, password=self.password)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_course_status_no_auth(self):
+        url = self._course_status_url()
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 401)
+
+    def test_default_value(self):
+        (__, __, unit, __) = self._setup_course_skeleton()
+        self.client.login(username=self.username, password=self.password)
+
+        url = self._course_status_url()
+        result = self.client.get(url)
+        json_data = json.loads(result.content)
+
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(json_data["last_visited_module_id"], unicode(unit.location))
+
+    def test_course_update_no_args(self):
+        self.client.login(username=self.username, password=self.password)
+
+        url = self._course_status_url()
+        result = self.client.patch(url)  # pylint: disable=no-member
+        self.assertEqual(result.status_code, 200)
+
+    def test_course_update(self):
+        (__, __, __, other_unit) = self._setup_course_skeleton()
+        self.client.login(username=self.username, password=self.password)
+
+        url = self._course_status_url()
+        result = self.client.patch(  # pylint: disable=no-member
+            url,
+            {"last_visited_module_id": unicode(other_unit.location)}
+        )
+        self.assertEqual(result.status_code, 200)
+        result = self.client.get(url)
+        json_data = json.loads(result.content)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(json_data["last_visited_module_id"], unicode(other_unit.location))
+
+    def test_course_update_bad_module(self):
+        self.client.login(username=self.username, password=self.password)
+
+        url = self._course_status_url()
+        result = self.client.patch(  # pylint: disable=no-member
+            url,
+            {"last_visited_module_id": "abc"},
+        )
+        json_data = json.loads(result.content)
+        self.assertEqual(result.status_code, 400)
+        self.assertEqual(json_data, errors.ERROR_INVALID_MODULE_ID)
+
+    def test_course_update_no_timezone(self):
+        (__, __, __, other_unit) = self._setup_course_skeleton()
+        self.client.login(username=self.username, password=self.password)
+        url = self._course_status_url()
+        past_date = datetime.datetime.now()
+        result = self.client.patch(  # pylint: disable=no-member
+            url,
+            {
+                "last_visited_module_id": unicode(other_unit.location),
+                "modification_date": past_date.isoformat()  # pylint: disable=maybe-no-member
+            },
+        )
+
+        json_data = json.loads(result.content)
+        self.assertEqual(result.status_code, 400)
+        self.assertEqual(json_data, errors.ERROR_INVALID_MODIFICATION_DATE)
+
+    def _test_course_update_date_sync(self, date, initial_unit, update_unit, expected_unit):
+        """
+        Helper for test cases that use a modification to decide whether
+        to update the course status
+        """
+        self.client.login(username=self.username, password=self.password)
+        url = self._course_status_url()
+        # save something so we have an initial date
+        self.client.patch(  # pylint: disable=no-member
+            url,
+            {"last_visited_module_id": unicode(initial_unit.location)}
+        )
+
+        # now actually update it
+        result = self.client.patch(  # pylint: disable=no-member
+            url,
+            {
+                "last_visited_module_id": unicode(update_unit.location),
+                "modification_date": date.isoformat()
+            },
+        )
+
+        json_data = json.loads(result.content)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(json_data["last_visited_module_id"], unicode(expected_unit.location))
+
+    def test_course_update_old_date(self):
+        (__, __, unit, other_unit) = self._setup_course_skeleton()
+        date = timezone.now() + datetime.timedelta(days=-100)
+        self._test_course_update_date_sync(date, unit, other_unit, unit)
+
+    def test_course_update_new_date(self):
+        (__, __, unit, other_unit) = self._setup_course_skeleton()
+
+        date = timezone.now() + datetime.timedelta(days=100)
+        self._test_course_update_date_sync(date, unit, other_unit, other_unit)
+
+    def test_course_update_no_initial_date(self):
+        (__, __, _, other_unit) = self._setup_course_skeleton()
+        self.client.login(username=self.username, password=self.password)
+        url = self._course_status_url()
+        result = self.client.patch(  # pylint: disable=no-member
+            url,
+            {
+                "last_visited_module_id": unicode(other_unit.location),
+                "modification_date": timezone.now().isoformat()
+            }
+        )
+        json_data = json.loads(result.content)
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(json_data["last_visited_module_id"], unicode(other_unit.location))
+
+    def test_course_update_invalid_date(self):
+        self.client.login(username=self.username, password=self.password)
+
+        url = self._course_status_url()
+        result = self.client.patch(  # pylint: disable=no-member
+            url,
+            {"modification_date": "abc"}
+        )
+        json_data = json.loads(result.content)
+        self.assertEqual(result.status_code, 400)
+        self.assertEqual(json_data, errors.ERROR_INVALID_MODIFICATION_DATE)
