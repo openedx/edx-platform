@@ -43,7 +43,7 @@ def render_individual_css(package, paths, raw=False):
     return '\n'.join(tags)
 
 
-def compressed_js(package_name):
+def compressed_js(package_name, raw=False):
     package = settings.PIPELINE_JS.get(package_name, {})
     if package:
         package = {package_name: package}
@@ -52,19 +52,23 @@ def compressed_js(package_name):
     package = packager.package_for('js', package_name)
 
     if settings.PIPELINE_ENABLED:
-        return render_js(package, package.output_filename)
+        return render_js(package, package.output_filename, raw=raw)
     else:
         paths = packager.compile(package.paths)
         templates = packager.pack_templates(package)
-        return render_individual_js(package, paths, templates)
+        return render_individual_js(package, paths, templates, raw=raw)
 
 
-def render_js(package, path):
+def render_js(package, path, raw=False):
     template_name = package.template_name or "mako/js.html"
     context = package.extra_context
+
+    url = try_staticfiles_lookup(path)
+    if raw:
+        url += "?raw"
     context.update({
         'type': guess_type(path, 'text/javascript'),
-        'url': try_staticfiles_lookup(path)
+        'url': url
     })
     return render_to_string(template_name, context)
 
@@ -77,8 +81,8 @@ def render_inline_js(package, js):
     return render_to_string("mako/inline_js.html", context)
 
 
-def render_individual_js(package, paths, templates=None):
-    tags = [render_js(package, js) for js in paths]
+def render_individual_js(package, paths, templates=None, raw=False):
+    tags = [render_js(package, js, raw) for js in paths]
     if templates:
         tags.append(render_inline_js(package, templates))
     return '\n'.join(tags)
