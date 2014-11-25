@@ -1,21 +1,20 @@
 """
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
-from mock import patch
 from django.test.utils import override_settings
-
-from django.test import TestCase
 from django.test.client import RequestFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import AdminFactory
 from django.utils import simplejson
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from mock import patch
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from student.tests.factories import AdminFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from class_dashboard import views
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestViews(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/views.py

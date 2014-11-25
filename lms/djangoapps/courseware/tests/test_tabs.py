@@ -1,25 +1,25 @@
 """
 Test cases for tabs.
 """
-from mock import MagicMock, Mock, patch
-
-from courseware.courses import get_course_by_id
-from courseware.views import get_static_tab_contents, static_tab
-
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+from mock import MagicMock, Mock, patch
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+from courseware.courses import get_course_by_id
+from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
+)
+from courseware.views import get_static_tab_contents, static_tab
 from student.tests.factories import UserFactory
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
@@ -49,7 +49,6 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         with self.assertRaises(Http404):
             static_tab(request, course_id='edX/toy', tab_slug='new_tab')
 
-    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     def test_get_static_tab_contents(self):
         course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(UserFactory.create())
@@ -69,8 +68,11 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", static_tab)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests for the static tab dates of an XML course
+    """
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that tabs still appear when
     # the course is already closed

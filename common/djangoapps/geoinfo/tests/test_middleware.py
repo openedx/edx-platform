@@ -1,22 +1,20 @@
 """
 Tests for CountryMiddleware.
 """
-
-from mock import Mock, patch
+from mock import patch
 import pygeoip
 
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory, AnonymousUserFactory
-
-from django.contrib.sessions.middleware import SessionMiddleware
 from geoinfo.middleware import CountryMiddleware
 
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from student.tests.factories import UserFactory, AnonymousUserFactory
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CountryMiddlewareTests(TestCase):
     """
     Tests of CountryMiddleware.

@@ -3,29 +3,27 @@ Base test classes for LMS instructor-initiated background tasks
 
 """
 import os
-import shutil
-
 import json
-from uuid import uuid4
 from mock import Mock
+import shutil
+from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
-
 from django.conf import settings
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from courseware.model_data import StudentModule
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from courseware.tests.tests import LoginEnrollmentTestCase
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
-
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
 
 from instructor_task.api_helper import encode_problem_and_student_input
 from instructor_task.models import PROGRESS, QUEUING
@@ -99,7 +97,7 @@ class InstructorTaskTestCase(TestCase):
         return self._create_entry(task_state=task_state, task_output=progress, student=student)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Base test class for InstructorTask-related tests that require
@@ -184,7 +182,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         return request
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
     """
     Base test class for InstructorTask-related tests that require

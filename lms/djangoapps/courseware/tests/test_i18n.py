@@ -1,13 +1,15 @@
 """
 Tests i18n in courseware
 """
-from django.test import TestCase
-from django.test.utils import override_settings
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 import re
 
+from django.test import TestCase
+from django.test.utils import override_settings
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, LANGUAGES=(('eo', 'Esperanto'),))
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE, LANGUAGES=(('eo', 'Esperanto'),))
 class I18nTestCase(TestCase):
     """
     Tests for i18n

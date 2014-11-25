@@ -1,12 +1,10 @@
 """
 Test for LMS instructor background task queue management
 """
-
+from bulk_email.models import CourseEmail, SEND_TO_ALL
+from courseware.tests.factories import UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from courseware.tests.factories import UserFactory
-
-from bulk_email.models import CourseEmail, SEND_TO_ALL
 from instructor_task.api import (
     get_running_instructor_tasks,
     get_instructor_task_history,

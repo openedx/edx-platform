@@ -1,33 +1,34 @@
 """
 Test the about xblock
 """
-import mock
-from mock import patch
-import pytz
 import datetime
-from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+import pytz
+
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from mock import patch
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from course_modes.models import CourseMode
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
+)
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
+from shoppingcart.models import Order, PaidCourseRegistration
+from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from .helpers import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
-from course_modes.models import CourseMode
-from student.models import CourseEnrollment
-
-from shoppingcart.models import Order, PaidCourseRegistration
-
-from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
 
 # HTML for registration button
 REG_STR = "<form id=\"class_enroll_form\" method=\"post\" data-remote=\"true\" action=\"/change_enrollment\">"
 SHIB_ERROR_STR = "The currently logged-in user account does not have permission to enroll in this course."
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests about xblock.
@@ -120,8 +121,11 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertTrue(target_url.endswith(info_url))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Tests for the course about page
+    """
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that an about page still appears when
     # the course is already closed
@@ -131,7 +135,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     # common/test/data/2014/about/overview.html
     xml_data = "about page 463139"
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_logged_in_xml(self):
         self.setup_user()
         url = reverse('about_course', args=[self.xml_course_id.to_deprecated_string()])
@@ -139,7 +143,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_anonymous_user_xml(self):
         url = reverse('about_course', args=[self.xml_course_id.to_deprecated_string()])
         resp = self.client.get(url)
@@ -147,7 +151,7 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(self.xml_data, resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
@@ -197,7 +201,7 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTes
         self.assertNotIn(REG_STR, resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutWithInvitationOnly(ModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
@@ -244,7 +248,7 @@ class AboutWithInvitationOnly(ModuleStoreTestCase):
 
 
 @patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Test cases covering about page behavior for courses that use shib enrollment domain ("shib courses")
@@ -283,7 +287,7 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(REG_STR, resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end
@@ -319,7 +323,7 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertNotIn(REG_STR, resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):

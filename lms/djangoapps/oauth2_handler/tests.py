@@ -1,23 +1,22 @@
 # pylint: disable=missing-docstring
 from django.core.cache import cache
 from django.test.utils import override_settings
-
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from lang_pref import LANGUAGE_KEY
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from student.models import anonymous_id_for_user
 from student.models import UserProfile
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student.tests.factories import UserFactory, UserProfileFactory
 from user_api.models import UserPreference
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Will also run default tests for IDTokens and UserInfo
 from oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class BaseTestMixin(ModuleStoreTestCase):
     profile = None
 

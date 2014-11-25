@@ -3,16 +3,16 @@
 """
 Tests for the Shopping Cart Models
 """
+import datetime
+import pytz
 import StringIO
 from textwrap import dedent
-import pytz
-import datetime
 
 from django.conf import settings
 from django.test.utils import override_settings
 
 from course_modes.models import CourseMode
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation,
                                  CourseRegCodeItemAnnotation)
 from shoppingcart.views import initialize_report
@@ -22,7 +22,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ReportTypeTests(ModuleStoreTestCase):
     """
     Tests for the models used to generate certificate status reports
@@ -179,7 +179,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_UNI_REVENUE_SHARE_CSV.strip())
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     """
     Tests for the models used to generate itemized purchase reports

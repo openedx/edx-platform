@@ -3,7 +3,6 @@ Tests for student activation and login
 '''
 import json
 import unittest
-from mock import patch
 
 from django.test import TestCase
 from django.test.client import Client
@@ -12,23 +11,21 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.http import HttpResponseBadRequest, HttpResponse
+from external_auth.models import ExternalAuthMap
 import httpretty
+from mock import patch
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from social.apps.django_app.default.models import UserSocialAuth
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from student.views import (
     _parse_course_id_from_string,
     _get_course_enrollment_domain,
     login_oauth_token,
 )
-
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore.django import modulestore
-
-from external_auth.models import ExternalAuthMap
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LoginTest(TestCase):
@@ -345,7 +342,7 @@ class UtilFnTest(TestCase):
         self.assertIsNone(_parse_course_id_from_string(NON_COURSE_URL))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ExternalAuthShibTest(ModuleStoreTestCase):
     """
     Tests how login_user() interacts with ExternalAuth, in particular Shib

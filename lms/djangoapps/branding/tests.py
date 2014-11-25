@@ -2,20 +2,19 @@
 Tests for branding page
 """
 import datetime
-from django.http import HttpResponseRedirect
-from pytz import UTC
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
+from pytz import UTC
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-import student.views
 from branding.views import index
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from edxmako.tests import mako_middleware_process_request
+import student.views
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -23,7 +22,7 @@ FEATURES_WO_STARTDATE = settings.FEATURES.copy()
 FEATURES_WO_STARTDATE['DISABLE_START_DATES'] = True
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AnonymousIndexPageTest(ModuleStoreTestCase):
     """
     Tests that anonymous users can access the '/' page,  Need courses with start date

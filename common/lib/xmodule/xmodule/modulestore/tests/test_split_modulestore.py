@@ -2,13 +2,15 @@
     Test split modulestore w/o using any django stuff.
 """
 import datetime
+from importlib import import_module
+from path import path
 import random
 import re
 import unittest
 import uuid
+
 from contracts import contract
-from importlib import import_module
-from path import path
+from nose.plugins.attrib import attr
 
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseDescriptor
@@ -33,6 +35,7 @@ BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
 
 
+@attr('mongo')
 class SplitModuleTest(unittest.TestCase):
     '''
     The base set of tests manually populates a db w/ courses which have

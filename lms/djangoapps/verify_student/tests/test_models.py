@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, datetime
 import json
-from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false
-from mock import patch
-import pytz
-from django.test import TestCase
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from django.test.utils import override_settings
-from django.conf import settings
 import requests.exceptions
+import pytz
 
+from django.conf import settings
+from django.test import TestCase
+from django.test.utils import override_settings
+from mock import patch
+from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=E0611
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from reverification.tests.factories import MidcourseReverificationWindowFactory
 from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
 from verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationException,
 )
-from reverification.tests.factories import MidcourseReverificationWindowFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -418,7 +420,7 @@ class TestPhotoVerification(TestCase):
             self.assertEquals(parsed_error_msg, "There was an error verifying your ID photos.")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('verify_student.models.S3Connection', new=MockS3Connection)
 @patch('verify_student.models.Key', new=MockKey)

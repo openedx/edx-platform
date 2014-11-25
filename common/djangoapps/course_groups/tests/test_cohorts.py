@@ -1,33 +1,25 @@
-import django.test
-from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.http import Http404
-
+from django.test import TestCase
 from django.test.utils import override_settings
 from mock import call, patch
-
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
-from course_groups.models import CourseUserGroup
-from course_groups import cohorts
-from course_groups.tests.helpers import topic_name_to_id, config_course_cohorts, CohortFactory
-
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import mixed_store_config
+from course_groups import cohorts
+from course_groups.models import CourseUserGroup
+from course_groups.tests.helpers import topic_name_to_id, config_course_cohorts, CohortFactory
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
+
 
 # NOTE: running this with the lms.envs.test config works without
 # manually overriding the modulestore.  However, running with
 # cms.envs.test doesn't.
-
-TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
-
-
 @patch("course_groups.cohorts.tracker")
-class TestCohortSignals(django.test.TestCase):
+class TestCohortSignals(TestCase):
     def setUp(self):
         self.course_key = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
 
@@ -123,9 +115,11 @@ class TestCohortSignals(django.test.TestCase):
         self.assertFalse(mock_tracker.emit.called)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestCohorts(django.test.TestCase):
-
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
+class TestCohorts(TestCase):
+    """
+    Test the cohorts feature
+    """
     def setUp(self):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
