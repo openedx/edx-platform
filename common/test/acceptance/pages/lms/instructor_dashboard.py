@@ -13,6 +13,7 @@ class InstructorDashboardPage(CoursePage):
     Instructor dashboard, where course staff can manage a course.
     """
     url_path = "instructor"
+
     def is_browser_on_page(self):
         return self.q(css='div.instructor-dashboard-wrapper-2').present
 
@@ -31,6 +32,7 @@ class MembershipPage(PageObject):
     Membership section of the Instructor dashboard.
     """
     url = None
+
     def is_browser_on_page(self):
         return self.q(css='a[data-section=membership].active-section').present
 
