@@ -52,10 +52,10 @@ except:
 
 <%def name='js(group)'>
   % if settings.PIPELINE_ENABLED:
-    ${compressed_js(group) | n, decode.utf8}
+    ${compressed_js(group, raw=raw) | n, decode.utf8}
   % else:
     % for filename in settings.PIPELINE_JS[group]['source_filenames']:
-      <script type="text/javascript" src="${staticfiles_storage.url(filename.replace('.coffee', '.js'))}"></script>
+      <script type="text/javascript" src="${staticfiles_storage.url(filename.replace('.coffee', '.js'))}${"?raw" if raw else ""}"></script>
     % endfor
   %endif
 </%def>
