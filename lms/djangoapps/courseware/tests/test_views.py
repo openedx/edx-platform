@@ -76,7 +76,7 @@ class TestJumpTo(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class ViewsTestCase(TestCase):
     """
     Tests for views.py methods.
