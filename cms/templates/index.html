@@ -14,7 +14,7 @@
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions">
-    <h1 class="page-header">${_("My Courses")}</h1>
+    <h1 class="page-header">${_("Studio Home")}</h1>
 
     % if user.is_active:
     <nav class="nav-actions">
@@ -42,33 +42,6 @@
   % if user.is_active:
   <section class="content">
     <article class="content-primary" role="main">
-
-      <div class="introduction">
-        <h2 class="title">${_("Welcome, {0}!").format(user.username)}</h2>
-
-        %if len(courses) > 0 or len(libraries) > 0:
-        <div class="copy">
-          <p>
-            %if libraries_enabled:
-              ${_("Here are all of the courses and librariess you currently have access to in {studio_name}:").format(studio_name=settings.STUDIO_SHORT_NAME)}
-            %else:
-              ${_("Here are all of the courses you currently have access to in {studio_name}:").format(studio_name=settings.STUDIO_SHORT_NAME)}
-            %endif
-          </p>
-        </div>
-
-        %else:
-        <div class="copy">
-          <p>
-            %if libraries_enabled:
-              ${_("You currently aren't associated with any {studio_name} Courses and Libraries").format(studio_name=settings.STUDIO_SHORT_NAME)}
-            %else:
-              ${_("You currently aren't associated with any {studio_name} Courses.").format(studio_name=settings.STUDIO_SHORT_NAME)}
-            %endif
-          </p>
-        </div>
-        %endif
-      </div>
 
       % if course_creator_status=='granted':
       <div class="wrapper-create-element wrapper-create-course">

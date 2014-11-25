@@ -1,6 +1,7 @@
 """
 Views related to operations on course objects
 """
+from django.shortcuts import redirect
 import json
 import random
 import string  # pylint: disable=deprecated-module
@@ -71,7 +72,8 @@ from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
 
 
-__all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
+__all__ = ['course_info_handler', 'course_handler', 'course_listing',
+           'course_info_update_handler',
            'course_rerun_handler',
            'settings_handler',
            'grading_handler',
@@ -230,7 +232,7 @@ def course_handler(request, course_key_string=None):
                 return HttpResponseBadRequest()
         elif request.method == 'GET':  # assume html
             if course_key_string is None:
-                return course_listing(request)
+                return redirect(reverse("home"))
             else:
                 return course_index(request, CourseKey.from_string(course_key_string))
         else:
