@@ -303,13 +303,20 @@
           vertical-align: top;
         }
 
-        .icon {
-          @include margin-right($baseline/4);
-        }
-
         .wrapper-section-title {
           width: flex-grid(5, 6);
           line-height: 0;
+        }
+
+        .action-edit.action-inline {
+
+          .icon {
+            vertical-align: middle;
+            -webkit-transform: none;
+            -moz-transform: none;
+            -o-transform: none;
+            transform: none;
+          }
         }
       }
 
@@ -399,6 +406,18 @@
           width: flex-grid(5, 6);
           margin-top: -($baseline/10);
           line-height: 0;
+        }
+
+        .action-edit.action-inline {
+
+          .icon {
+            margin-right: 0;
+            vertical-align: middle;
+            -webkit-transform: none;
+            -moz-transform: none;
+            -o-transform: none;
+            transform: none;
+          }
         }
       }
 
