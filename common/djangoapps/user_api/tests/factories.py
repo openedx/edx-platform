@@ -2,7 +2,7 @@
 from factory.django import DjangoModelFactory
 from factory import SubFactory
 from student.tests.factories import UserFactory
-from user_api.models import UserPreference, UserCourseTag
+from user_api.models import UserPreference, UserCourseTag, UserOrgTag
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -21,5 +21,15 @@ class UserCourseTagFactory(DjangoModelFactory):
 
     user = SubFactory(UserFactory)
     course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+    key = None
+    value = None
+
+
+class UserOrgTagFactory(DjangoModelFactory):
+    """ Simple factory class for generating UserOrgTags """
+    FACTORY_FOR = UserOrgTag
+
+    user = SubFactory(UserFactory)
+    org = 'org'
     key = None
     value = None
