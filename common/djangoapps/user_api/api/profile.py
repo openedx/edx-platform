@@ -5,8 +5,10 @@ but does NOT include basic account information such as username, password, and
 email address.
 
 """
+import datetime
+from django.conf import settings
 
-
+from user_api.api import course_tag
 from user_api.models import User, UserProfile, UserPreference
 from user_api.helpers import intercept_errors
 
@@ -155,3 +157,38 @@ def update_preferences(username, **kwargs):
     else:
         for key, value in kwargs.iteritems():
             UserPreference.set_preference(user, key, value)
+
+
+@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
+def update_email_opt_in(username, course_id, optin):
+    """Updates a user's preference for receiving org-wide emails.
+
+    Sets a User Course Tag defining the choice to opt in or opt out of organization-wide
+    emails.  The organization is determined based on the course passed into the function.
+
+    Args:
+        username (str): The user to set a preference for.
+        course_id (SlashSeparatedCourseKey): The course is used to determine the organization this setting is
+            related to. Setting this multiple times for a single organization through multiple course enrollments
+            will default to the most recent choice.
+        optin (boolean): True if the user is choosing to receive emails for this organization. If the user is not
+            the correct age to receive emails, email-optin is set to False regardless.
+
+    Returns:
+        None
+
+    Raises:
+        ProfileUserNotFound: Raised when the username specified is not associated with a user.
+
+    """
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise ProfileUserNotFound
+
+    profile = UserProfile.objects.get(user=user)
+    of_age = (
+        datetime.datetime.now().year - profile.year_of_birth >=  # pylint: disable=maybe-no-member
+        getattr(settings, 'EMAIL_OPTIN_MINIMUM_AGE', 13)
+    )
+    course_tag.set_course_tag(user, course_id, "email-optin", str(optin and of_age))

@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 """ Tests for the profile API. """
+from django.contrib.auth.models import User
 
 from django.test import TestCase
 import ddt
+from django.test.utils import override_settings
 from nose.tools import raises
 from dateutil.parser import parse as parse_datetime
+from xmodule.modulestore.tests.factories import CourseFactory
+import datetime
 
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
+from user_api.api import course_tag as course_tag_api
 from user_api.models import UserProfile
 
 
@@ -93,6 +98,36 @@ class ProfileApiTest(TestCase):
 
         preferences = profile_api.preference_info(self.USERNAME)
         self.assertEqual(preferences['preference_key'], 'preference_value')
+
+    @ddt.data(
+        # Check that a 27 year old can opt-in
+        (27, True, u"True"),
+
+        # Check that a 32-year old can opt-out
+        (32, False, u"False"),
+
+        # Check that someone 13 years old can opt-in
+        (13, True, u"True"),
+
+        # Check that someone 12 years old cannot opt-in
+        (12, True, u"False")
+    )
+    @ddt.unpack
+    @override_settings(EMAIL_OPTIN_MINIMUM_AGE=13)
+    def test_update_email_optin(self, age, option, expected_result):
+        # Create the course and account.
+        course = CourseFactory.create()
+        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+
+        # Set year of birth
+        user = User.objects.get(username=self.USERNAME)
+        profile = UserProfile.objects.get(user=user)
+        year_of_birth = datetime.datetime.now().year - age  # pylint: disable=maybe-no-member
+        profile.year_of_birth = year_of_birth
+        profile.save()
+
+        profile_api.update_email_opt_in(self.USERNAME, course.id, option)
+        self.assertEqual(course_tag_api.get_course_tag(user, course.id, 'email-optin'), expected_result)
 
     @raises(profile_api.ProfileUserNotFound)
     def test_retrieve_and_update_preference_info_no_user(self):

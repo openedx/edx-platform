@@ -1365,6 +1365,10 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 # parallel, and what the SES rate is.
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
+############################# Email Opt In ####################################
+
+# Minimum age for organization-wide email opt in
+EMAIL_OPTIN_MINIMUM_AGE = 13
 
 ############################## Video ##########################################
 
