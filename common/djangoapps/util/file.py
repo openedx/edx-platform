@@ -1,4 +1,7 @@
-import csv
+"""
+Utility methods related to file handling.
+"""
+
 from datetime import datetime
 import os
 from pytz import UTC
@@ -52,8 +55,7 @@ def store_uploaded_file(
             msg = ungettext(
                 "The file must end with the extension '{file_types}'.",
                 "The file must end with one of the following extensions: '{file_types}'.",
-                len(allowed_file_types)).format(file_types=file_types
-            )
+                len(allowed_file_types)).format(file_types=file_types)
             raise exceptions.PermissionDenied(msg)
 
         stored_file_name = base_storage_filename + file_extension
@@ -65,9 +67,9 @@ def store_uploaded_file(
         if validator:
             try:
                 validator(file_storage, stored_file_name)
-            except Exception as e:
+            except Exception as exception:
                 file_storage.delete(stored_file_name)
-                raise e
+                raise exception
 
     finally:
         uploaded_file.close()
@@ -82,6 +84,7 @@ def store_uploaded_file(
     return file_storage, stored_file_name
 
 
+# pylint: disable=invalid-name
 def course_and_time_based_filename_generator(course_id, base_name):
     """
     Generates a filename (without extension) based on the current time and the supplied filename.
@@ -99,5 +102,5 @@ def course_and_time_based_filename_generator(course_id, base_name):
     return u"{course_prefix}_{base_name}_{timestamp_str}".format(
         course_prefix=urllib.quote(unicode(course_id).replace("/", "_")),
         base_name=base_name,
-        timestamp_str=datetime.now(UTC).strftime("%Y-%m-%d-%H%M%S")
+        timestamp_str=datetime.now(UTC).strftime("%Y-%m-%d-%H%M%S")  # pylint: disable=maybe-no-member
     )
