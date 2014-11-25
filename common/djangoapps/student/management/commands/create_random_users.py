@@ -12,12 +12,15 @@ from student.views import _do_create_account
 
 
 def get_random_post_override():
-    id = uuid.uuid4().hex[:8]
+    """
+    Generate unique user data for dummy users.
+    """
+    identification = uuid.uuid4().hex[:8]
     return {
-        'username': 'user_{id}'.format(id=id),
-        'email': 'email_{id}@example.com'.format(id=id),
+        'username': 'user_{id}'.format(id=identification),
+        'email': 'email_{id}@example.com'.format(id=identification),
         'password': '12345',
-        'name': 'User {id}'.format(id=id),
+        'name': 'User {id}'.format(id=identification),
         'level_of_education': 1,
         'gender': 'other',
         'mailing_address': '141 Portland Street',

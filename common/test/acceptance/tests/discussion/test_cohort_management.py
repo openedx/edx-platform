@@ -369,7 +369,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             urllib.quote(unicode(self.course_id).replace("/", "_")), base_file_name
         ), report)
         report_datetime = datetime.strptime(
-            report[report.index(base_file_name)+len(base_file_name):-len(".csv")],
+            report[report.index(base_file_name) + len(base_file_name):-len(".csv")],
             "%Y-%m-%d-%H%M"
         )
         self.assertLessEqual(start_time.replace(second=0, microsecond=0), utc.localize(report_datetime))
@@ -408,7 +408,9 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then I get an error message stating that the file must have either a username or email column
         """
         self.cohort_management_page.upload_cohort_file("cohort_users_missing_user_columns.csv")
-        self._verify_cohort_by_csv_notification("The file must contain a 'username' column, an 'email' column, or both.")
+        self._verify_cohort_by_csv_notification(
+            "The file must contain a 'username' column, an 'email' column, or both."
+        )
 
     def _verify_cohort_by_csv_notification(self, expected_message):
         """
