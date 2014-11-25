@@ -101,14 +101,3 @@ def course_and_time_based_filename_generator(course_id, base_name):
         base_name=base_name,
         timestamp_str=datetime.now(UTC).strftime("%Y-%m-%d-%H%M%S")
     )
-
-
-def unicode_csv_dictreader(utf8_data, **kwargs):
-    """
-    Read a CSV file as a dict using csv.DictReader, but respect utf-8.
-
-    Based on http://stackoverflow.com/a/5005573
-    """
-    csv_reader = csv.DictReader(utf8_data, **kwargs)
-    for row in csv_reader:
-        yield dict([(unicode(key, 'utf-8'), unicode(value, 'utf-8')) for key, value in row.iteritems()])
