@@ -25,8 +25,9 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.utils.html import strip_tags
 import string  # pylint: disable=deprecated-module
 import random
+import unicodecsv
 import urllib
-from util.file import store_uploaded_file, course_and_time_based_filename_generator, unicode_csv_dictreader
+from util.file import store_uploaded_file, course_and_time_based_filename_generator
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -985,7 +986,7 @@ def add_users_to_cohorts(request, course_id):
     try:
         def validator(file_storage, filename):
             with file_storage.open(filename, 'rU') as f:
-                reader = csv.DictReader(codecs.EncodedFile(f,"utf-8"))
+                reader = unicodecsv.DictReader(f)
                 fieldnames = reader.fieldnames
                 msg = None
                 if "cohort" not in fieldnames:

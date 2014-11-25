@@ -7,6 +7,7 @@ import json
 import urllib
 from datetime import datetime
 from time import time
+import unicodecsv
 
 from celery import Task, current_task
 from celery.utils.log import get_task_logger
@@ -20,7 +21,6 @@ from pytz import UTC
 from xmodule.modulestore.django import modulestore
 from track.views import task_track
 
-from util.file import unicode_csv_dictreader
 from course_groups.cohorts import add_users_to_cohorts
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
@@ -638,13 +638,14 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     start_date = datetime.now(UTC)
 
     # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
-    users_to_cohorts = [
-        {
-            'username_or_email': row.get('email') or row.get('username'),
-            'cohort': row.get('cohort')
-        }
-        for row in unicode_csv_dictreader(DefaultStorage().open(task_input['file_name'], 'rU'))
-    ]
+    with DefaultStorage().open(task_input['file_name'], 'rU') as input_csv:
+        users_to_cohorts = [
+            {
+                'username_or_email': row.get('email') or row.get('username'),
+                'cohort': row.get('cohort') or ''
+            }
+            for row in unicodecsv.DictReader(input_csv)
+        ]
 
     task_progress = TaskProgress(action_name, len(users_to_cohorts), start_time)
     current_step = {'step': 'Cohorting Students'}
