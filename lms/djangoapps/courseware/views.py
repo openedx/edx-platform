@@ -492,6 +492,31 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
             # which will prefetch the children more efficiently than doing a recursive load
+            #
+            # If get_item() is called below instead of get_module(), then this exception and traceback happen:
+            #
+            # File "/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/views.py", line 326, in index
+            #   return _index_bulk_op(request, user, course_key, chapter, section, position)
+            # File "/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/views.py", line 471, in _index_bulk_op
+            #   context['fragment'] = section_module.render(STUDENT_VIEW)
+            # File "/edx/app/edxapp/venvs/edxapp/src/xblock/xblock/core.py", line 260, in render
+            #   return self.runtime.render(self, view, context)
+            # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 1190, in render
+            #   return block.xmodule_runtime.render(to_render, view_name, context)
+            # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 1053, in render
+            #   return super(MetricsMixin, self).render(block, view_name, context=context)
+            # File "/edx/app/edxapp/venvs/edxapp/src/xblock/xblock/runtime.py", line 586, in render
+            #   frag = view_fn(context)
+            # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/seq_module.py", line 107, in student_view
+            #   progress = child.get_progress()
+            # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/vertical_module.py", line 61, in get_progress
+            #   progresses = [child.get_progress() for child in children]
+            # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 488, in __get__
+            #   return getattr(getattr(instance, self._source), self._name)
+            # File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 943, in _xmodule
+            #   raise UndefinedContext()
+
+            #section_descriptor = modulestore().get_item(section_descriptor.location, depth=None)
             section_descriptor = get_module(
                 request.user, request, section_descriptor.location, field_data_cache,
                 static_asset_path=course.static_asset_path, depth=None
