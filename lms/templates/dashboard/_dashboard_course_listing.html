@@ -1,4 +1,4 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked" />
+<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status" />
 
 <%! from django.utils.translation import ugettext as _ %>
 <%!
@@ -67,6 +67,11 @@
           <span class="sts-enrollment-value">${_("Professional Ed")}</span>
         </span>
         % endif
+    % endif
+
+    ## DEBUG
+    % if verification_status is not None:
+    DEBUG: ${ verification_status }
     % endif
 
     <section class="info">
