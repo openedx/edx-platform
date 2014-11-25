@@ -28,7 +28,7 @@
                     % else:
                         <li class="action-item action-edit nav-item">
                             <a href="#" class="button edit-button action-button">
-                                <i class="icon-pencil"></i>
+                                <i class="icon fa fa-pencil"></i>
                                 <span class="action-button-text">${_("Edit")}</span>
                             </a>
                         </li>
@@ -47,7 +47,7 @@
                     <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="locator-container">
                     </section>
                     <div class="ui-loading is-hidden">
-                        <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">Loading...</span></p>
+                        <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading...</span></p>
                     </div>
                 </article>
                 <aside class="content-supplementary" role="complementary">

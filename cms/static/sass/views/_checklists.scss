@@ -43,7 +43,7 @@
         }
       }
     }
-    // <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value"><span class="int">0</span>% of checklist completed</span></span>
+
 
     // header/title
     header {
@@ -91,7 +91,7 @@
         color: $gray-l2;
 
 
-        .icon-ok {
+        .fa-check-square-o {
           @extend %t-icon4;
           display: inline-block;
           margin-left: ($baseline/2);
@@ -128,7 +128,7 @@
         @include green-button();
         @include float(left);
 
-        .icon-add {
+        .fa-plus {
           @extend %t-icon7;
           display: inline-block;
           vertical-align: middle;
@@ -183,13 +183,13 @@
 
       header {
 
-        .checklist-title, .icon-caret-down {
+        .checklist-title, .fa-caret-down {
           color: $green;
         }
 
         .checklist-status {
 
-          .status-count, .status-amount, .icon-ok {
+          .status-count, .status-amount, .fa-check-square-o {
             color: $green;
           }
         }
