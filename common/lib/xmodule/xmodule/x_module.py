@@ -1725,6 +1725,7 @@ class DiscussionService(object):
         course_settings = make_course_settings(course)
 
         context = {
+            'user': user,
             'course': course,
             'course_id': course_id,
             'staff_access': has_access(user, 'staff', course),
