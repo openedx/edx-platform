@@ -1,5 +1,5 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date"],
+    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date", "tinymce", "jquery.tinymce"],
     function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
 
 var DetailsView = ValidatingView.extend({
@@ -38,6 +38,34 @@ var DetailsView = ValidatingView.extend({
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
+        // Editor tinymce
+        cachethis = this;
+        tinymce.init({
+            selector: "textarea#course-overview",
+            setup: function(editor) {
+                editor.on('change', function(e){
+                    var newVal = tinymce.activeEditor.getContent();
+                    if (cachethis.model.get('overview') != newVal){
+                        cachethis.setAndValidate('overview', newVal);
+                    }
+                });
+            },
+            plugins: ["table code"],
+            menu: {
+                file: {title: 'File', items: 'save'},
+                edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
+                insert: {title: 'Insert', items: '|'}, 
+                view: {title: 'View', items: 'visualaid'}, 
+                format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
+                table: {title: 'Table'}, 
+                tools: {title: 'Tools', items: 'inserttable code'} 
+            },
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table | code",
+        });
+    },
+
+    changeOverview: function(editor){
+        console.log("editor changed: ");
     },
 
     render: function() {
@@ -47,7 +75,7 @@ var DetailsView = ValidatingView.extend({
         this.setupDatePicker('enrollment_end');
 
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
-        this.codeMirrorize(null, $('#course-overview')[0]);
+//        this.codeMirrorize(null, $('#course-overview')[0]);
 
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
 
