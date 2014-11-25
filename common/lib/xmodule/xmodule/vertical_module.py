@@ -40,7 +40,7 @@ class VerticalBlock(XBlock):
         }))
         return fragment
 
-    def studio_view(self, context):
+    def author_view(self, context):
         """
         Renders the Studio preview view, which supports drag and drop.
         """

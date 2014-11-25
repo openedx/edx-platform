@@ -291,6 +291,29 @@ class XModuleMixin(XBlockMixin):
     @property
     def runtime(self):
         return CombinedSystem(self.xmodule_runtime, self._runtime)
+        # Handle XModule backwards compatibility. If this is a pure
+        # XBlock, and it has an xmodule_runtime defined, then we're in
+        # an XModule context, not an XModuleDescriptor context,
+        # so we should use the xmodule_runtime (ModuleSystem) as the runtime.
+        #
+        # If this code always returns a PureSystem() irregardless of having a self.xmodule_runtime,
+        # the exception and traceback below occur:
+        #
+        #   File "/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/views.py", line 326, in index
+        #     return _index_bulk_op(request, user, course_key, chapter, section, position)
+        #   File "/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/views.py", line 348, in _index_bulk_op
+        #     course_key, user, course, depth=2)
+        #   File "/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/model_data.py", line 114, in cache_for_descriptor_descendents
+        #     descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
+        #   File "/edx/app/edxapp/edx-platform/lms/djangoapps/courseware/model_data.py", line 108, in get_child_descriptors
+        #     for child in descriptor.get_children() + descriptor.get_required_module_descriptors():
+        #   File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 337, in get_children
+        #     child = self.runtime.get_block(child_loc)
+        #   File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 1399, in get_block
+        #     return self.get_module(self.descriptor_runtime.get_block(block_id))
+        #   File "/edx/app/edxapp/edx-platform/common/lib/xmodule/xmodule/x_module.py", line 1435, in __getattr__
+        #     return getattr(self._descriptor_system, name)
+        # AttributeError: 'CachingDescriptorSystem' object has no attribute 'get_module'
 
     @runtime.setter
     def runtime(self, value):
