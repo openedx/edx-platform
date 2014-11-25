@@ -13,7 +13,7 @@ from student.views import _do_create_account
 
 def get_random_post_override():
     """
-    Dan should write a doc-string.
+    Generate unique user data for dummy users.
     """
     identification = uuid.uuid4().hex[:8]
     return {
