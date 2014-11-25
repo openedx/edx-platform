@@ -12,6 +12,7 @@ import util.file
 from util.file import course_and_time_based_filename_generator, store_uploaded_file, unicode_csv_dictreader
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core import exceptions
+import os
 
 
 class FilenameGeneratorTestCase(TestCase):
@@ -55,7 +56,8 @@ class StoreUploadedFileTestCase(TestCase):
 
     def setUp(self):
         self.request = Mock(spec=HttpRequest)
-        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", "content")}
+        self.file_content = "test file content"
+        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.csv", self.file_content)}
         self.stored_file_name = None
         self.file_storage = None
 
@@ -97,8 +99,10 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Verify that a validator function can throw an exception.
         """
-        def validator(file):
-            self.assertEqual(self.request.FILES["uploaded_file"], file)
+        def validator(storage, file):
+            self.assertEqual("stored_file.csv", os.path.basename(file))
+            with storage.open(file, 'rU') as f:
+                self.assertEqual(self.file_content, f.read())
             raise exceptions.PermissionDenied("validation failed")
 
         with self.assertRaises(exceptions.PermissionDenied) as error:
@@ -118,7 +122,7 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Tests uploading a file with upper case extension. Verifies that the stored file contents are correct.
         """
-        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.CSV", "content")}
+        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.CSV", self.file_content)}
         self.file_storage, self.stored_file_name = store_uploaded_file(
             self.request, "uploaded_file", [".gif", ".csv"], "second_stored_file"
         )
@@ -127,8 +131,7 @@ class StoreUploadedFileTestCase(TestCase):
     def _verify_successful_upload(self):
         self.assertTrue(self.file_storage.exists(self.stored_file_name))
         with self.file_storage.open(self.stored_file_name, 'r') as f:
-            data = f.read()
-        self.assertEqual("content", data)
+            self.assertEqual(self.file_content, f.read())
 
 
 class CsvDictReaderTestCase(TestCase):
