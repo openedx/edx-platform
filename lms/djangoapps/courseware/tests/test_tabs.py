@@ -19,7 +19,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE, TES
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
@@ -49,7 +49,6 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         with self.assertRaises(Http404):
             static_tab(request, course_id='edX/toy', tab_slug='new_tab')
 
-    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     def test_get_static_tab_contents(self):
         course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(UserFactory.create())

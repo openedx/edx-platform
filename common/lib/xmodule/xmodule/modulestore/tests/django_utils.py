@@ -5,6 +5,8 @@ Modulestore configuration for test cases.
 from uuid import uuid4
 from django.test import TestCase
 from django.contrib.auth.models import User
+from student.tests.factories import UserFactory
+
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore import ModuleStoreEnum
@@ -192,7 +194,7 @@ class ModuleStoreTestCase(TestCase):
 
         if kwargs.pop('create_user', True):
             # Create the user so we can log them in.
-            self.user = User.objects.create_user(uname, email, password)
+            self.user = UserFactory.create(username=uname, email=email, password=password)
 
             # Note that we do not actually need to do anything
             # for registration if we directly mark them active.
@@ -211,7 +213,7 @@ class ModuleStoreTestCase(TestCase):
         """
         uname = 'teststudent'
         password = 'foo'
-        nonstaff_user = User.objects.create_user(uname, 'test+student@edx.org', password)
+        nonstaff_user = UserFactory.create_user(username=uname, email='test+student@edx.org', password=password)
 
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.
