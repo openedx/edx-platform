@@ -1009,7 +1009,7 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.ajax_post('/course/', self.course_data)
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
 
     def assert_course_creation_failed(self, error_message):
         """
@@ -1038,7 +1038,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.course_data['display_name'] = 'Robot Super Course Two'
         self.course_data['run'] = '2013_Summer'
 
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
 
     def test_create_course_case_change(self):
         """Test new course creation - error path due to case insensitive name equality"""
@@ -1046,13 +1046,13 @@ class ContentStoreTest(ContentStoreTestCase):
         self.client.ajax_post('/course/', self.course_data)
         cache_current = self.course_data['org']
         self.course_data['org'] = self.course_data['org'].lower()
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
         self.course_data['org'] = cache_current
 
         self.client.ajax_post('/course/', self.course_data)
         cache_current = self.course_data['number']
         self.course_data['number'] = self.course_data['number'].upper()
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
 
     def test_course_substring(self):
         """
