@@ -638,13 +638,14 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     start_date = datetime.now(UTC)
 
     # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
-    users_to_cohorts = [
-        {
-            'username_or_email': row.get('email') or row.get('username'),
-            'cohort': row.get('cohort')
-        }
-        for row in unicode_csv_dictreader(DefaultStorage().open(task_input['file_name'], 'rU'))
-    ]
+    with DefaultStorage().open(task_input['file_name'], 'rU') as input_csv:
+        users_to_cohorts = [
+            {
+                'username_or_email': row.get('email') or row.get('username'),
+                'cohort': row.get('cohort')
+            }
+            for row in unicode_csv_dictreader(input_csv)
+        ]
 
     task_progress = TaskProgress(action_name, len(users_to_cohorts), start_time)
     current_step = {'step': 'Cohorting Students'}
