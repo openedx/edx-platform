@@ -6,8 +6,8 @@ paths actually work.
 
 """
 import csv
-import logging
 import json
+import logging
 from mock import patch
 import textwrap
 

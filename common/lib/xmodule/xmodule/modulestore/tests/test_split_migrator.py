@@ -2,14 +2,18 @@
 Tests for split_migrator
 
 """
-import uuid
 import random
+import uuid
+
 import mock
+from nose.plugins.attrib import attr
+
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
 
 
+@attr('mongo')
 class TestMigration(SplitWMongoCourseBoostrapper):
     """
     Test the split migrator

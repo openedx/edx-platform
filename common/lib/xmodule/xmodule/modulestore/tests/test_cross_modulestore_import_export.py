@@ -11,16 +11,17 @@ and then for each combination of modulestores, performing the sequence:
     4) Compare all modules in the source and destination modulestores to make sure that they line up
 
 """
-import ddt
-import itertools
-import random
 from contextlib import contextmanager, nested
+import itertools
+from path import path
+import random
 from shutil import rmtree
 from tempfile import mkdtemp
-from path import path
+
+import ddt
+from nose.plugins.attrib import attr
 
 from xmodule.tests import CourseComparisonTest
-
 from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -289,6 +290,7 @@ COURSE_DATA_NAMES = (
 
 
 @ddt.ddt
+@attr('mongo')
 class CrossStoreXMLRoundtrip(CourseComparisonTest):
     """
     This class exists to test XML import and export between different modulestore
