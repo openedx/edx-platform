@@ -113,6 +113,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         CohortFactory(course_id=self.course.id, name='Cohort 2')
         self.create_student(username='student_1', email='student_1@example.com')
         self.create_student(username='student_2', email='student_2@example.com')
+        self.csv_header_row = ['cohort_name', 'exists', 'students_added', 'students_changed', 'students_already_present', 'students_unknown']
 
     def _cohort_students_and_upload(self, csv_rows):
         """
@@ -139,6 +140,12 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ]
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+            ]
+        )
 
     @patch('instructor_task.tasks_helper.DefaultStorage')
     def test_email(self, mock_default_storage):
@@ -155,6 +162,12 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ]
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+            ]
+        )
 
     @patch('instructor_task.tasks_helper.DefaultStorage')
     def test_username_and_email(self, mock_default_storage):
@@ -171,6 +184,12 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ]
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+            ]
+        )
 
     @patch('instructor_task.tasks_helper.DefaultStorage')
     def test_prefer_email(self, mock_default_storage):
@@ -193,6 +212,12 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ]
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+            ]
+        )
 
     @patch('instructor_task.tasks_helper.DefaultStorage')
     def test_non_existent_user(self, mock_default_storage):
@@ -209,6 +234,12 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ]
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '0', '0', 'Invalid'])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '0', '0', 'also_fake@bad.com'])),
+            ]
+        )
 
     @patch('instructor_task.tasks_helper.DefaultStorage')
     def test_non_existent_cohort(self, mock_default_storage):
@@ -225,3 +256,9 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ]
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+            ]
+        )
