@@ -7,14 +7,12 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest
 import json
 import logging
 import re
-import csv
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
 from util.json_request import JsonResponse
-from django.utils.translation import ugettext as _
 from . import cohorts
 from .models import CourseUserGroup
 

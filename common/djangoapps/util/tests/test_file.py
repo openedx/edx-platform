@@ -99,9 +99,10 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Verify that a validator function can throw an exception.
         """
-        def validator(storage, file):
-            self.assertEqual("stored_file.csv", os.path.basename(file))
-            with storage.open(file, 'rU') as f:
+        def validator(storage, filename):
+            """ Validation test function """
+            self.assertEqual("stored_file.csv", os.path.basename(filename))
+            with storage.open(filename, 'rU') as f:
                 self.assertEqual(self.file_content, f.read())
             raise exceptions.PermissionDenied("validation failed")
 
@@ -129,6 +130,7 @@ class StoreUploadedFileTestCase(TestCase):
         self._verify_successful_upload()
 
     def _verify_successful_upload(self):
+        """ Helper method that checks that the stored version of the uploaded file has the correct content """
         self.assertTrue(self.file_storage.exists(self.stored_file_name))
         with self.file_storage.open(self.stored_file_name, 'r') as f:
             self.assertEqual(self.file_content, f.read())

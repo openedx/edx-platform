@@ -119,11 +119,11 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         """
         Call `cohort_students_and_upload` with a file generated from `csv_data`.
         """
-        with tempfile.NamedTemporaryFile() as fp:
-            fp.write(csv_data.encode('utf-8'))
-            fp.flush()
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(csv_data.encode('utf-8'))
+            temp_file.flush()
             with patch('instructor_task.tasks_helper._get_current_task'):
-                return cohort_students_and_upload(None, None, self.course.id, {'file_name': fp.name}, 'cohorted')
+                return cohort_students_and_upload(None, None, self.course.id, {'file_name': temp_file.name}, 'cohorted')
 
     @patch('instructor_task.tasks_helper.DefaultStorage')
     def test_username(self, mock_default_storage):
