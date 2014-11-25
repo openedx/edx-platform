@@ -63,7 +63,9 @@ define(
                         data: JSON.stringify({
                             files: _.map(
                                 uploadData.files,
-                                function(file) { return {"file_name": file.name}; }
+                                function(file) {
+                                    return {"file_name": file.name, "content_type": file.type};
+                                }
                             )
                         }),
                         dataType: "json",
@@ -75,6 +77,7 @@ define(
                                 view.uploadForm.fileupload("add", {
                                     files: [uploadData.files[index]],
                                     url: file["upload-url"],
+                                    multipart: false,
                                     global: false,  // Do not trigger global AJAX error handler
                                     redirected: true
                                 });

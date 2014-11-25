@@ -157,7 +157,11 @@ def videos_post(course, request):
             key.set_metadata(metadata_name, value)
 
         # 4. generate URL
-        video_file['upload-url'] = key.generate_url(KEY_EXPIRATION_IN_SECONDS, 'PUT')
+        video_file['upload-url'] = key.generate_url(
+            KEY_EXPIRATION_IN_SECONDS,
+            'PUT',
+            headers={"Content-Type": video_file["content_type"]}
+        )
 
         # 5. persist edx_video_id as uploaded through this course
         video_meta_data = AssetMetadata(
