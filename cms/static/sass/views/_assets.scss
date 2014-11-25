@@ -33,6 +33,7 @@
     color: $gray;
 
     .new-button {
+      @extend %btn-primary-green;
       @extend %t-action3;
       @include margin-left($baseline);
 
