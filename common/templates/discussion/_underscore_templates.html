@@ -1,4 +1,7 @@
-<<<<<<< HEAD:lms/templates/discussion/_underscore_templates.html
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.template.defaultfilters import escapejs %>
+<%! from django_comment_client.permissions import cached_has_permission %>
+
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -19,7 +22,7 @@ from django_comment_client.permissions import has_permission
             </div>
             <div class="post-extended-content">
                 <div class="response-count"/>
-                % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
+                % if course is UNDEFINED or cached_has_permission(user, 'create_comment', course.id):
                 <div class="add-response">
                     <button class="button add-response-btn">
                         <i class="icon fa fa-reply"></i>
@@ -32,7 +35,7 @@ from django_comment_client.permissions import has_permission
                 <div class="post-status-closed bottom-post-status" style="display: none">
                   ${_("This thread is closed.")}
                 </div>
-                % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
+                % if course is UNDEFINED or cached_has_permission(user, 'create_comment', course.id):
                 <form class="discussion-reply-new" data-id="${'<%- id %>'}">
                     <h4>${_("Post a response:")}</h4>
                     <ul class="discussion-errors"></ul>
@@ -80,7 +83,7 @@ from django_comment_client.permissions import has_permission
     </a>
     <ol class="comments">
         <li class="new-comment">
-            % if course is UNDEFINED or has_permission(user, 'create_sub_comment', course.id):
+            % if course is UNDEFINED or cached_has_permission(user, 'create_sub_comment', course.id):
             <form class="comment-form" data-id="${'<%- wmdId %>'}">
                 <ul class="discussion-errors"></ul>
                 <label class="sr" for="add-new-comment">${_("Add a comment")}</label>
