@@ -111,7 +111,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.course = CourseFactory.create()
         CohortFactory(course_id=self.course.id, name='Cohort 1')
         CohortFactory(course_id=self.course.id, name='Cohort 2')
-        self.create_student(username='student_1', email='student_1@example.com')
+        self.create_student(username=u'student_1\xec', email='student_1@example.com')
         self.create_student(username='student_2', email='student_2@example.com')
         self.csv_header_row = ['cohort_name', 'exists', 'students_added', 'students_changed', 'students_already_present', 'students_unknown']
 
@@ -120,7 +120,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         Call `cohort_students_and_upload` with a file generated from `csv_data`.
         """
         with tempfile.NamedTemporaryFile() as fp:
-            fp.write(csv_data)
+            fp.write(csv_data.encode('utf-8'))
             fp.flush()
             with patch('instructor_task.tasks_helper._get_current_task'):
                 return cohort_students_and_upload(None, None, self.course.id, {'file_name': fp.name}, 'cohorted')
@@ -133,9 +133,9 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         mock_default_storage.return_value.open = open
 
         result = self._cohort_students_and_upload(
-            'username,email,cohort\n'
-            'student_1,,Cohort 1\n'
-            'student_2,,Cohort 2'
+            u'username,email,cohort\n'
+            u'student_1\xec,,Cohort 1\n'
+            u'student_2,,Cohort 2'
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
@@ -173,9 +173,9 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         mock_default_storage.return_value.open = open
 
         result = self._cohort_students_and_upload(
-            'username,email,cohort\n'
-            'student_1,student_1@example.com,Cohort 1\n'
-            'student_2,student_2@example.com,Cohort 2'
+            u'username,email,cohort\n'
+            u'student_1\xec,student_1@example.com,Cohort 1\n'
+            u'student_2,student_2@example.com,Cohort 2'
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
@@ -199,9 +199,9 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         mock_default_storage.return_value.open = open
 
         result = self._cohort_students_and_upload(
-            'username,email,cohort\n'
-            'student_1,student_1@example.com,Cohort 1\n'  # valid username and email
-            'Invalid,student_2@example.com,Cohort 2'      # invalid username, valid email
+            u'username,email,cohort\n'
+            u'student_1\xec,student_1@example.com,Cohort 1\n'  # valid username and email
+            u'Invalid,student_2@example.com,Cohort 2'      # invalid username, valid email
         )
         self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
@@ -270,13 +270,13 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         mock_default_storage.return_value.open = open
 
         result = self._cohort_students_and_upload(
-            'username,email,cohort\n'
-            'student_1,\n'
-            'student_2'
+            u'username,email,cohort\n'
+            u'student_1\xec,\n'
+            u'student_2'
         )
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['', 'False', '', '', '', ''])),
+                dict(zip(self.csv_header_row, ['', 'False', '0', '0', '0', ''])),
             ]
         )

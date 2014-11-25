@@ -9,7 +9,7 @@ from mock import patch, Mock
 from django.http import HttpRequest
 from django.core.files.uploadedfile import SimpleUploadedFile
 import util.file
-from util.file import course_and_time_based_filename_generator, store_uploaded_file, unicode_csv_dictreader
+from util.file import course_and_time_based_filename_generator, store_uploaded_file
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core import exceptions
 import os
@@ -132,20 +132,3 @@ class StoreUploadedFileTestCase(TestCase):
         self.assertTrue(self.file_storage.exists(self.stored_file_name))
         with self.file_storage.open(self.stored_file_name, 'r') as f:
             self.assertEqual(self.file_content, f.read())
-
-
-class CsvDictReaderTestCase(TestCase):
-    """
-    Tests for unicode_csv_dictreader.
-    """
-    def test_handles_utf8_data(self):
-        rows = [
-            [u'Header_1\xec', u'Header_2\xec'],
-            [u'value_1\xec', u'value_2\xec'],
-        ]
-        content = ('\n'.join([','.join(row) for row in rows])).encode('utf-8')
-        f = SimpleUploadedFile('unicode_content.csv', content, 'text/csv')
-        self.assertEqual(
-            [row for row in unicode_csv_dictreader(f)],
-            [{u'Header_1\xec': u'value_1\xec', u'Header_2\xec': u'value_2\xec'}]
-        )
