@@ -2,8 +2,8 @@ define([
     'jquery',
     'underscore',
     'js/common_helpers/ajax_helpers',
-    'js/student_account/models/LoginModel',
-    'js/student_account/views/LoginView'
+    'js/student_account/models/login_model',
+    'js/student_account/views/login_view'
 ], function($, _, AjaxHelpers, LoginModel, LoginView) {
     'use strict';
     describe('edx.student.account.LoginView', function() {

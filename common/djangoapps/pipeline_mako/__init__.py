@@ -129,6 +129,13 @@ def render_require_js_path_overrides(path_overrides):  # pylint: disable=invalid
         'require.paths = require.paths || [];'
     ])
 
+    # Specify override the base URL to point to STATIC_URL
+    html.append(
+        "require.baseUrl = '{url}'".format(
+            url=django_settings.STATIC_URL
+        )
+    )
+
     for module, url_path in path_overrides.iteritems():
         # Calculate the full URL, including any hashes added to the filename by the pipeline.
         # This will also include the base static URL (for example, "/static/") and the

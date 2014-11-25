@@ -1,7 +1,7 @@
 define([
         'gettext',
         'jquery',
-        'js/student_account/views/FormView',
+        'js/student_account/views/form_view',
         'text!js/student_account/templates/password_reset.underscore'
     ],
     function( gettext, $, FormView, passwordResetTpl ) {

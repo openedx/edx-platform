@@ -9,7 +9,7 @@
          */
         modules: [
             {
-                name: "js/student_account/accessApp",
+                name: "js/factories/login_and_register",
                 exclude: [
                     'jquery',
                     'jquery.cookie',
@@ -33,7 +33,7 @@
          * As of 2.1.10, mainConfigFile can be an array of values, with the last
          * value's config take precedence over previous values in the array.
          */
-        mainConfigFile: 'lms-require-config.js',
+        mainConfigFile: 'require-config-lms.js',
 
         /**
          * Set paths for modules. If relative paths, set relative to baseUrl above.

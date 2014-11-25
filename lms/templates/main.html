@@ -74,7 +74,7 @@ from microsite_configuration import page_title_breadcrumbs
   <%static:css group='style-app-extend2'/>
 
   % if enable_require_js:
-    <script type="text/javascript" src="${static.url("lms-require-config.js")}"></script>
+    <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
     ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
   % else:
     % if disable_courseware_js:

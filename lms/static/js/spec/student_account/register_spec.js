@@ -2,8 +2,8 @@ define([
     'jquery',
     'underscore',
     'js/common_helpers/ajax_helpers',
-    'js/student_account/models/RegisterModel',
-    'js/student_account/views/RegisterView'
+    'js/student_account/models/register_model',
+    'js/student_account/views/register_view'
 ], function($, _, AjaxHelpers, RegisterModel, RegisterView) {
     'use strict';
 

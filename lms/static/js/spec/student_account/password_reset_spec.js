@@ -2,8 +2,8 @@ define([
     'jquery',
     'underscore',
     'js/common_helpers/ajax_helpers',
-    'js/student_account/models/PasswordResetModel',
-    'js/student_account/views/PasswordResetView',
+    'js/student_account/models/password_reset_model',
+    'js/student_account/views/password_reset_view',
 ], function($, _, AjaxHelpers, PasswordResetModel, PasswordResetView) {
         describe('edx.student.account.PasswordResetView', function() {
             'use strict';

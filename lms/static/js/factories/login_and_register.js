@@ -4,7 +4,7 @@
 
     require([
         'jquery',
-        'js/student_account/views/AccessView'
+        'js/student_account/views/access_view'
     ],
     function( $, AccessView ) {
 

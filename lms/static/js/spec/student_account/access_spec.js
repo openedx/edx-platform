@@ -2,8 +2,8 @@ define([
     'jquery',
     'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
-    'js/student_account/views/AccessView',
-    'js/student_account/views/FormView',
+    'js/student_account/views/access_view',
+    'js/student_account/views/form_view',
     'js/student_account/enrollment',
     'js/student_account/shoppingcart',
     'js/student_account/emailoptin'

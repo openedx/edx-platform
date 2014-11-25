@@ -2,7 +2,7 @@ define([
         'gettext',
         'jquery',
         'underscore',
-        'js/student_account/views/FormView',
+        'js/student_account/views/form_view',
         'text!js/student_account/templates/login.underscore'
     ],
     function( gettext, $, _, FormView, loginTpl ) {
