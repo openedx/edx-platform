@@ -3,7 +3,6 @@
 Unit tests for sending course email
 """
 import json
-
 from mock import patch
 
 from django.conf import settings
@@ -12,16 +11,15 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from courseware.tests.factories import StaffFactory, InstructorFactory
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import Optout
+from courseware.tests.factories import StaffFactory, InstructorFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -44,7 +42,7 @@ class MockCourseEmailResult(object):
         return mock_update_subtask_status
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestEmailSendFromDashboard(ModuleStoreTestCase):
     """

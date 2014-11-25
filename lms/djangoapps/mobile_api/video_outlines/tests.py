@@ -1,31 +1,31 @@
 """
 Tests for video outline API
 """
-
+import copy
 import ddt
+from uuid import uuid4
 
+from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from django.conf import settings
+from edxval import api
+from rest_framework.test import APITestCase
+
+from courseware.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.video_module import transcripts_utils
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
-from courseware.tests.factories import UserFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
-from django.conf import settings
-from rest_framework.test import APITestCase
-from mobile_api.tests import ROLE_CASES
-from edxval import api
-from uuid import uuid4
 
-import copy
+from mobile_api.tests import ROLE_CASES
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE, CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestVideoOutline(ModuleStoreTestCase, APITestCase):
     """
     Tests for /api/mobile/v0.5/video_outlines/

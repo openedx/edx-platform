@@ -5,35 +5,38 @@ when you run "manage.py test".
 
 Replace this with more appropriate tests for your application.
 """
-import logging
-import unittest
 from datetime import datetime, timedelta
+import logging
 import pytz
+import unittest
 
 from django.conf import settings
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User, AnonymousUser
-from django.core.urlresolvers import reverse
 from django.contrib.sessions.middleware import SessionMiddleware
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from django.core.urlresolvers import reverse
+from django.test import TestCase
+from django.test.client import RequestFactory, Client
+from django.test.utils import override_settings
+from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from mock import Mock, patch
-
-from student.models import anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
+from student.models import (
+    anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
+)
 from student.views import (process_survey_link, _cert_info,
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
-from certificates.models import CertificateStatuses
-from certificates.tests.factories import GeneratedCertificateFactory
-import shoppingcart
-from bulk_email.models import Optout
+# These imports refer to lms djangoapps.
+# Their testcases are only run under lms.
+from bulk_email.models import Optout  # pylint: disable=import-error
+from certificates.models import CertificateStatuses  # pylint: disable=import-error
+from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+import shoppingcart  # pylint: disable=import-error
+
 
 log = logging.getLogger(__name__)
 
@@ -176,7 +179,7 @@ class CourseEndingTest(TestCase):
         self.assertIsNone(_cert_info(user, course2, cert_status))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
@@ -580,7 +583,7 @@ class EnrollInCourseTest(TestCase):
         self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "honor")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ChangeEnrollmentViewTest(ModuleStoreTestCase):
     """Tests the student.views.change_enrollment view"""
@@ -663,7 +666,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.assertEqual(enrollment_mode, u'honor')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class PaidRegistrationTest(ModuleStoreTestCase):
     """
     Tests for paid registration functionality (not verified student), involves shoppingcart
@@ -696,7 +699,7 @@ class PaidRegistrationTest(ModuleStoreTestCase):
             shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AnonymousLookupTable(ModuleStoreTestCase):
     """
     Tests for anonymous_id_functions
