@@ -17,6 +17,32 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
 )
 
 
+class AssetStoreTestData(object):
+    """
+    Shared data for constructing test assets.
+    """
+    now = datetime.now(pytz.utc)
+    user_id = 144
+    user_email = "me@example.com"
+
+    asset_fields = (
+        'filename', 'internal_name', 'basename', 'locked',
+        'edited_by', 'edited_by_email', 'edited_on', 'created_by', 'created_by_email', 'created_on',
+        'curr_version', 'prev_version'
+    )
+    all_asset_data = (
+        ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, user_id, user_email, now, user_id, user_email, now, '14', '13'),
+        ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, user_id, user_email, now, user_id, user_email, now, '1', None),
+        ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, user_id * 2, user_email, now, user_id * 2, user_email, now, 'AB', 'AA'),
+        ('dog.png', 'PUPY4242X', 'pictures/animals', True, user_id * 3, user_email, now, user_id * 3, user_email, now, '5', '4'),
+        ('not_here.txt', 'JJJCCC747', '/dev/null', False, user_id * 4, user_email, now, user_id * 4, user_email, now, '50', '49'),
+        ('asset.txt', 'JJJCCC747858', '/dev/null', False, user_id * 4, user_email, now, user_id * 4, user_email, now, '50', '49'),
+        ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, user_id * 7, user_email, now, user_id * 7, user_email, now, '1.1', '1.01'),
+        ('weather_patterns.bmp', '928SJXX2EB', 'science', False, user_id * 8, user_email, now, user_id * 8, user_email, now, '52', '51'),
+        ('demo.swf', 'DFDFGGGG14', 'demos/easy', False, user_id * 9, user_email, now, user_id * 9, user_email, now, '5', '4'),
+    )
+
+
 @ddt.ddt
 class TestMongoAssetMetadataStorage(unittest.TestCase):
     """
@@ -33,7 +59,7 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         """
         if type(mdata1) != type(mdata2):
             self.fail(self._formatMessage(msg, u"{} is not same type as {}".format(mdata1, mdata2)))
-        for attr in mdata1.ALLOWED_ATTRS:
+        for attr in mdata1.ATTRS_ALLOWED_TO_UPDATE:
             self.assertEqual(getattr(mdata1, attr), getattr(mdata2, attr), msg)
 
     def _compare_datetimes(self, datetime1, datetime2, msg=None):
@@ -68,27 +94,8 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         """
         Setup assets. Save in store if given
         """
-        asset_fields = (
-            'filename', 'internal_name', 'basename', 'locked',
-            'edited_by', 'edited_on', 'created_by', 'created_on',
-            'curr_version', 'prev_version'
-        )
-        now = datetime.now(pytz.utc)
-        user_id = ModuleStoreEnum.UserID.test
-        all_asset_data = (
-            ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, user_id, now, user_id, now, '14', '13'),
-            ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, user_id, now, user_id, now, '1', None),
-            ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, user_id * 2, now, user_id * 2, now, 'AB', 'AA'),
-            ('dog.png', 'PUPY4242X', 'pictures/animals', True, user_id * 3, now, user_id * 3, now, '5', '4'),
-            ('not_here.txt', 'JJJCCC747', '/dev/null', False, user_id * 4, now, user_id * 4, now, '50', '49'),
-            ('asset.txt', 'JJJCCC747858', '/dev/null', False, user_id * 4, now, user_id * 4, now, '50', '49'),
-            ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, user_id * 7, now, user_id * 7, now, '1.1', '1.01'),
-            ('weather_patterns.bmp', '928SJXX2EB', 'science', False, user_id * 8, now, user_id * 8, now, '52', '51'),
-            ('demo.swf', 'DFDFGGGG14', 'demos/easy', False, user_id * 9, now, user_id * 9, now, '5', '4'),
-        )
-
-        for i, asset in enumerate(all_asset_data):
-            asset_dict = dict(zip(asset_fields[1:], asset[1:]))
+        for i, asset in enumerate(AssetStoreTestData.all_asset_data):
+            asset_dict = dict(zip(AssetStoreTestData.asset_fields[1:], asset[1:]))
             if i in (0, 1) and course1_key:
                 asset_key = course1_key.make_asset_key('asset', asset[0])
                 asset_md = AssetMetadata(asset_key, **asset_dict)
