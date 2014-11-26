@@ -1844,3 +1844,30 @@ INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how peo
 COUNTRIES_OVERRIDE = {
     "TW": _("Taiwan"),
 }
+
+SESSION_COOKIE_NAME = None
+GIT_REPO_DIR = '/edx/var/edxapp/course_repos'
+MICROSITE_ROOT_DIR = ''
+CAS_SERVER_URL = None
+CAS_ATTRIBUTE_CALLBACK = None
+
+##### Defaults for OAUTH2 Provider ##############
+OAUTH_OIDC_ISSUER = None
+OAUTH_ENFORCE_SECURE = True
+OAUTH_ENFORCE_CLIENT_SECURE = True
+
+#### Course Registration Code length ####
+REGISTRATION_CODE_LENGTH = 8
+
+# SSL external authentication settings
+SSL_AUTH_EMAIL_DOMAIN = "MIT.EDU"
+SSL_AUTH_DN_FORMAT_STRING = "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}"
+
+GIT_IMPORT_STATIC = True
+META_UNIVERSITIES = {}
+DATADOG = {}
+EMAIL_FILE_PATH = None
+SEGMENT_IO_LMS = False
+
+MONGODB_LOG = {}
+SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
