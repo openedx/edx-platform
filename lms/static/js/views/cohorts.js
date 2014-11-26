@@ -31,7 +31,9 @@
         renderCSVUploadAndSelector: function(selectedCohort) {
             var fileUploaderModel = new FileUploaderModel({
                 title: gettext("Assign students to cohorts via a CSV file"),
-                description: gettext("Upload a CSV file, then download your results."),
+                inputLabel: gettext("Choose a .csv file"),
+                inputTip: gettext("Only properly formatted .csv files will be accepted."),
+                submitButtonText: gettext("Upload File and Assign Students"),
                 extension: ".csv",
                 url: this.upload_cohorts_csv_url
             });
