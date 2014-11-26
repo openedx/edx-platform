@@ -58,12 +58,16 @@
             <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
             <span class="sts-enrollment-value">${_("Verified")}</span>
           </span>
-          % else:
-          ## TODO: doc review of this messaging
+          % elif verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
           <span class="sts-enrollment" title="${_("Your verification is pending")}">
             <span class="label">${_("Enrolled as: ")}</span>
             <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Pending Ribbon/Badge" />
             <span class="sts-enrollment-value">${_("Verified Pending")}</span>
+          </span>
+          % elif verification_status == VERIFY_STATUS_MISSED_DEADLINE:
+          <span class="sts-enrollment" title="${_("You're enrolled as an honor code student")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <span class="sts-enrollment-value">${_("Honor Code")}</span>
           </span>
           % endif
         % elif enrollment.mode == "honor":

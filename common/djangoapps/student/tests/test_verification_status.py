@@ -201,9 +201,7 @@ class TestCourseVerificationStatus(ModuleStoreTestCase):
         VERIFY_STATUS_NEED_TO_VERIFY: "ID Verified Pending Ribbon/Badge",
         VERIFY_STATUS_SUBMITTED: "ID Verified Pending Ribbon/Badge",
         VERIFY_STATUS_APPROVED: "ID Verified Ribbon/Badge",
-
-        # TODO: do we want to display honor code instead?
-        VERIFY_STATUS_MISSED_DEADLINE: "ID Verified Pending Ribbon/Badge"
+        VERIFY_STATUS_MISSED_DEADLINE: "Honor"
     }
 
     NOTIFICATION_MESSAGES = {
