@@ -186,7 +186,7 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_default_value(self):
-        (__, __, unit, __) = self._setup_course_skeleton()
+        (section, sub_section, unit, __) = self._setup_course_skeleton()
         self.client.login(username=self.username, password=self.password)
 
         url = self._course_status_url()
@@ -195,6 +195,10 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
 
         self.assertEqual(result.status_code, 200)
         self.assertEqual(json_data["last_visited_module_id"], unicode(unit.location))
+        self.assertEqual(
+            json_data["last_visited_module_path"],
+            [unicode(module.location) for module in [unit, sub_section, section, self.course]]
+        )
 
     def test_course_update_no_args(self):
         self.client.login(username=self.username, password=self.password)
