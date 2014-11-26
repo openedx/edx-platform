@@ -251,7 +251,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 fragment.add_frag_resources(rendered_child)
                 contents.append({
                     'id': displayable.location.to_deprecated_string(),
-                    'content': rendered_child.content
+                    'content': rendered_child.content,
                 })
 
         fragment.add_content(self.system.render_template('vert_module.html', {
@@ -273,6 +273,11 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         if is_root:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
+                fragment.add_content(self.system.render_template("library-block-author-preview-header.html", {
+                    'max_count': self.max_count,
+                    'display_name': self.display_name or self.url_name,
+                    'mode': self.mode,
+                }))
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
             else:
                 fragment.add_content(u'<p>{}</p>'.format(
