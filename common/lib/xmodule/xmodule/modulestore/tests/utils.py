@@ -2,7 +2,9 @@
 Helper classes and methods for running modulestore tests without Django.
 """
 from importlib import import_module
+from opaque_keys.edx.keys import UsageKey
 from unittest import TestCase
+from xblock.fields import XBlockMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -40,17 +42,38 @@ def create_modulestore_instance(engine, contentstore, doc_store_config, options,
     )
 
 
+class LocationMixin(XBlockMixin):
+    """
+    Adds a `location` property to an :class:`XBlock` so it is more compatible
+    with old-style :class:`XModule` API. This is a simplified version of
+    :class:`XModuleMixin`.
+    """
+    @property
+    def location(self):
+        """ Get the UsageKey of this block. """
+        return self.scope_ids.usage_id
+
+    @location.setter
+    def location(self, value):
+        """ Set the UsageKey of this block. """
+        assert isinstance(value, UsageKey)
+        self.scope_ids = self.scope_ids._replace(  # pylint: disable=attribute-defined-outside-init,protected-access
+            def_id=value,
+            usage_id=value,
+        )
+
+
 class MixedSplitTestCase(TestCase):
     """
     Stripped-down version of ModuleStoreTestCase that can be used without Django
     (i.e. for testing in common/lib/ ). Sets up MixedModuleStore and Split.
     """
-    RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
+    RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': u'{}: {}, {}'.format(t_n, repr(d), repr(ctx))
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin, InheritanceMixin),
+        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin),
     }
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,

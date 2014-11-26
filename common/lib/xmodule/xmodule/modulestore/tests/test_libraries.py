@@ -6,17 +6,21 @@ Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 from bson.objectid import ObjectId
 import ddt
+from mock import patch
 from opaque_keys.edx.locator import LibraryLocator
+from xblock.fragment import Fragment
+from xblock.runtime import Runtime as VanillaRuntime
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
+from xmodule.x_module import AUTHOR_VIEW
 
 
 @ddt.ddt
 class TestLibraries(MixedSplitTestCase):
     """
     Test for libraries.
-    Mostly tests code found throughout split mongo, but also tests library_module.py
+    Mostly tests code found throughout split mongo, but also tests library_root_xblock.py
     """
     def test_create_library(self):
         """
@@ -166,3 +170,30 @@ class TestLibraries(MixedSplitTestCase):
         lib = self.store.get_library(lib_key, remove_version=False, remove_branch=False)
         version = lib.location.library_key.version_guid
         self.assertIsInstance(version, ObjectId)
+
+    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
+    def test_library_author_view(self):
+        """
+        Test that LibraryRoot.author_view can run and includes content from its
+        children.
+        We have to patch the runtime (module system) in order to be able to
+        render blocks in our test environment.
+        """
+        library = LibraryFactory.create(modulestore=self.store)
+        # Add one HTML block to the library:
+        ItemFactory.create(
+            category="html",
+            parent_location=library.location,
+            user_id=self.user_id,
+            publish_item=False,
+            modulestore=self.store,
+        )
+        library = self.store.get_library(library.location.library_key)
+
+        context = {'reorderable_items': set(), }
+        # Patch the HTML block to always render "Hello world"
+        message = u"Hello world"
+        hello_render = lambda _, context: Fragment(message)
+        with patch('xmodule.html_module.HtmlDescriptor.author_view', hello_render, create=True):
+            result = library.render(AUTHOR_VIEW, context)
+        self.assertIn(message, result.content)

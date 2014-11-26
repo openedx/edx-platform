@@ -554,7 +554,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             fields (dict): Fields to set on the course at initialization - e.g. display_name
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
 
-        Returns: a LibraryDescriptor
+        Returns: a LibraryRoot
         """
         # first make sure an existing course/lib doesn't already exist in the mapping
         lib_key = LibraryLocator(org=org, library=library)

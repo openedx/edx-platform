@@ -1,16 +1,12 @@
 """
-'library' XBlock/XModule
-
-The "library" XBlock/XModule is the root of every content library structure
-tree. All content blocks in the library are its children. It is analagous to
-the "course" XBlock/XModule used as the root of each normal course structure
-tree.
+'library' XBlock (LibraryRoot)
 """
 import logging
 
-from xmodule.vertical_module import VerticalDescriptor, VerticalModule
-
+from .studio_editable import StudioEditableModule
+from xblock.core import XBlock
 from xblock.fields import Scope, String, List
+from xblock.fragment import Fragment
 
 log = logging.getLogger(__name__)
 
@@ -18,9 +14,11 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-class LibraryFields(object):
+class LibraryRoot(XBlock):
     """
-    Fields of the "library" XBlock - see below.
+    The LibraryRoot is the root XBlock of a content library. All other blocks in
+    the library are its children. It contains metadata such as the library's
+    display_name.
     """
     display_name = String(
         help=_("Enter the name of the library as it should appear in Studio."),
@@ -34,19 +32,7 @@ class LibraryFields(object):
         scope=Scope.settings
     )
     has_children = True
-
-
-class LibraryDescriptor(LibraryFields, VerticalDescriptor):
-    """
-    Descriptor for our library XBlock/XModule.
-    """
-    module_class = VerticalModule
-
-    def __init__(self, *args, **kwargs):
-        """
-        Expects the same arguments as XModuleDescriptor.__init__
-        """
-        super(LibraryDescriptor, self).__init__(*args, **kwargs)
+    has_author_view = True
 
     def __unicode__(self):
         return u"Library: {}".format(self.display_name)
@@ -54,13 +40,39 @@ class LibraryDescriptor(LibraryFields, VerticalDescriptor):
     def __str__(self):
         return "Library: {}".format(self.display_name)
 
+    def author_view(self, context):
+        """
+        Renders the Studio preview view, which supports drag and drop.
+        """
+        fragment = Fragment()
+        contents = []
+
+        for child_key in self.children:  # pylint: disable=E1101
+            context['reorderable_items'].add(child_key)
+            child = self.runtime.get_block(child_key)
+            rendered_child = self.runtime.render_child(child, StudioEditableModule.get_preview_view_name(child), context)
+            fragment.add_frag_resources(rendered_child)
+
+            contents.append({
+                'id': unicode(child_key),
+                'content': rendered_child.content,
+            })
+
+        fragment.add_content(self.runtime.render_template("studio_render_children_view.html", {
+            'items': contents,
+            'xblock_context': context,
+            'can_add': True,
+            'can_reorder': True,
+        }))
+        return fragment
+
     @property
     def display_org_with_default(self):
         """
         Org display names are not implemented. This just provides API compatibility with CourseDescriptor.
         Always returns the raw 'org' field from the key.
         """
-        return self.location.course_key.org
+        return self.scope_ids.usage_id.course_key.org
 
     @property
     def display_number_with_default(self):
@@ -68,7 +80,7 @@ class LibraryDescriptor(LibraryFields, VerticalDescriptor):
         Display numbers are not implemented. This just provides API compatibility with CourseDescriptor.
         Always returns the raw 'library' field from the key.
         """
-        return self.location.course_key.library
+        return self.scope_ids.usage_id.course_key.library
 
     @classmethod
     def from_xml(cls, xml_data, system, id_generator):
