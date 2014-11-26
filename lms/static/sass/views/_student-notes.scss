@@ -16,7 +16,7 @@
           display: inline-block;
           width: flex-grid(7,12);
 
-          h1.page-title {
+          .page-title {
             font-weight: $font-light;
 
             .page-subtitle {
@@ -48,10 +48,13 @@
       border-bottom: none;
 
       .note-excerpt {
-        float: left;
+        display: inline-block;
         width: flex-grid(9, 12);
+        vertical-align: top;
 
-        p {
+        .note-excerpt-p,
+        .note-excerpt-ul,
+        .note-excerpt-ol {
           @extend %t-copy-base;
           padding: $baseline;
           background: tint($blue, 85%);
@@ -64,11 +67,11 @@
           list-style: none;
           background: tint($blue, 95%);
 
-          li {
+          .note-comment {
             padding: ($baseline/2) $baseline;
             border-bottom: 2px solid $white;
                             
-            p {
+            .note-comment-p {
               @extend %t-copy-sub1;
               padding: 0;
               margin: 0;
@@ -93,8 +96,9 @@
 
       .reference {
         @extend %t-copy-sub1;
-        float: left;
+        display: inline-block;
         width: flex-grid(3, 12);
+        vertical-align: top;
 
         .wrapper-reference-content {
           padding: 0 $baseline;
@@ -113,7 +117,7 @@
             margin-top: 0;
           }
 
-          a.reference-meta {
+          .reference-meta {
             font-weight: $font-regular;
             color: $gray-l2;
           }
@@ -156,7 +160,7 @@
     .tabs-label {
       @extend %t-copy-base;
       @include line-height(14);
-      float: left;
+      display: inline;
       margin-bottom: 0;
       padding: ($baseline/2) $baseline;
       padding-left: 0;
@@ -165,22 +169,22 @@
 
     .tabs {
       @include clearfix();
-      float: left;
+      display: inline;
       margin: 0;
       padding: 0;
       list-style: none;
 
       .tab {
-        float: left;
+        display: inline;
 
-        a.tab-label {
-          display: block;
+        .tab-label {
+          display: inline-block;
           padding: ($baseline/2) $baseline;
         }
         
         &.is-active {
 
-          a.tab-label {
+          .tab-label {
             color: $gray-d3;
             border-bottom: ($baseline/5) solid $gray-d3;
           }
