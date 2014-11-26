@@ -14,6 +14,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String, List, Integer, Boolean
 from xblock.fragment import Fragment
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.validation import StudioValidationMessage, StudioValidation
 from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
 from .xml_module import XmlDescriptor
@@ -260,6 +261,40 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         }))
         return fragment
 
+    def validate(self):
+        """
+        Validates the state of this Library Content Module Instance. This
+        is the override of the general XBlock method, and it will also ask
+        its superclass to validate.
+        """
+        validation = super(LibraryContentModule, self).validate()
+        if not isinstance(validation, StudioValidation):
+            validation = StudioValidation.copy(validation)
+        if not self.source_libraries:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.NOT_CONFIGURED,
+                    _(u"A library has not yet been selected."),
+                    action_class='edit-button',
+                    action_label=_(u"Select a Library")
+                )
+            )
+            return validation
+        for library_key, version in self.source_libraries:  # pylint: disable=unused-variable
+            library = _get_library(self.runtime.descriptor_runtime.modulestore, library_key)
+            if library is None:
+                validation.set_summary(
+                    StudioValidationMessage(
+                        StudioValidationMessage.ERROR,
+                        _(u'Library is invalid, corrupt, or has been deleted.'),
+                        action_class='edit-button',
+                        action_label=_(u"Edit Library List")
+                    )
+                )
+                break
+
+        return validation
+
     def author_view(self, context):
         """
         Renders the Studio views.
@@ -284,41 +319,31 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                     _('No matching content found in library, no library configured, or not yet loaded from library.')
                 ))
         else:
-            # When shown on a unit page, don't show any sort of preview - just the status of this block.
-            LibraryStatus = enum(  # pylint: disable=invalid-name
-                NONE=0,  # no library configured
-                INVALID=1,  # invalid configuration or library has been deleted/corrupted
-                OK=2,  # library configured correctly and should be working fine
-            )
             UpdateStatus = enum(  # pylint: disable=invalid-name
                 CANNOT=0,  # Cannot update - library is not set, invalid, deleted, etc.
                 NEEDED=1,  # An update is needed - prompt the user to update
                 UP_TO_DATE=2,  # No update necessary - library is up to date
             )
+            # When shown on a unit page, don't show any sort of preview - just the status of this block.
+            library_ok = bool(self.source_libraries)  # True if at least one source library is defined
             library_names = []
-            library_status = LibraryStatus.OK
             update_status = UpdateStatus.UP_TO_DATE
-            if self.source_libraries:
-                for library_key, version in self.source_libraries:
-                    library = _get_library(self.runtime.descriptor_runtime.modulestore, library_key)
-                    if library is None:
-                        library_status = LibraryStatus.INVALID
-                        update_status = UpdateStatus.CANNOT
-                        break
-                    library_names.append(library.display_name)
-                    latest_version = library.location.library_key.version_guid
-                    if version is None or version != latest_version:
-                        update_status = UpdateStatus.NEEDED
-                    # else library is up to date.
-            else:
-                library_status = LibraryStatus.NONE
-                update_status = UpdateStatus.CANNOT
+            for library_key, version in self.source_libraries:
+                library = _get_library(self.runtime.descriptor_runtime.modulestore, library_key)
+                if library is None:
+                    update_status = UpdateStatus.CANNOT
+                    library_ok = False
+                    break
+                library_names.append(library.display_name)
+                latest_version = library.location.library_key.version_guid
+                if version is None or version != latest_version:
+                    update_status = UpdateStatus.NEEDED
+
             fragment.add_content(self.system.render_template('library-block-author-view.html', {
-                'library_status': library_status,
-                'LibraryStatus': LibraryStatus,
-                'update_status': update_status,
-                'UpdateStatus': UpdateStatus,
                 'library_names': library_names,
+                'library_ok': library_ok,
+                'UpdateStatus': UpdateStatus,
+                'update_status': update_status,
                 'max_count': self.max_count,
                 'mode': self.mode,
                 'num_children': len(self.children),  # pylint: disable=no-member
