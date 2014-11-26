@@ -106,6 +106,15 @@
       }
     }
   }
+
+  // UI: visual dividers
+  .divider-lv1 {
+    border-top: ($baseline/10) solid $gray-l4;
+  }
+
+  .divider-lv2 {
+    border-top: ($baseline/20) solid $gray-l4;
+  }
 }
 
 // instructor dashboard 2
@@ -307,6 +316,12 @@ section.instructor-dashboard-content-2 {
       color: $gray;
     }
   }
+
+  .subsection-title {
+    @extend %hd-lv5;
+    @extend %t-weight4;
+    margin-bottom: ($baseline/2);
+  }
 }
 
 
@@ -430,7 +445,7 @@ section.instructor-dashboard-content-2 {
       .tip {
         @extend %t-copy-sub1;
         margin-top: ($baseline/4);
-        color: $gray-l3;
+        color: $gray-l2;
       }
 
       .field-text {
@@ -444,6 +459,10 @@ section.instructor-dashboard-content-2 {
           width: 100%;
           padding: ($baseline/2) ($baseline*0.75);
         }
+      }
+
+      .input-file {
+        margin-bottom: ($baseline/2);
       }
     }
 
@@ -482,10 +501,10 @@ section.instructor-dashboard-content-2 {
 
     .action-create {
       @include idashbutton($blue);
+      @extend %t-weight4;
       float: right;
       text-align: right;
       text-shadow: none;
-      font-weight: 600;
     }
 
     // STATE: is disabled
@@ -642,6 +661,42 @@ section.instructor-dashboard-content-2 {
     }
   }
 
+  // CSV-based file upload for auto cohort assigning
+  .cohort-management-file-upload {
+
+    .message-title {
+      @extend %t-title7;
+    }
+
+    .form-introduction {
+      @extend %t-copy-sub1;
+      margin-bottom: $baseline;
+
+      p {
+        color: $gray-l1;
+      }
+    }
+  }
+
+  .cohort-management-file-upload-form {
+    @extend %cohort-management-form;
+    border: 1px solid $gray-l5;
+    padding: $baseline ($baseline*0.75);
+
+    .form-fields {
+      margin-bottom: $baseline;
+    }
+
+    .action-submit {
+      @include idashbutton($blue);
+      // needed to override very poor specificity and base rules for blue button
+      @include font-size(14);
+      margin-bottom: 0;
+      // float: right;
+      font-weight: 700;
+      text-shadow: none;
+    }
+  }
 
   .cohort-management-supplemental {
     @extend %t-copy-sub1;

@@ -1,11 +1,25 @@
-<div>
-    <h2><%- model.get('title') %></h2>
+<div class="wrapper-form">
+  <h3 class="form-title"><%- model.get('title') %></h3>
+  <div class="form-introduction">
     <p><%- model.get('description') %></p>
-    <form id="upload-file-form" method="post" action="<%= model.get('url') %>" enctype="multipart/form-data">
-        <!--Note to Brian-- I saw this "a" ref in other examples we had, but I have no idea why we want both it and the input. If we do...-->
-        <!--<a href="#" class="choose-file-button"><%- gettext('Choose File') %></a>-->
-        <input class="file_field" name="uploaded-file" type="file" accept="<%- model.get('extension') %>"/>
-        <button type="submit" class="submit-file-button"><%- gettext('Upload File') %></button>
-    </form>
-    <div class="result"></div>
+  </div>
+
+  <div class="file-upload-form-result result">
+
+  </div>
+
+  <form class="file-upload-form" id="file-upload-form" method="post" action="<%= model.get('url') %>" enctype="multipart/form-data">
+
+      <div class="form-fields">
+        <div class="field field-file is-required">
+          <label class="field-label" for="file-upload-form-file"><%- gettext('Choose a .csv file') %></label>
+          <input id="file-upload-form-file" class="input input-file" name="uploaded-file" type="file" accept="<%- model.get('extension') %>"/>
+          <span class="tip tip-stacked"><%- gettext('Only properly formatted .csv files will be accepted.') %></span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button id="file-upload-form-submit" type="submit" class="submit-file-button action action-primary action-submit"><%- gettext('Upload File and Assign Students') %></button>
+      </div>
+  </form>
 </div>
