@@ -37,7 +37,7 @@
             });
             var fileUploaderView = new FileUploaderView({
                 model: fileUploaderModel,
-                el: this.$('.csv-upload'),
+                el: this.$('.cohort-management-file-upload'),
                 successNotification: function (file, event, data) {
                     var message = interpolate_text(gettext("Your file '{file}' has been uploaded. Go check... in 5 minutes."), {file: file});
                     return new NotificationModel({

@@ -3,8 +3,6 @@
     <span class="description"></span>
 </h2>
 
-<div class="csv-upload"></div>
-
 <!-- nav -->
 <div class="cohort-management-nav">
     <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
@@ -37,4 +35,10 @@
             true
         ) %>
     </p>
+</div>
+
+<hr class="divider" />
+
+<div class="cohort-management-file-upload">
+
 </div>
