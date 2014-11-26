@@ -5,11 +5,16 @@ but does NOT include basic account information such as username, password, and
 email address.
 
 """
+import datetime
+from django.conf import settings
+from django.db import IntegrityError
+import logging
+from pytz import UTC
 
-
-from user_api.models import User, UserProfile, UserPreference
+from user_api.models import User, UserProfile, UserPreference, UserOrgTag
 from user_api.helpers import intercept_errors
 
+log = logging.getLogger(__name__)
 
 class ProfileRequestError(Exception):
     """ The request to the API was not valid. """
@@ -155,3 +160,45 @@ def update_preferences(username, **kwargs):
     else:
         for key, value in kwargs.iteritems():
             UserPreference.set_preference(user, key, value)
+
+
+@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
+def update_email_opt_in(username, org, optin):
+    """Updates a user's preference for receiving org-wide emails.
+
+    Sets a User Org Tag defining the choice to opt in or opt out of organization-wide
+    emails.
+
+    Args:
+        username (str): The user to set a preference for.
+        org (str): The org is used to determine the organization this setting is related to.
+        optin (boolean): True if the user is choosing to receive emails for this organization. If the user is not
+            the correct age to receive emails, email-optin is set to False regardless.
+
+    Returns:
+        None
+
+    Raises:
+        ProfileUserNotFound: Raised when the username specified is not associated with a user.
+
+    """
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise ProfileUserNotFound
+
+    profile = UserProfile.objects.get(user=user)
+    of_age = (
+        profile.year_of_birth is None or  # If year of birth is not set, we assume user is of age.
+        datetime.datetime.now(UTC).year - profile.year_of_birth >=  # pylint: disable=maybe-no-member
+        getattr(settings, 'EMAIL_OPTIN_MINIMUM_AGE', 13)
+    )
+
+    try:
+        preference, _ = UserOrgTag.objects.get_or_create(
+            user=user, org=org, key='email-optin'
+        )
+        preference.value = str(optin and of_age)
+        preference.save()
+    except IntegrityError as err:
+        log.warn(u"Could not update organization wide preference due to IntegrityError: {}".format(err.message))
