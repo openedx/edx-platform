@@ -12,10 +12,12 @@ define(
                 appendSetFixtures($("<script>", {id: "active-video-upload-list-tpl", type: "text/template"}).text(activeVideoUploadListTpl));
                 appendSetFixtures(sandbox());
                 this.postUrl = "/test/post/url";
+                this.uploadButton = $("<button>");
                 this.view = new ActiveVideoUploadListView({
                     el: $("#sandbox"),
                     concurrentUploadLimit: concurrentUploadLimit,
-                    postUrl: this.postUrl
+                    postUrl: this.postUrl,
+                    uploadButton: this.uploadButton
                 });
                 this.view.render();
                 jasmine.Ajax.useMock();
@@ -24,11 +26,14 @@ define(
                 $(document).ajaxError(this.globalAjaxError);
             });
 
-            it("should trigger file selection when the upload button is clicked", function() {
+            it("should trigger file selection when either upload button clicked", function() {
                 var clickSpy = jasmine.createSpy();
                 clickSpy.andCallFake(function(event) { event.preventDefault(); });
                 this.view.$(".js-file-input").on("click", clickSpy);
                 this.view.$(".js-upload-button").click();
+                expect(clickSpy).toHaveBeenCalled();
+                clickSpy.reset();
+                this.uploadButton.click();
                 expect(clickSpy).toHaveBeenCalled();
             });
 
@@ -83,7 +88,7 @@ define(
                             expect(JSON.parse(this.request.params)).toEqual({
                                 "files": _.map(
                                     fileNames,
-                                    function(fileName) { return {"file-name": fileName}; }
+                                    function(fileName) { return {"file_name": fileName}; }
                                 )
                             });
                         });

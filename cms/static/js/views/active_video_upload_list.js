@@ -15,6 +15,9 @@ define(
                 this.listenTo(this.collection, "add", this.renderUpload);
                 this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
                 this.postUrl = options.postUrl;
+                if (options.uploadButton) {
+                    options.uploadButton.click(this.chooseFile.bind(this));
+                }
             },
 
             render: function() {

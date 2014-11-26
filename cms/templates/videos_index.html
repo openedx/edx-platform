@@ -23,12 +23,13 @@
 
 <%block name="requirejs">
     require(
-        ["backbone", "js/views/active_video_upload_list", "js/views/previous_video_upload_list"],
-        function (Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView) {
+        ["jquery", "backbone", "js/views/active_video_upload_list", "js/views/previous_video_upload_list"],
+        function ($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView) {
             $contentWrapper = $(".content-primary");
             activeView = new ActiveVideoUploadListView({
                 postUrl: "${post_url}",
-                concurrentUploadLimit: ${concurrent_upload_limit}
+                concurrentUploadLimit: ${concurrent_upload_limit},
+                uploadButton: $(".nav-actions .upload-button")
             });
             $contentWrapper.append(activeView.render().$el);
             var previousCollection = new Backbone.Collection($contentWrapper.data("previous-uploads"));
@@ -46,6 +47,15 @@
             <small class="subtitle">${_("Content")}</small>
             <span class="sr">&gt; </span>${_("Video Uploads")}
         </h1>
+
+        <nav class="nav-actions">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="button upload-button new-button"><i class="icon-plus"></i> ${_("Upload New File")}</a>
+                </li>
+            </ul>
+        </nav>
     </header>
 </div>
 
