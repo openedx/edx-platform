@@ -13,14 +13,21 @@ define(
                 this.template = this.loadTemplate("previous-video-upload");
             },
 
+            renderDuration: function(seconds) {
+                var minutes = Math.floor(seconds/ 60);
+                var seconds = Math.floor(seconds - minutes * 60);
+
+                return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+            },
+
             render: function() {
                 var duration = this.model.get("duration");
                 var renderedAttributes = {
                     // Translators: This is listed as the duration for a video that has not yet
                     // gotten far enough in the pipeline to have had its duration determined.
-                    duration: duration > 0 ? duration : i18n.gettext("Pending"),
+                    duration: duration > 0 ? this.renderDuration(duration) : i18n.gettext("Pending"),
                     created: Date.parse(this.model.get("created")).toLocaleString(
-                        {},
+                        [],
                         {timeZone: "UTC", timeZoneName: "short"}
                     ),
                     // Translators: This is the status label for a video upload with a status
