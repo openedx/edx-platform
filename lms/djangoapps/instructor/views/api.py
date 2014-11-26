@@ -1137,6 +1137,7 @@ def generate_registration_codes(request, course_id):
         'sale_price': sale_price,
         'quantity': quantity,
         'registration_codes': registration_codes,
+        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'course_url': course_url,
         'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         'dashboard_url': dashboard_url,

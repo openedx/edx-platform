@@ -40,10 +40,10 @@ from django.utils.translation import ugettext as _
             <div class="col-1">
                 % if item.list_price != None:
                 <% discount_applied = True %>
-                <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span></div>
-                <div class="price green">${_('Discount Applied:')} <span>  $${"{0:0.2f}".format(item.unit_cost)} </span></div>
+                <div class="price">${_('Price per student:')} <span class="line-through">  ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span></div>
+                <div class="price green">${_('Discount Applied:')} <span>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)} </span></div>
                 % else:
-                <div class="price">${_('Price per student:')} <span>  $${"{0:0.2f}".format(item.unit_cost)}</span></div>
+                <div class="price">${_('Price per student:')} <span>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}</span></div>
                 % endif
             </div>
             <div class="col-2">
@@ -82,7 +82,7 @@ from django.utils.translation import ugettext as _
               <input type="submit" value="Reset" class="blue-border" id="submit-reset-redemption">
            </div>
             %endif
-              <span class="pull-right">${_('Total:')} <b id="total-amount">$${"{0:0.2f}".format(amount)} USD</b></span>
+              <span class="pull-right">${_('Total:')} <b id="total-amount">${currency_symbol}${"{0:0.2f}".format(amount)} ${currency.upper()}</b></span>
           </div>
       </div>
       <div class="col-two">
