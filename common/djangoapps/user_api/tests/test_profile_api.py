@@ -174,8 +174,6 @@ class ProfileApiTest(TestCase):
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
         self.assertEqual(result_obj.value, expected_result)
 
-
-
     @raises(profile_api.ProfileUserNotFound)
     def test_retrieve_and_update_preference_info_no_user(self):
         preferences = profile_api.preference_info(self.USERNAME)
