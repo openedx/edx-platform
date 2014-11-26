@@ -32,7 +32,7 @@ def create_cert_course():
         min_price=16,
         suggested_prices='32,64,128',
         currency='usd',
-        )
+    )
 
 
 def register():

@@ -50,8 +50,10 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.tabssection = ItemFactory.create(parent=self.chapterchrome,
                                               display_name='tabs',
                                               chrome='tabs')
-        self.defaultchromesection = ItemFactory.create(parent=self.chapterchrome,
-                                             display_name='defaultchrome')
+        self.defaultchromesection = ItemFactory.create(
+            parent=self.chapterchrome,
+            display_name='defaultchrome',
+        )
         self.fullchromesection = ItemFactory.create(parent=self.chapterchrome,
                                                     display_name='fullchrome',
                                                     chrome='accordion,tabs')
@@ -79,7 +81,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         ''' Check if the progress tab is active in the tab set '''
         for line in response.content.split('\n'):
             if tabname in line and 'active' in line:
-                raise AssertionError("assertTabInactive failed: "+tabname+" active")
+                raise AssertionError("assertTabInactive failed: " + tabname + " active")
         return
 
     def test_chrome_settings(self):

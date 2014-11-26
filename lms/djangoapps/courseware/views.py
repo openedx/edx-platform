@@ -49,6 +49,7 @@ from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEnd
 from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
 from shoppingcart.models import CourseRegistrationCode
+from shoppingcart.utils import is_shopping_cart_enabled
 from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
@@ -56,6 +57,10 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
 
 from util.db import commit_on_success_with_read_committed
+
+import survey.utils
+import survey.views
+
 from util.views import ensure_valid_course_key
 log = logging.getLogger("edx.courseware")
 
@@ -215,6 +220,26 @@ def save_child_position(seq_module, child_name):
     seq_module.save()
 
 
+def save_positions_recursively_up(user, request, field_data_cache, xmodule):
+    """
+    Recurses up the course tree starting from a leaf
+    Saving the position property based on the previous node as it goes
+    """
+    current_module = xmodule
+
+    while current_module:
+        parent_location = modulestore().get_parent_location(current_module.location)
+        parent = None
+        if parent_location:
+            parent_descriptor = modulestore().get_item(parent_location)
+            parent = get_module_for_descriptor(user, request, parent_descriptor, field_data_cache, current_module.location.course_key)
+
+        if parent and hasattr(parent, 'position'):
+            save_child_position(parent, current_module.location.name)
+
+        current_module = parent
+
+
 def chat_settings(course, user):
     """
     Returns a dict containing the settings required to connect to a
@@ -303,12 +328,18 @@ def index(request, course_id, chapter=None, section=None,
 
 def _index_bulk_op(request, user, course_key, chapter, section, position):
     course = get_course_with_access(user, 'load', course_key, depth=2)
+
     staff_access = has_access(user, 'staff', course)
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
+
+    # check to see if there is a required survey that must be taken before
+    # the user can access the course.
+    if survey.utils.must_answer_survey(course, user):
+        return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
     masq = setup_masquerade(request, staff_access)
 
@@ -573,6 +604,12 @@ def course_info(request, course_id):
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
+
+        # check to see if there is a required survey that must be taken before
+        # the user can access the course.
+        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
+            return redirect(reverse('course_survey', args=[unicode(course.id)]))
+
         staff_access = has_access(request.user, 'staff', course)
         masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
         reverifications = fetch_reverify_banner_info(request, course_key)
@@ -685,7 +722,12 @@ def course_about(request, course_id):
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'see_exists', course_key)
+
+    permission_name = microsite.get_value(
+        'COURSE_ABOUT_VISIBILITY_PERMISSION',
+        settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+    )
+    course = get_course_with_access(request.user, permission_name, course_key)
 
     if microsite.get_value(
         'ENABLE_MKTG_SITE',
@@ -694,6 +736,7 @@ def course_about(request, course_id):
         return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
     registered = registered_for_course(course, request.user)
+
     staff_access = has_access(request.user, 'staff', course)
     studio_url = get_studio_url(course, 'settings/details')
 
@@ -709,8 +752,9 @@ def course_about(request, course_id):
     registration_price = 0
     in_cart = False
     reg_then_add_to_cart_link = ""
-    if (settings.FEATURES.get('ENABLE_SHOPPING_CART') and
-        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+
+    _is_shopping_cart_enabled = is_shopping_cart_enabled()
+    if (_is_shopping_cart_enabled):
         registration_price = CourseMode.min_course_price_for_currency(course_key,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
@@ -749,9 +793,11 @@ def course_about(request, course_id):
         'invitation_only': invitation_only,
         'active_reg_button': active_reg_button,
         'is_shib_course': is_shib_course,
-         # We do not want to display the internal courseware header, which is used when the course is found in the
-         # context. This value is therefor explicitly set to render the appropriate header.
+        # We do not want to display the internal courseware header, which is used when the course is found in the
+        # context. This value is therefor explicitly set to render the appropriate header.
         'disable_courseware_header': True,
+        'is_shopping_cart_enabled': _is_shopping_cart_enabled,
+        'cart_link': reverse('shoppingcart.views.show_cart'),
     })
 
 
@@ -766,8 +812,12 @@ def mktg_course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
-        course = get_course_with_access(request.user, 'see_exists', course_key)
-    except (ValueError, Http404) as e:
+        permission_name = microsite.get_value(
+            'COURSE_ABOUT_VISIBILITY_PERMISSION',
+            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+        )
+        course = get_course_with_access(request.user, permission_name, course_key)
+    except (ValueError, Http404):
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response(
@@ -812,6 +862,7 @@ def mktg_course_about(request, course_id):
         if force_english:
             translation.deactivate()
 
+
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @transaction.commit_manually
@@ -838,6 +889,12 @@ def _progress(request, course_key, student_id):
     Course staff are allowed to see the progress of students in their class.
     """
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
+
+    # check to see if there is a required survey that must be taken before
+    # the user can access the course.
+    if survey.utils.must_answer_survey(course, request.user):
+        return redirect(reverse('course_survey', args=[unicode(course.id)]))
+
     staff_access = has_access(request.user, 'staff', course)
 
     if student_id is None or student_id == request.user.id:
@@ -1061,3 +1118,30 @@ def get_course_lti_endpoints(request, course_id):
     ]
 
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
+
+
+@login_required
+def course_survey(request, course_id):
+    """
+    URL endpoint to present a survey that is associated with a course_id
+    Note that the actual implementation of course survey is handled in the
+    views.py file in the Survey Djangoapp
+    """
+
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
+
+    redirect_url = reverse('info', args=[course_id])
+
+    # if there is no Survey associated with this course,
+    # then redirect to the course instead
+    if not course.course_survey_name:
+        return redirect(redirect_url)
+
+    return survey.views.view_student_survey(
+        request.user,
+        course.course_survey_name,
+        course=course,
+        redirect_url=redirect_url,
+        is_required=course.course_survey_required,
+    )

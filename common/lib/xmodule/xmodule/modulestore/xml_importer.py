@@ -390,6 +390,7 @@ def _import_static_content_wrapper(static_content_store, do_import_static, cours
             dest_course_id, subpath=simport, verbose=verbose
         )
 
+
 def _import_module_and_update_references(
         module, store, user_id,
         source_course_id, dest_course_id,

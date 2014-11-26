@@ -5,8 +5,9 @@ navigation.  We want to do this in the context_processor to
 1) keep database accesses out of templates (this led to a transaction bug with user email changes)
 2) because navigation.html is "called" by being included in other templates, there's no "views.py" to put this.
 """
-from django.conf import settings
-import shoppingcart
+
+from .models import Order, PaidCourseRegistration, CourseRegCodeItem
+from .utils import is_shopping_cart_enabled
 
 
 def user_has_cart_context_processor(request):
@@ -15,12 +16,16 @@ def user_has_cart_context_processor(request):
     be displayed.  Anonymous users don't.
     Adds `display_shopping_cart` to the context
     """
-    return {'display_shopping_cart': (
-        request.user.is_authenticated() and                                # user is logged in and
-        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and  # settings enable paid course reg and
-        settings.FEATURES.get('ENABLE_SHOPPING_CART') and             # settings enable shopping cart and
-        shoppingcart.models.Order.user_cart_has_items(
+    display_shopping_cart = (
+        # user is logged in and
+        request.user.is_authenticated() and
+        # do we have the feature turned on
+        is_shopping_cart_enabled() and
+        # user's cart has PaidCourseRegistrations
+        Order.user_cart_has_items(
             request.user,
-            [shoppingcart.models.PaidCourseRegistration, shoppingcart.models.CourseRegCodeItem]
-        )  # user's cart has PaidCourseRegistrations
-    )}
+            [PaidCourseRegistration, CourseRegCodeItem]
+        )
+    )
+
+    return {'display_shopping_cart': display_shopping_cart}

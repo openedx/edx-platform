@@ -40,6 +40,7 @@ import lxml.etree
 
 from singledispatch import singledispatch
 
+
 @singledispatch
 def assert_student_view_valid_html(block, html):
     """

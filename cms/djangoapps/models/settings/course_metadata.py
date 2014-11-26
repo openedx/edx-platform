@@ -14,23 +14,24 @@ class CourseMetadata(object):
     # The list of fields that wouldn't be shown in Advanced Settings.
     # Should not be used directly. Instead the filtered_list method should be used if the field needs to be filtered
     # depending on the feature flag.
-    FILTERED_LIST = ['xml_attributes',
-                     'start',
-                     'end',
-                     'enrollment_start',
-                     'enrollment_end',
-                     'tabs',
-                     'graceperiod',
-                     'checklists',
-                     'show_timezone',
-                     'format',
-                     'graded',
-                     'hide_from_toc',
-                     'pdf_textbooks',
-                     'user_partitions',
-                     'name',  # from xblock
-                     'tags',  # from xblock
-                     'visible_to_staff_only'
+    FILTERED_LIST = [
+        'xml_attributes',
+        'start',
+        'end',
+        'enrollment_start',
+        'enrollment_end',
+        'tabs',
+        'graceperiod',
+        'checklists',
+        'show_timezone',
+        'format',
+        'graded',
+        'hide_from_toc',
+        'pdf_textbooks',
+        'user_partitions',
+        'name',  # from xblock
+        'tags',  # from xblock
+        'visible_to_staff_only',
     ]
 
     @classmethod

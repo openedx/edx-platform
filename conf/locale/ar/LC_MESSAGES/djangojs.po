@@ -49,6 +49,7 @@
 # 
 # Translators:
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
+# qrfahasan <ahasan@qrf.org>, 2014
 # mohammad hamdi <babrica@hotmail.com>, 2014
 # may <may@qordoba.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014
@@ -67,8 +68,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-10-27 10:49-0400\n"
-"PO-Revision-Date: 2014-10-13 16:51+0000\n"
+"POT-Creation-Date: 2014-11-10 09:06-0500\n"
+"PO-Revision-Date: 2014-11-05 10:01+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -87,7 +88,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
-msgstr "حسناً"
+msgstr "حسنًا"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -100,8 +101,6 @@ msgstr "حسناً"
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/course_info_handouts.underscore
@@ -119,9 +118,9 @@ msgstr "إلغاء"
 msgid "This link will open in a new browser window/tab"
 msgstr ""
 "#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
-"هذا الرابط سيُفتح في نافذة متصفح /علامة تبويب جديدة\n"
+"سوف يُفتَح هذا الرابط في نافذة متصفح/صفحة جديدة\n"
 "#-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#\n"
-"سيُفتح هذا الرابط في نافذة متصفّح/علامة تبويب جديدة"
+"سيُفتح هذا الرابط في نافذة متصفّح/صفحة جديدة"
 
 #: cms/static/js/factories/manage_users.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
@@ -214,7 +213,7 @@ msgstr[5] "(%(earned)s/%(possible)s نقاط)"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
-msgstr[0] "(%(num_points)s نقاط محتملة)"
+msgstr[0] "(%(num_points)s نقطة محتملة)"
 msgstr[1] "(%(num_points)s نقطة محتملة)"
 msgstr[2] "(%(num_points)s نقطة محتملة)"
 msgstr[3] "(%(num_points)s نقطة محتملة)"
@@ -237,7 +236,7 @@ msgstr "إخفاء الإجابات"
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr "أظهر الإجابات"
+msgstr "إظهار الإجابات"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Reveal Answer"
@@ -1743,32 +1742,32 @@ msgstr "انتهى الفيديو"
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] "ساعات %(value)s"
-msgstr[1] "ساعة %(value)s"
-msgstr[2] "ساعتان %(value)s"
-msgstr[3] "ساعات %(value)s"
-msgstr[4] "ساعات %(value)s"
-msgstr[5] "ساعات %(value)s"
+msgstr[0] "%(value)s ساعة"
+msgstr[1] "%(value)s ساعة "
+msgstr[2] "%(value)s ساعة"
+msgstr[3] " %(value)s ساعات"
+msgstr[4] "%(value)s ساعات "
+msgstr[5] "%(value)s ساعات "
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] "دقائق %(value)s"
-msgstr[1] "دقيقة %(value)s"
-msgstr[2] "دقيقتان %(value)s"
-msgstr[3] "دقائق %(value)s"
-msgstr[4] "دقائق %(value)s"
-msgstr[5] "دقائق %(value)s"
+msgstr[0] "%(value)s دقيقة"
+msgstr[1] "%(value)s دقيقة "
+msgstr[2] "%(value)s دقيقة"
+msgstr[3] "%(value)s دقائق "
+msgstr[4] "%(value)s دقائق "
+msgstr[5] "%(value)s دقائق "
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] "ثواني %(value)s"
-msgstr[1] "ثانية %(value)s"
-msgstr[2] "ثانيتان %(value)s"
-msgstr[3] "ثواني %(value)s"
-msgstr[4] "ثواني %(value)s"
-msgstr[5] "ثواني %(value)s"
+msgstr[0] "%(value)s ثانية"
+msgstr[1] "%(value)s ثانية "
+msgstr[2] "%(value)s ثانية"
+msgstr[3] "%(value)s ثواني "
+msgstr[4] "%(value)s ثواني "
+msgstr[5] "%(value)s ثواني "
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
@@ -1784,7 +1783,7 @@ msgstr "إيقاف العناوين الفرعية"
 
 #: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
 msgid "Creating missing groups&hellip;"
-msgstr "إنشاء المجموعات الناقصة&hellip؛"
+msgstr "إنشاء المجموعات الناقصة&hellip;"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
@@ -1848,9 +1847,9 @@ msgstr "..."
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "currently %(numVotes)s vote"
 msgid_plural "currently %(numVotes)s votes"
-msgstr[0] "يوجد %(صفر)s صوت"
-msgstr[1] "يوجد صوت %(واحد)s"
-msgstr[2] "يوجد صوتان %(اثنان)s"
+msgstr[0] "يوجد %(numVotes)s صوت"
+msgstr[1] "يوجد %(numVotes)s صوت"
+msgstr[2] "يوجد %(numVotes)s صوت"
 msgstr[3] "يوجد %(numVotes)s أصوات"
 msgstr[4] "يوجد %(numVotes)s أصوات"
 msgstr[5] "يوجد %(numVotes)s صوت"
@@ -1858,11 +1857,11 @@ msgstr[5] "يوجد %(numVotes)s صوت"
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
 msgid_plural "%(numVotes)s Votes"
-msgstr[0] "%(صفر)s أصوات"
-msgstr[1] "صوت %(واحد)s"
-msgstr[2] "صوتان %(اثنان)s"
-msgstr[3] "%(بعض)s الأصوات"
-msgstr[4] "%(عدة)s أصوات"
+msgstr[0] "%(numVotes)s صوت"
+msgstr[1] "%(numVotes)s صوت "
+msgstr[2] "%(numVotes)s صوت"
+msgstr[3] "%(numVotes)s أصوات"
+msgstr[4] "%(numVotes)s أصوات"
 msgstr[5] "%(numVotes)s صوت"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
@@ -1942,12 +1941,12 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
-msgstr[0] "تعليق جديد %(unread_count)s"
-msgstr[1] "تعليق جديد %(unread_count)s"
-msgstr[2] "تعليق جديد %(unread_count)s"
-msgstr[3] "تعليق جديد %(unread_count)s"
-msgstr[4] "تعليق جديد %(unread_count)s"
-msgstr[5] "تعليقات جديدة %(unread_count)s"
+msgstr[0] "%(unread_count)s تعليق جديد "
+msgstr[1] "%(unread_count)s تعليق جديد"
+msgstr[2] "%(unread_count)s تعليقات جديدة"
+msgstr[3] "%(unread_count)s تعليقات جديدة"
+msgstr[4] " %(unread_count)s تعليقات جديدة"
+msgstr[5] " %(unread_count)s تعليقات جديدة"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Search Results"
@@ -1989,22 +1988,22 @@ msgstr "هناك مشكلة ما في عملية تحميل المزيد من ا
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s other response"
 msgid_plural "%(numResponses)s other responses"
-msgstr[0] "%(صفر)s ردود أخرى"
-msgstr[1] "رد %(واحد)s آخر"
-msgstr[2] "ردّان %(اثنان)s آخران"
-msgstr[3] "%(بعض)s الردود الأخرى"
-msgstr[4] "%(عدة)s ردود أخرى"
+msgstr[0] "%(numResponses)s ردود أخرى"
+msgstr[1] "%(numResponses)s ردّ آخر"
+msgstr[2] "%(numResponses)s ردّ آخر"
+msgstr[3] "%(numResponses)s ردود أخرى"
+msgstr[4] "%(numResponses)s ردود أخرى"
 msgstr[5] "%(numResponses)s ردود أخرى"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
-msgstr[0] "ردود %(numResponses)s"
-msgstr[1] "ردود %(numResponses)s"
-msgstr[2] "ردود %(numResponses)s"
-msgstr[3] "ردود %(numResponses)s"
-msgstr[4] "ردود %(numResponses)s"
-msgstr[5] "ردود %(numResponses)s"
+msgstr[0] "%(numResponses)s ردّ"
+msgstr[1] "%(numResponses)s ردّ"
+msgstr[2] "%(numResponses)s ردّ"
+msgstr[3] "%(numResponses)s ردود"
+msgstr[4] "%(numResponses)s ردود "
+msgstr[5] "%(numResponses)s ردود "
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
@@ -2100,7 +2099,7 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d دقيقة"
 msgstr[1] "%d دقيقة"
-msgstr[2] "%d دقيقتين"
+msgstr[2] "%d دقيقة"
 msgstr[3] "%d دقائق "
 msgstr[4] "%d دقيقة"
 msgstr[5] "%d دقيقة"
@@ -2114,7 +2113,7 @@ msgid "about %d hour"
 msgid_plural "about %d hours"
 msgstr[0] "حوالي %d ساعة"
 msgstr[1] "حوالي %d ساعة"
-msgstr[2] "حوالي %d ساعتين"
+msgstr[2] "حوالي %d ساعة"
 msgstr[3] "حوالي %d ساعات"
 msgstr[4] "حوالي %d ساعة"
 msgstr[5] "حوالي %d ساعة"
@@ -2127,8 +2126,8 @@ msgstr "يوم واحد"
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d يوم"
-msgstr[1] "%d يوم واحد"
-msgstr[2] "%d يومين"
+msgstr[1] "%d يوم"
+msgstr[2] "%d يوم"
 msgstr[3] "%d أيام"
 msgstr[4] "%d يوم"
 msgstr[5] "%d يوم"
@@ -2141,10 +2140,10 @@ msgstr "حوالي الشهر"
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d شهر"
-msgstr[1] "%d شهر واحد"
-msgstr[2] "%d شهرين"
+msgstr[1] "%d شهر"
+msgstr[2] "%d شهر"
 msgstr[3] "%d أشهر"
-msgstr[4] "%d شهر"
+msgstr[4] "%d أشهر"
 msgstr[5] "%d شهر"
 
 #: common/static/js/src/jquery.timeago.locale.js
@@ -2171,11 +2170,11 @@ msgstr "انقر على مربع الاختيار لإزالة جميع الإب
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(totalFlags)s flag."
 msgid_plural "Check the box to remove %(totalFlags)s flags."
-msgstr[0] "انقر مربع الاختيار لإزالة %(صفر)s إبلاغ."
-msgstr[1] "انقر مربع الاختيار لإزالة إبلاغ %(واحد)s "
-msgstr[2] "انقر مربع الاختيار لإزالة إبلاغين %(اثنين)s"
-msgstr[3] "انقر مربع الاختيار لإزالة %(بضعة)s إبلاغات"
-msgstr[4] "انقر مربع الاختيار لإزالة %(عدة)s إبلاغات"
+msgstr[0] "انقر مربع الاختيار لإزالة %(totalFlags)s إبلاغ."
+msgstr[1] "انقر مربع الاختيار لإزالة %(totalFlags)s إبلاغ"
+msgstr[2] "انقر مربع الاختيار لإزالة %(totalFlags)s إبلاغ"
+msgstr[3] "انقر مربع الاختيار لإزالة %(totalFlags)s إبلاغات"
+msgstr[4] "انقر مربع الاختيار لإزالة %(totalFlags)s إبلاغات"
 msgstr[5] "انقر مربع الاختيار لإزالة %(totalFlags)s إبلاغات"
 
 #. Translators: 'count' is the number of flags solely for that annotation that
@@ -2183,11 +2182,11 @@ msgstr[5] "انقر مربع الاختيار لإزالة %(totalFlags)s إبل
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(count)s flag."
 msgid_plural "Check the box to remove %(count)s flags."
-msgstr[0] "انقر مربع الاختيار لإزالة %(صفر)s إبلاغ"
-msgstr[1] "انقر مربع الاختيار لإزالة إبلاغ %(واحد)s"
-msgstr[2] "انقر مربع الاختيار لإزالة إبلاغين %(اثنين)s"
-msgstr[3] "انقر مربع الاختيار لإزالة %(بضعة)s إبلاغات"
-msgstr[4] "انقر مربع الاختيار لإزالة %(عدة)s إبلاغات"
+msgstr[0] "انقر مربع الاختيار لإزالة %(count)s إبلاغ"
+msgstr[1] "انقر مربع الاختيار لإزالة %(count)s إبلاغ "
+msgstr[2] "انقر مربع الاختيار لإزالة %(count)s إبلاغ"
+msgstr[3] "انقر مربع الاختيار لإزالة %(count)s إبلاغ"
+msgstr[4] "انقر مربع الاختيار لإزالة %(count)s إبلاغ"
 msgstr[5] "انقر مربع الاختيار لإزالة %(count)s إبلاغات"
 
 #: common/static/js/vendor/ova/flagging-annotator.js
@@ -2208,11 +2207,11 @@ msgstr "الإبلاغ عن الملاحظات التوضيحية على أنه�
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "This annotation has %(count)s flag."
 msgid_plural "This annotation has %(count)s flags."
-msgstr[0] "يوجد %(صفر)s إبلاغ على هذه الملاحظات التوضيحية"
-msgstr[1] "يوجد إبلاغ %(واحد)s على هذه الملاحظات التوضيحية"
-msgstr[2] "يوجد إبلاغان %(اثنان)s على هذه الملاحظات التوضيحية"
-msgstr[3] "توجد %(بضعة)s إبلاغات على هذه الملاحظات التوضيحية"
-msgstr[4] "توجد %(عدة)s إبلاغات على هذه الملاحظات التوضيحية"
+msgstr[0] "يوجد %(count)s إبلاغ على هذه الملاحظات التوضيحية"
+msgstr[1] "يوجد %(count)s إبلاغ على هذه الملاحظات التوضيحية"
+msgstr[2] "يوجد %(count)s إبلاغ على هذه الملاحظات التوضيحية"
+msgstr[3] "توجد %(count)s إبلاغات على هذه الملاحظات التوضيحية"
+msgstr[4] "توجد %(count)s إبلاغات على هذه الملاحظات التوضيحية"
 msgstr[5] "يوجد %(count)s إبلاغات على هذه الملاحظات التوضيحية"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
@@ -2310,169 +2309,6 @@ msgstr "الرد"
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Tags:"
 msgstr "بطاقات التعريف:"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Available %s"
-msgstr "%s متاح "
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
-msgstr ""
-" هذه قائمة بالـ %s المتاحة. تستطيع اختيار البعض عن طريق انتقائهم في المربع "
-"أدناه ومن ثم الضغط على سهم \"اختيار\" الموجود بين المربعين."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Type into this box to filter down the list of available %s."
-msgstr "اطبع داخل هذا المربع لفلترة الخيارات في قائمة الـ %s المتاحة."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Filter"
-msgstr "فلترة"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose all"
-msgstr "اختيار الكل"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to choose all %s at once."
-msgstr "إضغط لاختيار جميع الـ %s في نفس الوقت"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Choose"
-msgstr "اختيار"
-
-#: lms/static/admin/js/SelectFilter2.js
-#: cms/templates/js/video/metadata-translations-item.underscore
-msgid "Remove"
-msgstr "حذف"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Chosen %s"
-msgstr "الـ %s المختارة"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr ""
-" هذه قائمة بالـ %s المختارة. تستطيع حذف البعض عن طريق انتقائهم في المربع "
-"أدناه ومن ثم الضغط على سهم \"حذف\" الموجود بين المربعين."
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Remove all"
-msgstr "حذف الكل"
-
-#: lms/static/admin/js/SelectFilter2.js
-msgid "Click to remove all chosen %s at once."
-msgstr "إضغط لحذف جميع الـ %s المختارة في نفس الوقت."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid "%(sel)s of %(cnt)s selected"
-msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s من %(cnt)s تم تحديدها "
-msgstr[1] "%(sel)s من %(cnt)s تم تحديدها"
-msgstr[2] "%(sel)s من %(cnt)s تم تحديدها"
-msgstr[3] "%(sel)s من %(cnt)s تم تحديدها"
-msgstr[4] "%(sel)s من %(cnt)s تم تحديدها"
-msgstr[5] "%(sel)s من %(cnt)s تم تحديدها"
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have unsaved changes on individual editable fields. If you run an "
-"action, your unsaved changes will be lost."
-msgstr ""
-"لديك بعض التغييرات التي لم يتم حفظها على حقول فردية قابلة للتعديل. إذا قمت "
-"بتشغيل أي عملية، ستلغى كافة التغييرات التي لم يتم حفظها."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
-"action."
-msgstr ""
-"لقد قمت باختيار عملية، إلا أنك لم تقم بحفظ التغييرات التي قمت بها على الحقول"
-" الفردية حتى الآن. الرجاء الضغط على OK للحفظ. ستحتاج إلى إعادة ذلك الإجراء "
-"مرة أخرى."
-
-#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
-msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
-"button."
-msgstr ""
-"لقد قمت باختيار عملية، إلا أنك لم تقم بأي تغييرات على الحقول الفردية. على "
-"الأرجح أنك تبحث على زر GO عوضاً عن زر الحفظ."
-
-#. Translators: the names of months, keep the pipe (|) separators.
-#: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
-msgid ""
-"January|February|March|April|May|June|July|August|September|October|November|December"
-msgstr ""
-"يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر"
-
-#. Translators: abbreviations for days of the week, keep the pipe (|)
-#. separators.
-#: lms/static/admin/js/calendar.js
-msgid "S|M|T|W|T|F|S"
-msgstr "الأحد|الإثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
-#: lms/static/admin/js/collapse.min.js
-msgid "Show"
-msgstr "إظهار"
-
-#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
-msgid "Hide"
-msgstr "إخفاء"
-
-#. Translators: the names of days, keep the pipe (|) separators.
-#: lms/static/admin/js/dateparse.js
-msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
-msgstr "الأحد|الإثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Now"
-msgstr "الآن"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Clock"
-msgstr "الساعة"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Choose a time"
-msgstr "اختر وقتاً"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Midnight"
-msgstr "منتصف الليل"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "6 a.m."
-msgstr "6 صباحاً"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Noon"
-msgstr "الظهر"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Today"
-msgstr "اليوم"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Calendar"
-msgstr "التقويم"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Yesterday"
-msgstr "أمس"
-
-#: lms/static/admin/js/admin/DateTimeShortcuts.js
-msgid "Tomorrow"
-msgstr "غداً"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
@@ -3080,7 +2916,7 @@ msgstr "تم تقييم <%= num %>  "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> more needed to start ML"
-msgstr "يلزم  <%= num %>  إضافية للبدء بـ ML"
+msgstr "يلزم  <%= num %>  إضافية للبدء بالتعلم الآلي"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Re-check for submissions"
@@ -3122,7 +2958,7 @@ msgstr "للمساعدة في التحرير بلغة المارك داون"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
-msgstr "سميك (Ctrl+B)"
+msgstr "خط عريض (Ctrl+B)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Italic (Ctrl+I)"
@@ -3204,13 +3040,17 @@ msgstr "عنوان"
 msgid "You have been logged out of your edX account. "
 msgstr "لقد تمّ تسجيل الخروج من حساب edX الخاص بك."
 
+#: lms/static/js/course_survey.js
+msgid "There has been an error processing your survey."
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr "حدث خطأ غير معروف."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
-msgstr "تم إعادة ضبط محاولات المستخدم {user} بنجاح"
+msgstr "تمت بنجاح إعادة ضبط عدد محاولات المستخدم {user} "
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to reset attempts."
@@ -3218,7 +3058,7 @@ msgstr "لم تنجح عمليات ضبط المحاولات."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully deleted student state for user {user}"
-msgstr "تم حذف حالة المستخدم {user} بنجاح"
+msgstr "تم بنجاح حذف حالة المستخدم {user} "
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to delete student state."
@@ -3226,7 +3066,7 @@ msgstr "لم تنجح عملية حذف حالة الطالب."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully rescored problem for user {user}"
-msgstr "تمت عمليات إعادة تقييم المستخدم {user} بنجاح"
+msgstr "تمت بنجاح إعادة تقييم المسألة للمستخدم {user} "
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem."
@@ -3304,32 +3144,32 @@ msgstr "خطأ في إضافة الطلاب"
 #: lms/static/js/views/cohort_editor.js
 msgid "{numUsersAdded} student has been added to this cohort group"
 msgid_plural "{numUsersAdded} students have been added to this cohort group"
-msgstr[0] "لقد أضيفَ {صفر} طالب إلى هذه المجموعة"
-msgstr[1] "لقد أضيفَ طالب {واحد} إلى هذه المجموعة"
-msgstr[2] "لقد أضيفَ طالبان {اثنان} إلى هذه المجموعة"
-msgstr[3] "لقد أضيفَ {بضعة} طلاب إلى هذه المجموعة"
-msgstr[4] "لقد أضيفَ {عدة} طلاب إلى هذه المجموعة"
+msgstr[0] "لقد أضيفَ {numUsersAdded} طالب إلى هذه المجموعة"
+msgstr[1] "لقد أضيفَ {numUsersAdded} طالب إلى هذه المجموعة"
+msgstr[2] "لقد أضيفَ {numUsersAdded} طالب إلى هذه المجموعة"
+msgstr[3] "لقد أضيفَ {numUsersAdded} طلاب إلى هذه المجموعة"
+msgstr[4] "لقد أضيفَ {numUsersAdded} طلاب إلى هذه المجموعة"
 msgstr[5] "لقد أضيفَ {numUsersAdded} طلاب إلى هذه المجموعة"
 
 #: lms/static/js/views/cohort_editor.js
 msgid "{numMoved} student was removed from {oldCohort}"
 msgid_plural "{numMoved} students were removed from {oldCohort}"
-msgstr[0] "لقد أزيلَ {صفر} طلاب من {oldCohort}"
-msgstr[1] "لقد أزيلَ طالب {واحد} من {oldCohort}"
-msgstr[2] "لقد أزيلَ طالبان {اثنان} من {oldCohort}"
-msgstr[3] "لقد أزيلَ {بضعة} طلاب من {oldCohort}"
-msgstr[4] "لقد أزيلَ {عدة} طلاب من {oldCohort}"
-msgstr[5] "لقد أزيلَ {numMoved} طلاب من {oldCohort}"
+msgstr[0] "لقد أزيلَ {numMoved} طالب من {oldCohort}"
+msgstr[1] "لقد أزيلَ {numMoved} طالب من {oldCohort}"
+msgstr[2] "لقد أزيلَ {numMoved} طالب من {oldCohort}"
+msgstr[3] "لقد أزيلَ {numMoved} طالب من {oldCohort}"
+msgstr[4] "لقد أزيلَ {numMoved} طالب من {oldCohort}"
+msgstr[5] "لقد أزيلَ {numMoved} طالب من {oldCohort}"
 
 #: lms/static/js/views/cohort_editor.js
 msgid "{numPresent} student was already in the cohort group"
 msgid_plural "{numPresent} students were already in the cohort group"
-msgstr[0] "{صفر} طلاب موجودون مسبقًا في المجموعة"
-msgstr[1] "طالب {واحد} موجود مسبقًا في المجموعة"
-msgstr[2] "طالبان {اثنان} موجودان مسبقًا في المجموعة"
-msgstr[3] "{بضعة} طلاب موجودون مسبقًا في المجموعة"
-msgstr[4] "{عدة} طلاب موجودون مسبقًا في المجموعة"
-msgstr[5] "{numPresent} طلاب موجودون مسبقًا في المجموعة"
+msgstr[0] "{numPresent} طالب موجود مسبقًا في المجموعة"
+msgstr[1] "{numPresent} طالب موجود مسبقًا في المجموعة"
+msgstr[2] "{numPresent} طالب موجود مسبقًا في المجموعة"
+msgstr[3] "{numPresent} طلاب موجودين مسبقًا في المجموعة"
+msgstr[4] "{numPresent} طلاب موجودين مسبقًا في المجموعة"
+msgstr[5] "{numPresent} طلاب موجودين مسبقًا في المجموعة"
 
 #: lms/static/js/views/cohort_editor.js
 msgid "Unknown user: {user}"
@@ -3338,11 +3178,11 @@ msgstr "مستخدم غير معروف: {user}"
 #: lms/static/js/views/cohort_editor.js
 msgid "There was an error when trying to add students:"
 msgid_plural "There were {numErrors} errors when trying to add students:"
-msgstr[0] "وقع {صفر} خطأ عند محاولة إضافة الطلاب:"
-msgstr[1] "وقع خطأ واحد عند محاولة إضافة الطلاب:"
-msgstr[2] "وقع خطآن {اثنان} عند محاولة إضافة الطلاب:"
-msgstr[3] "وقعت {بضعة} أخطاء عند محاولة إضافة الطلاب:"
-msgstr[4] "وقعت {عدة} أخطاء عند محاولة إضافة الطلاب:"
+msgstr[0] "وقع {numErrors} خطأ عند محاولة إضافة الطلاب:"
+msgstr[1] "وقع خطأ عند محاولة إضافة الطلاب:"
+msgstr[2] "وقع {numErrors} أخطاء عند محاولة إضافة الطلاب:"
+msgstr[3] "وقعت {numErrors} أخطاء عند محاولة إضافة الطلاب:"
+msgstr[4] "وقعت {numErrors} أخطاء عند محاولة إضافة الطلاب:"
 msgstr[5] "وقعت {numErrors} أخطاء عند محاولة إضافة الطلاب:"
 
 #: lms/static/js/views/cohort_editor.js
@@ -3451,7 +3291,7 @@ msgstr "هل أنت متأكد من رغبتك حذف هذه الصفحة؟ لا
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting&hellip;"
-msgstr "الحذف &hellip;"
+msgstr "الحذف&hellip;"
 
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 msgid "OpenAssessment Save Error"
@@ -3522,32 +3362,28 @@ msgstr ""
 
 #: cms/static/js/factories/import.js
 msgid "There was an error during the upload process."
-msgstr ""
+msgstr "حدث خطأ أثناء عملية التحميل.  "
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while unpacking the file."
-msgstr ""
+msgstr "حدث خطأ أثناء عملية تفريغ الملف. "
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while verifying the file you submitted."
-msgstr ""
+msgstr "حدث خطأ أثناء عملية التحقق من الملف الذي قمت بتقديمه. "
 
 #: cms/static/js/factories/import.js
 msgid "There was an error while importing the new course to our database."
-msgstr ""
+msgstr "حدث خطأ خلال عملية استيراد المساق الجديد إلى قاعدة البيانات لدينا. "
 
 #: cms/static/js/factories/import.js
 msgid "Your import has failed."
-msgstr ""
+msgstr "لم تنجح عملية الاستيراد"
 
 #: cms/static/js/factories/import.js cms/static/js/factories/import.js
 #: cms/static/js/views/import.js cms/static/js/views/import.js.c
 msgid "Choose new file"
 msgstr "اختر ملف جديد"
-
-#: cms/static/js/factories/import.js
-msgid "Your import is in progress; navigating away will abort it."
-msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 msgid "A valid email address is required"
@@ -3581,7 +3417,7 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 msgid "Are you sure?"
-msgstr ""
+msgstr "هل أنت متأكّد؟"
 
 #: cms/static/js/factories/manage_users.js
 msgid ""
@@ -3598,15 +3434,15 @@ msgstr ""
 
 #: cms/static/js/factories/manage_users.js
 msgid "Try Again"
-msgstr ""
+msgstr "حاول مرة أخرى"
 
 #: cms/static/js/factories/settings_advanced.js
 msgid "Hide Deprecated Settings"
-msgstr ""
+msgstr "إخفاء الإعدادات المهملة"
 
 #: cms/static/js/factories/settings_advanced.js
 msgid "Show Deprecated Settings"
-msgstr ""
+msgstr "إظهار الإعدادات المهملة"
 
 #: cms/static/js/factories/textbooks.js
 #: cms/static/js/views/pages/group_configurations.js
@@ -3652,6 +3488,10 @@ msgstr ""
 #: cms/static/js/models/uploads.js
 msgid "or"
 msgstr "أو"
+
+#: cms/static/js/models/xblock_validation.js
+msgid "This component has validation issues."
+msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
@@ -3795,9 +3635,9 @@ msgstr "غير مستخدم"
 #: cms/static/js/views/group_configuration_details.js
 msgid "Used in %(count)s unit"
 msgid_plural "Used in %(count)s units"
-msgstr[0] "مستخدم في %(صفر) وحدة"
-msgstr[1] "مستخدم في وحدة %(واحدة)"
-msgstr[2] "مستخدم في %(وحدتان)"
+msgstr[0] "مستخدم في %(count)s وحدة"
+msgstr[1] "مستخدم في %(count)s وحدة"
+msgstr[2] "مستخدم في %(count)s وحدة"
 msgstr[3] "مستخدم في %(count)s وحدة"
 msgstr[4] "مستخدم في %(count)s وحدة"
 msgstr[5] "مستخدم في %(count)s وحدة"
@@ -3861,7 +3701,8 @@ msgstr "تاريخ الإصدار:"
 
 #: cms/static/js/views/overview.js
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{month}/{day}/{year} at {hour}:{minute} التوقيت العالمي"
+msgstr ""
+"{month}/{day}/{year} في الساعة {hour}:{minute} بالتوقيت العالمي المنسّق UTC"
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
@@ -3964,10 +3805,24 @@ msgstr "إعدادات"
 msgid "New %(component_type)s"
 msgstr "%(component_type)s جديد"
 
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: cms/static/js/views/xblock_validation.js
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: cms/static/js/views/xblock_validation.js
+msgid "Error"
+msgstr ""
+
 #: cms/static/js/views/components/add_xblock.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Adding&hellip;"
-msgstr "الإضافة والمساعدة؛ Adding&hellip؛"
+msgstr "الإضافة&hellip;"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "%(display_name)s Settings"
@@ -4019,7 +3874,7 @@ msgstr "التغيير يدويًا"
 
 #: cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
-msgstr "نسخة مطابقة ومساعدة؛ Duplicating&hellip؛"
+msgstr "جاري النسخ&hellip;"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing&hellip;"
@@ -4054,7 +3909,7 @@ msgstr "جاري الإخفاء عن الطلاب&hellip;"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Explicitly Hiding from Students&hellip;"
-msgstr "جاري الإخفاء عن الطلاب "
+msgstr "جاري الإخفاء عن الطلاب&hellip;"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Inheriting Student Visibility&hellip;"
@@ -4416,7 +4271,7 @@ msgstr "إقفال/فتح الملفّ"
 
 #: cms/templates/js/checklist.underscore
 msgid "{number}% of checklists completed"
-msgstr "{number}% o من قوائم التحقّق تم استكمالها"
+msgstr "تم استكمال {number}% o من قوائم التحقّق "
 
 #: cms/templates/js/checklist.underscore
 msgid "Tasks Completed:"
@@ -4497,7 +4352,7 @@ msgstr "تم تقييمه بدرجة:"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
-msgstr "موعد التسليم:"
+msgstr "تاريخ الاستحقاق:"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -4967,6 +4822,10 @@ msgstr "خيارات الصفحة"
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "New Group Configuration"
 msgstr "إعدادات مجموعة جديدة"
+
+#: cms/templates/js/video/metadata-translations-item.underscore
+msgid "Remove"
+msgstr "حذف"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

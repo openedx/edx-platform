@@ -4,23 +4,34 @@
 import re
 from unittest import skipUnless
 from urllib import urlencode
+import json
 
-from mock import patch
+import mock
 import ddt
 from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core import mail
+from django.test.utils import override_settings
 
 from util.testing import UrlResetMixin
+from third_party_auth.tests.testutil import simulate_running_pipeline
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
 from util.bad_request_rate_limiter import BadRequestRateLimiter
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase, mixed_store_config
+)
+from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import CourseModeFactory
+
+
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 
 @ddt.ddt
-class StudentAccountViewTest(UrlResetMixin, TestCase):
-    """ Tests for the student account views. """
+class StudentAccountUpdateTest(UrlResetMixin, TestCase):
+    """ Tests for the student account views that update the user's account information. """
 
     USERNAME = u"heisenberg"
     ALTERNATE_USERNAME = u"walt"
@@ -50,9 +61,9 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
     INVALID_KEY = u"123abc"
 
-    @patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_NEW_DASHBOARD': True})
     def setUp(self):
-        super(StudentAccountViewTest, self).setUp()
+        super(StudentAccountUpdateTest, self).setUp("student_account.urls")
 
         # Create/activate a new account
         activation_key = account_api.create_account(self.USERNAME, self.OLD_PASSWORD, self.OLD_EMAIL)
@@ -66,7 +77,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         response = self.client.get(reverse('account_index'))
         self.assertContains(response, "Student Account")
 
-    def test_email_change(self):
+    def test_change_email(self):
         response = self._change_email(self.NEW_EMAIL, self.OLD_PASSWORD)
         self.assertEquals(response.status_code, 200)
 
@@ -112,7 +123,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
     def test_email_change_request_no_user(self):
         # Patch account API to raise an internal error when an email change is requested
-        with patch('student_account.views.account_api.request_email_change') as mock_call:
+        with mock.patch('student_account.views.account_api.request_email_change') as mock_call:
             mock_call.side_effect = account_api.AccountUserNotFound
             response = self._change_email(self.NEW_EMAIL, self.OLD_PASSWORD)
 
@@ -183,7 +194,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         activation_key = account_api.request_email_change(self.USERNAME, self.NEW_EMAIL, self.OLD_PASSWORD)
 
         # Patch account API to return an internal error
-        with patch('student_account.views.account_api.confirm_email_change') as mock_call:
+        with mock.patch('student_account.views.account_api.confirm_email_change') as mock_call:
             mock_call.side_effect = account_api.AccountInternalError
             response = self.client.get(reverse('email_change_confirm', kwargs={'key': activation_key}))
 
@@ -253,7 +264,6 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         result = self.client.login(username=self.USERNAME, password=self.NEW_PASSWORD)
         self.assertTrue(result)
 
-
     @ddt.data(True, False)
     def test_password_change_logged_out(self, send_email):
         # Log the user out
@@ -277,7 +287,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
 
         # Create a second user, but do not activate it
         account_api.create_account(self.ALTERNATE_USERNAME, self.OLD_PASSWORD, self.NEW_EMAIL)
-        
+
         # Send the view the email address tied to the inactive user
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 400)
@@ -285,7 +295,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
     def test_password_change_no_user(self):
         # Log out the user created during test setup
         self.client.logout()
-        
+
         # Send the view an email address not tied to any user
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 400)
@@ -299,7 +309,7 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
         # Make many consecutive bad requests in an attempt to trigger the rate limiter
         for attempt in xrange(self.INVALID_ATTEMPTS):
             self._change_password(email=self.NEW_EMAIL)
-        
+
         response = self._change_password(email=self.NEW_EMAIL)
         self.assertEqual(response.status_code, 403)
 
@@ -360,3 +370,201 @@ class StudentAccountViewTest(UrlResetMixin, TestCase):
             data['email'] = email
 
         return self.client.post(path=reverse('password_change_request'), data=data)
+
+
+@ddt.ddt
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
+    """ Tests for the student account views that update the user's account information. """
+
+    USERNAME = "bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "password"
+
+    @ddt.data(
+        ("account_login", "login"),
+        ("account_register", "register"),
+    )
+    @ddt.unpack
+    def test_login_and_registration_form(self, url_name, initial_mode):
+        response = self.client.get(reverse(url_name))
+        expected_data = u"data-initial-mode=\"{mode}\"".format(mode=initial_mode)
+        self.assertContains(response, expected_data)
+
+    @ddt.data("account_login", "account_register")
+    def test_login_and_registration_form_already_authenticated(self, url_name):
+        # Create/activate a new account and log in
+        activation_key = account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        account_api.activate_account(activation_key)
+        result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.assertTrue(result)
+
+        # Verify that we're redirected to the dashboard
+        response = self.client.get(reverse(url_name))
+        self.assertRedirects(response, reverse("dashboard"))
+
+    @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
+    @ddt.data("account_login", "account_register")
+    def test_third_party_auth_disabled(self, url_name):
+        response = self.client.get(reverse(url_name))
+        self._assert_third_party_auth_data(response, None, [])
+
+    @ddt.data(
+        ("account_login", None, None),
+        ("account_register", None, None),
+        ("account_login", "google-oauth2", "Google"),
+        ("account_register", "google-oauth2", "Google"),
+        ("account_login", "facebook", "Facebook"),
+        ("account_register", "facebook", "Facebook"),
+    )
+    @ddt.unpack
+    def test_third_party_auth(self, url_name, current_backend, current_provider):
+        # Simulate a running pipeline
+        if current_backend is not None:
+            pipeline_target = "student_account.views.third_party_auth.pipeline"
+            with simulate_running_pipeline(pipeline_target, current_backend):
+                response = self.client.get(reverse(url_name))
+
+        # Do NOT simulate a running pipeline
+        else:
+            response = self.client.get(reverse(url_name))
+
+        # This relies on the THIRD_PARTY_AUTH configuration in the test settings
+        expected_providers = [
+            {
+                "name": "Facebook",
+                "iconClass": "icon-facebook",
+                "loginUrl": self._third_party_login_url("facebook", "account_login"),
+                "registerUrl": self._third_party_login_url("facebook", "account_register")
+            },
+            {
+                "name": "Google",
+                "iconClass": "icon-google-plus",
+                "loginUrl": self._third_party_login_url("google-oauth2", "account_login"),
+                "registerUrl": self._third_party_login_url("google-oauth2", "account_register")
+            }
+        ]
+        self._assert_third_party_auth_data(response, current_provider, expected_providers)
+
+    @ddt.data([], ["honor"], ["honor", "verified", "audit"], ["professional"])
+    def test_third_party_auth_course_id_verified(self, modes):
+        # Create a course with the specified course modes
+        course = CourseFactory.create()
+        for slug in modes:
+            CourseModeFactory.create(
+                course_id=course.id,
+                mode_slug=slug,
+                mode_display_name=slug
+            )
+
+        # Verify that the entry URL for third party auth
+        # contains the course ID and redirects to the track selection page.
+        course_modes_choose_url = reverse(
+            "course_modes_choose",
+            kwargs={"course_id": unicode(course.id)}
+        )
+        expected_providers = [
+            {
+                "name": "Facebook",
+                "iconClass": "icon-facebook",
+                "loginUrl": self._third_party_login_url(
+                    "facebook", "account_login",
+                    course_id=unicode(course.id),
+                    redirect_url=course_modes_choose_url
+                ),
+                "registerUrl": self._third_party_login_url(
+                    "facebook", "account_register",
+                    course_id=unicode(course.id),
+                    redirect_url=course_modes_choose_url
+                )
+            },
+            {
+                "name": "Google",
+                "iconClass": "icon-google-plus",
+                "loginUrl": self._third_party_login_url(
+                    "google-oauth2", "account_login",
+                    course_id=unicode(course.id),
+                    redirect_url=course_modes_choose_url
+                ),
+                "registerUrl": self._third_party_login_url(
+                    "google-oauth2", "account_register",
+                    course_id=unicode(course.id),
+                    redirect_url=course_modes_choose_url
+                )
+            }
+        ]
+
+        # Verify that the login page contains the correct provider URLs
+        response = self.client.get(reverse("account_login"), {"course_id": unicode(course.id)})
+        self._assert_third_party_auth_data(response, None, expected_providers)
+
+    def test_third_party_auth_course_id_shopping_cart(self):
+        # Create a course with a white-label course mode
+        course = CourseFactory.create()
+        CourseModeFactory.create(
+            course_id=course.id,
+            mode_slug="honor",
+            mode_display_name="Honor",
+            min_price=100
+        )
+
+        # Verify that the entry URL for third party auth
+        # contains the course ID and redirects to the shopping cart
+        shoppingcart_url = reverse("shoppingcart.views.show_cart")
+        expected_providers = [
+            {
+                "name": "Facebook",
+                "iconClass": "icon-facebook",
+                "loginUrl": self._third_party_login_url(
+                    "facebook", "account_login",
+                    course_id=unicode(course.id),
+                    redirect_url=shoppingcart_url
+                ),
+                "registerUrl": self._third_party_login_url(
+                    "facebook", "account_register",
+                    course_id=unicode(course.id),
+                    redirect_url=shoppingcart_url
+                )
+            },
+            {
+                "name": "Google",
+                "iconClass": "icon-google-plus",
+                "loginUrl": self._third_party_login_url(
+                    "google-oauth2", "account_login",
+                    course_id=unicode(course.id),
+                    redirect_url=shoppingcart_url
+                ),
+                "registerUrl": self._third_party_login_url(
+                    "google-oauth2", "account_register",
+                    course_id=unicode(course.id),
+                    redirect_url=shoppingcart_url
+                )
+            }
+        ]
+
+        # Verify that the login page contains the correct provider URLs
+        response = self.client.get(reverse("account_login"), {"course_id": unicode(course.id)})
+        self._assert_third_party_auth_data(response, None, expected_providers)
+
+    def _assert_third_party_auth_data(self, response, current_provider, providers):
+        """Verify that third party auth info is rendered correctly in a DOM data attribute. """
+        expected_data = u"data-third-party-auth='{auth_info}'".format(
+            auth_info=json.dumps({
+                "currentProvider": current_provider,
+                "providers": providers
+            })
+        )
+        self.assertContains(response, expected_data)
+
+    def _third_party_login_url(self, backend_name, auth_entry, course_id=None, redirect_url=None):
+        """Construct the login URL to start third party authentication. """
+        params = [("auth_entry", auth_entry)]
+        if redirect_url:
+            params.append(("next", redirect_url))
+        if course_id:
+            params.append(("enroll_course_id", course_id))
+
+        return u"{url}?{params}".format(
+            url=reverse("social:begin", kwargs={"backend": backend_name}),
+            params=urlencode(params)
+        )

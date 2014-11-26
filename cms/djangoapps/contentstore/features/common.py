@@ -286,8 +286,15 @@ def _do_studio_prompt_action(intent, action):
     Wait for a studio prompt to appear and press the specified action button
     See cms/static/js/views/feedback_prompt.js for implementation
     """
-    assert intent in ['warning', 'error', 'confirmation', 'announcement',
-        'step-required', 'help', 'mini']
+    assert intent in [
+        'warning',
+        'error',
+        'confirmation',
+        'announcement',
+        'step-required',
+        'help',
+        'mini',
+    ]
     assert action in ['primary', 'secondary']
 
     world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))
@@ -331,7 +338,6 @@ def get_codemirror_value(index=0, find_prefix="$"):
         return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();
         """.format(index=index, find_prefix=find_prefix)
     )
-
 
 
 def attach_file(filename, sub_path):
@@ -388,4 +394,3 @@ def create_other_user(_step, name, has_extra_perms, role_name):
 @step('I log out')
 def log_out(_step):
     world.visit('logout')
-

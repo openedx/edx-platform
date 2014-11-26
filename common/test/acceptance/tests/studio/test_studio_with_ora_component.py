@@ -33,8 +33,14 @@ class ORAComponentTest(StudioCourseTest):
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
-                        XBlockFixtureDesc('combinedopenended', "Peer Problem",
-                              data=load_data_str('ora_peer_problem.xml'), metadata={'graded': True}),
+                        XBlockFixtureDesc(
+                            'combinedopenended',
+                            "Peer Problem",
+                            data=load_data_str('ora_peer_problem.xml'),
+                            metadata={
+                                'graded': True,
+                            },
+                        ),
                         XBlockFixtureDesc('peergrading', 'Peer Module'),
                     )
                 )

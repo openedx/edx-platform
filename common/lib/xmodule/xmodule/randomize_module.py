@@ -77,7 +77,6 @@ class RandomizeModule(RandomizeFields, XModule):
 
         return [self.child_descriptor]
 
-
     def student_view(self, context):
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
@@ -94,7 +93,6 @@ class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
     module_class = RandomizeModule
 
     filename_extension = "xml"
-
 
     def definition_to_xml(self, resource_fs):
 

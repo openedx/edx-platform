@@ -839,7 +839,6 @@ class MatlabInput(CodeInput):
                     'No response from Xqueue within {xqueue_timeout} seconds. Aborted.'
                 ).format(xqueue_timeout=XQUEUE_TIMEOUT)
 
-
     def handle_ajax(self, dispatch, data):
         """
         Handle AJAX calls directed to this input
@@ -1059,7 +1058,7 @@ class ImageInput(InputTypeBase):
                      self.value.strip().replace(' ', ''))
         if m:
             # Note: we subtract 15 to compensate for the size of the dot on the screen.
-            # (is a 30x30 image--lms/static/green-pointer.png).
+            # (is a 30x30 image--lms/static/images/green-pointer.png).
             (self.gx, self.gy) = [int(x) - 15 for x in m.groups()]
         else:
             (self.gx, self.gy) = (0, 0)

@@ -23,7 +23,7 @@
                     <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
                 </div>
             </article>
-            <aside class="content-supplementary" role="complimentary"></aside>
+            <aside class="content-supplementary" role="complementary"></aside>
         </section>
     </div>
 </div>

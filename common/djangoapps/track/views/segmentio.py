@@ -6,27 +6,25 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django_future.csrf import csrf_exempt
 
-from eventtracking import tracker as eventtracker
+from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from util.json_request import expect_json, JsonResponse
-
-from track import tracker
-from track import shim
 
 log = logging.getLogger(__name__)
 
 
 ERROR_UNAUTHORIZED = 'Unauthorized'
-WARNING_IGNORED_CHANNEL = 'Channel ignored'
-WARNING_IGNORED_ACTION = 'Action ignored'
+WARNING_IGNORED_SOURCE = 'Source ignored'
+WARNING_IGNORED_TYPE = 'Type ignored'
 ERROR_MISSING_USER_ID = 'Required user_id missing from context'
 ERROR_USER_NOT_EXIST = 'Specified user does not exist'
 ERROR_INVALID_USER_ID = 'Unable to parse userId as an integer'
-ERROR_MISSING_EVENT_TYPE = 'The event_type field must be specified in the properties dictionary'
+ERROR_MISSING_NAME = 'The name field must be specified in the properties dictionary'
 ERROR_MISSING_TIMESTAMP = 'Required timestamp field not found'
 ERROR_MISSING_RECEIVED_AT = 'Required receivedAt field not found'
 
@@ -34,7 +32,7 @@ ERROR_MISSING_RECEIVED_AT = 'Required receivedAt field not found'
 @require_POST
 @expect_json
 @csrf_exempt
-def track_segmentio_event(request):
+def segmentio_event(request):
     """
     An endpoint for logging events using segment.io's webhook integration.
 
@@ -50,34 +48,9 @@ def track_segmentio_event(request):
     Many of the root fields of a standard edX tracking event are read out of the "properties" dictionary provided by the
     segment.io event, which is, in turn, provided by the client that emitted the event.
 
-    In order for an event to be logged the following preconditions must be met:
-
-    * The "key" query string parameter must exactly match the django setting TRACKING_SEGMENTIO_WEBHOOK_SECRET. While
-      the endpoint is public, we want to limit access to it to the segment.io servers only.
-    * The value of the "channel" field of the event must be included in the list specified by the django setting
-      TRACKING_SEGMENTIO_ALLOWED_CHANNELS. This is intended to restrict the set of events to specific channels. For
-      example: just mobile devices.
-    * The value of the "action" field of the event must be included in the list specified by the django setting
-      TRACKING_SEGMENTIO_ALLOWED_ACTIONS. In order to make use of *all* of the features segment.io offers we would have
-      to implement some sort of persistent storage of information contained in some actions (like identify). For now,
-      we defer support of those actions and just support a limited set that can be handled without storing information
-      in external state.
-    * The value of the standard "userId" field of the event must be an integer that can be used to look up the user
-      using the primary key of the User model.
-    * Include an "event_type" field in the properties dictionary that indicates the edX event type. Note this can differ
-      from the "event" field found in the root of a segment.io event. The "event" field at the root of the structure is
-      intended to be human readable, the "event_type" field is expected to conform to the standard for naming events
-      found in the edX data documentation.
-
-    Additionally the event can optionally:
-
-    * Provide a "context" dictionary in the properties dictionary. This dictionary will be applied to the
-      existing context on the server overriding any existing keys. This context dictionary should include a "course_id"
-      field when the event is scoped to a particular course. The value of this field should be a valid course key. The
-      context may contain other arbitrary data that will be logged with the event, for example: identification
-      information for the device that emitted the event.
-    * Provide a "page" parameter in the properties dictionary which indicates the page that was being displayed to the
-      user or the mobile application screen that was visible to the user at the time the event was emitted.
+    In order for an event to be accepted and logged the "key" query string parameter must exactly match the django
+    setting TRACKING_SEGMENTIO_WEBHOOK_SECRET. While the endpoint is public, we want to limit access to it to the
+    segment.io servers only.
 
     """
 
@@ -88,7 +61,59 @@ def track_segmentio_event(request):
     expected_secret = getattr(settings, 'TRACKING_SEGMENTIO_WEBHOOK_SECRET', None)
     provided_secret = request.GET.get('key')
     if not expected_secret or provided_secret != expected_secret:
-        return failure_response(ERROR_UNAUTHORIZED, status=401)
+        return HttpResponse(status=401)
+
+    try:
+        track_segmentio_event(request)
+    except EventValidationError as err:
+        log.warning(
+            'Unable to process event received from segment.io: message="%s" event="%s"',
+            str(err),
+            request.body
+        )
+        # Do not let the requestor know why the event wasn't saved. If the secret key is compromised this diagnostic
+        # information could be used to scrape useful information from the system.
+
+    return HttpResponse(status=200)
+
+
+class EventValidationError(Exception):
+    """Raised when an invalid event is received."""
+    pass
+
+
+def track_segmentio_event(request):  # pylint: disable=too-many-statements
+    """
+    Record an event received from segment.io to the tracking logs.
+
+    This method assumes that the event has come from a trusted source.
+
+    The received event must meet the following conditions in order to be logged:
+
+    * The value of the "type" field of the event must be included in the list specified by the django setting
+      TRACKING_SEGMENTIO_ALLOWED_TYPES. In order to make use of *all* of the features segment.io offers we would have
+      to implement some sort of persistent storage of information contained in some actions (like identify). For now,
+      we defer support of those actions and just support a limited set that can be handled without storing information
+      in external state.
+    * The value of the standard "userId" field of the event must be an integer that can be used to look up the user
+      using the primary key of the User model.
+    * Include a "name" field in the properties dictionary that indicates the edX event name. Note this can differ
+      from the "event" field found in the root of a segment.io event. The "event" field at the root of the structure is
+      intended to be human readable, the "name" field is expected to conform to the standard for naming events
+      found in the edX data documentation.
+    * Have originated from a known and trusted segment.io client library. The django setting
+      TRACKING_SEGMENTIO_SOURCE_MAP maps the known library names to internal "event_source" strings. In order to be
+      logged the event must have a library name that is a valid key in that map.
+
+    Additionally the event can optionally:
+
+    * Provide a "context" dictionary in the properties dictionary. This dictionary will be applied to the
+      existing context on the server overriding any existing keys. This context dictionary should include a "course_id"
+      field when the event is scoped to a particular course. The value of this field should be a valid course key. The
+      context may contain other arbitrary data that will be logged with the event, for example: identification
+      information for the device that emitted the event.
+
+    """
 
     # The POST body will contain the JSON encoded event
     full_segment_event = request.json
@@ -96,52 +121,62 @@ def track_segmentio_event(request):
     # We mostly care about the properties
     segment_event = full_segment_event.get('properties', {})
 
-    def logged_failure_response(*args, **kwargs):
-        """Indicate a failure and log information about the event that will aide debugging efforts"""
-        failed_response = failure_response(*args, **kwargs)
-        log.warning('Unable to process event received from segment.io: %s', json.dumps(full_segment_event))
-        return failed_response
+    # Start with the context provided by segment.io in the "client" field if it exists
+    # We should tightly control which fields actually get included in the event emitted.
+    segment_context = full_segment_event.get('context')
 
-    # Selectively listen to particular channels, note that the client can set the "event_source" field in the
-    # "properties" dict to override the channel provided by segment.io. This is necessary because there is a bug in some
-    # segment.io client libraries that prevented them from sending correct channel fields.
-    channel = segment_event.get('event_source')
-    allowed_channels = [c.lower() for c in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_CHANNELS', [])]
-    if not channel or channel.lower() not in allowed_channels:
-        return response(WARNING_IGNORED_CHANNEL, committed=False)
-
-    # Ignore actions that are unsupported
-    action = full_segment_event.get('action')
-    allowed_actions = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_ACTIONS', [])]
-    if not action or action.lower() not in allowed_actions:
-        return response(WARNING_IGNORED_ACTION, committed=False)
-
+    # Build up the event context by parsing fields out of the event received from segment.io
     context = {}
 
-    # Start with the context provided by segment.io in the "client" field if it exists
-    segment_context = full_segment_event.get('context')
-    if segment_context:
-        context['client'] = segment_context
-        user_agent = segment_context.get('userAgent', '')
+    library_name = segment_context.get('library', {}).get('name')
+    source_map = getattr(settings, 'TRACKING_SEGMENTIO_SOURCE_MAP', {})
+    event_source = source_map.get(library_name)
+    if not event_source:
+        raise EventValidationError(WARNING_IGNORED_SOURCE)
     else:
-        user_agent = ''
+        context['event_source'] = event_source
+
+    # Ignore types that are unsupported
+    segment_event_type = full_segment_event.get('type')
+    allowed_types = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_TYPES', [])]
+    if not segment_event_type or segment_event_type.lower() not in allowed_types:
+        raise EventValidationError(WARNING_IGNORED_TYPE)
+
+    if segment_context:
+        # copy required fields from segment's context dict to our custom context dict
+        for context_field_name, segment_context_field_name in [
+            ('course_id', 'course_id'),
+            ('open_in_browser_url', 'open_in_browser_url'),
+            ('agent', 'userAgent')
+        ]:
+            if segment_context_field_name in segment_context:
+                context[context_field_name] = segment_context[segment_context_field_name]
+
+        # copy the entire segment's context dict as a sub-field of our custom context dict
+        context['client'] = dict(segment_context)
+
+        # remove duplicate and unnecessary fields from our copy
+        for field in ('traits', 'integrations', 'userAgent', 'course_id', 'open_in_browser_url'):
+            if field in context['client']:
+                del context['client'][field]
 
     # Overlay any context provided in the properties
     context.update(segment_event.get('context', {}))
 
     user_id = full_segment_event.get('userId')
     if not user_id:
-        return logged_failure_response(ERROR_MISSING_USER_ID)
+        raise EventValidationError(ERROR_MISSING_USER_ID)
 
     # userId is assumed to be the primary key of the django User model
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
-        return logged_failure_response(ERROR_USER_NOT_EXIST)
+        raise EventValidationError(ERROR_USER_NOT_EXIST)
     except ValueError:
-        return logged_failure_response(ERROR_INVALID_USER_ID)
+        raise EventValidationError(ERROR_INVALID_USER_ID)
     else:
         context['user_id'] = user.id
+        context['username'] = user.username
 
     # course_id is expected to be provided in the context when applicable
     course_id = context.get('course_id')
@@ -159,71 +194,22 @@ def track_segmentio_event(request):
             )
 
     if 'timestamp' in full_segment_event:
-        time = parse_iso8601_timestamp(full_segment_event['timestamp'])
+        context['timestamp'] = parse_iso8601_timestamp(full_segment_event['timestamp'])
     else:
-        return logged_failure_response(ERROR_MISSING_TIMESTAMP)
+        raise EventValidationError(ERROR_MISSING_TIMESTAMP)
 
     if 'receivedAt' in full_segment_event:
         context['received_at'] = parse_iso8601_timestamp(full_segment_event['receivedAt'])
     else:
-        return logged_failure_response(ERROR_MISSING_RECEIVED_AT)
+        raise EventValidationError(ERROR_MISSING_RECEIVED_AT)
 
-    if 'event_type' in segment_event:
-        event_type = segment_event['event_type']
-    else:
-        return logged_failure_response(ERROR_MISSING_EVENT_TYPE)
+    if 'name' not in segment_event:
+        raise EventValidationError(ERROR_MISSING_NAME)
 
-    with eventtracker.get_tracker().context('edx.segmentio', context):
-        complete_context = eventtracker.get_tracker().resolve_context()
-        event = {
-            "username": user.username,
-            "event_type": event_type,
-            "name": segment_event.get('name', ''),
-            # Will be either "mobile", "browser" or "server". These names happen to be identical to the names we already
-            # use so no mapping is necessary.
-            "event_source": channel,
-            # This timestamp is reported by the local clock on the device so it may be wildly incorrect.
-            "time": time,
-            "context": complete_context,
-            "page": segment_event.get('page'),
-            "host": complete_context.get('host', ''),
-            "agent": user_agent,
-            "ip": segment_event.get('ip', ''),
-            "event": segment_event.get('event', {}),
-        }
+    context['ip'] = segment_event.get('context', {}).get('ip', '')
 
-    # Some duplicated fields are passed into event-tracking via the context by track.middleware.
-    # Remove them from the event here since they are captured elsewhere.
-    shim.remove_shim_context(event)
-
-    tracker.send(event)
-
-    return response()
-
-
-def response(message=None, status=200, committed=True):
-    """
-    Produce a response from the segment.io event handler.
-
-    Returns: A JSON encoded string giving more information about what action was taken while processing the request.
-    """
-    result = {
-        'committed': committed
-    }
-
-    if message:
-        result['message'] = message
-
-    return JsonResponse(result, status=status)
-
-
-def failure_response(message, status=400):
-    """
-    Return a failure response when something goes wrong handling segment.io events.
-
-    Returns: A JSON encoded string giving more information about what went wrong when processing the request.
-    """
-    return response(message=message, status=status, committed=False)
+    with tracker.get_tracker().context('edx.segmentio', context):
+        tracker.emit(segment_event['name'], segment_event.get('data', {}))
 
 
 def parse_iso8601_timestamp(timestamp):

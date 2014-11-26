@@ -607,11 +607,13 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     def test_correct_http_status(self):
         json_data = json.dumps({
-                        "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
-                        "days_early_for_beta": {"value": "supposed to be an integer",
-                                        "display_name": "Days Early for Beta Users", },
-                        "advanced_modules": {"value": 1, "display_name": "Advanced Module List", },
-                    })
+            "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
+            "days_early_for_beta": {
+                "value": "supposed to be an integer",
+                "display_name": "Days Early for Beta Users",
+            },
+            "advanced_modules": {"value": 1, "display_name": "Advanced Module List", },
+        })
         response = self.client.ajax_post(self.course_setting_url, json_data)
         self.assertEqual(400, response.status_code)
 
@@ -623,7 +625,7 @@ class CourseMetadataEditingTest(CourseTestCase):
                 "days_early_for_beta": {"value": 2},
             },
             user=self.user
-         )
+        )
         self.update_check(test_model)
         # try fresh fetch to ensure persistence
         fresh = modulestore().get_course(self.course.id)

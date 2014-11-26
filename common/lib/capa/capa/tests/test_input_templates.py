@@ -11,6 +11,7 @@ from mako.template import Template as MakoTemplate
 from mako import exceptions
 from capa.inputtypes import Status
 
+
 class TemplateError(Exception):
     """
     Error occurred while rendering a Mako template.
@@ -496,6 +497,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         xml = self.render_to_xml(self.context)
 
         self.assert_has_xpath(xml, "//input[@size='40']", self.context)
+
 
 class AnnotationInputTemplateTest(TemplateTestCase):
     """

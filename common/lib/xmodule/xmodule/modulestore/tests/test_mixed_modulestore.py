@@ -22,6 +22,8 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import Mongo
 from xmodule.contentstore.content import StaticContent
 import mimetypes
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.xml_importer import import_from_xml
+from nose import SkipTest
 
 if not settings.configured:
     settings.configure()
@@ -718,7 +720,7 @@ class TestMixedModuleStore(CourseComparisonTest):
     # Split:
     #    queries: active_versions, draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data(('draft', 8, 2), ('split', 4, 3))
+    @ddt.data(('draft', 8, 2), ('split', 2, 2))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
@@ -1432,25 +1434,26 @@ class TestMixedModuleStore(CourseComparisonTest):
             self.assertLess(node.subtree_edited_on, subtree_before)
             self.assertEqual(node.subtree_edited_by, subtree_by)
 
-        # Create a dummy vertical & html to test against
-        component = self.store.create_child(
-            self.user_id,
-            test_course.location,
-            'vertical',
-            block_id='test_vertical'
-        )
-        child = self.store.create_child(
-            self.user_id,
-            component.location,
-            'html',
-            block_id='test_html'
-        )
-        sibling = self.store.create_child(
-            self.user_id,
-            component.location,
-            'html',
-            block_id='test_html_no_change'
-        )
+        with self.store.bulk_operations(test_course.id):
+            # Create a dummy vertical & html to test against
+            component = self.store.create_child(
+                self.user_id,
+                test_course.location,
+                'vertical',
+                block_id='test_vertical'
+            )
+            child = self.store.create_child(
+                self.user_id,
+                component.location,
+                'html',
+                block_id='test_html'
+            )
+            sibling = self.store.create_child(
+                self.user_id,
+                component.location,
+                'html',
+                block_id='test_html_no_change'
+            )
 
         after_create = datetime.datetime.now(UTC)
         # Verify that all nodes were last edited in the past by create_user
@@ -1461,7 +1464,8 @@ class TestMixedModuleStore(CourseComparisonTest):
         component.display_name = 'Changed Display Name'
 
         editing_user = self.user_id - 2
-        component = self.store.update_item(component, editing_user)
+        with self.store.bulk_operations(test_course.id):  # TNL-764 bulk ops disabled ancestor updates
+            component = self.store.update_item(component, editing_user)
         after_edit = datetime.datetime.now(UTC)
         check_node(component.location, after_create, after_edit, editing_user, after_create, after_edit, editing_user)
         # but child didn't change
@@ -1869,6 +1873,98 @@ class TestMixedModuleStore(CourseComparisonTest):
             dest_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
             self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
 
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_import_delete_import(self, default):
+        """
+        Test that deleting an element after import and then re-importing restores that element in draft
+        as well as published branches (PLAT_297)
+        """
+        # set the default modulestore
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+            with self.store.default_store(default):
+                dest_course_key = self.store.make_course_key('a', 'course', 'course')
+                courses = import_from_xml(
+                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_course_id=dest_course_key,
+                    create_new_course_if_not_present=True,
+                )
+                course_id = courses[0].id
+                # no need to verify course content here as test_cross_modulestore_import_export does that
+                # delete the vertical
+                vertical_loc = course_id.make_usage_key('vertical', 'vertical_test')
+                self.assertTrue(self.store.has_item(vertical_loc))
+                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+                    self.store.delete_item(vertical_loc, self.user_id)
+                # verify it's in the published still
+                with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
+                    self.assertTrue(self.store.has_item(vertical_loc))
+
+                # now re-import
+                import_from_xml(
+                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_course_id=dest_course_key,
+                )
+                # verify it's in both published and draft
+                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+                    self.assertTrue(self.store.has_item(vertical_loc))
+                with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
+                    self.assertTrue(self.store.has_item(vertical_loc))
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_import_edit_import(self, default):
+        """
+        Test that editing an element after import and then re-importing resets the draft and pub'd
+        to the imported pub'd value (PLAT-299)
+        """
+        if default == ModuleStoreEnum.Type.mongo:
+            raise SkipTest
+        # set the default modulestore
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+            with self.store.default_store(default):
+                dest_course_key = self.store.make_course_key('a', 'course', 'course')
+                courses = import_from_xml(
+                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_course_id=dest_course_key,
+                    create_new_course_if_not_present=True,
+                )
+                course_id = courses[0].id
+                # no need to verify course content here as test_cross_modulestore_import_export does that
+                # delete the vertical
+                vertical_loc = course_id.make_usage_key('vertical', 'vertical_test')
+                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+                    vertical = self.store.get_item(vertical_loc)
+                    vertical.display_name = "4"
+                    self.store.update_item(vertical, self.user_id)
+
+                # now re-import
+                import_from_xml(
+                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_course_id=dest_course_key,
+                )
+                # verify it's the same in both published and draft (toy has no drafts)
+                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+                    draft_vertical = self.store.get_item(vertical_loc)
+                with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
+                    published_vertical = self.store.get_item(vertical_loc)
+                self.assertEqual(draft_vertical.display_name, published_vertical.display_name)
 
 # ============================================================================================================
 # General utils for not using django settings

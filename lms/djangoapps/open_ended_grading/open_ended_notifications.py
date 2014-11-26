@@ -158,11 +158,15 @@ def combined_notifications(course, user):
 
     try:
         #Get the notifications from the grading controller
-        notifications = controller_qs.check_combined_notifications(course.id, student_id, user_is_staff,
-                                                                         last_time_viewed)
+        notifications = controller_qs.check_combined_notifications(
+            course.id,
+            student_id,
+            user_is_staff,
+            last_time_viewed,
+        )
         if notifications.get('success'):
             if (notifications.get('staff_needs_to_grade') or
-                notifications.get('student_needs_to_peer_grade')):
+                    notifications.get('student_needs_to_peer_grade')):
                 pending_grading = True
     except:
         #Non catastrophic error, so no real action
@@ -194,8 +198,12 @@ def set_value_in_cache(student_id, course_id, notification_type, value):
 
 
 def create_key_name(student_id, course_id, notification_type):
-    key_name = u"{prefix}{type}_{course}_{student}".format(prefix=KEY_PREFIX, type=notification_type, course=course_id,
-                                                          student=student_id)
+    key_name = u"{prefix}{type}_{course}_{student}".format(
+        prefix=KEY_PREFIX,
+        type=notification_type,
+        course=course_id,
+        student=student_id,
+    )
     return key_name
 
 

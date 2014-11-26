@@ -439,6 +439,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         def db_structure(_id):
             previous, _, current = _id.partition('.')
             return {'db': 'structure', 'previous_version': previous, '_id': current}
+
         def active_structure(_id):
             previous, _, current = _id.partition('.')
             return {'active': 'structure', 'previous_version': previous, '_id': current}

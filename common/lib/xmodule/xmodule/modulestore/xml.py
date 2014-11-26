@@ -846,3 +846,24 @@ class XMLModuleStore(ModuleStoreReadBase):
         if branch_setting != ModuleStoreEnum.Branch.published_only:
             raise ValueError(u"Cannot set branch setting to {} on a ReadOnly store".format(branch_setting))
         yield
+
+    def _find_course_asset(self, asset_key):
+        """
+        For now this is not implemented, but others should feel free to implement using the asset.json
+        which export produces.
+        """
+        raise NotImplementedError()
+
+    def find_asset_metadata(self, asset_key, **kwargs):
+        """
+        For now this is not implemented, but others should feel free to implement using the asset.json
+        which export produces.
+        """
+        raise NotImplementedError()
+
+    def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
+        """
+        For now this is not implemented, but others should feel free to implement using the asset.json
+        which export produces.
+        """
+        raise NotImplementedError()

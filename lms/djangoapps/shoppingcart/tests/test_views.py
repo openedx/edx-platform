@@ -49,6 +49,7 @@ def mock_render_purchase_form_html(*args, **kwargs):
 
 form_mock = Mock(side_effect=mock_render_purchase_form_html)
 
+
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
 
@@ -63,6 +64,7 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
         patcher = patch('student.models.tracker')
@@ -633,7 +635,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
 
-
     @patch('shoppingcart.views.render_purchase_form_html', form_mock)
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_cart(self):
@@ -911,11 +912,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-
         ((template, context), _) = render_mock.call_args
 
         # When we come from the upgrade flow, we get these context variables
-
 
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
@@ -965,8 +964,36 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         ((template, _context), _tmp) = render_mock.call_args
         self.assertEqual(template, cert_item.single_item_receipt_template)
 
+    def _assert_404(self, url, use_post=False):
+        """
+        Helper method to assert that a given url will return a 404 status code
+        """
+        if use_post:
+            response = self.client.post(url)
+        else:
+            response = self.client.get(url)
+        self.assertEquals(response.status_code, 404)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': False})
+    def test_disabled_paid_courses(self):
+        """
+        Assert that the pages that require ENABLE_PAID_COURSE_REGISTRATION=True return a
+        HTTP 404 status code when we have this flag turned off
+        """
+        self.login_user()
+        self._assert_404(reverse('shoppingcart.views.show_cart', args=[]))
+        self._assert_404(reverse('shoppingcart.views.clear_cart', args=[]))
+        self._assert_404(reverse('shoppingcart.views.remove_item', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart.views.register_code_redemption', args=["testing"]))
+        self._assert_404(reverse('shoppingcart.views.use_code', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart.views.update_user_cart', args=[]))
+        self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
+        self._assert_404(reverse('shoppingcart.views.register_courses', args=[]))
+
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
     """
     Test suite for RegistrationCodeRedemption Course Enrollments
@@ -1167,7 +1194,6 @@ class DonationViewTest(ModuleStoreTestCase):
         )
         self.assertEqual(response.status_code, 405)
 
-
     def test_donations_disabled(self):
         config = DonationConfiguration.current()
         config.enabled = False
@@ -1219,6 +1245,16 @@ class DonationViewTest(ModuleStoreTestCase):
             self.assertEqual(
                 payment_info["payment_params"]["merchant_defined_data1"],
                 unicode(course_id)
+            )
+            self.assertEqual(
+                payment_info["payment_params"]["merchant_defined_data2"],
+                "donation_course"
+            )
+        else:
+            self.assertEqual(payment_info["payment_params"]["merchant_defined_data1"], "")
+            self.assertEqual(
+                payment_info["payment_params"]["merchant_defined_data2"],
+                "donation_general"
             )
 
         processor_response_params = PaymentFakeView.response_post_params(payment_info["payment_params"])

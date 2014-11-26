@@ -219,9 +219,11 @@ def get_cohort(user, course_key):
         return None
 
     try:
-        return CourseUserGroup.objects.get(course_id=course_key,
-                                            group_type=CourseUserGroup.COHORT,
-                                            users__id=user.id)
+        return CourseUserGroup.objects.get(
+            course_id=course_key,
+            group_type=CourseUserGroup.COHORT,
+            users__id=user.id,
+        )
     except CourseUserGroup.DoesNotExist:
         # Didn't find the group.  We'll go on to create one if needed.
         pass
@@ -321,6 +323,7 @@ def add_cohort(course_key, name):
         {"cohort_name": cohort.name, "cohort_id": cohort.id}
     )
     return cohort
+
 
 def add_user_to_cohort(cohort, username_or_email):
     """

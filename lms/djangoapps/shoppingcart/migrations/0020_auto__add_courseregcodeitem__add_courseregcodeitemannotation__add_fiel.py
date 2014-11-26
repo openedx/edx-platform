@@ -59,7 +59,6 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default='personal', max_length=32),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting model 'CourseRegCodeItem'
         db.delete_table('shoppingcart_courseregcodeitem')
@@ -87,7 +86,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Order.order_type'
         db.delete_column('shoppingcart_order', 'order_type')
-
 
     models = {
         'auth.group': {

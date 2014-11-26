@@ -685,12 +685,8 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
     def test_no_asset_collection(self):
         courses = self.draft_store.get_courses()
         course = courses[0]
-        # Confirm that no asset collection means no asset metadata.
-        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id), None)
-        # Now delete the non-existent asset metadata.
-        self.draft_store.delete_all_asset_metadata(course.id, ModuleStoreEnum.UserID.test)
-        # Should still be nothing.
-        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id), None)
+        # Confirm that no specified asset collection name means empty asset metadata.
+        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
 
 
 class TestMongoKeyValueStore(object):

@@ -13,6 +13,12 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
 
+            events: {
+                "click .edit-button": "editXBlock",
+                "click .duplicate-button": "duplicateXBlock",
+                "click .delete-button": "deleteXBlock"
+            },
+
             options: {
                 collapsedClass: 'is-collapsed'
             },
@@ -81,12 +87,6 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 // Hide both blocks until we know which one to show
                 xblockView.$el.addClass(hiddenCss);
 
-                if (!options || !options.refresh) {
-                    // Add actions to any top level buttons, e.g. "Edit" of the container itself.
-                    // Do not add the actions on "refresh" though, as the handlers are already registered.
-                    self.addButtonActions(this.$el);
-                }
-
                 // Render the xblock
                 xblockView.render({
                     done: function() {
@@ -119,7 +119,6 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             },
 
             onXBlockRefresh: function(xblockView) {
-                this.addButtonActions(xblockView.$el);
                 this.xblockView.refresh();
                 // Update publish and last modified information from the server.
                 this.model.fetch();
@@ -137,30 +136,27 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
             },
 
-            addButtonActions: function(element) {
-                var self = this;
-                element.find('.edit-button').click(function(event) {
-                    event.preventDefault();
-                    self.editComponent(self.findXBlockElement(event.target));
-                });
-                element.find('.duplicate-button').click(function(event) {
-                    event.preventDefault();
-                    self.duplicateComponent(self.findXBlockElement(event.target));
-                });
-                element.find('.delete-button').click(function(event) {
-                    event.preventDefault();
-                    self.deleteComponent(self.findXBlockElement(event.target));
-                });
-            },
-
-            editComponent: function(xblockElement) {
-                var self = this,
+            editXBlock: function(event) {
+                var xblockElement = this.findXBlockElement(event.target),
+                    self = this,
                     modal = new EditXBlockModal({ });
+                event.preventDefault();
+
                 modal.edit(xblockElement, this.model, {
                     refresh: function() {
                         self.refreshXBlock(xblockElement);
                     }
                 });
+            },
+
+            duplicateXBlock: function(event) {
+                event.preventDefault();
+                this.duplicateComponent(this.findXBlockElement(event.target));
+            },
+
+            deleteXBlock: function(event) {
+                event.preventDefault();
+                this.deleteComponent(this.findXBlockElement(event.target));
             },
 
             createPlaceholderElement: function() {

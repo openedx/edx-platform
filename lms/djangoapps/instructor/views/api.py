@@ -1157,6 +1157,11 @@ def generate_registration_codes(request, course_id):
     for registration_code in registration_codes:
         csv_writer.writerow([registration_code.code])
 
+    finance_email = microsite.get_value('finance_email', settings.FINANCE_EMAIL)
+    if finance_email:
+        # append the finance email into the recipient_list
+        recipient_list.append(finance_email)
+
     # send a unique email for each recipient, don't put all email addresses in a single email
     for recipient in recipient_list:
         email = EmailMessage()

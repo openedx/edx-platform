@@ -4,8 +4,9 @@
 # pylint: disable=W0212
 # pylint: disable=W0613
 
-import sys, os
+import os
 from path import path
+import sys
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -39,8 +40,14 @@ sys.path.append(root / "lms/djangoapps/mobile_api/course_info")
 sys.path.append(root / "lms/djangoapps/mobile_api/users")
 sys.path.append(root / "lms/djangoapps/mobile_api/video_outlines")
 
-sys.path.insert(0, os.path.abspath(os.path.normpath(os.path.dirname(__file__)
-    + '/../../../')))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.normpath(
+            os.path.dirname(__file__) + '/../../../'
+        )
+    )
+)
 sys.path.append('.')
 
 #  django configuration  - careful here
@@ -73,6 +80,7 @@ copyright = u'2014, edX'
 # --- Mock modules ------------------------------------------------------------
 
 # Mock all the modules that the readthedocs build can't import
+
 
 class Mock(object):
     def __init__(self, *args, **kwargs):
@@ -125,7 +133,7 @@ MOCK_MODULES = [
     'yaml',
     'webob',
     'webob.multidict',
-    ]
+]
 
 if on_rtd:
     for mod_name in MOCK_MODULES:
@@ -176,7 +184,6 @@ def strip_tags(html):
     s = MLStripper()
     s.feed(html)
     return s.get_data()
-
 
 
 def process_docstring(app, what, name, obj, options, lines):

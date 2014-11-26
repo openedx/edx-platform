@@ -39,6 +39,7 @@ def _attr_safe_json(obj):
     """
     return saxutils.escape(json.dumps(obj), {'"': '&quot;'})
 
+
 @newrelic.agent.function_trace()
 def make_course_settings(course):
     """
@@ -55,6 +56,7 @@ def make_course_settings(course):
     }
 
     return obj
+
 
 @newrelic.agent.function_trace()
 def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PAGE):
@@ -156,6 +158,7 @@ def inline_discussion(request, course_id, discussion_id):
         'course_settings': make_course_settings(course)
     })
 
+
 @login_required
 def forum_form_discussion(request, course_id):
     """
@@ -212,7 +215,7 @@ def forum_form_discussion(request, course_id):
             'roles': _attr_safe_json(utils.get_role_ids(course_key)),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
-            'user_cohort': user_cohort_id, # read from container in NewPostView
+            'user_cohort': user_cohort_id,  # read from container in NewPostView
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
@@ -313,6 +316,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'course_settings': _attr_safe_json(course_settings)
         }
         return render_to_response('discussion/index.html', context)
+
 
 @require_GET
 @login_required

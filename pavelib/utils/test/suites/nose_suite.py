@@ -48,9 +48,12 @@ class NoseTestSuite(TestSuite):
             # will run the importable coverage rather than the
             # coverage that OS path finds.
 
+            if not cmd0.endswith('.py'):
+                cmd0 = "`which {}`".format(cmd0)
+
             cmd = (
                 "python -m coverage run --rcfile={root}/.coveragerc "
-                "`which {cmd0}` {cmd_rest}".format(
+                "{cmd0} {cmd_rest}".format(
                     root=self.root,
                     cmd0=cmd0,
                     cmd_rest=cmd_rest,

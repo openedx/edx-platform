@@ -20,6 +20,7 @@ from ..utils import get_lms_link_for_item
 
 __all__ = ['tabs_handler']
 
+
 @expect_json
 @login_required
 @ensure_csrf_cookie
@@ -203,4 +204,3 @@ def primitive_insert(course, num, tab_type, name):
     tabs = course.tabs
     tabs.insert(num, new_tab)
     modulestore().update_item(course, ModuleStoreEnum.UserID.primitive_command)
-

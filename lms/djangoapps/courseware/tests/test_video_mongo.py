@@ -372,8 +372,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
 
-
-    def test_get_html_with_non_existant_edx_video_id(self):
+    def test_get_html_with_non_existent_edx_video_id(self):
         """
         Tests the VideoModule get_html where a edx_video_id is given but a video is not found
         """
@@ -395,7 +394,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             <source src="example.mp4"/>
             <source src="example.webm"/>
             """,
-            'edx_video_id':"meow",
+            'edx_video_id': "meow",
             'result': {
                 'download_video_link': u'example_source.mp4',
                 'sources': json.dumps([u'example.mp4', u'example.webm']),
@@ -416,7 +415,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     @mock.patch('edxval.api.get_video_info')
     def test_get_html_with_mocked_edx_video_id(self, mock_get_video_info):
         mock_get_video_info.return_value = {
-            'url' : '/edxval/video/example',
+            'url': '/edxval/video/example',
             'edx_video_id': u'example',
             'duration': 111.0,
             'client_video_id': u'The example video',
@@ -453,7 +452,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'edx_video_id': "mock item",
             'result': {
                 'download_video_link': None,
-                'sources': json.dumps([u'example.mp4', u'example.webm']),
+                # make sure the desktop_mp4 url is included as part of the alternative sources.
+                'sources': json.dumps([u'example.mp4', u'example.webm', u'http://www.meowmix.com']),
             }
         }
 
@@ -512,28 +512,33 @@ class TestGetHtmlMethod(BaseTestXmodule):
         )
 
     def test_get_html_with_existing_edx_video_id(self):
-        result = create_profile(
-            dict(
-                profile_name="desktop_mp4",
-                extension="mp4",
-                width=200,
-                height=2001
+        # create test profiles and their encodings
+        encoded_videos = []
+        for profile, extension in [("desktop_webm", "webm"), ("desktop_mp4", "mp4")]:
+            result = create_profile(
+                dict(
+                    profile_name=profile,
+                    extension=extension,
+                    width=200,
+                    height=2001
+                )
             )
-        )
-        self.assertEqual(result, "desktop_mp4")
+            self.assertEqual(result, profile)
+            encoded_videos.append(
+                dict(
+                    url=u"http://fake-video.edx.org/thundercats.{}".format(extension),
+                    file_size=9000,
+                    bitrate=42,
+                    profile=profile,
+                )
+            )
+
         result = create_video(
             dict(
                 client_video_id="Thunder Cats",
                 duration=111,
                 edx_video_id="thundercats",
-                encoded_videos=[
-                    dict(
-                        url="http://fake-video.edx.org/thundercats.mp4",
-                        file_size=9000,
-                        bitrate=42,
-                        profile="desktop_mp4",
-                    )
-                ]
+                encoded_videos=encoded_videos
             )
         )
         self.assertEqual(result, "thundercats")
@@ -549,6 +554,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 {sources}
             </video>
         """
+
         data = {
             'download_video': 'true',
             'source': 'example_source.mp4',
@@ -556,10 +562,14 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 <source src="example.mp4"/>
                 <source src="example.webm"/>
             """,
-            'edx_video_id':"thundercats",
+            'edx_video_id': "thundercats",
             'result': {
                 'download_video_link': u'http://fake-video.edx.org/thundercats.mp4',
-                'sources': json.dumps([u'example.mp4', u'example.webm']),
+                # make sure the urls for the various encodings are included as part of the alternative sources.
+                'sources': json.dumps(
+                    [u'example.mp4', u'example.webm'] +
+                    [video['url'] for video in encoded_videos]
+                ),
             }
         }
 
@@ -624,8 +634,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
         """
         def side_effect(*args, **kwargs):
             cdn = {
-            'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
-            'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
+                'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
+                'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
             }
             return cdn.get(args[1])
 
@@ -636,30 +646,35 @@ class TestGetHtmlMethod(BaseTestXmodule):
             display_name="A Name"
             sub="a_sub_file.srt.sjson" source="{source}"
             download_video="{download_video}"
+            edx_video_id="{edx_video_id}"
             start_time="01:00:03" end_time="01:00:10"
             >
                 {sources}
             </video>
         """
-        cases = [
-            #
-            {
-                'download_video': 'true',
-                'source': 'example_source.mp4',
-                'sources': """
-                    <source src="http://example.com/example.mp4"/>
-                    <source src="http://example.com/example.webm"/>
-                """,
-                'result': {
-                    'download_video_link': u'example_source.mp4',
-                    'sources': json.dumps(
-                        [
-                            u'http://cdn_example.com/example.mp4',
-                            u'http://cdn_example.com/example.webm'
-                        ]
-                    ),
-                },
+
+        case_data = {
+            'download_video': 'true',
+            'source': 'example_source.mp4',
+            'sources': """
+                <source src="http://example.com/example.mp4"/>
+                <source src="http://example.com/example.webm"/>
+            """,
+            'result': {
+                'download_video_link': u'example_source.mp4',
+                'sources': json.dumps(
+                    [
+                        u'http://cdn_example.com/example.mp4',
+                        u'http://cdn_example.com/example.webm'
+                    ]
+                ),
             },
+        }
+
+        # test with and without edx_video_id specified.
+        cases = [
+            dict(case_data, edx_video_id=""),
+            dict(case_data, edx_video_id="vid-v1:12345"),
         ]
 
         initial_context = {
@@ -692,107 +707,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             DATA = SOURCE_XML.format(
                 download_video=data['download_video'],
                 source=data['source'],
-                sources=data['sources']
-            )
-            self.initialize_module(data=DATA)
-            self.item_descriptor.xmodule_runtime.user_location = 'CN'
-
-            context = self.item_descriptor.render('student_view').content
-
-            expected_context = dict(initial_context)
-            expected_context.update({
-                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'translation'
-                ).rstrip('/?'),
-                'transcript_available_translations_url': self.item_descriptor.xmodule_runtime.handler_url(
-                    self.item_descriptor, 'transcript', 'available_translations'
-                ).rstrip('/?'),
-                'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'id': self.item_descriptor.location.html_id(),
-            })
-            expected_context.update(data['result'])
-
-            self.assertEqual(
-                context,
-                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
-            )
-
-
-    @patch('xmodule.video_module.video_module.get_video_from_cdn')
-    def test_get_html_cdn_source(self, mocked_get_video):
-        """
-        Test if sources got from CDN.
-        """
-        def side_effect(*args, **kwargs):
-            cdn = {
-            'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
-            'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
-            }
-            return cdn.get(args[1])
-
-        mocked_get_video.side_effect = side_effect
-
-        SOURCE_XML = """
-            <video show_captions="true"
-            display_name="A Name"
-            sub="a_sub_file.srt.sjson" source="{source}"
-            download_video="{download_video}"
-            start_time="01:00:03" end_time="01:00:10"
-            >
-                {sources}
-            </video>
-        """
-        cases = [
-            {
-                'download_video': 'true',
-                'source': 'example_source.mp4',
-                'sources': """
-                    <source src="http://example.com/example.mp4"/>
-                    <source src="http://example.com/example.webm"/>
-                """,
-                'result': {
-                    'download_video_link': u'example_source.mp4',
-                    'sources': json.dumps(
-                        [
-                            u'http://cdn_example.com/example.mp4',
-                            u'http://cdn_example.com/example.webm'
-                        ]
-                    ),
-                },
-            },
-        ]
-
-        initial_context = {
-            'data_dir': getattr(self, 'data_dir', None),
-            'show_captions': 'true',
-            'handout': None,
-            'display_name': u'A Name',
-            'download_video_link': None,
-            'end': 3610.0,
-            'id': None,
-            'sources': '[]',
-            'speed': 'null',
-            'general_speed': 1.0,
-            'start': 3603.0,
-            'saved_video_position': 0.0,
-            'sub': u'a_sub_file.srt.sjson',
-            'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            'yt_test_timeout': 1500,
-            'yt_api_url': 'www.youtube.com/iframe_api',
-            'yt_test_url': 'gdata.youtube.com/feeds/api/videos/',
-            'transcript_download_format': 'srt',
-            'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
-            'transcript_language': u'en',
-            'transcript_languages': '{"en": "English"}',
-        }
-
-        for data in cases:
-            DATA = SOURCE_XML.format(
-                download_video=data['download_video'],
-                source=data['source'],
-                sources=data['sources']
+                sources=data['sources'],
+                edx_video_id=data['edx_video_id'],
             )
             self.initialize_module(data=DATA)
             self.item_descriptor.xmodule_runtime.user_location = 'CN'

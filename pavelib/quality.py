@@ -30,7 +30,9 @@ def run_pylint(options):
         # This makes the folder if it doesn't already exist.
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
-        flags = '-E' if errors else ''
+        flags = []
+        if errors:
+            flags.append("--errors-only")
 
         apps = [system]
 
@@ -51,7 +53,7 @@ def run_pylint(options):
             "{pythonpath_prefix} pylint {flags} -f parseable {apps} | "
             "tee {report_dir}/pylint.report".format(
                 pythonpath_prefix=pythonpath_prefix,
-                flags=flags,
+                flags=" ".join(flags),
                 apps=apps_list,
                 report_dir=report_dir
             )
@@ -64,6 +66,7 @@ def run_pylint(options):
     if num_violations > violations_limit > -1:
         raise Exception("Failed. Too many pylint violations. "
                         "The limit is {violations_limit}.".format(violations_limit=violations_limit))
+
 
 def _count_pylint_violations(report_file):
     """
@@ -82,6 +85,7 @@ def _count_pylint_violations(report_file):
         if len(violation_list_for_line) == 4:
             num_violations_report += 1
     return num_violations_report
+
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
@@ -113,9 +117,11 @@ def run_pep8(options):
         raise Exception("Failed. Too many pep8 violations. "
                         "The limit is {violations_limit}.".format(violations_limit=violations_limit))
 
+
 def _count_pep8_violations(report_file):
     num_lines = sum(1 for line in open(report_file))
     return num_lines
+
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
@@ -146,12 +152,7 @@ def run_quality(options):
     # If pep8 reports exist, use those
     # Otherwise, `diff-quality` will call pep8 itself
 
-    pep8_files = []
-    for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
-        for f in files:
-            if f == "pep8.report":
-                pep8_files.append(os.path.join(subdir, f))
-
+    pep8_files = get_violations_reports("pep8")
     pep8_reports = u' '.join(pep8_files)
 
     try:
@@ -173,12 +174,7 @@ def run_quality(options):
     # If pylint reports exist, use those
     # Otherwise, `diff-quality` will call pylint itself
 
-    pylint_files = []
-    for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
-        for f in files:
-            if f == "pylint.report":
-                pylint_files.append(os.path.join(subdir, f))
-
+    pylint_files = get_violations_reports("pylint")
     pylint_reports = u' '.join(pylint_files)
 
     pythonpath_prefix = (
@@ -188,12 +184,15 @@ def run_quality(options):
 
     try:
         sh(
-            "{pythonpath_prefix} diff-quality --violations=pylint {pylint_reports} {percentage_string} "
-            "--html-report {dquality_dir}/diff_quality_pylint.html".format(
+            "{pythonpath_prefix} diff-quality --violations=pylint "
+            "{pylint_reports} {percentage_string} "
+            "--html-report {dquality_dir}/diff_quality_pylint.html "
+            "--options='{pylint_options}'".format(
                 pythonpath_prefix=pythonpath_prefix,
                 pylint_reports=pylint_reports,
                 percentage_string=percentage_string,
-                dquality_dir=dquality_dir
+                dquality_dir=dquality_dir,
+                pylint_options="--disable=fixme",
             )
         )
     except BuildFailure, error_message:
@@ -217,3 +216,15 @@ def is_percentage_failure(error_message):
         return False
     else:
         return True
+
+
+def get_violations_reports(violations_type):
+    """
+    Finds violations reports files by naming convention (e.g., all "pep8.report" files)
+    """
+    violations_files = []
+    for subdir, _dirs, files in os.walk(os.path.join(Env.REPORT_DIR)):
+        for f in files:
+            if f == "{violations_type}.report".format(violations_type=violations_type):
+                violations_files.append(os.path.join(subdir, f))
+    return violations_files

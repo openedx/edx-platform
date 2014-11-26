@@ -11,6 +11,9 @@
 <head dir="${dir_rtl}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    % if responsive:
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    % endif
 <%! from django.utils.translation import ugettext as _ %>
 <%! from microsite_configuration import microsite %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
@@ -109,6 +112,7 @@
   <![endif]-->
 
   <%include file="widgets/optimizely.html" />
+  <%include file="widgets/segment-io.html" />
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
@@ -150,8 +154,6 @@
   % endif
 
   <%block name="js_extra"/>
-
-  <%include file="widgets/segment-io.html" />
 </body>
 </html>
 

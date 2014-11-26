@@ -22,6 +22,12 @@ $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
 $serif: $georgia;
 
+// FONT-WEIGHTS
+$font-light: 300;
+$font-regular: 400;
+$font-semibold: 600;
+$font-bold: 700;
+
 // ====================
 
 // MISC: base fonts/colors
@@ -173,6 +179,7 @@ $m-blue-d1: #1790C7;
 $m-blue-d2: #1580B0;
 $m-blue-d3: #126F9A;
 $m-blue-d4: #0A4A67;
+$m-blue-d5: #009EE7;
 $m-blue-t0: rgba($m-blue,0.125);
 $m-blue-t1: rgba($m-blue,0.25);
 $m-blue-t2: rgba($m-blue,0.50);
@@ -401,11 +408,11 @@ $homepage__header--background: lighten($blue, 15%);
 // IMAGES: backgrounds
 $homepage-bg-image: none;
 
-$login-banner-image: url(../images/bg-banner-account.png);
-$register-banner-image: url(../images/bg-banner-account.png);
-$passwordreset-banner-image: url(../images/bg-banner-account.png);
+$login-banner-image: url(../images/edx-background-banner-account.png);
+$register-banner-image: url(../images/edx-background-banner-account.png);
+$passwordreset-banner-image: url(../images/edx-background-banner-account.png);
 
-$video-thumb-url: '../images/courses/video-thumb.jpg';
+$video-thumb-url: '../images/homepage-hero-video-thumb.jpg';
 
 // ====================
 
@@ -422,6 +429,7 @@ $header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 // SPLINT: colors
 
 $msg-bg: $action-primary-bg;
+
 
 // New Shopping Cart
 

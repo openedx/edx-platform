@@ -93,8 +93,10 @@ def click_component_from_menu(category, component_type, is_advanced):
     """
     if is_advanced:
         # Sometimes this click does not work if you go too fast.
-        world.retry_on_exception(_click_advanced,
-            ignored_exceptions=AssertionError)
+        world.retry_on_exception(
+            _click_advanced,
+            ignored_exceptions=AssertionError,
+        )
 
     # Retry this in case the list is empty because you tried too fast.
     link = world.retry_on_exception(

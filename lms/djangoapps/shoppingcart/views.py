@@ -33,7 +33,7 @@ from .exceptions import (
 )
 from .models import (
     Order, OrderTypes,
-    PaidCourseRegistration, OrderItem, Coupon, CourseRegCodeItem,
+    PaidCourseRegistration, OrderItem, Coupon,
     CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption,
     Donation, DonationConfiguration
 )
@@ -44,6 +44,7 @@ from .processors import (
 
 import json
 from xmodule_django.models import CourseKeyField
+from .decorators import enforce_shopping_cart_enabled
 
 log = logging.getLogger("shoppingcart")
 AUDIT_LOG = logging.getLogger("audit")
@@ -94,6 +95,7 @@ def add_course_to_cart(request, course_id):
 
 
 @login_required
+@enforce_shopping_cart_enabled
 def update_user_cart(request):
     """
     when user change the number-of-students from the UI then
@@ -127,6 +129,7 @@ def update_user_cart(request):
 
 
 @login_required
+@enforce_shopping_cart_enabled
 def show_cart(request):
     """
     This view shows cart items.
@@ -158,6 +161,7 @@ def show_cart(request):
 
 
 @login_required
+@enforce_shopping_cart_enabled
 def clear_cart(request):
     cart = Order.get_cart_for_user(request.user)
     cart.clear()
@@ -175,6 +179,7 @@ def clear_cart(request):
 
 
 @login_required
+@enforce_shopping_cart_enabled
 def remove_item(request):
     """
     This will remove an item from the user cart and also delete the corresponding coupon codes redemption.
@@ -195,6 +200,7 @@ def remove_item(request):
             item.order.update_order_type()
 
     return HttpResponse('OK')
+
 
 def remove_code_redemption(order_item_course_id, item_id, item, user):
     """
@@ -227,6 +233,7 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
 
 
 @login_required
+@enforce_shopping_cart_enabled
 def reset_code_redemption(request):
     """
     This method reset the code redemption from user cart items.
@@ -239,6 +246,7 @@ def reset_code_redemption(request):
 
 
 @login_required
+@enforce_shopping_cart_enabled
 def use_code(request):
     """
     This method may generate the discount against valid coupon code
@@ -291,6 +299,7 @@ def get_reg_code_validity(registration_code, request, limiter):
 
 @require_http_methods(["GET", "POST"])
 @login_required
+@enforce_shopping_cart_enabled
 def register_code_redemption(request, registration_code):
     """
     This view allows the student to redeem the registration code
@@ -382,6 +391,7 @@ def use_coupon_code(coupons, user):
 
 
 @login_required
+@enforce_shopping_cart_enabled
 def register_courses(request):
     """
     This method enroll the user for available course(s)
@@ -480,6 +490,12 @@ def donate(request):
         reverse("shoppingcart.views.postpay_callback")
     )
 
+    # Add extra to make it easier to track transactions
+    extra_data = [
+        unicode(course_id) if course_id else "",
+        "donation_course" if course_id else "donation_general"
+    ]
+
     response_params = json.dumps({
         # The HTTP end-point for the payment processor.
         "payment_url": get_purchase_endpoint(),
@@ -488,7 +504,7 @@ def donate(request):
         "payment_params": get_signed_purchase_params(
             cart,
             callback_url=callback_url,
-            extra_data=([unicode(course_id)] if course_id else None)
+            extra_data=extra_data
         ),
     })
 
@@ -518,6 +534,7 @@ def postpay_callback(request):
 
 @require_http_methods(["GET", "POST"])
 @login_required
+@enforce_shopping_cart_enabled
 def billing_details(request):
     """
     This is the view for capturing additional billing details

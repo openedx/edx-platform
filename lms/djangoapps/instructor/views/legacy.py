@@ -134,8 +134,8 @@ def instructor_dashboard(request, course_id):
             'header': ['Statistic', 'Value'],
             'title': _('Course Statistics At A Glance'),
         }
-        data = [['# Enrolled', enrollment_number]]
-        data += [['Date', timezone.now().isoformat()]]
+
+        data = [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
             for field in course.fields.values():
@@ -938,11 +938,10 @@ def instructor_dashboard(request, course_id):
             "StudentsDailyActivity",  # active students by day
             "StudentsDropoffPerDay",  # active students dropoff by day
             # "OverallGradeDistribution",  # overall point distribution for course
-            "StudentsActive",  # num students active in time period (default = 1wk)
-            "StudentsEnrolled",  # num students enrolled
             # "StudentsPerProblemCorrect",  # foreach problem, num students correct
             "ProblemGradeDistribution",  # foreach problem, grade distribution
         ]
+
         for analytic_name in DASHBOARD_ANALYTICS:
             analytics_results[analytic_name] = get_analytics_result(analytic_name)
 
@@ -1430,6 +1429,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 
 #-----------------------------------------------------------------------------
 # enrollment
+
 
 def _do_enroll_students(course, course_key, students, secure=False, overload=False, auto_enroll=False, email_students=False, is_shib_course=False):
     """

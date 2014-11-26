@@ -11,6 +11,7 @@ from opaque_keys.edx.locator import CourseLocator
 from mock import patch
 import ddt
 
+
 @ddt.ddt
 class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
     """
@@ -24,7 +25,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         (COURSE_ID_SPLIT, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_SPLIT)),
         (COURSE_ID_MONGO, CourseLocator.from_string(COURSE_ID_MONGO)),
         (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
-        )
+    )
 
     @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):

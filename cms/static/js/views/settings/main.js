@@ -97,9 +97,10 @@ var DetailsView = ValidatingView.extend({
         var timefield = $(div).find("input:.time");
         var cachethis = this;
         var setfield = function () {
-            var newVal = DateUtils.getDate(datefield, timefield);
+            var newVal = DateUtils.getDate(datefield, timefield),
+                oldTime = new Date(cacheModel.get(fieldName)).getTime();
             if (newVal) {
-                if (!cacheModel.has(fieldName) || cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
+                if (!cacheModel.has(fieldName) || oldTime !== newVal.getTime()) {
                     cachethis.clearValidationErrors();
                     cachethis.setAndValidate(fieldName, newVal);
                 }

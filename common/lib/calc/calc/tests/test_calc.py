@@ -14,6 +14,7 @@ from pyparsing import ParseException
 # See http://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
 numpy.seterr(all='ignore')  # Also: 'ignore', 'warn' (default), 'raise'
 
+
 class EvaluatorTest(unittest.TestCase):
     """
     Run tests for calc.evaluator
