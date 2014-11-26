@@ -30,7 +30,7 @@ from lms.lib.comment_client.thread import get_course_thread_stats
 from lms.lib.comment_client.utils import CommentClientRequestError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from progress.models import StudentProgress, StudentProgressHistory
+from progress.models import StudentProgress
 from projects.models import Project, Workgroup
 from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -1589,7 +1589,7 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
                                               proforma_grade__gt=0)
         enrolled_qs = CourseEnrollment.objects.filter(course_id__exact=course_key, user__is_active=True,
                                                       is_active=True).exclude(user_id__in=exclude_users)
-        users_started_qs = StudentProgressHistory.objects.filter(course_id__exact=course_key, user__is_active=True,
+        users_started_qs = StudentProgress.objects.filter(course_id__exact=course_key, user__is_active=True,
                                                                  user__courseenrollment__is_active=True,
                                                                  user__courseenrollment__course_id__exact=course_key)\
             .exclude(user_id__in=exclude_users)
@@ -1617,8 +1617,8 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         enrolled_series = get_time_series_data(enrolled_qs, start_dt, end_dt, interval=interval,
                                                date_field='created', aggregate=Count('id'))
         started_series = get_time_series_data(users_started_qs, start_dt, end_dt, interval=interval,
-                                              date_field='created', date_field_model=StudentProgressHistory,
-                                              aggregate=Count('user', distinct=True))
+                                              date_field='created', date_field_model=StudentProgress,
+                                              aggregate=Count('user'))
         completed_series = get_time_series_data(grades_complete_qs, start_dt, end_dt, interval=interval,
                                                 date_field='modified', date_field_model=StudentGradebook,
                                                 aggregate=Count('id'))
@@ -1631,19 +1631,18 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         active_users_series = get_time_series_data(active_users_qs, start_dt, end_dt, interval=interval,
                                                    date_field='modified', date_field_model=StudentModule,
                                                    aggregate=Count('student', distinct=True))
-        not_started_series, total_enrolled_series = [], []
+        not_started_series = []
         for enrolled, started in zip(enrolled_series, started_series):
             not_started_series.append((started[0], (total_enrolled + enrolled[1]) - (total_started + started[1])))
             total_started += started[1]
             total_enrolled += enrolled[1]
-            total_enrolled_series.append((started[0], total_enrolled))
 
         data = {
             'users_not_started': not_started_series,
             'users_started': started_series,
             'users_completed': completed_series,
             'modules_completed': modules_completed_series,
-            'users_enrolled': total_enrolled_series,
+            'users_enrolled': enrolled_series,
             'active_users': active_users_series
         }
         return Response(data, status=status.HTTP_200_OK)
