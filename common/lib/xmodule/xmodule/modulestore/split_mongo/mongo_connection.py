@@ -1,21 +1,21 @@
 """
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
+from contracts import check
+import datetime
+from functools import wraps
+import pytz
 import re
-from mongodb_proxy import autoretry_read, MongoProxy
-import pymongo
 import time
 
+from mongodb_proxy import autoretry_read, MongoProxy
+import pymongo
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
-
-from contracts import check
-from functools import wraps
 from pymongo.errors import AutoReconnect
+
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo import BlockKey
-import datetime
-import pytz
 
 
 def structure_from_mongo(structure):

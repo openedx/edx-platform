@@ -2,16 +2,24 @@
 """
 Modulestore configuration for test cases.
 """
+import datetime
+import os
+import pytz
+import shutil
 from uuid import uuid4
+
 from django.test import TestCase
-from django.contrib.auth.models import User
+from mock import MagicMock, patch
+from mongodb_proxy import MongoProxy
+import mongomock
+from request_cache.middleware import RequestCache
+
+from student.tests.factories import UserFactory
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore import ModuleStoreEnum
-import datetime
-import pytz
-from request_cache.middleware import RequestCache
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
@@ -191,7 +199,7 @@ class ModuleStoreTestCase(TestCase):
 
         if kwargs.pop('create_user', True):
             # Create the user so we can log them in.
-            self.user = User.objects.create_user(uname, email, password)
+            self.user = UserFactory.create(username=uname, email=email, password=password)
 
             # Note that we do not actually need to do anything
             # for registration if we directly mark them active.
@@ -210,7 +218,7 @@ class ModuleStoreTestCase(TestCase):
         """
         uname = 'teststudent'
         password = 'foo'
-        nonstaff_user = User.objects.create_user(uname, 'test+student@edx.org', password)
+        nonstaff_user = UserFactory.create(username=uname, email='test+student@edx.org', password=password)
 
         # Note that we do not actually need to do anything
         # for registration if we directly mark them active.
@@ -237,8 +245,15 @@ class ModuleStoreTestCase(TestCase):
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
         module_store = modulestore()
-        if hasattr(module_store, '_drop_database'):
-            module_store._drop_database()  # pylint: disable=protected-access
+
+        if not isinstance(module_store, XMLModuleStore):
+            for store in module_store.modulestores:
+                if hasattr(store, 'database'):
+                    name = store.database.name
+                    store.database.connection.drop_database(name)
+                    conn = store.database.connection
+                    conn.disconnect()
+
         _CONTENTSTORE.clear()
         if hasattr(module_store, 'close_connections'):
             module_store.close_connections()
@@ -254,10 +269,33 @@ class ModuleStoreTestCase(TestCase):
         clear_existing_modulestores()
         TestCase.setUpClass()
 
-    def _pre_setup(self):
+    @patch('xmodule.modulestore.split_mongo.mongo_connection.pymongo')
+    def _pre_setup(self, mocked_mongo):
         """
         Flush the ModuleStore.
         """
+        def side_effect(**kwargs):
+            # 'kwargs': {'host': 'localhost', 'db': 'test_xmodule', 'port': 27017, 'collection': 'modulestorea125d'}
+            connection = MagicMock()
+            connection.database = MongoProxy(
+                mongomock.database.Database(
+                    mongomock.MongoClient(
+                        host=kwargs.get('host'),
+                        port=kwargs.get('port', 27017),
+                        tz_aware=kwargs.get('tz_aware', True),
+                    ),
+                    kwargs.get('db')
+                ),
+                wait_time=0.1
+            )
+
+            connection.course_index = connection.database[kwargs.get('collection') + '.active_versions']
+            connection.structures = connection.database[kwargs.get('collection') + '.structures']
+            connection.definitions = connection.database[kwargs.get('collection') + '.definitions']
+            return connection
+
+        # mocked_mongo.side_effect = side_effect
+        mocked_mongo.side_effect = mongomock
 
         # Flush the Mongo modulestore
         self.drop_mongo_collections()
@@ -277,6 +315,19 @@ class ModuleStoreTestCase(TestCase):
         clear_existing_modulestores()
         # clear RequestCache to emulate its clearance after each http request.
         RequestCache().clear_request_cache()
+
+        # Delete the tmp dir that contained the modulestore
+        module_store = modulestore()
+        if not isinstance(module_store, XMLModuleStore):
+            for store in module_store.modulestores:
+                if hasattr(store, 'database'):
+                    conn = store.database.connection
+                    conn.disconnect()
+                if hasattr(store, 'fs_root'):
+                    fs_root = store.fs_root
+                    if fs_root.startswith('/tmp/') and os.path.isdir(fs_root):
+                        shutil.rmtree(store.fs_root, ignore_errors=True)
+
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
