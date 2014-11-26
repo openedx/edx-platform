@@ -196,6 +196,22 @@ class TestCourseVerificationStatus(ModuleStoreTestCase):
             mode=enrollment_mode
         )
 
+    BANNER_ALT_MESSAGES = {
+        None: "Honor",
+        VERIFY_STATUS_NEED_TO_VERIFY: "ID Verified Pending Ribbon/Badge",
+        VERIFY_STATUS_SUBMITTED: "ID Verified Pending Ribbon/Badge",
+        VERIFY_STATUS_APPROVED: "ID Verified Ribbon/Badge",
+
+        # TODO: do we want to display honor code instead?
+        VERIFY_STATUS_MISSED_DEADLINE: "ID Verified Pending Ribbon/Badge"
+    }
+
+    NOTIFICATION_MESSAGES = {
+        VERIFY_STATUS_NEED_TO_VERIFY: "You still need to verify for this course.",
+        VERIFY_STATUS_SUBMITTED: "You have already verified your ID!",
+        VERIFY_STATUS_MISSED_DEADLINE: "You did not submit your verification before the deadline."
+    }
+
     def _assert_course_verification_status(self, status):
         """Check whether the specified verification status is shown on the dashboard.
 
@@ -212,19 +228,13 @@ class TestCourseVerificationStatus(ModuleStoreTestCase):
         # Sanity check: verify that the course is on the page
         self.assertContains(response, unicode(self.course.id))
 
-        # TODO: for now, we're just checking the debug status code
-        # piped through to the dashboard.  Once we implement
-        # the actual messaging, we'll need to update these assertions
-        # to check the page for the real messages.
-        if status is None:
-            self.assertNotContains(response, VERIFY_STATUS_NEED_TO_VERIFY)
-            self.assertNotContains(response, VERIFY_STATUS_SUBMITTED)
-            self.assertNotContains(response, VERIFY_STATUS_MISSED_DEADLINE)
-        elif status == VERIFY_STATUS_NEED_TO_VERIFY:
-            self.assertContains(response, VERIFY_STATUS_NEED_TO_VERIFY)
-        elif status == VERIFY_STATUS_SUBMITTED:
-            self.assertContains(response, VERIFY_STATUS_SUBMITTED)
-        elif status == VERIFY_STATUS_APPROVED:
-            self.assertContains(response, VERIFY_STATUS_APPROVED)
-        elif status == VERIFY_STATUS_MISSED_DEADLINE:
-            self.assertContains(response, VERIFY_STATUS_MISSED_DEADLINE)
+        # Verify that the correct banner is rendered on the dashboard
+        self.assertContains(response, self.BANNER_ALT_MESSAGES[status])
+
+        # Verify that the correct copy is rendered on the dashboard
+        # (and no other copy is also rendered!)
+        for msg_status, msg in self.NOTIFICATION_MESSAGES.iteritems():
+            if msg_status == status:
+                self.assertContains(response, msg)
+            else:
+                self.assertNotContains(response, msg)

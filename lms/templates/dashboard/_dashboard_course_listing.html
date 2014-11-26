@@ -4,6 +4,12 @@
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
+  from student.helpers import (
+    VERIFY_STATUS_NEED_TO_VERIFY,
+    VERIFY_STATUS_SUBMITTED,
+    VERIFY_STATUS_APPROVED,
+    VERIFY_STATUS_MISSED_DEADLINE
+  )
 %>
 
 <%
@@ -46,11 +52,20 @@
     % endif
     % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
         % if enrollment.mode == "verified":
+          % if verification_status == VERIFY_STATUS_APPROVED or not settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
           <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
             <span class="label">${_("Enrolled as: ")}</span>
             <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
             <span class="sts-enrollment-value">${_("Verified")}</span>
           </span>
+          % else:
+          ## TODO: doc review of this messaging
+          <span class="sts-enrollment" title="${_("Your verification is pending")}">
+            <span class="label">${_("Enrolled as: ")}</span>
+            <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Pending Ribbon/Badge" />
+            <span class="sts-enrollment-value">${_("Verified Pending")}</span>
+          </span>
+          % endif
         % elif enrollment.mode == "honor":
           <span class="sts-enrollment" title="${_("You're enrolled as an honor code student")}">
             <span class="label">${_("Enrolled as: ")}</span>
@@ -67,11 +82,6 @@
           <span class="sts-enrollment-value">${_("Professional Ed")}</span>
         </span>
         % endif
-    % endif
-
-    ## DEBUG
-    % if verification_status is not None:
-    DEBUG: ${ verification_status }
     % endif
 
     <section class="info">
@@ -130,6 +140,20 @@
                 </li>
               </ul>
             </div>
+        </div>
+      % elif verification_status is not None and not is_course_blocked:
+        <div class="message has-actions is-shown">
+          % if verification_status == VERIFY_STATUS_NEED_TO_VERIFY:
+            <p>${_('Almost there!')}</p>
+            <p>${_('You still need to verify for this course.')}</p>
+            <p>${_('Verify Now')}</p>
+          % elif verification_status == VERIFY_STATUS_SUBMITTED:
+            <p>${_('You have already verified your ID!')}</p>
+            <p>${_('Thanks for your patience as we process your request')}</p>
+          % elif verification_status == VERIFY_STATUS_MISSED_DEADLINE:
+            ## TODO: doc review of this message
+            <p>${_('You did not submit your verification before the deadline.')}</p>
+          % endif
         </div>
       %endif
       % if is_course_blocked:
