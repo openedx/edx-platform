@@ -107,9 +107,9 @@
                            %else:
                         <tr class="coupons-items">
                            %endif
-                            <td>${_('{code}').format(code=coupon.code)}</td>
-                            <td>${_('{description}').format(description=coupon.description)}</td>
-                            <td>${_('{discount}').format(discount=coupon.percentage_discount)}</td>
+                            <td>${coupon.code}</td>
+                            <td>${coupon.description}</td>
+                            <td>${coupon.percentage_discount}</td>
                            <td>${ coupon.couponredemption_set.filter(order__status='purchased').count() }</td>
                            <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">${_('Edit')}</a></td>
                         </tr>
