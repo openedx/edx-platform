@@ -90,10 +90,11 @@ class UserCourseStatus(views.APIView):
 
     http_method_names = ["get", "patch"]
 
-    def _last_visited_module_id(self, request, course):
+    def _last_visited_module_path(self, request, course):
         """
-        Returns the id of the last module visited by the current user in the given course.
-        If there is no such visit returns the default (the first item deep enough down the course tree)
+        Returns the path from the last module visited by the current user in the given course up to
+        the course module. If there is no such visit, the first item deep enough down the course
+        tree is used.
         """
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, request.user, course, depth=2)
@@ -101,13 +102,16 @@ class UserCourseStatus(views.APIView):
         course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course.id)
         current = course_module
 
+        path = []
         child = current
         while child:
+            path.append(child)
             child = get_current_child(current)
             if child:
                 current = child
 
-        return current
+        path.reverse()
+        return path
 
     def _process_arguments(self, request, username, course_id, course_handler):
         """
@@ -134,8 +138,12 @@ class UserCourseStatus(views.APIView):
         """
         Returns the course status
         """
-        current_module = self._last_visited_module_id(request, course)
-        return Response({"last_visited_module_id": unicode(current_module.location)})
+        path = self._last_visited_module_path(request, course)
+        path_ids = [unicode(module.location) for module in path]
+        return Response({
+            "last_visited_module_id": path_ids[0],
+            "last_visited_module_path": path_ids,
+        })
 
     def get(self, request, username, course_id):
         """
@@ -151,6 +159,8 @@ class UserCourseStatus(views.APIView):
 
         * last_visited_module_id: The id of the last module visited by the user in the given course
 
+        * last_visited_module_path: The ids of the modules in the path from the last visited module
+          to the course module
         """
 
         return self._process_arguments(request, username, course_id, lambda course: self.get_course_info(request, course))
