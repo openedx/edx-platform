@@ -11,7 +11,7 @@ from third_party_auth import (  # pylint: disable=W0611
     pipeline, provider,
     is_enabled as third_party_auth_enabled
 )
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
 
 
 def auth_pipeline_urls(auth_entry, redirect_url=None, course_id=None):

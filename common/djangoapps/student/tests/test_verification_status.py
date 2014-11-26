@@ -1,6 +1,7 @@
 """Tests for per-course verification status on the dashboard. """
 from datetime import datetime, timedelta
 
+import unittest
 import ddt
 from mock import patch
 from pytz import UTC
@@ -19,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from course_modes.tests.factories import CourseModeFactory
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
 
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
@@ -30,6 +31,7 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
     'SEPARATE_VERIFICATION_FROM_PAYMENT': True,
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True
 })
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestCourseVerificationStatus(ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
