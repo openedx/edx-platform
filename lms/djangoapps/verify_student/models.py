@@ -345,6 +345,12 @@ class PhotoVerification(StatusModel):
             if verification.active_at_datetime(deadline):
                 return verification
 
+    @property
+    def expiration_datetime(self):
+        """Datetime that the verification will expire. """
+        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        return self.created_at + timedelta(days=days_good_for)
+
     def active_at_datetime(self, deadline):
         """Check whether the verification was active at a particular datetime.
 
@@ -356,10 +362,9 @@ class PhotoVerification(StatusModel):
             bool
 
         """
-        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
         return (
             self.created_at < deadline and
-            self.created_at + timedelta(days=days_good_for) > deadline
+            self.expiration_datetime > deadline
         )
 
     def parsed_error_msg(self):

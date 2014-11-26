@@ -151,9 +151,13 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
             including modes that have expired.
 
     Returns:
-        dict: Mapping of course keys to an enumerated verification status.
+        dict: Mapping of course keys verification status dictionaries.
             If no verification status is applicable to a course, it will not
             be included in the dictionary.
+            The dictionaries have these keys:
+                * status (str): One of the enumerated status codes.
+                * days_until_deadline (int): Number of days until the verification deadline.
+                * verification_good_until (str): Date string for the verification expiration date.
     """
 
     status_by_course = {}
@@ -208,6 +212,20 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
             # Set the status for the course only if we're displaying some kind of message
             # Otherwise, leave the course out of the dictionary.
             if status is not None:
-                status_by_course[course.id] = status
+                days_until_deadline = None
+                verification_good_until = None
+
+                now = datetime.now(UTC)
+                if deadline is not None and deadline > now:
+                    days_until_deadline = (deadline - now).days
+
+                if relevant_verification is not None:
+                    verification_good_until = relevant_verification.expiration_datetime.strftime("%m/%d/%Y")
+
+                status_by_course[course.id] = {
+                    'status': status,
+                    'days_until_deadline': days_until_deadline,
+                    'verification_good_until': verification_good_until
+                }
 
     return status_by_course

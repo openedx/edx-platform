@@ -65,9 +65,8 @@ class TestCourseVerificationStatus(ModuleStoreTestCase):
         # so no verification status should be displayed
         self._assert_course_verification_status(None)
 
-    @ddt.data(None, FUTURE)
-    def test_need_to_verify(self, expiration):
-        self._setup_mode_and_enrollment(expiration, "verified")
+    def test_need_to_verify_no_expiration(self):
+        self._setup_mode_and_enrollment(None, "verified")
 
         # Since the student has not submitted a photo verification,
         # the student should see a "need to verify" message
@@ -83,6 +82,12 @@ class TestCourseVerificationStatus(ModuleStoreTestCase):
         # We should still need to verify
         attempt.mark_ready()
         self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_VERIFY)
+
+    def test_need_to_verify_expiration(self):
+        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, self.BANNER_ALT_MESSAGES[VERIFY_STATUS_NEED_TO_VERIFY])
+        self.assertContains(response, "You only have 4 days left to verify for this course.")
 
     @ddt.data(None, FUTURE)
     def test_waiting_approval(self, expiration):
@@ -108,6 +113,10 @@ class TestCourseVerificationStatus(ModuleStoreTestCase):
 
         # Expect that the successfully verified message is shown
         self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
+
+        # Check that the "verification good until" date is displayed
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, attempt.expiration_datetime.strftime("%m/%d/%Y"))
 
     def test_missed_verification_deadline(self):
         # Expiration date in the past
@@ -206,8 +215,8 @@ class TestCourseVerificationStatus(ModuleStoreTestCase):
 
     NOTIFICATION_MESSAGES = {
         VERIFY_STATUS_NEED_TO_VERIFY: "You still need to verify for this course.",
-        VERIFY_STATUS_SUBMITTED: "You have already verified your ID!",
-        VERIFY_STATUS_MISSED_DEADLINE: "You did not submit your verification before the deadline."
+        VERIFY_STATUS_SUBMITTED: "Thanks for your patience as we process your request.",
+        VERIFY_STATUS_APPROVED: "You have already verified your ID!",
     }
 
     def _assert_course_verification_status(self, status):
@@ -230,9 +239,9 @@ class TestCourseVerificationStatus(ModuleStoreTestCase):
         self.assertContains(response, self.BANNER_ALT_MESSAGES[status])
 
         # Verify that the correct copy is rendered on the dashboard
-        # (and no other copy is also rendered!)
-        for msg_status, msg in self.NOTIFICATION_MESSAGES.iteritems():
-            if msg_status == status:
-                self.assertContains(response, msg)
-            else:
+        if status is not None:
+            if status in self.NOTIFICATION_MESSAGES:
+                self.assertContains(response, self.NOTIFICATION_MESSAGES[status])
+        else:
+            for msg in self.NOTIFICATION_MESSAGES.values():
                 self.assertNotContains(response, msg)
