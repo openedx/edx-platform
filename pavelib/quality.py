@@ -126,14 +126,16 @@ def _count_pep8_violations(report_file):
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
+    ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("percentage=", "p", "fail if diff-quality is below this percentage"),
 ])
 def run_quality(options):
     """
     Build the html diff quality reports, and print the reports to the console.
+    :param: b, the branch to compare against, defaults to origin/master
     :param: p, diff-quality will fail if the quality percentage calculated is
         below this percentage. For example, if p is set to 80, and diff-quality finds
-        quality of the branch vs master is less than 80%, then this task will fail.
+        quality of the branch vs the compare branch is less than 80%, then this task will fail.
         This threshold would be applied to both pep8 and pylint.
     """
 
@@ -141,6 +143,12 @@ def run_quality(options):
     # This makes the folder if it doesn't already exist.
     dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
     diff_quality_percentage_failure = False
+
+    # Set the string, if needed, to be used for the diff-quality --compare-branch switch.
+    compare_branch = getattr(options, 'compare_branch', None)
+    compare_branch_string = ''
+    if compare_branch:
+        compare_branch_string = '--compare-branch={0}'.format(compare_branch)
 
     # Set the string, if needed, to be used for the diff-quality --fail-under switch.
     diff_threshold = int(getattr(options, 'percentage', -1))
@@ -158,9 +166,10 @@ def run_quality(options):
     try:
         sh(
             "diff-quality --violations=pep8 {pep8_reports} {percentage_string} "
-            "--html-report {dquality_dir}/diff_quality_pep8.html".format(
+            "{compare_branch_string} --html-report {dquality_dir}/diff_quality_pep8.html".format(
                 pep8_reports=pep8_reports,
                 percentage_string=percentage_string,
+                compare_branch_string=compare_branch_string,
                 dquality_dir=dquality_dir
             )
         )
@@ -185,12 +194,13 @@ def run_quality(options):
     try:
         sh(
             "{pythonpath_prefix} diff-quality --violations=pylint "
-            "{pylint_reports} {percentage_string} "
+            "{pylint_reports} {percentage_string} {compare_branch_string} "
             "--html-report {dquality_dir}/diff_quality_pylint.html "
             "--options='{pylint_options}'".format(
                 pythonpath_prefix=pythonpath_prefix,
                 pylint_reports=pylint_reports,
                 percentage_string=percentage_string,
+                compare_branch_string=compare_branch_string,
                 dquality_dir=dquality_dir,
                 pylint_options="--disable=fixme",
             )
