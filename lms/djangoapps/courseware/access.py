@@ -211,7 +211,7 @@ def _has_access_course_desc(user, action, course):
         'enroll': can_enroll,
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
-        'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id),
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id)
     }
 
     return _dispatch(checkers, action, user, course)
@@ -258,7 +258,6 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
             return False
 
-        # If start dates are off, can always load
         if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
             debug("Allow: DISABLE_START_DATES")
             return True
@@ -285,7 +284,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
     checkers = {
         'load': can_load,
         'staff': lambda: _has_staff_access_to_descriptor(user, descriptor, course_key),
-        'instructor': lambda: _has_instructor_access_to_descriptor(user, descriptor, course_key)
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, descriptor, course_key),
     }
 
     return _dispatch(checkers, action, user, descriptor)
