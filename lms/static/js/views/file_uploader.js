@@ -20,7 +20,7 @@
             }));
             var submitButton= this.$el.find('.submit-file-button');
             var resultNotification = this.$el.find('.result');
-            $('#upload-file-form').fileupload({
+            $('#file-upload-form').fileupload({
                 dataType: 'json',
                 type: 'POST',
                 done: this.successHandler.bind(this),
