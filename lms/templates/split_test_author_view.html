@@ -12,7 +12,7 @@ show_link = group_configuration_url is not None
         <p>
             <span class="message-text">
                 ${_("This content experiment uses group configuration '{group_configuration_name}'.").format(
-                    group_configuration_name="<a href='{}'>{}</a>".format(group_configuration_url, user_partition.name) if show_link else user_partition.name
+                    group_configuration_name=u"<a href='{}'>{}</a>".format(group_configuration_url, user_partition.name) if show_link else user_partition.name
                 )}
             </span>
         </p>
