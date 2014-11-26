@@ -173,7 +173,7 @@ def videos_post(course, request):
         # 6. persist edx_video_id in VAL
         create_video({
             'edx_video_id': edx_video_id,
-            'status': 'Uploading',
+            'status': 'upload',
             'client_video_id': file_name,
             'duration': 0,
             'encoded_videos': [],

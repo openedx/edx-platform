@@ -69,11 +69,19 @@ define(
 
             _.each(
                 [
-                    {status: "Uploading", expected: "Uploading"},
-                    {status: "foobar", expected: "Unknown"}
+                    {status: "upload", expected: "Uploading"},
+                    {status: "ingest", expected: "In Progress"},
+                    {status: "transcode_queue", expected: "In Progress"},
+                    {status: "transcode_active", expected: "In Progress"},
+                    {status: "file_delivered", expected: "Complete"},
+                    {status: "file_complete", expected: "Complete"},
+                    {status: "file_corrupt", expected: "Failed"},
+                    {status: "pipeline_error", expected: "Failed"},
+                    {status: "invalid_token", expected: "Invalid Token"},
+                    {status: "unexpected_status_string", expected: "Unknown"}
                 ],
                 function(caseInfo) {
-                    it("should render " + caseInfo.expected + " status correctly", function() {
+                    it("should render " + caseInfo.status + " status correctly", function() {
                         var $el = render({status: caseInfo.status});
                         expect($el.find(".actions-col").text()).toEqual(caseInfo.expected);
                     });

@@ -3,7 +3,15 @@ define(
     ["i18n", "js/views/baseview"],
     function(i18n, BaseView) {
         var statusMap = {
-            "Uploading": i18n.gettext("Uploading")
+            "upload": i18n.gettext("Uploading"),
+            "ingest": i18n.gettext("In Progress"),
+            "transcode_queue": i18n.gettext("In Progress"),
+            "transcode_active": i18n.gettext("In Progress"),
+            "file_delivered": i18n.gettext("Complete"),
+            "file_complete": i18n.gettext("Complete"),
+            "file_corrupt": i18n.gettext("Failed"),
+            "pipeline_error": i18n.gettext("Failed"),
+            "invalid_token": i18n.gettext("Invalid Token")
         };
 
         var PreviousVideoUploadView = BaseView.extend({
