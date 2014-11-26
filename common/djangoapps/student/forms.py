@@ -30,7 +30,14 @@ class PasswordResetFormNoActive(PasswordResetForm):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
 
-    def save(self, domain_override=None, subject_template_name='registration/password_reset_subject.txt', email_template_name='registration/password_reset_email.html', use_https=False, token_generator=default_token_generator, from_email=None, request=None):
+    def save(self,
+             domain_override=None,
+             subject_template_name='registration/password_reset_subject.txt',
+             email_template_name='registration/password_reset_email.html',
+             use_https=False,
+             token_generator=default_token_generator,
+             from_email=None,
+             request=None):
         """
         Generates a one-use only link for resetting password and sends to the
         user.
