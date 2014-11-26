@@ -1,0 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>
+<div class="wrapper-xblock-message">
+    <div class="xblock-message information">
+        <p>
+            <span class="message-text">
+                ${_('Showing all matching content eligible to be added into {display_name}. Each student will be assigned {mode} {max_count} components from this list.').format(max_count=max_count, display_name=display_name, mode=mode)}
+            </span>
+        </p>
+    </div>
+</div>
