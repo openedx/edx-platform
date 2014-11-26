@@ -3,6 +3,7 @@ Tests for student enrollment.
 """
 import ddt
 import unittest
+from mock import patch
 
 from django.test.utils import override_settings
 from django.conf import settings
@@ -104,6 +105,33 @@ class EnrollmentTest(ModuleStoreTestCase):
         # Expect that we're no longer enrolled
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
+    @patch('user_api.api.profile.update_email_opt_in')
+    @ddt.data(
+        ([], 'true'),
+        ([], 'false'),
+        (['honor', 'verified'], 'true'),
+        (['honor', 'verified'], 'false'),
+        (['professional'], 'true'),
+        (['professional'], 'false'),
+    )
+    @ddt.unpack
+    def test_enroll_with_email_opt_in(self, course_modes, email_opt_in, mock_update_email_opt_in):
+        # Create the course modes (if any) required for this test case
+        for mode_slug in course_modes:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug,
+            )
+
+        # Enroll in the course
+        self._change_enrollment('enroll', email_opt_in=email_opt_in)
+
+        # Verify that the profile API has been called as expected
+        opt_in = email_opt_in == 'true'
+        mock_update_email_opt_in.assert_called_once_with(self.USERNAME, self.course.org, opt_in)
+
     def test_user_not_authenticated(self):
         # Log out, so we're no longer authenticated
         self.client.logout()
@@ -133,7 +161,7 @@ class EnrollmentTest(ModuleStoreTestCase):
         resp = self._change_enrollment('unenroll', course_id="edx/")
         self.assertEqual(resp.status_code, 400)
 
-    def _change_enrollment(self, action, course_id=None):
+    def _change_enrollment(self, action, course_id=None, email_opt_in=None):
         """Change the student's enrollment status in a course.
 
         Args:
@@ -142,6 +170,8 @@ class EnrollmentTest(ModuleStoreTestCase):
         Keyword Args:
             course_id (unicode): If provided, use this course ID.  Otherwise, use the
                 course ID created in the setup for this test.
+            email_opt_in (unicode): If provided, pass this value along as
+                an additional GET parameter.
 
         Returns:
             Response
@@ -154,4 +184,8 @@ class EnrollmentTest(ModuleStoreTestCase):
             'enrollment_action': action,
             'course_id': course_id
         }
+
+        if email_opt_in:
+            params['email_opt_in'] = email_opt_in
+
         return self.client.post(reverse('change_enrollment'), params)

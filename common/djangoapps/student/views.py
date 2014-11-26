@@ -103,6 +103,7 @@ from third_party_auth import pipeline, provider
 from student.helpers import auth_pipeline_urls, set_logged_in_cookie
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
+from user_api.api import profile as profile_api
 
 import analytics
 from eventtracking import tracker
@@ -740,6 +741,12 @@ def try_change_enrollment(request):
             log.exception("Exception automatically enrolling after login: %s", exc)
 
 
+def _update_email_opt_in(request, username, org):
+    """Helper function used to hit the profile API if email opt-in is enabled."""
+    email_opt_in = request.POST.get('email_opt_in') == 'true'
+    profile_api.update_email_opt_in(username, org, email_opt_in)
+
+
 @require_POST
 @commit_on_success_with_read_committed
 def change_enrollment(request, check_access=True):
@@ -804,6 +811,10 @@ def change_enrollment(request, check_access=True):
             log.warning("User {0} tried to enroll in non-existent course {1}"
                         .format(user.username, course_id))
             return HttpResponseBadRequest(_("Course id is invalid"))
+
+        # Record the user's email opt-in preference
+        if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
+            _update_email_opt_in(request, user.username, course_id.org)
 
         available_modes = CourseMode.modes_for_course_dict(course_id)
 
