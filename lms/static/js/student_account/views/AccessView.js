@@ -170,6 +170,33 @@ var edx = edx || {};
          * Once authentication has completed successfully, a user may need to:
          *
          * - Enroll in a course.
+         * - Update email opt-in preferences
+         *
+         * These actions are delegated from the authComplete function to additional
+         * functions requiring authentication.
+         *
+         */
+        authComplete: function() {
+            var emailOptIn = edx.student.account.EmailOptInInterface,
+                queryParams = this.queryParams();
+
+            // Set the email opt in preference.
+            if (!_.isUndefined(queryParams.emailOptIn) && queryParams.enrollmentAction) {
+                emailOptIn.setPreference(
+                    decodeURIComponent(queryParams.courseId),
+                    queryParams.emailOptIn,
+                    this
+                ).always(this.enrollment);
+            } else {
+                this.enrollment();
+            }
+        },
+
+        /**
+         * Designed to be invoked after authentication has completed. This function enrolls
+         * the student as requested.
+         *
+         * - Enroll in a course.
          * - Add a course to the shopping cart.
          * - Be redirected to the dashboard / track selection page / shopping cart.
          *
@@ -191,7 +218,7 @@ var edx = edx || {};
          * ?course_id: The slash-separated course ID to enroll in or add to the cart.
          *
          */
-        authComplete: function() {
+        enrollment: function() {
             var enrollment = edx.student.account.EnrollmentInterface,
                 shoppingcart = edx.student.account.ShoppingCartInterface,
                 redirectUrl = '/dashboard',
@@ -248,7 +275,8 @@ var edx = edx || {};
             return {
                 next: $.url( '?next' ),
                 enrollmentAction: $.url( '?enrollment_action' ),
-                courseId: $.url( '?course_id' )
+                courseId: $.url( '?course_id' ),
+                emailOptIn: $.url( '?email_opt_in')
             };
         },
 

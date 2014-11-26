@@ -293,6 +293,10 @@
                 exports: 'edx.student.account.EnrollmentInterface',
                 deps: ['jquery', 'jquery.cookie']
             },
+            'js/student_account/emailoptin': {
+                exports: 'edx.student.account.EmailOptInInterface',
+                deps: ['jquery', 'jquery.cookie']
+            },
             'js/student_account/shoppingcart': {
                 exports: 'edx.student.account.ShoppingCartInterface',
                 deps: ['jquery', 'jquery.cookie', 'underscore']
@@ -362,6 +366,7 @@
                     'js/student_account/models/PasswordResetModel',
                     'js/student_account/models/RegisterModel',
                     'js/student_account/views/FormView',
+                    'js/student_account/emailoptin',
                     'js/student_account/enrollment',
                     'js/student_account/shoppingcart',
                 ]
@@ -383,6 +388,7 @@
         'lms/include/js/spec/student_account/register_spec.js',
         'lms/include/js/spec/student_account/password_reset_spec.js',
         'lms/include/js/spec/student_account/enrollment_spec.js',
+        'lms/include/js/spec/student_account/emailoptin_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js'
     ]);
