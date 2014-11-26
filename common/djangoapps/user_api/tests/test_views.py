@@ -14,10 +14,12 @@ from unittest import SkipTest, skipUnless
 import ddt
 from pytz import UTC
 import mock
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from user_api.api import account as account_api, profile as profile_api
 
 from student.tests.factories import UserFactory
+from user_api.models import UserOrgTag
 from user_api.tests.factories import UserPreferenceFactory
 from django_comment_common import models
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -1468,3 +1470,59 @@ class RegistrationViewTest(ApiTestCase):
         # Verify that the form description matches what we'd expect
         form_desc = json.loads(response.content)
         self.assertIn(expected_field, form_desc["fields"])
+
+
+@ddt.ddt
+class UpdateEmailOptInTestCase(ApiTestCase):
+    """Tests the UpdateEmailOptInPreference view. """
+
+    USERNAME = "steve"
+    EMAIL = "steve@isawesome.com"
+    PASSWORD = "steveopolis"
+
+    def setUp(self):
+        """ Create a course and user, then log in. """
+        super(UpdateEmailOptInTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.url = reverse("preferences_email_opt_in")
+
+    @ddt.data(
+        (u"True", u"True"),
+        (u"true", u"True"),
+        (u"TrUe", u"True"),
+        (u"Banana", u"False"),
+        (u"strawberries", u"False"),
+        (u"False", u"False"),
+    )
+    @ddt.unpack
+    def test_update_email_opt_in(self, opt, result):
+        """Tests the email opt in preference"""
+        # Register, which should trigger an activation email
+        response = self.client.post(self.url, {
+            "course_id": unicode(self.course.id),
+            "email_opt_in": opt
+        })
+        self.assertHttpOK(response)
+        preference = UserOrgTag.objects.get(
+            user=self.user, org=self.course.id.org, key="email-optin"
+        )
+        self.assertEquals(preference.value, result)
+
+    @ddt.data(
+        (True, False),
+        (False, True),
+        (False, False)
+    )
+    @ddt.unpack
+    def test_update_email_opt_in_wrong_params(self, use_course_id, use_opt_in):
+        """Tests the email opt in preference"""
+        params = {}
+        if use_course_id:
+            params["course_id"] = unicode(self.course.id)
+        if use_opt_in:
+            params["email_opt_in"] = u"True"
+
+        response = self.client.post(self.url, params)
+        self.assertHttpBadRequest(response)
