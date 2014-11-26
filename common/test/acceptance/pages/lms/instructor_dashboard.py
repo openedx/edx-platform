@@ -85,8 +85,8 @@ class MembershipPageCohortManagementSection(PageObject):
     The cohort management subsection of the Membership section of the Instructor dashboard.
     """
     url = None
-    csv_browse_button_selector = '.csv-upload input.file_field'
-    csv_upload_button_selector = '.csv-upload button.submit-file-button'
+    csv_browse_button_selector = '.cohort-management-file-upload #file-upload-form-file'
+    csv_upload_button_selector = '.cohort-management-file-upload #file-upload-form-submit'
 
     def is_browser_on_page(self):
         return self.q(css='.cohort-management.membership-section').present
@@ -197,8 +197,8 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Returns array of messages related to a CSV upload of cohort assignmentse.
         """
-        title_css = "div.csv-upload .message-title"
-        detail_css = "div.csv-upload .summary-item"
+        title_css = ".cohort-management-file-upload .message-title"
+        detail_css = ".cohort-management-file-upload .summary-item"
         return self._get_messages(title_css, detail_css)
 
     def _get_messages(self, title_css, details_css):

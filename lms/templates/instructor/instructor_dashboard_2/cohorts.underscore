@@ -3,11 +3,10 @@
     <span class="description"></span>
 </h2>
 
-<div class="csv-upload"></div>
-
-<!-- nav -->
+<h3 class="subsection-title"><%- gettext('Manually Assign Students to Cohort Groups') %></h3>
 <div class="cohort-management-nav">
     <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
+
         <div class="cohort-management-nav-form-select field field-select">
             <label for="cohort-select" class="label sr"><%- gettext("Select a cohort group to manage") %></label>
             <select class="input cohort-select" name="cohort-select" id="cohort-select">
@@ -37,4 +36,10 @@
             true
         ) %>
     </p>
+</div>
+
+<hr class="divider divider-lv1" />
+
+<div class="cohort-management-file-upload">
+
 </div>
