@@ -549,7 +549,7 @@ def _create_or_rerun_course(request):
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '
-                'organization, course number, and course run. Please '
+                'organization and course number. Please '
                 'change either organization or course number to be unique.'
             ),
             'OrgErrMsg': _(
