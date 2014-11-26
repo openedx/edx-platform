@@ -23,7 +23,7 @@ from xmodule.modulestore.tests.django_utils import mixed_store_config
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING, include_xml=True)
 
 
 @patch("course_groups.cohorts.tracker")

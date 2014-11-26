@@ -129,9 +129,6 @@ update_module_store_settings(
     module_store_options={
         'fs_root': TEST_ROOT / "data",
     },
-    xml_store_options={
-        'data_dir': COMMON_TEST_DATA_ROOT,
-    },
     doc_store_settings={
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,

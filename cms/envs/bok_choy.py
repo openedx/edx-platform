@@ -33,9 +33,6 @@ update_module_store_settings(
     module_store_options={
         'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=E1120
     },
-    xml_store_options={
-        'data_dir': (TEST_ROOT / "data").abspath(),
-    },
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
