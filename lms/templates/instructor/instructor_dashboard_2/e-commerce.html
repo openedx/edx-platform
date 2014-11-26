@@ -116,9 +116,9 @@
                            %else:
                         <tr class="coupons-items">
                            %endif
-                            <td>${_('{code}').format(code=coupon.code)}</td>
-                            <td>${_('{description}').format(description=coupon.description)}</td>
-                            <td>${_('{discount}').format(discount=coupon.percentage_discount)}</td>
+                            <td>${coupon.code}</td>
+                            <td>${coupon.description}</td>
+                            <td>${coupon.percentage_discount}</td>
                            <td>
                               ${ coupon.couponredemption_set.all().count() }
                            </td>
