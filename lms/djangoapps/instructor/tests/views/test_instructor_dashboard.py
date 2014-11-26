@@ -11,7 +11,9 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
+from shoppingcart.models import PaidCourseRegistration
+from course_modes.models import CourseMode
+from student.roles import CourseFinanceAdminRole
 
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -24,9 +26,14 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.course = CourseFactory.create()
 
+        self.course_mode = CourseMode(course_id=self.course.id,
+                                      mode_slug="honor",
+                                      mode_display_name="honor cert",
+                                      min_price=40)
+        self.course_mode.save()
         # Create instructor account
-        instructor = AdminFactory.create()
-        self.client.login(username=instructor.username, password="test")
+        self.instructor = AdminFactory.create()
+        self.client.login(username=self.instructor.username, password="test")
 
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -50,6 +57,26 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         return 'Demographic data is now available in <a href="http://example.com/courses/{}" ' \
                'target="_blank">Example</a>.'.format(unicode(self.course.id))
+
+    def test_default_currency_in_the_html_response(self):
+        """
+        Test that checks the default currency_symbol ($) in the response
+        """
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
+        response = self.client.get(self.url)
+        self.assertTrue('${amount}'.format(amount=total_amount) in response.content)
+
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
+    def test_override_currency_settings_in_the_html_response(self):
+        """
+        Test that checks the default currency_symbol ($) in the response
+        """
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
+        response = self.client.get(self.url)
+        self.assertTrue('{currency}{amount}'.format(currency='Rs', amount=total_amount) in response.content)
+
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='')

@@ -144,6 +144,7 @@ def _section_e_commerce(course, access):
         'section_display_name': _('E-Commerce'),
         'access': access,
         'course_id': course_key.to_deprecated_string(),
+        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
         'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_user_invoice_preference_url': reverse('get_user_invoice_preference', kwargs={'course_id': course_key.to_deprecated_string()}),

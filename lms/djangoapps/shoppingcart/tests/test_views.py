@@ -136,6 +136,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 403)
 
+    @patch('shoppingcart.views.render_to_response', render_mock)
     def test_billing_details(self):
         billing_url = reverse('billing_details')
         self.login_user()
@@ -150,6 +151,13 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
+        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        self.assertEqual(template, 'shoppingcart/billing_details.html')
+        # check for the default currency in the context
+        self.assertEqual(context['currency'], 'usd')
+        self.assertEqual(context['currency_symbol'], '$')
+
+
         data = {'company_name': 'Test Company', 'company_contact_name': 'JohnDoe',
                 'company_contact_email': 'john@est.com', 'recipient_name': 'Mocker',
                 'recipient_email': 'mock@germ.com', 'company_address_line_1': 'DC Street # 1',
@@ -159,6 +167,24 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         resp = self.client.post(billing_url, data)
         self.assertEqual(resp.status_code, 200)
+
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
+    def test_billing_details_with_override_currency_settings(self):
+        billing_url = reverse('billing_details')
+        self.login_user()
+
+        #chagne the order_type to business
+        self.cart.order_type = 'business'
+        self.cart.save()
+        resp = self.client.get(billing_url)
+        self.assertEqual(resp.status_code, 200)
+
+        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        self.assertEqual(template, 'shoppingcart/billing_details.html')
+        # check for the override currency settings in the context
+        self.assertEqual(context['currency'], 'PKR')
+        self.assertEqual(context['currency_symbol'], 'Rs')
 
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -655,6 +681,28 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(len(context['shoppingcart_items']), 2)
         self.assertEqual(context['amount'], 80)
         self.assertIn("80.00", context['form_html'])
+        # check for the default currency in the context
+        self.assertEqual(context['currency'], 'usd')
+        self.assertEqual(context['currency_symbol'], '$')
+
+    @patch('shoppingcart.views.render_purchase_form_html', form_mock)
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
+    def test_show_cart_with_override_currency_settings(self):
+        self.login_user()
+        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        self.assertEqual(resp.status_code, 200)
+
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=W0621
+        purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
+        self.assertIn(reg_item, purchase_form_arg_cart_items)
+
+        ((template, context), _) = render_mock.call_args
+        self.assertEqual(template, 'shoppingcart/shopping_cart.html')
+        # check for the override currency settings in the context
+        self.assertEqual(context['currency'], 'PKR')
+        self.assertEqual(context['currency_symbol'], 'Rs')
 
     def test_clear_cart(self):
         self.login_user()
@@ -841,6 +889,29 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn(reg_item, context['shoppingcart_items'][0])
         self.assertIn(cert_item, context['shoppingcart_items'][1])
         self.assertFalse(context['any_refunds'])
+        # check for the default currency settings in the context
+        self.assertEqual(context['currency_symbol'], '$')
+        self.assertEqual(context['currency'], 'usd')
+
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    def test_show_receipt_success_with_override_currency_settings(self):
+        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        self.login_user()
+        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        self.assertEqual(resp.status_code, 200)
+
+        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        self.assertEqual(template, 'shoppingcart/receipt.html')
+        self.assertIn(reg_item, context['shoppingcart_items'][0])
+        self.assertIn(cert_item, context['shoppingcart_items'][1])
+
+        # check for the override currency settings in the context
+        self.assertEqual(context['currency_symbol'], 'Rs')
+        self.assertEqual(context['currency'], 'PKR')
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_courseregcode_item_total_price(self):

@@ -156,6 +156,8 @@ def show_cart(request):
         'amount': total_cost,
         'site_name': site_name,
         'form_html': form_html,
+        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
+        'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
     }
     return render_to_response("shoppingcart/shopping_cart.html", context)
 
@@ -557,6 +559,8 @@ def billing_details(request):
             'shoppingcart_items': cart_items,
             'amount': total_cost,
             'form_html': form_html,
+            'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
+            'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
             'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
         }
         return render_to_response("shoppingcart/billing_details.html", context)
@@ -636,6 +640,8 @@ def show_receipt(request, ordernum):
         'order_type': order_type,
         'appended_course_names': appended_course_names,
         'appended_recipient_emails': appended_recipient_emails,
+        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
+        'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
         'total_registration_codes': total_registration_codes,
         'registration_codes': registration_codes,
         'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),

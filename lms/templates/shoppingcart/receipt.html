@@ -299,11 +299,11 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
               % if item.status == "purchased":
                 <div class="col-1">
                   % if item.list_price != None:
-                    <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span>
+                    <div class="price">${_('Price per student:')} <span class="line-through">  ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span>
                     </div>
-                    <div class="price green">${_('Discount Applied:')} <span>  $${"{0:0.2f}".format(item.unit_cost)} </span></div>
+                    <div class="price green">${_('Discount Applied:')} <span>   ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)} </span></div>
                   % else:
-                    <div class="price">${_('Price per student:')} <span>  $${"{0:0.2f}".format(item.unit_cost)}</span></div>
+                    <div class="price">${_('Price per student:')} <span>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}</span></div>
                   % endif
                 </div>
                 <div class="col-2">
@@ -317,12 +317,12 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
               % elif item.status == "refunded":
                 <div class="col-1">
                   % if item.list_price != None:
-                    <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span>
+                    <div class="price">${_('Price per student:')} <span class="line-through">   ${currency_symbol}${"{0:0.2f}".format(item.list_price)}</span>
                     </div>
-                    <div class="price green">${_('Discount Applied:')} <span><del> $${"{0:0.2f}".format(item.unit_cost)}
+                    <div class="price green">${_('Discount Applied:')} <span><del>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}
                     </del></span></div>
                   % else:
-                    <div class="price">${_('Price per student:')} <span><del> $${"{0:0.2f}".format(item.unit_cost)}</del></span>
+                    <div class="price">${_('Price per student:')} <span><del>  ${currency_symbol}${"{0:0.2f}".format(item.unit_cost)}</del></span>
                     </div>
                   % endif
                 </div>
@@ -348,7 +348,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
             ${_("Note: items with strikethough like <del>this</del> have been refunded.")}
           </span>
         % endif
-        <span class="pull-right">${_("Total")}: <b>$${"{0:0.2f}".format(order.total_cost)} USD</b></span>
+        <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>
       </div>
     </div>
     ## Allow for a microsite to be able to insert additional text at the bottom of the page

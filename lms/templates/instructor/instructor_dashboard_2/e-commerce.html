@@ -44,7 +44,7 @@
       <div class="wrap">
          <h2>${_("Course Price")}</h2>
          <div>
-            <span class="tip">${_("Course Price: ")}<span>$${section_data['course_price']}</span>
+            <span class="tip">${_("Course Price: ")}<span>${section_data['currency_symbol']}${section_data['course_price']}</span>
             %if section_data['access']['finance_admin'] is True:
             <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ ${_('Set Price')}</a>
             %endif
@@ -57,7 +57,7 @@
          <h2>${_("Transactions")}</h2>
          <div>
             %if section_data['total_amount'] is not None:
-            <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
+            <span>${_("Total Amount: ")}<span>${section_data['currency_symbol']}${section_data['total_amount']}</span></span>
             %endif
 
             <span class="csv_tip">${_("Click to generate a CSV file for all purchase transactions in this course")}
