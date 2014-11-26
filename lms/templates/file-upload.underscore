@@ -1,9 +1,5 @@
 <div class="wrapper-form">
   <h3 class="form-title"><%- model.get('title') %></h3>
-  <div class="form-introduction">
-    <p><%- model.get('description') %></p>
-  </div>
-
   <div class="file-upload-form-result result">
 
   </div>
@@ -12,14 +8,14 @@
 
       <div class="form-fields">
         <div class="field field-file is-required">
-          <label class="field-label" for="file-upload-form-file"><%- gettext('Choose a .csv file') %></label>
+          <label class="field-label" for="file-upload-form-file"><%- model.get('inputLabel') %></label>
           <input id="file-upload-form-file" class="input input-file" name="uploaded-file" type="file" accept="<%- model.get('extension') %>"/>
-          <span class="tip tip-stacked"><%- gettext('Only properly formatted .csv files will be accepted.') %></span>
+          <span class="tip tip-stacked"><%- model.get('inputTip') %></span>
         </div>
       </div>
 
       <div class="form-actions">
-        <button id="file-upload-form-submit" type="submit" class="submit-file-button action action-primary action-submit"><%- gettext('Upload File and Assign Students') %></button>
+        <button id="file-upload-form-submit" type="submit" class="submit-file-button action action-primary action-submit"><%- model.get('submitButtonText') %></button>
       </div>
   </form>
 </div>
