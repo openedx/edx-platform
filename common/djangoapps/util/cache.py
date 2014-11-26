@@ -43,17 +43,13 @@ def cache_if_anonymous(*get_parameters):
     @cache_if_anonymous()
     def myView(request):
     """
-
     def decorator(view_func):
-        """The outer wrapper, used to allow the decorator to take optional
-        arguments.
-        """
+        """The outer wrapper, used to allow the decorator to take optional arguments."""
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
             """The inner wrapper, which wraps the view function."""
             if not request.user.is_authenticated():
-                #Use the cache
-                # same view accessed through different domain names may
+                # Use the cache. The same view accessed through different domain names may
                 # return different things, so include the domain name in the key.
                 domain = str(request.META.get('HTTP_HOST')) + '.'
                 cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
@@ -70,7 +66,7 @@ def cache_if_anonymous(*get_parameters):
                 return response
 
             else:
-                #Don't use the cache
+                # Don't use the cache.
                 return view_func(request, *args, **kwargs)
 
         return wrapper
