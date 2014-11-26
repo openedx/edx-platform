@@ -113,10 +113,10 @@ AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_PROFILE = 'profile'
 AUTH_ENTRY_REGISTER = 'register'
 
-# pylint: disable=fixme
-# TODO (ECOM-369): Replace `AUTH_ENTRY_LOGIN` and `AUTH_ENTRY_REGISTER`
-# with these values once the A/B test completes, then delete
-# these constants.
+# This is left-over from an A/B test
+# of the new combined login/registration page (ECOM-369)
+# We need to keep both the old and new entry points
+# until every session from before the test ended has expired.
 AUTH_ENTRY_LOGIN_2 = 'account_login'
 AUTH_ENTRY_REGISTER_2 = 'account_register'
 
@@ -134,9 +134,10 @@ AUTH_DISPATCH_URLS = {
     AUTH_ENTRY_LOGIN: '/login',
     AUTH_ENTRY_REGISTER: '/register',
 
-    # TODO (ECOM-369): Replace the dispatch URLs
-    # for `AUTH_ENTRY_LOGIN` and `AUTH_ENTRY_REGISTER`
-    # with these values, but DO NOT DELETE THESE KEYS.
+    # This is left-over from an A/B test
+    # of the new combined login/registration page (ECOM-369)
+    # We need to keep both the old and new entry points
+    # until every session from before the test ended has expired.
     AUTH_ENTRY_LOGIN_2: '/account/login/',
     AUTH_ENTRY_REGISTER_2: '/account/register/',
 
@@ -152,11 +153,10 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_PROFILE,
     AUTH_ENTRY_REGISTER,
 
-    # TODO (ECOM-369): For the A/B test of the combined
-    # login/registration, we needed to introduce two
-    # additional end-points.  Once the test completes,
-    # delete these constants from the choices list.
-    # pylint: disable=fixme
+    # This is left-over from an A/B test
+    # of the new combined login/registration page (ECOM-369)
+    # We need to keep both the old and new entry points
+    # until every session from before the test ended has expired.
     AUTH_ENTRY_LOGIN_2,
     AUTH_ENTRY_REGISTER_2,
 
@@ -447,31 +447,16 @@ def parse_query_params(strategy, response, *args, **kwargs):
         # Whether the auth pipeline entered from /dashboard.
         'is_dashboard': auth_entry == AUTH_ENTRY_DASHBOARD,
         # Whether the auth pipeline entered from /login.
-        'is_login': auth_entry == AUTH_ENTRY_LOGIN,
+        'is_login': auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2],
         # Whether the auth pipeline entered from /register.
-        'is_register': auth_entry == AUTH_ENTRY_REGISTER,
+        'is_register': auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2],
         # Whether the auth pipeline entered from /profile.
         'is_profile': auth_entry == AUTH_ENTRY_PROFILE,
         # Whether the auth pipeline entered from an API
         'is_api': auth_entry == AUTH_ENTRY_API,
-
-        # TODO (ECOM-369): Delete these once the A/B test
-        # for the combined login/registration form completes.
-        # pylint: disable=fixme
-        'is_login_2': auth_entry == AUTH_ENTRY_LOGIN_2,
-        'is_register_2': auth_entry == AUTH_ENTRY_REGISTER_2,
     }
 
 
-# TODO (ECOM-369): Once the A/B test of the combined login/registration
-# form completes, we will be able to remove the extra login/registration
-# end-points.  HOWEVER, users who used the new forms during the A/B
-# test may still have values for "is_login_2" and "is_register_2"
-# in their sessions.  For this reason, we need to continue accepting
-# these kwargs in `redirect_to_supplementary_form`, but
-# these should redirect to the same location as "is_login" and "is_register"
-# (whichever login/registration end-points win in the test).
-# pylint: disable=fixme
 @partial.partial
 def ensure_user_information(
     strategy,
@@ -507,43 +492,30 @@ def ensure_user_information(
     # invariants have been violated and future misbehavior is likely.
     user_inactive = user and not user.is_active
     user_unset = user is None
-    dispatch_to_login = is_login and (user_unset or user_inactive)
+
+    dispatch_to_login = (
+        ((is_login or is_login_2) and (user_unset or user_inactive))
+        or
+        ((is_register or is_register_2) and user_inactive)
+    )
+    dispatch_to_register = (is_register or is_register_2) and user_unset
     reject_api_request = is_api and (user_unset or user_inactive)
+
     if reject_api_request:
         # Content doesn't matter; we just want to exit the pipeline
         return HttpResponseBadRequest()
 
-    # TODO (ECOM-369): Consolidate this with `dispatch_to_login`
-    # once the A/B test completes. # pylint: disable=fixme
-    dispatch_to_login_2 = is_login_2 and (user_unset or user_inactive)
-
     if is_dashboard or is_profile:
         return
 
+    # If the user has a linked account, but has not yet activated
+    # we should send them to the login page. The login page
+    # will tell them that they need to activate their account.
     if dispatch_to_login:
         return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN], strategy))
 
-    # TODO (ECOM-369): Consolidate this with `dispatch_to_login`
-    # once the A/B test completes. # pylint: disable=fixme
-    if dispatch_to_login_2:
-        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN_2], strategy))
-
-    if is_register and user_unset:
+    if dispatch_to_register:
         return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER], strategy))
-
-    # TODO (ECOM-369): Consolidate this with `is_register`
-    # once the A/B test completes. # pylint: disable=fixme
-    if is_register_2 and user_unset:
-        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER_2], strategy))
-
-    # If the user has a linked account, but has not yet activated
-    # we should send them to the login page.  The login page
-    # will tell them that they need to activate their account.
-    if is_register and user_inactive:
-        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN], strategy))
-
-    if is_register_2 and user_inactive:
-        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN_2], strategy))
 
 
 def _create_redirect_url(url, strategy):

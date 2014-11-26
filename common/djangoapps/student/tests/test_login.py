@@ -14,18 +14,13 @@ from django.http import HttpResponseBadRequest, HttpResponse
 from external_auth.models import ExternalAuthMap
 import httpretty
 from mock import patch
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from social.apps.django_app.default.models import UserSocialAuth
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
-from student.views import (
-    _parse_course_id_from_string,
-    _get_course_enrollment_domain,
-    login_oauth_token,
-)
+from student.views import login_oauth_token
+
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
 
 
 class LoginTest(TestCase):
@@ -324,24 +319,6 @@ class LoginTest(TestCase):
             self.assertNotIn(log_string, format_string)
 
 
-class UtilFnTest(TestCase):
-    """
-    Tests for utility functions in student.views
-    """
-    def test__parse_course_id_from_string(self):
-        """
-        Tests the _parse_course_id_from_string util function
-        """
-        COURSE_ID = u'org/num/run'                                # pylint: disable=invalid-name
-        COURSE_URL = u'/courses/{}/otherstuff'.format(COURSE_ID)  # pylint: disable=invalid-name
-        NON_COURSE_URL = u'/blahblah'                             # pylint: disable=invalid-name
-        self.assertEqual(
-            _parse_course_id_from_string(COURSE_URL),
-            SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID)
-        )
-        self.assertIsNone(_parse_course_id_from_string(NON_COURSE_URL))
-
-
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ExternalAuthShibTest(ModuleStoreTestCase):
     """
@@ -388,15 +365,6 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         })
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
-    def test__get_course_enrollment_domain(self):
-        """
-        Tests the _get_course_enrollment_domain utility function
-        """
-        self.assertIsNone(_get_course_enrollment_domain(SlashSeparatedCourseKey("I", "DONT", "EXIST")))
-        self.assertIsNone(_get_course_enrollment_domain(self.course.id))
-        self.assertEqual(self.shib_course.enrollment_domain, _get_course_enrollment_domain(self.shib_course.id))
-
-    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_login_required_dashboard(self):
         """
         Tests redirects to when @login_required to dashboard, which should always be the normal login,
@@ -416,7 +384,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/accounts/login?next={url}'.format(url=TARGET_URL), 302))
-        self.assertContains(noshib_response, ("Log into your {platform_name} Account | {platform_name}"
+        self.assertContains(noshib_response, ("Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 
