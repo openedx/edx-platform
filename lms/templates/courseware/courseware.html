@@ -228,121 +228,126 @@ ${fragment.foot_html()}
 % endif
 
 % if course.show_calculator:
-<div class="calc-main">
-        <a title="${_('Open Calculator')}" href="#" role="button" aria-controls="calculator_wrapper" aria-expanded="false" class="calc">${_("Open Calculator")}</a>
-        <div id="calculator_wrapper">
-            <form id="calculator">
-                <div class="input-wrapper">
-                    <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" tabindex="-1" />
+  <div class="calc-main">
+    <a title="${_('Open Calculator')}" href="#" role="button" aria-controls="calculator_wrapper" aria-expanded="false" class="calc">${_("Open Calculator")}</a>
 
-                    <div class="help-wrapper">
-                        <p class="sr" id="hint-instructions">${_('Use the arrow keys to navigate the tips or use the tab key to return to the calculator')}</p>
-                        <a id="calculator_hint" href="#" role="button" aria-haspopup="true" tabindex="-1" aria-describedby="hint-instructions">${_("Hints")}</a>
-                        <ul id="calculator_input_help" class="help" aria-activedescendant="hint-moreinfo" role="tooltip" aria-hidden="true">
-                          <li class="hint-item" id="hint-moreinfo" tabindex="-1"><p><span class="bold">${_("For detailed information, see <a href='http://edx-guide-for-students.readthedocs.org/en/latest/SFD_mathformatting.html'>Entering Mathematical and Scientific Expressions</a> in the <a href='http://edx-guide-for-students.readthedocs.org/en/latest/index.html'>edX Guide for Students</a>.")}</span></p></li>
-                          <li class="hint-item" id="hint-tips" tabindex="-1"><p><span class="bold">${_("Tips")}:</span> </p>
-                            <ul>
-                              <li class="hint-item" id="hint-paren" tabindex="-1"><p>Use parentheses () to make expressions clear. You can use parentheses inside other parentheses.</p></li>
-                              <li class="hint-item" id="hint-spaces" tabindex="-1"><p>Do not use spaces in expressions.</p></li>
-                              <li class="hint-item" id="hint-howto-constants" tabindex="-1"><p>For constants, indicate multiplication explicitly (example: 5*c).</p></li>
-                              <li class="hint-item" id="hint-howto-maffixes" tabindex="-1"><p>For affixes, type the number and affix without a space (example: 5c).</p></li>
-                              <li class="hint-item" id="hint-howto-functions" tabindex="-1"><p>For functions, type the name of the function, then the expression in parentheses.</p></li>
-                            </ul>
-                          </li>
-                          <li class="hint-item" id="hint-list" tabindex="-1"><p></p>
-                            <table border="1"> 
-                              <tbody>
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("To Use")}</span></p></td>
-                              <td valign="top"><p><span class="bold">${_("Type")}</span></p></td>
-                              <td valign="top"><p><span class="bold">${_("Examples")}</span></p></td>
-                              </tr>
+    <div id="calculator_wrapper">
+      <form id="calculator">
+        <div class="input-wrapper">
+          <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" tabindex="-1" />
 
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("Numbers")}</span></p></td>
-                              <td valign="top"><p>Integers</p>
-                              <p>Fractions</p>
-                              <p>Decimals</p></td>
-                              <td valign="top"><p>2520</p>
-                              <p>2/3</p>
-                              <p>3.14, .98</p></td>
-                              </tr>
+          <div class="help-wrapper">
+            <p class="sr" id="hint-instructions">${_('Use the arrow keys to navigate the tips or use the tab key to return to the calculator')}</p>
 
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("Operators")}</span></p></td>
-                              <td valign="top"><p>+ - * / (add, subtract, multiply, divide)</p>
-                              <p>^ (raise to a power)</p>
-                              <p>_ (add a subscript)</p>
-                              <p>|| (parallel resistors)</p></td>
-                              <td valign="top"><p>x+(2*y)/x-1</p>
-                              <p>x^(n+1)</p>
-                              <p>v_IN+v_OUT</p>
-                              <p>1||2</p></td>
-                              </tr>
+            <a id="calculator_hint" href="#" role="button" aria-haspopup="true" tabindex="-1" aria-describedby="hint-instructions">${_("Hints")}</a>
 
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("Greek letters")}</span></p></td>
-                              <td valign="top"><p>Name of letter</p></td>
-                              <td valign="top"><p>alpha</p>
-                              <p>lambda</p></td>
-                              </tr>
+            <ul id="calculator_input_help" class="help" aria-activedescendant="hint-moreinfo" role="tooltip" aria-hidden="true">
+              <li class="hint-item" id="hint-moreinfo" tabindex="-1">
+                <p><span class="bold">${_("For detailed information, see <a href='http://edx-guide-for-students.readthedocs.org/en/latest/SFD_mathformatting.html'>Entering Mathematical and Scientific Expressions</a> in the <a href='http://edx-guide-for-students.readthedocs.org/en/latest/index.html'>edX Guide for Students</a>.")}</span></p>
+              </li>
 
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("Constants")}</span></p></td>
-                              <td valign="top"><p>c, e, g, i, j, k, pi, q, T</p></td>
-                              <td valign="top"><p>20*c</p>
-                              <p>418*T</p></td>
-                              </tr>
+              <li class="hint-item" id="hint-tips" tabindex="-1"><p><span class="bold">${_("Tips")}:</span> </p>
+                <ul>
+                  <li class="hint-item" id="hint-paren" tabindex="-1"><p>Use parentheses () to make expressions clear. You can use parentheses inside other parentheses.</p></li>
+                  <li class="hint-item" id="hint-spaces" tabindex="-1"><p>Do not use spaces in expressions.</p></li>
+                  <li class="hint-item" id="hint-howto-constants" tabindex="-1"><p>For constants, indicate multiplication explicitly (example: 5*c).</p></li>
+                  <li class="hint-item" id="hint-howto-maffixes" tabindex="-1"><p>For affixes, type the number and affix without a space (example: 5c).</p></li>
+                  <li class="hint-item" id="hint-howto-functions" tabindex="-1"><p>For functions, type the name of the function, then the expression in parentheses.</p></li>
+                </ul>
+              </li>
 
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("Affixes")}</span></p></td>
-                              <td valign="top"><p>Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)</p></td>
-                              <td valign="top"><p>20%</p>
-                              <p>20c</p>
-                              <p>418T</p></td>
-                              </tr>
-
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("Basic functions")}</span></p></td>
-                              <td valign="top"><p>abs, exp, fact or factorial, ln, log2, log10, sqrt</p></td>
-                              <td valign="top"><p>abs(x+y)</p>
-                              <p>sqrt(x^2-y)</p></td>
-                              </tr>
-
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("Trigonometric functions")}</span></p></td>
-                              <td valign="top"><p>sin, cos, tan, sec, csc, cot </p>
-                              <p>arcsin, sinh, arcsinh, etc.</p></td>
-                              <td valign="top"><p>sin(4x+y)</p>
-                              <p>arccsch(4x+y)</p></td>
-                              </tr>
-
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("Scientific notation")}</span></p></td>
-                              <td valign="top"><p>10^ and the exponent</p></td>
-                              <td valign="top"><p>10^-9</p></td>
-                              </tr>
-
-                              <tr>
-                              <td valign="top"><p><span class="bold">${_("e notation")}</span></p></td>
-                              <td valign="top"><p>1e and the exponent</p></td>
-                              <td valign="top"><p>1e-9</p></td>
-                              </tr>
-
-                              </tbody>
-                              </table>
-
-                          </li>
-                          
-                        </ul>
-                    </div>
-                </div>
-                <input id="calculator_button" type="submit" title="${_('Calculate')}" value="=" aria-label="${_('Calculate')}" value="=" tabindex="-1" />
-                <input type="text" id="calculator_output" title="${_('Calculator Output Field')}" readonly tabindex="-1" />
-            </form>
-
+              <li class="hint-item" id="hint-list" tabindex="-1">
+                <table class="calculator-input-help-table">
+                  <tbody>
+                    <tr>
+                      <th scope="col">${_("To Use")}</th>
+                      <th scope="col">${_("Type")}</th>
+                      <th scope="col">${_("Examples")}</th>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("Numbers")}</th>
+                      <td>Integers<br />
+                        Fractions<br />
+                        Decimals
+                      </td>
+                      <td>2520<br />
+                        2/3<br />
+                        3.14, .98
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("Operators")}</th>
+                      <td>+ - * / (add, subtract, multiply, divide)<br />
+                        ^ (raise to a power)<br />
+                        _ (add a subscript)<br />
+                        || (parallel resistors)
+                      </td>
+                      <td>x+(2*y)/x-1
+                        x^(n+1)<br />
+                        v_IN+v_OUT<br />
+                        1||2
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("Greek letters")}</th>
+                      <td>Name of letter</td>
+                      <td>alpha<br />
+                        lambda
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("Constants")}</th>
+                      <td>c, e, g, i, j, k, pi, q, T</td>
+                      <td>20*c<br />
+                        418*T
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("Affixes")}</th>
+                      <td>Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)</td>
+                      <td>20%<br />
+                        20c<br />
+                        418T
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("Basic functions")}</th>
+                      <td>abs, exp, fact or factorial, ln, log2, log10, sqrt</td>
+                      <td>abs(x+y)<br />
+                        sqrt(x^2-y)
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("Trigonometric functions")}</th>
+                      <td>sin, cos, tan, sec, csc, cot<br />
+                        arcsin, sinh, arcsinh, etc.<br />
+                        >sin(4x+y)<br />
+                        arccsch(4x+y)
+                      </td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("Scientific notation")}</th>
+                      <td>10^ and the exponent</td>
+                      <td>10^-9</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">${_("e notation")}</th>
+                      <td>1e and the exponent</td>
+                      <td>1e-9</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </li>
+            </ul>
+          </div>
         </div>
+
+        <input id="calculator_button" type="submit" title="${_('Calculate')}" value="=" aria-label="${_('Calculate')}" value="=" tabindex="-1" />
+        <input type="text" id="calculator_output" title="${_('Calculator Output Field')}" readonly tabindex="-1" />
+      </form>
     </div>
+  </div>
 
 % endif
 <%include file="../modal/accessible_confirm.html" />
