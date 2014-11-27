@@ -8,7 +8,7 @@
 <%block name="custom_content">
 <div class="container">
   % if shoppingcart_items:
-  <section class="confirm-enrollment shopping-cart">
+  <section class="confirm-enrollment shopping-cart billing-details-view">
   <h3>${_('You can proceed to payment at any point in time. Any additional information you provide will be included in your receipt.')}</h3>
     <div class="billing-data">
       <div class="col-half">
@@ -93,6 +93,8 @@
         return false;
       }
       event.preventDefault();
+      // Disable the submit button to prevent duplicate submissions
+      $(this).addClass("disabled");
       var post_url = "${reverse('billing_details')}";
       var data = {
                "company_name" : $('input[name="company_name"]').val(),
@@ -104,10 +106,15 @@
                };
       $.post(post_url, data)
       .success(function(data) {
-                 payment_form.submit();
-              })
+            if (data.is_course_enrollment_closed == true) {
+              location.href = "${reverse('shoppingcart.views.show_cart')}";
+            }
+            else {
+              payment_form.submit();
+            }
+          })
       .error(function(data,status) {
-
+            $(this).removeClass("disabled");
              })
     });
   });

@@ -1,6 +1,7 @@
 """
 Tests for Shopping Cart views
 """
+import pytz
 from urlparse import urlparse
 
 from django.http import HttpRequest
@@ -1100,6 +1101,120 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
         self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
         self._assert_404(reverse('shoppingcart.views.register_courses', args=[]))
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
+class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
+    """
+    Test suite for ShoppingcartViews Course Enrollments Closed or not
+    """
+    def setUp(self):
+
+        super(ShoppingcartViewsClosedEnrollment, self).setUp()
+        self.user = UserFactory.create()
+        self.user.set_password('password')
+        self.user.save()
+        self.instructor = AdminFactory.create()
+        self.cost = 40
+
+        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        self.course_key = self.course.id
+        self.course_mode = CourseMode(course_id=self.course_key,
+                                      mode_slug="honor",
+                                      mode_display_name="honor cert",
+                                      min_price=self.cost)
+        self.course_mode.save()
+        self.testing_course = CourseFactory.create(
+            org='Edx',
+            number='999',
+            display_name='Testing Super Course',
+            metadata={"invitation_only": False}
+        )
+        self.course_mode = CourseMode(course_id=self.testing_course.id,
+                                      mode_slug="honor",
+                                      mode_display_name="honor cert",
+                                      min_price=self.cost)
+        self.course_mode.save()
+        self.cart = Order.get_cart_for_user(self.user)
+        self.now = datetime.now(pytz.UTC)
+        self.tomorrow = self.now + timedelta(days=1)
+        self.nextday = self.tomorrow + timedelta(days=1)
+
+    def login_user(self):
+        """
+        Helper fn to login self.user
+        """
+        self.client.login(username=self.user.username, password="password")
+
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    def test_to_check_that_cart_item_enrollment_is_closed(self):
+        self.login_user()
+        reg_item1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
+
+        # update the testing_course enrollment dates
+        self.testing_course.enrollment_start = self.tomorrow
+        self.testing_course.enrollment_end = self.nextday
+        self.testing_course = self.update_course(self.testing_course, self.user.id)
+
+        # testing_course enrollment is closed but the course is in the cart
+        # so we delete that item from the cart and display the message in the cart
+        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
+
+        ((template, context), _tmp) = render_mock.call_args
+        self.assertEqual(template, 'shoppingcart/shopping_cart.html')
+        self.assertEqual(context['order'], self.cart)
+        self.assertIn(reg_item1, context['shoppingcart_items'][0])
+        self.assertEqual(1, len(context['shoppingcart_items']))
+        self.assertEqual(True, context['is_course_enrollment_closed'])
+        self.assertIn(self.testing_course.display_name, context['appended_expired_course_names'])
+
+    def test_to_check_that_cart_item_enrollment_is_closed_when_clicking_the_payment_button(self):
+        self.login_user()
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
+
+        # update the testing_course enrollment dates
+        self.testing_course.enrollment_start = self.tomorrow
+        self.testing_course.enrollment_end = self.nextday
+        self.testing_course = self.update_course(self.testing_course, self.user.id)
+
+        # testing_course enrollment is closed but the course is in the cart
+        # so we delete that item from the cart and display the message in the cart
+        resp = self.client.get(reverse('shoppingcart.views.verify_cart'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(json.loads(resp.content)['is_course_enrollment_closed'])
+
+        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
+        self.assertIn('40.00', resp.content)
+
+    def test_is_enrollment_closed_when_order_type_is_business(self):
+        self.login_user()
+        self.cart.order_type = 'business'
+        self.cart.save()
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        CourseRegCodeItem.add_to_order(self.cart, self.testing_course.id, 2)
+
+        # update the testing_course enrollment dates
+        self.testing_course.enrollment_start = self.tomorrow
+        self.testing_course.enrollment_end = self.nextday
+        self.testing_course = self.update_course(self.testing_course, self.user.id)
+
+        resp = self.client.post(reverse('shoppingcart.views.billing_details'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(json.loads(resp.content)['is_course_enrollment_closed'])
+
+        # testing_course enrollment is closed but the course is in the cart
+        # so we delete that item from the cart and display the message in the cart
+        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
+        self.assertIn('40.00', resp.content)
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
