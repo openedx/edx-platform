@@ -220,6 +220,26 @@ def save_child_position(seq_module, child_name):
     seq_module.save()
 
 
+def save_positions_recursively_up(user, request, field_data_cache, xmodule):
+    """
+    Recurses up the course tree starting from a leaf
+    Saving the position property based on the previous node as it goes
+    """
+    current_module = xmodule
+
+    while current_module:
+        parent_location = modulestore().get_parent_location(current_module.location)
+        parent = None
+        if parent_location:
+            parent_descriptor = modulestore().get_item(parent_location)
+            parent = get_module_for_descriptor(user, request, parent_descriptor, field_data_cache, current_module.location.course_key)
+
+        if parent and hasattr(parent, 'position'):
+            save_child_position(parent, current_module.location.name)
+
+        current_module = parent
+
+
 def chat_settings(course, user):
     """
     Returns a dict containing the settings required to connect to a
@@ -773,8 +793,8 @@ def course_about(request, course_id):
         'invitation_only': invitation_only,
         'active_reg_button': active_reg_button,
         'is_shib_course': is_shib_course,
-         # We do not want to display the internal courseware header, which is used when the course is found in the
-         # context. This value is therefor explicitly set to render the appropriate header.
+        # We do not want to display the internal courseware header, which is used when the course is found in the
+        # context. This value is therefor explicitly set to render the appropriate header.
         'disable_courseware_header': True,
         'is_shopping_cart_enabled': _is_shopping_cart_enabled,
         'cart_link': reverse('shoppingcart.views.show_cart'),

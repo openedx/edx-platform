@@ -98,7 +98,7 @@ class PositionsCompare(list):
             return False
 
         if (isinstance(self[0], (list, int, float)) and
-            isinstance(other[0], (list, int, float))):
+                isinstance(other[0], (list, int, float))):
             return self.coordinate_positions_compare(other)
 
         elif (isinstance(self[0], (unicode, str)) and
@@ -352,8 +352,10 @@ class DragAndDrop(object):
         # correct_answer entries.  If the draggable is mentioned in at least one
         # correct_answer entry, the value is False.
         # default to consider every user answer excess until proven otherwise.
-        self.excess_draggables = dict((users_draggable.keys()[0], True)
-            for users_draggable in user_answer)
+        self.excess_draggables = dict(
+            (users_draggable.keys()[0], True)
+            for users_draggable in user_answer
+        )
 
         # Convert nested `user_answer` to flat format.
         user_answer = flat_user_answer(user_answer)
@@ -368,7 +370,8 @@ class DragAndDrop(object):
                 if draggable_name in answer['draggables']:
                     user_groups_data.append(draggable_name)
                     user_positions_data.append(
-                                            draggable_dict[draggable_name])
+                        draggable_dict[draggable_name]
+                    )
                     # proved that this is not excess
                     self.excess_draggables[draggable_name] = False
 

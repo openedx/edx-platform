@@ -172,7 +172,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 branched_location = location.for_branch(branch)
                 parent_loc = self.get_parent_location(branched_location)
                 SplitMongoModuleStore.delete_item(self, branched_location, user_id)
-                self._auto_publish_no_children(parent_loc, parent_loc.category, user_id, **kwargs)
+                # publish parent w/o child if deleted element is direct only (not based on type of parent)
+                if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
+                    self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
     def _map_revision_to_branch(self, key, revision=None):
         """
@@ -414,22 +416,12 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             new_usage_key = course_key.make_usage_key(block_type, block_id)
 
             if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-                # if importing a direct only, override existing draft
-                if block_type in DIRECT_ONLY_CATEGORIES:
-                    draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
-                    with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
-                        draft = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
-                        self._auto_publish_no_children(draft.location, block_type, user_id)
-                    return self.get_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.published))
-                # if new to published
-                elif not self.has_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.published)):
-                    # check whether it's new to draft
-                    if not self.has_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.draft)):
-                        # add to draft too
-                        draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
-                        with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
-                            draft = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
-                            return self.publish(draft.location, user_id, blacklist=EXCLUDE_ALL)
+                # override existing draft (PLAT-297, PLAT-299). NOTE: this has the effect of removing
+                # any local changes w/ the import.
+                draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
+                with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
+                    draft_block = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
+                    return self.publish(draft_block.location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
             # do the import
             partitioned_fields = self.partition_fields_by_scope(block_type, fields)

@@ -41,15 +41,15 @@ class VideoSummaryList(generics.ListAPIView):
         An array of videos in the course. For each video:
 
             * section_url: The URL to the first page of the section that
-              contains the video in the Learning Managent System.
+              contains the video in the Learning Management System.
 
-            * path: An array containing category and name values specifying the
-              complete path the the video in the courseware hierarcy. The
+            * path: An array containing category, name, and id values specifying the
+              complete path the the video in the courseware hierarchy. The
               following categories values are included: "chapter", "sequential",
               and "vertical". The name value is the display name for that object.
 
             * unit_url: The URL to the unit contains the video in the Learning
-              Managent System.
+              Management System.
 
             * named_path: An array consisting of the display names of the
               courseware objects in the path to the video.

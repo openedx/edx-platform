@@ -4,8 +4,9 @@
 # pylint: disable=W0212
 # pylint: disable=W0613
 
-import sys, os
+import os
 from path import path
+import sys
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -47,8 +48,14 @@ sys.path.append(root / "lms/djangoapps")
 sys.path.append(root / "lms/lib")
 sys.path.append(root / "cms/djangoapps")
 sys.path.append(root / "cms/lib")
-sys.path.insert(0, os.path.abspath(os.path.normpath(os.path.dirname(__file__)
-    + '/../../../')))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.normpath(
+            os.path.dirname(__file__) + '/../../../'
+        )
+    )
+)
 sys.path.append('.')
 
 #  django configuration  - careful here
@@ -134,7 +141,7 @@ MOCK_MODULES = [
     'yaml',
     'webob',
     'webob.multidict',
-    ]
+]
 
 if on_rtd:
     for mod_name in MOCK_MODULES:

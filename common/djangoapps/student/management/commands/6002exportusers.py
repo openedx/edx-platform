@@ -18,14 +18,13 @@ from student.models import UserProfile
 
 
 class Command(BaseCommand):
-    help = \
-'''Exports all users and user profiles.
+    help = """Exports all users and user profiles.
 Caveat: Should be looked over before any run
 for schema changes.
 
 Current version grabs user_keys from
 django.contrib.auth.models.User and up_keys
-from student.userprofile. '''
+from student.userprofile."""
 
     def handle(self, *args, **options):
         users = list(User.objects.all())

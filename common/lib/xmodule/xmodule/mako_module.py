@@ -23,9 +23,12 @@ class MakoModuleDescriptor(XModuleDescriptor):
     def __init__(self, *args, **kwargs):
         super(MakoModuleDescriptor, self).__init__(*args, **kwargs)
         if getattr(self.runtime, 'render_template', None) is None:
-            raise TypeError('{runtime} must have a render_template function'
-                            ' in order to use a MakoDescriptor'.format(
-                    runtime=self.runtime))
+            raise TypeError(
+                '{runtime} must have a render_template function'
+                ' in order to use a MakoDescriptor'.format(
+                    runtime=self.runtime,
+                )
+            )
 
     def get_context(self):
         """

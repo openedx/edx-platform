@@ -24,7 +24,8 @@ def i_export_the_course(step):
 
 @step('I edit and enter bad XML$')
 def i_enter_bad_xml(step):
-    enter_xml_in_advanced_problem(step,
+    enter_xml_in_advanced_problem(
+        step,
         """<problem><h1>Smallest Canvas</h1>
             <p>You want to make the smallest canvas you can.</p>
             <multiplechoiceresponse>

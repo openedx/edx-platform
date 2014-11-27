@@ -7,7 +7,10 @@
   analytics.page();
 
   % if user.is_authenticated():
-    window.identifyUser("${user.id}", "${user.email}", "${user.username}");
+    analytics.identify("${user.id}", {
+      email: "${user.email}",
+      username: "${user.username}"
+    });
   % endif
 </script>
 <!-- end Segment.io -->

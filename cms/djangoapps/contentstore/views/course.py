@@ -387,10 +387,13 @@ def course_listing(request):
             'run': uca.course_key.run,
             'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
             'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
-            'dismiss_link':
-                reverse_course_url('course_notifications_handler', uca.course_key, kwargs={
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
+                uca.course_key,
+                kwargs={
                     'action_state_id': uca.id,
-                }) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+                },
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
     # remove any courses in courses that are also in the in_process_course_actions list
@@ -456,10 +459,13 @@ def course_index(request, course_key):
             'rerun_notification_id': current_action.id if current_action else None,
             'course_release_date': course_release_date,
             'settings_url': settings_url,
-            'notification_dismiss_url':
-                reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
+            'notification_dismiss_url': reverse_course_url(
+                'course_notifications_handler',
+                current_action.course_key,
+                kwargs={
                     'action_state_id': current_action.id,
-                }) if current_action else None,
+                },
+            ) if current_action else None,
         })
 
 
@@ -543,7 +549,7 @@ def _create_or_rerun_course(request):
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '
-                'organization, course number, and course run. Please '
+                'organization and course number. Please '
                 'change either organization or course number to be unique.'
             ),
             'OrgErrMsg': _(
