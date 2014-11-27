@@ -97,6 +97,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-selector');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-editor');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/notification');
+                TemplateHelpers.installTemplate('templates/file-upload');
             });
 
             it("Show an error if no cohorts are defined", function() {
@@ -106,6 +107,9 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     'warning',
                     'Add Cohort Group'
                 );
+
+                // If no cohorts have been created, can't upload a CSV file.
+                expect(cohortsView.$('.cohort-management-file-upload').text().trim()).toBe('');
             });
 
             describe("Cohort Selector", function () {
@@ -113,6 +117,11 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     createCohortsView(this);
                     expect(cohortsView.$('.cohort-select').val()).toBe('');
                     expect(cohortsView.$('.cohort-management-group-header .title-value').text()).toBe('');
+                });
+
+                it('can upload a CSV of cohort assignments if a cohort exists', function () {
+                    expect(cohortsView.$('.cohort-management-file-upload').text()).
+                        toContain('Assign students to cohorts via a CSV file');
                 });
 
                 it('can select a cohort', function () {
