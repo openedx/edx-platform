@@ -68,7 +68,7 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
-from courseware.courses import get_courses, sort_by_announcement, get_course_about_section
+from courseware.courses import get_courses, sort_by_announcement, get_course_about_section  # pylint: disable=import-error
 from courseware.access import has_access
 
 from django_comment_common.models import Role

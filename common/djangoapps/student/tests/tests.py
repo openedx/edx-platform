@@ -593,7 +593,6 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.user = UserFactory.create(password='secret')
         self.client.login(username=self.user.username, password='secret')
-        self.url = reverse('change_enrollment')
 
     def _enroll_through_view(self, course):
         """ Enroll a student in a course. """
