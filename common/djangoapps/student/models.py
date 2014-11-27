@@ -770,6 +770,17 @@ class CourseEnrollment(models.Model):
         return enrollment_number
 
     @classmethod
+    def is_enrollment_closed(cls, user, course):
+        """
+        Returns a boolean value regarding whether the user has access to enroll in the course. Returns False if the
+        enrollment has been closed.
+        """
+        # Disable the pylint error here, as per ormsbee. This local import was previously
+        # in CourseEnrollment.enroll
+        from courseware.access import has_access  # pylint: disable=import-error
+        return not has_access(user, 'enroll', course)
+
+    @classmethod
     def is_course_full(cls, course):
         """
         Returns a boolean value regarding whether a course has already reached it's max enrollment
@@ -904,8 +915,6 @@ class CourseEnrollment(models.Model):
 
         Also emits relevant events for analytics purposes.
         """
-        from courseware.access import has_access
-
         # All the server-side checks for whether a user is allowed to enroll.
         try:
             course = modulestore().get_course(course_key)
@@ -921,7 +930,7 @@ class CourseEnrollment(models.Model):
         if check_access:
             if course is None:
                 raise NonExistentCourseError
-            if not has_access(user, 'enroll', course):
+            if CourseEnrollment.is_enrollment_closed(user, course):
                 log.warning(
                     "User {0} failed to enroll in course {1} because enrollment is closed".format(
                         user.username,

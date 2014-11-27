@@ -261,6 +261,10 @@
                 exports: 'js/dashboard/donation',
                 deps: ['jquery', 'underscore', 'gettext']
             },
+            'js/shoppingcart/shoppingcart.js': {
+                exports: 'js/shoppingcart/shoppingcart',
+                deps: ['jquery', 'underscore', 'gettext']
+            },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/cohort': {
@@ -382,6 +386,7 @@
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
+        'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',

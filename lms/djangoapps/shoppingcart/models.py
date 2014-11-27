@@ -152,6 +152,15 @@ class Order(models.Model):
 
         return False
 
+    @classmethod
+    def remove_cart_item_from_order(cls, item):
+        """
+        Removes the item from the cart if the item.order.status == 'cart'.
+        """
+        if item.order.status == 'cart':
+            log.info("Item {0} removed from the user cart".format(item.id))
+            item.delete()
+
     @property
     def total_cost(self):
         """
