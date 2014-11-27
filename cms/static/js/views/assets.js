@@ -15,6 +15,10 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 "click .filterable-column .column-filter-link": "toggleFilterColumn"
             },
 
+            typeData: ['Images', 'Documents', 'Text'],
+
+            allLabel: 'ALL',
+
             initialize : function(options) {
                 options = options || {};
 
@@ -24,7 +28,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.listenTo(collection, 'destroy', this.handleDestroy);
                 this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
                 this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
+                this.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                 this.setInitialSortColumn('js-asset-date-col');
+                this.setInitialFilterColumn('js-asset-type-col');
                 ViewUtils.showLoadingIndicator();
                 this.setPage(0);
                 // set default file size for uploads via template var,
@@ -58,7 +64,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     ViewUtils.hideLoadingIndicator();
 
                     // Create the table
-                    this.$el.html(this.template());
+                    this.$el.html(this.template({typeData: this.typeData}));
                     tableBody = this.$('#asset-table-body');
                     this.tableBody = tableBody;
                     this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
@@ -225,7 +231,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .progress-fill').html(percentVal);
             },
 
-            openFilterColumn: function(sortColumn, event) {
+            openFilterColumn: function(filterColumn, event) {
                 var $this = $(event.currentTarget);
                 this.toggleFilterColumnState($this, event);
             },
@@ -233,6 +239,14 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             toggleFilterColumnState: function(menu, event){
                 var $subnav = menu.find('.wrapper-nav-sub');
                 var $title = menu.find('.title');
+                var titleText = $title.find('.type-filter');
+                var assetfilter = $(event.currentTarget).data('assetfilter');
+                if(assetfilter == this.allLabel){
+                    titleText.text(titleText.data('alllabel'));
+                }
+                else{
+                    titleText.text(assetfilter);
+                }
 
                 if ($subnav.hasClass('is-shown')) {
                     $subnav.removeClass('is-shown');
@@ -251,8 +265,14 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             toggleFilterColumn: function(event) {
                 event.preventDefault();
                 var collection = this.collection;
-                collection.assetFilter = $(event.currentTarget).data('assetfilter');
-                this.setPage(0);
+                if($(event.currentTarget).data('assetfilter') == this.allLabel){
+                   collection.assetFilter = '';
+                }
+                else{
+                    collection.assetFilter = $(event.currentTarget).data('assetfilter');
+                }
+
+                this.selectFilter('js-asset-type-col');
                 this.closeFilterPopup(event);
             },
 

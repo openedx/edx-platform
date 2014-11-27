@@ -15,31 +15,27 @@
         <tr>
             <th class="thumb-col"><%= gettext("Preview") %></th>
             <th class="name-col sortable-column"><span class="column-sort-link" id="js-asset-name-col"><%= gettext("Name") %></span></th>
-            <th class="type-col filterable-column nav-course-courseware">
-                <div class="nav-dd nav-item">
+            <th class="type-col filterable-column">
+                <div id="js-asset-type-col" class="nav-dd nav-item">
                     <h3 class="title">
                         <span class="label-prefix sr">Course </span>
-                        <%= gettext("Type") %>
+                        <span class="type-filter" data-alllabel='<%= gettext("Type") %>'><%= gettext("Type") %></span>
                         <span class="filter-link"></span>
                         <i class="icon-caret-down ui-toggle-dd"></i>
                     </h3>
                     <div class="wrapper-nav-sub">
                         <div class="nav-sub">
                             <ul>
+                            <% _.each(typeData, function(type, key){ %>
                                 <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="">ALL</a>
+                                    <a class="column-filter-link" href="" data-assetfilter="<%= type %>"><%= type %></a>
+                                </li>
+                            <% }) %>
+                                <li class="nav-item">
+                                    <a class="column-filter-link" href="" data-assetfilter="OTHER">Other</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="JPG">JPG</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="PNG">PNG</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="TXT">TXT</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="PDF">PDF</a>
+                                    <a class="column-filter-link" href="" data-assetfilter="ALL">Reset</a>
                                 </li>
                             </ul>
                         </div>
