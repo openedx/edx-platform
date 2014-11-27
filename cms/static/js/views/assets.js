@@ -7,8 +7,14 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             events : {
                 "click .column-sort-link": "onToggleColumn",
-                "click .upload-button": "showUploadModal"
+                "click .upload-button": "showUploadModal",
+                "click .filterable-column .nav-item": "onFilterColumn",
+                "click .filterable-column .column-filter-link": "toggleFilterColumn"
             },
+
+            typeData: ['Images', 'Documents', 'Text'],
+
+            allLabel: 'ALL',
 
             initialize : function() {
                 PagingView.prototype.initialize.call(this);
@@ -17,7 +23,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.listenTo(collection, 'destroy', this.handleDestroy);
                 this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
                 this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
+                this.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                 this.setInitialSortColumn('js-asset-date-col');
+                this.setInitialFilterColumn('js-asset-type-col');
                 ViewUtils.showLoadingIndicator();
                 this.setPage(0);
                 assetsView = this;
@@ -42,7 +50,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     ViewUtils.hideLoadingIndicator();
 
                     // Create the table
-                    this.$el.html(this.template());
+                    this.$el.html(this.template({typeData: this.typeData}));
                     tableBody = this.$('#asset-table-body');
                     this.tableBody = tableBody;
                     this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
@@ -60,7 +68,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             renderPageItems: function() {
                 var self = this,
                 assets = this.collection,
-                hasAssets = assets.length > 0,
+                hasAssets = this.collection.assetFilter != '' ? true: assets.length > 0,
                 tableBody = this.getTableBody();
                 tableBody.empty();
                 if (hasAssets) {
@@ -103,6 +111,11 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             onToggleColumn: function(event) {
                 var columnName = event.target.id;
                 this.toggleSortOrder(columnName);
+            },
+
+            onFilterColumn: function(event) {
+                var columnName = event.target.id;
+                this.openFilterColumn(columnName, event);
             },
 
             hideModal: function (event) {
@@ -175,6 +188,56 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var percentVal = percentComplete + '%';
                 $('.upload-modal .progress-fill').width(percentVal);
                 $('.upload-modal .progress-fill').html(percentVal);
+            },
+
+            openFilterColumn: function(filterColumn, event) {
+                var $this = $(event.currentTarget);
+                this.toggleFilterColumnState($this, event);
+            },
+
+            toggleFilterColumnState: function(menu, event){
+                var $subnav = menu.find('.wrapper-nav-sub');
+                var $title = menu.find('.title');
+                var titleText = $title.find('.type-filter');
+                var assetfilter = $(event.currentTarget).data('assetfilter');
+                if(assetfilter == this.allLabel){
+                    titleText.text(titleText.data('alllabel'));
+                }
+                else{
+                    titleText.text(assetfilter);
+                }
+
+                if ($subnav.hasClass('is-shown')) {
+                    $subnav.removeClass('is-shown');
+                    $title.removeClass('is-selected');
+                } else {
+                    $('.nav-dd .nav-item .title').removeClass('is-selected');
+                    $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
+                    $title.addClass('is-selected');
+                    $subnav.addClass('is-shown');
+                }
+                // if propagation is not stopped, the event will bubble up to the
+                // body element, which will close the dropdown.
+                event.stopPropagation();
+            },
+
+            toggleFilterColumn: function(event) {
+                event.preventDefault();
+                var collection = this.collection;
+                if($(event.currentTarget).data('assetfilter') == this.allLabel){
+                   collection.assetFilter = '';
+                }
+                else{
+                    collection.assetFilter = $(event.currentTarget).data('assetfilter');
+                }
+
+                this.selectFilter('js-asset-type-col');
+                this.closeFilterPopup(event);
+            },
+
+            closeFilterPopup: function(event){
+                var $menu = $(event.currentTarget).parents('.nav-dd.nav-item');
+                this.toggleFilterColumnState($menu, event);
             },
 
             displayFinishedUpload: function (resp) {
