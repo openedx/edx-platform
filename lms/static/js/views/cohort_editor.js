@@ -1,7 +1,7 @@
 (function(Backbone, _, $, gettext, ngettext, interpolate_text, NotificationModel, NotificationView) {
     var CohortEditorView = Backbone.View.extend({
         events : {
-            "submit .cohort-management-group-add-form": "addStudents",
+            "submit .cohort-management-group-add-form": "addStudents"
         },
 
         initialize: function(options) {

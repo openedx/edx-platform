@@ -9,7 +9,11 @@
       <div class="form-fields">
         <div class="field field-file is-required">
           <label class="field-label" for="file-upload-form-file"><%- model.get('inputLabel') %></label>
-          <input id="file-upload-form-file" class="input input-file" name="uploaded-file" type="file" accept="<%- model.get('extension') %>"/>
+          <input id="file-upload-form-file" class="input input-file" name="uploaded-file" type="file"
+              <% if (model.get('extensions')) { %>
+                  accept="<%- model.get('extensions') %>"
+              <% } %>
+            />
           <span class="tip tip-stacked"><%- model.get('inputTip') %></span>
         </div>
       </div>

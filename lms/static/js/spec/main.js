@@ -392,6 +392,7 @@
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
+        'lms/include/js/spec/views/file_uploader_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',

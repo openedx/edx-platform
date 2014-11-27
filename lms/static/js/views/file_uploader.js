@@ -1,7 +1,9 @@
 /**
- * A view for uploading a file. Currently only single-file upload is supported. To support multiple-file
- * uploads, the HTML input must specifiy "multiple" and the notification messaging needs to be changed
- * to support the display of multiple status messages.
+ * A view for uploading a file.
+ *
+ * Currently only single-file upload is supported (to support multiple-file uploads, the HTML
+ * input must be changed to specify "multiple" and the notification messaging needs to be changed
+ * to support the display of multiple status messages).
  *
  * The associated model is FileUploaderModel.
  */
@@ -20,7 +22,7 @@
             }));
             var submitButton= this.$el.find('.submit-file-button');
             var resultNotification = this.$el.find('.result');
-            $('#file-upload-form').fileupload({
+            this.$el.find('#file-upload-form').fileupload({
                 dataType: 'json',
                 type: 'POST',
                 done: this.successHandler.bind(this),
@@ -67,16 +69,17 @@
             }
             else {
                 var message = null;
-                    if (data.jqXHR.responseText) {
-                        try {
-                            message = JSON.parse(data.jqXHR.responseText).error;
-                        }
-                        catch(err) {
-                        }
+                var jqXHR = data.response().jqXHR;
+                if (jqXHR.responseText) {
+                    try {
+                        message = JSON.parse(jqXHR.responseText).error;
                     }
-                    if (!message) {
-                        message = interpolate_text(gettext("Your upload of '{file}' failed."), {file: file});
+                    catch(err) {
                     }
+                }
+                if (!message) {
+                    message = interpolate_text(gettext("Your upload of '{file}' failed."), {file: file});
+                }
                 notificationModel = new NotificationModel({
                     type: "error",
                     title: message
