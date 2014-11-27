@@ -58,6 +58,7 @@
 
       .count-current-shown,
       .count-total,
+      .filter-column,
       .sort-order {
         @extend %t-strong;
       }
@@ -221,6 +222,7 @@
           margin: 0 -($baseline/2);
           .wrapper-nav-sub {
             top: 89px;
+            z-index: 101;
 
             > ol > .nav-item {
               @extend %t-action3;
@@ -239,6 +241,20 @@
               &:hover {
                 color: $blue-s1;
               }
+            }
+          }
+          .nav-sub {
+            @include text-align(left);
+
+            // ui triangle/nub
+            &:after {
+              left: $baseline;
+              margin-left: -10px;
+            }
+
+            &:before {
+              left: $baseline;
+              margin-left: -11px;
             }
           }
         }

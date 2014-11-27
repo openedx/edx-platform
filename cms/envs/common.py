@@ -796,5 +796,11 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
+
+# Files and Uploads type filter values
+FILES_AND_UPLOAD_TYPE_FILTER = {
+    "Images": ['image/png', 'image/jpeg'], "Documents": ['application/pdf'], "Text": ['application/txt']}
+

@@ -189,7 +189,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                     var requests;
                     requests = AjaxHelpers.requests(this);
                     assetsView.setPage(0);
-                    if (typeof responseData == "undefined"){
+                    if (!responseData){
                         AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
                     }
                     else{
