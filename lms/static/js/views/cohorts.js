@@ -34,7 +34,7 @@
                 inputLabel: gettext("Choose a .csv file"),
                 inputTip: gettext("Only properly formatted .csv files will be accepted."),
                 submitButtonText: gettext("Upload File and Assign Students"),
-                extension: ".csv",
+                extensions: ".csv",
                 url: this.upload_cohorts_csv_url
             });
             var fileUploaderView = new FileUploaderView({

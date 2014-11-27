@@ -15,11 +15,12 @@
              */
             inputTip: '',
             /**
-             * The expected file extension of the uploaded file. Some browsers will enforce
-             * that the uploaded file has this extension, but others (for instance, Firefox),
-             * will not.
+             * The allowed file extensions of the uploaded file, as a comma-separated string (ex, ".csv,.txt").
+             * Some browsers will enforce that only files with these extensions can be uploaded,
+             * but others (for instance, Firefox), will not. By default, no extensions are specified and any
+             * file can be uploaded.
              */
-            extension: '',
+            extensions: '',
             /**
              * Text to display on the submit button to upload the file. The default value for this is
              * "Upload File".
