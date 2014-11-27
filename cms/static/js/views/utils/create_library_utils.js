@@ -1,26 +1,26 @@
 /**
- * Provides utilities for validating courses during creation, for both new courses and reruns.
+ * Provides utilities for validating libraries during creation.
  */
 define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
     function ($, _, gettext, ViewUtils) {
         return function (selectors, classes) {
-            var validateTotalCourseItemsLength, setNewCourseFieldInErr, hasInvalidRequiredFields,
-                createCourse, validateFilledFields, configureHandlers;
+            var validateTotalKeyLength, setNewLibraryFieldInErr, hasInvalidRequiredFields,
+                createLibrary, validateFilledFields, configureHandlers;
 
             var validateRequiredField = ViewUtils.validateRequiredField;
             var validateURLItemEncoding = ViewUtils.validateURLItemEncoding;
 
-            // Ensure that org/course_num/run < 65 chars.
-            validateTotalCourseItemsLength = function () {
+            // Ensure that org/librarycode < 65 chars.
+            validateTotalKeyLength = function () {
                 var totalLength = _.reduce(
-                    [selectors.org, selectors.number, selectors.run],
+                    [selectors.org, selectors.number],
                     function (sum, ele) {
                         return sum + $(ele).val().length;
                     }, 0
                 );
                 if (totalLength > 65) {
                     $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
-                    $(selectors.errorMessage).html('<p>' + gettext('The combined length of the organization, course number, and course run fields cannot be more than 65 characters.') + '</p>');
+                    $(selectors.errorMessage).html('<p>' + gettext('The combined length of the organization and library code fields cannot be more than 65 characters.') + '</p>');
                     $(selectors.save).addClass(classes.disabled);
                 }
                 else {
@@ -28,7 +28,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                 }
             };
 
-            setNewCourseFieldInErr = function (el, msg) {
+            setNewLibraryFieldInErr = function (el, msg) {
                 if (msg) {
                     el.addClass(classes.error);
                     el.children(selectors.tipError).addClass(classes.showing).removeClass(classes.hiding).text(msg);
@@ -47,21 +47,21 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
             // One final check for empty values
             hasInvalidRequiredFields = function () {
                 return _.reduce(
-                    [selectors.name, selectors.org, selectors.number, selectors.run],
+                    [selectors.name, selectors.org, selectors.number],
                     function (acc, ele) {
                         var $ele = $(ele);
                         var error = validateRequiredField($ele.val());
-                        setNewCourseFieldInErr($ele.parent(), error);
+                        setNewLibraryFieldInErr($ele.parent(), error);
                         return error ? true : acc;
                     },
                     false
                 );
             };
 
-            createCourse = function (courseInfo, errorHandler) {
+            createLibrary = function (libraryInfo, errorHandler) {
                 $.postJSON(
-                    '/course/',
-                    courseInfo,
+                    '/library/',
+                    libraryInfo,
                     function (data) {
                         if (data.url !== undefined) {
                             ViewUtils.redirect(data.url);
@@ -75,7 +75,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
             // Ensure that all fields are not empty
             validateFilledFields = function () {
                 return _.reduce(
-                    [selectors.org, selectors.number, selectors.run, selectors.name],
+                    [selectors.org, selectors.number, selectors.name],
                     function (acc, ele) {
                         var $ele = $(ele);
                         return $ele.val().length !== 0 ? acc : false;
@@ -87,7 +87,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
             // Handle validation asynchronously
             configureHandlers = function () {
                 _.each(
-                    [selectors.org, selectors.number, selectors.run],
+                    [selectors.org, selectors.number],
                     function (ele) {
                         var $ele = $(ele);
                         $ele.on('keyup', function (event) {
@@ -98,8 +98,8 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                                 return;
                             }
                             var error = validateURLItemEncoding($ele.val(), $(selectors.allowUnicode).val() === 'True');
-                            setNewCourseFieldInErr($ele.parent(), error);
-                            validateTotalCourseItemsLength();
+                            setNewLibraryFieldInErr($ele.parent(), error);
+                            validateTotalKeyLength();
                             if (!validateFilledFields()) {
                                 $(selectors.save).addClass(classes.disabled);
                             }
@@ -109,8 +109,8 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                 var $name = $(selectors.name);
                 $name.on('keyup', function () {
                     var error = validateRequiredField($name.val());
-                    setNewCourseFieldInErr($name.parent(), error);
-                    validateTotalCourseItemsLength();
+                    setNewLibraryFieldInErr($name.parent(), error);
+                    validateTotalKeyLength();
                     if (!validateFilledFields()) {
                         $(selectors.save).addClass(classes.disabled);
                     }
@@ -118,10 +118,10 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
             };
 
             return {
-                validateTotalCourseItemsLength: validateTotalCourseItemsLength,
-                setNewCourseFieldInErr: setNewCourseFieldInErr,
+                validateTotalKeyLength: validateTotalKeyLength,
+                setNewLibraryFieldInErr: setNewLibraryFieldInErr,
                 hasInvalidRequiredFields: hasInvalidRequiredFields,
-                createCourse: createCourse,
+                createLibrary: createLibrary,
                 validateFilledFields: validateFilledFields,
                 configureHandlers: configureHandlers
             };

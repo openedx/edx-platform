@@ -5,7 +5,8 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
     function ($, _, gettext, NotificationView, PromptView) {
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
-            setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler;
+            setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler,
+            validateRequiredField=1, validateURLItemEncoding=2;
 
         /**
          * Toggles the expanded state of the current element.
@@ -173,6 +174,35 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             return false;
         };
 
+        /**
+         * Helper method for course/library creation - verifies a required field is not blank.
+         */
+        validateRequiredField = function (msg) {
+            return msg.length === 0 ? gettext('Required field.') : '';
+        };
+
+        /**
+         * Helper method for course/library creation.
+         * Check that a course (org, number, run) doesn't use any special characters
+         */
+        validateURLItemEncoding = function (item, allowUnicode) {
+            var required = validateRequiredField(item);
+            if (required) {
+                return required;
+            }
+            if (allowUnicode) {
+                if (/\s/g.test(item)) {
+                    return gettext('Please do not use any spaces in this field.');
+                }
+            }
+            else {
+                if (item !== encodeURIComponent(item)) {
+                    return gettext('Please do not use any spaces or special characters in this field.');
+                }
+            }
+            return '';
+        };
+
         return {
             'toggleExpandCollapse': toggleExpandCollapse,
             'showLoadingIndicator': showLoadingIndicator,
@@ -186,6 +216,8 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'setScrollOffset': setScrollOffset,
             'redirect': redirect,
             'reload': reload,
-            'hasChangedAttributes': hasChangedAttributes
+            'hasChangedAttributes': hasChangedAttributes,
+            'validateRequiredField': validateRequiredField,
+            'validateURLItemEncoding': validateURLItemEncoding
         };
     });
