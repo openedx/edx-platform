@@ -434,14 +434,14 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
             {
                 "name": "Facebook",
                 "iconClass": "icon-facebook",
-                "loginUrl": self._third_party_login_url("facebook", "account_login"),
-                "registerUrl": self._third_party_login_url("facebook", "account_register")
+                "loginUrl": self._third_party_login_url("facebook", "login"),
+                "registerUrl": self._third_party_login_url("facebook", "register")
             },
             {
                 "name": "Google",
                 "iconClass": "icon-google-plus",
-                "loginUrl": self._third_party_login_url("google-oauth2", "account_login"),
-                "registerUrl": self._third_party_login_url("google-oauth2", "account_register")
+                "loginUrl": self._third_party_login_url("google-oauth2", "login"),
+                "registerUrl": self._third_party_login_url("google-oauth2", "register")
             }
         ]
         self._assert_third_party_auth_data(response, current_provider, expected_providers)
@@ -468,12 +468,12 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
                 "name": "Facebook",
                 "iconClass": "icon-facebook",
                 "loginUrl": self._third_party_login_url(
-                    "facebook", "account_login",
+                    "facebook", "login",
                     course_id=unicode(course.id),
                     redirect_url=course_modes_choose_url
                 ),
                 "registerUrl": self._third_party_login_url(
-                    "facebook", "account_register",
+                    "facebook", "register",
                     course_id=unicode(course.id),
                     redirect_url=course_modes_choose_url
                 )
@@ -482,12 +482,12 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
                 "name": "Google",
                 "iconClass": "icon-google-plus",
                 "loginUrl": self._third_party_login_url(
-                    "google-oauth2", "account_login",
+                    "google-oauth2", "login",
                     course_id=unicode(course.id),
                     redirect_url=course_modes_choose_url
                 ),
                 "registerUrl": self._third_party_login_url(
-                    "google-oauth2", "account_register",
+                    "google-oauth2", "register",
                     course_id=unicode(course.id),
                     redirect_url=course_modes_choose_url
                 )
@@ -516,12 +516,12 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
                 "name": "Facebook",
                 "iconClass": "icon-facebook",
                 "loginUrl": self._third_party_login_url(
-                    "facebook", "account_login",
+                    "facebook", "login",
                     course_id=unicode(course.id),
                     redirect_url=shoppingcart_url
                 ),
                 "registerUrl": self._third_party_login_url(
-                    "facebook", "account_register",
+                    "facebook", "register",
                     course_id=unicode(course.id),
                     redirect_url=shoppingcart_url
                 )
@@ -530,12 +530,12 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
                 "name": "Google",
                 "iconClass": "icon-google-plus",
                 "loginUrl": self._third_party_login_url(
-                    "google-oauth2", "account_login",
+                    "google-oauth2", "login",
                     course_id=unicode(course.id),
                     redirect_url=shoppingcart_url
                 ),
                 "registerUrl": self._third_party_login_url(
-                    "google-oauth2", "account_register",
+                    "google-oauth2", "register",
                     course_id=unicode(course.id),
                     redirect_url=shoppingcart_url
                 )
@@ -545,6 +545,27 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
         # Verify that the login page contains the correct provider URLs
         response = self.client.get(reverse("account_login"), {"course_id": unicode(course.id)})
         self._assert_third_party_auth_data(response, None, expected_providers)
+
+    @override_settings(SITE_NAME=settings.MICROSITE_TEST_HOSTNAME)
+    def test_microsite_uses_old_login_page(self):
+        # Retrieve the login page from a microsite domain
+        # and verify that we're served the old page.
+        resp = self.client.get(
+            reverse("account_login"),
+            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
+        )
+        self.assertContains(resp, "Log into your Test Microsite Account")
+        self.assertContains(resp, "login-form")
+
+    def test_microsite_uses_old_register_page(self):
+        # Retrieve the register page from a microsite domain
+        # and verify that we're served the old page.
+        resp = self.client.get(
+            reverse("account_register"),
+            HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME
+        )
+        self.assertContains(resp, "Register for Test Microsite")
+        self.assertContains(resp, "register-form")
 
     def _assert_third_party_auth_data(self, response, current_provider, providers):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
