@@ -22,10 +22,10 @@ ${_("The items in your order are:")}
 
 ${_("Quantity - Description - Price")}
 %for order_item in order_items:
-    ${order_item.qty} - ${order_item.line_desc} - ${"$" if order_item.currency == 'usd' else ""}${order_item.line_cost}
+    ${order_item.qty} - ${order_item.line_desc} - ${currency_symbol}${order_item.line_cost}
 %endfor
 
-${_("Total billed to credit/debit card: {currency_symbol}{total_cost}").format(total_cost=order.total_cost, currency_symbol=("$" if order.currency == 'usd' else ""))}
+${_("Total billed to credit/debit card: {currency_symbol}{total_cost}").format(total_cost=order.total_cost, currency_symbol=currency_symbol)}
 
 % if has_billing_info:
 ${order.bill_to_cardtype} ${_("#:")} ${order.bill_to_ccnum}

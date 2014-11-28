@@ -27,10 +27,10 @@ ${_("Thank you for your purchase of ")} <b> ${course_names} </b>
 
 <p>${_("Quantity - Description - Price")}<br>
 %for order_item in order_items:
-    ${order_item.qty} - ${order_item.line_desc} - ${"$" if order_item.currency == 'usd' else ""}${order_item.line_cost}</p>
+    ${order_item.qty} - ${order_item.line_desc} - ${currency_symbol}${order_item.line_cost}</p>
 %endfor
 
-<p>${_("Total billed to credit/debit card: {currency_symbol}{total_cost}").format(total_cost=order.total_cost, currency_symbol=("$" if order.currency == 'usd' else ""))}</p>
+<p>${_("Total billed to credit/debit card: {currency_symbol}{total_cost}").format(total_cost=order.total_cost, currency_symbol=currency_symbol)}</p>
 
 <p>
 % if order.company_name:
