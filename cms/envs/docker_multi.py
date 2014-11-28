@@ -1,49 +1,49 @@
 from .docker import *
 
 CACHES = {
-             "celery": {
-                 "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
-                 "KEY_FUNCTION": "util.memcache.safe_key",
-                 "KEY_PREFIX": "celery",
-                 "LOCATION": [
-                     "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
-                 ],
-                 "TIMEOUT": "7200"
-             },
-             "default": {
-                 "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
-                 "KEY_FUNCTION": "util.memcache.safe_key",
-                 "KEY_PREFIX": "default",
-                 "LOCATION": [
-                     "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
-                 ]
-             },
-             "general": {
-                 "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
-                 "KEY_FUNCTION": "util.memcache.safe_key",
-                 "KEY_PREFIX": "general",
-                 "LOCATION": [
-                     "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
-                 ]
-             },
-             "mongo_metadata_inheritance": {
-                 "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
-                 "KEY_FUNCTION": "util.memcache.safe_key",
-                 "KEY_PREFIX": "mongo_metadata_inheritance",
-                 "LOCATION": [
-                     "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
-                 ],
-                 "TIMEOUT": 300
-             },
-             "staticfiles": {
-                 "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
-                 "KEY_FUNCTION": "util.memcache.safe_key",
-                 "KEY_PREFIX": "9818fcbe520e_general",
-                 "LOCATION": [
-                     "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
-                 ]
-             }
-         },
+    "celery": {
+        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "KEY_FUNCTION": "util.memcache.safe_key",
+        "KEY_PREFIX": "celery",
+        "LOCATION": [
+            "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
+        ],
+        "TIMEOUT": "7200"
+    },
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "KEY_FUNCTION": "util.memcache.safe_key",
+        "KEY_PREFIX": "default",
+        "LOCATION": [
+            "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
+        ]
+    },
+    "general": {
+        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "KEY_FUNCTION": "util.memcache.safe_key",
+        "KEY_PREFIX": "general",
+        "LOCATION": [
+            "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
+        ]
+    },
+    "mongo_metadata_inheritance": {
+        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "KEY_FUNCTION": "util.memcache.safe_key",
+        "KEY_PREFIX": "mongo_metadata_inheritance",
+        "LOCATION": [
+            "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
+        ],
+        "TIMEOUT": 300
+    },
+    "staticfiles": {
+        "BACKEND": "django.core.cache.backends.memcached.MemcachedCache",
+        "KEY_FUNCTION": "util.memcache.safe_key",
+        "KEY_PREFIX": "9818fcbe520e_general",
+        "LOCATION": [
+            "{}:{}".format(os.environ.get("DB_PORT_11211_TCP_ADDR"), os.environ.get("DB_PORT_11211_TCP_PORT"))
+        ]
+    }
+}
 
 DATABASES = {
     "default": {
