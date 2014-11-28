@@ -482,7 +482,7 @@ class LoginOAuthTokenMixin(object):
         self._setup_user_response(success=True)
         response = self.client.post(self.url, {"access_token": "dummy"})
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(self.client.session['_auth_user_id'], self.user.id)
+        self.assertEqual(self.client.session['_auth_user_id'], self.user.id)  # pylint: disable=no-member
 
     def test_invalid_token(self):
         self._setup_user_response(success=False)

@@ -42,7 +42,7 @@ def no_prereq_install():
 
     try:
         return vals[val]
-    except:
+    except KeyError:
         return False
 
 
