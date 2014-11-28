@@ -35,130 +35,141 @@ from django.core.urlresolvers import reverse
   <div class="wrapper-content wrapper">
     <section class="content">
       <h2 class="is-hidden">Content</h2>
-      <article class="content-primary" role="main">
+      <div class="content-primary" role="main">
         <h3 class="is-hidden">Video Uploads</h3>
-        <article data-locator="" data-course-key="">
-          <div class="file-drop">
-            <form class="file-drop-upload-form" id="form-file-drop" action="upload.php" method="POST" enctype="multipart/form-data">
-              <label for="file-drop-filename" class="file-drop-filename-label sr">
-              <input class="file-drop-filename" type="hidden" id="file-drop-filename" name="file" />
-              <fieldset class="file-drop-fieldset">
-                <legend class="file-drop-legend sr">Upload your videos</legend>
-                <div class="area-file-drop">
-                  Drag and drop your video files here, or...
+        <div class="file-drop">
+          <form class="file-drop-upload-form" id="form-file-drop" action="upload.php" method="POST" enctype="multipart/form-data">
+            <label for="file-drop-filename" class="file-drop-filename-label sr"></label>
+            <input class="file-drop-filename sr" type="hidden" id="file-drop-filename" name="file" />
+            <div class="file-drop-area">
+              Drag and drop or click here to upload video files.
 
-                  <label for="video-files" class="video-files-label sr">Files to upload:</label>
-                  <input type="file" class="video-files-filename sr" id="video-files" name="video-files[]" multiple="multiple" />
-                </div>
-                <div class="action-area">
-                  <button type="button" class="button primary-green"><i class="icon-plus"></i>Select files</button>
-                </div>
-              </fieldset>
-            </form>
-          </div>
-        </article>
+              <label for="video-files" class="video-files-label sr">Choose one or many files to upload:</label>
+              <input type="file" class="video-files-filename sr" id="video-files" name="video-files[]" multiple="multiple" />
+            </div>
+          </form>
+        </div>
 
-        <section class="video-upload-progress-container clearfix">
+        <section class="video-upload-progress-container">
           <h3 class="video-upload-progress-title sr">Video Upload Progress</h3>
-          <ul class="video-upload-progress-list clearfix">
+          <ul class="video-upload-progress-list">
+
             <li class="video-upload-item">
               <div class="video-detail-wrapper">
-                <h4 class="" id="video-upload-001">Something random that's supposed to be uploading</h4>
-                <div class="progress-bar">
-                  <progress class="bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-001"></progress>
+                <h4 class="video-detail-title" id="video-upload-001">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-001"></progress>
                 </div>
                 <div class="video-actions">
-                  <button type="button"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                  <button type="button" class="action-button action-remove"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
                 </div>
                 <div class="status-message"></div>
               </div>
             </li>
+
             <li class="video-upload-item">
               <div class="video-detail-wrapper">
-                <h4 id="video-upload-002">Something random that's supposed to be uploading</h4>
-                <div class="progress-bar bar-error">
-                  <progress class="bar" role="progressbar" max="100" value="51" aria-describedby="video-upload-002"></progress>
+                <h4 class="video-detail-title" id="video-upload-002">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar bar-error">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="51" aria-describedby="video-upload-002"></progress>
                 </div>
                 <div class="video-actions">
-                  <button type="button"><i class="icon icon-rotate-left"></i><span class="sr">Retry</span></button>
+                  <button type="button" class="action-button action-retry"><i class="icon icon-rotate-left"></i><span class="sr">Retry</span></button>
                 </div>
                 <div class="status-message">
                   <p class="text error">Upload failed</p>
                 </div>
               </div>
             </li>
+
             <li class="video-upload-item">
               <div class="video-detail-wrapper">
-                <h4 id="video-upload-003">Something random that's supposed to be uploading</h4>
-                <div class="progress-bar bar-success">
-                  <progress class="bar" role="progressbar" max="100" value="100" aria-describedby="video-upload-003"></progress>
+                <h4 class="video-detail-title" id="video-upload-003">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar bar-success">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="100" aria-describedby="video-upload-003"></progress>
                 </div>
                 <div class="video-actions">
-                  <button type="button"><i class="icon icon-trash"></i><span class="sr">Remove</span></button>
+                  <button type="button" class="action-button action-delete"><i class="icon icon-trash"></i><span class="sr">Remove</span></button>
                 </div>
                 <div class="status-message">
                   <p class="text success"><i class="icon icon-ok"></i> Complete!</p>
                 </div>
               </div>
             </li>
+
             <li class="video-upload-item">
               <div class="video-detail-wrapper">
-                <h4 id="video-upload-004">Something random that's supposed to be uploading</h4>
-                <div class="progress-bar">
-                  <progress class="bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-004"></progress>
+                <h4 class="video-detail-title" id="video-upload-004">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-004"></progress>
                 </div>
                 <div class="video-actions">
-                  <button type="button"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
                 </div>
                 <div class="status-message"></div>
               </div>
             </li>
+
             <li class="video-upload-item">
               <div class="video-detail-wrapper">
-                <h4 id="video-upload-005">Something random that's supposed to be uploading</h4>
-                <div class="progress-bar">
-                  <progress class="bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-005"></progress>
+                <h4 class="video-detail-title" id="video-upload-005">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-005"></progress>
                 </div>
                 <div class="video-actions">
-                  <button type="button"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
                 </div>
                 <div class="status-message"></div>
               </div>
             </li>
-            <li class="video-upload-item is-duplicate">
-              <div class="video-detail-wrapper">
-                <h4 id="video-upload-006">Something random that's supposed to be uploading</h4>
-                <div class="progress-bar">
-                  <progress class="bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-006"></progress>
-                </div>
-                <div class="video-actions">
-                  <button type="button"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
-                </div>
-                <div class="status-message">
-                  <p class="duplicate">A file with this name already exists. Try renaming the file and uploading again.</p>
-                </div>
-              </div>
-            </li>
+
             <li class="video-upload-item">
               <div class="video-detail-wrapper">
-                <h4 id="video-upload-007">Something random that's supposed to be uploading</h4>
-                <div class="progress-bar">
-                  <progress class="bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-007"></progress>
+                <h4 class="video-detail-title" id="video-upload-006">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-006"></progress>
                 </div>
                 <div class="video-actions">
-                  <button type="button"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
                 </div>
                 <div class="status-message"></div>
               </div>
             </li>
+
             <li class="video-upload-item">
               <div class="video-detail-wrapper">
-                <h4 id="video-upload-008">Something random that's supposed to be uploading</h4>
-                <div class="progress-bar">
-                  <progress class="bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-008"></progress>
+                <h4 class="video-detail-title" id="video-upload-007">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-007"></progress>
                 </div>
                 <div class="video-actions">
-                  <button type="button"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-008">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-008"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
+                </div>
+                <div class="status-message"></div>
+              </div>
+            </li>
+
+            <li class="video-upload-item">
+              <div class="video-detail-wrapper">
+                <h4 class="video-detail-title" id="video-upload-009">Something random that's supposed to be uploading</h4>
+                <div class="video-detail-progress-bar">
+                  <progress class="upload-progress-bar" role="progressbar" max="100" value="37" aria-describedby="video-upload-009"></progress>
+                </div>
+                <div class="video-actions">
+                  <button type="button" class="action-button action-cancel"><i class="icon icon-remove"></i><span class="sr">Cancel</span></button>
                 </div>
                 <div class="status-message"></div>
               </div>
@@ -179,52 +190,45 @@ from django.core.urlresolvers import reverse
             <h3>Previous Uploads</h3>
             <table>
               <caption class="sr">List of uploaded files and assets in this course</caption>
-              <colgroup>
-                <col class="title-cols">
-                <col class="size-cols">
-                <col class="date-cols">
-                <col class="embed-cols">
-                <col class="action-cols">
-              </colgroup>
               <thead>
                 <tr>
-                  <th class="title-col sortable-column"><span class="column-sort-link" id="js-asset-title-col">Title</span></th>
-                  <th class="size-col sortable-column"><span class="column-sort-link" id="js-asset-size-col">Size</span></th>
+                  <th class="name-col sortable-column"><span class="column-sort-link" id="js-asset-name-col">Name</span></th>
+                  <th class="duration-col sortable-column"><span class="column-sort-link" id="js-asset-duration-col">Duration</span></th>
                   <th class="date-col">Date Added</th>
-                  <th class="embed-col">Embed URL</th>
-                  <th class="action-col sortable-column"><span class="column-sort-link" id="js-asset-action-col">Actions</span></th>
+                  <th class="video-id-col">Video ID</th>
+                  <th class="status-col sortable-column"><span class="column-sort-link" id="js-asset-status-col">Status</span></th>
                 </tr>
               </thead>
-              <tbody id="asset-table-body">
+              <tbody>
                 <tr>
-                  <td class="title-col">
+                  <td class="name-col">
                     <a href="#">Something-random</a>
                   </td>
-                  <td class="size-col">
+                  <td class="duration-col">
                     4.35MB
                   </td>
                   <td class="date-col">
                     Nov. 12, 2014 at 4:35pm
                   </td>
-                  <td class="embed-col">
+                  <td class="video-id-col">
                     MIT4758331-V004100
                   </td>
-                  <td class="actions-col">
+                  <td class="status-col">
                     <span class="success">Complete</span>
                   </td>
                 </tr>
                 <tr>
-                  <td class="title-col">
+                  <td class="name-col">
                     <a href="#">section1-unit3</a>
                   </td>
-                  <td class="size-col">
+                  <td class="duration-col">
                     1.05GB
                   </td>
                   <td class="date-col">
                     Nov. 12, 2014 at 4:47pm
                   </td>
-                  <td class="embed-col"></td>
-                  <td class="actions-col">
+                  <td class="video-id-col"></td>
+                  <td class="status-col">
                     <span class="info">In Progress</span>
                   </td>
                 </tr>
@@ -239,7 +243,7 @@ from django.core.urlresolvers import reverse
             <span class="copy">Loading &hellip;</span>
           </p>
         </div>
-      </article>
+      </div>
 
       <aside class="content-supplementary" role="complementary">
         <div class="bit">
