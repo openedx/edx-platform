@@ -2,16 +2,16 @@
 Views for user API
 """
 
-# TODO: remove unused
+
 from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-# TODO: myimports
 from django.utils import simplejson
 from django.http import HttpResponse
+
 from ..mobile_settings import _APP_SECRET, _APP_ID
 
 
@@ -34,7 +34,7 @@ class AppSecret(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        secret = ''
+        secret = 'Null'
         if kwargs['app_id'] == _APP_ID:
             secret = _APP_SECRET
         return Response( {"app-secret": secret} )
