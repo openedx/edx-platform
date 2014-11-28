@@ -45,6 +45,30 @@ CACHES = {
     }
 }
 
+CONTENTSTORE = {
+    "ADDITIONAL_OPTIONS": {},
+    "DOC_STORE_CONFIG": {
+        "collection": "modulestore",
+        "db": "docker-edxapp",
+        "host": [
+            os.environ.get("MONGO_PORT_27017_TCP_ADDR")
+        ],
+        "password": "daheiYae2c",
+        "port": int(os.environ.get("MONGO_PORT_27017_TCP_PORT")),
+        "user": "edxapp"
+    },
+    "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",
+    "OPTIONS": {
+        "db": "docker-edxapp",
+        "host": [
+            os.environ.get("MONGO_PORT_27017_TCP_ADDR")
+        ],
+        "password": "daheiYae2c",
+        "port": int(os.environ.get("MONGO_PORT_27017_TCP_PORT")),
+        "user": "edxapp"
+    }
+}
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -62,6 +86,17 @@ DATABASES = {
         "PORT": os.environ.get("DB_PORT_3306_TCP_PORT"),
         "USER": "edxapp001"
     }
+}
+
+DOC_STORE_CONFIG = {
+    "collection": "modulestore",
+    "db": "docker-edxapp",
+    "host": [
+        os.environ.get("MONGO_PORT_27017_TCP_ADDR")
+    ],
+    "password": "daheiYae2c",
+    "port": int(os.environ.get("MONGO_PORT_27017_TCP_PORT")),
+    "user": "edxapp"
 }
 
 MODULESTORE = {
