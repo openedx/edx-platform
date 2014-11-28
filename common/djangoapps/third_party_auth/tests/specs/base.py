@@ -198,13 +198,6 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             self.assertFalse(payload.get('success'))
             self.assertIn('incorrect', payload.get('value'))
 
-    def assert_javascript_would_submit_login_form(self, boolean, response):
-        """Asserts we pass form submit JS the right boolean string."""
-        argument_string = re.search(
-            r'function\ post_form_if_pipeline_running.*\(([a-z]+)\)', response.content, re.DOTALL).groups()[0]
-        self.assertIn(argument_string, ['true', 'false'])
-        self.assertEqual(boolean, True if argument_string == 'true' else False)
-
     def assert_json_failure_response_is_inactive_account(self, response):
         """Asserts failure on /login for inactive account looks right."""
         self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
@@ -234,15 +227,14 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def assert_login_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /login not in the pipeline looks correct."""
         self.assertEqual(200, response.status_code)
-        self.assertIn('Sign in with ' + self.PROVIDER_CLASS.NAME, response.content)
-        self.assert_javascript_would_submit_login_form(False, response)
-        self.assert_signin_button_looks_functional(response.content, pipeline.AUTH_ENTRY_LOGIN)
+        # The combined login/registration page dynamically generates the login button,
+        # but we can still check that the provider name is passed in the data attribute
+        # for the container element.
+        self.assertIn(self.PROVIDER_CLASS.NAME, response.content)
 
     def assert_login_response_in_pipeline_looks_correct(self, response):
         """Asserts a GET of /login in the pipeline looks correct."""
         self.assertEqual(200, response.status_code)
-        # Make sure the form submit JS is told to submit the form:
-        self.assert_javascript_would_submit_login_form(True, response)
 
     def assert_password_overridden_by_pipeline(self, username, password):
         """Verifies that the given password is not correct.
@@ -262,27 +254,22 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(auth_settings._SOCIAL_AUTH_LOGIN_REDIRECT_URL, response.get('Location'))
 
     def assert_redirect_to_login_looks_correct(self, response):
-        """Asserts a response would redirect to /login."""
+        """Asserts a response would redirect to /account/login."""
         self.assertEqual(302, response.status_code)
-        self.assertEqual('/' + pipeline.AUTH_ENTRY_LOGIN, response.get('Location'))
+        self.assertEqual('/account/login', response.get('Location'))
 
     def assert_redirect_to_register_looks_correct(self, response):
-        """Asserts a response would redirect to /register."""
+        """Asserts a response would redirect to /account/register."""
         self.assertEqual(302, response.status_code)
-        self.assertEqual('/' + pipeline.AUTH_ENTRY_REGISTER, response.get('Location'))
+        self.assertEqual('/account/register', response.get('Location'))
 
     def assert_register_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /register not in the pipeline looks correct."""
         self.assertEqual(200, response.status_code)
-        self.assertIn('Sign up with ' + self.PROVIDER_CLASS.NAME, response.content)
-        self.assert_signin_button_looks_functional(response.content, pipeline.AUTH_ENTRY_REGISTER)
-
-    def assert_signin_button_looks_functional(self, content, auth_entry):
-        """Asserts JS is available to signin buttons and has the right args."""
-        self.assertTrue(re.search(r'function thirdPartySignin', content))
-        self.assertEqual(
-            pipeline.get_login_url(self.PROVIDER_CLASS.NAME, auth_entry),
-            re.search(r"thirdPartySignin\(event, '([^']+)", content).groups()[0])
+        # The combined login/registration page dynamically generates the register button,
+        # but we can still check that the provider name is passed in the data attribute
+        # for the container element.
+        self.assertIn(self.PROVIDER_CLASS.NAME, response.content)
 
     def assert_social_auth_does_not_exist_for_user(self, user, strategy):
         """Asserts a user does not have an auth with the expected provider."""
@@ -404,10 +391,10 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     # Actual tests, executed once per child.
 
     def test_canceling_authentication_redirects_to_login_when_auth_entry_login(self):
-        self.assert_exception_redirect_looks_correct('/login', auth_entry=pipeline.AUTH_ENTRY_LOGIN)
+        self.assert_exception_redirect_looks_correct('/account/login', auth_entry=pipeline.AUTH_ENTRY_LOGIN)
 
     def test_canceling_authentication_redirects_to_register_when_auth_entry_register(self):
-        self.assert_exception_redirect_looks_correct('/register', auth_entry=pipeline.AUTH_ENTRY_REGISTER)
+        self.assert_exception_redirect_looks_correct('/account/register', auth_entry=pipeline.AUTH_ENTRY_REGISTER)
 
     def test_canceling_authentication_redirects_to_login_when_auth_login_2(self):
         self.assert_exception_redirect_looks_correct('/account/login/', auth_entry=pipeline.AUTH_ENTRY_LOGIN_2)

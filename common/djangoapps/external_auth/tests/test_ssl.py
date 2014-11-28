@@ -220,8 +220,7 @@ class SSLClientTest(ModuleStoreTestCase):
         # Test that they do signin if they don't have a cert
         response = self.client.get(reverse('signin_user'))
         self.assertEqual(200, response.status_code)
-        self.assertTrue('login_form' in response.content
-                        or 'login-form' in response.content)
+        self.assertTrue('login-and-registration-container' in response.content)
 
         # And get directly logged in otherwise
         response = self.client.get(

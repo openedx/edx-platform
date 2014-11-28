@@ -241,7 +241,7 @@ def get_email_params(course, auto_enroll, secure=True):
     registration_url = u'{proto}://{site}{path}'.format(
         proto=protocol,
         site=stripped_site_name,
-        path=reverse('student.views.register_user')
+        path=reverse('register_user')
     )
     course_url = u'{proto}://{site}{path}'.format(
         proto=protocol,
