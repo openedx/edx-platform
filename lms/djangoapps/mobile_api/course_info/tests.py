@@ -24,7 +24,6 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
     def test_about(self):
         url = reverse('course-about-detail', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
-        # self.assertTrue(False)  # pylint: disable=E1103
         self.assertEqual(response.status_code, 200)
         self.assertTrue('overview' in response.data)  # pylint: disable=E1103
 
