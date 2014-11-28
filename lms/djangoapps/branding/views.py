@@ -36,20 +36,10 @@ def get_course_enrollments(user):
 @cache_if_anonymous
 def index(request):
     '''
-    Redirects to main page -- info page if user authenticated, or marketing if not
+    Present the landing page to the end user which is the course catalog, unless the
+    ENABLE_MKTG_SITE is set to True which means that a different landing page (typically
+    at a different URL) should be show via redirect to a MKTG_URLS configuration
     '''
-
-    if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
-        # For microsites, only redirect to dashboard if user has
-        # courses in his/her dashboard. Otherwise UX is a bit cryptic.
-        # In this case, we want to have the user stay on a course catalog
-        # page to make it easier to browse for courses (and register)
-        if microsite.get_value(
-                'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
-                settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)
-        ) or get_course_enrollments(request.user):
-
-            return redirect(reverse('dashboard'))
 
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES'):
         from external_auth.views import ssl_login
