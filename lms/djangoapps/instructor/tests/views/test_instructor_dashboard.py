@@ -15,6 +15,7 @@ from shoppingcart.models import PaidCourseRegistration
 from course_modes.models import CourseMode
 from student.roles import CourseFinanceAdminRole
 
+
 class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for the instructor dashboard (not legacy).
@@ -76,7 +77,6 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         response = self.client.get(self.url)
         self.assertTrue('{currency}{amount}'.format(currency='Rs', amount=total_amount) in response.content)
-
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
