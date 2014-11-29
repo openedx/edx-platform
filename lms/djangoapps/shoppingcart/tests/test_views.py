@@ -157,7 +157,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(context['currency'], 'usd')
         self.assertEqual(context['currency_symbol'], '$')
 
-
         data = {'company_name': 'Test Company', 'company_contact_name': 'JohnDoe',
                 'company_contact_email': 'john@est.com', 'recipient_name': 'Mocker',
                 'recipient_email': 'mock@germ.com', 'company_address_line_1': 'DC Street # 1',
