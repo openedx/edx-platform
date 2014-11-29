@@ -142,9 +142,9 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEquals(resp.status_code, 200)
 
-    def test_redirect_on_homepage_when_has_enrollments(self):
+    def test_no_redirect_on_homepage_when_has_enrollments(self):
         """
-        Verify that a user going to homepage will redirect to dashboard if he/she has
+        Verify that a user going to homepage will not redirect to dashboard if he/she has
         a course enrollment
         """
         self.setup_users()
@@ -154,7 +154,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.course, True)
 
         resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.status_code, 200)
 
     def test_microsite_course_enrollment(self):
         """
