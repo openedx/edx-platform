@@ -1,10 +1,10 @@
 """
 Handles requests for data, returning a json
 """
+import json
 
 import logging
 
-from django.utils import simplejson
 from django.http import HttpResponse
 
 from courseware.courses import get_course_with_access
@@ -48,7 +48,7 @@ def all_sequential_open_distrib(request, course_id):
     else:
         json = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(simplejson.dumps(json), mimetype="application/json")
+    return HttpResponse(json.dumps(json), mimetype="application/json")
 
 
 def all_problem_grade_distribution(request, course_id):
@@ -74,7 +74,7 @@ def all_problem_grade_distribution(request, course_id):
     else:
         json = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(simplejson.dumps(json), mimetype="application/json")
+    return HttpResponse(json.dumps(json), mimetype="application/json")
 
 
 def section_problem_grade_distrib(request, course_id, section):
@@ -92,17 +92,17 @@ def section_problem_grade_distrib(request, course_id, section):
     If this is requested multiple times quickly for the same course, it is better to call all_problem_grade_distribution
     and pick out the sections of interest.
     """
-    json = {}
+    data = {}
 
     # Only instructor for this particular course can request this information
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
-            json = dashboard_data.get_d3_section_grade_distrib(course_key, section)
+            data = dashboard_data.get_d3_section_grade_distrib(course_key, section)
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
-            json = {'error': "error"}
+            data = {'error': "error"}
     else:
-        json = {'error': "Access Denied: User does not have access to this course's data"}
+        data = {'error': "Access Denied: User does not have access to this course's data"}
 
-    return HttpResponse(simplejson.dumps(json), mimetype="application/json")
+    return HttpResponse(json.dumps(data), mimetype="application/json")

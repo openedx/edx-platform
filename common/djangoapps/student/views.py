@@ -1299,7 +1299,8 @@ def _do_create_account(post_vars, extended_profile=None):
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     try:
-        user.save()
+        with transaction.atomic():
+            user.save()
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=post_vars['username'])) > 0:
@@ -1527,7 +1528,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
     # Ok, looks like everything is legit.  Create the account.
     try:
-        with transaction.commit_on_success():
+        with transaction.atomic():
             ret = _do_create_account(post_vars, extended_profile)
     except AccountValidationError as exc:
         return JsonResponse({'success': False, 'value': exc.message, 'field': exc.field}, status=400)

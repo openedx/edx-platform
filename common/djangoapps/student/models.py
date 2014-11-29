@@ -281,7 +281,7 @@ class UserProfile(models.Model):
         self.set_meta(meta)
         self.save()
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def update_name(self, new_name):
         """Update the user's name, storing the old name in the history.
 
@@ -308,7 +308,7 @@ class UserProfile(models.Model):
         self.name = new_name
         self.save()
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def update_email(self, new_email):
         """Update the user's email and save the change in the history.
 

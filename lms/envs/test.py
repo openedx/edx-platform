@@ -152,7 +152,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'edx.db'
+        'NAME': TEST_ROOT / 'db' / 'edx.db',
+        'ATOMIC_REQUESTS': True,
     },
 
 }
@@ -204,6 +205,8 @@ simplefilter('ignore')  # Change to "default" to see the first instance of each 
 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
+    INSTALLED_APPS += ('social.apps.django_app.default',)
 
 THIRD_PARTY_AUTH = {
     "Google": {

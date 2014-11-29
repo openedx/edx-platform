@@ -10,7 +10,7 @@ def expect_json(view_function):
     """
     View decorator for simplifying handing of requests that expect json.  If the request's
     CONTENT_TYPE is application/json, parses the json dict from request.body, and updates
-    request.POST with the contents.
+    request.json with the contents.
     """
     @wraps(view_function)
     def parse_json_into_request(request, *args, **kwargs):

@@ -195,6 +195,9 @@ class LoginTest(TestCase):
         response = client1.post(self.url, creds)
         self._assert_response(response, success=True)
 
+        # Reload the user from the database
+        self.user = UserFactory.FACTORY_FOR.objects.get(pk=self.user.pk)
+
         self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
 
         # second login should log out the first
