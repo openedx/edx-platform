@@ -127,7 +127,7 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
     def setup_thread_page(self, thread_id):
-        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint: disable=W0201
+        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
     def test_marked_answer_comments(self):
@@ -318,7 +318,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
-        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=W0201
+        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.expand()
 
     def test_initial_render(self):

@@ -608,7 +608,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
 
         self.module = self._get_module(course.id, descriptor, descriptor.location)
 
-        # pylint: disable=W0201
+        # pylint: disable=attribute-defined-outside-init
         self.child_module = self._get_module(course.id, child_descriptor, child_descriptor.location)
 
     def setup_xml_course(self):
