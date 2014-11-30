@@ -158,7 +158,7 @@ class Order(models.Model):
         Return the total cost of the cart.  If the order has been purchased, returns total of
         all purchased and not refunded items.
         """
-        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))  # pylint: disable=E1101
+        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))  # pylint: disable=no-member
 
     def has_items(self, item_type=None):
         """
@@ -166,9 +166,9 @@ class Order(models.Model):
         If an item_type is passed in then we check to see if there are any items of that class type
         """
         if not item_type:
-            return self.orderitem_set.exists()  # pylint: disable=E1101
+            return self.orderitem_set.exists()  # pylint: disable=no-member
         else:
-            items = self.orderitem_set.all().select_subclasses()  # pylint: disable=E1101
+            items = self.orderitem_set.all().select_subclasses()  # pylint: disable=no-member
             for item in items:
                 if isinstance(item, item_type):
                     return True
@@ -178,7 +178,7 @@ class Order(models.Model):
         """
         Reset the items price state in the user cart
         """
-        for item in self.orderitem_set.all():  # pylint: disable=E1101
+        for item in self.orderitem_set.all():  # pylint: disable=no-member
             if item.list_price:
                 item.unit_cost = item.list_price
                 item.list_price = None
@@ -188,7 +188,7 @@ class Order(models.Model):
         """
         Clear out all the items in the cart
         """
-        self.orderitem_set.all().delete()  # pylint: disable=E1101
+        self.orderitem_set.all().delete()  # pylint: disable=no-member
 
     @transaction.commit_on_success
     def start_purchase(self):
@@ -216,7 +216,7 @@ class Order(models.Model):
         The UI/UX may change in the future to make the switching between PaidCourseRegistration
         and CourseRegCodeItems a more explicit UI gesture from the purchaser
         """
-        cart_items = self.orderitem_set.all()  # pylint: disable=E1101
+        cart_items = self.orderitem_set.all()  # pylint: disable=no-member
         is_order_type_business = False
         for cart_item in cart_items:
             if cart_item.qty > 1:
@@ -272,7 +272,7 @@ class Order(models.Model):
         """
         send confirmation e-mail
         """
-        recipient_list = [(self.user.username, getattr(self.user, 'email'), 'user')]  # pylint: disable=E1101
+        recipient_list = [(self.user.username, getattr(self.user, 'email'), 'user')]  # pylint: disable=no-member
         if self.company_contact_email:
             recipient_list.append((self.company_contact_name, self.company_contact_email, 'company_contact'))
         joined_course_names = ""
@@ -310,7 +310,7 @@ class Order(models.Model):
                         'course_names': ", ".join([course_info[0] for course_info in courses_info]),
                         'dashboard_url': dashboard_url,
                         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-                        'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=E1101
+                        'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=no-member
                         'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
                         'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
                         'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
@@ -333,7 +333,7 @@ class Order(models.Model):
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
-            log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
+            log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=no-member
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
@@ -356,7 +356,7 @@ class Order(models.Model):
         """
         if self.status == 'purchased':
             log.error(
-                u"`purchase` method called on order {}, but order is already purchased.".format(self.id)  # pylint: disable=E1101
+                u"`purchase` method called on order {}, but order is already purchased.".format(self.id)  # pylint: disable=no-member
             )
             return
         self.status = 'purchased'
@@ -410,8 +410,8 @@ class Order(models.Model):
         try:
             if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
                 tracking_context = tracker.get_tracker().resolve_context()
-                analytics.track(self.user.id, event_name, {  # pylint: disable=E1101
-                    'orderId': self.id,  # pylint: disable=E1101
+                analytics.track(self.user.id, event_name, {  # pylint: disable=no-member
+                    'orderId': self.id,  # pylint: disable=no-member
                     'total': str(self.total_cost),
                     'currency': self.currency,
                     'products': [item.analytics_data() for item in orderitems]
@@ -427,7 +427,7 @@ class Order(models.Model):
             # errors in the logs.
             log.exception(
                 u'Unable to emit {event} event for user {user} and order {order}'.format(
-                    event=event_name, user=self.user.id, order=self.id)  # pylint: disable=E1101
+                    event=event_name, user=self.user.id, order=self.id)  # pylint: disable=no-member
             )
 
     def add_billing_details(self, company_name='', company_contact_name='', company_contact_email='', recipient_name='',
@@ -595,7 +595,7 @@ class OrderItem(TimeStampedModel):
 
         """
         return {
-            'id': self.id,  # pylint: disable=E1101
+            'id': self.id,  # pylint: disable=no-member
             'sku': type(self).__name__,
             'name': 'N/A',
             'price': str(self.unit_cost),
@@ -652,7 +652,7 @@ class CourseRegistrationCode(models.Model):
             for item in cart_items:
                 CourseEnrollment.enroll(cart.user, item.course_id)
                 log.info("Enrolled '{0}' in free course '{1}'"
-                         .format(cart.user.email, item.course_id))  # pylint: disable=E1101
+                         .format(cart.user.email, item.course_id))  # pylint: disable=no-member
                 item.status = 'purchased'
                 item.save()
 
@@ -834,7 +834,7 @@ class PaidCourseRegistration(OrderItem):
         This will return the total amount of money that a purchased course generated
         """
         total_cost = 0
-        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=E1101
+        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=no-member
 
         if result['total'] is not None:
             total_cost = result['total']
@@ -911,7 +911,7 @@ class PaidCourseRegistration(OrderItem):
         CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
-                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=E1101
+                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member
 
     def generate_receipt_instructions(self):
         """
@@ -948,7 +948,7 @@ class PaidCourseRegistration(OrderItem):
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
             data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)  # pylint: disable=E1101
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=no-member
         if self.mode:
             data['sku'] = sku + u'.' + unicode(self.mode)
         return data
@@ -979,7 +979,7 @@ class CourseRegCodeItem(OrderItem):
         This will return the total amount of money that a purchased course generated
         """
         total_cost = 0
-        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=E1101
+        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=no-member
 
         if result['total'] is not None:
             total_cost = result['total']
@@ -1061,7 +1061,7 @@ class CourseRegCodeItem(OrderItem):
             save_registration_code(self.user, self.course_id, invoice=None, order=self.order)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
-                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=E1101
+                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member
 
     @property
     def csv_report_comments(self):
@@ -1088,7 +1088,7 @@ class CourseRegCodeItem(OrderItem):
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
             data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)  # pylint: disable=E1101
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=no-member
         if self.mode:
             data['sku'] = sku + u'.' + unicode(self.mode)
         return data
@@ -1328,7 +1328,7 @@ class CertificateItem(OrderItem):
         sku = data['sku']
         if self.course_id != CourseKeyField.Empty:
             data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)  # pylint: disable=E1101
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=no-member
         if self.mode:
             data['sku'] = sku + u'.' + unicode(self.mode)
         return data
@@ -1496,7 +1496,7 @@ class Donation(OrderItem):
         data = super(Donation, self).analytics_data()
         if self.course_id != CourseKeyField.Empty:
             data['name'] = unicode(self.course_id)
-            data['category'] = unicode(self.course_id.org)  # pylint: disable=E1101
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=no-member
         else:
             data['name'] = settings.PLATFORM_NAME
             data['category'] = settings.PLATFORM_NAME

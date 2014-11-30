@@ -253,7 +253,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         response = self.client.post(self.url)
         self.assertTrue('<td>AS452</td>' in response.content)
         data = {
-            'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',  # pylint: disable=E1101
+            'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',  # pylint: disable=no-member
             'course_id': coupon.course_id.to_deprecated_string()
         }
         # URL for update_coupon

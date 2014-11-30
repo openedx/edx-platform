@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 
 # Disable no-member warning:
-# pylint: disable=E1101
+# pylint: disable=no-member
 
 
 class VideoStudentViewHandlers(object):

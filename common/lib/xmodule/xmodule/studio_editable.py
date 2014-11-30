@@ -19,10 +19,10 @@ class StudioEditableModule(object):
         """
         contents = []
 
-        for child in self.descriptor.get_children():  # pylint: disable=E1101
+        for child in self.descriptor.get_children():  # pylint: disable=no-member
             if can_reorder:
                 context['reorderable_items'].add(child.location)
-            child_module = self.system.get_module(child)  # pylint: disable=E1101
+            child_module = self.system.get_module(child)  # pylint: disable=no-member
             rendered_child = child_module.render(StudioEditableModule.get_preview_view_name(child_module), context)
             fragment.add_frag_resources(rendered_child)
 
@@ -31,7 +31,7 @@ class StudioEditableModule(object):
                 'content': rendered_child.content
             })
 
-        fragment.add_content(self.system.render_template("studio_render_children_view.html", {  # pylint: disable=E1101
+        fragment.add_content(self.system.render_template("studio_render_children_view.html", {  # pylint: disable=no-member
             'items': contents,
             'xblock_context': context,
             'can_add': can_add,

@@ -122,7 +122,7 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
     def test_course_serializer(self):
         self.client.login(username=self.username, password=self.password)
         self._enroll(self.course)
-        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=E1101
+        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
         self.assertEqual(serialized['course']['video_outline'], None)
         self.assertEqual(serialized['course']['name'], self.course.display_name)
         self.assertEqual(serialized['course']['number'], self.course.id.course)
@@ -135,7 +135,7 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
 
         self.client.login(username=self.username, password=self.password)
         self._enroll(self.course)
-        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=E1101
+        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
         self.assertEqual(serialized['course']['org'], self.course.display_organization)
 

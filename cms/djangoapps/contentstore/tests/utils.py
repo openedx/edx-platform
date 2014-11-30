@@ -1,4 +1,4 @@
-# pylint: disable=E1101
+# pylint: disable=no-member
 '''
 Utilities for contentstore tests
 '''

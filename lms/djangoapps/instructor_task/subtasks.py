@@ -307,7 +307,7 @@ def queue_subtasks_for_query(entry, action_name, create_subtask_fcn, item_querys
         entry.id,
         total_num_subtasks,
         total_num_items,
-    )  # pylint: disable=E1101
+    )  # pylint: disable=no-member
     progress = initialize_subtask_info(entry, action_name, total_num_items, subtask_id_list)
 
     # Construct a generator that will return the recipients to use for each subtask.

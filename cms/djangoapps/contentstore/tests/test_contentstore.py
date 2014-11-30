@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=E1101
 # pylint: disable=W0212
 
 import copy

@@ -106,8 +106,8 @@ def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
     )
 
     # Clear the queue of existing emails
-    while not mail.queue.empty():  # pylint: disable=E1101
-        mail.queue.get()  # pylint: disable=E1101
+    while not mail.queue.empty():  # pylint: disable=no-member
+        mail.queue.get()  # pylint: disable=no-member
 
     # Because we flush the database before each run,
     # we need to ensure that the email template fixture
@@ -156,8 +156,8 @@ def then_the_email_is_sent(step, recipient):  # pylint: disable=unused-argument
     # Retrieve messages.  Because we are using celery in "always eager"
     # mode, we expect all messages to be sent by this point.
     messages = []
-    while not mail.queue.empty():  # pylint: disable=E1101
-        messages.append(mail.queue.get())  # pylint: disable=E1101
+    while not mail.queue.empty():  # pylint: disable=no-member
+        messages.append(mail.queue.get())  # pylint: disable=no-member
 
     # Check that we got the right number of messages
     assert_equal(
