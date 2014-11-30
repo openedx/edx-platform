@@ -127,7 +127,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         url = reverse('video-summary-list', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        return response.data  # pylint: disable=E1103
+        return response.data  # pylint: disable=maybe-no-member
 
     def _create_video_with_subs(self):
         """

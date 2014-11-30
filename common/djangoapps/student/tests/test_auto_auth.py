@@ -163,8 +163,8 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
-            self.assertIn(cookie, response.cookies)  # pylint: disable=E1103
-            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=E1103
+            self.assertIn(cookie, response.cookies)  # pylint: disable=maybe-no-member
+            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=maybe-no-member
 
 
 class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):

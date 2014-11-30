@@ -75,7 +75,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         self.assertTrue(self.signal_fired)
 
         # Confirm the analytics event was emitted.
-        self.mock_tracker.emit.assert_has_calls(  # pylint: disable=E1103
+        self.mock_tracker.emit.assert_has_calls(  # pylint: disable=maybe-no-member
             [
                 call(
                     EVENT_NAME_ENROLLMENT_ACTIVATED,
