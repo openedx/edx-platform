@@ -8,7 +8,7 @@ import unittest
 
 import ddt
 from mock import patch
-from nose.tools import assert_equals, assert_false  # pylint: disable=E0611
+from nose.tools import assert_equals, assert_false  # pylint: disable=no-name-in-module
 from pytz import UTC
 
 from util.date_utils import (

@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from lettuce.django import django_url
-from nose.tools import assert_equals, assert_in  # pylint: disable=E0611
+from nose.tools import assert_equals, assert_in  # pylint: disable=no-name-in-module
 from logging import getLogger
 logger = getLogger(__name__)
 

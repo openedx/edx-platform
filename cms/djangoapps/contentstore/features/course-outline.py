@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from common import *
-from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=E0611
+from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=no-name-in-module
 
 from logging import getLogger
 logger = getLogger(__name__)

@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from mock import patch, ANY, Mock
-from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
+from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE

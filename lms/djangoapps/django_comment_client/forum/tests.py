@@ -21,7 +21,7 @@ from django_comment_client.utils import strip_none
 
 from courseware.tests.modulestore_config import TEST_DATA_DIR
 from courseware.courses import UserNotEnrolled
-from nose.tools import assert_true  # pylint: disable=E0611
+from nose.tools import assert_true  # pylint: disable=no-name-in-module
 from mock import patch, Mock, ANY, call
 
 from course_groups.models import CourseUserGroup

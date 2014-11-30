@@ -1,4 +1,4 @@
-from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=E0611
+from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=no-name-in-module
 
 
 def check_has_course_method(modulestore, locator, locator_key_fields):

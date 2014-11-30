@@ -19,7 +19,7 @@ import lettuce.django
 from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
-from nose.tools import assert_equals  # pylint: disable=E0611
+from nose.tools import assert_equals  # pylint: disable=no-name-in-module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
