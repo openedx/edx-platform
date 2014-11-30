@@ -865,7 +865,7 @@ class SplitModuleItemTests(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(locator)
 
-    # pylint: disable=W0212
+    # pylint: disable=protected-access
     def test_matching(self):
         '''
         test the block and value matches help functions
@@ -1304,7 +1304,7 @@ class TestItemCrud(SplitModuleTest):
             fields={'display_name': 'problem 2', 'data': another_payload},
             definition_locator=original.definition_locator,
         )
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         modulestore()._clear_cache()
 
         # now begin the test

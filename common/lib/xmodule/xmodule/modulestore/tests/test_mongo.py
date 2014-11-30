@@ -2,7 +2,7 @@
 Unit tests for the Mongo modulestore
 """
 # pylint: disable=no-member
-# pylint: disable=W0212
+# pylint: disable=protected-access
 # pylint: disable=no-name-in-module
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none

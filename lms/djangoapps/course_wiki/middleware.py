@@ -98,5 +98,5 @@ class WikiAccessMiddleware(object):
             response = self._redirect_from_referrer(request, wiki_path) or response
 
         # END HACK: _transform_url must be set to a no-op function after it's done its work
-        reverse._transform_url = lambda url: url  # pylint: disable=W0212
+        reverse._transform_url = lambda url: url  # pylint: disable=protected-access
         return response

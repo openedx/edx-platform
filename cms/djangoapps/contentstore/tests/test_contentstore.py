@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=W0212
 
 import copy
 import mock

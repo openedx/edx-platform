@@ -16,7 +16,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_NONE)
 
 # pylint: disable=missing-docstring
-# pylint: disable=W0212
+# pylint: disable=protected-access
 
 
 class AccessTestCase(TestCase):

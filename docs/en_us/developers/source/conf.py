@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=invalid-name
 # pylint: disable=W0622
-# pylint: disable=W0212
+# pylint: disable=protected-access
 # pylint: disable=unused-argument
 
 import os

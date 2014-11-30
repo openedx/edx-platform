@@ -601,7 +601,7 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_check_problem_with_files(self):
         # Check a problem with uploaded files, using the check_problem API.
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
 
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
@@ -650,7 +650,7 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_check_problem_with_files_as_xblock(self):
         # Check a problem with uploaded files, using the XBlock API.
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
 
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
