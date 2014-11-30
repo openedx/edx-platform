@@ -605,7 +605,7 @@ def _import_course_draft(
 
                         drafts.append(draft)
 
-                except Exception:  # pylint: disable=W0703
+                except Exception:  # pylint: disable=broad-except
                     logging.exception('Error while parsing course xml.')
 
     # sort drafts by `index_in_children_list` attribute
@@ -614,7 +614,7 @@ def _import_course_draft(
     for draft in get_draft_subtree_roots(drafts):
         try:
             _import_module(draft.module)
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             logging.exception('while importing draft descriptor %s', draft.module)
 
 

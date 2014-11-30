@@ -60,7 +60,7 @@ class CoffeeScriptWatcher(PatternMatchingEventHandler):
         print('\tCHANGED:', event.src_path)
         try:
             compile_coffeescript(event.src_path)
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             traceback.print_exc()
 
 
@@ -89,7 +89,7 @@ class SassWatcher(PatternMatchingEventHandler):
         print('\tCHANGED:', event.src_path)
         try:
             compile_sass()
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             traceback.print_exc()
 
 
@@ -110,7 +110,7 @@ class XModuleSassWatcher(SassWatcher):
         print('\tCHANGED:', event.src_path)
         try:
             process_xmodule_assets()
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             traceback.print_exc()
 
 

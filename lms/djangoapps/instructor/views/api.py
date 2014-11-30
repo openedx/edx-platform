@@ -261,7 +261,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
         try:
             upload_file = request.FILES.get('students_list')
             students = [row for row in csv.reader(upload_file.read().splitlines())]
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             general_errors.append({
                 'username': '', 'email': '', 'response': _('Could not read uploaded file.')
             })
@@ -488,7 +488,7 @@ def students_update_enrollment(request, course_id):
                 'invalidIdentifier': True,
             })
 
-        except Exception as exc:  # pylint: disable=W0703
+        except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
             log.exception("Error while #{}ing student")

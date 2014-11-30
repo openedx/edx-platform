@@ -152,7 +152,7 @@ def import_handler(request, course_key_string):
                         }]
                     })
             # Send errors to client with stage at which error occurred.
-            except Exception as exception:   # pylint: disable=W0703
+            except Exception as exception:   # pylint: disable=broad-except
                 _save_request_status(request, key, -1)
                 if course_dir.isdir():
                     shutil.rmtree(course_dir)
@@ -251,7 +251,7 @@ def import_handler(request, course_key_string):
                 _save_request_status(request, key, 4)
 
             # Send errors to client with stage at which error occurred.
-            except Exception as exception:   # pylint: disable=W0703
+            except Exception as exception:   # pylint: disable=broad-except
                 log.exception(
                     "error importing course"
                 )
