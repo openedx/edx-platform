@@ -7,7 +7,7 @@ from opaque_keys.edx import locator
 import unittest
 import ddt
 
-from shoppingcart.models import Order, CertificateItem  # pylint: disable=F0401
+from shoppingcart.models import Order, CertificateItem  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from student.management.commands import transfer_students
 from student.models import CourseEnrollment, UNENROLL_DONE, EVENT_NAME_ENROLLMENT_DEACTIVATED, \

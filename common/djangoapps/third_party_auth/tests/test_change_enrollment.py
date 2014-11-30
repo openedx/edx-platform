@@ -5,7 +5,7 @@ import unittest
 import ddt
 import pytz
 from third_party_auth import pipeline
-from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=F0401
+from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=import-error
 from social.apps.django_app import utils as social_utils
 from django.conf import settings
 from django.contrib.sessions.backends import cache
