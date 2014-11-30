@@ -6,7 +6,7 @@
 # pylint: disable=W0613
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=E0611
+from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=no-name-in-module
 
 DISPLAY_NAME = "Display Name"
 

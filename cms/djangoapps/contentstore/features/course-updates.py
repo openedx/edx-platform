@@ -4,7 +4,7 @@
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, get_codemirror_value
-from nose.tools import assert_in  # pylint: disable=E0611
+from nose.tools import assert_in  # pylint: disable=no-name-in-module
 
 
 @step(u'I go to the course updates page')

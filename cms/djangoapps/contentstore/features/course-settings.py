@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, upload_file
 from django.conf import settings
 
-from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=E0611
+from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=no-name-in-module
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 

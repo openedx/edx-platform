@@ -1,6 +1,6 @@
 import re
 
-from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=E0611
+from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=no-name-in-module
 from static_replace import (replace_static_urls, replace_course_urls,
                             _url_replace_regex)
 from mock import patch, Mock

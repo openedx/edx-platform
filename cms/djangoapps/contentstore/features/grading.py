@@ -7,7 +7,7 @@ from terrain.steps import reload_the_page
 from selenium.common.exceptions import InvalidElementStateException
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from contentstore.utils import reverse_course_url
-from nose.tools import assert_in, assert_not_in, assert_equal, assert_not_equal  # pylint: disable=E0611
+from nose.tools import assert_in, assert_not_in, assert_equal, assert_not_equal  # pylint: disable=no-name-in-module
 
 
 @step(u'I am viewing the grading settings')
