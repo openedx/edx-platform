@@ -91,6 +91,7 @@ urlpatterns += patterns(
     url(r'^settings/advanced/{}$'.format(settings.COURSE_KEY_PATTERN), 'advanced_settings_handler'),
     url(r'^textbooks/{}$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_list_handler'),
     url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_detail_handler'),
+    url(r'^videos/{}$'.format(settings.COURSE_KEY_PATTERN), 'videos_handler'),
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN), 'group_configurations_list_handler'),
     url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)/?$'.format(settings.COURSE_KEY_PATTERN),
         'group_configurations_detail_handler'),
@@ -109,7 +110,6 @@ urlpatterns += patterns(
     # Serve catalog of localized strings to be rendered by Javascript
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
-
 
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
     urlpatterns += (url(

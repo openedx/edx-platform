@@ -1,0 +1,5 @@
+<td class="title-col"><%- client_video_id %></td>
+<td class="size-col"><%- duration %></td>
+<td class="date-col"><%- created %></td>
+<td class="embed-col"><%- edx_video_id %></td>
+<td class="actions-col"><%- status %></td>

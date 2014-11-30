@@ -30,19 +30,17 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LMS_BASE = "localhost:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
-############################# ADVANCED COMPONENTS #############################
+############################# FEATURE FLAGS #############################
 
-# Make it easier to test advanced components in local dev
+# Make it easier to test features in local dev
 FEATURES['ALLOW_ALL_ADVANCED_COMPONENTS'] = True
+FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
+FEATURES['ALLOW_COURSE_RERUNS'] = True
 
 ################################# CELERY ######################################
 
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
-
-################################ COURSE RERUNS ################################
-
-FEATURES['ALLOW_COURSE_RERUNS'] = True
 
 ################################ DEBUG TOOLBAR ################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
