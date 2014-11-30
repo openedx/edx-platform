@@ -336,11 +336,11 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
         # was encountered has already been updated before the retry call was made,
         # so we only log here.
         log.warning("Send-email task %s for email %s: being retried", current_task_id, email_id)
-        raise send_exception  # pylint: disable=E0702
+        raise send_exception  # pylint: disable=raising-bad-type
     else:
         log.error("Send-email task %s for email %s: failed: %s", current_task_id, email_id, send_exception)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
-        raise send_exception  # pylint: disable=E0702
+        raise send_exception  # pylint: disable=raising-bad-type
 
     # return status in a form that can be serialized by Celery into JSON:
     log.info("Send-email task %s for email %s: returning status %s", current_task_id, email_id, new_subtask_status)
