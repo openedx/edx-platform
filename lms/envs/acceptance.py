@@ -159,7 +159,7 @@ SELENIUM_GRID = {
 #####################################################################
 # See if the developer has any local overrides.
 try:
-    from .private import *  # pylint: disable=F0401
+    from .private import *  # pylint: disable=import-error
 except ImportError:
     pass
 

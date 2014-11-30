@@ -73,8 +73,8 @@ from social.exceptions import AuthException
 from social.pipeline import partial
 
 import student
-from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=F0401
-from shoppingcart.exceptions import (  # pylint: disable=F0401
+from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=import-error
+from shoppingcart.exceptions import (  # pylint: disable=import-error
     CourseDoesNotExistException,
     ItemAlreadyInCartException,
     AlreadyEnrolledInCourseException

@@ -308,6 +308,6 @@ REGISTRATION_CODE_LENGTH = 8
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=F0401
+    from .private import *      # pylint: disable=import-error
 except ImportError:
     pass
