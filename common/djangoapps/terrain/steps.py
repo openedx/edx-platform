@@ -6,7 +6,7 @@
 # pylint: disable=wildcard-import
 
 # Disable the "Unused import %s from wildcard import" warning
-# pylint: disable=W0614
+# pylint: disable=unused-wildcard-import
 
 # Disable the "unused argument" warning because lettuce uses "step"
 # pylint: disable=unused-argument
