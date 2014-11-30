@@ -70,7 +70,6 @@ def test_get_time_display_coerce():
                   get_time_display(test_time_daylight, '%b %d %H:%M', coerce_tz="US/Pacific"))
 
 
-# pylint: disable=W0232
 class NamelessTZ(tzinfo):
     """Static timezone for testing"""
 

@@ -5,8 +5,8 @@ from xmodule.x_module import XModuleDescriptor
 import factory
 from factory.helpers import lazy_attribute
 from opaque_keys.edx.keys import UsageKey
-# Factories don't have __init__ methods, and are self documenting
-# pylint: disable=W0232, missing-docstring
+# Factories are self documenting
+# pylint: disable=missing-docstring
 
 
 class SplitFactory(factory.Factory):
