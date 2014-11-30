@@ -1026,7 +1026,7 @@ class CourseRegCodeItem(OrderItem):
 
         super(CourseRegCodeItem, cls).add_to_order(order, course_id, cost, currency=currency)
 
-        item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)  # pylint: disable=W0612
+        item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)  # pylint: disable=unused-variable
         item.status = order.status
         item.mode = course_mode.slug
         item.unit_cost = cost
@@ -1057,7 +1057,7 @@ class CourseRegCodeItem(OrderItem):
         # file, but there's also a shared dependency on a random string generator which
         # is in another PR (for another feature)
         from instructor.views.api import save_registration_code
-        for i in range(total_registration_codes):  # pylint: disable=W0612
+        for i in range(total_registration_codes):  # pylint: disable=unused-variable
             save_registration_code(self.user, self.course_id, invoice=None, order=self.order)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
