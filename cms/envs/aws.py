@@ -4,7 +4,7 @@ This is the default template for our main set of AWS servers.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 import json
 

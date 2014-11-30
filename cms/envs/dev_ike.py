@@ -1,6 +1,6 @@
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 # dev environment for ichuang/mit
 

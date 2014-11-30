@@ -3,7 +3,7 @@ This config file runs the simplest dev environment"""
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from .common import *
 from logsettings import get_logger_config
