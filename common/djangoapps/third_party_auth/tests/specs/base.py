@@ -654,7 +654,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN)))
 
         # Next, the provider makes a request against /auth/complete/<provider>.
-        # pylint:disable-msg=protected-access
+        # pylint: disable-msg=protected-access
         self.assert_redirect_to_register_looks_correct(actions.do_complete(strategy, social_views._do_login))
 
         mako_middleware_process_request(strategy.request)
@@ -716,7 +716,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # assignment via pipeline to make sure a distinct username is created.
         strategy.storage.user.create_user(username=self.get_username(), email='user@email.com', password='password')
         strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        # pylint:disable-msg=protected-access
+        # pylint: disable-msg=protected-access
         self.assert_redirect_to_register_looks_correct(actions.do_complete(strategy, social_views._do_login))
         distinct_username = pipeline.get(request)['kwargs']['username']
         self.assertNotEqual(original_username, distinct_username)
@@ -725,7 +725,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_REGISTER, redirect_uri='social:complete')
         strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
-        # pylint:disable-msg=protected-access
+        # pylint: disable-msg=protected-access
         self.assert_redirect_to_register_looks_correct(actions.do_complete(strategy, social_views._do_login))
 
         mako_middleware_process_request(strategy.request)
