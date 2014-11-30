@@ -23,7 +23,7 @@ from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
-import string  # pylint: disable=W0402
+import string  # pylint: disable=deprecated-module
 import random
 import urllib
 from util.json_request import JsonResponse
