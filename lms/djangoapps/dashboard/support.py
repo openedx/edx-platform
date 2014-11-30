@@ -18,7 +18,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
-class RefundForm(forms.Form):  # pylint: disable=R0924
+class RefundForm(forms.Form):  # pylint: disable=incomplete-protocol
     """
     Form for manual refunds
     """
