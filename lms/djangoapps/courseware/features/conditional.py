@@ -1,5 +1,5 @@
 # pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, steps
 from nose.tools import assert_in, assert_true  # pylint: disable=no-name-in-module

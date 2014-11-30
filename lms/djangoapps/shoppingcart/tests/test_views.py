@@ -151,7 +151,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/billing_details.html')
         # check for the default currency in the context
         self.assertEqual(context['currency'], 'usd')
@@ -179,7 +179,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/billing_details.html')
         # check for the override currency settings in the context
         self.assertEqual(context['currency'], 'PKR')
@@ -669,7 +669,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=W0621
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
         self.assertIn(cert_item, purchase_form_arg_cart_items)
@@ -693,7 +693,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=W0621
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
 
@@ -849,7 +849,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertEqual(context['order'].total_cost, self.testing_cost)
@@ -882,7 +882,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
@@ -903,7 +903,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertIn(reg_item, context['shoppingcart_items'][0])
         self.assertIn(cert_item, context['shoppingcart_items'][1])
@@ -944,7 +944,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # check for the enrollment codes content
         self.assertIn('Please send each professional one of these unique registration codes to enroll into the course.', resp.content)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])

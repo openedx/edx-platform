@@ -1,5 +1,5 @@
 # pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=redefined-outer-name
 
 # Lettuce formats proposed definitions for unimplemented steps with the
 # argument name "step" instead of "_step" and pylint does not like that.

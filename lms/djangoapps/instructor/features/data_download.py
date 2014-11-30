@@ -4,7 +4,7 @@ acceptance tests.
 """
 
 # pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
 from nose.tools import assert_in, assert_regexp_matches  # pylint: disable=E0611
