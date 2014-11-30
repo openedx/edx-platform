@@ -421,7 +421,7 @@ class Order(models.Model):
                     }
                 })
 
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             # Capturing all exceptions thrown while tracking analytics events. We do not want
             # an operation to fail because of an analytics event, so we will capture these
             # errors in the logs.

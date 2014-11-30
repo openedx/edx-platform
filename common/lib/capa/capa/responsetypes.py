@@ -2229,7 +2229,7 @@ class ExternalResponse(LoncapaResponse):
         cmap = CorrectMap()
         try:
             submission = [student_answers[k] for k in idset]
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error(
                 'Error %s: cannot get student answer for %s; student_answers=%s',
                 err,
@@ -2244,7 +2244,7 @@ class ExternalResponse(LoncapaResponse):
 
         try:
             rxml = self.do_external_request('get_score', extra_payload)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(
@@ -2276,7 +2276,7 @@ class ExternalResponse(LoncapaResponse):
         try:
             rxml = self.do_external_request('get_answers', {})
             exans = json.loads(rxml.find('expected').text)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
                 msg = '<span class="inline-error">%s</span>' % str(
@@ -2486,7 +2486,7 @@ class FormulaResponse(LoncapaResponse):
             name = hxml.get('name')
             correct_answer = contextualize_text(
                 hxml.get('answer'), self.context)
-            # pylint: disable=W0703
+            # pylint: disable=broad-except
             try:
                 correctness = self.check_formula(
                     correct_answer,

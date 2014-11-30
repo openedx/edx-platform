@@ -552,7 +552,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 attempt = attempts[0]
                 if attempt.status != "approved":
                     return False
-            except Exception:  # pylint: disable=W0703
+            except Exception:  # pylint: disable=broad-except
                 return False
 
         return True
