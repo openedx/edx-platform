@@ -1133,7 +1133,7 @@ class CertificateItem(OrderItem):
     mode = models.SlugField()
 
     @receiver(UNENROLL_DONE)
-    def refund_cert_callback(sender, course_enrollment=None, skip_refund=False, **kwargs):  # pylint: disable=E0213,W0613
+    def refund_cert_callback(sender, course_enrollment=None, skip_refund=False, **kwargs):  # pylint: disable=no-self-argument,unused-argument
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
         occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
