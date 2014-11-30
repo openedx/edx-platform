@@ -1,4 +1,4 @@
-# pylint: disable=E1101
+# pylint: disable=no-member
 # pylint: disable=W0212
 # pylint: disable=no-name-in-module
 from nose.tools import assert_equals, assert_raises, \

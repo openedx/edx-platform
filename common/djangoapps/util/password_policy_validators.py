@@ -1,4 +1,4 @@
-# pylint: disable=E1101
+# pylint: disable=no-member
 """
 This file exposes a number of password complexity validators which can be optionally added to
 account creation
