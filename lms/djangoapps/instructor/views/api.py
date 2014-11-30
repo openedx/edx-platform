@@ -1229,7 +1229,7 @@ def spent_registration_codes(request, course_id):  # pylint: disable=W0613
 
         company_name = request.POST['spent_company_name']
         if company_name:
-            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint:  disable=E1103
+            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint: disable=maybe-no-member
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)

@@ -180,7 +180,7 @@ class OrderTest(ModuleStoreTestCase):
         self.assertIn(item.additional_instruction_text, mail.outbox[0].body)
 
         # Assert Google Analytics event fired for purchase.
-        self.mock_tracker.track.assert_called_once_with(  # pylint: disable=E1103
+        self.mock_tracker.track.assert_called_once_with(  # pylint: disable=maybe-no-member
             1,
             'Completed Order',
             {
