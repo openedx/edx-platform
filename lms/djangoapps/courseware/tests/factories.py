@@ -1,5 +1,5 @@
 # Factories don't have __init__ methods, and are self documenting
-# pylint: disable=W0232, C0111
+# pylint: disable=W0232, missing-docstring
 import json
 from functools import partial
 import factory

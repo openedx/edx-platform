@@ -1,4 +1,4 @@
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 
 # Disable the "wildcard import" warning so we can bring in all methods from

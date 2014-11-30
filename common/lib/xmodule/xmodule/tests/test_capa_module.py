@@ -2,7 +2,7 @@
 """
 Tests of the Capa XModule
 """
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 # pylint: disable=R0904
 # pylint: disable=C0103
 # pylint: disable=C0302

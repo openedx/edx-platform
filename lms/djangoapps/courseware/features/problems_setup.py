@@ -1,4 +1,4 @@
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 
 # EVERY PROBLEM TYPE MUST HAVE THE FOLLOWING:

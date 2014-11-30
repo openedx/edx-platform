@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # disable missing docstring
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 import requests
 from lettuce import world, step
