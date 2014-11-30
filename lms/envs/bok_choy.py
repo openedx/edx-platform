@@ -6,7 +6,7 @@ import os
 from path import path
 from tempfile import mkdtemp
 
-CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=E1120
+CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=no-value-for-parameter
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
 ########################## Prod-like settings ###################################
@@ -34,7 +34,7 @@ LOG_DIR = (TEST_ROOT / "log").abspath()
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=E1120
+        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=no-value-for-parameter
     },
     xml_store_options={
         'data_dir': (TEST_ROOT / "data").abspath(),
