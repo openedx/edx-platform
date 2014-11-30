@@ -1095,7 +1095,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         cache.clear()
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
-        for i in xrange(30):  # pylint: disable=W0612
+        for i in xrange(30):  # pylint: disable=unused-variable
             response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
             self.assertEquals(response.status_code, 404)
 
@@ -1119,7 +1119,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         cache.clear()
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
-        for i in xrange(30):  # pylint: disable=W0612
+        for i in xrange(30):  # pylint: disable=unused-variable
             response = self.client.get(url, **{'HTTP_HOST': 'localhost'})
             self.assertEquals(response.status_code, 404)
 
