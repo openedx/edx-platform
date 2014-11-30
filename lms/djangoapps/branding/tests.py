@@ -16,6 +16,9 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 import student.views
 from branding.views import index
 from edxmako.tests import mako_middleware_process_request
+from mock import patch
+from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -31,6 +34,9 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
     def setUp(self):
         super(AnonymousIndexPageTest, self).setUp()
         self.factory = RequestFactory()
+        self.user = UserFactory.create()
+        self.user.set_password('password')
+        self.user.save()
         self.course = CourseFactory.create(
             days_early_for_beta=5,
             enrollment_start=datetime.datetime.now(UTC) + datetime.timedelta(days=3),
@@ -59,6 +65,64 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
     def test_anon_user_no_startdate_index(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True})
+    @patch.dict('django.conf.settings.FEATURES', {'REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES': False})
+    def test_redirects_homepage_to_dashboard_if_always_redirect_flag_is_set_to_true(self):
+        """
+        Check when user clicks on homepage then he will be redirected to dashboard if only the flag
+        ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER set to True.
+        """
+        self.client.login(username=self.user.username, password="password")
+        response = self.client.get('/')
+        self.assertRedirects(response, '/dashboard')
+
+    @patch.dict('django.conf.settings.FEATURES', {'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': False})
+    @patch.dict('django.conf.settings.FEATURES', {'REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES': True})
+    def test_redirects_homepage_to_dashboard_if_enrolled_in_courses(self):
+        """
+        Check when user clicks on homepage then he will be redirected to dashboard if the flag
+        REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES is set to True and User is also enrolled in any course.
+        """
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.client.login(username=self.user.username, password="password")
+        response = self.client.get('/')
+        self.assertRedirects(response, '/dashboard')
+
+    @patch.dict('django.conf.settings.FEATURES', {'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': False})
+    @patch.dict('django.conf.settings.FEATURES', {'REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES': True})
+    def test_does_not_redirect_homepage_to_dashboard_if_user_not_enrolled_in_courses(self):
+        """
+        Check when user clicks on homepage then he will not be redirected to dashboard even if the flag
+        REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES is set to True but the user is not enrolled in any course.
+        """
+        self.client.login(username=self.user.username, password="password")
+        response = self.client.get('/')
+        self.assertEquals(response.status_code, 200)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': False})
+    @patch.dict('django.conf.settings.FEATURES', {'REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES': False})
+    def test_does_not_redirect_homepage_to_dashboard_if_user_enrolled_in_courses(self):
+        """
+        Check when user clicks on homepage then he will not be redirected to dashboard even if user enrolled in courses
+        but the flag REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES is not set to True.
+        """
+        CourseEnrollment.enroll(self.user, self.course.id)
+        self.client.login(username=self.user.username, password="password")
+        response = self.client.get('/')
+        self.assertEquals(response.status_code, 200)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': False})
+    @patch.dict('django.conf.settings.FEATURES', {'REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES': False})
+    def test_does_not_redirect_homepage_to_dashboard(self):
+        """
+        Check when user clicks on homepage then he will not be redirected to dashboard if none of the flag is set and
+        also user is not enrolled in any courses.
+        """
+        self.client.login(username=self.user.username, password="password")
+        response = self.client.get('/')
+        self.assertEquals(response.status_code, 200)
+
 
     def test_allow_x_frame_options(self):
         """

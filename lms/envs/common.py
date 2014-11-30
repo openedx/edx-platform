@@ -273,6 +273,11 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
+    # When a logged in user goes to the homepage ('/') should the user be
+    # redirected to the dashboard if he's enrolled in any courses. Set to False to
+    # stay at the homepage.
+    'REDIRECT_HOMEPAGE_TO_DASHBOARD_IF_ENROLLED_IN_COURSES': True,
+
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
