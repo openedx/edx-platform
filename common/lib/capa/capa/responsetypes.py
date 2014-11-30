@@ -55,7 +55,7 @@ log = logging.getLogger(__name__)
 
 registry = TagRegistry()
 
-CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
+CorrectMap = correctmap.CorrectMap  # pylint: disable=invalid-name
 CORRECTMAP_PY = None
 
 

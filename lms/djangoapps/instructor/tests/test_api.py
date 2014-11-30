@@ -569,7 +569,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
-        # (comment because pylint C0103)
+        # (comment because pylint C0103(invalid-name))
         # self.maxDiff = None
 
     def tearDown(self):
@@ -1119,7 +1119,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
-        # (comment because pylint C0103)
+        # (comment because pylint C0103(invalid-name))
         # self.maxDiff = None
 
     def test_missing_params(self):

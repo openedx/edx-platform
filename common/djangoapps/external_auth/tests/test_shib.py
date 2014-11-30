@@ -582,9 +582,9 @@ class ShibUtilFnTest(TestCase):
     Tests util functions in shib module
     """
     def test__flatten_to_ascii(self):
-        DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
-        STR_DIACRI = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
-        FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=C0103
+        DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=invalid-name
+        STR_DIACRI = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=invalid-name
+        FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=invalid-name
         self.assertEqual(_flatten_to_ascii('jasön'), 'jason')  # umlaut
         self.assertEqual(_flatten_to_ascii('Jason包'), 'Jason')  # mandarin, so it just gets dropped
         self.assertEqual(_flatten_to_ascii('abc'), 'abc')  # pass through
