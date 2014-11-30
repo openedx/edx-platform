@@ -49,7 +49,7 @@ class RefundTests(ModuleStoreTestCase):
         Order.objects.filter(user=self.student).delete()
 
     def _enroll(self, purchase=True):
-        # pylint: disable=C0111
+        # pylint: disable=missing-docstring
         CourseEnrollment.enroll(self.student, self.course_id, self.course_mode.mode_slug)
         if purchase:
             self.order = Order.get_cart_for_user(self.student)

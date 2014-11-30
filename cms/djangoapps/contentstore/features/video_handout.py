@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # disable missing docstring
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 from lettuce import world, step
 from nose.tools import assert_true  # pylint: disable=E0611

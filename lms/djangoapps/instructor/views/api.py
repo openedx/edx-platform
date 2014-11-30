@@ -95,7 +95,7 @@ def common_exceptions_400(func):
     Catches common exceptions and renders matching 400 errors.
     (decorator without arguments)
     """
-    def wrapped(request, *args, **kwargs):  # pylint: disable=C0111
+    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
         use_json = (request.is_ajax() or
                     request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
@@ -129,8 +129,8 @@ def require_query_params(*args, **kwargs):
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
 
             error_response_data = {
@@ -166,8 +166,8 @@ def require_post_params(*args, **kwargs):
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
 
             error_response_data = {
@@ -206,8 +206,8 @@ def require_level(level):
     if level not in ['instructor', 'staff']:
         raise ValueError("unrecognized level '{}'".format(level))
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
             course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id']))
 

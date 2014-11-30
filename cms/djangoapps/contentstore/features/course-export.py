@@ -1,4 +1,4 @@
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
 # pylint: disable=W0613
 

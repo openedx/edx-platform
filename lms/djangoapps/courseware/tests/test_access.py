@@ -15,7 +15,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE)
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 # pylint: disable=W0212
 
 

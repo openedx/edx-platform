@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 
 CS_PREFIX = "http://localhost:4567/api/v1"
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 
 class MockRequestSetupMixin(object):

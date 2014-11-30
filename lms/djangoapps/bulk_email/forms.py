@@ -22,7 +22,7 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
 
     name = forms.CharField(required=False)
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         model = CourseEmailTemplate
         fields = ('html_template', 'plain_template', 'name')
 
@@ -76,7 +76,7 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
 class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
     """Input form for email enabling, allowing us to verify data."""
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         model = CourseAuthorization
 
     def clean_course_id(self):

@@ -30,7 +30,7 @@ TEST_DATA_MONGO_MODULESTORE = mixed_store_config(TEST_DATA_DIR, {}, include_xml=
 
 log = logging.getLogger(__name__)
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
