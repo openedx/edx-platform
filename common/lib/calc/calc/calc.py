@@ -356,7 +356,7 @@ class ParseAugmenter(object):
         sum_term = Group(sum_term)("sum")
 
         # Finish the recursion.
-        expr << sum_term  # pylint: disable=W0104
+        expr << sum_term  # pylint: disable=pointless-statement
         self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
 
     def reduce_tree(self, handle_actions, terminal_converter=None):
