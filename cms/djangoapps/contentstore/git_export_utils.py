@@ -65,7 +65,7 @@ def cmd_log(cmd, cwd):
 
 def export_to_git(course_id, repo, user='', rdir=None):
     """Export a course to git."""
-    # pylint: disable=R0915
+    # pylint: disable=too-many-statements
 
     if not GIT_REPO_EXPORT_DIR:
         raise GitExportError(GitExportError.NO_EXPORT_DIR)
