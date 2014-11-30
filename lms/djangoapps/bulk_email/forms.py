@@ -17,7 +17,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
-class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
+class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     """Form providing validation of CourseEmail templates."""
 
     name = forms.CharField(required=False)
@@ -73,7 +73,7 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
         return name
 
 
-class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
+class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     """Input form for email enabling, allowing us to verify data."""
 
     class Meta:  # pylint: disable=missing-docstring
