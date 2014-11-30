@@ -747,7 +747,7 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, redefined-outer-name
     """
     return the summary of all sales records for a particular course
     """
@@ -778,7 +778,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_order_records(request, course_id):  # pylint: disable=W0613, W0621
+def get_sale_order_records(request, course_id):  # pylint: disable=W0613, redefined-outer-name
     """
     return the summary of all sales records for a particular course
     """
@@ -878,7 +878,7 @@ def re_validate_invoice(obj_invoice):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=W0613, redefined-outer-name
     """
     return the summary of all purchased transactions for a particular course
     """
@@ -906,7 +906,7 @@ def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, redefined-outer-name
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -1107,7 +1107,7 @@ def generate_registration_codes(request, course_id):
         internal_reference=internal_reference, customer_reference_number=customer_reference_number
     )
     registration_codes = []
-    for _ in range(course_code_number):  # pylint: disable=W0621
+    for _ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(request.user, course_id, sale_invoice, order=None)
         registration_codes.append(generated_registration_code)
 

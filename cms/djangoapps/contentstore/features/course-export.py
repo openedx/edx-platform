@@ -1,5 +1,5 @@
 # pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=redefined-outer-name
 # pylint: disable=W0613
 
 from lettuce import world, step

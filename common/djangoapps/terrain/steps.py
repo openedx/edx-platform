@@ -1,5 +1,5 @@
 # pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=redefined-outer-name
 
 # Disable the "wildcard import" warning so we can bring in all methods from
 # course helpers and ui helpers

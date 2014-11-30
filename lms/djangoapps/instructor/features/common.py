@@ -3,7 +3,7 @@ Define common steps for instructor dashboard acceptance tests.
 """
 
 # pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=redefined-outer-name
 
 from __future__ import absolute_import
 
