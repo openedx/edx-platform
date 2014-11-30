@@ -3,7 +3,7 @@
 
 # Disable the "wildcard import" warning so we can bring in all methods from
 # course helpers and ui helpers
-# pylint: disable=W0401
+# pylint: disable=wildcard-import
 
 # Disable the "Unused import %s from wildcard import" warning
 # pylint: disable=W0614

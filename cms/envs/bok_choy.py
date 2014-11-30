@@ -15,7 +15,7 @@ from path import path
 os.environ['SERVICE_VARIANT'] = 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()  # pylint: disable=no-value-for-parameter
 
-from .aws import *  # pylint: disable=W0401, W0614
+from .aws import *  # pylint: disable=wildcard-import, W0614
 
 ######################### Testing overrides ####################################
 
