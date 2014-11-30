@@ -56,12 +56,12 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div><p>Video Test Instructions.</p></div>"
-        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
+        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=protected-access
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
-        actual = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
+        actual = self.mod._extract_instructions(xmltree)  # pylint: disable=protected-access
         self.assertIsNone(actual)
 
     def test_get_extension(self):
@@ -71,8 +71,8 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         """
         expectedyoutube = 'video/youtube'
         expectednotyoutube = 'video/mp4'
-        result1 = self.mod._get_extension(self.sample_sourceurl)  # pylint: disable=W0212
-        result2 = self.mod._get_extension(self.sample_youtubeurl)  # pylint: disable=W0212
+        result1 = self.mod._get_extension(self.sample_sourceurl)  # pylint: disable=protected-access
+        result2 = self.mod._get_extension(self.sample_youtubeurl)  # pylint: disable=protected-access
         self.assertEqual(expectedyoutube, result2)
         self.assertEqual(expectednotyoutube, result1)
 

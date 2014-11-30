@@ -22,7 +22,7 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
         admin site. This is used by changelist_view. """
         # Default: qs = self.model._default_manager.get_active_coupons_query_set()
         # Queryset with all the coupons including the soft-deletes: qs = self.model._default_manager.get_query_set()
-        query_string = self.model._default_manager.get_active_coupons_query_set()  # pylint: disable=W0212
+        query_string = self.model._default_manager.get_active_coupons_query_set()  # pylint: disable=protected-access
         return query_string
 
     def get_actions(self, request):
