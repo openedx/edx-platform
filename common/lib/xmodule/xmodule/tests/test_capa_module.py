@@ -3,9 +3,7 @@
 Tests of the Capa XModule
 """
 # pylint: disable=missing-docstring
-# pylint: disable=R0904
 # pylint: disable=invalid-name
-# pylint: disable=C0302
 
 import datetime
 import json
