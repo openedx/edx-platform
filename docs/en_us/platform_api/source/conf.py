@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 # pylint: disable=W0622
 # pylint: disable=W0212
 # pylint: disable=W0613

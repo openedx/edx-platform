@@ -35,7 +35,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
     # Default number of seconds to delay the response to simulate network latency.
     DEFAULT_DELAY_SEC = 0.5
 
-    def do_DELETE(self):  # pylint: disable=C0103
+    def do_DELETE(self):  # pylint: disable=invalid-name
         """
         Allow callers to delete all the server configurations using the /del_config URL.
         """

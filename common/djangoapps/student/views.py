@@ -110,7 +110,7 @@ from eventtracking import tracker
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
-ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
+ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 
 
 def csrf_token(context):

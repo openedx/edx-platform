@@ -65,7 +65,7 @@ ORDER_STATUSES = (
 )
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
-OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=C0103
+OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=invalid-name
 
 
 class OrderTypes(object):

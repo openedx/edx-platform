@@ -141,7 +141,7 @@ class TestWikiAccessForNumericalCourseNumber(TestWikiAccessBase):
         wiki_200_page_page = self.create_urlpath(wiki_200_page, 'Grandchild')
         self.wiki_200_pages = [wiki_200, wiki_200_page, wiki_200_page_page]
 
-    def test_course_staff_is_course_wiki_staff_for_numerical_course_number(self):  # pylint: disable=C0103
+    def test_course_staff_is_course_wiki_staff_for_numerical_course_number(self):  # pylint: disable=invalid-name
         for page in self.wiki_200_pages:
             for course_staff in self.course_200_staff:
                 self.assertTrue(user_is_article_course_staff(course_staff, page.article))

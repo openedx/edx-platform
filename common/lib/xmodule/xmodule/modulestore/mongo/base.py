@@ -441,7 +441,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
     DEFAULT_ASSET_COLLECTION_NAME = 'assetstore'
 
     # TODO (cpennington): Enable non-filesystem filestores
-    # pylint: disable=C0103
+    # pylint: disable=invalid-name
     # pylint: disable=W0201
     def __init__(self, contentstore, doc_store_config, fs_root, render_template,
                  default_class=None,

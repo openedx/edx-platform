@@ -38,7 +38,7 @@ from reverification.models import MidcourseReverificationWindow
 log = logging.getLogger(__name__)
 
 
-def generateUUID():  # pylint: disable=C0103
+def generateUUID():  # pylint: disable=invalid-name
     """ Utility function; generates UUIDs """
     return str(uuid.uuid4())
 
