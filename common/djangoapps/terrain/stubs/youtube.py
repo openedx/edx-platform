@@ -52,7 +52,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         """
 
         # Initialize only once if IFRAME_API_RESPONSE is none.
-        global IFRAME_API_RESPONSE  # pylint: disable=W0603
+        global IFRAME_API_RESPONSE  # pylint: disable=global-statement
         if IFRAME_API_RESPONSE is None:
             IFRAME_API_RESPONSE = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
 
