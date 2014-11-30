@@ -3,7 +3,7 @@
 
 # Lettuce formats proposed definitions for unimplemented steps with the
 # argument name "step" instead of "_step" and pylint does not like that.
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 
 from lettuce import world, step
 from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=no-name-in-module

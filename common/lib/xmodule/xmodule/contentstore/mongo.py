@@ -18,7 +18,7 @@ from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 
 class MongoContentStore(ContentStore):
 
-    # pylint: disable=W0613
+    # pylint: disable=unused-argument
     def __init__(self, host, db, port=27017, user=None, password=None, bucket='fs', collection=None, **kwargs):
         """
         Establish the connection with the mongo backend and connect to the collections

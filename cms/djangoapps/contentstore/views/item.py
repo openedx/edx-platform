@@ -585,7 +585,7 @@ def _delete_item(usage_key, user):
         store.delete_item(usage_key, user.id)
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 @login_required
 @require_http_methods(("GET", "DELETE"))
 def orphan_handler(request, course_key_string):

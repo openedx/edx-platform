@@ -37,7 +37,7 @@ class MockCourseEmailResult(object):
 
     def get_mock_update_subtask_status(self):
         """Wrapper for mock email function."""
-        def mock_update_subtask_status(entry_id, current_task_id, new_subtask_status):  # pylint: disable=W0613
+        def mock_update_subtask_status(entry_id, current_task_id, new_subtask_status):  # pylint: disable=unused-argument
             """Increments count of number of emails sent."""
             self.emails_sent += new_subtask_status.succeeded
             return update_subtask_status(entry_id, current_task_id, new_subtask_status)

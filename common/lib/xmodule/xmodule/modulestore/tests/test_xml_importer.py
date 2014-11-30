@@ -95,7 +95,7 @@ def modulestore():
     return ModuleStoreNoSettings.modulestore
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 def render_to_template_mock(*args):
     pass
 

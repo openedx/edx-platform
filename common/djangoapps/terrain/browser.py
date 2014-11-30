@@ -3,7 +3,7 @@ Browser set up for acceptance tests.
 """
 
 # pylint: disable=no-member
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 
 from lettuce import before, after, world
 from splinter.browser import Browser

@@ -35,7 +35,7 @@ class PersistentCourseFactory(SplitFactory):
     """
     FACTORY_FOR = CourseDescriptor
 
-    # pylint: disable=W0613
+    # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, course='999', run='run', org='testX', user_id=ModuleStoreEnum.UserID.test,
                 master_branch=ModuleStoreEnum.BranchName.draft, **kwargs):
@@ -60,7 +60,7 @@ class ItemFactory(SplitFactory):
 
     display_name = factory.LazyAttributeSequence(lambda o, n: "{} {}".format(o.category, n))
 
-    # pylint: disable=W0613
+    # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, parent_location, category='chapter',
                 user_id=ModuleStoreEnum.UserID.test, definition_locator=None, force=False,

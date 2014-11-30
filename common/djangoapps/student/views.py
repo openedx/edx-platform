@@ -1268,7 +1268,7 @@ class AccountValidationError(Exception):
 
 
 @receiver(post_save, sender=User)
-def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
+def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     handler that saves the user Signup Source
     when the user is created

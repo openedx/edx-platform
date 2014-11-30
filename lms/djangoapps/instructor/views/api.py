@@ -747,7 +747,7 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, redefined-outer-name
+def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-argument, redefined-outer-name
     """
     return the summary of all sales records for a particular course
     """
@@ -778,7 +778,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, r
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_order_records(request, course_id):  # pylint: disable=W0613, redefined-outer-name
+def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument, redefined-outer-name
     """
     return the summary of all sales records for a particular course
     """
@@ -878,7 +878,7 @@ def re_validate_invoice(obj_invoice):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=W0613, redefined-outer-name
+def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=unused-argument, redefined-outer-name
     """
     return the summary of all purchased transactions for a particular course
     """
@@ -906,7 +906,7 @@ def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, redefined-outer-name
+def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -976,7 +976,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_coupon_codes(request, course_id):  # pylint: disable=W0613
+def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Active Coupons.
     """
@@ -1044,7 +1044,7 @@ def random_code_generator():
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def get_registration_codes(request, course_id):  # pylint: disable=W0613
+def get_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Registration Codes.
     """
@@ -1181,7 +1181,7 @@ def generate_registration_codes(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def active_registration_codes(request, course_id):  # pylint: disable=W0613
+def active_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Active Registration Codes.
     """
@@ -1208,7 +1208,7 @@ def active_registration_codes(request, course_id):  # pylint: disable=W0613
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def spent_registration_codes(request, course_id):  # pylint: disable=W0613
+def spent_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Spent(used) Registration Codes.
     """
@@ -1238,7 +1238,7 @@ def spent_registration_codes(request, course_id):  # pylint: disable=W0613
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_anon_ids(request, course_id):  # pylint: disable=W0613
+def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
@@ -1839,7 +1839,7 @@ def proxy_legacy_analytics(request, course_id):
 
 
 @require_POST
-def get_user_invoice_preference(request, course_id):  # pylint: disable=W0613
+def get_user_invoice_preference(request, course_id):  # pylint: disable=unused-argument
     """
     Gets invoice copy user's preferences.
     """
