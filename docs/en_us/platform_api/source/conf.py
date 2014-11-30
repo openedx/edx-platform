@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=invalid-name
-# pylint: disable=W0622
+# pylint: disable=redefined-builtin
 # pylint: disable=protected-access
 # pylint: disable=unused-argument
 
