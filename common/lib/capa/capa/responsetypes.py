@@ -874,7 +874,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Both to avoid double-processing, and to feed the logs.
             if self.has_shuffle():
                 return
-            self._has_shuffle = True  # pylint: disable=W0201
+            self._has_shuffle = True  # pylint: disable=attribute-defined-outside-init
             # Move elements from tree to list for shuffling, then put them back.
             ordering = list(choicegroup.getchildren())
             for choice in ordering:
@@ -958,7 +958,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Both to avoid double-processing, and to feed the logs.
             if self.has_answerpool():
                 return
-            self._has_answerpool = True  # pylint: disable=W0201
+            self._has_answerpool = True  # pylint: disable=attribute-defined-outside-init
 
             choices_list = list(choicegroup.getchildren())
 
