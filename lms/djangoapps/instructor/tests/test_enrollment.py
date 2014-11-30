@@ -371,7 +371,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
         a call to create_user will make objects which
         correspond to the state represented in the SettableEnrollmentState.
     """
-    def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):  # pylint: disable=W0231
+    def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):  # pylint: disable=super-init-not-called
         self.user = user
         self.enrollment = enrollment
         self.allowed = allowed
