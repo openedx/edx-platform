@@ -79,19 +79,19 @@ REPORTS_DATA = (
 
 
 @common_exceptions_400
-def view_success(request):  # pylint: disable=W0613
+def view_success(request):  # pylint: disable=unused-argument
     "A dummy view for testing that returns a simple HTTP response"
     return HttpResponse('success')
 
 
 @common_exceptions_400
-def view_user_doesnotexist(request):  # pylint: disable=W0613
+def view_user_doesnotexist(request):  # pylint: disable=unused-argument
     "A dummy view that raises a User.DoesNotExist exception"
     raise User.DoesNotExist()
 
 
 @common_exceptions_400
-def view_alreadyrunningerror(request):  # pylint: disable=W0613
+def view_alreadyrunningerror(request):  # pylint: disable=unused-argument
     "A dummy view that raises an AlreadyRunningError exception"
     raise AlreadyRunningError()
 

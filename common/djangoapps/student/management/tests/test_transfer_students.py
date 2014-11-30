@@ -36,7 +36,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         """Disconnects the UNENROLL stub receiver."""
         UNENROLL_DONE.disconnect(self.assert_unenroll_signal)
 
-    def assert_unenroll_signal(self, skip_refund=False, **kwargs):   # pylint: disable=W0613
+    def assert_unenroll_signal(self, skip_refund=False, **kwargs):   # pylint: disable=unused-argument
         """ Signal Receiver stub for testing that the unenroll signal was fired. """
         self.assertFalse(self.signal_fired)
         self.assertTrue(skip_refund)

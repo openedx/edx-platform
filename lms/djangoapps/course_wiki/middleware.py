@@ -35,7 +35,7 @@ class WikiAccessMiddleware(object):
                 # Even though we came from the course, we can't see it. So don't worry about it.
                 pass
 
-    def process_view(self, request, view_func, view_args, view_kwargs):  # pylint: disable=W0613
+    def process_view(self, request, view_func, view_args, view_kwargs):  # pylint: disable=unused-argument
         """
         This function handles authentication logic for wiki urls and redirects from
         the "root wiki" to the "course wiki" if the user accesses the wiki from a course url

@@ -9,7 +9,7 @@
 # pylint: disable=W0614
 
 # Disable the "unused argument" warning because lettuce uses "step"
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 
 # django_url is assigned late in the process of loading lettuce,
 # so we import this as a module, and then read django_url from

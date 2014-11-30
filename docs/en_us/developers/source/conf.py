@@ -2,7 +2,7 @@
 # pylint: disable=invalid-name
 # pylint: disable=W0622
 # pylint: disable=W0212
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 
 import os
 from path import path

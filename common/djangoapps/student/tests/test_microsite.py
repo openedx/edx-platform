@@ -26,7 +26,7 @@ FAKE_MICROSITE = {
 }
 
 
-def fake_site_name(name, default=None):  # pylint: disable=W0613
+def fake_site_name(name, default=None):  # pylint: disable=unused-argument
     """
     create a fake microsite site name
     """
@@ -36,7 +36,7 @@ def fake_site_name(name, default=None):  # pylint: disable=W0613
         return default
 
 
-def fake_microsite_get_value(name, default=None):  # pylint: disable=W0613
+def fake_microsite_get_value(name, default=None):  # pylint: disable=unused-argument
     """
     create a fake microsite site name
     """
