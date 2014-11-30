@@ -228,7 +228,7 @@ COUNTRY_INDEX = 3
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def register_and_enroll_students(request, course_id):  # pylint: disable=R0915
+def register_and_enroll_students(request, course_id):  # pylint: disable=too-many-statements
     """
     Create new account and Enroll students in this course.
     Passing a csv file that contains a list of students.
