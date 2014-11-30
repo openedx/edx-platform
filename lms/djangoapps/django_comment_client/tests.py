@@ -1,3 +1,6 @@
+"""
+Tests of various permissions levels for the comment client
+"""
 import string       # pylint: disable=W0402
 import random
 

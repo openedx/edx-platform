@@ -1,3 +1,6 @@
+"""
+Unit tests for the Mongo modulestore
+"""
 # pylint: disable=no-member
 # pylint: disable=W0212
 # pylint: disable=no-name-in-module
