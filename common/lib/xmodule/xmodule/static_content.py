@@ -171,7 +171,7 @@ def _write_files(output_root, contents, generated_suffix_map=None):
 
         # not_file is included to short-circuit this check, because
         # read_md5 depends on the file already existing
-        write_file = not_file or output_file.read_md5() != hashlib.md5(file_content).digest()  # pylint: disable=E1121
+        write_file = not_file or output_file.read_md5() != hashlib.md5(file_content).digest()  # pylint: disable=too-many-function-args
         if write_file:
             LOG.debug("Writing %s", output_file)
             output_file.write_bytes(file_content)
