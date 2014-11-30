@@ -988,7 +988,7 @@ class CourseRegCodeItem(OrderItem):
 
     @classmethod
     @transaction.commit_on_success
-    def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=W0221
+    def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=arguments-differ
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
