@@ -6,8 +6,8 @@ from user_api.models import UserPreference, UserCourseTag, UserOrgTag
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-# Factories don't have __init__ methods, and are self documenting
-# pylint: disable=W0232, missing-docstring
+# Factories are self documenting
+# pylint: disable=missing-docstring
 class UserPreferenceFactory(DjangoModelFactory):
     FACTORY_FOR = UserPreference
 
