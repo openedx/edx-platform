@@ -22,7 +22,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=wildcard-import, W0611, unused-wildcard-import, invalid-name
+# pylint: disable=wildcard-import, unused-import, unused-wildcard-import, invalid-name
 
 import sys
 import os
