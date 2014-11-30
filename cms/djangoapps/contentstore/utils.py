@@ -1,3 +1,6 @@
+"""
+Common utility functions useful throughout the contentstore
+"""
 # pylint: disable=no-member
 
 import copy

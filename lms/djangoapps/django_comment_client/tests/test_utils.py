@@ -114,6 +114,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         utils.add_courseware_context(threads, self.course)
 
         def assertThreadCorrect(thread, discussion, expected_title):  # pylint: disable=invalid-name
+            """Asserts that the given thread has the expected set of properties"""
             self.assertEqual(
                 set(thread.keys()),
                 set(["commentable_id", "courseware_url", "courseware_title"])
