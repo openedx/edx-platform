@@ -7,7 +7,7 @@ This file was inspired by the django-passwords project at https://github.com/dst
 authored by dstufft (https://github.com/dstufft)
 """
 from __future__ import division
-import string  # pylint: disable=W0402
+import string  # pylint: disable=deprecated-module
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
