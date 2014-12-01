@@ -17,7 +17,10 @@ def expect_json(view_function):
         # cdodge: fix postback errors in CMS. The POST 'content-type' header can include additional information
         # e.g. 'charset', so we can't do a direct string compare
         if "application/json" in request.META.get('CONTENT_TYPE', '') and request.body:
-            request.json = json.loads(request.body)
+            try:
+                request.json = json.loads(request.body)
+            except ValueError:
+                return JsonResponseBadRequest({"error": "Invalid JSON"})
         else:
             request.json = {}
 
