@@ -23,6 +23,32 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
     Annotator.frozenSrc = null;
 
     /**
+     * Modifies Annotator.Plugin.Auth.haveValidToken to make it work with a new
+     * token format.
+     **/
+    Annotator.Plugin.Auth.prototype.haveValidToken = function() {
+        return (
+          this._unsafeToken &&
+          this._unsafeToken.sub &&
+          this._unsafeToken.exp &&
+          this._unsafeToken.iat &&
+          this.timeToExpiry() > 0
+        );
+    };
+
+    /**
+     * Modifies Annotator.Plugin.Auth.timeToExpiry to make it work with a new
+     * token format.
+     **/
+    Annotator.Plugin.Auth.prototype.timeToExpiry = function() {
+        var now = new Date().getTime() / 1000,
+            expiry = this._unsafeToken.exp,
+            timeToExpiry = expiry - now;
+
+        return (timeToExpiry > 0) ? timeToExpiry : 0;
+    };
+
+    /**
      * Modifies Annotator.highlightRange to add a "tabindex=0" attribute
      * to the <span class="annotator-hl"> markup that encloses the note.
      * These are then focusable via the TAB key.
