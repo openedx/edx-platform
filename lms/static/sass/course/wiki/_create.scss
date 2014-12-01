@@ -17,12 +17,12 @@ form#wiki_revision {
     @extend textarea;
     @include box-sizing(border-box);
     font-family: monospace;
-    margin-bottom: 20px;
+    margin-bottom: $baseline;
   }
 
   textarea {
     @include box-sizing(border-box);
-    margin-bottom: 20px;
+    margin-bottom: $baseline;
     min-height: 450px;
     width: 100%;
   }
@@ -43,7 +43,7 @@ form#wiki_revision {
   }
 
   input[type="submit"] {
-    margin-top: 20px;
+    margin-top: $baseline;
   }
 }
 

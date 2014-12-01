@@ -8,7 +8,7 @@
 // extends btn
 %m-btn {
   @include box-sizing(border-box);
-  @include transition(color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  @include transition(color $tmg-f2 ease-in-out, background $tmg-f2 ease-in-out, box-shadow $tmg-f2 ease-in-out);
   display: inline-block;
   cursor: pointer;
   text-decoration: none;
@@ -171,7 +171,7 @@
       display: block;
 
       .track {
-        @include transition(all 0.25s ease-in-out);
+        @include transition(all $tmg-f2 ease-in-out);
         color: $white;
         display: block;
         font-size: 13px;

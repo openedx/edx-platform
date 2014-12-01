@@ -171,13 +171,13 @@ $sm-btn-linkedin: #0077b5;
         padding-top: 25px;
 
         form {
-            @include clearfix;
+            @include clearfix();
             clear: both;
         }
     }
 
     .login-form {
-        margin-bottom: 20px;
+        margin-bottom: $baseline;
     }
 
     .password-reset-form {
@@ -207,7 +207,7 @@ $sm-btn-linkedin: #0077b5;
     }
 
     .form-field {
-        @include clearfix;
+        @include clearfix();
         clear: both;
         position: relative;
         width: 100%;
@@ -280,7 +280,7 @@ $sm-btn-linkedin: #0077b5;
         textarea {
             display: block;
             width: 100%;
-            margin: 0 0 5px;
+            margin: 0 0 ($baseline/4);
             padding: 0 ($baseline/2);
 
             &.long {
@@ -294,7 +294,7 @@ $sm-btn-linkedin: #0077b5;
             &.checkbox {
                 display: inline;
                 width: auto;
-                margin-right: 5px;
+                margin-right: ($baseline/4);
             }
 
             &.error {
@@ -365,7 +365,7 @@ $sm-btn-linkedin: #0077b5;
     .login-provider {
         @extend %btn-secondary-grey-outline;
         width: 130px;
-        padding: 0 0 0 40px;
+        padding: 0 0 0 ($baseline*2);
         height: 34px;
         text-align: left;
         text-shadow: none;
@@ -399,7 +399,7 @@ $sm-btn-linkedin: #0077b5;
         }
 
         &:last-child {
-            margin-bottom: 20px;
+            margin-bottom: $baseline;
         }
 
         &.button-Google {

@@ -1,6 +1,7 @@
-// lms variables
+// lms - utilities - variables
+// ====================
 
-// base
+// BASE
 $baseline: 20px;
 
 // ====================
@@ -56,13 +57,13 @@ $tmg-f3: 0.125s;
 $transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
 
 // COLORS
-$black: rgb(0,0,0);
+$black: rgb(0,0,0);  // #000000;
 $black-t0: rgba($black, 0.125);
 $black-t1: rgba($black, 0.25);
 $black-t2: rgba($black, 0.5);
 $black-t3: rgba($black, 0.75);
 
-$white: rgb(255,255,255);
+$white: rgb(255,255,255);  // #FFFFFF;
 $white-t0: rgba($white, 0.125);
 $white-t1: rgba($white, 0.25);
 $white-t2: rgba($white, 0.5);
@@ -81,7 +82,7 @@ $gray-d2: shade($gray,40%); // #4c4c4c
 $gray-d3: shade($gray,60%); // #323232
 $gray-d4: shade($gray,80%); // #191919
 
-$pink: rgb(182,37,103);
+$pink: rgb(182,37,103); // #b72567;
 $pink-l1: tint($pink,20%);
 $pink-l2: tint($pink,40%);
 $pink-l3: tint($pink,60%);
@@ -98,7 +99,7 @@ $pink-u1: desaturate($pink,15%);
 $pink-u2: desaturate($pink,30%);
 $pink-u3: desaturate($pink,45%);
 
-$red: rgb(178, 6, 16);
+$red: rgb(178, 6, 16); // #b20610;
 $red-l1: tint($red,20%);
 $red-l2: tint($red,40%);
 $red-l3: tint($red,60%);
@@ -115,7 +116,7 @@ $red-u1: desaturate($red,15%);
 $red-u2: desaturate($red,30%);
 $red-u3: desaturate($red,45%);
 
-$green: rgb(37, 184, 90);
+$green: rgb(37, 184, 90); // #25b85a;
 $green-l1: tint($green,20%);
 $green-l2: tint($green,40%);
 $green-l3: tint($green,60%);
@@ -149,7 +150,7 @@ $light-gray: #ddd;
 // used by descriptor css
 $lightGrey: #edf1f5;
 $darkGrey: #8891a1;
-$lightGrey1: #ccc;
+$lightGrey1: $gray-l3;
 $blue-d1: shade($blue,20%);
 $blue-d2: shade($blue,40%);
 $blue-d4: shade($blue,80%);
@@ -215,7 +216,7 @@ $m-green-t3: rgba($m-green,0.75);
 
 // ====================
 
-// shadows
+// SHADOWS
 $shadow: rgba(0,0,0,0.2);
 $shadow-l1: rgba(0,0,0,0.1);
 $shadow-l2: rgba(0,0,0,0.05);
@@ -242,7 +243,7 @@ $courseware-header-bg: transparent;
 $footer-bg: $white;
 $courseware-footer-border: none;
 $courseware-footer-shadow: none;
-$courseware-footer-margin: 0px;
+$courseware-footer-margin: 0;
 $courseware-border-bottom-color: #44a2de;
 $courseware-button-border-color: #e6e6e6;
 $courseware-hover-color: #333435;
@@ -278,7 +279,7 @@ $audit-color-lvl2: tint($audit-color-lvl1, 33%);
 // ACTIONS: general
 $button-bg-image: linear-gradient(#fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
 $button-bg-color: transparent;
-$button-bg-hover-color: #fff;
+$button-bg-hover-color: $white;
 
 // ACTIONS: primary
 $action-primary-bg: $m-blue-d3;
@@ -383,7 +384,7 @@ $button-archive-color: #eee;
 
 // MISC: shadow, form, modal
 $shadow-color: $blue;
-$form-bg-color: #fff;
+$form-bg-color: $white;
 $modal-bg-color: rgb(245,245,245);
 
 // MISC: sidebar

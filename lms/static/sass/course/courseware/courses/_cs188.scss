@@ -63,13 +63,13 @@ body.cs188 {
 
   .course-staff {
     .teacher {
-      margin-bottom: 40px;
+      margin-bottom: ($baseline*2);
 
       h3 {
         color: $base-font-color;
         font-family: $sans-serif;
         font-weight: 700;
-        margin-bottom: 15px;
+        margin-bottom: ($baseline*0.75);
         text-transform: none;
       }
 
@@ -99,7 +99,7 @@ body.cs188 {
         margin-top: 3px;
         list-style: disc;
         ul, ol {
-          margin: 0px;
+          margin: 0;
         }
       }
     }
@@ -121,7 +121,7 @@ body.cs188 {
 
     .choicegroup {
       input[type=checkbox], input[type=radio] {
-        margin-right: 5px;
+        margin-right: ($baseline/4);
       }
     }
 

@@ -43,7 +43,7 @@ body.discussion, .discussion-course, div.discussion-body {
   }
 
   .edit-post-form {
-    @include clearfix;
+    @include clearfix();
     margin-bottom: ($baseline*2);
     width: 100%;
     @include box-sizing(border-box);
@@ -59,7 +59,7 @@ body.discussion, .discussion-course, div.discussion-body {
     .post-cancel {
       @include white-button;
       float: left;
-      margin: ($baseline/2) 0 0 ($baseline*.75);
+      margin: ($baseline/2) 0 0 ($baseline*0.75);
     }
 
     .post-update {
@@ -274,7 +274,7 @@ body.discussion, .discussion-course, div.discussion-body {
     padding: 30px;
     font-size: 20px;
     font-weight: 700;
-    color: #ccc;
+    color: $gray-l3;
     text-align: center;
   }
 
@@ -295,7 +295,7 @@ body.discussion, .discussion-course, div.discussion-body {
     padding: 40px 40px 10px;
 
     section {
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid $gray-l3;
     }
 
     .label {
@@ -315,7 +315,7 @@ body.discussion, .discussion-course, div.discussion-body {
     .home-title {
       font-size: 18px;
       color: $black;
-      margin-bottom: 5px;
+      margin-bottom: ($baseline/4);
     }
     .home-description {
       font-size: 12px;
@@ -652,7 +652,7 @@ body.discussion, .discussion-course, div.discussion-body {
 
   .discussion-reply-new {
     padding: $baseline ($baseline*1.5);
-    @include clearfix;
+    @include clearfix();
     @include transition(opacity .2s linear 0s);
 
     h4 {
@@ -810,18 +810,18 @@ body.discussion, .discussion-course, div.discussion-body {
           }
 
           .discussion-post {
-            @include clearfix;
+            @include clearfix();
 
             .inline-comment-count {
+              @extend %ui-depth2;
               position: relative;
-              z-index: 100;
               float: right;
               display: block;
               height: 27px;
               margin-top: 6px;
               margin-right: 8px;
               padding: 0 8px;
-              border-radius: 5px;
+              border-radius: ($baseline/4);
               font-size: 12px;
               font-weight: 400;
               line-height: 25px;
@@ -830,7 +830,7 @@ body.discussion, .discussion-course, div.discussion-body {
 
             header {
               padding-bottom: 0;
-              margin-bottom: ($baseline*.75);
+              margin-bottom: ($baseline*0.75);
 
               .posted-details {
                 margin-top: ($baseline/5);
@@ -862,11 +862,11 @@ body.discussion, .discussion-course, div.discussion-body {
           .responses {
             header {
               padding-bottom: 0;
-              margin-bottom: 15px;
+              margin-bottom: ($baseline*0.75);
 
               .posted-by {
                 float: left;
-                margin-right: 5px;
+                margin-right: ($baseline/4);
                 font-size: 16px;
               }
             }
@@ -891,7 +891,7 @@ body.discussion, .discussion-course, div.discussion-body {
 
         .post-tools {
           box-shadow: 0 1px 1px $shadow inset;
-          background: #f6f6f6;
+          background: $gray-l6;
 
           &:hover {
             background: #fcfcfc;
@@ -957,7 +957,7 @@ body.discussion, .discussion-course, div.discussion-body {
   }
 
   section.pagination {
-    margin-top: 30px;
+    margin-top: ($baseline*1.5);
 
     nav.discussion-paginator {
       float: right;
@@ -974,7 +974,7 @@ body.discussion, .discussion-course, div.discussion-body {
             display: inline-block;
             height: 35px;
             padding: 0 15px;
-            border: 1px solid #ccc;
+            border: 1px solid $gray-l3;
             border-radius: 3px;
             font-size: 13px;
             font-weight: 700;
@@ -990,7 +990,7 @@ body.discussion, .discussion-course, div.discussion-body {
   .edit-post-form {
     width: 100%;
     margin-bottom: $baseline;
-    @include clearfix;
+    @include clearfix();
     @include box-sizing(border-box);
 
     .form-row {
@@ -1087,7 +1087,7 @@ body.discussion, .discussion-course, div.discussion-body {
 // post metadata - cohorts
 .group-visibility-label {
     font-size: 12px;
-    color:#000;
+    color:$black;
     font-style: italic;
     background-color: $white;
   }

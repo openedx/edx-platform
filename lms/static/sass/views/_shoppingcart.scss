@@ -2,26 +2,26 @@
 // ====================
 
 .notification {
-  padding: 30px 30px 0 30px;
+  padding: ($baseline*1.5) ($baseline*1.5) 0 ($baseline*1.5);
 }
 
 .error_msg {
-  margin: 20px;
-  padding: 5px;
+  margin: $baseline;
+  padding: ($baseline/4);
   color: $red;
   border: 1px solid $red;
 
 }
 .cart-errors{
-  background: #FFEEF5;color:#B72667;text-align: center;padding: 10px 0px;
+  background: #FFEEF5;color:#B72667;text-align: center;padding: ($baseline/2) 0;
   font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
   border-bottom: 1px solid #B72667;
-  margin-bottom: 20px;
+  margin-bottom: $baseline;
   display: none;
 }
 .cart-list {
   padding: 30px;
-  margin-top: 40px;
+  margin-top: ($baseline*2);
   border-radius: 3px;
   border: 1px solid $border-color-1;
   background-color: $action-primary-fg;
@@ -34,26 +34,26 @@
   .cart-table {
     width: 100%;
     tr:nth-child(even){
-        background-color: #f8f8f8;
-        border-bottom: 1px solid #f3f3f3;
+        background-color: $gray-l6;
+        border-bottom: 1px solid $gray-l5;
       }
     tr.always-gray{
       background: #eee !important;
-      border-top: 2px solid #FFFFFF;
+      border-top: 2px solid $white;
     }
     tr.always-white{
       background: #fff !important;
       td{
-        padding: 30px 0px 10px;
+        padding: ($baseline*1.5) 0 ($baseline/2);
       }
     }
     tr{
         td.cart-total{
-            padding: 10px 0;
+            padding: ($baseline/2) 0;
             span{
                 display: inline-block;
-                margin-right: 15px;
-                margin-left: 15px;
+                margin-right: ($baseline*0.75);
+                margin-left: ($baseline*0.75);
                 font-weight: bold;
               }
         }
@@ -90,7 +90,7 @@
 
     .cart-items {
       td {
-        padding: 10px 0px;
+        padding: ($baseline/2) 0;
         position: relative;
         line-height: normal;
         span.old-price{
@@ -112,7 +112,7 @@
       td:nth-child(1){
          line-height: 22px;
          text-align: left;
-         padding-right: 20px;
+         padding-right: $baseline;
       }
     }
 
@@ -163,7 +163,7 @@
     }
     tr.order-item {
       td {
-        padding-bottom: 10px;
+        padding-bottom: ($baseline/2);
         span.old-price{
           text-decoration: line-through !important;
         }
@@ -183,18 +183,18 @@
 .confirm-enrollment {
   .title {
     font-size:24px;
-    border-bottom:1px solid #f2f2f2;
+    border-bottom:1px solid $gray-l5;
     text-align: left;
     line-height:70px;
   }
   .course-image {
     display: inline-block;
     width: 223px;
-    margin-right: 10px;
+    margin-right: ($baseline/2);
     vertical-align: top;
   }
   .enrollment-details {
-    margin-bottom: 20px;
+    margin-bottom: $baseline;
     display: inline-block;
     width: calc(100% - 237px);
     .sub-title {
@@ -247,7 +247,7 @@
     background-clip: padding-box;
     float: right;
     border-radius: 3px;
-    color: #FFFFFF;
+    color: $white;
     display: inline-block;
     padding: 6px 18px;
     text-decoration: none;
@@ -270,7 +270,7 @@
     border: 1px solid #00A1E5;
     border-radius: 3px;
     box-shadow: 0 1px 0 0 #00A1E5 inset;
-    color: #FFFFFF;
+    color: $white;
     display: inline-block;
     padding: 7px 18px;
     text-decoration: none;
@@ -409,7 +409,7 @@
               span{
                 color: $dark-gray1;
                 font-size: 24px;
-                padding-left: 20px;
+                padding-left: $baseline;
               }
             &.green{color: $green1;}
             .line-through{text-decoration: line-through;}
@@ -459,7 +459,7 @@
             .button{
               position: absolute;
               background: none;
-              margin-left: -30px;
+              margin-left: -($baseline*1.5);
               padding: 0;
               border: none;
               box-shadow: none;
@@ -475,17 +475,17 @@
             }
             &.disabled{
               .counter{
-                border: 2px solid #CCCCCC;
+                border: 2px solid $gray;
                 &:hover{
                   cursor: not-allowed;
                 }
                 input{
-                  color: #CCC;
+                  color: $gray-l3;
                 }
               }
               .button{
                 i{
-                  color: #ccc;
+                  color: $gray-l3;
                 }
               }
               }
@@ -539,7 +539,7 @@
         text-transform: lowercase;
         font-weight: 600;
         display: inline-block;
-        padding: 10px 0px;
+        padding: ($baseline/2) 0;
         cursor: pointer;
         }
         span{
@@ -549,7 +549,7 @@
           b{
             font-weight: 600;
             font-size: 24px;
-            padding-left: 20px;
+            padding-left: $baseline;
             letter-spacing: 0;
           }
         }
@@ -588,7 +588,7 @@
       .green{
         color: $green1;
         font-weight: 600;
-        margin-right: 20px;
+        margin-right: $baseline;
       }
       input[type="submit"]{
         padding: 9px 35px;
@@ -621,23 +621,23 @@
     }
     .col-two{
       overflow: hidden;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #f2f2f2;
+      padding-bottom: $baseline;
+      border-bottom: 2px solid $gray-l5;
       .row-inside {
         float: left;
         width: 50%;
-        padding: 10px 0;
+        padding: ($baseline/2) 0;
         b{
           font-size: 14px;
           width: 190px;
           display: inline-block;
-          margin-right: 20px;
+          margin-right: $baseline;
           font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
           vertical-align: top;
         }
         label{
           width: 300px;
-          margin: 0px;
+          margin: 0;
           display: inline-block;
           font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
           font-style: normal;
@@ -652,10 +652,10 @@
           display: inline-block;
           border: 2px solid #979797;
           border-radius: 3px;
-          margin: 10px 0;
-          margin-left: 5px;
+          margin: ($baseline/2) 0;
+          margin-left: ($baseline/4);
           &:first-child{
-            margin-left: 15px;
+            margin-left: ($baseline*0.75);
           }
           &.blue{
             border-color: $blue2;
@@ -675,7 +675,7 @@
           }
           }
           input[type="radio"]{
-            margin-left: 10px;
+            margin-left: ($baseline/2);
           }
         }
       .col-2{
@@ -688,7 +688,7 @@
           font-size: 24px;
           letter-spacing: 0;
           font-weight: 600;
-          margin-left: 15px;
+          margin-left: ($baseline*0.75);
           &#register{
             padding: 18px 30px;
           }
@@ -724,7 +724,7 @@
     }
   .disclaimer{
     color: $light-gray2;
-    padding: 10px 0px;
+    padding: ($baseline/2) 0;
     text-align: right;
     font-weight: 300;
   }
@@ -742,7 +742,7 @@
       padding: 12px 0px;
       color: $dark-gray1;
       font-size: 17px;
-      margin-bottom: 5px;
+      margin-bottom: ($baseline/4);
     }
     .row{
       display: table-row;
@@ -753,13 +753,13 @@
       background: $light-gray1;
       padding: 20px;
       border-radius: 4px;
-      margin-bottom: 15px;
+      margin-bottom: ($baseline*0.75);
       min-height: 240px;
       &:nth-child(even){
         margin-left: 30px;
       }
       .data-group{
-      margin-bottom: 15px;
+      margin-bottom: ($baseline*0.75);
         label{
         display: block;
         font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
@@ -768,9 +768,9 @@
         font-weight: 400;
         color: $dark-gray2;
       }
-      input{width: 100%;margin-bottom: 5px;}
+      input{width: 100%;margin-bottom: ($baseline/4);}
       &:nth-child(4n){
-        margin-right: 0px;
+        margin-right: 0;
       }
     }
     }
@@ -798,7 +798,7 @@
       a.blue{
         margin:0 0 0 20px;
         i{
-          margin-left: 10px;
+          margin-left: ($baseline/2);
         }
       }
       .mt-7 {
@@ -810,7 +810,7 @@
   .bordered-bar{
     border-bottom: 2px solid $light-gray1;
     border-top: 2px solid $light-gray1;
-    margin-bottom: 20px;
+    margin-bottom: $baseline;
     padding: 20px;
     h2{
       color: $dark-gray1;
@@ -832,8 +832,8 @@
     }
   }
   .pattern{
-    margin-top: 10px;
-    margin-bottom: 20px;
+    margin-top: ($baseline/2);
+    margin-bottom: $baseline;
     padding:20px;
     color: $dark-gray1;
     h2 {
@@ -916,7 +916,7 @@
       letter-spacing: 0;
       color: #9b9b9b;
       text-align: center;
-      margin-top: 20px;
+      margin-top: $baseline;
       text-transform: initial;
       margin-bottom: 5px;
   }

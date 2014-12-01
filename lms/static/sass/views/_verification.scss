@@ -17,7 +17,7 @@
   }
 
   .expandable-icon {
-    @include transition(all 0.25s ease-in-out 0s);
+    @include transition(all $tmg-f2 ease-in-out 0s);
     display: inline-block;
     vertical-align: middle;
     margin-right: ($baseline/4);
@@ -451,7 +451,7 @@
   }
 
   .progress-sts {
-    @include size(($baseline/4));
+    @include size($baseline/4);
     @extend %ui-depth1;
     position: absolute;
     top: 43px;
@@ -764,7 +764,7 @@
           .action-retakephotos a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
@@ -892,7 +892,7 @@
           .action-editname a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
@@ -1003,11 +1003,11 @@
   // UI: nav - wizard
   .nav-wizard {
     @extend %ui-well;
-    @include clearfix;
+    @include clearfix();
     width: flex-grid(12,12);
     border-radius: ($baseline/10);
     background: $m-gray-l4;
-    padding: ($baseline*.75) $baseline;
+    padding: ($baseline*0.75) $baseline;
 
     .help-inline, .wizard-steps {
 
@@ -1691,7 +1691,7 @@
     }
 
     .modal.edit-name .submit input {
-      color: #fff;
+      color: $white;
     }
 
     .modal {
@@ -1951,7 +1951,7 @@
 
         .item {
           box-shadow: 0 2px 5px 0 $shadow-l1 inset;
-          margin: ($baseline*.75) ($baseline*.75) ($baseline*.75) 0;
+          margin: ($baseline*0.75) ($baseline*0.75) ($baseline*0.75) 0;
           border: 1px solid $m-gray-t2;
 
           &.complete {
@@ -2014,7 +2014,7 @@
 
         .course-info {
           margin-bottom: ($baseline/2);
-          padding: ($baseline/2) ($baseline*.75);
+          padding: ($baseline/2) ($baseline*0.75);
         }
 
         .course-name {
@@ -2031,7 +2031,7 @@
 
         .reverify-status {
           background-color: $light-gray;
-          padding: ($baseline/2) ($baseline*.75);
+          padding: ($baseline/2) ($baseline*0.75);
         }
       }
 
@@ -2215,7 +2215,7 @@
             .action-retakephotos a {
               @extend %btn-primary-blue;
               @include font-size(14);
-              padding: ($baseline/2) ($baseline*.75);
+              padding: ($baseline/2) ($baseline*0.75);
             }
           }
         }
@@ -2272,13 +2272,13 @@
           .action-editname a {
             @extend %btn-primary-blue;
             @include font-size(14);
-            padding: ($baseline/2) ($baseline*.75);
+            padding: ($baseline/2) ($baseline*0.75);
           }
         }
       }
 
       .nav-wizard {
-        padding: ($baseline*.75) $baseline;
+        padding: ($baseline*0.75) $baseline;
 
         .prompt-verify {
           float: left;

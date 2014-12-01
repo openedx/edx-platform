@@ -70,7 +70,7 @@
         }
 
         &.is-selectable {
-          cursor: pointer;
+          @extend %ui-fake-link;
 
           &:hover {
             color: $blue;
@@ -240,8 +240,8 @@
 
         .task-name {
           @include transition(color $tmg-f2 ease-in-out 0s);
+          @extend %ui-fake-link;
           vertical-align: baseline;
-          cursor: pointer;
           margin-bottom: 0;
         }
 
@@ -260,7 +260,7 @@
       }
 
       .task-actions {
-        @include transition(opacity $tmg-f2 ease-in-out 0.25s);
+        @include transition(opacity $tmg-f2 ease-in-out $tmg-f2);
         @include clearfix();
         display: inline-block;
         vertical-align: middle;

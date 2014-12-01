@@ -51,7 +51,7 @@
           .button {
             @extend %t-action3;
             @extend %t-regular;
-            padding: ($baseline/4) ($baseline*.75);
+            padding: ($baseline/4) ($baseline*0.75);
           }
         }
       }
@@ -137,7 +137,7 @@
 
       .bar-mod-content {
         border: 0;
-        padding: ($baseline/2) ($baseline*.75) ($baseline/4) ($baseline*.75);
+        padding: ($baseline/2) ($baseline*0.75) ($baseline/4) ($baseline*0.75);
 
         .title {
           margin-bottom: ($baseline/10);
@@ -189,7 +189,7 @@
       }
 
       .wrapper-pub-actions {
-        padding: ($baseline*.75);
+        padding: ($baseline*0.75);
 
         .action-publish {
           @extend %btn-primary-blue;
@@ -217,7 +217,7 @@
 
       .wrapper-last-publish {
         margin-bottom: $baseline;
-        padding: ($baseline*.75);
+        padding: ($baseline*0.75);
         background-color: $white;
 
         .copy {

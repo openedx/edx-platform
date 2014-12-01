@@ -3,79 +3,79 @@
     @include background-image(radial-gradient(circle at 50% 30%, rgba(0,0,0, 0.3), rgba(0,0,0, 0.8)));
     display: none;
     height:100%;
-    left: 0px;
+    left: 0;
     position: fixed;
-    top: 0px;
+    top: 0;
     width:100%;
     z-index:100;
 }
 
 .modal {
-  background: rgba(0,0,0, 0.6);
+  @extend %ui-depth1;
+  background: $shadow-d2;
   border: 1px solid rgba(0, 0, 0, 0.9);
-  border-radius: 0px;
+  border-radius: 0;
   box-shadow: 0 15px 80px 15px rgba(0,0,0, 0.5);
-  color: #fff;
+  color: $white;
   display: none;
   left: 50%;
   padding: 8px;
   position: absolute;
   width: grid-width(5);
-  z-index: 12;
 
   &.video-modal {
     left: 50%;
-    padding: 10px;
+    padding: ($baseline/2);
     width: 582px;
 
     .inner-wrapper {
-      background: #000;
+      background: $black;
       box-shadow: none;
       height: 315px;
-      padding: 10px;
+      padding: ($baseline/2);
       width: 560px;
     }
   }
 
   &.home-page-video-modal {
     left: 50%;
-    padding: 10px;
+    padding: ($baseline/2);
     width: 662px;
 
     .inner-wrapper {
-      background: #000;
+      background: $black;
       box-shadow: none;
       height: 360px;
-      padding: 10px;
+      padding: ($baseline/2);
       width: 640px;
     }
   }
 
   .inner-wrapper {
+    @extend %ui-depth1;
     background: $modal-bg-color;
-    border-radius: 0px;
+    border-radius: 0;
     border: 1px solid rgba(0, 0, 0, 0.9);
     box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
     overflow: hidden;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 10px;
+    padding-left: ($baseline/2);
+    padding-right: ($baseline/2);
+    padding-bottom: ($baseline/2);
     position: relative;
-    z-index: 2;
 
     header {
-      margin-bottom: 30px;
+      @extend %ui-depth1;
+      margin-bottom: ($baseline*1.5);
       overflow: hidden;
-      padding: 28px 20px 0px;
+      padding: 28px $baseline 0;
       position: relative;
-      z-index: 2;
 
       &::before {
         @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 0.8) 0%, rgba(255,255,255, 0) 100%));
         content: "";
         display: block;
         height: 400px;
-        left: 0px;
+        left: 0;
         margin: 0 auto;
         position: absolute;
         top: -140px;
@@ -86,13 +86,13 @@
       hr {
         @extend %faded-hr-divider-light;
         border: none;
-        margin: 0px;
+        margin: 0;
         position: relative;
         z-index: 2;
 
         &::after {
           @extend %faded-hr-divider;
-          bottom: 0px;
+          bottom: 0;
           content: "";
           display: block;
           position: absolute;
@@ -113,7 +113,7 @@
       border: 1px solid rgb(143, 14, 14);
       color: rgb(143, 14, 14);
       display: none;
-      margin-bottom: 20px;
+      margin-bottom: $baseline;
       padding: 12px;
     }
 
@@ -122,30 +122,30 @@
       border: 1px solid darken($yellow, 60%);
       color: darken($yellow, 60%);
       display: none;
-      margin-bottom: 20px;
+      margin-bottom: $baseline;
       padding: 12px;
     }
 
     .activation-message, .message {
-      padding: 0 40px 10px;
+      padding: 0 ($baseline*2) ($baseline/2);
 
       p {
-        margin-bottom: 10px;
+        margin-bottom: ($baseline/2);
       }
     }
 
     form {
       margin-bottom: 12px;
-      padding: 0px 40px 20px;
+      padding: 0 ($baseline*2) $baseline;
       position: relative;
       z-index: 2;
 
       .input-group {
-        @include clearfix;
+        @include clearfix();
         border-bottom: 1px solid rgb(210,210,210);
         box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
-        margin-bottom: 30px;
-        padding-bottom: 10px;
+        margin-bottom: ($baseline*1.5);
+        padding-bottom: ($baseline/2);
       }
 
       label {
@@ -163,14 +163,14 @@
       }
 
       input[type="checkbox"] {
-        margin-right: 5px;
+        margin-right: ($baseline/4);
       }
 
       textarea {
         background: rgb(255,255,255);
         display: block;
         height: 45px;
-        margin-bottom: 20px;
+        margin-bottom: $baseline;
         width: 100%;
       }
 
@@ -180,7 +180,7 @@
         background: rgb(255,255,255);
         display: block;
         height: 45px;
-        margin-bottom: 20px;
+        margin-bottom: $baseline;
         width: 100%;
       }
 
@@ -192,8 +192,8 @@
         border-radius: 3px;
         box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
         display: block;
-        margin-bottom: 20px;
-        padding: 8px 10px;
+        margin-bottom: $baseline;
+        padding: 8px ($baseline/2);
 
         &:hover, &:focus {
           background: rgb(230,230,230);
@@ -210,7 +210,7 @@
       }
 
       .citizenship, .gender, .date-of-birth {
-        margin-bottom: 20px;
+        margin-bottom: $baseline;
         float: left;
         width: flex-grid(4);
 
@@ -230,7 +230,7 @@
       }
 
       .submit {
-        padding-top: 10px;
+        padding-top: ($baseline/2);
 
         input[type="submit"] {
           display: block;
@@ -269,7 +269,7 @@
         }
 
         span + a {
-          margin-left: 15px;
+          margin-left: ($baseline*0.75);
         }
       }
     }
