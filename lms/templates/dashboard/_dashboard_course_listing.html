@@ -56,42 +56,42 @@
           % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
             <span class="sts-enrollment" title="${_("Your verification is pending")}">
               <span class="label">${_("Enrolled as: ")}</span>
-              <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Pending Ribbon/Badge" />
-              <span class="sts-enrollment-value">${_("Verified Pending")}</span>
+              <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="ID Verified Pending Ribbon/Badge" />
+              <div class="sts-enrollment-value">${_("Verified Pending")}</div>
             </span>
           % elif verification_status.get('status') == VERIFY_STATUS_APPROVED:
             <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
               <span class="label">${_("Enrolled as: ")}</span>
-              <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
-              <span class="sts-enrollment-value">${_("Verified")}</span>
+              <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="ID Verified Ribbon/Badge" />
+              <div class="sts-enrollment-value">${_("Verified")}</div>
             </span>
           % else:
             <span class="sts-enrollment" title="${_("You're enrolled as an honor code student")}">
               <span class="label">${_("Enrolled as: ")}</span>
-              <span class="sts-enrollment-value">${_("Honor Code")}</span>
+              <div class="sts-enrollment-value">${_("Honor Code")}</div>
             </span>
           % endif
         % else:
           <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
             <span class="label">${_("Enrolled as: ")}</span>
-            <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge" />
-            <span class="sts-enrollment-value">${_("Verified")}</span>
+            <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="ID Verified Ribbon/Badge" />
+            <div class="sts-enrollment-value">${_("Verified")}</div>
           </span>
         % endif
       % elif enrollment.mode == "honor":
         <span class="sts-enrollment" title="${_("You're enrolled as an honor code student")}">
           <span class="label">${_("Enrolled as: ")}</span>
-          <span class="sts-enrollment-value">${_("Honor Code")}</span>
+          <div class="sts-enrollment-value">${_("Honor Code")}</div>
         </span>
       % elif enrollment.mode == "audit":
         <span class="sts-enrollment" title="${_("You're auditing this course")}">
           <span class="label">${_("Enrolled as: ")}</span>
-          <span class="sts-enrollment-value">${_("Auditing")}</span>
+          <div class="sts-enrollment-value">${_("Auditing")}</div>
         </span>
       % elif enrollment.mode == "professional":
         <span class="sts-enrollment" title="${_("You're enrolled as a professional education student")}">
         <span class="label">${_("Enrolled as: ")}</span>
-        <span class="sts-enrollment-value">${_("Professional Ed")}</span>
+        <div class="sts-enrollment-value">${_("Professional Ed")}</div>
       </span>
       % endif
     % endif
@@ -131,15 +131,18 @@
         % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED] and not is_course_blocked:
         <div class="message message-status is-shown">
           % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
-            % if verification_status['days_until_deadline'] is not None:
-              <h4 class="message-title">${_('Verification not yet complete.')}</h4>
-              <p class="message-copy">${_('You only have {days} days left to verify for this course.').format(days=verification_status['days_until_deadline'])}</p>
-            % else:
-              <h4 class="message-title">${_('Almost there!')}</h4>
-              <p class="message-copy">${_('You still need to verify for this course.')}</p>
-            % endif
-            ## TODO: style this button
-            <p>${_('Verify Now')}</p>
+            <div class="verification-reminder">
+              % if verification_status['days_until_deadline'] is not None:
+                <h4 class="message-title">${_('Verification not yet complete.')}</h4>
+                <p class="message-copy">${_('You only have {days} days left to verify for this course.').format(days=verification_status['days_until_deadline'])}</p>
+              % else:
+                <h4 class="message-title">${_('Almost there!')}</h4>
+                <p class="message-copy">${_('You still need to verify for this course.')}</p>
+              % endif
+            </div>
+            <div class="verification-cta">
+              <a href="#" class="cta">${_('Verify Now')}</a>
+            </div>
           % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
             <h4 class="message-title">${_('You have already verified your ID!')}</h4>
             <p class="message-copy">${_('Thanks for your patience as we process your request.')}</p>
