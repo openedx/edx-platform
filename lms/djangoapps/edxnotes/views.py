@@ -13,6 +13,7 @@ from courseware.courses import get_course_with_access
 from edxnotes.exceptions import EdxNotesParseError
 from edxnotes.helpers import (
     get_notes,
+    get_id_token,
     is_feature_enabled,
     search
 )
@@ -61,3 +62,12 @@ def search_notes(request, course_id):
         return JsonResponseBadRequest({"error": err.message}, status=500)
 
     return HttpResponse(search_results)
+
+
+# pylint: disable=unused-argument
+@login_required
+def get_token(request, course_id):
+    """
+    Get JWT ID-Token, in case you need new one.
+    """
+    return HttpResponse(get_id_token(request.user))

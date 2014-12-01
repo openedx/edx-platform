@@ -5,6 +5,7 @@ import json
 from mock import patch, MagicMock
 from unittest import skipUnless
 from datetime import datetime
+from edxmako.shortcuts import render_to_string
 from edxnotes.decorators import edxnotes
 from django.conf import settings
 from django.test import TestCase
@@ -65,14 +66,37 @@ class EdxNotesDecoratorTest(TestCase):
         self.client.login(username=self.user.username, password="edx")
         self.problem = TestProblem(self.course)
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
-    def test_edxnotes_enabled(self):
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_EDXNOTES': True})
+    @patch("edxnotes.decorators.get_endpoint")
+    @patch("edxnotes.decorators.get_token_url")
+    @patch("edxnotes.decorators.get_id_token")
+    @patch("edxnotes.decorators.generate_uid")
+    def test_edxnotes_enabled(self, mock_generate_uid, mock_get_id_token, mock_get_token_url, mock_get_endpoint):
         """
         Tests if get_html is wrapped when feature flag is on and edxnotes are
         enabled for the course.
         """
+        mock_generate_uid.return_value = "uid"
+        mock_get_id_token.return_value = "token"
+        mock_get_token_url.return_value = "/tokenUrl"
+        mock_get_endpoint.return_value = "/endpoint"
         enable_edxnotes_for_the_course(self.course, self.user.id)
-        self.assertIn("edx-notes-wrapper", self.problem.get_html())
+        expected_context = {
+            "content": "original_get_html",
+            "uid": "uid",
+            "params": {
+                "usageId": u"test_usage_id",
+                "courseId": unicode(self.course.id).encode("utf-8"),
+                "token": "token",
+                "tokenUrl": "/tokenUrl",
+                "endpoint": "/endpoint",
+                "debug": settings.DEBUG,
+            },
+        }
+        self.assertEqual(
+            self.problem.get_html(),
+            render_to_string("edxnotes_wrapper.html", expected_context),
+        )
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_edxnotes_disabled_if_edxnotes_flag_is_false(self):
@@ -431,13 +455,15 @@ class EdxNotesHelpersTest(TestCase):
         )
 
     @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
-    @patch("edxnotes.helpers.get_token")
+    @patch("edxnotes.helpers.anonymous_id_for_user")
+    @patch("edxnotes.helpers.get_id_token")
     @patch("edxnotes.helpers.requests.get")
-    def test_send_request_with_query_string(self, mock_get, get_token):
+    def test_send_request_with_query_string(self, mock_get, mock_get_id_token, mock_anonymous_id_for_user):
         """
         Tests that requests are send with correct information.
         """
-        get_token.return_value = "test_token"
+        mock_get_id_token.return_value = "test_token"
+        mock_anonymous_id_for_user.return_value = "anonymous_id"
         helpers.send_request(
             self.user, self.course.id, path="test", query_string="text"
         )
@@ -447,20 +473,22 @@ class EdxNotesHelpersTest(TestCase):
                 "x-annotator-auth-token": "test_token"
             },
             params={
-                "user": self.user.username,
+                "user": "anonymous_id",
                 "course_id": unicode(self.course.id),
                 "text": "text",
             }
         )
 
     @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
-    @patch("edxnotes.helpers.get_token")
+    @patch("edxnotes.helpers.anonymous_id_for_user")
+    @patch("edxnotes.helpers.get_id_token")
     @patch("edxnotes.helpers.requests.get")
-    def test_send_request_without_query_string(self, mock_get, get_token):
+    def test_send_request_without_query_string(self, mock_get, mock_get_id_token, mock_anonymous_id_for_user):
         """
         Tests that requests are send with correct information.
         """
-        get_token.return_value = "test_token"
+        mock_get_id_token.return_value = "test_token"
+        mock_anonymous_id_for_user.return_value = "anonymous_id"
         helpers.send_request(
             self.user, self.course.id, path="test"
         )
@@ -470,7 +498,7 @@ class EdxNotesHelpersTest(TestCase):
                 "x-annotator-auth-token": "test_token"
             },
             params={
-                "user": self.user.username,
+                "user": "anonymous_id",
                 "course_id": unicode(self.course.id),
             }
         )
