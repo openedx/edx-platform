@@ -1034,11 +1034,12 @@ courseware_js = (
 # Courseware Search
 # TODO: add conditional
 courseware_js += (
-    'js/search/models/SearchResult.js',
-    'js/search/collections/SearchResultCollection.js',
-    'js/search/views/SearchFormView.js',
-    'js/search/views/SearchResultsView.js',
-    'js/search/searchApp.js',
+    'js/search/models/result.js',
+    'js/search/collections/collection.js',
+    'js/search/views/form.js',
+    'js/search/views/list.js',
+    'js/search/views/item.js',
+    'js/search/search.js',
 )
 
 

@@ -514,6 +514,10 @@
             'annotator': {
                 exports: 'Annotator',
                 deps: ['jquery']
+            },
+            'js/search/views/form': {
+                exports: 'edx.search.Form',
+                deps: ['jquery', 'underscore', 'backbone']
             }
         }
     });
@@ -561,6 +565,7 @@
         'lms/include/js/spec/edxnotes/plugins/events_spec.js',
         'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js'
+        'lms/include/js/spec/search/search_spec.js'
     ]);
 
 }).call(this, requirejs, define);

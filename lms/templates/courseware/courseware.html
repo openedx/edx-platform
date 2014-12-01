@@ -23,12 +23,13 @@ ${page_title_breadcrumbs(course_name())}
     <%static:include path="js/${template_name}.underscore" />
 </script>
 % endfor
-<script type="text/template" id="search_result_item-tpl">
-    <%static:include path="courseware_search/search_result_item.underscore" />
+
+% for template_name in ["search_item", "search_list", "search_loading"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="courseware_search/${template_name}.underscore" />
 </script>
-<script type="text/template" id="search_result_list-tpl">
-    <%static:include path="courseware_search/search_result_list.underscore" />
-</script>
+% endfor
+
 </%block>
 
 <%block name="headextra">
@@ -203,7 +204,7 @@ ${fragment.foot_html()}
       </header>
 
       ## TODO: add conditional
-      <div id="couserware-search" class="search-container">
+      <div id="courseware-search" class="search-container">
         <form role="search-form">
           <input type="text" class="search-field"/>
           <button type="submit" class="search-button" aria-label="${_('Search')}">${_('search')} <i class="icon-search"></i></button>

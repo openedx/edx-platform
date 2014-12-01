@@ -5,8 +5,8 @@ var edx = edx || {};
 
     edx.search = edx.search || {};
 
-    edx.search.SearchFormView = Backbone.View.extend({
-        el: '#couserware-search',
+    edx.search.Form = Backbone.View.extend({
+        el: '#courseware-search',
         events: {
             'submit form': 'submitForm',
             'click .cancel-button': 'clearSearch',
@@ -14,7 +14,6 @@ var edx = edx || {};
         emptySearchRegex: /^\s*$/,
 
         initialize: function (options) {
-            this.collection = options.collection || {};
             this.$searchField = this.$el.find('.search-field');
             this.$searchButton = this.$el.find('.search-button');
             this.$cancelButton = this.$el.find('.cancel-button');
@@ -46,13 +45,13 @@ var edx = edx || {};
 
         performSearch: function (searchTerm) {
             this.setActiveStyle();
-            this.collection.performSearch(searchTerm);
+            this.trigger('search', searchTerm);
         },
 
         clearSearch: function () {
             this.$searchField.val('');
             this.setInitialStyle();
-            this.trigger('SearchFormView:clearSearch');
+            this.trigger('clear');
         }
 
     });
