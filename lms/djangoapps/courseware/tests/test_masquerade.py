@@ -21,7 +21,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_GRADED_MODULESTORE
 
 
-# TODO: the abtest in the sample course "graded" is currently preventing
+# TODO: the "abtest" node in the sample course "graded" is currently preventing
 # it from being successfully loaded in the mongo modulestore.
 # Fix this testcase class to not depend on that course, and let it use
 # the mocked modulestore instead of the XML.
