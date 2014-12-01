@@ -96,6 +96,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
     def test_email_flag_true_xml_store(self):
         # If the enable email setting is enabled, but this is an XML backed course,
         # the email view shouldn't be available on the instructor dashboard.
+        # It doesn't matter what value of 'REQUIRE_COURSE_EMAIL_AUTH' is.
 
         # The course factory uses a MongoModuleStore backing, so patch the
         # `get_modulestore_type` method to pretend to be XML-backed.
@@ -109,7 +110,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
             response = self.client.get(self.url)
             self.assertFalse(self.email_link in response.content)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_send_mail_unauthorized(self):
         """ Test 'Send email' action returns an error if course is not authorized to send email. """
 
@@ -123,7 +124,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         )
         self.assertContains(response, "Email is not enabled for this course.")
 
-    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_send_mail_authorized(self):
         """ Test 'Send email' action when course is authorized to send email. """
 
