@@ -45,7 +45,7 @@ if Backbone?
         mode: @mode
         model: @model
         el: @el
-        course_settings: @course_settings
+        course_settings: @options.course_settings
         topicId: @topicId
       )
       @render()
