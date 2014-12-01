@@ -3,7 +3,7 @@
 define([
      'jquery', 'underscore', 'annotator', 'js/edxnotes/utils/logger', 'js/edxnotes/views/shim'
 ], function ($, _, Annotator, Logger) {
-    var plugins = ['Store'],
+    var plugins = ['Auth', 'Store'],
         getOptions, setupPlugins, updateHeaders, getAnnotator;
 
     /**
@@ -13,6 +13,8 @@ define([
      * @param {String} params.user User id of annotation owner.
      * @param {String} params.usageId Usage Id of the component.
      * @param {String} params.courseId Course id.
+     * @param {String} params.token An authentication token.
+     * @param {String} params.tokenUrl The URL to request the token from.
      * @return {Object} Options.
      **/
     getOptions = function (element, params) {
@@ -24,6 +26,10 @@ define([
             prefix = params.endpoint.replace(/(.+)\/$/, '$1');
 
         return {
+            auth: {
+                token: params.token,
+                tokenUrl: params.tokenUrl
+            },
             store: {
                 prefix: prefix,
                 annotationData: defaultParams,
@@ -37,18 +43,6 @@ define([
                 }
             }
         };
-    };
-
-    /**
-     * Updates request headers.
-     * @param {jQuery Element} The container element.
-     * @param {String} token An authentication token.
-     **/
-    updateHeaders = function (element, token) {
-        var current = element.data('annotator:headers');
-        element.data('annotator:headers', $.extend(current, {
-          'x-annotator-auth-token': token
-        }));
     };
 
     /**
@@ -72,6 +66,7 @@ define([
      * @param {String} params.usageId Usage Id of the component.
      * @param {String} params.courseId Course id.
      * @param {String} params.token An authentication token.
+     * @param {String} params.tokenUrl The URL to request the token from.
      * @return {Object} An instance of Annotator.js.
      **/
     getAnnotator = function (element, params) {
@@ -80,7 +75,6 @@ define([
             logger = Logger.getLogger(element.id, params.debug),
             annotator;
 
-        updateHeaders(el, params.token);
         annotator = el.annotator(options).data('annotator');
         setupPlugins(annotator, plugins, options);
         annotator.logger = logger;
