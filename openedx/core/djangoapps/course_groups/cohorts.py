@@ -16,6 +16,7 @@ from eventtracking import tracker
 from student.models import get_user_by_username_or_email
 from .models import CourseUserGroup, CourseUserGroupPartitionGroup
 
+
 log = logging.getLogger(__name__)
 
 

@@ -1,42 +1,59 @@
 '''
----------------------------------------- Masequerade ----------------------------------------
+---------------------------------------- Masquerade ----------------------------------------
 Allow course staff to see a student or staff view of courseware.
 Which kind of view has been selected is stored in the session state.
 '''
 
-import json
 import logging
 
-from django.http import HttpResponse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from util.json_request import expect_json, JsonResponse
+
+from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
-MASQ_KEY = 'masquerade_identity'
+MASQUERADE_SETTINGS_KEY = 'masquerade_settings'
 
 
-def handle_ajax(request, marg):
-    '''
-    Handle ajax call from "staff view" / "student view" toggle button
-    '''
-    if marg == 'toggle':
-        status = request.session.get(MASQ_KEY, '')
-        if status is None or status in ['', 'staff']:
-            status = 'student'
-        else:
-            status = 'staff'
-        request.session[MASQ_KEY] = status
-    return HttpResponse(json.dumps({'status': status}))
+class CourseMasquerade(object):
+    """
+    Masquerade settings for a particular course.
+    """
+    def __init__(self, course_key, role='student', group_id=None):
+        self.course_key = course_key
+        self.role = role
+        self.group_id = group_id
 
 
-def setup_masquerade(request, staff_access=False):
-    '''
+@require_POST
+@login_required
+@expect_json
+def handle_ajax(request, course_key_string):
+    """
+    Handle AJAX posts to update the current user's masquerade. Note that the masquerade is global
+    and so applies to all courses.
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
+    course_settings_json = request.json
+    role = course_settings_json.get('role', 'student')
+    group_id = course_settings_json.get('group_id', None)
+    masquerade_settings[course_key] = CourseMasquerade(course_key, role=role, group_id=group_id)
+    request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
+    return JsonResponse()
+
+
+def setup_masquerade(request, course_key, staff_access=False):
+    """
     Setup masquerade identity (allows staff to view courseware as either staff or student)
 
-    Uses request.session[MASQ_KEY] to store status of masquerading.
+    Uses request.session[MASQUERADE_SETTINGS_KEY] to store status of masquerading.
     Adds masquerade status to request.user, if masquerading active.
     Return string version of status of view (either 'staff' or 'student')
-    '''
+    """
     if request.user is None:
         return None
 
@@ -46,20 +63,43 @@ def setup_masquerade(request, staff_access=False):
     if not staff_access:  # can masquerade only if user has staff access to course
         return None
 
-    usertype = request.session.get(MASQ_KEY, '')
-    if usertype is None or not usertype:
-        request.session[MASQ_KEY] = 'staff'
-        usertype = 'staff'
+    masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
 
-    if usertype == 'student':
-        request.user.masquerade_as_student = True
+    # Store the masquerade settings on the user so it can be accessed without the request
+    request.user.masquerade_settings = masquerade_settings
 
-    return usertype
+    # Return the masquerade for the current course, or none if there isn't one
+    return masquerade_settings.get(course_key, None)
 
 
-def is_masquerading_as_student(user):
-    '''
-    Return True if user is masquerading as a student, False otherwise
-    '''
-    masq = getattr(user, 'masquerade_as_student', False)
-    return masq is True
+def get_course_masquerade(user, course_key):
+    """
+    Returns the masquerade for the current user for the specified course. If no masquerade has
+    been installed, then a default no-op masquerade is returned.
+    """
+    masquerade_settings = getattr(user, 'masquerade_settings', {})
+    return masquerade_settings.get(course_key, None)
+
+
+def get_masquerade_role(user, course_key):
+    """
+    Returns the role that the user is masquerading as, or None if no masquerade is in effect.
+    """
+    course_masquerade = get_course_masquerade(user, course_key)
+    return course_masquerade.role if course_masquerade else False
+
+
+def is_masquerading_as_student(user, course_key):
+    """
+    Returns true if the user is a staff member masquerading as a student.
+    """
+    return get_masquerade_role(user, course_key) == 'student'
+
+
+def get_masquerading_group_id(user, course_key):
+    """
+    Returns the id of the user partition group that the user is currently masquerading as,
+    or None if none.
+    """
+    course_masquerade = get_course_masquerade(user, course_key)
+    return course_masquerade.group_id if course_masquerade else None
