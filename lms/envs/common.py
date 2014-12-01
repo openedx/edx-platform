@@ -1046,6 +1046,7 @@ student_account_js = [
     'js/utils/edx.utils.validate.js',
     'js/src/utility.js',
     'js/student_account/enrollment.js',
+    'js/student_account/emailoptin.js',
     'js/student_account/shoppingcart.js',
     'js/student_account/models/LoginModel.js',
     'js/student_account/models/RegisterModel.js',
