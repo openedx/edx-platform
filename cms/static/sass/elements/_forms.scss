@@ -99,6 +99,32 @@ form {
     }
   }
 
+  // CASE: checkbox input
+  .field-checkbox {
+
+    .input-checkbox ~ label {
+      color: $color-copy-base;
+    }
+
+    .input-checkbox:checked ~ label {
+      @extend %t-strong;
+      color: $ui-action-primary-color-focus;
+    }
+  }
+
+  // CASE: radio input
+  .field-radio {
+
+    .input-radio ~ label {
+      color: $color-copy-base;
+    }
+
+    .input-radio:checked ~ label {
+      @extend %t-strong;
+      color: $ui-action-primary-color-focus;
+    }
+  }
+
   // CASE: file input
   input[type=file] {
     @extend %t-copy-sub1;

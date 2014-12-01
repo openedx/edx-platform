@@ -52,6 +52,45 @@
       }
     }
 
+    // UI: summary messages
+    .summary-message {
+      margin-bottom: $baseline;
+      padding: ($baseline*0.75);
+      background: $gray-d3;
+
+      .icon, .copy {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      .icon {
+        @extend %t-icon4;
+        margin-right: ($baseline/2);
+        color: $white;
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+        max-width: 85%;
+        color: $gray-l4;
+      }
+    }
+
+    // CASE: Warning summary message
+    .summary-message-warning {
+      border-top: ($baseline/5) solid $color-warning;
+
+      .icon {
+        color: $color-warning;
+      }
+    }
+
+    // visual dividers
+    .divider-visual {
+      margin: ($baseline*0.75) 0;
+      border: ($baseline/20) solid $gray-l4;
+    }
+
     // sections within a modal
     .modal-section {
       margin-bottom: ($baseline*0.75);
@@ -64,7 +103,7 @@
     .modal-section-title {
       @extend %t-title6;
       margin: 0 0 ($baseline/2) 0;
-      border-bottom: 1px solid $gray-l4;
+      border-bottom: ($baseline/10) solid $gray-l4;
       padding-bottom: ($baseline/4);
       color: $gray-d2;
     }
@@ -230,6 +269,128 @@
           height: auto;
           max-height: none;
         }
+      }
+    }
+  }
+
+  // component: access modal
+  .xblock-access-modal {
+
+    // UI: access summary
+    .access-summary-title {
+      margin-bottom: ($baseline*0.75);
+      padding-bottom: ($baseline*0.75);
+    }
+
+
+    .access-summary-value {
+      display: inline-block;
+      vertical-align: top;
+      margin-left: ($baseline/4);
+      @extend %t-strong;
+    }
+
+    .access-controls-secondary {
+      max-height: 100%;
+      overflow-y: scroll;
+    }
+
+    .access-controls-title {
+      @extend %t-title8;
+      @extend %t-strong;
+      margin-bottom: ($baseline/4);
+      text-transform: uppercase;
+      letter-spacing: 0.1rem;
+      color: $gray-l2;
+    }
+
+    .access-controls-group {
+      @extend %wipe-last-child;
+      margin-bottom: $baseline;
+    }
+
+
+    // UI: form fields
+    .list-fields {
+
+      .field {
+        @extend %wipe-last-child;
+        display: block;
+        width: 100%;
+        margin-bottom: ($baseline/4);
+
+        label {
+          @extend %t-copy-sub1;
+          @include transition(color $tmg-f3 ease-in-out 0s);
+
+          &.is-focused {
+            color: $blue;
+          }
+        }
+
+        input, textarea {
+          @extend %t-copy-base;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          padding: ($baseline/2);
+        }
+
+        .tip {
+          @extend %t-copy-sub1;
+          @include transition(color, 0.15s, ease-in-out);
+          display: block;
+          margin-top: ($baseline/4);
+          color: $gray-l2;
+        }
+
+        .tip-warning {
+          color: $gray-d2;
+        }
+      }
+
+      // UI: radio and checkbox inputs
+      .field-radio, .field-checkbox {
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        label {
+          margin-left: ($baseline/2);
+        }
+      }
+    }
+  }
+
+  // CASE: no groups configured for access
+  .is-not-configured {
+    @extend %no-content;
+    text-align: left; // reset for %no-content's default styling
+
+    .title {
+      @extend %t-title6;
+      font-weight: 600;  // needed for poorly scoped .title rule in modals
+      margin: 0 0 ($baseline/2) 0; // needed for poorly scoped .title rule in modals
+    }
+
+    .copy {
+      @extend %t-copy-sub1;
+
+       p {
+        @extend %wipe-last-child;
+        margin-bottom: $baseline;
+      }
+    }
+
+    &.has-actions {
+
+      .actions {
+        margin-top: $baseline;
+      }
+
+      .action {
+        margin-left: 0; // reset for %no-content's default styling
       }
     }
   }
