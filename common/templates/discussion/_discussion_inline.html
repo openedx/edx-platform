@@ -1,5 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django_comment_client.permissions import cached_has_permission %>
+<%! from django_comment_client.permissions import has_permission %>
 <%include file="_underscore_templates.html" />
 
 <%namespace name='static' file='../static_content.html'/>
@@ -14,7 +14,7 @@
 
 <div class="discussion-module" data-discussion-id="${discussion_id | h}">
     <a class="discussion-show control-button" href="javascript:void(0)" data-discussion-id="${discussion_id | h}" role="button"><span class="show-hide-discussion-icon"></span><span class="button-text">${_("Show Discussion")}</span></a>
-    % if cached_has_permission(user, 'create_thread', course.id):
+    % if has_permission(user, 'create_thread', course.id):
         <a href="#" class="new-post-btn" role="button"><span class="icon fa fa-edit new-post-icon"></span>${_("New Post")}</a>
     % endif
 </div>
