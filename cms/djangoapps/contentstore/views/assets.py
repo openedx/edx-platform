@@ -100,7 +100,8 @@ def _assets_json(request, course_key):
     requested_page_size = int(request.REQUEST.get('page_size', 50))
     requested_sort = request.REQUEST.get('sort', 'date_added')
     requested_filter = request.REQUEST.get('asset_type', '')
-    requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTER.get(requested_filter, None)
+    requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTER.get(
+        requested_filter, None)
     filter_params = None
     if requested_filter is not None and len(requested_filter) > 0:
         if requested_filter == 'OTHER':
@@ -108,12 +109,14 @@ def _assets_json(request, course_key):
             where = []
             for all_filter in all_filters:
                 extension_filters = all_filters[all_filter]
-                where.extend(["this.displayname.split('.').reverse()[0].toUpperCase() != '{}'.toUpperCase()".format(extension_filter) for extension_filter in extension_filters])
+                where.extend(["this.displayname.split('.').reverse()[0].toUpperCase() != '{}'.toUpperCase()".format(
+                    extension_filter) for extension_filter in extension_filters])
             filter_params = {
                 "$where": ' && '.join(where),
             }
         else:
-            where =  ["this.displayname.split('.').reverse()[0].toUpperCase() == '{}'.toUpperCase()".format(req_filter) for req_filter in requested_file_types]
+            where = ["this.displayname.split('.').reverse()[0].toUpperCase() == '{}'.toUpperCase()".format(
+                req_filter) for req_filter in requested_file_types]
             filter_params = {
                 "$where": ' || '.join(where),
             }
@@ -131,26 +134,32 @@ def _assets_json(request, course_key):
 
     current_page = max(requested_page, 0)
     start = current_page * requested_page_size
-    assets, total_count = _get_assets_for_page(request, course_key, current_page, requested_page_size, sort, filter_params=filter_params)
+    assets, total_count = _get_assets_for_page(
+        request, course_key, current_page, requested_page_size, sort, filter_params=filter_params)
     end = start + len(assets)
 
-    # If the query is beyond the final page, then re-query the final page so that at least one asset is returned
+    # If the query is beyond the final page, then re-query the final page so
+    # that at least one asset is returned
     if requested_page > 0 and start >= total_count:
         current_page = int(math.floor((total_count - 1) / requested_page_size))
         start = current_page * requested_page_size
-        assets, total_count = _get_assets_for_page(request, course_key, current_page, requested_page_size, sort, filter_params=filter_params)
+        assets, total_count = _get_assets_for_page(
+            request, course_key, current_page, requested_page_size, sort, filter_params=filter_params)
         end = start + len(assets)
 
     asset_json = []
     for asset in assets:
         asset_location = asset['asset_key']
-        # note, due to the schema change we may not have a 'thumbnail_location' in the result set
+        # note, due to the schema change we may not have a 'thumbnail_location'
+        # in the result set
         thumbnail_location = asset.get('thumbnail_location', None)
         if thumbnail_location:
-            thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4])
+            thumbnail_location = course_key.make_asset_key(
+                'thumbnail', thumbnail_location[4])
 
         asset_locked = asset.get('locked', False)
-        asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
+        asset_json.append(_get_asset_json(asset['displayname'], asset[
+                          'uploadDate'], asset_location, thumbnail_location, asset_locked))
 
     return JsonResponse({
         'start': start,
