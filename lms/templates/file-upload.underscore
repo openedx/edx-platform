@@ -1,5 +1,6 @@
 <div class="wrapper-form">
-  <h3 class="form-title"><%- model.get('title') %></h3>
+  <h3 class="form-title subsection-title"><%- model.get('title') %></h3>
+
   <div class="file-upload-form-result result">
 
   </div>
