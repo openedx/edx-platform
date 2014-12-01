@@ -315,27 +315,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Flush the ModuleStore.
         """
-        def side_effect(**kwargs):
-            # 'kwargs': {'host': 'localhost', 'db': 'test_xmodule', 'port': 27017, 'collection': 'modulestorea125d'}
-            connection = MagicMock()
-            connection.database = MongoProxy(
-                mongomock.database.Database(
-                    mongomock.MongoClient(
-                        host=kwargs.get('host'),
-                        port=kwargs.get('port', 27017),
-                        tz_aware=kwargs.get('tz_aware', True),
-                    ),
-                    kwargs.get('db')
-                ),
-                wait_time=0.1
-            )
-
-            connection.course_index = connection.database[kwargs.get('collection') + '.active_versions']
-            connection.structures = connection.database[kwargs.get('collection') + '.structures']
-            connection.definitions = connection.database[kwargs.get('collection') + '.definitions']
-            return connection
-
-        # mocked_mongo.side_effect = side_effect
+        # Mock out the modulestore pymongo calls
         mocked_mongo.side_effect = mongomock
 
         # Flush the Mongo modulestore
