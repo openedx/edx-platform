@@ -1,0 +1,100 @@
+<%inherit file="base.html" />
+## TODO: make online help resolve correctly
+<%def name="online_help_token()"><% return "videos" %></%def>
+<%!
+  import json
+  from django.core.serializers.json import DjangoJSONEncoder
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
+<%block name="title">${_("Video Uploads")}</%block>
+<%block name="bodyclass">is-signedin course view-uploads view-video-upload</%block>
+
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% for template_name in ["active-video-upload-list", "active-video-upload", "previous-video-upload-list", "previous-video-upload"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="requirejs">
+    require(
+        ["jquery", "backbone", "js/views/active_video_upload_list", "js/views/previous_video_upload_list"],
+        function ($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView) {
+            $contentWrapper = $(".content-primary");
+            activeView = new ActiveVideoUploadListView({
+                postUrl: "${post_url}",
+                concurrentUploadLimit: ${concurrent_upload_limit},
+                uploadButton: $(".nav-actions .upload-button")
+            });
+            $contentWrapper.append(activeView.render().$el);
+            var previousCollection = new Backbone.Collection($contentWrapper.data("previous-uploads"));
+            previousView = new PreviousVideoUploadListView({collection: previousCollection});
+            $contentWrapper.append(previousView.render().$el);
+        }
+    );
+</%block>
+
+<%block name="content">
+
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+        <h1 class="page-header">
+            <small class="subtitle">${_("Content")}</small>
+            <span class="sr">&gt; </span>${_("Video Uploads")}
+        </h1>
+
+        <nav class="nav-actions">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="button upload-button new-button"><i class="icon-plus"></i> ${_("Upload New File")}</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <section class="content">
+        <article class="content-primary" role="main" data-previous-uploads="${json.dumps(previous_uploads, cls=DjangoJSONEncoder) | h}"></article>
+
+        <aside class="content-supplementary" role="complementary">
+            <div class="bit">
+                <h3 class="title-3">${_("Adding Videos")}</h3>
+
+                <p>${_("To submit your course videos for processing simply drag and drop the files on to this page, or select files from your computer by using the Select files button.")}</p>
+            </div>
+
+            <div class="bit external-help">
+                <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about managing videos")}</a>
+            </div>
+
+        </aside>
+    </section>
+</div>
+
+
+</%block>
+
+<%block name="view_alerts">
+<!-- alert: save confirmed with close -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
+    <div class="alert confirmation">
+        <i class="icon-ok"></i>
+
+        <div class="copy">
+            <h2 class="title title-3">${_('Your file has been deleted.')}</h2>
+        </div>
+
+        <a href="" rel="view" class="action action-alert-close">
+            <i class="icon-remove-sign"></i>
+            <span class="label">${_('close alert')}</span>
+        </a>
+    </div>
+</div>
+</%block>

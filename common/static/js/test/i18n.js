@@ -1,4 +1,4 @@
-window.gettext = function(s){return s;};
+window.gettext = window.gettext_noop = function(s){return s;};
 window.ngettext = function(singular, plural, num){ return num == 1 ? singular : plural }
 
 function interpolate(fmt, obj, named) {
