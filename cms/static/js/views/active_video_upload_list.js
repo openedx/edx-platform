@@ -6,7 +6,9 @@ define(
         var ActiveVideoUploadListView = BaseView.extend({
             tagName: "div",
             events: {
-                "click .js-upload-button": "chooseFile"
+                "click .file-drop-area": "chooseFile",
+                "dragleave .file-drop": "dragleave",
+                "drop .file-drop": "dragleave"
             },
 
             initialize: function(options) {
@@ -22,12 +24,15 @@ define(
 
             render: function() {
                 this.$el.html(this.template());
-                this.uploadForm = this.$(".form-file-drop");
-                this.uploadForm.fileupload({
+                this.$uploadForm = this.$(".file-drop-upload-form");
+                this.$dropZone = this.$uploadForm.find(".file-drop-area");
+                this.$uploadForm.fileupload({
                     type: "PUT",
                     autoUpload: true,
                     singleFileUploads: false,
                     limitConcurrentUploads: this.concurrentUploadLimit,
+                    dropZone: this.$dropZone,
+                    dragover: this.dragover.bind(this),
                     add: this.fileUploadAdd.bind(this),
                     send: this.fileUploadSend.bind(this),
                     done: this.fileUploadDone.bind(this),
@@ -38,12 +43,22 @@ define(
 
             renderUpload: function(model) {
                 var itemView = new ActiveVideoUploadView({model: model});
-                this.$(".js-active-video-upload-list").append(itemView.render().$el);
+                this.$(".video-upload-progress-list").append(itemView.render().$el);
             },
 
             chooseFile: function(event) {
                 event.preventDefault();
-                this.uploadForm.find(".js-file-input").click();
+                this.$uploadForm.find(".js-file-input").click();
+            },
+
+            dragover: function(event) {
+                event.preventDefault();
+                this.$(".file-drop").addClass("is-dropped");
+            },
+
+            dragleave: function(event) {
+                event.preventDefault();
+                this.$(".file-drop").removeClass("is-dropped");
             },
 
             // Each file is ultimately sent to a separate URL, but we want to make a
@@ -77,7 +92,7 @@ define(
                         _.each(
                             responseData["files"],
                             function(file, index) {
-                                view.uploadForm.fileupload("add", {
+                                view.$uploadForm.fileupload("add", {
                                     files: [uploadData.files[index]],
                                     url: file["upload-url"],
                                     multipart: false,
