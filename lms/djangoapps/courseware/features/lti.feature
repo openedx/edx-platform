@@ -64,7 +64,7 @@ Feature: LMS.LTI component
   | False              | True      |
   And I view the LTI and it is rendered in iframe
   And I see in iframe that LTI role is Instructor
-  And I switch to Student view
+  And I switch to student
   Then I see in iframe that LTI role is Student
 
   #8
@@ -162,7 +162,7 @@ Feature: LMS.LTI component
   | True                 |
   Then I view the permission alert
   Then I reject the permission alert and do not view the LTI
-  
+
   #16
   Scenario: LTI component requests permission for username and displays LTI when accepted
   Given the course has correct LTI credentials with registered Instructor
@@ -180,7 +180,7 @@ Feature: LMS.LTI component
   | True              |
   Then I view the permission alert
   Then I reject the permission alert and do not view the LTI
-  
+
   #18
   Scenario: LTI component requests permission for email and displays LTI when accepted
   Given the course has correct LTI credentials with registered Instructor
@@ -198,7 +198,7 @@ Feature: LMS.LTI component
   | True              | True                 |
   Then I view the permission alert
   Then I reject the permission alert and do not view the LTI
-  
+
   #20
   Scenario: LTI component requests permission for email and username and displays LTI when accepted
   Given the course has correct LTI credentials with registered Instructor

@@ -708,7 +708,7 @@ class StaffLockTest(CourseOutlineTest):
             When I enable explicit staff lock on one section
             And I click the View Live button to switch to staff view
             Then I see two sections in the sidebar
-            And when I click to toggle to student view
+            And when I switch the view mode to student view
             Then I see one section in the sidebar
         """
         self.course_outline_page.visit()
@@ -718,7 +718,7 @@ class StaffLockTest(CourseOutlineTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_sections, 2)
-        StaffPage(self.browser, self.course_id).toggle_staff_view()
+        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
         self.assertEqual(courseware.num_sections, 1)
 
     def test_locked_subsections_do_not_appear_in_lms(self):
@@ -728,7 +728,7 @@ class StaffLockTest(CourseOutlineTest):
             When I enable explicit staff lock on one subsection
             And I click the View Live button to switch to staff view
             Then I see two subsections in the sidebar
-            And when I click to toggle to student view
+            And when I switch the view mode to student view
             Then I see one section in the sidebar
         """
         self.course_outline_page.visit()
@@ -737,7 +737,7 @@ class StaffLockTest(CourseOutlineTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_subsections, 2)
-        StaffPage(self.browser, self.course_id).toggle_staff_view()
+        StaffPage(self.browser, self.course_id).set_staff_view_mode('Student')
         self.assertEqual(courseware.num_subsections, 1)
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
