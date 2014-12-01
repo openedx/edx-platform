@@ -86,6 +86,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         # create the video in VAL
         api.create_video({
             'edx_video_id': self.edx_video_id,
+            'status': 'test',
             'client_video_id': u"test video omega \u03a9",
             'duration': 12,
             'courses': [unicode(self.course.id)],

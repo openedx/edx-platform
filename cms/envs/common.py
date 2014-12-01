@@ -108,6 +108,9 @@ FEATURES = {
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
 
+    # Turn off Video Upload Pipeline through Studio, by default
+    'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
+
     # edx-notifications subsystem
     'ENABLE_NOTIFICATIONS': False,
 
@@ -557,6 +560,14 @@ YOUTUBE = {
             'v': 'set_youtube_id_of_11_symbols_here',
         },
     },
+}
+
+############################# VIDEO UPLOAD PIPELINE #############################
+
+VIDEO_UPLOAD_PIPELINE = {
+    'BUCKET': '',
+    'ROOT_PATH': '',
+    'CONCURRENT_UPLOAD_LIMIT': 4,
 }
 
 ############################ APPS #####################################
