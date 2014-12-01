@@ -283,6 +283,9 @@ FEATURES = {
     # Enable the combined login/registration form
     'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
 
+    # Enable organizational email opt-in
+    'ENABLE_MKTG_EMAIL_OPT_IN': False,
+
     # Show a section in the membership tab of the instructor dashboard
     # to allow an upload of a CSV file that contains a list of new accounts to create
     # and register for course.
