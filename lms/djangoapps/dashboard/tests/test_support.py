@@ -49,7 +49,7 @@ class RefundTests(ModuleStoreTestCase):
         Order.objects.filter(user=self.student).delete()
 
     def _enroll(self, purchase=True):
-        # pylint: disable=C0111
+        # pylint: disable=missing-docstring
         CourseEnrollment.enroll(self.student, self.course_id, self.course_mode.mode_slug)
         if purchase:
             self.order = Order.get_cart_for_user(self.student)
@@ -106,7 +106,7 @@ class RefundTests(ModuleStoreTestCase):
         pars['confirmed'] = 'true'
         response = self.client.post('/support/refund/', pars)
         self.assertTrue(response.status_code, 302)
-        response = self.client.get(response.get('location'))  # pylint: disable=E1103
+        response = self.client.get(response.get('location'))  # pylint: disable=maybe-no-member
 
         self.assertContains(response, "Unenrolled %s from" % self.student)
         self.assertContains(response, "Refunded 1 for order id")

@@ -38,7 +38,7 @@ from reverification.models import MidcourseReverificationWindow
 log = logging.getLogger(__name__)
 
 
-def generateUUID():  # pylint: disable=C0103
+def generateUUID():  # pylint: disable=invalid-name
     """ Utility function; generates UUIDs """
     return str(uuid.uuid4())
 
@@ -552,7 +552,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 attempt = attempts[0]
                 if attempt.status != "approved":
                     return False
-            except Exception:  # pylint: disable=W0703
+            except Exception:  # pylint: disable=broad-except
                 return False
 
         return True

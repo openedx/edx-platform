@@ -21,7 +21,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
-def root_create(request):  # pylint: disable=W0613
+def root_create(request):  # pylint: disable=unused-argument
     """
     In the edX wiki, we don't show the root_create view. Instead, we
     just create the root automatically if it doesn't exist.
@@ -30,7 +30,7 @@ def root_create(request):  # pylint: disable=W0613
     return redirect('wiki:get', path=root.path)
 
 
-def course_wiki_redirect(request, course_id):  # pylint: disable=W0613
+def course_wiki_redirect(request, course_id):  # pylint: disable=unused-argument
     """
     This redirects to whatever page on the wiki that the course designates
     as it's home page. A course's wiki must be an article on the root (for
@@ -58,7 +58,7 @@ def course_wiki_redirect(request, course_id):  # pylint: disable=W0613
         new_site.domain = settings.SITE_NAME
         new_site.name = "edX"
         new_site.save()
-        site_id = str(new_site.id)  # pylint: disable=E1101
+        site_id = str(new_site.id)  # pylint: disable=no-member
         if site_id != str(settings.SITE_ID):
             raise ImproperlyConfigured("No site object was created and the SITE_ID doesn't match the newly created one. {} != {}".format(site_id, settings.SITE_ID))
 

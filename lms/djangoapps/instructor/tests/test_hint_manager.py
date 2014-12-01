@@ -12,7 +12,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

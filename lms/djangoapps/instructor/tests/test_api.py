@@ -2,7 +2,7 @@
 """
 Unit tests for instructor.api methods.
 """
-# pylint: disable=E1111
+
 import unittest
 import json
 import requests
@@ -79,19 +79,19 @@ REPORTS_DATA = (
 
 
 @common_exceptions_400
-def view_success(request):  # pylint: disable=W0613
+def view_success(request):  # pylint: disable=unused-argument
     "A dummy view for testing that returns a simple HTTP response"
     return HttpResponse('success')
 
 
 @common_exceptions_400
-def view_user_doesnotexist(request):  # pylint: disable=W0613
+def view_user_doesnotexist(request):  # pylint: disable=unused-argument
     "A dummy view that raises a User.DoesNotExist exception"
     raise User.DoesNotExist()
 
 
 @common_exceptions_400
-def view_alreadyrunningerror(request):  # pylint: disable=W0613
+def view_alreadyrunningerror(request):  # pylint: disable=unused-argument
     "A dummy view that raises an AlreadyRunningError exception"
     raise AlreadyRunningError()
 
@@ -111,26 +111,26 @@ class TestCommonExceptions400(unittest.TestCase):
 
     def test_user_doesnotexist(self):
         self.request.is_ajax.return_value = False
-        resp = view_user_doesnotexist(self.request)
+        resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
         self.assertIn("User does not exist", resp.content)
 
     def test_user_doesnotexist_ajax(self):
         self.request.is_ajax.return_value = True
-        resp = view_user_doesnotexist(self.request)
+        resp = view_user_doesnotexist(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
         result = json.loads(resp.content)
         self.assertIn("User does not exist", result["error"])
 
     def test_alreadyrunningerror(self):
         self.request.is_ajax.return_value = False
-        resp = view_alreadyrunningerror(self.request)
+        resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Task is already running", resp.content)
 
     def test_alreadyrunningerror_ajax(self):
         self.request.is_ajax.return_value = True
-        resp = view_alreadyrunningerror(self.request)
+        resp = view_alreadyrunningerror(self.request)  # pylint: disable=assignment-from-no-return
         self.assertEqual(resp.status_code, 400)
         result = json.loads(resp.content)
         self.assertIn("Task is already running", result["error"])
@@ -569,7 +569,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
-        # (comment because pylint C0103)
+        # (comment because pylint C0103(invalid-name))
         # self.maxDiff = None
 
     def tearDown(self):
@@ -1119,7 +1119,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
-        # (comment because pylint C0103)
+        # (comment because pylint C0103(invalid-name))
         # self.maxDiff = None
 
     def test_missing_params(self):

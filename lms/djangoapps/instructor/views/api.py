@@ -23,7 +23,7 @@ from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
-import string  # pylint: disable=W0402
+import string  # pylint: disable=deprecated-module
 import random
 import urllib
 from util.json_request import JsonResponse
@@ -95,7 +95,7 @@ def common_exceptions_400(func):
     Catches common exceptions and renders matching 400 errors.
     (decorator without arguments)
     """
-    def wrapped(request, *args, **kwargs):  # pylint: disable=C0111
+    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
         use_json = (request.is_ajax() or
                     request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
@@ -129,8 +129,8 @@ def require_query_params(*args, **kwargs):
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
 
             error_response_data = {
@@ -166,8 +166,8 @@ def require_post_params(*args, **kwargs):
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
 
             error_response_data = {
@@ -206,8 +206,8 @@ def require_level(level):
     if level not in ['instructor', 'staff']:
         raise ValueError("unrecognized level '{}'".format(level))
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
             course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id']))
 
@@ -228,7 +228,7 @@ COUNTRY_INDEX = 3
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def register_and_enroll_students(request, course_id):  # pylint: disable=R0915
+def register_and_enroll_students(request, course_id):  # pylint: disable=too-many-statements
     """
     Create new account and Enroll students in this course.
     Passing a csv file that contains a list of students.
@@ -261,7 +261,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=R0915
         try:
             upload_file = request.FILES.get('students_list')
             students = [row for row in csv.reader(upload_file.read().splitlines())]
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             general_errors.append({
                 'username': '', 'email': '', 'response': _('Could not read uploaded file.')
             })
@@ -488,7 +488,7 @@ def students_update_enrollment(request, course_id):
                 'invalidIdentifier': True,
             })
 
-        except Exception as exc:  # pylint: disable=W0703
+        except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
             log.exception("Error while #{}ing student")
@@ -747,7 +747,7 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-argument, redefined-outer-name
     """
     return the summary of all sales records for a particular course
     """
@@ -778,7 +778,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_order_records(request, course_id):  # pylint: disable=W0613, W0621
+def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument, redefined-outer-name
     """
     return the summary of all sales records for a particular course
     """
@@ -811,7 +811,7 @@ def get_sale_order_records(request, course_id):  # pylint: disable=W0613, W0621
     db_columns = [x[0] for x in query_features]
     csv_columns = [x[1] for x in query_features]
     sale_data = instructor_analytics.basic.sale_order_record_features(course_id, db_columns)
-    header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)  # pylint: disable=W0612
+    header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)  # pylint: disable=unused-variable
     return instructor_analytics.csvs.create_csv_response("e-commerce_sale_order_records.csv", csv_columns, datarows)
 
 
@@ -878,7 +878,7 @@ def re_validate_invoice(obj_invoice):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=unused-argument, redefined-outer-name
     """
     return the summary of all purchased transactions for a particular course
     """
@@ -906,7 +906,7 @@ def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -976,7 +976,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_coupon_codes(request, course_id):  # pylint: disable=W0613
+def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Active Coupons.
     """
@@ -1044,7 +1044,7 @@ def random_code_generator():
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def get_registration_codes(request, course_id):  # pylint: disable=W0613
+def get_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Registration Codes.
     """
@@ -1107,7 +1107,7 @@ def generate_registration_codes(request, course_id):
         internal_reference=internal_reference, customer_reference_number=customer_reference_number
     )
     registration_codes = []
-    for _ in range(course_code_number):  # pylint: disable=W0621
+    for _ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(request.user, course_id, sale_invoice, order=None)
         registration_codes.append(generated_registration_code)
 
@@ -1181,7 +1181,7 @@ def generate_registration_codes(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def active_registration_codes(request, course_id):  # pylint: disable=W0613
+def active_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Active Registration Codes.
     """
@@ -1208,7 +1208,7 @@ def active_registration_codes(request, course_id):  # pylint: disable=W0613
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def spent_registration_codes(request, course_id):  # pylint: disable=W0613
+def spent_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Spent(used) Registration Codes.
     """
@@ -1229,7 +1229,7 @@ def spent_registration_codes(request, course_id):  # pylint: disable=W0613
 
         company_name = request.POST['spent_company_name']
         if company_name:
-            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint:  disable=E1103
+            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint: disable=maybe-no-member
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
@@ -1238,7 +1238,7 @@ def spent_registration_codes(request, course_id):  # pylint: disable=W0613
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_anon_ids(request, course_id):  # pylint: disable=W0613
+def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
@@ -1709,7 +1709,7 @@ def send_email(request, course_id):
     )
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=no-member
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -1839,7 +1839,7 @@ def proxy_legacy_analytics(request, course_id):
 
 
 @require_POST
-def get_user_invoice_preference(request, course_id):  # pylint: disable=W0613
+def get_user_invoice_preference(request, course_id):  # pylint: disable=unused-argument
     """
     Gets invoice copy user's preferences.
     """

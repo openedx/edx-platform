@@ -151,7 +151,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/billing_details.html')
         # check for the default currency in the context
         self.assertEqual(context['currency'], 'usd')
@@ -179,7 +179,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/billing_details.html')
         # check for the override currency settings in the context
         self.assertEqual(context['currency'], 'PKR')
@@ -405,7 +405,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         item = self.cart.orderitem_set.all().select_subclasses()[1]
         self.assertEquals(item.unit_cost, self.get_discount(self.testing_cost))
 
-    def test_soft_delete_coupon(self):  # pylint: disable=E1101
+    def test_soft_delete_coupon(self):  # pylint: disable=no-member
         self.add_coupon(self.course_key, True, self.coupon_code)
         coupon = Coupon(code='TestCode', description='testing', course_id=self.course_key,
                         percentage_discount=12, created_by=self.user, is_active=True)
@@ -416,25 +416,25 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         get_coupon = Coupon.objects.get(id=1)
         request = HttpRequest()
         request.user = admin
-        setattr(request, 'session', 'session')  # pylint: disable=E1101
-        messages = FallbackStorage(request)  # pylint: disable=E1101
-        setattr(request, '_messages', messages)  # pylint: disable=E1101
+        setattr(request, 'session', 'session')  # pylint: disable=no-member
+        messages = FallbackStorage(request)  # pylint: disable=no-member
+        setattr(request, '_messages', messages)  # pylint: disable=no-member
         coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
         test_query_set = coupon_admin.queryset(request)
         test_actions = coupon_admin.get_actions(request)
         self.assertTrue('really_delete_selected' in test_actions['really_delete_selected'])
         self.assertEqual(get_coupon.is_active, True)
-        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=E1101
+        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=no-member
         for coupon in test_query_set:
             self.assertEqual(coupon.is_active, False)
-        coupon_admin.delete_model(request, get_coupon)  # pylint: disable=E1101
+        coupon_admin.delete_model(request, get_coupon)  # pylint: disable=no-member
         self.assertEqual(get_coupon.is_active, False)
 
         coupon = Coupon(code='TestCode123', description='testing123', course_id=self.course_key,
                         percentage_discount=22, created_by=self.user, is_active=True)
         coupon.save()
         test_query_set = coupon_admin.queryset(request)
-        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=E1101
+        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=no-member
         for coupon in test_query_set:
             self.assertEqual(coupon.is_active, False)
 
@@ -669,7 +669,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=W0621
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
         self.assertIn(cert_item, purchase_form_arg_cart_items)
@@ -693,7 +693,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=W0621
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
 
@@ -849,7 +849,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertEqual(context['order'].total_cost, self.testing_cost)
@@ -882,7 +882,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
@@ -903,7 +903,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertIn(reg_item, context['shoppingcart_items'][0])
         self.assertIn(cert_item, context['shoppingcart_items'][1])
@@ -944,7 +944,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # check for the enrollment codes content
         self.assertIn('Please send each professional one of these unique registration codes to enroll into the course.', resp.content)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
@@ -1095,7 +1095,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         cache.clear()
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
-        for i in xrange(30):  # pylint: disable=W0612
+        for i in xrange(30):  # pylint: disable=unused-variable
             response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
             self.assertEquals(response.status_code, 404)
 
@@ -1119,7 +1119,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         cache.clear()
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
-        for i in xrange(30):  # pylint: disable=W0612
+        for i in xrange(30):  # pylint: disable=unused-variable
             response = self.client.get(url, **{'HTTP_HOST': 'localhost'})
             self.assertEquals(response.status_code, 404)
 

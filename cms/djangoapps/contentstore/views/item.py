@@ -221,7 +221,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
-            except Exception as exc:                          # pylint: disable=w0703
+            except Exception as exc:                          # pylint: disable=broad-except
                 log.debug("unable to render studio_view for %r", xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
@@ -585,7 +585,7 @@ def _delete_item(usage_key, user):
         store.delete_item(usage_key, user.id)
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 @login_required
 @require_http_methods(("GET", "DELETE"))
 def orphan_handler(request, course_key_string):

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=C0103
-# pylint: disable=W0622
-# pylint: disable=W0212
-# pylint: disable=W0613
+# pylint: disable=invalid-name
+# pylint: disable=redefined-builtin
+# pylint: disable=protected-access
+# pylint: disable=unused-argument
 
 import os
 from path import path

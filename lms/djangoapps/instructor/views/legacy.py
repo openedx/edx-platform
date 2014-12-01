@@ -860,7 +860,7 @@ def instructor_dashboard(request, course_id):
                 )
 
                 # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-                submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=E1101
+                submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=no-member
 
             except Exception as err:  # pylint: disable=broad-except
                 # Catch any errors and deliver a message to the user

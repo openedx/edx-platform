@@ -114,17 +114,15 @@ def instructor_dashboard_2(request, course_id):
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
-"""
-Section functions starting with _section return a dictionary of section data.
+## Section functions starting with _section return a dictionary of section data.
 
-The dictionary must include at least {
-    'section_key': 'circus_expo'
-    'section_display_name': 'Circus Expo'
-}
+## The dictionary must include at least {
+##     'section_key': 'circus_expo'
+##     'section_display_name': 'Circus Expo'
+## }
 
-section_key will be used as a css attribute, javascript tie-in, and template import filename.
-section_display_name will be used to generate link titles in the nav bar.
-"""  # pylint: disable=W0105
+## section_key will be used as a css attribute, javascript tie-in, and template import filename.
+## section_display_name will be used to generate link titles in the nav bar.
 
 
 def _section_e_commerce(course, access):

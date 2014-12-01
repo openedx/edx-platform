@@ -439,7 +439,7 @@ class LoncapaProblem(object):
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
-        self.has_targeted = True  # pylint: disable=W0201
+        self.has_targeted = True  # pylint: disable=attribute-defined-outside-init
 
         for mult_choice_response in tree.xpath('//multiplechoiceresponse[@targeted-feedback]'):
             show_explanation = mult_choice_response.get('targeted-feedback') == 'alwaysShowCorrectChoiceExplanation'

@@ -1,4 +1,7 @@
-# pylint: disable=E1103, E1101
+"""
+Common utility functions useful throughout the contentstore
+"""
+# pylint: disable=no-member
 
 import copy
 import logging

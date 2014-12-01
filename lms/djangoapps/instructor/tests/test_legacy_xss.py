@@ -15,7 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from instructor.views import legacy
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

@@ -84,7 +84,7 @@ def modulestore():
         options.update(ModuleStoreNoSettings.MODULESTORE['OPTIONS'])
         options['render_template'] = render_to_template_mock
 
-        # pylint: disable=W0142
+        # pylint: disable=star-args
         ModuleStoreNoSettings.modulestore = class_(
             None,  # contentstore
             ModuleStoreNoSettings.MODULESTORE['DOC_STORE_CONFIG'],
@@ -95,7 +95,7 @@ def modulestore():
     return ModuleStoreNoSettings.modulestore
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 def render_to_template_mock(*args):
     pass
 

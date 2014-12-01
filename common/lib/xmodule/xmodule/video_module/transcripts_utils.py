@@ -19,19 +19,19 @@ from xmodule.contentstore.django import contentstore
 log = logging.getLogger(__name__)
 
 
-class TranscriptException(Exception):  # pylint disable=C0111
+class TranscriptException(Exception):  # pylint: disable=missing-docstring
     pass
 
 
-class TranscriptsGenerationException(Exception):  # pylint disable=C0111
+class TranscriptsGenerationException(Exception):  # pylint: disable=missing-docstring
     pass
 
 
-class GetTranscriptsFromYouTubeException(Exception):  # pylint disable=C0111
+class GetTranscriptsFromYouTubeException(Exception):  # pylint: disable=missing-docstring
     pass
 
 
-class TranscriptsRequestValidationException(Exception):  # pylint disable=C0111
+class TranscriptsRequestValidationException(Exception):  # pylint: disable=missing-docstring
     pass
 
 

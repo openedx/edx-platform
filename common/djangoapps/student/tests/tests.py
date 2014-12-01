@@ -322,7 +322,7 @@ class DashboardTest(ModuleStoreTestCase):
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
 
-        # TODO: Until we can allow course administrators to define a refund period for paid for courses show_refund_option should be False. # pylint: disable=W0511
+        # TODO: Until we can allow course administrators to define a refund period for paid for courses show_refund_option should be False. # pylint: disable=fixme
         self.assertFalse(enrollment.refundable())
 
         resp = self.client.post(reverse('student.views.dashboard', args=[]))

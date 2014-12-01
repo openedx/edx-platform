@@ -1,6 +1,6 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
-# pylint: disable=W0613
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
 
 from lettuce import world, step
 from component_settings_editor_helpers import enter_xml_in_advanced_problem

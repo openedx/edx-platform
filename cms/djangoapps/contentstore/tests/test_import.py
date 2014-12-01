@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=E1101
+# pylint: disable=no-member
 # pylint: disable=protected-access
 """
 Tests for import_from_xml using the mongo modulestore.

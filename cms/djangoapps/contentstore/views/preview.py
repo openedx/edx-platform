@@ -227,7 +227,7 @@ def get_preview_fragment(request, descriptor, context):
 
     try:
         fragment = module.render(preview_view, context)
-    except Exception as exc:                          # pylint: disable=W0703
+    except Exception as exc:                          # pylint: disable=broad-except
         log.warning("Unable to render %s for %r", preview_view, module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment

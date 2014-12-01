@@ -53,7 +53,7 @@ def set_course_tag(user, course_id, key, value):
         key: arbitrary (<=255 char string)
         value: arbitrary string
     """
-    # pylint: disable=W0511
+    # pylint: disable=fixme
     # TODO: There is a risk of IntegrityErrors being thrown here given
     # simultaneous calls from many processes. Handle by retrying after
     # a short delay?

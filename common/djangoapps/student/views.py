@@ -110,7 +110,7 @@ from eventtracking import tracker
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
-ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
+ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 
 
 def csrf_token(context):
@@ -1268,7 +1268,7 @@ class AccountValidationError(Exception):
 
 
 @receiver(post_save, sender=User)
-def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
+def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     handler that saves the user Signup Source
     when the user is created

@@ -23,12 +23,12 @@ class ProgressTest(unittest.TestCase):
 
     def test_create_object(self):
         # These should work:
-        prg1 = Progress(0, 2)  # pylint: disable=W0612
-        prg2 = Progress(1, 2)  # pylint: disable=W0612
-        prg3 = Progress(2, 2)  # pylint: disable=W0612
+        prg1 = Progress(0, 2)  # pylint: disable=unused-variable
+        prg2 = Progress(1, 2)  # pylint: disable=unused-variable
+        prg3 = Progress(2, 2)  # pylint: disable=unused-variable
 
-        prg4 = Progress(2.5, 5.0)  # pylint: disable=W0612
-        prg5 = Progress(3.7, 12.3333)  # pylint: disable=W0612
+        prg4 = Progress(2.5, 5.0)  # pylint: disable=unused-variable
+        prg5 = Progress(3.7, 12.3333)  # pylint: disable=unused-variable
 
         # These shouldn't
         self.assertRaises(ValueError, Progress, 0, 0)

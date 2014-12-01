@@ -170,7 +170,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
     def _define_course_email(self):
         """Create CourseEmail object for testing."""
         course_email = CourseEmail.create(self.course.id, self.instructor, SEND_TO_ALL, "Test Subject", "<p>This is a test message</p>")
-        return course_email.id  # pylint: disable=E1101
+        return course_email.id  # pylint: disable=no-member
 
     def _test_resubmission(self, api_call):
         """
@@ -181,7 +181,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         `AlreadyRunningError`.
         """
         instructor_task = api_call()
-        instructor_task = InstructorTask.objects.get(id=instructor_task.id)  # pylint: disable=E1101
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)  # pylint: disable=no-member
         instructor_task.task_state = PROGRESS
         instructor_task.save()
         with self.assertRaises(AlreadyRunningError):

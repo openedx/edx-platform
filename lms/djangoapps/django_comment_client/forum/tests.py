@@ -21,7 +21,7 @@ from django_comment_client.utils import strip_none
 
 from courseware.tests.modulestore_config import TEST_DATA_DIR
 from courseware.courses import UserNotEnrolled
-from nose.tools import assert_true  # pylint: disable=E0611
+from nose.tools import assert_true  # pylint: disable=no-name-in-module
 from mock import patch, Mock, ANY, call
 
 from course_groups.models import CourseUserGroup
@@ -30,7 +30,7 @@ TEST_DATA_MONGO_MODULESTORE = mixed_store_config(TEST_DATA_DIR, {}, include_xml=
 
 log = logging.getLogger(__name__)
 
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

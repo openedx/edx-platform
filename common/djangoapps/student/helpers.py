@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import CourseKey
 from course_modes.models import CourseMode
-from third_party_auth import (  # pylint: disable=W0611
+from third_party_auth import (  # pylint: disable=unused-import
     pipeline, provider,
     is_enabled as third_party_auth_enabled
 )

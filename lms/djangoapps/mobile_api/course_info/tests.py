@@ -25,7 +25,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         url = reverse('course-about-detail', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('overview' in response.data)  # pylint: disable=E1103
+        self.assertTrue('overview' in response.data)  # pylint: disable=maybe-no-member
 
     def test_handouts(self):
         url = reverse('course-handouts-list', kwargs={'course_id': unicode(self.course.id)})
@@ -36,5 +36,5 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         url = reverse('course-updates-list', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, [])  # pylint: disable=E1103
+        self.assertEqual(response.data, [])  # pylint: disable=maybe-no-member
         # TODO: add handouts and updates, somehow

@@ -2,8 +2,8 @@
 Steps for problem.feature lettuce tests
 '''
 
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
 from common import i_am_registered_for_the_course, visit_scenario_item

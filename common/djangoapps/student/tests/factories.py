@@ -12,8 +12,8 @@ from uuid import uuid4
 from pytz import UTC
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-# Factories don't have __init__ methods, and are self documenting
-# pylint: disable=W0232, C0111
+# Factories are self documenting
+# pylint: disable=missing-docstring
 
 
 class GroupFactory(DjangoModelFactory):

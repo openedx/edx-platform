@@ -63,7 +63,7 @@ log = logging.getLogger(__name__)
 
 #########################################################################
 
-registry = TagRegistry()  # pylint: disable=C0103
+registry = TagRegistry()  # pylint: disable=invalid-name
 
 
 class Status(object):
