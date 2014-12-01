@@ -97,7 +97,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         scopes, claims = self.get_id_token_values('openid course_instructor')
 
         self.assertIn('course_instructor', scopes)
-        self.assertNotIn('instructor_courses', claims)   # should not return courses in id_token
+        self.assertNotIn('instructor_courses', claims)  # should not return courses in id_token
 
     def test_course_staff_courses_with_claims(self):
         CourseStaffRole(self.course_key).add_users(self.user)
@@ -119,6 +119,16 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         self.assertEqual(len(claims['staff_courses']), 1)
         self.assertIn(course_id, claims['staff_courses'])
         self.assertNotIn(nonexistent_course_id, claims['staff_courses'])
+
+    def test_permissions_scope(self):
+        scopes, claims = self.get_id_token_values('openid profile permissions')
+        self.assertIn('permissions', scopes)
+        self.assertFalse(claims['administrator'])
+
+        self.user.is_staff = True
+        self.user.save()
+        _scopes, claims = self.get_id_token_values('openid profile permissions')
+        self.assertTrue(claims['administrator'])
 
 
 class UserInfoTest(BaseTestMixin, UserInfoTestCase):
@@ -184,3 +194,13 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         courses = claims['instructor_courses']
         self.assertIn(self.course_id, courses)
         self.assertEqual(len(courses), 1)
+
+    def test_permissions_scope(self):
+        claims = self.get_with_scope('permissions')
+        self.assertIn('administrator', claims)
+        self.assertFalse(claims['administrator'])
+
+        self.user.is_staff = True
+        self.user.save()
+        claims = self.get_with_scope('permissions')
+        self.assertTrue(claims['administrator'])
