@@ -37,4 +37,3 @@ class TestPaverPrereqInstall(unittest.TestCase):
 
     def test_no_prereq_install_1(self):
         self.check_val('1', True)
-
