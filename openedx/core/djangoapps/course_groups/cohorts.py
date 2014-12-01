@@ -16,6 +16,7 @@ from eventtracking import tracker
 from student.models import get_user_by_username_or_email
 from .models import CourseUserGroup, CourseUserGroupPartitionGroup
 
+
 log = logging.getLogger(__name__)
 
 
@@ -381,15 +382,15 @@ def add_user_to_cohort(cohort, username_or_email):
     return (user, previous_cohort_name)
 
 
-def get_partition_group_id_for_cohort(cohort):
+def get_group_info_for_cohort(cohort):
     """
-    Get the ids of the partition and group to which this cohort has been linked
+    Get the ids of the group and partition to which this cohort has been linked
     as a tuple of (int, int).
 
-    If the cohort has not been linked to any partition/group, both values in the
+    If the cohort has not been linked to any group/partition, both values in the
     tuple will be None.
     """
     res = CourseUserGroupPartitionGroup.objects.filter(course_user_group=cohort)
     if len(res):
-        return res[0].partition_id, res[0].group_id
+        return res[0].group_id, res[0].partition_id
     return None, None

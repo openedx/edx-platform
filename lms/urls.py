@@ -389,7 +389,8 @@ if settings.COURSEWARE_ENABLED:
     # allow course staff to change to student view of courseware
     if settings.FEATURES.get('ENABLE_MASQUERADE'):
         urlpatterns += (
-            url(r'^masquerade/(?P<marg>.*)$', 'courseware.masquerade.handle_ajax', name="masquerade-switch"),
+            url(r'^courses/{}/masquerade$'.format(settings.COURSE_KEY_PATTERN),
+                'courseware.masquerade.handle_ajax', name="masquerade_update"),
         )
 
     # discussion forums live within courseware, so courseware must be enabled first

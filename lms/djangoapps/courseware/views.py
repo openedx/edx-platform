@@ -354,7 +354,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     if survey.utils.must_answer_survey(course, user):
         return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-    masq = setup_masquerade(request, staff_access)
+    masquerade = setup_masquerade(request, course_key, staff_access)
 
     try:
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -377,7 +377,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'fragment': Fragment(),
             'staff_access': staff_access,
             'studio_url': studio_url,
-            'masquerade': masq,
+            'masquerade': masquerade,
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_key),
         }
@@ -419,8 +419,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         chapter_module = course_module.get_child_by(lambda m: m.location.name == chapter)
         if chapter_module is None:
             # User may be trying to access a chapter that isn't live yet
-            if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
-                log.debug('staff masq as student: no chapter %s' % chapter)
+            if masquerade and masquerade.role == 'student':  # if staff is masquerading as student be kinder, don't 404
+                log.debug('staff masquerading as student: no chapter %s', chapter)
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
             raise Http404
 
@@ -429,8 +429,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
-                if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
-                    log.debug('staff masq as student: no section %s' % section)
+                if masquerade and masquerade.role == 'student':  # don't 404 if staff is masquerading as student
+                    log.debug('staff masquerading as student: no section %s', section)
                     return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
                 raise Http404
 
@@ -625,7 +625,7 @@ def course_info(request, course_id):
             return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
         staff_access = has_access(request.user, 'staff', course)
-        masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
+        masquerade = setup_masquerade(request, course_key, staff_access)  # allow staff to masquerade on the info page
         reverifications = fetch_reverify_banner_info(request, course_key)
         studio_url = get_studio_url(course, 'course_info')
 
@@ -643,7 +643,7 @@ def course_info(request, course_id):
             'cache': None,
             'course': course,
             'staff_access': staff_access,
-            'masquerade': masq,
+            'masquerade': masquerade,
             'studio_url': studio_url,
             'reverifications': reverifications,
             'show_enroll_banner': show_enroll_banner,

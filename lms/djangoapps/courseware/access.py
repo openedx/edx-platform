@@ -18,7 +18,7 @@ from xblock.core import XBlock
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
 from external_auth.models import ExternalAuthMap
-from courseware.masquerade import is_masquerading_as_student
+from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from django.utils.timezone import UTC
 from student import auth
 from student.roles import (
@@ -396,7 +396,7 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
             return _has_staff_access_to_descriptor(user, descriptor, course_key)
 
         # If start dates are off, can always load
-        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
+        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user, course_key):
             debug("Allow: DISABLE_START_DATES")
             return True
 
@@ -579,7 +579,7 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: no user or anon user")
         return False
 
-    if is_masquerading_as_student(user):
+    if is_masquerading_as_student(user, course_key):
         return False
 
     if GlobalStaff().has_user(user):
@@ -636,8 +636,9 @@ def get_user_role(user, course_key):
     Return corresponding string if user has staff, instructor or student
     course role in LMS.
     """
-    if is_masquerading_as_student(user):
-        return 'student'
+    role = get_masquerade_role(user, course_key)
+    if role:
+        return role
     elif has_access(user, 'instructor', course_key):
         return 'instructor'
     elif has_access(user, 'staff', course_key):
