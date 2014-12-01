@@ -53,7 +53,7 @@ define(
 
             dragover: function(event) {
                 event.preventDefault();
-                this.$(".file-drop").addClass("is-dropped");
+                this.$(".file-drop").addClass("is-dropped"); 
             },
 
             dragleave: function(event) {
