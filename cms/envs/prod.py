@@ -1,5 +1,13 @@
 """
 This is the default template for our main set of AWS servers.
+
+Before importing this settings file the following MUST be
+defined in the environment:
+
+    * SERVICE_VARIANT - can be either "lms" or "cms"
+    * CONFIG_ROOT - the directory where the application
+                    yaml config files are located
+
 """
 
 # We intentionally define lots of variables that aren't used, and
@@ -9,7 +17,6 @@ This is the default template for our main set of AWS servers.
 import yaml
 
 from .common import *
-
 from logsettings import get_logger_config
 import os
 
@@ -19,35 +26,49 @@ from xmodule.modulestore.modulestore_settings import convert_module_store_settin
 
 # https://stackoverflow.com/questions/2890146/how-to-force-pyyaml-to-load-strings-as-unicode-objects
 from yaml import Loader, SafeLoader
+
+
 def construct_yaml_str(self, node):
-    # Override the default string handling function 
+    # Override the default string handling function
     # to always return unicode objects
     return self.construct_scalar(node)
 Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
 SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
 
+
 def convert_tokens(tokens):
-   
+    """
+    This function is called on the token
+    dictionary, at the top level it converts
+    all strings containing 'None' to a literal
+    None due to a bug in Ansible which creates
+    the yaml files
+    """
+
     for k, v in tokens.iteritems():
         if v == 'None':
             tokens[k] = None
- 
-# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
+
+# SERVICE_VARIANT specifies name of the variant used, which decides what YAML
 # configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 
-# CONFIG_ROOT specifies the directory where the JSON configuration
+# CONFIG_ROOT specifies the directory where the YAML configuration
 # files are expected to be found. If not specified, use the project
 # directory.
 CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 
-# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
+# CONFIG_PREFIX specifies the prefix of the YAML configuration files,
 # based on the service variant. If no variant is use, don't use a
 # prefix.
 CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 
-
-############### ALWAYS THE SAME ################################
+##############################################################
+#
+# DEFAULT SETTINGS FOR PRODUCTION
+#
+# These are defaults common for all production deployments
+#
 
 DEBUG = False
 TEMPLATE_DEBUG = False
@@ -56,7 +77,10 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
-###################################### CELERY  ################################
+##############################################################
+#
+# DEFAULT SETTINGS FOR CELERY
+#
 
 # Don't use a connection pool, since connections are dropped by ELB.
 BROKER_POOL_LIMIT = 0
@@ -98,28 +122,45 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
-####################### START ENV_TOKENS #######################
+##############################################################
+#
+# ENV TOKEN IMPORT
+#
+# Currently non-secure and secure settings are managed
+# in two yaml files. This section imports the non-secure
+# settings and modifies them in code if necessary.
+#
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
     ENV_TOKENS = yaml.load(env_file)
 
 convert_tokens(ENV_TOKENS)
 
+##########################################
+# Merge settings from common.py
+#
+# Before the tokens are imported directly
+# into settings some dictionary settings
+# need to be merged from common.py
+
 ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
 for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 
+# Delete keys from ENV_TOKENS so that when it's imported
+# into settings it doesn't override what was set above
 if 'FEATURES' in ENV_TOKENS:
-	del ENV_TOKENS['FEATURES']
+    del ENV_TOKENS['FEATURES']
 
 vars().update(ENV_TOKENS)
 
-
-################## ENV_TOKENS Modifications #######################
-# 
-# Some Django settings need to be modified after they are
-# read in from yaml and imported into settings.
-# 
+##########################################
+# Manipulate imported settings with code
+#
+# For historical reasons some settings need
+# to be modified in code.  For example
+# conversions to other data structures that
+# cannot be represented in YAML.
 
 if STATIC_URL_BASE:
     # collectstatic will fail if STATIC_URL is a unicode string
@@ -175,14 +216,21 @@ if AUTH_USE_CAS:
 
 MICROSITE_ROOT_DIR = path(MICROSITE_ROOT_DIR)
 
-################ SECURE AUTH ITEMS ###############################
-# Secret things: passwords, access keys, etc.
+##############################################################
+#
+# AUTH TOKEN IMPORT
+#
+
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.yaml") as auth_file:
     AUTH_TOKENS = yaml.load(auth_file)
 
 convert_tokens(AUTH_TOKENS)
 
 vars().update(AUTH_TOKENS)
+
+##########################################
+# Manipulate imported settings with code
+#
 
 if SEGMENT_IO_KEY:
     FEATURES['SEGMENT_IO'] = SEGMENT_IO
