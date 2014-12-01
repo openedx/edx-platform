@@ -107,13 +107,6 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         self.assertTrue(response.ok)
         self.assertDictEqual({"total": 2, "rows": notes}, response.json())
 
-        response = requests.get(self._get_url("api/v1/search"), params={
-            "user": "user-without-notes",
-            "usage_id": "dummy-usage-id",
-            "course_id": "dummy-course-id",
-        })
-        self.assertDictEqual({"total": 0, "rows": []}, response.json())
-
         response = requests.get(self._get_url("api/v1/search"))
         self.assertEqual(response.status_code, 400)
 
