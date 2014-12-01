@@ -12,6 +12,8 @@ from django.views.decorators.http import require_http_methods
 from edxval.api import create_video, get_videos_for_ids
 from opaque_keys.edx.keys import CourseKey
 
+from contentstore.utils import reverse_course_url
+from edxmako.shortcuts import render_to_response
 from util.json_request import expect_json, JsonResponse
 from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore.django import modulestore
@@ -37,6 +39,8 @@ def videos_handler(request, course_key_string):
     The restful handler for video uploads.
 
     GET
+        html: return an HTML page to display previous video uploads and allow
+            new ones
         json: return json representing the videos that have been uploaded and
             their statuses
     POST
@@ -58,8 +62,11 @@ def videos_handler(request, course_key_string):
     ):
         return HttpResponseNotFound()
 
-    if request.method == 'GET':
-        return videos_index_json(course)
+    if request.method == "GET":
+        if "application/json" in request.META.get("HTTP_ACCEPT", ""):
+            return videos_index_json(course)
+        else:
+            return videos_index_html(course)
     else:
         return videos_post(course, request)
 
@@ -79,6 +86,21 @@ def _get_videos(course):
             for attr in ["edx_video_id", "client_video_id", "created", "duration", "status"]
         }
         for video in get_videos_for_ids(edx_videos_ids)
+    )
+
+
+def videos_index_html(course):
+    """
+    Returns an HTML page to display previous video uploads and allow new ones
+    """
+    return render_to_response(
+        "videos_index.html",
+        {
+            "context_course": course,
+            "post_url": reverse_course_url("videos_handler", unicode(course.id)),
+            "previous_uploads": _get_videos(course),
+            "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
+        }
     )
 
 

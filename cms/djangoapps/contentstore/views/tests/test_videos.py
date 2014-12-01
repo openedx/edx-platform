@@ -115,6 +115,14 @@ class VideoUploadTestCase(CourseTestCase):
             for field in ["edx_video_id", "client_video_id", "duration", "status"]:
                 self.assertEqual(response_video[field], original_video[field])
 
+    def test_get_html(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertRegexpMatches(response["Content-Type"], "^text/html(;.*)?$")
+        # Crude check for presence of data in returned HTML
+        for video in self.previous_uploads:
+            self.assertIn(video["edx_video_id"], response.content)
+
     def test_post_non_json(self):
         response = self.client.post(self.url, {"files": []})
         self.assertEqual(response.status_code, 400)
