@@ -682,7 +682,7 @@ section.instructor-dashboard-content-2 {
     }
   }
 
-  .cohort-management-file-upload-form {
+  .file-upload-form {
     @extend %cohort-management-form;
     border: 1px solid $gray-l5;
     padding: $baseline ($baseline*0.75);
