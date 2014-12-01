@@ -1673,6 +1673,24 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         already_running_status = "A grade report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below."
         self.assertIn(already_running_status, response.content)
 
+    def test_get_ora2_responses_success(self):
+        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
+            mock_submit_ora2_task.return_value = True
+            response = self.client.get(url, {})
+        success_status = "The ORA2 responses report is being generated."
+        self.assertIn(success_status, response.content)
+
+    def test_get_ora2_responses_already_running(self):
+        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
+            mock_submit_ora2_task.side_effect = AlreadyRunningError()
+            response = self.client.get(url, {})
+        already_running_status = "An ORA2 responses report generation task is already in progress."
+        self.assertIn(already_running_status, response.content)
+
     def test_get_students_features_csv(self):
         """
         Test that some minimum of information is formatted

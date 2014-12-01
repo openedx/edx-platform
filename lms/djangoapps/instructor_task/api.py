@@ -13,16 +13,20 @@ from celery.states import READY_STATES
 from xmodule.modulestore.django import modulestore
 
 from instructor_task.models import InstructorTask
-from instructor_task.tasks import (rescore_problem,
-                                   reset_problem_attempts,
-                                   delete_problem_state,
-                                   send_bulk_course_email,
-                                   calculate_grades_csv,
-                                   get_student_submissions)
-
-from instructor_task.api_helper import (check_arguments_for_rescoring,
-                                        encode_problem_and_student_input,
-                                        submit_task)
+from instructor_task.tasks import (
+    rescore_problem,
+    reset_problem_attempts,
+    delete_problem_state,
+    send_bulk_course_email,
+    calculate_grades_csv,
+    get_student_submissions,
+    get_ora2_responses,
+)
+from instructor_task.api_helper import (
+    check_arguments_for_rescoring,
+    encode_problem_and_student_input,
+    submit_task,
+)
 from bulk_email.models import CourseEmail
 
 
@@ -33,6 +37,7 @@ def get_running_instructor_tasks(course_id):
     Used to generate a list of tasks to display on the instructor dashboard.
     """
     instructor_tasks = InstructorTask.objects.filter(course_id=course_id)
+
     # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
     for state in READY_STATES:
         instructor_tasks = instructor_tasks.exclude(task_state=state)
@@ -220,6 +225,7 @@ def submit_calculate_grades_csv(request, course_key):
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
+
 def submit_get_student_submissions(request, course_key):
     """
     AlreadyRunningError is raised if the student submissions report is already being generated.
@@ -228,5 +234,17 @@ def submit_get_student_submissions(request, course_key):
     task_class = get_student_submissions
     task_input = {}
     task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_ora2_request_task(request, course_key):
+    """
+    AlreadyRunningError is raised if an ora2 report is already being generated.
+    """
+    task_type = 'ora2_responses'
+    task_class = get_ora2_responses
+    task_input = {}
+    task_key = ''
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
