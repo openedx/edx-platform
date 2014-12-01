@@ -148,3 +148,8 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
     </div>
 </div>
 </%block>
+
+<!-- NOTE: remove this HTML if you want to not see the fake visibility modal -->
+<%block name="modal_placeholder">
+    <%include file="ux/reference/modal_access-component.html" />
+</%block>
