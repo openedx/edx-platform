@@ -114,6 +114,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 // Switch the sort column back to the default (most recent date added) and show the first page
                 // so that the new asset is shown at the top of the page.
                 this.setInitialSortColumn('js-asset-date-col');
+                this.setInitialFilterColumn('js-asset-type-col');
                 this.setPage(0);
 
                 analytics.track('Uploaded a File', {
