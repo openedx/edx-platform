@@ -19,7 +19,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
-from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
@@ -212,7 +211,7 @@ def get_xqueue_callback_url_prefix(request):
     return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
 
 
-def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
+def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                               static_asset_path=''):
     """
@@ -220,10 +219,6 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
 
     See get_module() docstring for further details.
     """
-    # allow course staff to masquerade as student
-    if has_access(user, 'staff', descriptor, course_id):
-        setup_masquerade(request, True)
-
     track_function = make_track_function(request)
     xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
 
@@ -233,7 +228,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
         user=user,
         descriptor=descriptor,
         field_data_cache=field_data_cache,
-        course_id=course_id,
+        course_id=course_key,
         track_function=track_function,
         xqueue_callback_url_prefix=xqueue_callback_url_prefix,
         position=position,

@@ -60,7 +60,7 @@ class StaffViewTest(UniqueCourseTest):
         """
         self.courseware_page.visit()
         staff_page = StaffPage(self.browser, self.course_id)
-        self.assertEqual(staff_page.staff_status, 'Staff view')
+        self.assertEqual(staff_page.staff_view_mode, 'Staff')
         return staff_page
 
 
@@ -75,8 +75,8 @@ class StaffViewToggleTest(StaffViewTest):
 
         course_page = self._goto_staff_page()
         self.assertTrue(course_page.has_tab('Instructor'))
-        course_page.toggle_staff_view()
-        self.assertEqual(course_page.staff_status, 'Student view')
+        course_page.set_staff_view_mode('Student')
+        self.assertEqual(course_page.staff_view_mode, 'Student')
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
