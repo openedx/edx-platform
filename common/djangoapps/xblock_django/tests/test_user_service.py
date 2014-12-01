@@ -8,7 +8,9 @@ from xblock_django.user_service import (
     ATTR_KEY_USER_ID,
     ATTR_KEY_USERNAME,
 )
+from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory, AnonymousUserFactory
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class UserServiceTestCase(TestCase):
@@ -55,3 +57,39 @@ class UserServiceTestCase(TestCase):
         xb_user = django_user_service.get_current_user()
         self.assertTrue(xb_user.is_current_user)
         self.assert_xblock_user_matches_django(xb_user, self.user)
+
+    def test_get_anonymous_user_id_returns_none_for_non_staff_users(self):
+        """
+        Tests for anonymous_user_id method to return None if user is Non-Staff.
+        """
+        django_user_service = DjangoXBlockUserService(self.user, user_is_staff=False)
+
+        anonymous_user_id = django_user_service.get_anonymous_user_id(username=self.user.username, course_id='edx/toy/2012_Fall')
+        self.assertIsNone(anonymous_user_id)
+
+    def test_get_anonymous_user_id_returns_none_for_non_existing_users(self):
+        """
+        Tests for anonymous_user_id method to return None username does not exist in system.
+        """
+        django_user_service = DjangoXBlockUserService(self.user, user_is_staff=True)
+
+        anonymous_user_id = django_user_service.get_anonymous_user_id(username="No User", course_id='edx/toy/2012_Fall')
+        self.assertIsNone(anonymous_user_id)
+
+    def test_get_anonymous_user_id_returns_id_for_existing_users(self):
+        """
+        Tests for anonymous_user_id method returns anonymous user id for a user.
+        """
+        anon_user_id = anonymous_id_for_user(
+            user=self.user,
+            course_id=SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'),
+            save=True
+        )
+
+        django_user_service = DjangoXBlockUserService(self.user, user_is_staff=True)
+        anonymous_user_id = django_user_service.get_anonymous_user_id(
+            username=self.user.username,
+            course_id='edX/toy/2012_Fall'
+        )
+
+        self.assertEqual(anonymous_user_id, anon_user_id)
