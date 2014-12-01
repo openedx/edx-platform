@@ -37,12 +37,12 @@ from django.core.urlresolvers import reverse
       <h2 class="is-hidden">Content</h2>
       <div class="content-primary" role="main">
         <h3 class="is-hidden">Video Uploads</h3>
-        <div class="file-drop">
-          <form class="file-drop-upload-form" id="form-file-drop" action="upload.php" method="POST" enctype="multipart/form-data">
+        <div class="file-drop" id="file-drop">
+          <form class="file-drop-upload-form" action="upload.php" method="POST" enctype="multipart/form-data">
             <label for="file-drop-filename" class="file-drop-filename-label sr"></label>
             <input class="file-drop-filename sr" type="hidden" id="file-drop-filename" name="file" />
             <div class="file-drop-area">
-              Drag and drop or click here to upload video files.
+              <span id="file-drop-area-status">Drag and drop or click here to upload video files.</span>
 
               <label for="video-files" class="video-files-label sr">Choose one or many files to upload:</label>
               <input type="file" class="video-files-filename sr" id="video-files" name="video-files[]" multiple="multiple" />
@@ -271,5 +271,41 @@ from django.core.urlresolvers import reverse
       </div>
     </div>
   </div>
+
+  <script type="text/javascript">
+  var file_drop = document.getElementById('file-drop'),
+      file_drop_text = document.getElementById('file-drop-area-status');
+
+  file_drop.ondragover = function() {
+    this.className = 'file-drop is-dropped';
+    return false;
+  };
+
+  file_drop.ondragend = function() {
+    this.className = 'file-drop is-dropped';
+    return false;
+  };
+
+  file_drop.ondrop = function(e) {
+    this.className = 'file-drop has-dropped';
+    e.preventDefault();
+
+    var file = e.dataTransfer.files[0],
+        reader = new FileReader();
+
+    file_drop_text.innerHTML = file.name;
+
+    reader.onload = function(event) {
+      // console.log(event.target);
+      // console.log(event.target.name);
+    };
+
+    // console.log(file);
+    // console.log(file.name);
+    reader.readAsDataURL(file);
+
+    return false;
+  };
+  </script>
 
 </%block>

@@ -17,6 +17,19 @@
         text-align: center;
       }
     }
+
+    &:hover, 
+    &.is-dropped {
+      background: $blue-l5;
+      border-style: solid;
+      border-color: $blue-l4;
+    }
+
+    &.has-dropped {
+      background: $blue-l4;
+      border-style: solid;
+      border-color: $blue-l3;
+    }
   }
 
   .video-upload-progress-container {
