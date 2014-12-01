@@ -638,13 +638,18 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     start_date = datetime.now(UTC)
 
     # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
-    with DefaultStorage().open(task_input['file_name'], 'rU') as input_csv:
+    with DefaultStorage().open(task_input['file_name']) as f:
+        # NOTE: There's a bug with the s3 implementation of django file
+        # storage in which passing mode='rU' does not actually open the
+        # file in universal newline mode.  Since the CSV library does not
+        # understand CR/CRLF, we are forced to read the whole file into
+        # memory via file.read().splitlines().
         users_to_cohorts = [
             {
                 'username_or_email': row.get('email') or row.get('username'),
                 'cohort': row.get('cohort') or ''
             }
-            for row in unicodecsv.DictReader(input_csv, encoding='utf-8')
+            for row in unicodecsv.DictReader(f.read().splitlines(), encoding='utf-8')
         ]
 
     task_progress = TaskProgress(action_name, len(users_to_cohorts), start_time)

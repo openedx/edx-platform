@@ -975,8 +975,14 @@ def add_users_to_cohorts(request, course_id):
             """
             Verifies that the expected columns are present.
             """
-            with file_storage.open(file_to_validate, 'rU') as f:
-                reader = unicodecsv.reader(f, encoding='utf-8')
+            with file_storage.open(file_to_validate) as f:
+                # NOTE: There's a bug with the s3 implementation of django file
+                # storage in which passing mode='rU' does not actually open the
+                # file in universal newline mode.  Since the CSV library does not
+                # understand CR/CRLF, we are forced to read the whole file into
+                # memory via file.read().splitlines().
+                file_data = f.read().splitlines()
+                reader = unicodecsv.reader(file_data, encoding='utf-8')
                 try:
                     fieldnames = next(reader)
                 except StopIteration:
