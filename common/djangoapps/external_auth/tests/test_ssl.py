@@ -17,11 +17,11 @@ from external_auth.models import ExternalAuthMap
 import external_auth.views
 from mock import Mock
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
