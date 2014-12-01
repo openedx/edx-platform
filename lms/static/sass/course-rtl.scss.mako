@@ -1,5 +1,5 @@
-@import 'bourbon/bourbon';
-@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+@import 'bourbon/dist/bourbon';
+@import 'bi-app-sass/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 @import 'base/reset';
 @import 'base/font_face';

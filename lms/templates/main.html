@@ -62,10 +62,16 @@
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
-  <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
-  <%static:css group='style-app-extend1'/>
-  <%static:css group='style-app-extend2'/>
+  <link rel="stylesheet" href="${static.url('css/lms-style-vendor.css')}" type="text/css" media="all" />
+  %if dir_rtl == 'rtl':
+    <link rel="stylesheet" href="${static.url('css/lms-style-app-rtl.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${static.url('css/lms-style-app-extend1-rtl.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${static.url('css/lms-style-app-extend2-rtl.css')}" type="text/css" media="all" />
+  %else:
+    <link rel="stylesheet" href="${static.url('css/lms-style-app.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${static.url('css/lms-style-app-extend1.css')}" type="text/css" media="all" />
+    <link rel="stylesheet" href="${static.url('css/lms-style-app-extend2.css')}" type="text/css" media="all" />
+  %endif
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
