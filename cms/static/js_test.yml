@@ -52,6 +52,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/jasmine.async.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/draggabilly.pkgd.js
@@ -67,6 +68,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload.js
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process.js
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate.js
+    - xmodule_js/common_static/js/vendor/mock-ajax.js
 
 # Paths to source JavaScript files
 src_paths:

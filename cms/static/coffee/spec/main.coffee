@@ -45,6 +45,7 @@ requirejs.config({
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
         "URI": "xmodule_js/common_static/js/vendor/URI.min",
+        "mock-ajax": "xmodule_js/common_static/js/vendor/mock-ajax",
 
         "mathjax": "//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
@@ -190,6 +191,9 @@ requirejs.config({
             exports: "XBlock",
             deps: ["xblock/core"]
         },
+        "mock-ajax": {
+            deps: ["jasmine", "jquery"]
+        }
 
         "coffee/src/main": {
             deps: ["coffee/src/ajax_prefix"]
@@ -228,6 +232,9 @@ define([
     "js/spec/utils/handle_iframe_binding_spec",
     "js/spec/utils/module_spec",
 
+    "js/spec/views/active_video_upload_list_spec",
+    "js/spec/views/previous_video_upload_spec",
+    "js/spec/views/previous_video_upload_list_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/assets_spec",
     "js/spec/views/baseview_spec",
