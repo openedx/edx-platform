@@ -111,7 +111,6 @@ urlpatterns += patterns(
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
-
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
     urlpatterns += (url(
         r'^export_git/{}$'.format(
