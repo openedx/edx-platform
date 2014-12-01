@@ -2,7 +2,6 @@
 This test file will run through some LMS test scenarios regarding access and navigation of the LMS
 """
 import time
-import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -121,7 +120,6 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTabActive('progress', response)
         self.assertTabInactive('courseware', response)
 
-    @unittest.skip
     @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)
     def test_inactive_session_timeout(self):
         """

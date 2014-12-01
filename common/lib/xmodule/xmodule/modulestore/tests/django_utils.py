@@ -43,9 +43,10 @@ def mixed_store_config(data_dir, mappings, include_xml=False, xml_course_dirs=No
         xml_course_dirs (list): The directories containing XML courses to load from disk.
 
         note: For the courses to be loaded into the XML modulestore and accessible do the following:
-            include_xml should be True
-            xml_course_dirs should be the list of courses you want to load
-            mappings should be configured, pointing the xml courses to the xml modulestore
+            * include_xml should be True
+            * xml_course_dirs should be the list of directories (relative to data_dir)
+                  containing the courses you want to load
+            * mappings should be configured, pointing the xml courses to the xml modulestore
 
     """
     stores = [
