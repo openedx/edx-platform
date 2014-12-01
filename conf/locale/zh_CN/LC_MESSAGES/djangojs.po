@@ -54,14 +54,17 @@
 # focusheart <focusheart@gmail.com>, 2014
 # GoodLuck <1833447072@qq.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
+# harry <i.jucao@gmail.com>, 2014
 # Harry Li <harry75369@gmail.com>, 2014
 # bnw, 2014
 # Jerome Huang <canni3269@gmail.com>, 2014
+# jsgang <jsgang9@gmail.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
 # Jianfei Wang <me@thinxer.com>, 2013
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# wanghe <1636807295@qq.com>, 2014
 # 熊冬升 <xdsnet@gmail.com>, 2013
 # xianwei yang <yetie.net@gmail.com>, 2014
 # 刘知远 <liuliudong@163.com>, 2013
@@ -74,6 +77,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# jsgang <jsgang9@gmail.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
 # 胡超威 <chadennishu@gmail.com>, 2014
@@ -90,7 +94,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-10 09:06-0500\n"
+"POT-Creation-Date: 2014-12-01 11:35-0500\n"
 "PO-Revision-Date: 2014-10-08 18:08+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -2240,11 +2244,23 @@ msgid "Error: You cannot remove yourself from the Instructor group!"
 msgstr "错误：您不可以将自己从主讲教师组中删除。"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Errors"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following errors were generated:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Warnings"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following warnings were generated:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Success"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -3829,6 +3845,29 @@ msgid ""
 "information on %(link_start)s the Data Download page. %(link_end)s"
 msgstr ""
 
+#: lms/templates/student_account/access.underscore
+msgid "Welcome!"
+msgstr ""
+
+#: lms/templates/student_account/access.underscore
+msgid "Log in or register to take courses from the world's best universities."
+msgstr ""
+
+#: lms/templates/student_account/access.underscore
+msgid ""
+"Sorry, we're having some technical problems. Wait a few minutes and try "
+"again."
+msgstr ""
+
+#: lms/templates/student_account/access.underscore
+#: lms/templates/student_account/access.underscore
+msgid "I am a new user"
+msgstr ""
+
+#: lms/templates/student_account/access.underscore
+msgid "I am a returning user"
+msgstr ""
+
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
 msgstr ""
@@ -3842,7 +3881,81 @@ msgid "Change My Email Address"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
+#: lms/templates/student_account/password_reset.underscore
 msgid "Reset Password"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot password?"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You've successfully logged into %(currentProvider)s, but your "
+"%(currentProvider)s account isn't linked with an %(platformName)s account. "
+"To link your accounts, go to your %(platformName)s dashboard."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "We couldn't log you in."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Log in"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Log in using %(name)s"
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid ""
+"Enter the email address you used to create your account. We'll send you a "
+"link you can use to reset your password."
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "An error occurred."
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "Reset password"
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "Password Reset Email Sent"
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid ""
+"We've sent instructions for resetting your password to the email address you"
+" provided."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "You've successfully logged into %(currentProvider)s."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid ""
+"We just need a little more information before you start learning with "
+"%(platformName)s."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Register using %(name)s"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "We couldn't complete your registration."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Register"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Required field"
 msgstr ""
 
 #: lms/templates/student_profile/profile.underscore

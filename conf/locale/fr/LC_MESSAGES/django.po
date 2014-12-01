@@ -154,7 +154,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-10 09:08-0500\n"
+"POT-Creation-Date: 2014-12-01 11:37-0500\n"
 "PO-Revision-Date: 2014-10-27 15:11+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -260,10 +260,8 @@ msgstr "Étudiant"
 #: common/djangoapps/student/middleware.py
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
-"please contact us at {link_start}{support_email}{link_end}"
+"please contact us at {support_email}"
 msgstr ""
-"Votre compte a été désactivé. Si vous pensez que cela a été fait par erreur,"
-" veuillez nous contacter à {link_start}{support_email}{link_end}"
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
@@ -626,6 +624,180 @@ msgstr "Nom requis"
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Invalid ID"
 msgstr "ID invalide"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's email address.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's email address.
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+#: common/djangoapps/user_api/views.py lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/dashboard.html
+#: lms/templates/courseware/instructor_dashboard.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#, fuzzy
+msgid "Email"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"E-mail\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Email"
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the registration form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+#: common/djangoapps/user_api/views.py
+msgid "username@domain.com"
+msgstr ""
+
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+msgid "The email address you used to register with {platform_name}"
+msgstr ""
+
+#: cms/templates/login.html cms/templates/register.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/provider_login.html lms/templates/register.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
+msgid "Password"
+msgstr "Mot de passe"
+
+#: lms/templates/login.html
+msgid "Remember me"
+msgstr "Se souvenir de moi"
+
+#: common/djangoapps/user_api/views.py
+msgid ""
+"It looks like {email_address} and {username} belong to an existing account. "
+"Try again with a different email address and username."
+msgstr ""
+
+#: common/djangoapps/user_api/views.py
+msgid ""
+"It looks like {email_address} belongs to an existing account. Try again with"
+" a different email address."
+msgstr ""
+
+#: common/djangoapps/user_api/views.py
+msgid ""
+"It looks like {username} belongs to an existing account. Try again with a "
+"different username."
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's full name.
+#: common/djangoapps/user_api/views.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
+#: lms/templates/dashboard.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/verify_student/_modal_editname.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Full Name"
+msgstr "Nom complet"
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: common/djangoapps/user_api/views.py
+msgid "The name that will appear on your certificates"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's public username.
+#: common/djangoapps/user_api/views.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+#: common/djangoapps/user_api/views.py
+msgid "The name that will identify you in your courses"
+msgstr ""
+
+#: lms/templates/register.html
+msgid "Highest Level of Education Completed"
+msgstr "Plus haut niveau de formation obtenu"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's gender.
+#: common/djangoapps/user_api/views.py lms/djangoapps/instructor/views/api.py
+#: lms/templates/register.html lms/templates/signup_modal.html
+msgid "Gender"
+msgstr "Genre"
+
+#: lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Year of Birth"
+msgstr "Année de naissance"
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: common/djangoapps/user_api/views.py lms/djangoapps/instructor/views/api.py
+#: lms/templates/register.html
+msgid "Mailing Address"
+msgstr "Adresse postale"
+
+#: common/djangoapps/user_api/views.py
+msgid "If you'd like, tell us why you're interested in {platform_name}"
+msgstr ""
+
+#: lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "City"
+msgstr "Ville"
+
+#: lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Country"
+msgstr "Pays"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr "Code d'honneur"
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
+#: lms/templates/footer.html
+msgid "Terms of Service and Honor Code"
+msgstr "Conditions générales du service et charte utilisateur"
+
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+msgid "I agree to the {platform_name} {terms_of_service}."
+msgstr ""
+
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+msgid "You must agree to the {platform_name} {terms_of_service}."
+msgstr ""
+
+#: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: lms/templates/static_templates/tos.html
+msgid "Terms of Service"
+msgstr "Conditions générales du service"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -4039,19 +4211,6 @@ msgid "Name"
 msgstr "Nom"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr "Nom d'utilisateur"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Grade"
 msgstr "Note"
@@ -4566,20 +4725,6 @@ msgid "User ID"
 msgstr "ID de l'utilisateur"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/templates/dashboard.html
-#: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#, fuzzy
-msgid "Email"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"E-mail\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"Email"
-
-#: lms/djangoapps/instructor/views/api.py
 msgid "Language"
 msgstr "Langue"
 
@@ -4591,11 +4736,6 @@ msgstr "Adresse"
 msgid "Birth Year"
 msgstr "Année de naissance"
 
-#: lms/djangoapps/instructor/views/api.py lms/templates/register.html
-#: lms/templates/signup_modal.html
-msgid "Gender"
-msgstr "Genre"
-
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 #, fuzzy
@@ -4605,10 +4745,6 @@ msgstr ""
 "Niveau de formation\n"
 "#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
 "Niveau de Formation"
-
-#: lms/djangoapps/instructor/views/api.py lms/templates/register.html
-msgid "Mailing Address"
-msgstr "Adresse postale"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Goals"
@@ -4756,6 +4892,10 @@ msgstr "CourseMode en mode ralenti ({mode_slug}) n'existe pas"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "CourseMode price updated successfully"
 msgstr "Le prix du ​​CourseMode a été correctement mis à jour"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Enrollment data is now available in {dashboard_link}."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
@@ -5088,16 +5228,6 @@ msgstr "{title} dans le cours {course_key}"
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "ID"
 msgstr "Identifiant"
-
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
-#: lms/templates/dashboard.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/register.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/_modal_editname.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Full Name"
-msgstr "Nom complet"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
@@ -7178,12 +7308,9 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
-"There is already a course defined with the same organization, course number,"
-" and course run. Please change either organization or course number to be "
-"unique."
+"There is already a course defined with the same organization and course "
+"number. Please change either organization or course number to be unique."
 msgstr ""
-"Il existe déjà un Cours avec les mêmes numéros d'organisme et de cours. "
-"Changez en un des deux pour le rendre unique."
 
 #: cms/djangoapps/contentstore/views/course.py
 #: cms/djangoapps/contentstore/views/course.py
@@ -7423,14 +7550,6 @@ msgstr "exemple : jean.dupont@domaine.com"
 msgid "Forgot password?"
 msgstr "Mot de passe oublié ?"
 
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
-msgid "Password"
-msgstr "Mot de passe"
-
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
@@ -7478,11 +7597,6 @@ msgstr "Ce compte a déjà été activé."
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr ""
 "Accédez à votre {link_start}tableau de bord{link_end} pour voir vos cours."
-
-#: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
-#: lms/templates/static_templates/tos.html
-msgid "Terms of Service"
-msgstr "Conditions générales du service"
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
 #: lms/templates/footer-legacy.html lms/templates/footer.html
@@ -8000,11 +8114,6 @@ msgstr ""
 msgid "&copy; 2014 edX, some rights reserved."
 msgstr "&copy; 2014 edX, certains droits réservés."
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
-msgid "Terms of Service and Honor Code"
-msgstr "Conditions générales du service et charte utilisateur"
-
 #: lms/templates/footer-edx-new.html
 msgid "(Revised 4/16/2014)"
 msgstr "(Revisé le 16/04/2014)"
@@ -8087,6 +8196,12 @@ msgstr ""
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
 msgstr "&copy; 2014 {platform_name}, certains droits réservés."
+
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: lms/templates/footer.html
+msgid "Powered by Open edX"
+msgstr ""
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
@@ -8410,10 +8525,6 @@ msgstr ""
 msgid "Account Preferences"
 msgstr "Préférences du compte"
 
-#: lms/templates/login.html
-msgid "Remember me"
-msgstr "Se souvenir de moi"
-
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
 #: lms/templates/login.html
@@ -8552,8 +8663,17 @@ msgstr "Rejeter"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
+msgid "How it Works"
+msgstr "Comment ça marche"
+
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Find Courses"
 msgstr "Trouver un cours"
+
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+msgid "Schools & Partners"
+msgstr "Écoles et Partenaires"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
@@ -8570,14 +8690,6 @@ msgstr "Déconnexion"
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
 msgstr "Panier"
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid "How it Works"
-msgstr "Comment ça marche"
-
-#: lms/templates/navigation-edx.html
-msgid "Schools & Partners"
-msgstr "Écoles et Partenaires"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/register.html
@@ -8870,29 +8982,8 @@ msgid "Additional Personal Information"
 msgstr "Informations  personnelles supplémentaires"
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "City"
-msgstr "Ville"
-
-#: lms/templates/register.html
 msgid "example: New York"
 msgstr "exemple : New York"
-
-#: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Country"
-msgstr "Pays"
-
-#: lms/templates/register.html
-msgid "Highest Level of Education Completed"
-msgstr "Plus haut niveau de formation obtenu"
-
-#: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Year of Birth"
-msgstr "Année de naissance"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
@@ -9949,16 +10040,9 @@ msgstr "Téléchargement des notes"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "Note: some of these buttons are known to time out for larger courses. We "
-"have temporarily disabled those features for courses with more than "
-"{max_enrollment} students. We are urgently working on fixing this issue. "
-"Thank you for your patience as we continue working to improve the platform!"
+"have disabled those features for courses with more than {max_enrollment} "
+"students."
 msgstr ""
-"Remarque : Quelques-unes de ces fonctionnalités sont connues pour provoquer "
-"un time-out pour les cours les plus grands. Nous avons temporairement "
-"désactivé ces fonctions pour les cours ayant plus de {max_enrollment} "
-"étudiants inscrits. Nous travaillons à résoudre ce problème en priorité. "
-"Merci de votre patience pendant que nous continuons à travailler pour "
-"améliorer la plateforme!"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Export grades to remote gradebook"
@@ -10119,27 +10203,6 @@ msgid "Section:"
 msgstr "Section :"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Batch Enrollment"
-msgstr "Inscription Automatique"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid ""
-"Enroll or un-enroll one or many students: enter emails, separated by new "
-"lines or commas;"
-msgstr ""
-"Inscrire ou désinscrire un ou plusieurs étudiants; entrez les adresses "
-"email, séparées par une nouvelle ligne ou une virgule;"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Notify students by email"
-msgstr "Notifier les étudiants par email"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Auto-enroll students when they activate"
-msgstr "Inscrire automatiquement les étudiants lors de l'activation"
-
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Problem urlname:"
 msgstr "url de l'exercice :"
 
@@ -10239,18 +10302,6 @@ msgstr "Un email mis en fil d'attente NE PEUT PAS être annulé."
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "No Analytics are available at this time."
 msgstr "Aucune analyse disponible pour le moment."
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid ""
-"Students enrolled (historical count, includes those who have since "
-"unenrolled):"
-msgstr ""
-"Étudiants inscrits (dénombrement historique, incluant ceux qui ont annulé "
-"leur inscription depuis)"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Students active in the last week:"
-msgstr "Étudiants actifs durant la dernière semaine :"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Student activity day by day"
@@ -10582,12 +10633,6 @@ msgstr "Vérifié"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as an honor code student"
 msgstr "Vous êtes inscrit en tant qu'étudiant code d'honneur"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr "Code d'honneur"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're auditing this course"
@@ -11749,12 +11794,9 @@ msgstr "Merci pour votre achat de {course_name} !"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"An invoice for ${total_price} is attached. Payment is due immediately.  "
-"Information on payment methods can be found on the invoice."
+"An invoice for {currency_symbol}{total_price} is attached. Payment is due "
+"immediately.  Information on payment methods can be found on the invoice."
 msgstr ""
-"Une facture de {total_price}$ est jointe. Le règlement est exigible "
-"immédiatement. Les informations sur les moyens de paiement figurent sur la "
-"facture."
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
@@ -11866,7 +11908,7 @@ msgid "Customer Reference Number: {reference_number}"
 msgstr "Numéro de référence client : {reference_number}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Balance Due: ${sale_price}"
+msgid "Balance Due: {currency_symbol}{sale_price}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
@@ -11875,15 +11917,14 @@ msgstr "Cours : {course_name}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid ""
-"Price:         ${course_price}  Quantity:      {quantity}  Sub-Total:    "
-"${sub_total}  Discount:  ${discount}"
+"Price:        {currency_symbol}{course_price}  Quantity:      {quantity}  "
+"Sub-Total:    {currency_symbol}{sub_total}  Discount:  "
+"{currency_symbol}{discount}"
 msgstr ""
-"Prix : ${course_price} Quantité : {quantity} Sous-total : ${sub_total} "
-"Réduction : ${discount}"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Total:      ${sale_price}"
-msgstr "Total : ${sale_price}"
+msgid "Total:      {currency_symbol}{sale_price}"
+msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Payment instructions"
@@ -12692,6 +12733,10 @@ msgstr "Répartition selon le sexe"
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
 msgstr "Retourner à l’ancien tableau de bord"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Batch Enrollment"
+msgstr "Inscription Automatique"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -14150,6 +14195,10 @@ msgstr ""
 
 #: lms/templates/student_account/index.html
 msgid "Student Account"
+msgstr ""
+
+#: lms/templates/student_account/login_and_register.html
+msgid "Log in or Register"
 msgstr ""
 
 #: lms/templates/student_profile/index.html

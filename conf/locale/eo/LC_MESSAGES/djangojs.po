@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-10 09:40-0500\n"
-"PO-Revision-Date: 2014-11-10 14:42:09.315985\n"
+"POT-Creation-Date: 2014-12-01 11:46-0500\n"
+"PO-Revision-Date: 2014-12-01 16:48:06.184809\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2355,12 +2355,24 @@ msgstr ""
 "∂σłσ#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Errors"
+msgstr "Érrörs Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following errors were generated:"
 msgstr "Thé föllöwïng érrörs wéré générätéd: Ⱡ'σяєм ιρ#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Warnings"
+msgstr "Wärnïngs #"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following warnings were generated:"
 msgstr "Thé föllöwïng wärnïngs wéré générätéd: Ⱡ'σяєм ιρѕ#"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Success"
+msgstr "Süççéss #"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "All accounts were created successfully."
@@ -4127,6 +4139,33 @@ msgstr ""
 "ïnförmätïön ön %(link_start)s thé Dätä Döwnlöäd pägé. %(link_end)s Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
+#: lms/templates/student_account/access.underscore
+msgid "Welcome!"
+msgstr "Wélçömé! #"
+
+#: lms/templates/student_account/access.underscore
+msgid "Log in or register to take courses from the world's best universities."
+msgstr ""
+"Lög ïn ör régïstér tö täké çöürsés fröm thé wörld's ßést ünïvérsïtïés. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/student_account/access.underscore
+msgid ""
+"Sorry, we're having some technical problems. Wait a few minutes and try "
+"again."
+msgstr ""
+"Sörrý, wé'ré hävïng sömé téçhnïçäl prößléms. Wäït ä féw mïnütés änd trý "
+"ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: lms/templates/student_account/access.underscore
+#: lms/templates/student_account/access.underscore
+msgid "I am a new user"
+msgstr "Ì äm ä néw üsér Ⱡ'#"
+
+#: lms/templates/student_account/access.underscore
+msgid "I am a returning user"
+msgstr "Ì äm ä rétürnïng üsér Ⱡ'σя#"
+
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
 msgstr "Néw Àddréss Ⱡ#"
@@ -4140,8 +4179,93 @@ msgid "Change My Email Address"
 msgstr "Çhängé Mý Émäïl Àddréss Ⱡ'σяє#"
 
 #: lms/templates/student_account/account.underscore
+#: lms/templates/student_account/password_reset.underscore
 msgid "Reset Password"
 msgstr "Rését Pässwörd Ⱡ'#"
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot password?"
+msgstr "Förgöt pässwörd? Ⱡ'σ#"
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You've successfully logged into %(currentProvider)s, but your "
+"%(currentProvider)s account isn't linked with an %(platformName)s account. "
+"To link your accounts, go to your %(platformName)s dashboard."
+msgstr ""
+"Ýöü'vé süççéssfüllý löggéd ïntö %(currentProvider)s, ßüt ýöür "
+"%(currentProvider)s äççöünt ïsn't lïnkéd wïth än %(platformName)s äççöünt. "
+"Tö lïnk ýöür äççöünts, gö tö ýöür %(platformName)s däshßöärd. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: lms/templates/student_account/login.underscore
+msgid "We couldn't log you in."
+msgstr "Wé çöüldn't lög ýöü ïn. Ⱡ'σяє#"
+
+#: lms/templates/student_account/login.underscore
+msgid "Log in"
+msgstr "Lög ïn Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/student_account/login.underscore
+msgid "Log in using %(name)s"
+msgstr "Lög ïn üsïng %(name)s Ⱡ'σ#"
+
+#: lms/templates/student_account/password_reset.underscore
+msgid ""
+"Enter the email address you used to create your account. We'll send you a "
+"link you can use to reset your password."
+msgstr ""
+"Éntér thé émäïl äddréss ýöü üséd tö çréäté ýöür äççöünt. Wé'll sénd ýöü ä "
+"lïnk ýöü çän üsé tö rését ýöür pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "An error occurred."
+msgstr "Àn érrör öççürréd. Ⱡ'σ#"
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "Reset password"
+msgstr "Rését pässwörd Ⱡ'#"
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "Password Reset Email Sent"
+msgstr "Pässwörd Rését Émäïl Sént Ⱡ'σяєм#"
+
+#: lms/templates/student_account/password_reset.underscore
+msgid ""
+"We've sent instructions for resetting your password to the email address you"
+" provided."
+msgstr ""
+"Wé'vé sént ïnstrüçtïöns för réséttïng ýöür pässwörd tö thé émäïl äddréss ýöü"
+" prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/templates/student_account/register.underscore
+msgid "You've successfully logged into %(currentProvider)s."
+msgstr "Ýöü'vé süççéssfüllý löggéd ïntö %(currentProvider)s. Ⱡ'σяєм ιρ#"
+
+#: lms/templates/student_account/register.underscore
+msgid ""
+"We just need a little more information before you start learning with "
+"%(platformName)s."
+msgstr ""
+"Wé jüst nééd ä lïttlé möré ïnförmätïön ßéföré ýöü stärt léärnïng wïth "
+"%(platformName)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/student_account/register.underscore
+msgid "Register using %(name)s"
+msgstr "Régïstér üsïng %(name)s Ⱡ'σ#"
+
+#: lms/templates/student_account/register.underscore
+msgid "We couldn't complete your registration."
+msgstr "Wé çöüldn't çömplété ýöür régïsträtïön. Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/student_account/register.underscore
+msgid "Register"
+msgstr "Régïstér #"
+
+#: lms/templates/student_account/register.underscore
+msgid "Required field"
+msgstr "Réqüïréd fïéld Ⱡ'#"
 
 #: lms/templates/student_profile/profile.underscore
 msgid "Full Name"
