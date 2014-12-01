@@ -2,28 +2,21 @@
 """
 Unit tests for handling email sending errors
 """
-import json
-
 from itertools import cycle
-from mock import patch
-from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from celery.states import SUCCESS, RETRY
-
 from django.test.utils import override_settings
 from django.conf import settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db import DatabaseError
-
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+import json
+from mock import patch
+from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     initialize_subtask_info,
@@ -33,6 +26,10 @@ from instructor_task.subtasks import (
     DuplicateTaskException,
     MAX_DATABASE_LOCK_RETRIES,
 )
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class EmailTestException(Exception):
@@ -40,7 +37,7 @@ class EmailTestException(Exception):
     pass
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestEmailErrors(ModuleStoreTestCase):
     """

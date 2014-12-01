@@ -1,13 +1,14 @@
 """
 Test the heartbeat
 """
-from django.test.client import Client
-from django.core.urlresolvers import reverse
 import json
-from django.db.utils import DatabaseError
-import mock
-from django.test.testcases import TestCase
 
+from django.core.urlresolvers import reverse
+from django.db.utils import DatabaseError
+from django.test.client import Client
+from django.test.testcases import TestCase
+import mock
+from nose.plugins.attrib import attr
 
 class HeartbeatTestCase(TestCase):
     """
@@ -26,6 +27,7 @@ class HeartbeatTestCase(TestCase):
         response = self.client.get(self.heartbeat_url)
         self.assertEqual(response.status_code, 200)
 
+    @attr('mongo')
     def test_sql_fail(self):
         with mock.patch('heartbeat.views.connection') as mock_connection:
             mock_connection.cursor.return_value.execute.side_effect = DatabaseError
@@ -34,6 +36,7 @@ class HeartbeatTestCase(TestCase):
             response_dict = json.loads(response.content)
             self.assertIn('SQL', response_dict)
 
+    @attr('mongo')
     def test_mongo_fail(self):
         with mock.patch('pymongo.MongoClient.alive', return_value=False):
             response = self.client.get(self.heartbeat_url)

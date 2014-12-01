@@ -130,74 +130,15 @@ END
         ;;
 
     "lms-acceptance")
-        case "$SHARD" in
-
-            "all")
-                paver test_acceptance -s lms --extra_args="-v 3"
-                ;;
-
-            *)
-                paver test_acceptance -s lms --extra_args="-v 3 --tag shard_${SHARD}"
-                ;;
-        esac
+        paver help
         ;;
 
     "cms-acceptance")
-        case "$SHARD" in
-
-            "all")
-                paver test_acceptance -s cms --extra_args="-v 3"
-                ;;
-
-            *)
-                paver test_acceptance -s cms --extra_args="-v 3 --tag shard_${SHARD}"
-                ;;
-        esac
+        paver help
         ;;
 
     "bok-choy")
-        case "$SHARD" in
-
-            "all")
-                paver test_bokchoy
-                paver bokchoy_coverage
-                ;;
-
-            "1")
-                paver test_bokchoy --extra_args="-a shard_1"
-                paver bokchoy_coverage
-                ;;
-
-            "2")
-                paver test_bokchoy --extra_args="-a 'shard_2'"
-                paver bokchoy_coverage
-                ;;
-
-            "3")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False"
-                paver bokchoy_coverage
-                ;;
-
-            # Default case because if we later define another bok-choy shard on Jenkins
-            # (e.g. Shard 4) in the multi-config project and expand this file
-            # with an additional case condition, old branches without that commit
-            # would not execute any tests on the worker assigned to that shard
-            # and thus their build would fail.
-            # This way they will just report 1 test executed and passed.
-            *)
-                # Need to create an empty test result so the post-build
-                # action doesn't fail the build.
-                # May be unnecessary if we changed the "Skip if there are no test files"
-                # option to True in the jenkins job definitions.
-                mkdir -p reports
-                cat > reports/bok_choy/xunit.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="acceptance.tests" name="shard_placeholder" time="0.001"></testcase>
-</testsuite>
-END
-                ;;
-        esac
+        paver help
         ;;
 
 esac
