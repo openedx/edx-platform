@@ -107,6 +107,9 @@ class PaginationTestCase(AssetsTestCase):
         self.assert_correct_sort_response(self.url, 'date_added', 'desc')
         self.assert_correct_sort_response(self.url, 'display_name', 'asc')
         self.assert_correct_sort_response(self.url, 'display_name', 'desc')
+        self.assert_correct_filter_response(self.url, 'asset_type', '')
+        self.assert_correct_filter_response(self.url, 'asset_type', 'OTHER')
+        self.assert_correct_filter_response(self.url, 'asset_type', 'Text')
 
         # Verify querying outside the range of valid pages
         self.assert_correct_asset_response(self.url + "?page_size=2&page=-1", 0, 2, 3)
@@ -140,6 +143,28 @@ class PaginationTestCase(AssetsTestCase):
         else:
             self.assertGreaterEqual(name1, name2)
             self.assertGreaterEqual(name2, name3)
+
+    def assert_correct_filter_response(self, url, filter_type, filter_value):
+        """
+        Get from the url w/ a filter option and ensure items honor that filter
+        """
+        requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTER.get(filter_value, None)
+        resp = self.client.get(url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+        assets_response = json_response['assets']
+        if filter_value is not '':
+            extensions = [asset['display_name'].split('.')[-1].upper() for asset in assets_response]
+            if filter_value is 'OTHER':
+                all_file_type_extensions = []
+                for file_type in settings.FILES_AND_UPLOAD_TYPE_FILTER:
+                    all_file_type_extensions.extend(file_type)
+                for extension in extensions:
+                    self.assertNotIn(extension, all_file_type_extensions)
+            else:
+                for extension in extensions:
+                    self.assertIn(extension, requested_file_types)
+
+
 
 
 @ddt
