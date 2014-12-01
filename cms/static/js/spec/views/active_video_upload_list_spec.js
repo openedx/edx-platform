@@ -26,11 +26,11 @@ define(
                 $(document).ajaxError(this.globalAjaxError);
             });
 
-            it("should trigger file selection when either upload button clicked", function() {
+            it("should trigger file selection when either the upload button or the drop zone is clicked", function() {
                 var clickSpy = jasmine.createSpy();
                 clickSpy.andCallFake(function(event) { event.preventDefault(); });
                 this.view.$(".js-file-input").on("click", clickSpy);
-                this.view.$(".js-upload-button").click();
+                this.view.$(".file-drop-area").click();
                 expect(clickSpy).toHaveBeenCalled();
                 clickSpy.reset();
                 this.uploadButton.click();
@@ -115,7 +115,7 @@ define(
                                         )
                                     })
                                 });
-                                this.$uploadElems = this.view.$(".js-active-video-upload-list > li");
+                                this.$uploadElems = this.view.$(".video-upload-item");
                             });
 
                             it("should start uploads", function() {
@@ -140,7 +140,7 @@ define(
                                 expect(this.$uploadElems.length).toEqual(caseInfo.numFiles);
                                 this.$uploadElems.each(function(i, uploadElem) {
                                     var $uploadElem = $(uploadElem);
-                                    expect($.trim($uploadElem.find(".filename").text())).toEqual(
+                                    expect($.trim($uploadElem.find(".video-detail-title").text())).toEqual(
                                         fileNames[i]
                                     );
                                     expect($.trim($uploadElem.find(".status-message").text())).toEqual(
@@ -177,7 +177,7 @@ define(
                                         });
 
                                         it("should update status", function() {
-                                            var $uploadElem = $(".js-active-video-upload-list > li:first");
+                                            var $uploadElem = $(".video-upload-item:first");
                                             expect($uploadElem.length).toEqual(1);
                                             expect($.trim($uploadElem.find(".status-message").text())).toEqual(
                                                 subCaseInfo.statusText
