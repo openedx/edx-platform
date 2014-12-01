@@ -3,18 +3,23 @@ Test the partitions and partitions service
 
 """
 
+import json
 from django.conf import settings
 import django.test
 from django.test.utils import override_settings
 from mock import patch
+from unittest import skipUnless
 
+from courseware.masquerade import handle_ajax, setup_masquerade
+from courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore.tests.django_utils import mixed_store_config
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from ..partition_scheme import CohortPartitionScheme
+from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..models import CourseUserGroupPartitionGroup
 from ..cohorts import add_user_to_cohort, get_course_cohorts
 from .helpers import CohortFactory, config_course_cohorts
@@ -280,3 +285,111 @@ class TestExtension(django.test.TestCase):
         self.assertEqual(UserPartition.get_scheme('cohort'), CohortPartitionScheme)
         with self.assertRaisesRegexp(UserPartitionError, 'Unrecognized scheme'):
             UserPartition.get_scheme('other')
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestGetCohortedUserPartition(django.test.TestCase):
+    """
+    Test that `get_cohorted_user_partition` returns the first user_partition with scheme `CohortPartitionScheme`.
+    """
+    def setUp(self):
+        """
+        Regenerate a course with cohort configuration, partition and groups,
+        and a student for each test.
+        """
+        self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.course = modulestore().get_course(self.course_key)
+        self.student = UserFactory.create()
+
+        self.random_user_partition = UserPartition(
+            1,
+            'Random Partition',
+            'Should not be returned',
+            [Group(0, 'Group 0'), Group(1, 'Group 1')],
+            scheme=RandomUserPartitionScheme
+        )
+
+        self.cohort_user_partition = UserPartition(
+            0,
+            'Cohort Partition 1',
+            'Should be returned',
+            [Group(10, 'Group 10'), Group(20, 'Group 20')],
+            scheme=CohortPartitionScheme
+        )
+
+        self.second_cohort_user_partition = UserPartition(
+            2,
+            'Cohort Partition 2',
+            'Should not be returned',
+            [Group(10, 'Group 10'), Group(1, 'Group 1')],
+            scheme=CohortPartitionScheme
+        )
+
+    def test_returns_first_cohort_user_partition(self):
+        """
+        Test get_cohorted_user_partition returns first user_partition with scheme `CohortPartitionScheme`.
+        """
+        self.course.user_partitions.append(self.random_user_partition)
+        self.course.user_partitions.append(self.cohort_user_partition)
+        self.course.user_partitions.append(self.second_cohort_user_partition)
+        self.assertEqual(self.cohort_user_partition, get_cohorted_user_partition(self.course_key))
+
+    def test_no_cohort_user_partitions(self):
+        """
+        Test get_cohorted_user_partition returns None when there are no cohorted user partitions.
+        """
+        self.course.user_partitions.append(self.random_user_partition)
+        self.assertIsNone(get_cohorted_user_partition(self.course_key))
+
+
+class TestMasqueradedGroup(StaffMasqueradeTestCase):
+    """
+    Check for staff being able to masquerade as belonging to a group.
+    """
+    def setUp(self):
+        super(TestMasqueradedGroup, self).setUp()
+        self.user_partition = UserPartition(
+            0, 'Test User Partition', '',
+            [Group(0, 'Group 1'), Group(1, 'Group 2')],
+            scheme_id='cohort'
+        )
+        self.course.user_partitions.append(self.user_partition)
+        self.session = {}
+        modulestore().update_item(self.course, self.test_user.id)
+
+    def _verify_masquerade_for_group(self, group):
+        """
+        Verify that the masquerade works for the specified group id.
+        """
+        # Send the request to set the masquerade
+        request_json = {
+            "role": "student",
+        }
+        if group and self.user_partition:
+            request_json['user_partition_id'] = self.user_partition.id
+            request_json['group_id'] = group.id
+        request = self._create_mock_json_request(
+            self.test_user,
+            body=json.dumps(request_json),
+            session=self.session
+        )
+        handle_ajax(request, unicode(self.course.id))
+
+        # Now setup the masquerade for the test user
+        setup_masquerade(request, self.test_user, True)
+        scheme = self.user_partition.scheme    # pylint: disable=no-member
+        self.assertEqual(
+            scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
+            group
+        )
+
+    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_group_masquerade(self):
+        """
+        Tests that a staff member can masquerade as being in a particular group.
+        """
+        self._verify_masquerade_for_group(self.user_partition.groups[0])
+        self._verify_masquerade_for_group(self.user_partition.groups[1])
+        self._verify_masquerade_for_group(None)
+

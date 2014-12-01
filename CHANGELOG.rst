@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio/LMS: Implement cohorted courseware. TNL-648
+
 LMS: Student Notes: Eventing for Student Notes. TNL-931
 
 LMS: Student Notes: Add course structure view. TNL-762
@@ -26,6 +28,9 @@ LMS: Student Notes: Toggle single note visibility. TNL-660
 LMS: Student Notes: Add Notes page. TNL-797
 
 LMS: Student Notes: Add possibility to add/edit/remove notes. TNL-655
+=======
+LMS: Extend preview to support cohorted courseware.  TNL-651
+>>>>>>> Extend preview to support cohorted courseware
 
 Platform: Add group_access field to all xblocks.  TNL-670
 

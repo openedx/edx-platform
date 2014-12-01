@@ -7,9 +7,11 @@ import functools
 import requests
 import os
 from path import path
+from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
-from bok_choy.javascript import js_defined
+from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
+from xmodule.partitions.partitions import UserPartition
 
 
 def skip_if_browser(browser):
@@ -279,3 +281,12 @@ class YouTubeStubConfig(object):
             return json.loads(response.content)
         else:
             return {}
+
+
+def create_user_partition_json(partition_id, name, description, groups, scheme="random"):
+    """
+    Helper method to create user partition JSON. If scheme is not supplied, "random" is used.
+    """
+    return UserPartition(
+        partition_id, name, description, groups, MockUserPartitionScheme(scheme)
+    ).to_json()

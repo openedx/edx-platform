@@ -223,7 +223,7 @@ def get_xqueue_callback_url_prefix(request):
     return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
 
 
-def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_id,
+def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                               static_asset_path=''):
     """
@@ -231,10 +231,6 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
 
     See get_module() docstring for further details.
     """
-    # allow course staff to masquerade as student
-    if has_access(user, 'staff', descriptor, course_id):
-        setup_masquerade(request, True)
-
     track_function = make_track_function(request)
     xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
 
@@ -244,7 +240,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
         user=user,
         descriptor=descriptor,
         field_data_cache=field_data_cache,
-        course_id=course_id,
+        course_id=course_key,
         track_function=track_function,
         xqueue_callback_url_prefix=xqueue_callback_url_prefix,
         position=position,
@@ -818,6 +814,7 @@ def _get_module_by_usage_id(request, course_id, usage_id):
         user,
         descriptor
     )
+    setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever

@@ -623,13 +623,13 @@ class TestCohortsAndPartitionGroups(TestCase):
         link.save()
         return link
 
-    def test_get_partition_group_id_for_cohort(self):
+    def test_get_group_info_for_cohort(self):
         """
-        Basic test of the partition_group_id accessor function
+        Basic test of the partition_group_info accessor function
         """
         # api should return nothing for an unmapped cohort
         self.assertEqual(
-            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            cohorts.get_group_info_for_cohort(self.first_cohort),
             (None, None),
         )
         # create a link for the cohort in the db
@@ -640,14 +640,14 @@ class TestCohortsAndPartitionGroups(TestCase):
         )
         # api should return the specified partition and group
         self.assertEqual(
-            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
-            (self.partition_id, self.group1_id)
+            cohorts.get_group_info_for_cohort(self.first_cohort),
+            (self.group1_id, self.partition_id)
         )
         # delete the link in the db
         link.delete()
         # api should return nothing again
         self.assertEqual(
-            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            cohorts.get_group_info_for_cohort(self.first_cohort),
             (None, None),
         )
 
@@ -666,12 +666,12 @@ class TestCohortsAndPartitionGroups(TestCase):
             self.group1_id,
         )
         self.assertEqual(
-            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
-            (self.partition_id, self.group1_id),
+            cohorts.get_group_info_for_cohort(self.first_cohort),
+            (self.group1_id, self.partition_id),
         )
         self.assertEqual(
-            cohorts.get_partition_group_id_for_cohort(self.second_cohort),
-            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            cohorts.get_group_info_for_cohort(self.second_cohort),
+            cohorts.get_group_info_for_cohort(self.first_cohort),
         )
 
     def test_multiple_partition_groups(self):
@@ -701,14 +701,14 @@ class TestCohortsAndPartitionGroups(TestCase):
             self.group1_id
         )
         self.assertEqual(
-            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
-            (self.partition_id, self.group1_id)
+            cohorts.get_group_info_for_cohort(self.first_cohort),
+            (self.group1_id, self.partition_id)
         )
         # delete the link
         self.first_cohort.delete()
         # api should return nothing at that point
         self.assertEqual(
-            cohorts.get_partition_group_id_for_cohort(self.first_cohort),
+            cohorts.get_group_info_for_cohort(self.first_cohort),
             (None, None),
         )
         # link should no longer exist because of delete cascade

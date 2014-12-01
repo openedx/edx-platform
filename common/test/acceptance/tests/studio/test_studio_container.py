@@ -698,14 +698,14 @@ class UnitPublishingTest(ContainerBase):
         """
         Verifies no component is visible when viewing as a student.
         """
-        self._verify_and_return_staff_page().toggle_staff_view()
+        self._verify_and_return_staff_page().set_staff_view_mode('Student')
         self.assertEqual(0, self.courseware.num_xblock_components)
 
     def _verify_student_view_visible(self, expected_components):
         """
         Verifies expected components are visible when viewing as a student.
         """
-        self._verify_and_return_staff_page().toggle_staff_view()
+        self._verify_and_return_staff_page().set_staff_view_mode('Student')
         self._verify_components_visible(expected_components)
 
     def _verify_components_visible(self, expected_components):

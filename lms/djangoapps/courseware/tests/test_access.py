@@ -6,6 +6,7 @@ from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
+from courseware.masquerade import CourseMasquerade
 from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
 from xmodule.course_module import (
@@ -255,6 +256,14 @@ class UserRoleTestCase(TestCase):
         self.course_staff = StaffFactory(course_key=self.course_key)
         self.course_instructor = InstructorFactory(course_key=self.course_key)
 
+    def _install_masquerade(self, user, role='student'):
+        """
+        Installs a masquerade for the specified user.
+        """
+        user.masquerade_settings = {
+            self.course_key: CourseMasquerade(self.course_key, role=role)
+        }
+
     def test_user_role_staff(self):
         """Ensure that user role is student for staff masqueraded as student."""
         self.assertEqual(
@@ -262,7 +271,7 @@ class UserRoleTestCase(TestCase):
             access.get_user_role(self.course_staff, self.course_key)
         )
         # Masquerade staff
-        self.course_staff.masquerade_as_student = True
+        self._install_masquerade(self.course_staff)
         self.assertEqual(
             'student',
             access.get_user_role(self.course_staff, self.course_key)
@@ -275,7 +284,7 @@ class UserRoleTestCase(TestCase):
             access.get_user_role(self.course_instructor, self.course_key)
         )
         # Masquerade instructor
-        self.course_instructor.masquerade_as_student = True
+        self._install_masquerade(self.course_instructor)
         self.assertEqual(
             'student',
             access.get_user_role(self.course_instructor, self.course_key)

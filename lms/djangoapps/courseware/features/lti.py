@@ -387,9 +387,9 @@ def check_role(_step, role):
 
 @step('I switch to (.*)$')
 def switch_view(_step, view):
-    staff_status = world.css_find('#staffstatus').first
-    if staff_status.text != view:
-        world.css_click('#staffstatus')
+    staff_status = world.css_find('#action-preview-select').first.value
+    if staff_status != view:
+        world.browser.select("select", view)
         world.wait_for_ajax_complete()
 
 
