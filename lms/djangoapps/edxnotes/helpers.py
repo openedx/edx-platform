@@ -12,11 +12,14 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext as _
+
+from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from util.date_utils import get_default_time_display
 from dateutil.parser import parse as dateutil_parse
 from provider.oauth2.models import AccessToken, Client
+import oauth2_provider.oidc as oidc
 from provider.utils import now
 from .exceptions import EdxNotesParseError
 log = logging.getLogger(__name__)
@@ -33,20 +36,36 @@ class NoteJSONEncoder(JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def get_token(user):
+def get_id_token(user):
     """
-    Generates OAuth access token for a user.
+    Generates JWT ID-Token, using or creating user's OAuth access token.
     """
     try:
-        token = AccessToken.objects.get(
-            client=Client.objects.get(name="edx-notes"),
+        client = Client.objects.get(name="edx-notes")
+    except Client.DoesNotExist:
+        raise ImproperlyConfigured("OAuth2 Client with name 'edx-notes' is not present in the DB")
+    try:
+        access_token = AccessToken.objects.get(
+            client=client,
             user=user,
             expires__gt=now()
         )
     except AccessToken.DoesNotExist:
-        token = AccessToken(client=Client.objects.get(name="edx-notes"), user=user)
-        token.save()
-    return token.token
+        access_token = AccessToken(client=client, user=user)
+        access_token.save()
+
+    id_token = oidc.id_token(access_token)
+    secret = id_token.access_token.client.client_secret
+    return id_token.encode(secret)
+
+
+def get_token_url(course_id):
+    """
+    Returns token url for the course.
+    """
+    return reverse("get_token", kwargs={
+        "course_id": course_id.to_deprecated_string(),
+    })
 
 
 def send_request(user, course_id, path="", query_string=""):
@@ -55,7 +74,7 @@ def send_request(user, course_id, path="", query_string=""):
     """
     url = get_endpoint(path)
     params = {
-        "user": user.username,
+        "user": anonymous_id_for_user(user, None),
         "course_id": unicode(course_id).encode("utf-8"),
     }
 
@@ -67,7 +86,7 @@ def send_request(user, course_id, path="", query_string=""):
     response = requests.get(
         url,
         headers={
-            "x-annotator-auth-token": get_token(user)
+            "x-annotator-auth-token": get_id_token(user)
         },
         params=params
     )
