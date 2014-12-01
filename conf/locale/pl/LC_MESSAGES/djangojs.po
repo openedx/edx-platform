@@ -5,7 +5,7 @@
 # 
 # Translators:
 # Adam Łukasiak <adamus160@gmail.com>, 2014
-# Fundacja_Eduprojekt.org <maciej@eduprojekt.org>, 2014
+# EDP <maciej@eduprojekt.org>, 2014
 # Grzegorz <john.doe.gg@gmail.com>, 2014
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
@@ -21,7 +21,8 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Fundacja_Eduprojekt.org <maciej@eduprojekt.org>, 2014
+# EDP <maciej@eduprojekt.org>, 2014
+# Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # kuba11p <jakubsw.p@gmail.com>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
@@ -35,7 +36,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Fundacja_Eduprojekt.org <maciej@eduprojekt.org>, 2014
+# EDP <maciej@eduprojekt.org>, 2014
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -43,6 +44,8 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# EDP <maciej@eduprojekt.org>, 2014
+# EDP <maciej@eduprojekt.org>, 2014
 # Jakub Kopczyk <kuba5566@gmail.com>, 2014
 # Mateusz <blue90pl@gmail.com>, 2014
 # Sebastian <foobarbaz@gazeta.pl>, 2014
@@ -50,9 +53,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-10 09:06-0500\n"
-"PO-Revision-Date: 2014-10-29 18:21+0000\n"
-"Last-Translator: Jakub Kopczyk <kuba5566@gmail.com>\n"
+"POT-Creation-Date: 2014-12-01 11:35-0500\n"
+"PO-Revision-Date: 2014-11-24 13:30+0000\n"
+"Last-Translator: EDP <maciej@eduprojekt.org>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2295,11 +2298,23 @@ msgid "Error: You cannot remove yourself from the Instructor group!"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Errors"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following errors were generated:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Warnings"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following warnings were generated:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js
+msgid "Success"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -3894,6 +3909,29 @@ msgid ""
 "information on %(link_start)s the Data Download page. %(link_end)s"
 msgstr ""
 
+#: lms/templates/student_account/access.underscore
+msgid "Welcome!"
+msgstr ""
+
+#: lms/templates/student_account/access.underscore
+msgid "Log in or register to take courses from the world's best universities."
+msgstr ""
+
+#: lms/templates/student_account/access.underscore
+msgid ""
+"Sorry, we're having some technical problems. Wait a few minutes and try "
+"again."
+msgstr ""
+
+#: lms/templates/student_account/access.underscore
+#: lms/templates/student_account/access.underscore
+msgid "I am a new user"
+msgstr ""
+
+#: lms/templates/student_account/access.underscore
+msgid "I am a returning user"
+msgstr ""
+
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
 msgstr ""
@@ -3907,7 +3945,81 @@ msgid "Change My Email Address"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
+#: lms/templates/student_account/password_reset.underscore
 msgid "Reset Password"
+msgstr ""
+
+#: lms/templates/student_account/form_field.underscore
+msgid "Forgot password?"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid ""
+"You've successfully logged into %(currentProvider)s, but your "
+"%(currentProvider)s account isn't linked with an %(platformName)s account. "
+"To link your accounts, go to your %(platformName)s dashboard."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "We couldn't log you in."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Log in"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Log in using %(name)s"
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid ""
+"Enter the email address you used to create your account. We'll send you a "
+"link you can use to reset your password."
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "An error occurred."
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "Reset password"
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "Password Reset Email Sent"
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid ""
+"We've sent instructions for resetting your password to the email address you"
+" provided."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "You've successfully logged into %(currentProvider)s."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid ""
+"We just need a little more information before you start learning with "
+"%(platformName)s."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Register using %(name)s"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "We couldn't complete your registration."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Register"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Required field"
 msgstr ""
 
 #: lms/templates/student_profile/profile.underscore
