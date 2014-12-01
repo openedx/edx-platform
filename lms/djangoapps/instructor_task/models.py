@@ -238,6 +238,7 @@ class S3ReportStore(ReportStore):
             settings.AWS_ACCESS_KEY_ID,
             settings.AWS_SECRET_ACCESS_KEY
         )
+
         self.bucket = conn.get_bucket(bucket_name)
 
     @classmethod
@@ -327,13 +328,10 @@ class S3ReportStore(ReportStore):
         can be plugged straight into an href
         """
         course_dir = self.key_for(course_id, '')
-        return sorted(
-            [
-                (key.key.split("/")[-1], key.generate_url(expires_in=300))
-                for key in self.bucket.list(prefix=course_dir.key)
-            ],
-            reverse=True
-        )
+        return [
+            (key.key.split("/")[-1], key.generate_url(expires_in=300))
+            for key in sorted(self.bucket.list(prefix=course_dir.key), reverse=True, key=lambda k: k.last_modified)
+        ]
 
 
 class LocalFSReportStore(ReportStore):
@@ -410,10 +408,10 @@ class LocalFSReportStore(ReportStore):
         course_dir = self.path_to(course_id, '')
         if not os.path.exists(course_dir):
             return []
-        return sorted(
-            [
-                (filename, ("file://" + urllib.quote(os.path.join(course_dir, filename))))
-                for filename in os.listdir(course_dir)
-            ],
-            reverse=True
-        )
+        files = [(filename, os.path.join(course_dir, filename)) for filename in os.listdir(course_dir)]
+        files.sort(key=lambda (filename, full_path): os.path.getmtime(full_path), reverse=True)
+
+        return [
+            (filename, ("file://" + urllib.quote(full_path)))
+            for filename, full_path in files
+        ]
