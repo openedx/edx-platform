@@ -1,66 +1,64 @@
 .open-ended-problems,
-.combined-notifications
-{
-    padding: 40px;
-    .problem-list
-    {
+.combined-notifications {
+    padding: ($baseline*2);
+
+    .problem-list {
         table-layout: auto;
-        margin-top: 10px;
-        width:70%;
-        td, th
-        {
+        margin-top: ($baseline/2);
+        width: 70%;
+
+        td, th {
             padding: 7px;
         }
     }
-    .notification-container
-    {
-        margin: 30px 0px;
+
+    .notification-container {
+        margin: ($baseline*1.5) 0;
     }
 
-    .notification
-    {
-        margin: 10px;
+    .notification {
+        @include clearfix();
+        margin: ($baseline/2);
         width: 30%;
         display: inline-block;
         vertical-align: top;
-        .notification-link
-        {
+
+        .notification-link {
             display:block;
             height: 9em;
-            padding: 10px;
+            padding: ($baseline/2);
             border: 1px solid black;
             text-align: center;
-            p
-            {
-                font-size: .9em;
+            
+            p {
+                font-size: 0.9em;
                 text-align: center;
             }
         }
-        .notification-title
-        {
+
+        .notification-title {
             text-transform: uppercase;
             background: $blue;
             color: white;
-            padding: 5px 0px;
+            padding: ($baseline/4) 0;
             font-size: 1.1em;
         }
+
         .notification-link:hover,
-        .notification-link:focus
-        {
+        .notification-link:focus {
             background-color: #eee;
         }
-        .notification-description
-        {
+
+        .notification-description {
             padding-top:5%;
         }
-        .alert-message
-        {
-            img
-            {
+
+        .alert-message {
+            
+            img {
                 vertical-align: baseline;
             }
         }
-        @include clearfix;
     }
 
 }

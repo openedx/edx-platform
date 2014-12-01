@@ -406,7 +406,7 @@
   }
 
   .feedback-symbol {
-    @include transition (color 0.50s ease-in-out 0s);
+    @include transition (color $tmg-f1 ease-in-out 0s);
     @extend %t-icon3;
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
@@ -584,7 +584,7 @@
   }
 
   .feedback-symbol {
-    @include transition (color 0.50s ease-in-out 0s);
+    @include transition (color $tmg-f1 ease-in-out 0s);
     @extend %t-icon3;
     width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;
@@ -760,7 +760,7 @@
   .message {
     @extend %t-copy-sub1;
     background-color: $gray-d2;
-    padding: ($baseline/2) ($baseline*.75);
+    padding: ($baseline/2) ($baseline*0.75);
     color: $white;
 
     [class^="icon-"] {
@@ -873,13 +873,13 @@ body.uxdesign.alerts {
   .alert {
     @extend %t-copy-sub1;
     padding: 15px 20px;
-    margin-bottom: 30px;
+    margin-bottom: ($baseline*1.5);
     border-radius: 3px;
     border: 1px solid #edbd3c;
     border-radius: 3px;
     background: #fbf6e1;
     // background: #edbd3c;
-    @include clearfix;
+    @include clearfix();
 
     .alert-message {
       @include float(left);

@@ -41,7 +41,7 @@
         }
 
         &.is-selectable {
-          cursor: pointer;
+          @extend %ui-fake-link;
 
           &:hover {
             color: $blue;
@@ -322,7 +322,7 @@
           }
 
           .action-close {
-            @include transition(color 0.25s ease-in-out);
+            @include transition(color $tmg-f2 ease-in-out);
             @extend %t-action1;
             display: inline-block;
             float: right;

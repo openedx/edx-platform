@@ -80,9 +80,7 @@
       }
 
       .list-input {
-        margin: 0;
-        padding: 0;
-        list-style: none;
+        @extend %cont-no-list;
 
         .field {
           margin: 0 0 ($baseline*0.75) 0;

@@ -49,7 +49,7 @@
       position: relative;
       width: 100%;
       border-radius: 3px;
-      margin: 5px 0 0 0;
+      margin: ($baseline/4) 0 0 0;
       border: 1px solid $gray-l3;
       padding: ($baseline/2) ($baseline*0.75);
       background: $white;
@@ -99,7 +99,7 @@
     @include box-sizing(border-box);
     display: inline-block;
     border: 1px solid transparent;
-    border-radius: 5px;
+    border-radius: ($baseline/4);
     color: $gray-l1;
 
     .action-icon {

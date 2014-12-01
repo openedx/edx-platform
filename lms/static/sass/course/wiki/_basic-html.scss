@@ -89,7 +89,7 @@ section.wiki-body {
     b, strong { font-weight: bolder }
 
     blockquote      {
-      padding: 10px 20px;
+      padding: ($baseline/2) $baseline;
       background: #e3e3e3;
       border-left: 4px solid;
     }

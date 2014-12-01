@@ -9,7 +9,7 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background: rgba(0, 0, 0, .8);
+	background: rgba(0, 0, 0, 0.8);
 }
 
 .modal {
@@ -21,7 +21,7 @@
 	width: 930px;
 	height: 540px;
 	margin-left: -465px;
-	background: #fff;
+	background: $white;
 
 	.modal-body {
 		height: 400px;
@@ -38,14 +38,14 @@
 	h2 {
 		@extend %t-title5;
 		@extend %t-light;
-		margin: 0 10px 30px;
+		margin: 0 ($baseline/2) ($baseline*1.5);
 		color: #646464;
 		letter-spacing: 1px;
 		text-transform: uppercase;
 	}
 
 	p {
-		margin: 20px;
+		margin: $baseline;
 	}
 
 	.revert-button {

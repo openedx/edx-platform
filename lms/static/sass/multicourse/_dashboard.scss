@@ -2,7 +2,7 @@
 // ====================
 
 .dashboard {
-  @include clearfix;
+  @include clearfix();
   padding: ($baseline*2) 0 0 0;
 
   .profile-sidebar {
@@ -22,8 +22,8 @@
 
       h1.user-name {
         overflow: hidden;
-        margin: 0px;
-        padding: ($baseline*.75) ($baseline/2);
+        margin: 0;
+        padding: ($baseline*0.75) ($baseline/2);
         color: $base-font-color;
         text-transform: none;
         text-wrap: nowrap;
@@ -33,12 +33,12 @@
     }
 
     .user-info {
-      @include clearfix;
+      @include clearfix();
 
       > ul {
         @include box-sizing(border-box);
-        @include clearfix;
-        margin: 0px;
+        @include clearfix();
+        margin: 0;
         border: 1px solid $border-color-2;
         border-top: none;
         border-radius: 0 0 ($baseline/4) ($baseline/4);
@@ -47,10 +47,10 @@
         background: $white;
 
         li {
-          @include clearfix;
+          @include clearfix();
           border-bottom: 1px dotted $border-color-2;
           list-style: none;
-          margin-bottom: 15px;
+          margin-bottom: ($baseline*0.75);
           padding-bottom: 17px;
 
           &:last-child {
@@ -185,7 +185,7 @@
     }
 
     .news-carousel {
-      @include clearfix;
+      @include clearfix();
       margin: 30px 10px 0;
       border: 1px solid $border-color-2;
       background: $dashboard-profile-color;
@@ -196,7 +196,7 @@
       }
 
       header {
-        @include clearfix;
+        @include clearfix();
         height: 50px;
       }
 
@@ -228,7 +228,7 @@
 
       h4 {
         float: left;
-        margin-left: 15px;
+        margin-left: ($baseline*0.75);
         font-size: 15px;
         line-height: 48px;
         font-weight: 700;
@@ -256,7 +256,7 @@
 
       .news-image {
         height: 180px;
-        margin-bottom: 15px;
+        margin-bottom: ($baseline*0.75);
 
         img {
           width: 100%;
@@ -266,7 +266,7 @@
 
       h5 {
         margin-bottom: 8px;
-        margin-left: 5px;
+        margin-left: ($baseline/4);
 
         a {
           font-size: 16px;
@@ -275,7 +275,7 @@
       }
 
       .excerpt {
-        margin-left: 5px;
+        margin-left: ($baseline/4);
         font-size: 13px;
         padding-bottom: 40px;
       }
@@ -287,12 +287,12 @@
   // course listings
   .my-courses {
     @include float(left);
-    margin: 0px;
+    margin: 0;
     width: flex-grid(9);
 
     > header {
       border-bottom: 1px solid $border-color-2;
-      margin-bottom: 30px;
+      margin-bottom: ($baseline*1.5);
     }
 
     .empty-dashboard-message {
@@ -302,7 +302,7 @@
       p {
         color: $lighter-base-font-color;
         font-style: italic;
-        margin-bottom: 20px;
+        margin-bottom: $baseline;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
       }
 
@@ -312,13 +312,13 @@
         background-color: $button-bg-color;
         border: 1px solid $border-color-2;
         border-radius: 4px;
-        box-shadow: 0 1px 8px 0 rgba(0,0,0, 0.1);
+        box-shadow: 0 1px 8px 0 $shadow-l1;
         @include box-sizing(border-box);
         color: $base-font-color;
         font-family: $sans-serif;
         display: inline-block;
         letter-spacing: 1px;
-        margin-left: 5px;
+        margin-left: ($baseline/4);
         padding: 5px 10px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
 
@@ -368,7 +368,7 @@
         max-height: 100%;
         width: 200px;
         height: 120px;
-        margin: 0px;
+        margin: 0;
         border-radius: ($baseline/10);
         border: 1px solid $dashboard-course-cover-border;
         border-bottom: 4px solid $dashboard-course-cover-border;
@@ -381,7 +381,7 @@
       }
 
       .info {
-        @include clearfix;
+        @include clearfix();
         @include padding(0, 10px, 0, 230px);
 
         > hgroup {
@@ -410,7 +410,7 @@
 
           h3 a, h3 span {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: ($baseline/2);
             font-family: $sans-serif;
             font-size: 34px;
             line-height: 42px;
@@ -428,7 +428,7 @@
           box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
           margin-top: 17px;
           margin-right: flex-gutter();
-          padding: 5px;
+          padding: ($baseline/4);
           width: flex-grid(8);
           float: left;
           @include box-sizing(border-box);
@@ -442,7 +442,7 @@
         }
 
         .course-status-completed {
-          background: #ccc;
+          background: $gray-l3;
           color: $very-light-text;
 
           p {
@@ -602,7 +602,7 @@
 
     // UI: message
     .message {
-      @include clearfix;
+      @include clearfix();
       border-radius: 3px;
       display: none;
       z-index: 10;
@@ -610,7 +610,7 @@
       padding: ($baseline*0.5) $baseline;
       font-family: $sans-serif;
       background: tint($yellow,70%);
-      border: 1px solid #ccc;
+      border: 1px solid $gray-l3;
 
       // STATE: shown
       &.is-shown {
@@ -630,7 +630,7 @@
       }
 
       .actions {
-        @include clearfix;
+        @include clearfix();
         list-style: none;
         margin: 0;
         padding: 0;
@@ -660,7 +660,7 @@
           }
 
           .message-title .value, .message-copy {
-            @include transition(color 0.25s ease-in-out 0s);
+            @include transition(color $tmg-f2 ease-in-out 0s);
           }
 
           // STATE: hover
@@ -674,7 +674,7 @@
         }
 
         .wrapper-extended {
-          @include transition(opacity 0.25s ease-in-out 0);
+          @include transition(opacity $tmg-f2 ease-in-out 0);
           display: none;
           opacity: 0.0;
         }
@@ -706,7 +706,7 @@
         }
 
         .ui-toggle-expansion {
-          @include transition(all 0.25s ease-in-out 0s);
+          @include transition(all $tmg-f2 ease-in-out 0s);
           @include transform-origin(50% 50%);
           @include font-size(21);
           display: inline-block;
@@ -774,7 +774,7 @@
     // TYPE: status
     .message-status {
       background: tint($yellow,70%);
-      border-color: #ccc;
+      border-color: $gray-l3;
 
       .message-copy {
         @extend %t-copy-sub1;
@@ -841,14 +841,14 @@
       &.exam-register {
 
         .message-copy {
-          margin-top: 5px;
+          margin-top: ($baseline/4);
           width: 55%;
         }
       }
 
       &.exam-schedule {
         .exam-button {
-          margin-top: 5px;
+          margin-top: ($baseline/4);
         }
       }
 
@@ -864,7 +864,7 @@
 
       .button {
         display: inline-block;
-        margin-top: 10px;
+        margin-top: ($baseline/2);
         padding: 9px 18px 10px;
         font-size: 13px;
         font-weight: bold;
@@ -1127,7 +1127,7 @@
    p.course-block{
     border-style: solid;
     border-color: #E3DC86;
-    padding: 5px;
+    padding: ($baseline/4);
     border-width: 1px;
     background: #FDFBE4;
 
@@ -1173,7 +1173,7 @@
   }
   a.disable-look-settings{
     @extend a.disable-look-unregister;
-      margin-right: 10px;
+      margin-right: ($baseline/2);
     }
 
   }

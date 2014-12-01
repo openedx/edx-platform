@@ -104,7 +104,7 @@
 
   .container, .introduction {
     @include box-sizing(border-box);
-    @include clearfix;
+    @include clearfix();
     margin: 0 auto;
     width: 960px;
     background: $container-bg;
@@ -241,7 +241,7 @@
 
       .cta-login-action {
         @extend %btn-secondary-grey-outline;
-        padding: ($baseline/10) ($baseline*.75);
+        padding: ($baseline/10) ($baseline*0.75);
         margin-left: ($baseline/4);
       }
     }
@@ -343,7 +343,7 @@
       input, textarea {
         width: 100%;
         margin: 0;
-        padding: ($baseline/2) ($baseline*.75);
+        padding: ($baseline/2) ($baseline*0.75);
 
         &.long {
           width: 100%;

@@ -40,7 +40,7 @@ section.tool-wrapper {
         background: none;
         border: none;
         border-radius: 0;
-        color: #fff;
+        color: $white;
         margin-bottom: 0;
 
         &.ui-tabs-selected {
@@ -119,7 +119,7 @@ section.tool-wrapper {
         @extend .clearfix;
         border-bottom: 1px solid darken(#073642, 10%);
         box-shadow: 0 1px 0 lighten(#073642, 2%);
-        @include clearfix;
+        @include clearfix();
         margin-bottom: lh();
         margin-bottom: lh();
         padding: 0 0 lh();
@@ -143,7 +143,7 @@ section.tool-wrapper {
           margin-bottom: 0;
 
           input {
-            margin-right: 5px;
+            margin-right: ($baseline/4);
           }
         }
       }
@@ -152,7 +152,7 @@ section.tool-wrapper {
         display: block;
         float: left;
         margin-bottom: 0;
-        margin-right: 20px;
+        margin-right: $baseline;
         margin-top: 8px;
         text-align: right;
       }
@@ -160,7 +160,7 @@ section.tool-wrapper {
 
     label {
       border-radius: 2px;
-      color: #fff;
+      color: $white;
       font-weight: bold;
       padding: 3px;
       -webkit-font-smoothing: antialiased;
@@ -206,7 +206,7 @@ section.tool-wrapper {
         p {
           font-weight: bold;
           display: inline-block;
-          margin: 0 lh(.5) lh() 0;
+          margin: 0 lh(0.5) lh() 0;
           color: #839496;
           text-shadow: 0 -1px 0 darken(#073642, 10%);
           -webkit-font-smoothing: antialiased;

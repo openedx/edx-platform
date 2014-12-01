@@ -18,8 +18,8 @@
   // UI: export controls
   .export-controls {
     @extend %ui-window;
-    @include clearfix;
-    padding: 30px 40px;
+    @include clearfix();
+    padding: ($baseline*1.5) ($baseline*2);
   }
 
   // UI: import form
