@@ -102,6 +102,7 @@
       @extend %t-title8;
     }
 
+    // UI: publishing details/summary
     .bit-publishing {
       @extend %bar-module;
 
@@ -185,11 +186,22 @@
           display: block;
         }
 
-
+        // UI: note about specific access
+        .note-access {
+          @extend %t-strong;
+          @extend %t-copy-sub2;
+          margin-top: ($baseline/4); // needed since this element may be conditionally placed and its sibling UI elements will always be present.
+          padding: ($baseline/2);
+          border-radius: ($baseline/10);
+          background: tint($color-access-set, 85%);
+          color: $color-access-set;
+        }
       }
 
       .wrapper-pub-actions {
-        padding: ($baseline*.75);
+        border-top: 1px solid $gray-l4;
+        margin-top: ($baseline/2);
+        padding: $baseline ($baseline*0.75) ($baseline*0.75) ($baseline*0.75);
 
         .action-publish {
           @extend %btn-primary-blue;
@@ -209,7 +221,6 @@
           }
         }
       }
-
     }
 
     // versioning widget

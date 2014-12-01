@@ -38,7 +38,8 @@ messages = json.dumps(xblock.validate().to_json())
     <div class="studio-xblock-wrapper" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
     % endif
 
-    <section class="wrapper-xblock ${section_class} ${collapsible_class}">
+    <!-- NOTE: @andyarmstrong, in order to style the case when an access level is set, we need to add a class to each xblock's wrapper. How does .has-access-set sound? -->
+    <section class="wrapper-xblock ${section_class} ${collapsible_class} has-access-set">
 % endif
 
 <header class="xblock-header xblock-header-${xblock.category}">
@@ -60,6 +61,13 @@ messages = json.dumps(xblock.validate().to_json())
                             <a href="#" class="edit-button action-button">
                                 <i class="icon-pencil"></i>
                                 <span class="action-button-text">${_("Edit")}</span>
+                            </a>
+                        </li>
+                        <!-- NOTE: @andyarmstrong, here's a static version of the new access control we're adding. -->
+                        <li class="action-item action-access">
+                            <a href="#" data-tooltip="${_("Access Settings")}" class="access-button action-button">
+                                <i class="icon-key"></i>
+                                <span class="sr">${_("Access Settings")}</span>
                             </a>
                         </li>
                         <li class="action-item action-duplicate">
