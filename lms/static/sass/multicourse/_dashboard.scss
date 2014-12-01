@@ -488,6 +488,12 @@
           @extend %text-sr;
         }
 
+        .deco-graphic {
+          position: absolute;
+          top: -5px;
+          right: -8px;
+        }
+
         .sts-enrollment-value {
           @extend %ui-depth1;
           @extend %copy-badge;
@@ -891,6 +897,30 @@
           .btn {
             @extend %btn-inherited-primary;
           }
+        }
+      }
+
+      .verification-reminder {
+        width: flex-grid(8, 12);
+        position: relative;
+        float: left;
+      }
+
+      .verification-cta {
+        width: flex-grid(4, 12);
+        position: relative;
+        float: left;
+
+        .cta {
+          @include button(simple, $green-d1);
+          @include box-sizing(border-box);
+          @include float(right);
+          border-radius: 3px;
+          display: block;
+          font: normal 15px/1.6rem $sans-serif;
+          letter-spacing: 0;
+          padding: 6px 32px 7px;
+          text-align: center;
         }
       }
     }
