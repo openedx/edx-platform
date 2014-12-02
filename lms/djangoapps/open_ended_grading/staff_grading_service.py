@@ -57,15 +57,25 @@ class MockStaffGradingService(object):
 
     def get_problem_list(self, course_id, grader_id):
         self.cnt += 1
-        return {'success': True,
-                 'problem_list': [
-                     json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
-                                 'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5,
-                                 'min_for_ml': 10}),
-                     json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
-                                 'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5,
-                                 'min_for_ml': 10})
-                 ]}
+        return {
+            'success': True,
+            'problem_list': [
+                json.dumps({
+                    'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
+                    'problem_name': "Problem 1",
+                    'num_graded': 3,
+                    'num_pending': 5,
+                    'min_for_ml': 10,
+                }),
+                json.dumps({
+                    'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
+                    'problem_name': "Problem 2",
+                    'num_graded': 1,
+                    'num_pending': 5,
+                    'min_for_ml': 10,
+                }),
+            ],
+        }
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):
@@ -278,6 +288,7 @@ def get_next(request, course_id):
     return HttpResponse(json.dumps(_get_next(course_key, grader_id, location)),
                         mimetype="application/json")
 
+
 def get_problem_list(request, course_id):
     """
     Get all the problems for the given course id
@@ -320,7 +331,7 @@ def get_problem_list(request, course_id):
                 u'If not, please do so and return to this page.'
             )
         valid_problem_list = []
-        for i in xrange(0,len(problem_list)):
+        for i in xrange(0, len(problem_list)):
             # Needed to ensure that the 'location' key can be accessed.
             try:
                 problem_list[i] = json.loads(problem_list[i])

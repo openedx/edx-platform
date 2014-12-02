@@ -11,6 +11,7 @@ from opaque_keys.edx.locator import CourseLocator
 from mock import patch
 import ddt
 
+
 @ddt.ddt
 class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
     """
@@ -24,7 +25,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         (COURSE_ID_SPLIT, SlashSeparatedCourseKey.from_deprecated_string(COURSE_ID_SPLIT)),
         (COURSE_ID_MONGO, CourseLocator.from_string(COURSE_ID_MONGO)),
         (COURSE_ID_SPLIT, CourseLocator.from_string(COURSE_ID_SPLIT)),
-        )
+    )
 
     @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):
@@ -162,8 +163,8 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         # Check that session and CSRF are set in the response
         for cookie in ['csrftoken', 'sessionid']:
-            self.assertIn(cookie, response.cookies)  # pylint: disable=E1103
-            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=E1103
+            self.assertIn(cookie, response.cookies)  # pylint: disable=maybe-no-member
+            self.assertTrue(response.cookies[cookie].value)  # pylint: disable=maybe-no-member
 
 
 class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):

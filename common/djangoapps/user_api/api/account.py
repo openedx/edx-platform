@@ -1,5 +1,6 @@
 """Python API for user accounts.
 
+
 Account information includes a student's username, password, and email
 address, but does NOT include user profile information (i.e., demographic
 information and preferences).
@@ -139,6 +140,34 @@ def create_account(username, password, email):
 
     # Return the activation key, which the caller should send to the user
     return registration.activation_key
+
+
+def check_account_exists(username=None, email=None):
+    """Check whether an account with a particular username or email already exists.
+
+    Keyword Arguments:
+        username (unicode)
+        email (unicode)
+
+    Returns:
+        list of conflicting fields
+
+    Example Usage:
+        >>> account_api.check_account_exists(username="bob")
+        []
+        >>> account_api.check_account_exists(username="ted", email="ted@example.com")
+        ["email", "username"]
+
+    """
+    conflicts = []
+
+    if email is not None and User.objects.filter(email=email).exists():
+        conflicts.append("email")
+
+    if username is not None and User.objects.filter(username=username).exists():
+        conflicts.append("username")
+
+    return conflicts
 
 
 @intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])

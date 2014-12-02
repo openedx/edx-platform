@@ -76,6 +76,7 @@ def marketing_link_context_processor(request):
         ]
     )
 
+
 def open_source_footer_context_processor(request):
     """
     Checks the site name to determine whether to use the edX.org footer or the Open Source Footer.
@@ -96,6 +97,7 @@ def microsite_footer_context_processor(request):
             ("IS_REQUEST_IN_MICROSITE", microsite.is_request_in_microsite())
         ]
     )
+
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
 

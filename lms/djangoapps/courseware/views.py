@@ -5,6 +5,7 @@ Courseware views functions
 import logging
 import urllib
 import json
+import cgi
 
 from datetime import datetime
 from collections import defaultdict
@@ -49,6 +50,7 @@ from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEnd
 from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
 from shoppingcart.models import CourseRegistrationCode
+from shoppingcart.utils import is_shopping_cart_enabled
 from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
@@ -92,7 +94,7 @@ def user_groups(user):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
+@cache_if_anonymous()
 def courses(request):
     """
     Render "find courses" page.  The course selection work is done in courseware.courses.
@@ -217,6 +219,26 @@ def save_child_position(seq_module, child_name):
                 seq_module.position = position
     # Save this new position to the underlying KeyValueStore
     seq_module.save()
+
+
+def save_positions_recursively_up(user, request, field_data_cache, xmodule):
+    """
+    Recurses up the course tree starting from a leaf
+    Saving the position property based on the previous node as it goes
+    """
+    current_module = xmodule
+
+    while current_module:
+        parent_location = modulestore().get_parent_location(current_module.location)
+        parent = None
+        if parent_location:
+            parent_descriptor = modulestore().get_item(parent_location)
+            parent = get_module_for_descriptor(user, request, parent_descriptor, field_data_cache, current_module.location.course_key)
+
+        if parent and hasattr(parent, 'position'):
+            save_child_position(parent, current_module.location.name)
+
+        current_module = parent
 
 
 def chat_settings(course, user):
@@ -586,7 +608,7 @@ def course_info(request, course_id):
 
         # check to see if there is a required survey that must be taken before
         # the user can access the course.
-        if survey.utils.must_answer_survey(course, request.user):
+        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
             return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
         staff_access = has_access(request.user, 'staff', course)
@@ -692,7 +714,7 @@ def registered_for_course(course, user):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
+@cache_if_anonymous()
 def course_about(request, course_id):
     """
     Display the course's about page.
@@ -701,7 +723,12 @@ def course_about(request, course_id):
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'see_exists', course_key)
+
+    permission_name = microsite.get_value(
+        'COURSE_ABOUT_VISIBILITY_PERMISSION',
+        settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+    )
+    course = get_course_with_access(request.user, permission_name, course_key)
 
     if microsite.get_value(
         'ENABLE_MKTG_SITE',
@@ -710,6 +737,7 @@ def course_about(request, course_id):
         return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
     registered = registered_for_course(course, request.user)
+
     staff_access = has_access(request.user, 'staff', course)
     studio_url = get_studio_url(course, 'settings/details')
 
@@ -725,8 +753,9 @@ def course_about(request, course_id):
     registration_price = 0
     in_cart = False
     reg_then_add_to_cart_link = ""
-    if (settings.FEATURES.get('ENABLE_SHOPPING_CART') and
-        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+
+    _is_shopping_cart_enabled = is_shopping_cart_enabled()
+    if (_is_shopping_cart_enabled):
         registration_price = CourseMode.min_course_price_for_currency(course_key,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
@@ -765,27 +794,29 @@ def course_about(request, course_id):
         'invitation_only': invitation_only,
         'active_reg_button': active_reg_button,
         'is_shib_course': is_shib_course,
-         # We do not want to display the internal courseware header, which is used when the course is found in the
-         # context. This value is therefor explicitly set to render the appropriate header.
+        # We do not want to display the internal courseware header, which is used when the course is found in the
+        # context. This value is therefor explicitly set to render the appropriate header.
         'disable_courseware_header': True,
+        'is_shopping_cart_enabled': _is_shopping_cart_enabled,
+        'cart_link': reverse('shoppingcart.views.show_cart'),
     })
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
+@cache_if_anonymous('organization_full_name')
 @ensure_valid_course_key
 def mktg_course_about(request, course_id):
-    """
-    This is the button that gets put into an iframe on the Drupal site
-    """
-
+    """This is the button that gets put into an iframe on the Drupal site."""
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
-        course = get_course_with_access(request.user, 'see_exists', course_key)
-    except (ValueError, Http404) as e:
-        # if a course does not exist yet, display a coming
-        # soon button
+        permission_name = microsite.get_value(
+            'COURSE_ABOUT_VISIBILITY_PERMISSION',
+            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+        )
+        course = get_course_with_access(request.user, permission_name, course_key)
+    except (ValueError, Http404):
+        # If a course does not exist yet, display a "Coming Soon" button
         return render_to_response(
             'courseware/mktg_coming_soon.html', {'course_id': course_key.to_deprecated_string()}
         )
@@ -812,6 +843,12 @@ def mktg_course_about(request, course_id):
         'course_modes': course_modes,
     }
 
+    if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
+        # Drupal will pass the organization's full name as a GET parameter. If no full name
+        # is provided, the marketing iframe won't show the email opt-in checkbox.
+        organization_full_name = request.GET.get('organization_full_name')
+        context['organization_full_name'] = cgi.escape(organization_full_name) if organization_full_name else organization_full_name
+
     # The edx.org marketing site currently displays only in English.
     # To avoid displaying a different language in the register / access button,
     # we force the language to English.
@@ -827,6 +864,7 @@ def mktg_course_about(request, course_id):
         # Just to be safe, reset the language if we forced it to be English.
         if force_english:
             translation.deactivate()
+
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

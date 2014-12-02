@@ -17,12 +17,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
-class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
+class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     """Form providing validation of CourseEmail templates."""
 
     name = forms.CharField(required=False)
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         model = CourseEmailTemplate
         fields = ('html_template', 'plain_template', 'name')
 
@@ -55,7 +55,11 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
 
     def clean_name(self):
         """Validate the name field. Enforce uniqueness constraint on 'name' field"""
-        name = self.cleaned_data.get("name")
+
+        # Note that we get back a blank string in the Form for an empty 'name' field
+        # we want those to be set to None in Python and NULL in the database
+        name = self.cleaned_data.get("name").strip() or None
+
         # if we are creating a new CourseEmailTemplate, then we need to
         # enforce the uniquess constraint as part of the Form validation
         if not self.instance.pk:
@@ -69,10 +73,10 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
         return name
 
 
-class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
+class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     """Input form for email enabling, allowing us to verify data."""
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         model = CourseAuthorization
 
     def clean_course_id(self):

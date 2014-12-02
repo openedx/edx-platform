@@ -1,5 +1,5 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -32,7 +32,7 @@ def create_cert_course():
         min_price=16,
         suggested_prices='32,64,128',
         currency='usd',
-        )
+    )
 
 
 def register():

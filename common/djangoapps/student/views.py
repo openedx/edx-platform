@@ -40,6 +40,11 @@ from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
 
+from requests import HTTPError
+
+from social.apps.django_app import utils as social_utils
+from social.backends import oauth as social_oauth
+
 from edxmako.shortcuts import render_to_response, render_to_string
 from mako.exceptions import TopLevelLookupException
 
@@ -95,10 +100,15 @@ from util.password_policy_validators import (
     validate_password_dictionary
 )
 
+import third_party_auth
 from third_party_auth import pipeline, provider
-from student.helpers import auth_pipeline_urls, set_logged_in_cookie
+from student.helpers import (
+    auth_pipeline_urls, set_logged_in_cookie,
+    check_verify_status_by_course
+)
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
+from user_api.api import profile as profile_api
 
 import analytics
 from eventtracking import tracker
@@ -109,7 +119,7 @@ from cities.models import PublicEntity
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
-ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
+ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=invalid-name
 
 
 def csrf_token(context):
@@ -414,7 +424,7 @@ def register_user(request, extra_context=None):
 
     # If third-party auth is enabled, prepopulate the form with data from the
     # selected provider.
-    if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')) and pipeline.running(request):
+    if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
         overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
@@ -498,9 +508,14 @@ def dashboard(request):
     course_enrollment_pairs.sort(key=lambda x: x[1].created, reverse=True)
 
     # Retrieve the course modes for each course
+    enrolled_course_ids = [course.id for course, __ in course_enrollment_pairs]
+    all_course_modes, unexpired_course_modes = CourseMode.all_and_unexpired_modes_for_courses(enrolled_course_ids)
     course_modes_by_course = {
-        course.id: CourseMode.modes_for_course_dict(course.id)
-        for course, __ in course_enrollment_pairs
+        course_id: {
+            mode.slug: mode
+            for mode in modes
+        }
+        for course_id, modes in unexpired_course_modes.iteritems()
     }
 
     # Check to see if the student has recently enrolled in a course.
@@ -539,6 +554,29 @@ def dashboard(request):
         )
         for course, enrollment in course_enrollment_pairs
     }
+
+    # Determine the per-course verification status
+    # This is a dictionary in which the keys are course locators
+    # and the values are one of:
+    #
+    # VERIFY_STATUS_NEED_TO_VERIFY
+    # VERIFY_STATUS_SUBMITTED
+    # VERIFY_STATUS_APPROVED
+    # VERIFY_STATUS_MISSED_DEADLINE
+    #
+    # Each of which correspond to a particular message to display
+    # next to the course on the dashboard.
+    #
+    # If a course is not included in this dictionary,
+    # there is no verification messaging to display.
+    if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
+        verify_status_by_course = check_verify_status_by_course(
+            user,
+            course_enrollment_pairs,
+            all_course_modes
+        )
+    else:
+        verify_status_by_course = {}
 
     cert_statuses = {
         course.id: cert_info(request.user, course)
@@ -618,6 +656,7 @@ def dashboard(request):
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
         'verification_status': verification_status,
+        'verification_status_by_course': verify_status_by_course,
         'verification_msg': verification_msg,
         'show_refund_option_for': show_refund_option_for,
         'block_courses': block_courses,
@@ -634,7 +673,7 @@ def dashboard(request):
         'provider_states': [],
     }
 
-    if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')):
+    if third_party_auth.is_enabled():
         context['duplicate_provider'] = pipeline.get_duplicate_provider(messages.get_messages(request))
         context['provider_user_states'] = pipeline.get_provider_user_states(user)
 
@@ -742,6 +781,12 @@ def try_change_enrollment(request):
             log.exception("Exception automatically enrolling after login: %s", exc)
 
 
+def _update_email_opt_in(request, username, org):
+    """Helper function used to hit the profile API if email opt-in is enabled."""
+    email_opt_in = request.POST.get('email_opt_in') == 'true'
+    profile_api.update_email_opt_in(username, org, email_opt_in)
+
+
 @require_POST
 @commit_on_success_with_read_committed
 def change_enrollment(request, check_access=True):
@@ -806,6 +851,10 @@ def change_enrollment(request, check_access=True):
             log.warning("User {0} tried to enroll in non-existent course {1}"
                         .format(user.username, course_id))
             return HttpResponseBadRequest(_("Course id is invalid"))
+
+        # Record the user's email opt-in preference
+        if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
+            _update_email_opt_in(request, user.username, course_id.org)
 
         available_modes = CourseMode.modes_for_course_dict(course_id)
 
@@ -925,7 +974,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     redirect_url = None
     response = None
     running_pipeline = None
-    third_party_auth_requested = microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')) and pipeline.running(request)
+    third_party_auth_requested = third_party_auth.is_enabled() and pipeline.running(request)
     third_party_auth_successful = False
     trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     user = None
@@ -947,7 +996,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             AUDIT_LOG.warning(
                 u'Login failed - user with username {username} has no social auth with backend_name {backend_name}'.format(
                     username=username, backend_name=backend_name))
-            return HttpResponseBadRequest(
+            return HttpResponse(
                 _("You've successfully logged into your {provider_name} account, but this account isn't linked with an {platform_name} account yet.").format(
                     platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
                 )
@@ -961,7 +1010,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                     platform_name=settings.PLATFORM_NAME
                 ),
                 content_type="text/plain",
-                status=401
+                status=403
             )
 
     else:
@@ -1118,6 +1167,37 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
+@csrf_exempt
+@require_POST
+@social_utils.strategy("social:complete")
+def login_oauth_token(request, backend):
+    """
+    Authenticate the client using an OAuth access token by using the token to
+    retrieve information from a third party and matching that information to an
+    existing user.
+    """
+    backend = request.social_strategy.backend
+    if isinstance(backend, social_oauth.BaseOAuth1) or isinstance(backend, social_oauth.BaseOAuth2):
+        if "access_token" in request.POST:
+            # Tell third party auth pipeline that this is an API call
+            request.session[pipeline.AUTH_ENTRY_KEY] = pipeline.AUTH_ENTRY_API
+            user = None
+            try:
+                user = backend.do_auth(request.POST["access_token"])
+            except HTTPError:
+                pass
+            # do_auth can return a non-User object if it fails
+            if user and isinstance(user, User):
+                login(request, user)
+                return JsonResponse(status=204)
+            else:
+                # Ensure user does not re-enter the pipeline
+                request.social_strategy.clean_partial_pipeline()
+                return JsonResponse({"error": "invalid_token"}, status=401)
+        else:
+            return JsonResponse({"error": "invalid_request"}, status=400)
+    raise Http404
+
 
 @ensure_csrf_cookie
 def logout_user(request):
@@ -1240,7 +1320,7 @@ class AccountValidationError(Exception):
 
 
 @receiver(post_save, sender=User)
-def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
+def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     handler that saves the user Signup Source
     when the user is created
@@ -1356,7 +1436,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
 
-    if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')) and pipeline.running(request):
+    if third_party_auth.is_enabled() and pipeline.running(request):
         post_vars = dict(post_vars.items())
         post_vars.update({'password': pipeline.make_random_password()})
 
@@ -1545,7 +1625,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
         # If the user is registering via 3rd party auth, track which provider they use
         provider_name = None
-        if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
+        if third_party_auth.is_enabled() and pipeline.running(request):
             running_pipeline = pipeline.get(request)
             current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
             provider_name = current_provider.NAME
@@ -1634,7 +1714,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     redirect_url = try_change_enrollment(request)
 
     # Resume the third-party-auth pipeline if necessary.
-    if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')) and pipeline.running(request):
+    if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         redirect_url = pipeline.get_complete_url(running_pipeline['backend'])
 
@@ -1790,11 +1870,9 @@ def activate_account(request, key):
 
 
 @csrf_exempt
+@require_POST
 def password_reset(request):
     """ Attempts to send a password reset e-mail. """
-    if request.method != "POST":
-        raise Http404
-
     # Add some rate limiting here by re-using the RateLimitMixin as a helper class
     limiter = BadRequestRateLimiter()
     if limiter.is_rate_limit_exceeded(request):

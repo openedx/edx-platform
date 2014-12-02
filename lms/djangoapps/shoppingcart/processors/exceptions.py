@@ -16,5 +16,6 @@ class CCProcessorDataException(CCProcessorException):
 class CCProcessorWrongAmountException(CCProcessorException):
     pass
 
+
 class CCProcessorUserCancelled(CCProcessorException):
     pass

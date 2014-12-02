@@ -1,4 +1,4 @@
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 import datetime
 import os
 import pytz

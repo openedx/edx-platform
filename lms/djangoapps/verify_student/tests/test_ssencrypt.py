@@ -1,11 +1,11 @@
 import base64
-
 from nose.tools import assert_equals
 
 from verify_student.ssencrypt import (
     aes_decrypt, aes_encrypt, encrypt_and_encode, decode_and_decrypt,
     rsa_decrypt, rsa_encrypt, random_aes_key
 )
+
 
 def test_aes():
     key_str = "32fe72aaf2abb44de9e161131b5435c8d37cbdb6f5df242ae860b283115f2dae"
@@ -27,6 +27,7 @@ def test_aes():
     assert_roundtrip("12345678901234561234567890123456123456789012345601")
     assert_roundtrip("")
     assert_roundtrip("\xe9\xe1a\x13\x1bT5\xc8")  # Random, non-ASCII text
+
 
 def test_rsa():
     # Make up some garbage keys for testing purposes.

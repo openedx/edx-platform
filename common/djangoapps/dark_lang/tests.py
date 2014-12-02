@@ -144,7 +144,6 @@ class DarkLangMiddlewareTests(TestCase):
             self.process_request(accept='rel-ter;q=1.0, rel;q=0.5')
         )
 
-
     def assertSessionLangEquals(self, value, request):
         """
         Assert that the 'django_language' set in request.session is equal to value

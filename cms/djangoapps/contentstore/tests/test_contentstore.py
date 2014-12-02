@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=E1101
-# pylint: disable=W0212
 
 import copy
 import mock
+from mock import patch
 import shutil
 import lxml
 
@@ -536,6 +535,7 @@ class MiscCourseTests(ContentStoreTestCase):
         for expected in expected_types:
             self.assertIn(expected, resp.content)
 
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
         # response HTML
@@ -855,15 +855,14 @@ class MiscCourseTests(ContentStoreTestCase):
         self.assertContains(resp, unicode(asset_key))
 
     def test_prefetch_children(self):
-        # make sure we haven't done too many round trips to DB
-        # note we say 4 round trips here for:
+        # make sure we haven't done too many round trips to DB:
         # 1) the course,
         # 2 & 3) for the chapters and sequentials
         # Because we're querying from the top of the tree, we cache information needed for inheritance,
         # so we don't need to make an extra query to compute it.
         # set the branch to 'publish' in order to prevent extra lookups of draft versions
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, self.course.id):
-            with check_mongo_calls(3, 0):
+            with check_mongo_calls(3):
                 course = self.store.get_course(self.course.id, depth=2)
 
             # make sure we pre-fetched a known sequential which should be at depth=2
@@ -875,7 +874,7 @@ class MiscCourseTests(ContentStoreTestCase):
         # Now, test with the branch set to draft. No extra round trips b/c it doesn't go deep enough to get
         # beyond direct only categories
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
-            with check_mongo_calls(3, 0):
+            with check_mongo_calls(3):
                 self.store.get_course(self.course.id, depth=2)
 
     def _check_verticals(self, locations):
@@ -1010,7 +1009,7 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.ajax_post('/course/', self.course_data)
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
 
     def assert_course_creation_failed(self, error_message):
         """
@@ -1039,7 +1038,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.course_data['display_name'] = 'Robot Super Course Two'
         self.course_data['run'] = '2013_Summer'
 
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
 
     def test_create_course_case_change(self):
         """Test new course creation - error path due to case insensitive name equality"""
@@ -1047,13 +1046,13 @@ class ContentStoreTest(ContentStoreTestCase):
         self.client.ajax_post('/course/', self.course_data)
         cache_current = self.course_data['org']
         self.course_data['org'] = self.course_data['org'].lower()
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
         self.course_data['org'] = cache_current
 
         self.client.ajax_post('/course/', self.course_data)
         cache_current = self.course_data['number']
         self.course_data['number'] = self.course_data['number'].upper()
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change either organization or course number to be unique.')
 
     def test_course_substring(self):
         """

@@ -64,6 +64,7 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
         patcher = patch('student.models.tracker')
@@ -135,6 +136,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 403)
 
+    @patch('shoppingcart.views.render_to_response', render_mock)
     def test_billing_details(self):
         billing_url = reverse('billing_details')
         self.login_user()
@@ -149,6 +151,12 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        self.assertEqual(template, 'shoppingcart/billing_details.html')
+        # check for the default currency in the context
+        self.assertEqual(context['currency'], 'usd')
+        self.assertEqual(context['currency_symbol'], '$')
+
         data = {'company_name': 'Test Company', 'company_contact_name': 'JohnDoe',
                 'company_contact_email': 'john@est.com', 'recipient_name': 'Mocker',
                 'recipient_email': 'mock@germ.com', 'company_address_line_1': 'DC Street # 1',
@@ -158,6 +166,24 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         resp = self.client.post(billing_url, data)
         self.assertEqual(resp.status_code, 200)
+
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
+    def test_billing_details_with_override_currency_settings(self):
+        billing_url = reverse('billing_details')
+        self.login_user()
+
+        #chagne the order_type to business
+        self.cart.order_type = 'business'
+        self.cart.save()
+        resp = self.client.get(billing_url)
+        self.assertEqual(resp.status_code, 200)
+
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        self.assertEqual(template, 'shoppingcart/billing_details.html')
+        # check for the override currency settings in the context
+        self.assertEqual(context['currency'], 'PKR')
+        self.assertEqual(context['currency_symbol'], 'Rs')
 
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -379,7 +405,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         item = self.cart.orderitem_set.all().select_subclasses()[1]
         self.assertEquals(item.unit_cost, self.get_discount(self.testing_cost))
 
-    def test_soft_delete_coupon(self):  # pylint: disable=E1101
+    def test_soft_delete_coupon(self):  # pylint: disable=no-member
         self.add_coupon(self.course_key, True, self.coupon_code)
         coupon = Coupon(code='TestCode', description='testing', course_id=self.course_key,
                         percentage_discount=12, created_by=self.user, is_active=True)
@@ -390,25 +416,25 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         get_coupon = Coupon.objects.get(id=1)
         request = HttpRequest()
         request.user = admin
-        setattr(request, 'session', 'session')  # pylint: disable=E1101
-        messages = FallbackStorage(request)  # pylint: disable=E1101
-        setattr(request, '_messages', messages)  # pylint: disable=E1101
+        setattr(request, 'session', 'session')  # pylint: disable=no-member
+        messages = FallbackStorage(request)  # pylint: disable=no-member
+        setattr(request, '_messages', messages)  # pylint: disable=no-member
         coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
         test_query_set = coupon_admin.queryset(request)
         test_actions = coupon_admin.get_actions(request)
         self.assertTrue('really_delete_selected' in test_actions['really_delete_selected'])
         self.assertEqual(get_coupon.is_active, True)
-        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=E1101
+        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=no-member
         for coupon in test_query_set:
             self.assertEqual(coupon.is_active, False)
-        coupon_admin.delete_model(request, get_coupon)  # pylint: disable=E1101
+        coupon_admin.delete_model(request, get_coupon)  # pylint: disable=no-member
         self.assertEqual(get_coupon.is_active, False)
 
         coupon = Coupon(code='TestCode123', description='testing123', course_id=self.course_key,
                         percentage_discount=22, created_by=self.user, is_active=True)
         coupon.save()
         test_query_set = coupon_admin.queryset(request)
-        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=E1101
+        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=no-member
         for coupon in test_query_set:
             self.assertEqual(coupon.is_active, False)
 
@@ -643,7 +669,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=W0621
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
         self.assertIn(cert_item, purchase_form_arg_cart_items)
@@ -654,6 +680,28 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(len(context['shoppingcart_items']), 2)
         self.assertEqual(context['amount'], 80)
         self.assertIn("80.00", context['form_html'])
+        # check for the default currency in the context
+        self.assertEqual(context['currency'], 'usd')
+        self.assertEqual(context['currency_symbol'], '$')
+
+    @patch('shoppingcart.views.render_purchase_form_html', form_mock)
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
+    def test_show_cart_with_override_currency_settings(self):
+        self.login_user()
+        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
+        self.assertEqual(resp.status_code, 200)
+
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
+        purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
+        self.assertIn(reg_item, purchase_form_arg_cart_items)
+
+        ((template, context), _) = render_mock.call_args
+        self.assertEqual(template, 'shoppingcart/shopping_cart.html')
+        # check for the override currency settings in the context
+        self.assertEqual(context['currency'], 'PKR')
+        self.assertEqual(context['currency_symbol'], 'Rs')
 
     def test_clear_cart(self):
         self.login_user()
@@ -801,7 +849,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertEqual(context['order'].total_cost, self.testing_cost)
@@ -834,12 +882,35 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
         self.assertIn(cert_item, context['shoppingcart_items'][1])
         self.assertFalse(context['any_refunds'])
+        # check for the default currency settings in the context
+        self.assertEqual(context['currency_symbol'], '$')
+        self.assertEqual(context['currency'], 'usd')
+
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    def test_show_receipt_success_with_override_currency_settings(self):
+        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        self.login_user()
+        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        self.assertEqual(resp.status_code, 200)
+
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        self.assertEqual(template, 'shoppingcart/receipt.html')
+        self.assertIn(reg_item, context['shoppingcart_items'][0])
+        self.assertIn(cert_item, context['shoppingcart_items'][1])
+
+        # check for the override currency settings in the context
+        self.assertEqual(context['currency_symbol'], 'Rs')
+        self.assertEqual(context['currency'], 'PKR')
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_courseregcode_item_total_price(self):
@@ -873,7 +944,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # check for the enrollment codes content
         self.assertIn('Please send each professional one of these unique registration codes to enroll into the course.', resp.content)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=W0621
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
@@ -963,8 +1034,36 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         ((template, _context), _tmp) = render_mock.call_args
         self.assertEqual(template, cert_item.single_item_receipt_template)
 
+    def _assert_404(self, url, use_post=False):
+        """
+        Helper method to assert that a given url will return a 404 status code
+        """
+        if use_post:
+            response = self.client.post(url)
+        else:
+            response = self.client.get(url)
+        self.assertEquals(response.status_code, 404)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': False})
+    def test_disabled_paid_courses(self):
+        """
+        Assert that the pages that require ENABLE_PAID_COURSE_REGISTRATION=True return a
+        HTTP 404 status code when we have this flag turned off
+        """
+        self.login_user()
+        self._assert_404(reverse('shoppingcart.views.show_cart', args=[]))
+        self._assert_404(reverse('shoppingcart.views.clear_cart', args=[]))
+        self._assert_404(reverse('shoppingcart.views.remove_item', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart.views.register_code_redemption', args=["testing"]))
+        self._assert_404(reverse('shoppingcart.views.use_code', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart.views.update_user_cart', args=[]))
+        self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
+        self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
+        self._assert_404(reverse('shoppingcart.views.register_courses', args=[]))
+
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
     """
     Test suite for RegistrationCodeRedemption Course Enrollments
@@ -996,7 +1095,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         cache.clear()
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
-        for i in xrange(30):  # pylint: disable=W0612
+        for i in xrange(30):  # pylint: disable=unused-variable
             response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
             self.assertEquals(response.status_code, 404)
 
@@ -1020,7 +1119,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         cache.clear()
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
-        for i in xrange(30):  # pylint: disable=W0612
+        for i in xrange(30):  # pylint: disable=unused-variable
             response = self.client.get(url, **{'HTTP_HOST': 'localhost'})
             self.assertEquals(response.status_code, 404)
 
@@ -1216,6 +1315,16 @@ class DonationViewTest(ModuleStoreTestCase):
             self.assertEqual(
                 payment_info["payment_params"]["merchant_defined_data1"],
                 unicode(course_id)
+            )
+            self.assertEqual(
+                payment_info["payment_params"]["merchant_defined_data2"],
+                "donation_course"
+            )
+        else:
+            self.assertEqual(payment_info["payment_params"]["merchant_defined_data1"], "")
+            self.assertEqual(
+                payment_info["payment_params"]["merchant_defined_data2"],
+                "donation_general"
             )
 
         processor_response_params = PaymentFakeView.response_post_params(payment_info["payment_params"])

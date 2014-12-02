@@ -390,6 +390,7 @@ def _import_static_content_wrapper(static_content_store, do_import_static, cours
             dest_course_id, subpath=simport, verbose=verbose
         )
 
+
 def _import_module_and_update_references(
         module, store, user_id,
         source_course_id, dest_course_id,
@@ -604,7 +605,7 @@ def _import_course_draft(
 
                         drafts.append(draft)
 
-                except Exception:  # pylint: disable=W0703
+                except Exception:  # pylint: disable=broad-except
                     logging.exception('Error while parsing course xml.')
 
     # sort drafts by `index_in_children_list` attribute
@@ -613,7 +614,7 @@ def _import_course_draft(
     for draft in get_draft_subtree_roots(drafts):
         try:
             _import_module(draft.module)
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             logging.exception('while importing draft descriptor %s', draft.module)
 
 

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.db import models
+from model_utils.models import TimeStampedModel
 
 from xmodule_django.models import CourseKeyField
 
@@ -10,7 +11,7 @@ from xmodule_django.models import CourseKeyField
 # but currently the rest of the system assumes that "student" defines
 # certain models.  For now we will leave the models in "student" and
 # create an alias in "user_api".
-from student.models import UserProfile, Registration, PendingEmailChange  # pylint:disable=unused-import
+from student.models import UserProfile, Registration, PendingEmailChange  # pylint: disable=unused-import
 
 
 class UserPreference(models.Model):
@@ -59,3 +60,19 @@ class UserCourseTag(models.Model):
 
     class Meta:  # pylint: disable=missing-docstring
         unique_together = ("user", "course_id", "key")
+
+
+class UserOrgTag(TimeStampedModel):
+    """ Per-Organization user tags.
+
+    Allows settings to be configured at an organization level.
+
+    """
+    user = models.ForeignKey(User, db_index=True, related_name="+")
+    key = models.CharField(max_length=255, db_index=True)
+    org = models.CharField(max_length=255, db_index=True)
+    value = models.TextField()
+
+    class Meta:
+        """ Meta class for defining unique constraints. """
+        unique_together = ("user", "org", "key")

@@ -143,9 +143,20 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
         raise EventValidationError(WARNING_IGNORED_TYPE)
 
     if segment_context:
+        # copy required fields from segment's context dict to our custom context dict
+        for context_field_name, segment_context_field_name in [
+            ('course_id', 'course_id'),
+            ('open_in_browser_url', 'open_in_browser_url'),
+            ('agent', 'userAgent')
+        ]:
+            if segment_context_field_name in segment_context:
+                context[context_field_name] = segment_context[segment_context_field_name]
+
+        # copy the entire segment's context dict as a sub-field of our custom context dict
         context['client'] = dict(segment_context)
-        context['agent'] = segment_context.get('userAgent', '')
-        for field in ('traits', 'integrations', 'userAgent'):
+
+        # remove duplicate and unnecessary fields from our copy
+        for field in ('traits', 'integrations', 'userAgent', 'course_id', 'open_in_browser_url'):
             if field in context['client']:
                 del context['client'][field]
 

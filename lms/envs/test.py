@@ -10,7 +10,7 @@ sessions. Assumes structure:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from .common import *
 import os
@@ -52,6 +52,8 @@ FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
+
+FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -350,6 +352,10 @@ MICROSITE_CONFIGURATION = {
         "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
         "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>",
         "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
+        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
+        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
+        "ENABLE_SHOPPING_CART": True,
+        "ENABLE_PAID_COURSE_REGISTRATION": True,
     },
     "default": {
         "university": "default_university",

@@ -7,32 +7,33 @@ Notes for running by hand:
 
 ./manage.py lms --settings test test lms/djangoapps/courseware
 """
-
 import json
 
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.factories import StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from lms.lib.xblock.runtime import quote_slashes
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_GRADED_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+# TODO: the "abtest" node in the sample course "graded" is currently preventing
+# it from being successfully loaded in the mongo modulestore.
+# Fix this testcase class to not depend on that course, and let it use
+# the mocked modulestore instead of the XML.
+@override_settings(MODULESTORE=TEST_DATA_MIXED_GRADED_MODULESTORE)
 class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check for staff being able to masquerade as student.
     """
 
     def setUp(self):
-
         # Clear out the modulestores, causing them to reload
         clear_existing_modulestores()
-
         self.graded_course = modulestore().get_course(SlashSeparatedCourseKey("edX", "graded", "2012_Fall"))
 
         # Create staff account

@@ -2,10 +2,8 @@
 """
 Tests of the Capa XModule
 """
-# pylint: disable=C0111
-# pylint: disable=R0904
-# pylint: disable=C0103
-# pylint: disable=C0302
+# pylint: disable=missing-docstring
+# pylint: disable=invalid-name
 
 import datetime
 import json
@@ -141,6 +139,7 @@ class CapaFactory(object):
                 module.get_score = lambda: {'score': 0, 'total': 1}
 
         return module
+
 
 class CapaFactoryWithFiles(CapaFactory):
     """
@@ -602,7 +601,7 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_check_problem_with_files(self):
         # Check a problem with uploaded files, using the check_problem API.
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
 
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
@@ -651,7 +650,7 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_check_problem_with_files_as_xblock(self):
         # Check a problem with uploaded files, using the XBlock API.
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
 
         # The files we'll be uploading.
         fnames = ["prog1.py", "prog2.py", "prog3.py"]
@@ -1394,7 +1393,6 @@ class CapaModuleTest(unittest.TestCase):
         Run the test for each possible rerandomize value
         """
 
-
         def _reset_and_get_seed(module):
             """
             Reset the XModule and return the module's seed
@@ -1890,3 +1888,29 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': ''
             }
         })
+
+    def test_get_answer_with_jump_to_id_urls(self):
+        """
+        Make sure replace_jump_to_id_urls() is called in get_answer.
+        """
+        problem_xml = textwrap.dedent("""
+        <problem>
+            <p>What is 1+4?</p>
+                <numericalresponse answer="5">
+                  <formulaequationinput />
+                </numericalresponse>
+
+                <solution>
+                <div class="detailed-solution">
+                <p>Explanation</p>
+                <a href="/jump_to_id/c0f8d54964bc44a4a1deb8ecce561ecd">here's the same link to the hint page.</a>
+                </div>
+                </solution>
+        </problem>
+        """)
+
+        data = dict()
+        problem = CapaFactory.create(showanswer='always', xml=problem_xml)
+        problem.runtime.replace_jump_to_id_urls = Mock()
+        problem.get_answer(data)
+        self.assertTrue(problem.runtime.replace_jump_to_id_urls.called)

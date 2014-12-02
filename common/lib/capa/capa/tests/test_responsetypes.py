@@ -606,7 +606,6 @@ class StringResponseTest(ResponseTest):
         self.assert_grade(problem, u"î", "incorrect")
         self.assert_grade(problem, u"o", "incorrect")
 
-
     def test_backslash_and_unicode_regexps(self):
         """
         Test some special cases of [unicode] regexps.
@@ -1042,8 +1041,6 @@ class CodeResponseTest(ResponseTest):
                 self.assertEquals(output[answer_id]['msg'], u'Invalid grader reply. Please contact the course staff.')
 
 
-
-
 class ChoiceResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import ChoiceResponseXMLFactory
     xml_factory_class = ChoiceResponseXMLFactory
@@ -1074,6 +1071,17 @@ class ChoiceResponseTest(ResponseTest):
 
         # No choice 3 exists --> mark incorrect
         self.assert_grade(problem, 'choice_3', 'incorrect')
+
+    def test_grade_with_no_checkbox_selected(self):
+        """
+        Test that answer marked as incorrect if no checkbox selected.
+        """
+        problem = self.build_problem(
+            choice_type='checkbox', choices=[False, False, False]
+        )
+
+        correct_map = problem.grade_answers({})
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
 
 
 class JavascriptResponseTest(ResponseTest):

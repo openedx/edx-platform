@@ -56,6 +56,13 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
 
 
+def _advanced_component_types():
+    """
+    Return advanced component types which can be created.
+    """
+    return [c_type for c_type in ADVANCED_COMPONENT_TYPES if c_type not in settings.DEPRECATED_ADVANCED_COMPONENT_TYPES]
+
+
 @require_GET
 @login_required
 def subsection_handler(request, usage_key_string):
@@ -292,10 +299,11 @@ def get_component_templates(course):
     # enabled for the course.
     course_advanced_keys = course.advanced_modules
     advanced_component_templates = {"type": "advanced", "templates": [], "display_name": _("Advanced")}
+    advanced_component_types = _advanced_component_types()
     # Set component types according to course policy file
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
-            if category in ADVANCED_COMPONENT_TYPES and not category in categories:
+            if category in advanced_component_types and not category in categories:
                 # boilerplates not supported for advanced components
                 try:
                     component_display_name = xblock_type_display_name(category, default_display_name=category)

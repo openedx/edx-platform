@@ -3,6 +3,7 @@
 from collections import namedtuple
 from datetime import datetime
 from decimal import Decimal
+import analytics
 import pytz
 import logging
 import smtplib
@@ -21,6 +22,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.core.urlresolvers import reverse
 from model_utils.managers import InheritanceManager
+from model_utils.models import TimeStampedModel
 from django.core.mail.message import EmailMessage
 
 from xmodule.modulestore.django import modulestore
@@ -29,6 +31,7 @@ from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, UNENROLL_DONE
+from eventtracking import tracker
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
 
@@ -62,7 +65,7 @@ ORDER_STATUSES = (
 )
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
-OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=C0103
+OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=invalid-name
 
 
 class OrderTypes(object):
@@ -155,7 +158,7 @@ class Order(models.Model):
         Return the total cost of the cart.  If the order has been purchased, returns total of
         all purchased and not refunded items.
         """
-        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))  # pylint: disable=E1101
+        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))  # pylint: disable=no-member
 
     def has_items(self, item_type=None):
         """
@@ -163,9 +166,9 @@ class Order(models.Model):
         If an item_type is passed in then we check to see if there are any items of that class type
         """
         if not item_type:
-            return self.orderitem_set.exists()  # pylint: disable=E1101
+            return self.orderitem_set.exists()  # pylint: disable=no-member
         else:
-            items = self.orderitem_set.all().select_subclasses()  # pylint: disable=E1101
+            items = self.orderitem_set.all().select_subclasses()  # pylint: disable=no-member
             for item in items:
                 if isinstance(item, item_type):
                     return True
@@ -175,7 +178,7 @@ class Order(models.Model):
         """
         Reset the items price state in the user cart
         """
-        for item in self.orderitem_set.all():  # pylint: disable=E1101
+        for item in self.orderitem_set.all():  # pylint: disable=no-member
             if item.list_price:
                 item.unit_cost = item.list_price
                 item.list_price = None
@@ -185,7 +188,7 @@ class Order(models.Model):
         """
         Clear out all the items in the cart
         """
-        self.orderitem_set.all().delete()  # pylint: disable=E1101
+        self.orderitem_set.all().delete()  # pylint: disable=no-member
 
     @transaction.commit_on_success
     def start_purchase(self):
@@ -213,7 +216,7 @@ class Order(models.Model):
         The UI/UX may change in the future to make the switching between PaidCourseRegistration
         and CourseRegCodeItems a more explicit UI gesture from the purchaser
         """
-        cart_items = self.orderitem_set.all()  # pylint: disable=E1101
+        cart_items = self.orderitem_set.all()  # pylint: disable=no-member
         is_order_type_business = False
         for cart_item in cart_items:
             if cart_item.qty > 1:
@@ -269,7 +272,7 @@ class Order(models.Model):
         """
         send confirmation e-mail
         """
-        recipient_list = [(self.user.username, getattr(self.user, 'email'), 'user')]  # pylint: disable=E1101
+        recipient_list = [(self.user.username, getattr(self.user, 'email'), 'user')]  # pylint: disable=no-member
         if self.company_contact_email:
             recipient_list.append((self.company_contact_name, self.company_contact_email, 'company_contact'))
         joined_course_names = ""
@@ -306,7 +309,8 @@ class Order(models.Model):
                         'order_items': orderitems,
                         'course_names': ", ".join([course_info[0] for course_info in courses_info]),
                         'dashboard_url': dashboard_url,
-                        'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=E1101
+                        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
+                        'order_placed_by': '{username} ({email})'.format(username=self.user.username, email=getattr(self.user, 'email')),  # pylint: disable=no-member
                         'has_billing_info': settings.FEATURES['STORE_BILLING_INFO'],
                         'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
                         'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL),
@@ -329,7 +333,7 @@ class Order(models.Model):
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
-            log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
+            log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=no-member
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
@@ -351,6 +355,9 @@ class Order(models.Model):
 
         """
         if self.status == 'purchased':
+            log.error(
+                u"`purchase` method called on order {}, but order is already purchased.".format(self.id)  # pylint: disable=no-member
+            )
             return
         self.status = 'purchased'
         self.purchase_time = datetime.now(pytz.utc)
@@ -391,6 +398,37 @@ class Order(models.Model):
             csv_file, courses_info = self.generate_registration_codes_csv(orderitems, site_name)
 
         self.send_confirmation_emails(orderitems, self.order_type == OrderTypes.BUSINESS, csv_file, site_name, courses_info)
+        self._emit_purchase_event(orderitems)
+
+    def _emit_purchase_event(self, orderitems):
+        """
+        Emit an analytics purchase event for this Order. Will iterate over all associated
+        OrderItems and add them as products in the event as well.
+
+        """
+        event_name = 'Completed Order'  # Required event name by Segment
+        try:
+            if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+                tracking_context = tracker.get_tracker().resolve_context()
+                analytics.track(self.user.id, event_name, {  # pylint: disable=no-member
+                    'orderId': self.id,  # pylint: disable=no-member
+                    'total': str(self.total_cost),
+                    'currency': self.currency,
+                    'products': [item.analytics_data() for item in orderitems]
+                }, context={
+                    'Google Analytics': {
+                        'clientId': tracking_context.get('client_id')
+                    }
+                })
+
+        except Exception:  # pylint: disable=broad-except
+            # Capturing all exceptions thrown while tracking analytics events. We do not want
+            # an operation to fail because of an analytics event, so we will capture these
+            # errors in the logs.
+            log.exception(
+                u'Unable to emit {event} event for user {user} and order {order}'.format(
+                    event=event_name, user=self.user.id, order=self.id)  # pylint: disable=no-member
+            )
 
     def add_billing_details(self, company_name='', company_contact_name='', company_contact_email='', recipient_name='',
                             recipient_email='', customer_reference_number=''):
@@ -434,7 +472,7 @@ class Order(models.Model):
         return instruction_dict, instruction_set
 
 
-class OrderItem(models.Model):
+class OrderItem(TimeStampedModel):
     """
     This is the basic interface for order items.
     Order items are line items that fill up the shopping carts and orders.
@@ -545,6 +583,26 @@ class OrderItem(models.Model):
         """
         return ''
 
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
+
+        The default implementation returns defaults for most attributes. When no name or
+        category is specified by the implementation, the string 'N/A' is placed for the
+        name and category.  This should be handled appropriately by all implementations.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
+
+        """
+        return {
+            'id': self.id,  # pylint: disable=no-member
+            'sku': type(self).__name__,
+            'name': 'N/A',
+            'price': str(self.unit_cost),
+            'quantity': self.qty,
+            'category': 'N/A',
+        }
+
 
 class Invoice(models.Model):
     """
@@ -594,7 +652,7 @@ class CourseRegistrationCode(models.Model):
             for item in cart_items:
                 CourseEnrollment.enroll(cart.user, item.course_id)
                 log.info("Enrolled '{0}' in free course '{1}'"
-                         .format(cart.user.email, item.course_id))  # pylint: disable=E1101
+                         .format(cart.user.email, item.course_id))  # pylint: disable=no-member
                 item.status = 'purchased'
                 item.save()
 
@@ -776,7 +834,7 @@ class PaidCourseRegistration(OrderItem):
         This will return the total amount of money that a purchased course generated
         """
         total_cost = 0
-        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=E1101
+        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=no-member
 
         if result['total'] is not None:
             total_cost = result['total']
@@ -856,7 +914,7 @@ class PaidCourseRegistration(OrderItem):
         CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
-                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=E1101
+                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member
 
     def generate_receipt_instructions(self):
         """
@@ -878,6 +936,25 @@ class PaidCourseRegistration(OrderItem):
             return PaidCourseRegistrationAnnotation.objects.get(course_id=self.course_id).annotation
         except PaidCourseRegistrationAnnotation.DoesNotExist:
             return u""
+
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
+
+        If the Order Item is associated with a course, additional fields will be populated with
+        course information. If there is a mode associated, the mode data is included in the SKU.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
+
+        """
+        data = super(PaidCourseRegistration, self).analytics_data()
+        sku = data['sku']
+        if self.course_id != CourseKeyField.Empty:
+            data['name'] = unicode(self.course_id)
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=no-member
+        if self.mode:
+            data['sku'] = sku + u'.' + unicode(self.mode)
+        return data
 
 
 class CourseRegCodeItem(OrderItem):
@@ -905,7 +982,7 @@ class CourseRegCodeItem(OrderItem):
         This will return the total amount of money that a purchased course generated
         """
         total_cost = 0
-        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=E1101
+        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=no-member
 
         if result['total'] is not None:
             total_cost = result['total']
@@ -914,7 +991,7 @@ class CourseRegCodeItem(OrderItem):
 
     @classmethod
     @transaction.commit_on_success
-    def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=W0221
+    def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=arguments-differ
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -952,7 +1029,7 @@ class CourseRegCodeItem(OrderItem):
 
         super(CourseRegCodeItem, cls).add_to_order(order, course_id, cost, currency=currency)
 
-        item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)  # pylint: disable=W0612
+        item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)  # pylint: disable=unused-variable
         item.status = order.status
         item.mode = course_mode.slug
         item.unit_cost = cost
@@ -983,11 +1060,11 @@ class CourseRegCodeItem(OrderItem):
         # file, but there's also a shared dependency on a random string generator which
         # is in another PR (for another feature)
         from instructor.views.api import save_registration_code
-        for i in range(total_registration_codes):  # pylint: disable=W0612
+        for i in range(total_registration_codes):  # pylint: disable=unused-variable
             save_registration_code(self.user, self.course_id, invoice=None, order=self.order)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
-                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=E1101
+                 .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member
 
     @property
     def csv_report_comments(self):
@@ -999,6 +1076,25 @@ class CourseRegCodeItem(OrderItem):
             return CourseRegCodeItemAnnotation.objects.get(course_id=self.course_id).annotation
         except CourseRegCodeItemAnnotation.DoesNotExist:
             return u""
+
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
+
+        If the OrderItem is associated with a course, additional fields will be populated with
+        course information. If a mode is available, it will be included in the SKU.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
+
+        """
+        data = super(CourseRegCodeItem, self).analytics_data()
+        sku = data['sku']
+        if self.course_id != CourseKeyField.Empty:
+            data['name'] = unicode(self.course_id)
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=no-member
+        if self.mode:
+            data['sku'] = sku + u'.' + unicode(self.mode)
+        return data
 
 
 class CourseRegCodeItemAnnotation(models.Model):
@@ -1040,7 +1136,7 @@ class CertificateItem(OrderItem):
     mode = models.SlugField()
 
     @receiver(UNENROLL_DONE)
-    def refund_cert_callback(sender, course_enrollment=None, **kwargs):
+    def refund_cert_callback(sender, course_enrollment=None, skip_refund=False, **kwargs):  # pylint: disable=no-self-argument,unused-argument
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
         occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
@@ -1050,7 +1146,7 @@ class CertificateItem(OrderItem):
         """
 
         # Only refund verified cert unenrollments that are within bounds of the expiration date
-        if not course_enrollment.refundable():
+        if (not course_enrollment.refundable()) or skip_refund:
             return
 
         target_certs = CertificateItem.objects.filter(course_id=course_enrollment.course_id, user_id=course_enrollment.user, status='purchased', mode='verified')
@@ -1221,6 +1317,25 @@ class CertificateItem(OrderItem):
                 status='purchased',
                 unit_cost__gt=(CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd')))).count()
 
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
+
+        If the CertificateItem is associated with a course, additional fields will be populated with
+        course information. If there is a mode associated with the certificate, it is included in the SKU.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
+
+        """
+        data = super(CertificateItem, self).analytics_data()
+        sku = data['sku']
+        if self.course_id != CourseKeyField.Empty:
+            data['name'] = unicode(self.course_id)
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=no-member
+        if self.mode:
+            data['sku'] = sku + u'.' + unicode(self.mode)
+        return data
+
 
 class DonationConfiguration(ConfigurationModel):
     """Configure whether donations are enabled on the site."""
@@ -1368,3 +1483,24 @@ class Donation(OrderItem):
         return {
             'receipt_has_donation_item': True,
         }
+
+    def analytics_data(self):
+        """Simple function used to construct analytics data for the OrderItem.
+
+        If the donation is associated with a course, additional fields will be populated with
+        course information. When no name or category is specified by the implementation, the
+        platform name is used as a default value for required event fields, to declare that
+        the Order is specific to the platform, rather than a specific product name or category.
+
+        Returns
+            A dictionary containing analytics data for this OrderItem.
+
+        """
+        data = super(Donation, self).analytics_data()
+        if self.course_id != CourseKeyField.Empty:
+            data['name'] = unicode(self.course_id)
+            data['category'] = unicode(self.course_id.org)  # pylint: disable=no-member
+        else:
+            data['name'] = settings.PLATFORM_NAME
+            data['category'] = settings.PLATFORM_NAME
+        return data

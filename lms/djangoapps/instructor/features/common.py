@@ -2,14 +2,14 @@
 Define common steps for instructor dashboard acceptance tests.
 """
 
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from __future__ import absolute_import
 
 from lettuce import world, step
 from mock import patch
-from nose.tools import assert_in  # pylint: disable=E0611
+from nose.tools import assert_in  # pylint: disable=no-name-in-module
 
 from courseware.tests.factories import StaffFactory, InstructorFactory
 

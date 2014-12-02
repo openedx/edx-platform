@@ -4,13 +4,14 @@ Tests for course_info
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase
+
+from courseware.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.factories import UserFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestVideoOutline(ModuleStoreTestCase, APITestCase):
     """
     Tests for /api/mobile/v0.5/course_info/...
@@ -25,7 +26,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         url = reverse('course-about-detail', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('overview' in response.data)  # pylint: disable=E1103
+        self.assertTrue('overview' in response.data)  # pylint: disable=maybe-no-member
 
     def test_handouts(self):
         url = reverse('course-handouts-list', kwargs={'course_id': unicode(self.course.id)})
@@ -36,5 +37,5 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         url = reverse('course-updates-list', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, [])  # pylint: disable=E1103
+        self.assertEqual(response.data, [])  # pylint: disable=maybe-no-member
         # TODO: add handouts and updates, somehow

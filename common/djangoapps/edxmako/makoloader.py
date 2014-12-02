@@ -34,7 +34,6 @@ class MakoLoader(object):
 
         self.module_directory = module_directory
 
-
     def __call__(self, template_name, template_dirs=None):
         return self.load_template(template_name, template_dirs)
 

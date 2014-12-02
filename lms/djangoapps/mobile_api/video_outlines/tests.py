@@ -1,25 +1,31 @@
 """
 Tests for video outline API
 """
+import copy
+import ddt
+from uuid import uuid4
+
+from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from django.conf import settings
+from edxval import api
+from rest_framework.test import APITestCase
+
+from courseware.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.video_module import transcripts_utils
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
-from courseware.tests.factories import UserFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
-from django.conf import settings
-from rest_framework.test import APITestCase
-from edxval import api
-from uuid import uuid4
-import copy
+
+from mobile_api.tests import ROLE_CASES
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@ddt.ddt
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE, CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestVideoOutline(ModuleStoreTestCase, APITestCase):
     """
     Tests for /api/mobile/v0.5/video_outlines/
@@ -99,11 +105,20 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
 
         self.client.login(username=self.user.username, password='test')
 
-    def test_course_not_available(self):
-        nonmobile = CourseFactory.create()
+    @ddt.data(*ROLE_CASES)
+    @ddt.unpack
+    def test_non_mobile_access(self, role, should_succeed):
+        nonmobile = CourseFactory.create(mobile_available=False)
+
+        if role:
+            role(nonmobile.id).add_users(self.user)
+
         url = reverse('video-summary-list', kwargs={'course_id': unicode(nonmobile.id)})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        if should_succeed:
+            self.assertEqual(response.status_code, 200)
+        else:
+            self.assertEqual(response.status_code, 403)
 
     def _get_video_summary_list(self):
         """
@@ -112,7 +127,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         url = reverse('video-summary-list', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        return response.data  # pylint: disable=E1103
+        return response.data  # pylint: disable=maybe-no-member
 
     def _create_video_with_subs(self):
         """
@@ -173,6 +188,7 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         self.assertEqual(course_outline[1]['summary']['video_url'], self.html5_video_url)
         self.assertEqual(course_outline[1]['summary']['size'], 0)
         self.assertEqual(course_outline[1]['path'][2]['name'], self.other_unit.display_name)
+        self.assertEqual(course_outline[1]['path'][2]['id'], unicode(self.other_unit.location))
 
         self.assertEqual(course_outline[2]['summary']['video_url'], self.html5_video_url)
         self.assertEqual(course_outline[2]['summary']['size'], 0)

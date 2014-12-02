@@ -1,6 +1,9 @@
-# pylint: disable=E1101
-# pylint: disable=W0212
-# pylint: disable=E0611
+"""
+Unit tests for the Mongo modulestore
+"""
+# pylint: disable=no-member
+# pylint: disable=protected-access
+# pylint: disable=no-name-in-module
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
 # pylint: enable=E0611
@@ -685,12 +688,8 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
     def test_no_asset_collection(self):
         courses = self.draft_store.get_courses()
         course = courses[0]
-        # Confirm that no asset collection means no asset metadata.
-        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id), None)
-        # Now delete the non-existent asset metadata.
-        self.draft_store.delete_all_asset_metadata(course.id, ModuleStoreEnum.UserID.test)
-        # Should still be nothing.
-        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id), None)
+        # Confirm that no specified asset collection name means empty asset metadata.
+        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
 
 
 class TestMongoKeyValueStore(object):

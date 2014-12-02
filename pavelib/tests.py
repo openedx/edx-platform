@@ -103,6 +103,9 @@ def test_lib(options):
     test_suite = suites.PythonTestSuite('python tests', subsuites=lib_tests, **opts)
     test_suite.run()
 
+    # Clear the Esperanto directory of any test artifacts
+    sh('git checkout conf/locale/eo')
+
 
 @task
 @needs(
@@ -159,7 +162,7 @@ def test(options):
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @cmdopts([
-    ("compare_branch", "b", "Branch to compare against, defaults to origin/master"),
+    ("compare_branch=", "b", "Branch to compare against, defaults to origin/master"),
 ])
 def coverage(options):
     """

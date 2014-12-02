@@ -2,7 +2,7 @@
 
 ${_("Thank you for your purchase of {course_name}!").format(course_name=course.display_name)}
 
-${_("An invoice for ${total_price} is attached. Payment is due immediately.  Information on payment methods can be found on the invoice.").format(total_price=sale_price)}
+${_("An invoice for {currency_symbol}{total_price} is attached. Payment is due immediately.  Information on payment methods can be found on the invoice.").format(currency_symbol=currency_symbol, total_price=sale_price)}
 
 ${_("A CSV file of your registration codes is attached. Please distribute registration codes to each student planning to enroll using the email template below.")}
 

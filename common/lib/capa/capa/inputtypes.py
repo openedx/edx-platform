@@ -63,7 +63,7 @@ log = logging.getLogger(__name__)
 
 #########################################################################
 
-registry = TagRegistry()  # pylint: disable=C0103
+registry = TagRegistry()  # pylint: disable=invalid-name
 
 
 class Status(object):
@@ -838,7 +838,6 @@ class MatlabInput(CodeInput):
                 self.msg = _(
                     'No response from Xqueue within {xqueue_timeout} seconds. Aborted.'
                 ).format(xqueue_timeout=XQUEUE_TIMEOUT)
-
 
     def handle_ajax(self, dispatch, data):
         """

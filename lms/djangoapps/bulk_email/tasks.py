@@ -252,7 +252,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     return progress
 
 
-@task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)  # pylint: disable=E1102
+@task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)  # pylint: disable=not-callable
 def send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status_dict):
     """
     Sends an email to a list of recipients.
@@ -336,11 +336,11 @@ def send_course_email(entry_id, email_id, to_list, global_email_context, subtask
         # was encountered has already been updated before the retry call was made,
         # so we only log here.
         log.warning("Send-email task %s for email %s: being retried", current_task_id, email_id)
-        raise send_exception  # pylint: disable=E0702
+        raise send_exception  # pylint: disable=raising-bad-type
     else:
         log.error("Send-email task %s for email %s: failed: %s", current_task_id, email_id, send_exception)
         update_subtask_status(entry_id, current_task_id, new_subtask_status)
-        raise send_exception  # pylint: disable=E0702
+        raise send_exception  # pylint: disable=raising-bad-type
 
     # return status in a form that can be serialized by Celery into JSON:
     log.info("Send-email task %s for email %s: returning status %s", current_task_id, email_id, new_subtask_status)
