@@ -133,8 +133,10 @@ generate_merge:
         - mako-studio.po
         - messages.po
         - wiki.po
+        - gacco.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po
         - underscore.po
         - underscore-studio.po
+        - gaccojs.po
