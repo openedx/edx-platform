@@ -4,6 +4,7 @@ Unit tests for contentstore.views.library
 More important high-level tests are in contentstore/tests/test_libraries.py
 """
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
+from contentstore.views.component import get_component_templates
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import LibraryFactory
 from mock import patch
@@ -183,3 +184,16 @@ class UnitTestLibraries(ModuleStoreTestCase):
         lib = LibraryFactory.create()
         response = self.client.get(make_url_for_lib(lib.location.library_key))
         self.assertEqual(response.status_code, 403)
+
+    def test_get_component_templates(self):
+        """
+        Verify that templates for adding discussion and advanced components to
+        content libraries are not provided.
+        """
+        lib = LibraryFactory.create()
+        lib.advanced_modules = ['lti']
+        lib.save()
+        templates = [template['type'] for template in get_component_templates(lib, library=True)]
+        self.assertIn('problem', templates)
+        self.assertNotIn('discussion', templates)
+        self.assertNotIn('advanced', templates)

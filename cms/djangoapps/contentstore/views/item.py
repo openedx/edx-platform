@@ -460,6 +460,13 @@ def _create_item(request):
     if not has_course_author_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
+    if isinstance(usage_key, LibraryUsageLocator):
+        # Only these categories are supported at this time.
+        if category not in ['html', 'problem', 'video']:
+            return HttpResponseBadRequest(
+                "Category '%s' not supported for Libraries" % category, content_type='text/plain'
+            )
+
     store = modulestore()
     with store.bulk_operations(usage_key.course_key):
         parent = store.get_item(usage_key)

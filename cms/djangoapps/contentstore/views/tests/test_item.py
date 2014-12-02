@@ -1469,6 +1469,41 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
         self.assertIsNone(xblock_info.get('graders', None))
 
 
+class TestLibraryXBlockCreation(ItemTest):
+    """
+    Tests the adding of XBlocks to Library
+    """
+    def test_add_xblock(self):
+        """
+        Verify we can add an XBlock to a Library.
+        """
+        lib = LibraryFactory.create()
+        self.create_xblock(parent_usage_key=lib.location, display_name='Test', category="html")
+        lib = self.store.get_library(lib.location.library_key)
+        self.assertTrue(lib.children)
+        xblock_locator = lib.children[0]
+        self.assertEqual(self.store.get_item(xblock_locator).display_name, 'Test')
+
+    def test_no_add_discussion(self):
+        """
+        Verify we cannot add a discussion module to a Library.
+        """
+        lib = LibraryFactory.create()
+        response = self.create_xblock(parent_usage_key=lib.location, display_name='Test', category='discussion')
+        self.assertEqual(response.status_code, 400)
+        lib = self.store.get_library(lib.location.library_key)
+        self.assertFalse(lib.children)
+
+    def test_no_add_advanced(self):
+        lib = LibraryFactory.create()
+        lib.advanced_modules = ['lti']
+        lib.save()
+        response = self.create_xblock(parent_usage_key=lib.location, display_name='Test', category='lti')
+        self.assertEqual(response.status_code, 400)
+        lib = self.store.get_library(lib.location.library_key)
+        self.assertFalse(lib.children)
+
+
 class TestXBlockPublishingInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
