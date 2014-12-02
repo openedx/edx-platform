@@ -220,13 +220,6 @@ def _get_all_courses():
     Utitilty function to list all available courses.
 
     """
-<<<<<<< HEAD
     ms_courses = modulestore().get_courses()
     courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
-=======
-
-    ms_courses = modulestore().get_courses()
-    courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
-
->>>>>>> hotfix-2014-11-24
     return courses

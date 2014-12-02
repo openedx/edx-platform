@@ -7,7 +7,6 @@ import urllib
 import urllib2
 import json
 from util.json_request import JsonResponse
-from datetime import datetime
 from pytz import timezone
 
 from datetime import datetime
@@ -29,7 +28,6 @@ from edxmako.shortcuts import render_to_response, render_to_string, marketing_li
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
-from functools import wraps
 from markupsafe import escape
 
 from courseware import grades
@@ -43,13 +41,8 @@ from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
 from open_ended_grading import open_ended_notifications
-<<<<<<< HEAD
 from student.models import UserTestGroup, CourseEnrollment, UserProfile
-from student.views import single_course_reverification_info
-=======
-from student.models import UserTestGroup, CourseEnrollment
 from student.views import single_course_reverification_info, is_course_blocked
->>>>>>> hotfix-2014-11-24
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
@@ -61,8 +54,6 @@ import shoppingcart
 from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from opaque_keys import InvalidKeyError
-
-from mako.exceptions import TopLevelLookupException
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -1145,7 +1136,6 @@ def get_course_lti_endpoints(request, course_id):
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
 
 
-<<<<<<< HEAD
 @require_GET
 def get_analytics_answer_dist(request):
     """
@@ -1248,7 +1238,8 @@ def process_analytics_answer_dist(data):
     }
 
     return JsonResponse(response_payload)
-=======
+
+
 @login_required
 def course_survey(request, course_id):
     """
@@ -1274,4 +1265,3 @@ def course_survey(request, course_id):
         redirect_url=redirect_url,
         is_required=course.course_survey_required,
     )
->>>>>>> hotfix-2014-11-24

@@ -475,17 +475,16 @@ urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
-<<<<<<< HEAD
 if settings.FEATURES.get('ENABLE_SUPERUSER_LOGIN_AS'):
     urlpatterns += (
         url(r'^su_login_as/(?P<username>[\w.@+-]+)/?$', 'student.views.superuser_login_as', name='impersonate'),
     )
-=======
+
 # Survey Djangoapp
 urlpatterns += (
     url(r'^survey/', include('survey.urls')),
 )
->>>>>>> hotfix-2014-11-24
+
 
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
