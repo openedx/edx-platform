@@ -1,5 +1,5 @@
 & {
-    margin-bottom: ($baseline*1.5);
+    margin-bottom: 30px;
 }
 
 .is-hidden {
@@ -28,7 +28,7 @@ div.video {
   }
 
   div.tc-wrapper {
-    @include clearfix();
+    @include clearfix;
     position: relative;
   }
 
@@ -42,20 +42,21 @@ div.video {
   .wrapper-downloads {
     margin: 0;
     padding: 0;
+    list-style: none;
 
     .video-download-button{
       display: inline-block;
       vertical-align: top;
-      margin: ($baseline*0.75) ($baseline/2) 0 0;
+      margin: ($baseline*.75) ($baseline/2) 0 0;
 
       > a {
-        @include transition(all $tmg-f2 ease-in-out 0s);
+        @include transition(all 0.25s ease-in-out 0s);
         @include font-size(14);
         line-height : 14px;
         float: left;
         border-radius: 3px;
         background-color: $very-light-text;
-        padding: ($baseline*0.75);
+        padding: ($baseline*.75);
         color: $lighter-base-font-color;
 
         &:hover, &:focus {
@@ -64,24 +65,48 @@ div.video {
         }
       }
     }
+
     .video-tracks {
       > a {
         border-radius: 3px 0 0 3px;
       }
+
       > a.external-track {
         border-radius: 3px;
       }
     }
+
+    .branding {
+      display: inline-block;
+      float: right;
+      margin: 15px 0 0 10px;
+      vertical-align: top;
+
+      .host-tag {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 70%;
+        color: #777;
+      }
+
+      .brand-logo {
+        display: inline-block;
+        max-width: 100%;
+        max-height: ($baseline*1.5);
+        padding: ($baseline/4) 0;
+        vertical-align: middle;
+      }
+    }
   }
 
-  article.video-wrapper {
-    float: left;
-    margin-right: flex-gutter(9);
-    width: flex-grid(6, 9);
-    background-color: black;
+  .video-wrapper {
     position: relative;
+    float: left;
+    width: flex-grid(6, 9);
+    margin-right: flex-gutter(9);
+    background-color: black;
 
-    div.video-player-pre, div.video-player-post {
+    .video-player-pre, .video-player-post {
        height: 50px;
        background-color: black;
     }
@@ -89,23 +114,23 @@ div.video {
     .spinner {
       @include transform(translate(-50%, -50%));
       position: absolute;
-      z-index: 1;
-      background: rgba(0, 0, 0, 0.7);
       top: 50%;
       left: 50%;
+      z-index: 1;
       padding: 30px;
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 25%;
 
       &:after{
         @include animation(rotateCW 3s infinite linear);
-        content: '';
         display: block;
+        position: relative;
+        content: '';
         width: 30px;
         height: 30px;
         border: 7px solid white;
         border-top-color: transparent;
         border-radius: 100%;
-        position: relative;
       }
     }
 
@@ -113,25 +138,25 @@ div.video {
       @include transform(translate(-50%, -50%));
       position: absolute;
       z-index: 1;
-      background: rgba(0, 0, 0, 0.7);
       top: 50%;
       left: 50%;
       padding: 30px;
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 25%;
 
       &:after{
-        content: '';
         display: block;
+        position: relative;
+        content: '';
         width: 0px;
         height: 0px;
         border-style: solid;
         border-width: 30px 0 30px 50px;
-        border-color: transparent transparent transparent $white;
-        position: relative;
+        border-color: transparent transparent transparent #ffffff;
       }
     }
 
-    section.video-player {
+    .video-player {
       overflow: hidden;
       min-height: 300px;
 
@@ -144,8 +169,8 @@ div.video {
       }
 
       object, iframe, video {
-        border: none;
         width: 100%;
+        border: none;
       }
 
       h3 {
@@ -158,59 +183,51 @@ div.video {
       }
     }
 
-    section.video-controls {
+    .video-controls {
       @include clearfix();
-      background: #333;
-      border: 1px solid $black;
-      border-top: 0;
-      color: $gray-l3;
       position: relative;
 
       &:hover, &:focus {
+
         ul, div {
           opacity: 1;
         }
       }
 
       %video-button {
-        @extend %ui-fake-link;
         @include transition(none);
         display: block;
-        font-weight: 800;
-        line-height: 46px;
+        overflow: hidden;
         margin: 0;
         padding: 0 0 0 15px;
-        overflow: hidden;
-        text-indent: -9999px;
-        -webkit-font-smoothing: antialiased;
-        box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-        color: $white;
+        color: #fff;
+        font-weight: 800;
+        line-height: 46px;
         border-width: 0 1px;
         border-style: solid;
-        border-color: $black;
+        border-color: #000;
+        cursor: pointer;
+        -webkit-font-smoothing: antialiased;
 
         &:hover, &:focus {
           background-color: #444;
-          color: $white;
+          color: #fff;
           text-decoration: none;
         }
 
         &:active,
         &:focus {
-          color: $white;
+          color: #fff;
           background-color: #444;
           text-decoration: none;
         }
       }
 
-      div.slider {
+      .slider {
         @include clearfix();
         @include transform(scaleY(0.5) translate3d(0, 50%, 0));
         background: #c2c2c2;
-        border: 1px solid $black;
         border-radius: 0;
-        border-top: 1px solid $black;
-        box-shadow: inset 0 1px 0 #eee, 0 1px 0 #555;
         position: absolute;
         z-index: 1;
         bottom: 100%;
@@ -224,32 +241,31 @@ div.video {
         -ms-transition: -ms-transform 0.7s ease-in-out;
         transition: transform 0.7s ease-in-out;
 
-        div.ui-widget-header {
+        .ui-widget-header {
           background: #777;
-          box-shadow: inset 0 1px 0 #999;
         }
 
-        div.ui-corner-all.slider-range {
+        .ui-corner-all.slider-range {
           background-color: #1e91d3;
           opacity: 0.3;
         }
 
         a.ui-slider-handle {
-          @extend %ui-fake-link;
           @include transform(scale(.7, 1.3) translate3d(-80%, -15%, 0));
+          top: 0;
+          height: 20px;
+          width: 20px;
+          margin-left: 0;
           background: $pink url(../images/slider-handle.png) center center no-repeat;
           background-size: 50%;
           border: 1px solid darken($pink, 20%);
           border-radius: 50%;
           box-shadow: inset 0 1px 0 lighten($pink, 10%);
-          height: 20px;
-          margin-left: 0;
-          top: 0;
           -webkit-transition: -webkit-transform 0.7s ease-in-out;
           -moz-transition: -moz-transform 0.7s ease-in-out;
           -ms-transition: -ms-transform 0.7s ease-in-out;
           transition: transform 0.7s ease-in-out;
-          width: 20px;
+          cursor: pointer;
 
           &:focus, &:hover {
             background-color: lighten($pink, 10%);
@@ -257,131 +273,167 @@ div.video {
         }
       }
 
-      ul.vcr {
-        float: left;
-        list-style: none;
-        margin: 0 lh() 0 0;
-        padding: 0;
+      .video-control,
+      .speeds,
+      .volume,
+      .size-quality-controls,
+      .language-control,
+      .branding,
+      .label,
+      .value,
+      .size-control,
+      .add-fullscreen {
+        height: 46px;
+        line-height: 46px;
+      }
 
-        @media (max-width: 1120px) {
-          margin-right: lh(0.5);
-          font-size: em(14);
-        }
+      .video-playback-controls {
+        @include clearfix();
+        background: #181818;
+        color: #f2f2f2;
 
-        li {
+        .video-controls-options {
+          display: block;
           float: left;
-          margin-bottom: 0;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          border-right: 1px solid #666;
 
-          a {
-            @extend %video-button;
-            background-image: url('../images/vcr.png');
-            background-position: 15px 15px ;
-            background-repeat: no-repeat;
-            border-left: none;
-            box-shadow: 1px 0 0 #555;
-            padding: 0 lh(.75);
-            width: 14px;
+          .video-control {
+            display: block;
+            float: left;
+            margin: 0;
 
-            &:focus {
-              @extend %ui-depth4;
-              position: relative;
-              outline: $white dotted thin;
-              outline-offset: -2px;
+            a {
+              @extend %video-button;
+              width: 14px;
+              padding: 0 lh(.75);
+              box-shadow: none;
+              border: none;
+              text-align: center;
+
+              &:focus {
+                position: relative;
+                z-index: 10000;
+                outline: $white dotted thin;
+                outline-offset: -2px;
+              }
+
+              &:empty {
+                height: 46px;
+              }
             }
 
-            &:empty {
-              height: 46px;
-              background-position: 15px 15px;
-            }
+            .vidtime {
+              padding: 0 lh(.75);
+              font-weight: bold;
+              -webkit-font-smoothing: antialiased;
 
-            &.play {
-              background-position: 17px -114px;
-            }
-
-            &.pause {
-              background-position: 16px -50px;
+              @media (max-width: 1120px) {
+                padding-left: lh(.5);
+              }
             }
           }
 
-          div.vidtime {
-            font-weight: bold;
-            line-height: 46px; //height of play pause buttons
-            -webkit-font-smoothing: antialiased;
-            padding-left: lh(.75);
-            @media (max-width: 1120px) {
-              padding-left: lh(0.5);
-            }
+          .video-control:first-child {
+            border-right: 1px solid #666;
+          }
+
+          @media (max-width: 1120px) {
+            margin-right: lh(.5);
+            font-size: em(14);
           }
         }
       }
 
-      div.secondary-controls {
-        float: right;
+      .secondary-controls {
+        display: block;
+        float: left;
 
-        a.speed-button,
-        div.volume > a,
-        a.add-fullscreen,
-        a.quality-control,
-        a.hide-subtitles {
-          // overflow is used to bypass Firefox CSS :focus outline bug
-          // http://johndoesdesign.com/blog/2012/css/firefox-and-its-css-focus-outline-bug/
-          &:focus {
-            @extend %ui-depth5;
-            position: relative;
-            outline: $white dotted thin;
-            outline-offset: -2px;
-            overflow: auto;
-          }
-        }
-
-        .menu-container {
-          float: left;
+        .speeds {
+          display: block;
           position: relative;
+          float: left;
+          border-right: 1px solid #666;
 
-          &.is-opened {
-            .menu {
-              display: block;
-              opacity: 1;
-              padding: 0;
-              margin: 0;
-              list-style: none;
+          .speed-button {
+            @extend %video-button;
+            @include clearfix();
+            border: none;
+            text-indent: 0;
+
+            @media (max-width: 1120px) {
+              min-width: 0;
+              width: 60px;
+            }
+
+            .icon {
+              float: left;
+              margin-top: 1em;
+              min-width: ($baseline / 2);
+            }
+
+            .label {
+              float: left;
+              padding: 0 lh(.25) 0 lh(.5);
+              font-size: em(14);
+              font-weight: normal;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+              color: #999;
+
+              @media (max-width: 1120px) {
+                display: none;
+              }
+            }
+
+            .value {
+              float: left;
+              margin-bottom: 0;
+              padding: 0 lh(.5) 0 0;
+              font-weight: bold;
+              color: #fff;
+
+              @media (max-width: 1120px) {
+                padding: 0 lh(.5) 0 lh(.5);
+              }
             }
           }
 
-          .menu {
+          .video-speeds {
             @include transition(none);
-            @extend %ui-depth1;
-            box-shadow: inset 1px 0 0 #555, 0 1px 0 #444;
-            background-color: #444;
-            border: 1px solid $black;
-            bottom: 46px;
             display: none;
-            opacity: 0;
             position: absolute;
+            z-index: 10;
+            width: 127px;
+            bottom: 46px;
+            opacity: 0;
+            background-color: #444;
 
             li {
-              @extend %ui-fake-link;
-              box-shadow:  0 1px 0 #555;
-              border-bottom: 1px solid $black;
-              color: $white;
+              color: #fff;
+              cursor: pointer;
 
               a {
-                border: 0;
-                color: $white;
                 display: block;
-                padding: lh(0.5);
                 overflow: hidden;
+                padding: lh(.5);
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                border: 0;
+                color: #fff;
 
-                &:hover, &:focus {
+                &:hover,
+                &:focus {
                   background-color: #666;
                   color: #aaa;
                   outline-offset: -4px;
                 }
               }
 
-              &.is-active{
+              &.is-active {
+
                 a {
                   font-weight: bold;
                 }
@@ -393,131 +445,91 @@ div.video {
                 margin-top: 0;
               }
             }
-          }
-        }
-
-        div.speeds {
-          &.is-opened {
-            .speed-button {
-              background-image: url('../images/open-arrow.png');
-            }
-          }
-
-          .menu{
-            width: 131px;
 
             @media (max-width: 1120px) {
               width: 80px;
             }
           }
 
-          .speed-button {
-            @extend %video-button;
-            @include clearfix();
-            background-image: url('../images/closed-arrow.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
-            min-width: 116px;
-            text-indent: 0;
+          &.is-opened {
 
-            @media (max-width: 1120px) {
-              min-width: 0;
-              width: 60px;
-            }
-
-            .label {
-              float: left;
-              font-size: em(14);
-              font-weight: normal;
-              letter-spacing: 1px;
-              padding: 0 lh(0.25) 0 lh(0.5);
-              line-height: 46px;
-              text-transform: uppercase;
-              color: #999;
-
-              @media (max-width: 1120px) {
-                display: none;
-              }
-            }
-
-            .value {
-              float: left;
-              font-weight: bold;
-              margin-bottom: 0;
-              padding: 0 lh(0.5) 0 0;
-
-              @media (max-width: 1120px) {
-                padding: 0 lh(0.5) 0 lh(0.5);
-              }
-
-              line-height: 46px;
-              color: $white;
+            .video-speeds {
+              display: block;
+              opacity: 1;
+              padding: 0;
+              margin: 0;
+              list-style: none;
             }
           }
         }
 
-        div.volume {
-          float: left;
+        a.speed-button,
+        div.volume > a,
+        a.add-fullscreen,
+        a.quality-control,
+        a.hide-subtitles {
+
+          &:focus {
+            position: relative;
+            z-index: 10000;
+            overflow: auto;
+            outline: $white dotted thin;
+            outline-offset: -2px;
+          }
+        }
+
+        .volume {
           position: relative;
+          display: block;
+          float: left;
+          border-right: 1px solid #666;
 
           &.is-opened {
+
             .volume-slider-container {
               display: block;
               opacity: 1;
             }
           }
 
-          &.is-muted {
-            & > a {
-              background-image: url('../images/mute.png');
-            }
-          }
-
           & > a {
             @extend %video-button;
             @include clearfix();
-            background-image: url('../images/volume.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
-            border-left: none;
             width: 30px;
             height: 46px;
+            border: none;
           }
 
           .volume-slider-container {
             @include transition(none);
-            @extend %ui-depth1;
-            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
-            background-color: #444;
-            border: 1px solid $black;
-            bottom: 46px;
             display: none;
-            opacity: 0;
             position: absolute;
+            z-index: 10;
+            bottom: 46px;
+            margin-left: -1px;
             width: 45px;
             height: 125px;
-            margin-left: -1px;
+            opacity: 0;
+            background-color: #444;
 
             .volume-slider {
               height: 100px;
-              border: 0;
               width: 5px;
               margin: 14px auto;
+              border: 0;
               background: #666;
-              border: 1px solid $black;
-              box-shadow: 0 1px 0 #333;
 
               a.ui-slider-handle {
-                @extend %ui-fake-link;
-                @include transition(height $tmg-s2 ease-in-out 0s, width $tmg-s2 ease-in-out 0s);
+                @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
+                left: -6px;
+                height: 15px;
+                width: 15px;
                 background: $pink url(../images/slider-handle.png) center center no-repeat;
                 background-size: 50%;
                 border: 1px solid darken($pink, 20%);
                 border-radius: 15px;
                 box-shadow: inset 0 1px 0 lighten($pink, 10%);
-                height: 15px;
-                left: -6px;
-                width: 15px;
+                cursor: pointer;
               }
 
               .ui-slider-range {
@@ -527,48 +539,91 @@ div.video {
           }
         }
 
-        a.add-fullscreen {
-          @extend %video-button;
-          background: url(../images/fullscreen.png) center no-repeat;
-          border-left: none;
+        .size-quality-controls {
+          display: block;
           float: left;
-          padding: 0 11px;
-          width: 30px;
-        }
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          border-right: 1px solid #666;
 
+          .size-control {
+            margin: 0;
+            height: 46px;
+            border: none;
 
-        a.quality-control {
-          @extend %video-button;
-          background: url(../images/hd.png) center no-repeat;
-          border-left: none;
-          float: left;
-          padding: 0 11px;
-          width: 30px;
-
-          &.active {
-            background-color: #F44;
-            color: #0ff;
-            text-decoration: none;
+            .add-fullscreen {
+              @extend %video-button;
+              display: inline-block;
+              width: 24px;
+              padding: 0 11px;
+              border: none;
+              line-height: 46px;
+              text-align: center;
+            }
           }
 
-          &.is-hidden {
-            display: none !important;
+          .quality-control {
+            margin: 0;
+            height: 46px;
+
+            .quality-toggle-control {
+              @extend %video-button;
+              float: left;
+              width: 30px;
+              padding: 0 11px;
+              border: none;
+
+              &.active {
+                background-color: #F44;
+                color: #0ff;
+                text-decoration: none;
+              }
+
+              &.is-hidden {
+                display: none !important;
+              }
+            }
           }
         }
 
-        div.lang {
-          & > a.hide-subtitles {
+        .language-control {
+          display: block;
+          float: left;
+          height: 46px;
+          border-right: 1px solid #666;
+
+          .subtitles-control {
             @extend %video-button;
-            @include transition(none);
-            box-shadow: inset 1px 0 0 #555;
-            background: url('../images/cc.png') center no-repeat;
-            border-left: none;
-            border-right: none;
-            padding: 0 11px;
-            width: 30px;
+            float: left;
+            padding: 0;
+            width: 46px;
+            text-align: center;
+            border: none;
+            white-space: nowrap;
 
-            &.off {
-              opacity: 0.7;
+            &.show_transcript {
+
+              .icon {
+                color: $white;
+              }
+            }
+
+            &.hide_transcript {
+
+              .icon {
+                color: $gray-l1;
+              }
+            }
+
+            &.active {
+              background-color: #F44;
+              color: #0ff;
+              text-decoration: none;
+            }
+
+            &.is-hidden {
+              display: none !important;
             }
           }
 
@@ -580,12 +635,13 @@ div.video {
       }
     }
 
-    &:hover section.video-controls {
+    &:hover .video-controls {
+
       ul, div {
         opacity: 1;
       }
 
-      div.slider {
+      .slider {
         @include transform(scaleY(1) translate3d(0, 0, 0));
 
         a.ui-slider-handle {
@@ -595,24 +651,24 @@ div.video {
     }
   }
 
-  ol.subtitles {
-    padding-left: 0;
+  .subtitles {
     float: left;
-    max-height: 460px;
-    overflow: auto;
     width: flex-grid(3, 9);
     margin: 0;
+    max-height: 460px;
+    padding-left: 0;
     font-size: 14px;
     list-style: none;
     visibility: visible;
+    overflow: auto;
 
     li {
-      @extend %ui-fake-link;
-      border: 0;
-      color: rgb(29,157,217);
       margin-bottom: 8px;
       padding: 0;
+      border: 0;
       line-height: lh();
+      color: rgb(29,157,217);
+      cursor: pointer;
 
       &.current {
         color: #333;
@@ -629,105 +685,111 @@ div.video {
       }
 
       &:empty {
-        margin-bottom: 0;
+        margin-bottom: 0px;
       }
     }
   }
 
   &.closed {
 
-    article.video-wrapper {
+    .video-wrapper {
       width: flex-grid(9,9);
 
       background-color: inherit;
     }
 
-    article.video-wrapper section.video-controls.html5 {
-      bottom: 0;
-      left: 0;
-      right: 0;
+    .video-wrapper .video-controls.html5 {
       position: absolute;
+      bottom: 0px;
+      left: 0px;
+      right: 0px;
       z-index: 1;
     }
 
-    article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {
-        height: 0;
+    .video-wrapper .video-player-pre,
+    .video-wrapper .video-player-post {
+        height: 0px;
     }
 
-    article.video-wrapper section.video-player {
+    .video-wrapper .video-player {
+
       h3 {
         color: black;
       }
     }
 
-    ol.subtitles {
+    .subtitles {
         width: 0;
         height: 0;
     }
 
-    ol.subtitles.html5 {
-        @extend %ui-depth0;
-        background-color: rgba(243, 243, 243, 0.8);
-        height: 100%;
+    .subtitles.html5 {
         position: absolute;
+        z-index: 0;
+        display: none;
+        height: 100%;
+        width: 275px;
         right: 0;
         bottom: 0;
         top: 0;
-        width: 275px;
-        padding: 0 $baseline;
-        display: none;
+        padding: 0 20px;
+        background-color: rgba(243, 243, 243, 0.8);
     }
   }
 
   &.video-fullscreen {
-    @extend %ui-depth4;
-    background: rgba(#000, .95);
-    border: 0;
-    bottom: 0;
+    position: fixed;
+    z-index: 9999;
     height: 100%;
+    width: 100%;
+    bottom: 0;
     left: 0;
+    top: 0;
     margin: 0;
     padding: 0;
-    position: fixed;
-    top: 0;
-    width: 100%;
     vertical-align: middle;
+    background: rgba(#000, .95);
+    border: 0;
     border-radius: 0;
 
     &.closed {
-      div.tc-wrapper {
-        article.video-wrapper {
+
+      .tc-wrapper {
+
+        .video-wrapper {
           width: 100%;
         }
       }
     }
 
-    article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {
-        height: 0;
+    .video-wrapper .video-player-pre,
+    .video-wrapper .video-player-post {
+        height: 0px;
     }
 
-    article.video-wrapper {
+    .video-wrapper {
         position: static;
     }
 
-    article.video-wrapper section.video-player {
+    .video-wrapper .video-player {
+
       h3 {
-        color: white;
+        color: $white;
       }
     }
 
-    div.tc-wrapper {
-      @include clearfix();
+    .tc-wrapper {
+
+      @include clearfix;
+      position: static;
       width: 100%;
       height: 100%;
 
-      position: static;
-
-      article.video-wrapper {
+      .video-wrapper {
         height: 100%;
         width: 75%;
-        vertical-align: middle;
         margin-right: 0;
+        vertical-align: middle;
 
         object, iframe, video{
           position: absolute;
@@ -736,19 +798,19 @@ div.video {
         }
       }
 
-      section.video-controls {
-        @extend %ui-depth4;
+      .video-controls {
+        position: absolute;
+        z-index: 9999;
         bottom: 0;
         left: 0;
-        position: absolute;
-        width: 100%; 
+        width: 100%;
       }
     }
 
-    ol.subtitles {
+    .subtitles {
       @include box-sizing(border-box);
       @include transition(none);
-      background: $black;
+      background: #000;
       height: 100%;
       width: 25%;
       padding: lh();
@@ -765,8 +827,11 @@ div.video {
   }
 
   &.is-touch {
-    div.tc-wrapper {
-      article.video-wrapper {
+
+    .tc-wrapper {
+
+      .video-wrapper {
+
         object, iframe, video{
           width: 100%;
           height: 100%;
@@ -775,5 +840,3 @@ div.video {
     }
   }
 }
-
-
