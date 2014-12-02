@@ -36,6 +36,8 @@ FEATURES['DISABLE_START_DATES'] = True
 # the one in cms/envs/test.py
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
+FEATURES['ENABLE_DISCUSSION_EMAIL_DIGEST'] = True
+
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
@@ -394,3 +396,7 @@ MONGODB_LOG = {
     'password': '',
     'db': 'xlog',
 }
+
+
+############# OPEN EDX SERVER API #################
+FEATURES['SERVER_API'] = True

@@ -90,6 +90,23 @@ class UsernameCipher(object):
         return UsernameCipher._remove_padding(decrypted)
 
 
+def enable_notifications(user):
+    UserPreference.objects.get_or_create(
+        user=user,
+        key=NOTIFICATION_PREF_KEY,
+        defaults={
+            "value": UsernameCipher.encrypt(user.username)
+        }
+    )
+
+
+def disable_notifications(user):
+    UserPreference.objects.filter(
+        user=user,
+        key=NOTIFICATION_PREF_KEY
+    ).delete()
+
+
 @require_POST
 def ajax_enable(request):
     """
