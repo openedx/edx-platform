@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
 <h2 class="problem-header">
@@ -8,7 +8,7 @@
 <div class="problem-progress"></div>
 
 <div class="problem" aria-live="polite" aria-relevant="all">
-  ${ problem['html'] }
+  ${ problem['html'] | n}
 
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />

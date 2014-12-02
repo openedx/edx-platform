@@ -3,7 +3,7 @@
     <div id="asset-paging-header"></div>
 
     <table>
-        <caption class="sr"><%= gettext("List of uploaded files and assets in this course") %></caption>
+        <caption class="sr"><%- gettext("List of uploaded files and assets in this course") %></caption>
         <colgroup>
             <col class="thumb-cols" />
             <col class="name-cols" />
@@ -13,12 +13,12 @@
         </colgroup>
         <thead>
         <tr>
-            <th class="thumb-col"><%= gettext("Preview") %></th>
-            <th class="name-col sortable-column"><span class="column-sort-link" id="js-asset-name-col"><%= gettext("Name") %></span></th>
-            <th class="date-col sortable-column"><span class="column-sort-link" id="js-asset-date-col"><%= gettext("Date Added") %></span></th>
-            <th class="embed-col"><%= gettext("Embed URL") %></th>
-            <th class="embed-col"><%= gettext("External URL") %></th>
-            <th class="actions-col"><span class="sr"><%= gettext("Actions") %></span></th>
+            <th class="thumb-col"><%- gettext("Preview") %></th>
+            <th class="name-col sortable-column"><span class="column-sort-link" id="js-asset-name-col"><%- gettext("Name") %></span></th>
+            <th class="date-col sortable-column"><span class="column-sort-link" id="js-asset-date-col"><%- gettext("Date Added") %></span></th>
+            <th class="embed-col"><%- gettext("Embed URL") %></th>
+            <th class="embed-col"><%- gettext("External URL") %></th>
+            <th class="actions-col"><span class="sr"><%- gettext("Actions") %></span></th>
         </tr>
         </thead>
 
@@ -29,5 +29,5 @@
 
 </div>
 <div class="no-asset-content">
-    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button upload-button new-button"><i class="icon-plus"></i><%= gettext("Upload your first asset") %></a></p>
+    <p><%- gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button upload-button new-button"><i class="icon-plus"></i><%- gettext("Upload your first asset") %></a></p>
 </div>

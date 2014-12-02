@@ -44,7 +44,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
             var parentLocator = target.data('parent'),
                 category = target.data('category'),
                 displayName = target.data('default-name');
-            return ViewUtils.runOperationShowingMessage(gettext('Adding&hellip;'),
+            return ViewUtils.runOperationShowingMessage(gettext('Adding'),
                 function() {
                     var addOperation = $.Deferred();
                     analytics.track('Created a ' + category, {
@@ -82,7 +82,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
                 ),
                 interpolate(gettext('Yes, delete this %(xblock_type)s'), { xblock_type: xblockType }, true),
                 function() {
-                    ViewUtils.runOperationShowingMessage(gettext('Deleting&hellip;'),
+                    ViewUtils.runOperationShowingMessage(gettext('Deleting'),
                         function() {
                             return $.ajax({
                                 type: 'DELETE',
@@ -112,7 +112,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
          */
         updateXBlockField = function(xblockInfo, fieldName, newValue) {
             var requestData = createUpdateRequestData(fieldName, newValue);
-            return ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+            return ViewUtils.runOperationShowingMessage(gettext('Saving'),
                 function() {
                     return xblockInfo.save(requestData, { patch: true });
                 });
@@ -127,7 +127,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
          */
         updateXBlockFields = function(xblockInfo, xblockData, options) {
             options = _.extend({}, { patch: true }, options);
-            return ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+            return ViewUtils.runOperationShowingMessage(gettext('Saving'),
                 function() {
                     return xblockInfo.save(xblockData, options);
                 }

@@ -51,7 +51,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
             getContentHtml: function() {
                 return this.template({
                     url: this.options.url || CMS.URL.UPLOAD_ASSET,
-                    message: this.model.escape('message'),
+                    message: this.model.get('message'),
                     selectedFile: this.model.get('selectedFile'),
                     uploading: this.model.get('uploading'),
                     uploadedBytes: this.model.get('uploadedBytes'),

@@ -1,11 +1,11 @@
 <%!
-from django.utils.translation import ugettext as _ 
+from util.markup import HTML, ugettext as _
 %>
 
 <h2>${chapter_module.display_name_with_default}</h2>
 
-<p>${_("You were most recently in {section_link}.  If you\'re done with that, choose another section on the left.").format(
-	    section_link=u'<a href="{url}">{section_name}</a>'.format(
+<p>${_("You were most recently in {section_link}.  If you're done with that, choose another section on the left.").format(
+	    section_link=HTML(u'<a href="{url}">{section_name}</a>').format(
 	        url=prev_section_url,
 	        section_name=prev_section.display_name_with_default,
 	    )

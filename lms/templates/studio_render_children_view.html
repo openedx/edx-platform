@@ -2,7 +2,7 @@
     <ol class="reorderable-container">
 % endif
     % for item in items:
-    ${item['content']}
+    ${item['content'] | n}
     % endfor
 % if can_reorder:
     </ol>

@@ -2,7 +2,7 @@
 ## We are no longer supporting this file or accepting changes into it.    ##
 ## Please see lms/templates/instructor for instructor dashboard templates ##
 
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%inherit file="../main.html" />
@@ -486,7 +486,9 @@ function goto( mode)
     <p>
     ## Translators: days_early_for_beta should not be translated
     ${_("Enter usernames or emails for students who should be beta-testers, one per line, or separated by commas.  They will get to "
-        "see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.")}
+        "see course materials early, as configured via the {tt_start}days_early_for_beta{tt_end} option in the course policy.").format(
+            tt_start=HTML('<tt>'), tt_end=HTML('</tt>')
+    )}
     </p>
     <p>
     <textarea cols="50" row="30" name="betausers"></textarea>
@@ -506,7 +508,7 @@ function goto( mode)
 
 %if modeflag.get('Email'):
     %if email_msg:
-        <p></p><p>${email_msg}</p>
+        <p></p><p>${email_msg | n}</p>
     %endif
 
     <ul class="list-fields">
@@ -540,7 +542,7 @@ function goto( mode)
       <li class="field">
         <label>Message:</label>
         <div class="email-editor">
-          ${editor}
+          ${editor | n}
         </div>
         <input type="hidden" name="message" value="">
       </li>
@@ -583,7 +585,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 
 %if msg:
-    <p></p><p id="idash_msg">${msg}</p>
+    <p></p><p id="idash_msg">${msg | n}</p>
 %endif
 
 ##-----------------------------------------------------------------------------
@@ -657,7 +659,7 @@ function goto( mode)
     <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
 
     <script>
-      ${d3_stacked_bar_graph.body()}
+      ${d3_stacked_bar_graph.body() | n}
     </script>
 
     <div id="metrics"></div>
@@ -670,14 +672,14 @@ function goto( mode)
           <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
           <div class="metrics-left" id="metric_opened_${i}">
             <h3>${_("Count of Students that Opened a Subsection")}</h3>
-            <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+            <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading")}</p>
           </div>
           <div class="metrics-right" id="metric_grade_${i}">
             <h3>${_("Grade Distribution per Problem")}</h3>
             %if not metrics_results['section_has_problem'][i]:
               <p>${_("There are no problems in this section.")}</p>
             %else:
-              <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+              <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading")}</p>
             %endif
           </div>
         </div>
@@ -791,17 +793,17 @@ function goto( mode)
     <br/>
     <p>
       <hr width="100%">
-      <h2>${datatable['title'] | h}</h2>
+      <h2>${datatable['title']}</h2>
       <table class="stat_table">
         <tr>
         %for hname in datatable['header']:
-          <th>${hname | h}</th>
+          <th>${hname}</th>
         %endfor
         </tr>
         %for row in datatable['data']:
           <tr>
           %for value in row:
-            <td>${value | h}</td>
+            <td>${value}</td>
           %endfor
           </tr>
         %endfor
@@ -854,17 +856,17 @@ function goto( mode)
     <br/>
     <p>
       <hr width="100%">
-      <h2>${course_stats['title'] | h}</h2>
+      <h2>${course_stats['title']}</h2>
       <table class="stat_table">
         <tr>
         %for hname in course_stats['header']:
-          <th>${hname | h}</th>
+          <th>${hname}</th>
         %endfor
         </tr>
         %for row in course_stats['data']:
           <tr>
             %for value in row:
-              <td>${value | h}</td>
+              <td>${value}</td>
             %endfor
           </tr>
         %endfor
@@ -908,9 +910,9 @@ function goto( mode)
     %else:
       <ul>
         % for (summary, err) in course_errors:
-        <li>${summary | h}
+        <li>${summary}
         % if err:
-          <ul><li><pre>${err | h}</pre></li></ul>
+          <ul><li><pre>${err}</pre></li></ul>
         % else:
           <p>&nbsp;</p>
         % endif

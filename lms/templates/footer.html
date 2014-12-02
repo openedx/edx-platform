@@ -1,6 +1,6 @@
 ## mako
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 <%! from microsite_configuration.templatetags.microsite import platform_name %>
 
@@ -47,7 +47,7 @@
         </p>
       </div>
 
-      <p class="copyright">${_("&copy; 2014 {platform_name}, some rights reserved").format(platform_name=settings.PLATFORM_NAME)}</p>
+      <p class="copyright">${_(u"© 2014 {platform_name}, some rights reserved").format(platform_name=settings.PLATFORM_NAME)}</p>
         <nav class="nav-legal">
           <ul>
             <li class="nav-legal-01">

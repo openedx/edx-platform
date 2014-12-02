@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
@@ -10,8 +10,8 @@
         <p>
             ${_("You should see your new email address listed on the "
                 "{link_start}account settings{link_end} page.").format(
-                link_start="<a href='{url}'>".format(url=reverse('account_index')),
-                link_end="</a>",
+                link_start=HTML("<a href='{url}'>").format(url=reverse('account_index')),
+                link_end=HTML("</a>"),
             )}
         </p>
     </section>

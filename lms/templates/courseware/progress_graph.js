@@ -2,6 +2,8 @@
 <%!
   import json
   import math
+  from django.utils.html import escapejs
+  from markupsafe import escape
 %>
 
 $(function () {
@@ -48,7 +50,7 @@ $(function () {
       categoryData = categories[ section['category'] ]
     
       categoryData['data'].append( [tickIndex, section['percent']] )
-      ticks.append( [tickIndex, section['label'] ] )
+      ticks.append( [tickIndex, escape(section['label']) ] )
     
       if section['category'] in detail_tooltips:
           detail_tooltips[ section['category'] ].append( section['detail'] )
@@ -107,13 +109,13 @@ $(function () {
   else:
     grade_cutoff_ticks = [ ]
   %>
-  
-  var series = ${ json.dumps( series ) };
-  var ticks = ${ json.dumps(ticks) };
-  var bottomTicks = ${ json.dumps(bottomTicks) };
-  var detail_tooltips = ${ json.dumps(detail_tooltips) };
-  var droppedScores = ${ json.dumps(droppedScores) };
-  var grade_cutoff_ticks = ${ json.dumps(grade_cutoff_ticks) }
+
+  var series = JSON.parse('${ json.dumps(series) | n,escapejs }');
+  var ticks = JSON.parse('${ json.dumps(ticks) | n,escapejs }');
+  var bottomTicks = JSON.parse('${ json.dumps(bottomTicks) | n,escapejs }');
+  var detail_tooltips = JSON.parse('${ json.dumps(detail_tooltips) | n,escapejs }');
+  var droppedScores = JSON.parse('${ json.dumps(droppedScores) | n,escapejs }');
+  var grade_cutoff_ticks = JSON.parse('${ json.dumps(grade_cutoff_ticks) | n,escapejs }')
   
   //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );

@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
 ${static.css(group='style-vendor-tinymce-content', raw=True)}
 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
@@ -17,7 +17,7 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
 		    <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_('Collapse Instructions')}</a>
 		</div>
 		<div class="annotatable-section-body annotatable-instructions">
-		    ${instructions_html}
+		    ${instructions_html | n}
 		</div>
 	</div>
 	% endif

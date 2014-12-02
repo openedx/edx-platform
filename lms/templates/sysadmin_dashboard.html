@@ -1,6 +1,6 @@
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
@@ -164,7 +164,7 @@ textarea {
 %endif
 
 %if msg:
-    <p>${msg}</p>
+    <p>${msg | n}</p>
 %endif
 
 %if datatable:

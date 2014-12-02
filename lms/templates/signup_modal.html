@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.conf import settings %>
@@ -22,7 +22,7 @@
       <header>
         <h2>
 	  ${_('Sign Up for {platform_name}').format(
-	      platform_name=u'<span class="edx">{}</span>'.format(settings.PLATFORM_NAME)
+	      platform_name=HTML(u'<span class="edx">{}</span>').format(settings.PLATFORM_NAME)
 	  )}
 	</h2>
         <hr>
@@ -47,7 +47,7 @@
           <label data-field="name" for="signup_fullname">${_('Full Name')} + ' *'</label>
 	    <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
 	  % else:
-	  <p>${_('<i>Welcome</i> {name}').format(name=extauth_id)}</p><br/>
+          <p>${_('{em_start}Welcome{em_end} {name}').format(name=extauth_id, em_start=HTML('<i>'), em_end=HTML('</i>'))}</p><br/>
 	  <p><i>${_('Enter a public username:')}</i></p>
 
           <label data-field="username" for="signup_username">${_('Public Username')} + ' *'</label>
@@ -128,16 +128,16 @@
           <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
             <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
             ${_('I agree to the {link_start}Terms of Service{link_end}').format(
-              link_start='<a href="{url}" target="_blank">'.format(url=reverse('tos')),
-              link_end='</a>') + ' *'}
+              link_start=HTML('<a href="{url}" target="_blank">').format(url=reverse('tos')),
+              link_end=HTML('</a>'))} *
           </label>
 
           % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
           <label data-field="honor_code" class="honor-code" for="signup_honor">
             <input id="signup_honor" name="honor_code" type="checkbox" value="true">
             ${_('I agree to the {link_start}Honor Code{link_end}').format(
-              link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
-              link_end='</a>') + ' *'}
+              link_start=HTML('<a href="{url}" target="_blank">').format(url=reverse('honor')),
+              link_end=HTML('</a>'))} *
           </label>
           % endif
         </div>

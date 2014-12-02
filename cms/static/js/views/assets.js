@@ -150,7 +150,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             startUpload: function (event) {
                 var file = event.target.value;
 
-                $('.upload-modal h1').text(gettext('Uploading…'));
+                $('.upload-modal h1').text(gettext('Uploading'));
                 $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
                 $('.upload-modal .choose-file-button').hide();
                 $('.upload-modal .progress-bar').removeClass('loaded').show();

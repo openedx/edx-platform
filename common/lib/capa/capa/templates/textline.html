@@ -14,7 +14,7 @@
       <div style="display:none;" name="${hidden}" inputid="input_${id}" />
     % endif
 
-  <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" value="${value|h}"
+  <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" value="${value}"
         % if do_math:
             class="math"
         % endif
@@ -25,14 +25,14 @@
             style="display:none;"
         % endif
    />
-   ${trailing_text | h}
+   ${trailing_text}
 
       <p class="status" 
          %if status != 'unsubmitted':
          %endif
          aria-describedby="input_${id}">
         %if value:
-        ${value|h}
+        ${value}
         % else:
         ${label}
         %endif

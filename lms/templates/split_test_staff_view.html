@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 
 <div class="split-test-view">
     <select class="split-test-select">
@@ -10,7 +10,7 @@
 
     % for idx, item in enumerate(items):
     <div class="split-test-child" data-group-id="${item['group_id']}" data-id="${item['id']}">
-        ${item['content'] | h}
+        ${item['content']}
     </div>
     % endfor
 

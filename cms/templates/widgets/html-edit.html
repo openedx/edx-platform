@@ -1,12 +1,12 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 
 <div class="wrapper-comp-editor" id="editor-tab" data-base-asset-url="${base_asset_url}" data-editor="${editor}">
     <section class="html-editor editor">
       <div class="row">
           % if editor == 'visual':
-            <textarea class="tiny-mce">${data | h}</textarea>
+            <textarea class="tiny-mce">${data}</textarea>
           % endif
-          <textarea name="" class="edit-box">${data | h}</textarea>
+          <textarea name="" class="edit-box">${data}</textarea>
       </div>
     </section>
 </div>

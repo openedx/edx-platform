@@ -77,7 +77,7 @@ var AssetView = BaseView.extend({
   lockAsset: function(e) {
     var asset = this.model;
     var saving = new NotificationView.Mini({
-      title: gettext("Saving&hellip;")
+      title: gettext("Saving")
     }).show();
     asset.save({'locked': !asset.get('locked')}, {
       wait: true, // This means we won't re-render until we get back the success state.

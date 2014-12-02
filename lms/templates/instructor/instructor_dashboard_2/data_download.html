@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%page args="section_data"/>
 
 
@@ -59,7 +59,10 @@
   %endif
 
     ## Translators: a table of URL links to report files appears after this sentence.
-    <p>${_("<b>Note</b>: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")}</p><br>
+    <p>${_("{em_start}Note{em_end}: To keep student data secure, you cannot save or email these links for direct access. "
+            "Copies of links expire within 5 minutes.").format(
+                em_start=HTML("<b>"), em_end=HTML("</b>")
+    )}</p><br>
 
     <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['list_report_downloads_url'] }" ></div>
   </div>

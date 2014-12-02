@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 <%block name="bodyclass">midcourse-reverification-process step-dash register</%block>
@@ -23,7 +23,7 @@
                   <li class="item">
                     <div class="course-info">
                       <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
-                      <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
+                      <p class="deadline">${_('Re-verify by {date}').format(date=HTML("<strong>{}</strong>").format(item.date))}</p>
                     </div>
                     <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': item.course_id.to_deprecated_string()})}">
 			${_("Re-verify for {course_number}").format(course_number=item.course_number)}
@@ -42,7 +42,7 @@
                   <li class="item">
                     <div class="course-info">
                       <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
-                      <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
+                      <p class="deadline">${_('Re-verify by {date}').format(date=HTML("<strong>{}</strong>").format(item.date))}</p>
                     </div>
                     <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': item.course_id.to_deprecated_string()})}">
 			${_("Re-verify for {course_number}").format(course_number=item.course_number)}
@@ -67,7 +67,7 @@
                 <li class="item pending">
                   <div class="course-info">
                     <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
-                    <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
+                    <p class="deadline">${_('Re-verify by {date}').format(date=HTML("<strong>{}</strong>").format(item.date))}</p>
                   </div>
                   <p class="reverify-status pending">${_("Pending")}</p>
                 </li>
@@ -77,7 +77,7 @@
                 <li class="item complete">
                   <div class="course-info">
                     <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
-                    <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
+                    <p class="deadline">${_('Re-verify by {date}').format(date=HTML("<strong>{}</strong>").format(item.date))}</p>
                   </div>
                   <p class="reverify-status complete">${_("Complete")}</p>
                 </li>
@@ -87,7 +87,7 @@
                 <li class="item failed">
                   <div class="course-info">
                     <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
-                    <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
+                    <p class="deadline">${_('Re-verify by {date}').format(date=HTML("<strong>{}</strong>").format(item.date))}</p>
                   </div>
                   <p class="reverify-status">${_("Failed")}</p>
                 </li>
@@ -100,14 +100,14 @@
           % if reverifications["must_reverify"]:
             <p class="support">${_("Don't want to re-verify right now?") + u" {a_start}{text}{a_end}".format(
 	        text=_("Return to where you left off"),
-                a_start='<a href="{url}">'.format(url=referer),
-                a_end="</a>",
+                a_start=HTML('<a href="{url}">').format(url=referer),
+                a_end=HTML('</a>'),
               )}</p>
           % else:
           <p class="support">${u"{a_start}{text}{a_end}".format(
 	        text=_("Return to where you left off"),
-                a_start='<a href="{url}">'.format(url=referer),
-                a_end="</a>",
+                a_start=HTML('<a href="{url}">').format(url=referer),
+                a_end=HTML('</a>'),
               )}</p>
           % endif
 
@@ -127,7 +127,12 @@
             <h3 class="title faq-question">${_("What will I need to re-verify?")}</h3>
             <div class="copy faq-answer">
 
-              <p>${_("Because you are just confirming that you are still you, the only thing you will need to do to re-verify is to <b>submit a new photo of your face with your webcam</b>. The process is quick and you will be brought back to where you left off so you can keep on learning.")}</p>
+              <p>${_("Because you are just confirming that you are still you, "
+                      "the only thing you will need to do to re-verify is to "
+                      "{em_start}submit a new photo of your face with your webcam{em_end}. "
+                      "The process is quick and you will be brought back to where you left off so you can keep on learning.").format(
+                          em_start=HTML("<b>"), em_end=HTML("</b>"),
+                    )}</p>
 
               <p>${_("If you changed your name during the semester and it no longer matches the original ID you submitted, you will need to re-edit your name to match as well.")}</p>
             </div>
@@ -136,7 +141,12 @@
           <div class="faq-item">
             <h3 class="title faq-question">${_("What if I have trouble with my re-verification?")}</h3>
             <div class="copy faq-answer">
-              <p>${_('Because of the short time that re-verification is open, you <strong>will not be able to correct a failed verification</strong>. If you think there was an error in the review, please contact us at {email}').format(email='<a class="contact-link" href="mailto:{email}"">{email}</a>.'.format(email=billing_email))}</p>
+              <p>${_("Because of the short time that re-verification is open, you {strong_start}will not be able to correct a failed verification{strong_end}. "
+                      "If you think there was an error in the review, please contact us at {email}.").format(
+                        email=HTML('<a class="contact-link" href="mailto:{email}">{email}</a>').format(email=billing_email),
+                        strong_start=HTML('<strong>'),
+                        strong_end=HTML('</strong>'),
+                )}</p>
             </div>
           </div>
         </div>

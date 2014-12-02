@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
@@ -13,8 +13,8 @@
     <p>${_('Something went wrong. Check to make sure the URL you went to was '
            'correct -- e-mail programs will sometimes split it into two '
            'lines. If you still have issues, e-mail us to let us know what happened '
-           'at {email}.').format(email='<a href="mailto:{email}">{email}</a>'.format(email=settings.BUGS_EMAIL))}</p>
+           'at {email}.').format(email=HTML('<a href="mailto:{email}">{email}</a>').format(email=settings.BUGS_EMAIL))}</p>
 
-    <p>${_('Or you can go back to the {link_start}home page{link_end}.').format(link_start='<a href="/">', link_end='</a>')}</p>
+    <p>${_('Or you can go back to the {link_start}home page{link_end}.').format(link_start=HTML('<a href="/">'), link_end=HTML('</a>'))}</p>
   </section>
 </section>

@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <% num_results = len(results) %>
 % for (i,result) in enumerate(results):
     % if 'task_name' in result and 'result' in result:

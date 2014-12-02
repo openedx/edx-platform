@@ -8,7 +8,7 @@
           % if (option_id==value):
         	selected="true"
           % endif
-          > ${option_description}</option>
+          > ${option_description | n}</option>
       % endfor
     </select>
 
@@ -16,7 +16,7 @@
   <span class="status ${status.classname}"
       id="status_${id}"
       aria-describedby="input_${id}">
-    <span class="sr">${value|h} - ${status.display_name}</span>
+    <span class="sr">${value} - ${status.display_name}</span>
   </span>
 
   % if msg:

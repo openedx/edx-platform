@@ -207,9 +207,9 @@ class DashboardTest(ModuleStoreTestCase):
         Test that the certificate verification status for courses is visible on the dashboard.
         """
         self.client.login(username="jack", password="test")
-        self.check_verification_status_on('verified', 'You\'re enrolled as a verified student')
-        self.check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
-        self.check_verification_status_on('audit', 'You\'re auditing this course')
+        self.check_verification_status_on('verified', 'You&#39;re enrolled as a verified student')
+        self.check_verification_status_on('honor', 'You&#39;re enrolled as an honor code student')
+        self.check_verification_status_on('audit', 'You&#39;re auditing this course')
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def check_verification_status_off(self, mode, value):
@@ -228,9 +228,9 @@ class DashboardTest(ModuleStoreTestCase):
         if the verified certificates setting is off.
         """
         self.client.login(username="jack", password="test")
-        self.check_verification_status_off('verified', 'You\'re enrolled as a verified student')
-        self.check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
-        self.check_verification_status_off('audit', 'You\'re auditing this course')
+        self.check_verification_status_off('verified', 'You&#39;re enrolled as a verified student')
+        self.check_verification_status_off('honor', 'You&#39;re enrolled as an honor code student')
+        self.check_verification_status_off('audit', 'You&#39;re auditing this course')
 
     def test_course_mode_info(self):
         verified_mode = CourseModeFactory.create(

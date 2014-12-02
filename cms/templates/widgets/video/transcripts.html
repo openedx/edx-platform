@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%namespace name='static' file='../../static_content.html'/>
 <%page args="tabName"/>
 
@@ -25,7 +25,7 @@ import json
     </script>
 % endfor
 
-<div class="wrapper-comp-settings basic_metadata_edit" data-metadata='${json.dumps(transcripts_basic_tab_metadata) | h}'></div>
+<div class="wrapper-comp-settings basic_metadata_edit" data-metadata='${json.dumps(transcripts_basic_tab_metadata)}'></div>
 
 <script type="text/javascript">
     require(

@@ -1,8 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="pagetitle">${_('{course_number} Textbook').format(course_number=course.display_number_with_default) | h}</%block>
+<%block name="pagetitle">${_('{course_number} Textbook').format(course_number=course.display_number_with_default)}</%block>
 <%block name="nav_skip">#viewer-frame</%block>
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -42,7 +42,7 @@ $(function(){
 
 <div class="book">
 <iframe
-  title="${current_chapter['title']|h}"
+  title="${current_chapter['title']}"
   id="viewer-frame"
   src="${request.path}?viewer=true${viewer_params}"
   width="856"
