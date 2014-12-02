@@ -1,23 +1,24 @@
 """
 Tests for course_info
 """
-from django.test.utils import override_settings
+import json
+
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase
 
 from courseware.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.xml_importer import import_from_xml
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
-class TestVideoOutline(ModuleStoreTestCase, APITestCase):
+class TestCourseInfo(ModuleStoreTestCase, APITestCase):
     """
     Tests for /api/mobile/v0.5/course_info/...
     """
     def setUp(self):
-        super(TestVideoOutline, self).setUp()
+        super(TestCourseInfo, self).setUp()
         self.user = UserFactory.create()
         self.course = CourseFactory.create(mobile_available=True)
         self.client.login(username=self.user.username, password='test')
@@ -28,10 +29,53 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('overview' in response.data)  # pylint: disable=maybe-no-member
 
-    def test_handouts(self):
+    def test_about_static_rewrites(self):
+        about_usage_key = self.course.id.make_usage_key('about', 'overview')
+        about_module = self.store.get_item(about_usage_key)
+        underlying_about_html = about_module.data
+
+        # check that we start with relative static assets
+        self.assertIn('\"/static/', underlying_about_html)
+
+        url = reverse('course-about-detail', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url)
+        json_data = json.loads(response.content)
+        about_html = json_data['overview']
+
+        # but shouldn't finish with any
+        self.assertNotIn('\"/static/', about_html)
+
+    def test_no_handouts(self):
         url = reverse('course-handouts-list', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_handout_exists(self):
+        course_items = import_from_xml(self.store, self.user.id, settings.COMMON_TEST_DATA_ROOT, ['toy'])
+        course = course_items[0]
+        url = reverse('course-handouts-list', kwargs={'course_id': unicode(course.id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_handout_static_rewrites(self):
+        course_items = import_from_xml(self.store, self.user.id, settings.COMMON_TEST_DATA_ROOT, ['toy'])
+        course = course_items[0]
+
+        # check that we start with relative static assets
+        handouts_usage_key = course.id.make_usage_key('course_info', 'handouts')
+        underlying_handouts = self.store.get_item(handouts_usage_key)
+        self.assertIn('\'/static/', underlying_handouts.data)
+
+        url = reverse('course-handouts-list', kwargs={'course_id': unicode(course.id)})
+        response = self.client.get(url)
+
+        json_data = json.loads(response.content)
+        handouts_html = json_data['handouts_html']
+
+        # but shouldn't finish with any
+        self.assertNotIn('\'/static/', handouts_html)
+
+        self.assertEqual(response.status_code, 200)
 
     def test_updates(self):
         url = reverse('course-updates-list', kwargs={'course_id': unicode(self.course.id)})
