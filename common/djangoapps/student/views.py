@@ -99,7 +99,10 @@ from util.password_policy_validators import (
 
 import third_party_auth
 from third_party_auth import pipeline, provider
-from student.helpers import auth_pipeline_urls, set_logged_in_cookie
+from student.helpers import (
+    auth_pipeline_urls, set_logged_in_cookie,
+    check_verify_status_by_course
+)
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
 from user_api.api import profile as profile_api
@@ -496,9 +499,14 @@ def dashboard(request):
     course_enrollment_pairs.sort(key=lambda x: x[1].created, reverse=True)
 
     # Retrieve the course modes for each course
+    enrolled_course_ids = [course.id for course, __ in course_enrollment_pairs]
+    all_course_modes, unexpired_course_modes = CourseMode.all_and_unexpired_modes_for_courses(enrolled_course_ids)
     course_modes_by_course = {
-        course.id: CourseMode.modes_for_course_dict(course.id)
-        for course, __ in course_enrollment_pairs
+        course_id: {
+            mode.slug: mode
+            for mode in modes
+        }
+        for course_id, modes in unexpired_course_modes.iteritems()
     }
 
     # Check to see if the student has recently enrolled in a course.
@@ -537,6 +545,29 @@ def dashboard(request):
         )
         for course, enrollment in course_enrollment_pairs
     }
+
+    # Determine the per-course verification status
+    # This is a dictionary in which the keys are course locators
+    # and the values are one of:
+    #
+    # VERIFY_STATUS_NEED_TO_VERIFY
+    # VERIFY_STATUS_SUBMITTED
+    # VERIFY_STATUS_APPROVED
+    # VERIFY_STATUS_MISSED_DEADLINE
+    #
+    # Each of which correspond to a particular message to display
+    # next to the course on the dashboard.
+    #
+    # If a course is not included in this dictionary,
+    # there is no verification messaging to display.
+    if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
+        verify_status_by_course = check_verify_status_by_course(
+            user,
+            course_enrollment_pairs,
+            all_course_modes
+        )
+    else:
+        verify_status_by_course = {}
 
     cert_statuses = {
         course.id: cert_info(request.user, course)
@@ -616,6 +647,7 @@ def dashboard(request):
         'show_email_settings_for': show_email_settings_for,
         'reverifications': reverifications,
         'verification_status': verification_status,
+        'verification_status_by_course': verify_status_by_course,
         'verification_msg': verification_msg,
         'show_refund_option_for': show_refund_option_for,
         'block_courses': block_courses,

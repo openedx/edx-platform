@@ -188,11 +188,8 @@ class PhotoVerification(StatusModel):
         Returns the earliest allowed date given the settings
 
         """
-        DAYS_GOOD_FOR = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
-        allowed_date = (
-            datetime.now(pytz.UTC) - timedelta(days=DAYS_GOOD_FOR)
-        )
-        return allowed_date
+        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        return datetime.now(pytz.UTC) - timedelta(days=days_good_for)
 
     @classmethod
     def user_is_verified(cls, user, earliest_allowed_date=None, window=None):
@@ -309,6 +306,66 @@ class PhotoVerification(StatusModel):
                 error_msg = attempt.parsed_error_msg()
 
         return (status, error_msg)
+
+    @classmethod
+    def verification_for_datetime(cls, deadline, candidates):
+        """Find a verification in a set that applied during a particular datetime.
+
+        A verification is considered "active" during a datetime if:
+        1) The verification was created before the datetime, and
+        2) The verification is set to expire after the datetime.
+
+        Note that verification status is *not* considered here,
+        just the start/expire dates.
+
+        If multiple verifications were active at the deadline,
+        returns the most recently created one.
+
+        Arguments:
+            deadline (datetime): The datetime at which the verification applied.
+                If `None`, then return the most recently created candidate.
+            candidates (list of `PhotoVerification`s): Potential verifications to search through.
+
+        Returns:
+            PhotoVerification: A photo verification that was active at the deadline.
+                If no verification was active, return None.
+
+        """
+        if len(candidates) == 0:
+            return None
+
+        # If there's no deadline, then return the most recently created verification
+        if deadline is None:
+            return candidates[0]
+
+        # Otherwise, look for a verification that was in effect at the deadline,
+        # preferring recent verifications.
+        # If no such verification is found, implicitly return `None`
+        for verification in candidates:
+            if verification.active_at_datetime(deadline):
+                return verification
+
+    @property
+    def expiration_datetime(self):
+        """Datetime that the verification will expire. """
+        days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+        return self.created_at + timedelta(days=days_good_for)
+
+    def active_at_datetime(self, deadline):
+        """Check whether the verification was active at a particular datetime.
+
+        Arguments:
+            deadline (datetime): The date at which the verification was active
+                (created before and expired after).
+
+        Returns:
+            bool
+
+        """
+        return (
+            self.created_at < deadline and
+            self.expiration_datetime > deadline
+        )
 
     def parsed_error_msg(self):
         """
