@@ -997,6 +997,41 @@ def fetch_reverify_banner_info(request, course_key):
     return reverifications
 
 
+def get_static_tab_contents(request, course, tab, wrap_xmodule_display=True):
+    """
+    Returns the contents for the given static tab
+    """
+    loc = course.id.make_usage_key(
+        tab.type,
+        tab.url_slug,
+    )
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, modulestore().get_item(loc), depth=0
+    )
+    tab_module = get_module(
+        request.user,
+        request,
+        loc,
+        field_data_cache,
+        static_asset_path=course.static_asset_path,
+        wrap_xmodule_display=wrap_xmodule_display
+    )
+
+    logging.debug('course_module = {0}'.format(tab_module))
+
+    html = ''
+    if tab_module is not None:
+        try:
+            html = tab_module.render(STUDENT_VIEW).content
+        except Exception:  # pylint: disable=broad-except
+            html = render_to_string('courseware/error-message.html', None)
+            log.exception(
+                u"Error rendering course={course}, tab={tab_url}".format(course=course, tab_url=tab['url_slug'])
+            )
+
+    return html
+
+
 @login_required
 @ensure_valid_course_key
 def submission_history(request, course_id, student_username, location):
@@ -1073,36 +1108,6 @@ def notification_image_for_tab(course_tab, user, course):
             return notifications['img_path']
 
     return None
-
-
-def get_static_tab_contents(request, course, tab):
-    """
-    Returns the contents for the given static tab
-    """
-    loc = course.id.make_usage_key(
-        tab.type,
-        tab.url_slug,
-    )
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, modulestore().get_item(loc), depth=0
-    )
-    tab_module = get_module(
-        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path
-    )
-
-    logging.debug('course_module = {0}'.format(tab_module))
-
-    html = ''
-    if tab_module is not None:
-        try:
-            html = tab_module.render(STUDENT_VIEW).content
-        except Exception:  # pylint: disable=broad-except
-            html = render_to_string('courseware/error-message.html', None)
-            log.exception(
-                u"Error rendering course={course}, tab={tab_url}".format(course=course, tab_url=tab['url_slug'])
-            )
-
-    return html
 
 
 @require_GET

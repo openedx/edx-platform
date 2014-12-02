@@ -186,8 +186,7 @@ FEATURES = {
 
     # Enable legacy instructor dashboard
     'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
-
-    # Is this an edX-owned domain? (used for edX specific messaging and images)
+    # Is this an edX-owned domain? (used on instructor dashboard)
     'IS_EDX_DOMAIN': False,
 
     # Toggle to enable certificates of courses on dashboard
@@ -1571,6 +1570,9 @@ INSTALLED_APPS = (
     'survey',
 
     'lms.djangoapps.lms_xblock',
+
+    # edX Server API
+    'server_api',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1939,3 +1941,7 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
+
+
+############# OPEN EDX SERVER API #################
+FEATURES['SERVER_API'] = False

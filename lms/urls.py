@@ -95,6 +95,21 @@ urlpatterns += (
     url(r'^course_modes/', include('course_modes.urls')),
 )
 
+# OPEN EDX SERVER API
+if settings.FEATURES["SERVER_API"]:
+    urlpatterns += (
+        url(r'^api/server/', include('server_api.urls')),
+    )
+
+# OPEN EDX USER API
+# mattdrayer: Please note that the user_api declaration must follow
+# the server api declaration.  When declared ahead of the server api
+# the user_api will oddly begin to return server-oriented user URIs
+# At this time I'm not sure why this seems to be a one-way scenario.
+urlpatterns += (
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.urls')),
+)
+
 
 js_info_dict = {
     'domain': 'djangojs',
