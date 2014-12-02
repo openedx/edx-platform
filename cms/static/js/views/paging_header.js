@@ -32,7 +32,7 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
 
         messageHtml: function() {
             var message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ');
-            if (this.view.collection.assetFilter){
+            if (this.view.collection.assetType){
                 message = gettext(message + 'filtered by %(asset_type)s, ');
             }
             if (this.view.collection.sortDirection === 'asc') {
