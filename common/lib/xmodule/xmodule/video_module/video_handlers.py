@@ -55,7 +55,7 @@ class VideoStudentViewHandlers(object):
 
         if dispatch == 'save_user_state':
             for key in data:
-                if hasattr(self, key) and key in accepted_keys:
+                if key in accepted_keys:
                     if key in conversions:
                         value = conversions[key](data[key])
                     else:
