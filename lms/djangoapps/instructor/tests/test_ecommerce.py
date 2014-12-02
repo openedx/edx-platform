@@ -2,21 +2,20 @@
 Unit tests for Ecommerce feature flag in new instructor dashboard.
 """
 
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from mock import patch
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from course_modes.models import CourseMode
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from student.roles import CourseFinanceAdminRole
+from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegistrationCode
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from course_modes.models import CourseMode
-from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegistrationCode
-from mock import patch
-from student.roles import CourseFinanceAdminRole
 
-
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestECommerceDashboardViews(ModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard
