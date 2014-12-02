@@ -82,7 +82,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             renderPageItems: function() {
                 var self = this,
                 assets = this.collection,
-                hasAssets = this.collection.assetFilter != '' ? true: assets.length > 0,
+                hasAssets = this.collection.assetType != '' || assets.length > 0,
                 tableBody = this.getTableBody();
                 tableBody.empty();
                 if (hasAssets) {
@@ -237,16 +237,16 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.toggleFilterColumnState($this, event);
             },
 
-            toggleFilterColumnState: function(menu, event){
+            toggleFilterColumnState: function(menu, event) {
                 var $subnav = menu.find('.wrapper-nav-sub');
                 var $title = menu.find('.title');
                 var titleText = $title.find('.type-filter');
-                var assetfilter = $(event.currentTarget).data('assetfilter');
-                if(assetfilter == this.allLabel){
+                var assettype = $(event.currentTarget).data('assetfilter');
+                if(assettype == this.allLabel){
                     titleText.text(titleText.data('alllabel'));
                 }
                 else{
-                    titleText.text(assetfilter);
+                    titleText.text(assettype);
                 }
 
                 if ($subnav.hasClass('is-shown')) {
@@ -267,10 +267,10 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 event.preventDefault();
                 var collection = this.collection;
                 if($(event.currentTarget).data('assetfilter') == this.allLabel){
-                   collection.assetFilter = '';
+                    collection.assetType = '';
                 }
                 else{
-                    collection.assetFilter = $(event.currentTarget).data('assetfilter');
+                    collection.assetType = $(event.currentTarget).data('assetfilter');
                 }
 
                 this.selectFilter('js-asset-type-col');
