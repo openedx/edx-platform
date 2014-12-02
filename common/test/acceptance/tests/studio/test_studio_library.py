@@ -1,7 +1,6 @@
 """
 Acceptance tests for Content Libraries in Studio
 """
-
 from .base_studio_test import StudioLibraryTest
 from ...pages.studio.utils import add_component
 from ...pages.studio.library import LibraryPage
@@ -102,3 +101,9 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertEqual(len(self.lib_page.xblocks), 1)
         problem_block = self.lib_page.xblocks[0]
         self.assertIn("Laura Roslin", problem_block.student_content)
+
+    def test_no_discussion_button(self):
+        """
+        Ensure the UI is not loaded for adding discussions.
+        """
+        self.assertFalse(self.browser.find_elements_by_css_selector('span.large-discussion-icon'))
