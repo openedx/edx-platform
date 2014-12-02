@@ -75,6 +75,7 @@ def save_to_store(content, name, mime_type, location):
     contentstore().save(content)
     return content_location
 
+
 def save_subs_to_store(subs, subs_id, item, language='en'):
     """
     Save transcripts into `StaticContent`.
@@ -89,6 +90,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     filedata = json.dumps(subs, indent=2)
     filename = subs_filename(subs_id, language)
     return save_to_store(filedata, filename, 'application/json', item.location)
+
 
 def get_transcripts_from_youtube(youtube_id, settings, i18n):
     """
@@ -428,6 +430,7 @@ def get_or_create_sjson(item):
     sjson_transcript = Transcript.asset(item.location, source_subs_id, item.transcript_language).data
     return sjson_transcript
 
+
 class Transcript(object):
     """
     Container for transcript methods.
@@ -592,3 +595,17 @@ class VideoTranscriptsMixin(object):
             raise ValueError
 
         return content, filename, Transcript.mime_types[transcript_format]
+
+    def get_default_transcript_language(self):
+        """
+        Returns the default transcript language for this video module.
+        """
+        if self.transcript_language in self.transcripts:
+            transcript_language = self.transcript_language
+        elif self.sub:
+            transcript_language = u'en'
+        elif len(self.transcripts) > 0:
+            transcript_language = sorted(self.transcripts)[0]
+        else:
+            transcript_language = u'en'
+        return transcript_language

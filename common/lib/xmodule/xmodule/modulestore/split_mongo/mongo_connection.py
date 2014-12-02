@@ -2,11 +2,18 @@
 Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
 """
 import re
+from mongodb_proxy import autoretry_read, MongoProxy
 import pymongo
+import time
+
+# Import this just to export it
+from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+
 from contracts import check
+from functools import wraps
+from pymongo.errors import AutoReconnect
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo import BlockKey
-from datetime import tzinfo
 import datetime
 import pytz
 
@@ -67,19 +74,23 @@ class MongoConnection(object):
     Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
     """
     def __init__(
-        self, db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
+        self, db, collection, host, port=27017, tz_aware=True, user=None, password=None,
+        asset_collection=None, retry_wait_time=0.1, **kwargs
     ):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
         """
-        self.database = pymongo.database.Database(
-            pymongo.MongoClient(
-                host=host,
-                port=port,
-                tz_aware=tz_aware,
-                **kwargs
+        self.database = MongoProxy(
+            pymongo.database.Database(
+                pymongo.MongoClient(
+                    host=host,
+                    port=port,
+                    tz_aware=tz_aware,
+                    **kwargs
+                ),
+                db
             ),
-            db
+            wait_time=retry_wait_time
         )
 
         if user is not None and password is not None:
@@ -112,6 +123,7 @@ class MongoConnection(object):
         """
         return structure_from_mongo(self.structures.find_one({'_id': key}))
 
+    @autoretry_read()
     def find_structures_by_id(self, ids):
         """
         Return all structures that specified in ``ids``.
@@ -121,6 +133,7 @@ class MongoConnection(object):
         """
         return [structure_from_mongo(structure) for structure in self.structures.find({'_id': {'$in': ids}})]
 
+    @autoretry_read()
     def find_structures_derived_from(self, ids):
         """
         Return all structures that were immediately derived from a structure listed in ``ids``.
@@ -130,6 +143,7 @@ class MongoConnection(object):
         """
         return [structure_from_mongo(structure) for structure in self.structures.find({'previous_version': {'$in': ids}})]
 
+    @autoretry_read()
     def find_ancestor_structures(self, original_version, block_key):
         """
         Find all structures that originated from ``original_version`` that contain ``block_key``.
@@ -149,23 +163,27 @@ class MongoConnection(object):
             }
         })]
 
-    def upsert_structure(self, structure):
+    def insert_structure(self, structure):
         """
-        Update the db record for structure, creating that record if it doesn't already exist
+        Insert a new structure into the database.
         """
-        self.structures.update({'_id': structure['_id']}, structure_to_mongo(structure), upsert=True)
+        self.structures.insert(structure_to_mongo(structure))
 
     def get_course_index(self, key, ignore_case=False):
         """
         Get the course_index from the persistence mechanism whose id is the given key
         """
-        case_regex = ur"(?i)^{}$" if ignore_case else ur"{}"
-        return self.course_index.find_one(
-            {
-                key_attr: re.compile(case_regex.format(getattr(key, key_attr)))
+        if ignore_case:
+            query = {
+                key_attr: re.compile(u'^{}$'.format(re.escape(getattr(key, key_attr))), re.IGNORECASE)
                 for key_attr in ('org', 'course', 'run')
             }
-        )
+        else:
+            query = {
+                key_attr: getattr(key, key_attr)
+                for key_attr in ('org', 'course', 'run')
+            }
+        return self.course_index.find_one(query)
 
     def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
@@ -231,12 +249,11 @@ class MongoConnection(object):
         """
         return self.definitions.find_one({'_id': key})
 
-    def find_matching_definitions(self, query):
+    def get_definitions(self, definitions):
         """
-        Find the definitions matching the query. Right now the query must be a legal mongo query
-        :param query: a mongo-style query of {key: [value|{$in ..}|..], ..}
+        Retrieve all definitions listed in `definitions`.
         """
-        return self.definitions.find(query)
+        return self.definitions.find({'$in': {'_id': definitions}})
 
     def insert_definition(self, definition):
         """
@@ -260,4 +277,3 @@ class MongoConnection(object):
             ],
             unique=True
         )
-

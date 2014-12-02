@@ -29,7 +29,7 @@ from ...fixtures.discussion import (
     SearchResult,
 )
 
-from helpers import BaseDiscussionMixin
+from .helpers import BaseDiscussionMixin
 
 
 class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):

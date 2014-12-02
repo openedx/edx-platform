@@ -20,32 +20,42 @@ import re
 from uuid import uuid4
 
 from bson.son import SON
-from fs.osfs import OSFS
-from path import path
 from datetime import datetime
+from fs.osfs import OSFS
+from mongodb_proxy import MongoProxy, autoretry_read
+from path import path
 from pytz import UTC
+from contracts import contract, new_contract
+from operator import itemgetter
+from sortedcontainers import SortedListWithKey
 
 from importlib import import_module
-from xmodule.errortracker import null_error_tracker, exc_info_to_str
-from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.error_module import ErrorDescriptor
-from xblock.runtime import KvsFieldData
-from xblock.exceptions import InvalidScopeError
-from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
-
-from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
-from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
+from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
-from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
-from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from opaque_keys.edx.keys import UsageKey, CourseKey
+
+from xblock.core import XBlock
+from xblock.exceptions import InvalidScopeError
+from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
+from xblock.runtime import KvsFieldData
+
+from xmodule.assetstore import AssetMetadata
+from xmodule.error_module import ErrorDescriptor
+from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
+from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 
 log = logging.getLogger(__name__)
+
+new_contract('CourseKey', CourseKey)
+new_contract('AssetKey', AssetKey)
+new_contract('AssetMetadata', AssetMetadata)
 
 # sort order that returns DRAFT items first
 SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
@@ -194,7 +204,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             try:
                 category = json_data['location']['category']
                 class_ = self.load_block_type(category)
-
 
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
@@ -427,6 +436,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
     """
     A Mongodb backed ModuleStore
     """
+
+    # If no name is specified for the asset metadata collection, this name is used.
+    DEFAULT_ASSET_COLLECTION_NAME = 'assetstore'
+
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
     # pylint: disable=W0201
@@ -435,6 +448,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  error_tracker=null_error_tracker,
                  i18n_service=None,
                  fs_service=None,
+                 retry_wait_time=0.1,
                  **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -443,22 +457,30 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         super(MongoModuleStore, self).__init__(contentstore=contentstore, **kwargs)
 
         def do_connection(
-            db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
+            db, collection, host, port=27017, tz_aware=True, user=None, password=None, asset_collection=None, **kwargs
         ):
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
-            self.database = pymongo.database.Database(
-                pymongo.MongoClient(
-                    host=host,
-                    port=port,
-                    tz_aware=tz_aware,
-                    document_class=dict,
-                    **kwargs
+            self.database = MongoProxy(
+                pymongo.database.Database(
+                    pymongo.MongoClient(
+                        host=host,
+                        port=port,
+                        tz_aware=tz_aware,
+                        document_class=dict,
+                        **kwargs
+                    ),
+                    db
                 ),
-                db
+                wait_time=retry_wait_time
             )
             self.collection = self.database[collection]
+
+            # Collection which stores asset metadata.
+            if asset_collection is None:
+                asset_collection = self.DEFAULT_ASSET_COLLECTION_NAME
+            self.asset_collection = self.database[asset_collection]
 
             if user is not None and password is not None:
                 self.database.authenticate(user, password)
@@ -488,6 +510,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         self.collection.database.connection.close()
 
+    def mongo_wire_version(self):
+        """
+        Returns the wire version for mongo. Only used to unit tests which instrument the connection.
+        """
+        self.database.connection._ensure_connected()
+        return self.database.connection.max_wire_version
+
     def _drop_database(self):
         """
         A destructive operation to drop the underlying database and close all connections.
@@ -497,9 +526,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         super(MongoModuleStore, self)._drop_database()
 
         connection = self.collection.database.connection
-        connection.drop_database(self.collection.database)
+        connection.drop_database(self.collection.database.proxied_object)
         connection.close()
 
+    @autoretry_read()
     def fill_in_run(self, course_key):
         """
         In mongo some course_keys are used without runs. This helper function returns
@@ -673,6 +703,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         item['location'] = item['_id']
         del item['_id']
 
+    @autoretry_read()
     def _query_children_for_cache_children(self, course_key, items):
         """
         Generate a pymongo in query for finding the items and return the payloads
@@ -777,6 +808,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for item in items
         ]
 
+    @autoretry_read()
     def get_courses(self, **kwargs):
         '''
         Returns a list of course descriptors.
@@ -908,6 +940,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             for key in ('tag', 'org', 'course', 'category', 'name', 'revision')
         ])
 
+    @autoretry_read()
     def get_items(
             self,
             course_id,
@@ -1137,7 +1170,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         '''
         return self.get_course(location.course_key, depth)
 
-    def _update_single_item(self, location, update):
+    def _update_single_item(self, location, update, allow_not_found=False):
         """
         Set update on the specified item, and raises ItemNotFoundError
         if the location doesn't exist
@@ -1150,10 +1183,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             {'_id': location.to_deprecated_son()},
             {'$set': update},
             multi=False,
-            upsert=True,
-            # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
-            # from overriding our default value set in the init method.
-            safe=self.collection.safe
+            upsert=allow_not_found,
+            w=1,  # wait until primary commits
         )
         if result['n'] == 0:
             raise ItemNotFoundError(location)
@@ -1205,14 +1236,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if xblock.has_children:
                 children = self._serialize_scope(xblock, Scope.children)
                 payload.update({'definition.children': children['children']})
-            self._update_single_item(xblock.scope_ids.usage_id, payload)
+            self._update_single_item(xblock.scope_ids.usage_id, payload, allow_not_found=allow_not_found)
 
             # update subtree edited info for ancestors
             # don't update the subtree info for descendants of the publish root for efficiency
-            if (
-                (not isPublish or (isPublish and is_publish_root)) and
-                not self._is_in_bulk_operation(xblock.location.course_key)
-            ):
+            if not isPublish or (isPublish and is_publish_root):
                 ancestor_payload = {
                     'edit_info.subtree_edited_on': now,
                     'edit_info.subtree_edited_by': user_id
@@ -1282,7 +1310,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                         {'$set': {'definition.children': []}},
                         multi=False,
                         upsert=True,
-                        safe=self.collection.safe
                     )
                 elif ancestor_loc.category == 'course':
                     # once we reach the top location of the tree and if the location is not an orphan then the
@@ -1431,6 +1458,151 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         field_data = KvsFieldData(kvs)
         return field_data
+
+    def _find_course_assets(self, course_key):
+        """
+        Internal; finds (or creates) course asset info about all assets for a particular course
+
+        Arguments:
+            course_key (CourseKey): course identifier
+
+        Returns:
+            Asset info for the course
+        """
+        # Using the course_key, find or insert the course asset metadata document.
+        # A single document exists per course to store the course asset metadata.
+        course_key = self.fill_in_run(course_key)
+        course_assets = self.asset_collection.find_one(
+            {'course_id': unicode(course_key)},
+        )
+
+        if course_assets is None:
+            # Not found, so create.
+            course_assets = {'course_id': unicode(course_key), 'storage': 'FILLMEIN-TMP', 'assets': []}
+            course_assets['_id'] = self.asset_collection.insert(course_assets)
+
+        return course_assets
+
+    @contract(asset_metadata='AssetMetadata')
+    def save_asset_metadata(self, asset_metadata, user_id):
+        """
+        Saves the info for a particular course's asset.
+
+        Arguments:
+            asset_metadata (AssetMetadata): data about the course asset
+
+        Returns:
+            True if info save was successful, else False
+        """
+        course_assets, asset_idx = self._find_course_asset(asset_metadata.asset_id)
+        all_assets = SortedListWithKey([], key=itemgetter('filename'))
+        # Assets should be pre-sorted, so add them efficiently without sorting.
+        # extend() will raise a ValueError if the passed-in list is not sorted.
+        all_assets.extend(course_assets[asset_metadata.asset_id.block_type])
+        asset_metadata.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
+
+        # Translate metadata to Mongo format.
+        metadata_to_insert = asset_metadata.to_storable()
+        if asset_idx is None:
+            # Add new metadata sorted into the list.
+            all_assets.add(metadata_to_insert)
+        else:
+            # Replace existing metadata.
+            all_assets[asset_idx] = metadata_to_insert
+
+        # Update the document.
+        self.asset_collection.update(
+            {'_id': course_assets['_id']},
+            {'$set': {asset_metadata.asset_id.block_type: all_assets.as_list()}}
+        )
+        return True
+
+    @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
+    def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
+        """
+        Copy all the course assets from source_course_key to dest_course_key.
+        If dest_course already has assets, this removes the previous value.
+        It doesn't combine the assets in dest.
+
+        Arguments:
+            source_course_key (CourseKey): identifier of course to copy from
+            dest_course_key (CourseKey): identifier of course to copy to
+        """
+        source_assets = self._find_course_assets(source_course_key)
+        dest_assets = source_assets.copy()
+        dest_assets['course_id'] = unicode(dest_course_key)
+        del dest_assets['_id']
+
+        self.asset_collection.remove({'course_id': unicode(dest_course_key)})
+        # Update the document.
+        self.asset_collection.insert(dest_assets)
+
+    @contract(asset_key='AssetKey', attr_dict=dict)
+    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
+        """
+        Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
+
+        Arguments:
+            asset_key (AssetKey): asset identifier
+            attr_dict (dict): attribute: value pairs to set
+
+        Raises:
+            ItemNotFoundError if no such item exists
+            AttributeError is attr is one of the build in attrs.
+        """
+        course_assets, asset_idx = self._find_course_asset(asset_key)
+        if asset_idx is None:
+            raise ItemNotFoundError(asset_key)
+
+        # Form an AssetMetadata.
+        all_assets = course_assets[asset_key.block_type]
+        md = AssetMetadata(asset_key, asset_key.path)
+        md.from_storable(all_assets[asset_idx])
+        md.update(attr_dict)
+
+        # Generate a Mongo doc from the metadata and update the course asset info.
+        all_assets[asset_idx] = md.to_storable()
+
+        self.asset_collection.update({'_id': course_assets['_id']}, {"$set": {asset_key.block_type: all_assets}})
+
+    @contract(asset_key='AssetKey')
+    def delete_asset_metadata(self, asset_key, user_id):
+        """
+        Internal; deletes a single asset's metadata.
+
+        Arguments:
+            asset_key (AssetKey): key containing original asset filename
+
+        Returns:
+            Number of asset metadata entries deleted (0 or 1)
+        """
+        course_assets, asset_idx = self._find_course_asset(asset_key)
+        if asset_idx is None:
+            return 0
+
+        all_asset_info = course_assets[asset_key.block_type]
+        all_asset_info.pop(asset_idx)
+
+        # Update the document.
+        self.asset_collection.update(
+            {'_id': course_assets['_id']},
+            {'$set': {asset_key.block_type: all_asset_info}}
+        )
+        return 1
+
+    # pylint: disable=unused-argument
+    @contract(course_key='CourseKey')
+    def delete_all_asset_metadata(self, course_key, user_id):
+        """
+        Delete all of the assets which use this course_key as an identifier.
+
+        Arguments:
+            course_key (CourseKey): course_identifier
+        """
+        # Using the course_id, find the course asset metadata document.
+        # A single document exists per course to store the course asset metadata.
+        course_assets = self._find_course_assets(course_key)
+        self.asset_collection.remove(course_assets['_id'])
 
     def heartbeat(self):
         """

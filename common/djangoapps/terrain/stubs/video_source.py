@@ -9,6 +9,7 @@ import os
 from logging import getLogger
 LOGGER = getLogger(__name__)
 
+
 class VideoSourceRequestHandler(SimpleHTTPRequestHandler):
     """
     Request handler for serving video sources locally.

@@ -33,7 +33,7 @@ from sys import float_info
 from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -715,12 +715,13 @@ class ChoiceResponse(LoncapaResponse):
         if not isinstance(student_answer, list):
             student_answer = [student_answer]
 
+        no_empty_answer = student_answer != []
         student_answer = set(student_answer)
 
         required_selected = len(self.correct_choices - student_answer) == 0
         no_extra_selected = len(student_answer - self.correct_choices) == 0
 
-        correct = required_selected & no_extra_selected
+        correct = required_selected & no_extra_selected & no_empty_answer
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
@@ -2114,7 +2115,13 @@ class CodeResponse(LoncapaResponse):
         except etree.XMLSyntaxError as _err:
             # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>,
             # XML parser will raise exception, so wee fallback to html5parser, which will set empty "" values for such attrs.
-            parsed = html5lib.parseFragment(msg, treebuilder='lxml', namespaceHTMLElements=False)
+            try:
+                parsed = html5lib.parseFragment(msg, treebuilder='lxml', namespaceHTMLElements=False)
+            except ValueError:
+                # the parsed message might contain strings that are not
+                # xml compatible, in which case, throw the error message
+                parsed = False
+
             if not parsed:
                 log.error("Unable to parse external grader message as valid"
                       " XML: score_msg['msg']=%s", msg)

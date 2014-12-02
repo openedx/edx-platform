@@ -151,7 +151,7 @@ def _preview_module_system(request, descriptor):
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
-        get_python_lib_zip=(lambda :get_python_lib_zip(contentstore, course_id)),
+        get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, course_id)),
         mixins=settings.XBLOCK_MIXINS,
         course_id=course_id,
         anonymous_student_id='student',

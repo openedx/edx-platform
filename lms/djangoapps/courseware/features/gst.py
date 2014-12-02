@@ -26,6 +26,7 @@ DEFAULT_DATA = """\
 </configuration>
 """
 
+
 @steps
 class GraphicalSliderToolSteps(object):
     COURSE_NUM = 'test_course'

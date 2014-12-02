@@ -1,4 +1,4 @@
-define ["js/models/section", "js/spec_helpers/create_sinon", "js/utils/module"], (Section, create_sinon, ModuleUtils) ->
+define ["js/models/section", "js/common_helpers/ajax_helpers", "js/utils/module"], (Section, AjaxHelpers, ModuleUtils) ->
     describe "Section", ->
         describe "basic", ->
             beforeEach ->
@@ -34,7 +34,7 @@ define ["js/models/section", "js/spec_helpers/create_sinon", "js/utils/module"],
                 })
 
             it "show/hide a notification when it saves to the server", ->
-                server = create_sinon['server'](200, this)
+                server = AjaxHelpers['server'](200, this)
 
                 @model.save()
                 expect(Section.prototype.showNotification).toHaveBeenCalled()
@@ -43,7 +43,7 @@ define ["js/models/section", "js/spec_helpers/create_sinon", "js/utils/module"],
 
             it "don't hide notification when saving fails", ->
                 # this is handled by the global AJAX error handler
-                server = create_sinon['server'](500, this)
+                server = AjaxHelpers['server'](500, this)
 
                 @model.save()
                 server.respond()

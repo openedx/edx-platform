@@ -17,6 +17,7 @@ import random
 from contextlib import contextmanager, nested
 from shutil import rmtree
 from tempfile import mkdtemp
+from path import path
 
 from xmodule.tests import CourseComparisonTest
 
@@ -28,12 +29,20 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.xml import XMLModuleStore
+
+TEST_DATA_DIR = 'common/test/data/'
 
 
 COMMON_DOCSTORE_CONFIG = {
     'host': MONGO_HOST,
     'port': MONGO_PORT_NUM,
 }
+DATA_DIR = path(__file__).dirname().parent.parent / "tests" / "data" / "xml-course-root"
+
+XBLOCK_MIXINS = (InheritanceMixin, XModuleMixin)
 
 
 class MemoryCache(object):
@@ -82,6 +91,7 @@ class MongoModulestoreBuilder(object):
         doc_store_config = dict(
             db='modulestore{}'.format(random.randint(0, 10000)),
             collection='xmodule',
+            asset_collection='asset_metadata',
             **COMMON_DOCSTORE_CONFIG
         )
 
@@ -95,6 +105,7 @@ class MongoModulestoreBuilder(object):
             render_template=repr,
             branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
             metadata_inheritance_cache_subsystem=MemoryCache(),
+            xblock_mixins=XBLOCK_MIXINS,
         )
         modulestore.ensure_indexes()
 
@@ -139,6 +150,7 @@ class VersioningModulestoreBuilder(object):
             doc_store_config,
             fs_root,
             render_template=repr,
+            xblock_mixins=XBLOCK_MIXINS,
         )
         modulestore.ensure_indexes()
 
@@ -153,6 +165,30 @@ class VersioningModulestoreBuilder(object):
 
     def __repr__(self):
         return 'SplitModulestoreBuilder()'
+
+
+class XmlModulestoreBuilder(object):
+    """
+    A builder class for a XMLModuleStore.
+    """
+    # pylint: disable=unused-argument
+    @contextmanager
+    def build(self, contentstore=None, course_ids=None):
+        """
+        A contextmanager that returns an isolated xml modulestore
+
+        Args:
+            contentstore: The contentstore that this modulestore should use to store
+                all of its assets.
+        """
+        modulestore = XMLModuleStore(
+            DATA_DIR,
+            course_ids=course_ids,
+            default_class='xmodule.hidden_module.HiddenDescriptor',
+            xblock_mixins=XBLOCK_MIXINS,
+        )
+
+        yield modulestore
 
 
 class MixedModulestoreBuilder(object):
@@ -189,7 +225,13 @@ class MixedModulestoreBuilder(object):
             # Generate a fake list of stores to give the already generated stores appropriate names
             stores = [{'NAME': name, 'ENGINE': 'This space deliberately left blank'} for name in names]
 
-            modulestore = MixedModuleStore(contentstore, self.mappings, stores, create_modulestore_instance=create_modulestore_instance)
+            modulestore = MixedModuleStore(
+                contentstore,
+                self.mappings,
+                stores,
+                create_modulestore_instance=create_modulestore_instance,
+                xblock_mixins=XBLOCK_MIXINS,
+            )
 
             yield modulestore
 
@@ -223,13 +265,20 @@ class MongoContentstoreBuilder(object):
     def __repr__(self):
         return 'MongoContentstoreBuilder()'
 
-
-MODULESTORE_SETUPS = (
-    MongoModulestoreBuilder(),
-#     VersioningModulestoreBuilder(),  # FIXME LMS-11227
+MIXED_MODULESTORE_BOTH_SETUP = MixedModulestoreBuilder([
+    ('draft', MongoModulestoreBuilder()),
+    ('split', VersioningModulestoreBuilder())
+])
+MIXED_MODULESTORE_SETUPS = (
     MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())]),
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
+DIRECT_MODULESTORE_SETUPS = (
+    MongoModulestoreBuilder(),
+#     VersioningModulestoreBuilder(),  # FUTUREDO: LMS-11227
+)
+MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
+
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 COURSE_DATA_NAMES = (
     'toy',
@@ -269,13 +318,13 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                 with dest_content_builder.build() as dest_content:
                     # Construct the modulestore for storing the second import (using the second contentstore)
                     with dest_builder.build(dest_content) as dest_store:
-                        source_course_key = source_store.make_course_key('source', 'course', 'key')
-                        dest_course_key = dest_store.make_course_key('dest', 'course', 'key')
+                        source_course_key = source_store.make_course_key('a', 'course', 'course')
+                        dest_course_key = dest_store.make_course_key('a', 'course', 'course')
 
                         import_from_xml(
                             source_store,
                             'test_user',
-                            'common/test/data',
+                            TEST_DATA_DIR,
                             course_dirs=[course_data_name],
                             static_content_store=source_content,
                             target_course_id=source_course_key,
@@ -287,20 +336,31 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                             source_content,
                             source_course_key,
                             self.export_dir,
-                            'exported_course',
+                            'exported_source_course',
                         )
 
                         import_from_xml(
                             dest_store,
                             'test_user',
                             self.export_dir,
+                            course_dirs=['exported_source_course'],
                             static_content_store=dest_content,
                             target_course_id=dest_course_key,
                             create_new_course_if_not_present=True,
                         )
 
+# NOT CURRENTLY USED
+#                         export_to_xml(
+#                             dest_store,
+#                             dest_content,
+#                             dest_course_key,
+#                             self.export_dir,
+#                             'exported_dest_course',
+#                         )
+
                         self.exclude_field(None, 'wiki_slug')
                         self.exclude_field(None, 'xml_attributes')
+                        self.exclude_field(None, 'parent')
                         self.ignore_asset_key('_id')
                         self.ignore_asset_key('uploadDate')
                         self.ignore_asset_key('content_son')

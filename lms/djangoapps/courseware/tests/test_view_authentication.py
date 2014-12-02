@@ -72,7 +72,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         urls.extend([
             reverse('book', kwargs={'course_id': course.id.to_deprecated_string(),
                                     'book_index': index})
-            for index, book in enumerate(course.textbooks)
+            for index, __ in enumerate(course.textbooks)
         ])
         for url in urls:
             self.assert_request_status_code(404, url)
@@ -132,7 +132,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.course = modulestore().get_course(self.course.id)
 
-        self.test_course = CourseFactory.create(number='666', display_name='Robot_Sub_Course')
+        self.test_course = CourseFactory.create(org=self.course.id.org)
         self.other_org_course = CourseFactory.create(org='Other_Org_Course')
         self.sub_courseware_chapter = ItemFactory.create(
             parent_location=self.test_course.location,

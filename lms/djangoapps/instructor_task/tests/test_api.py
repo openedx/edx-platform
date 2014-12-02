@@ -17,6 +17,7 @@ from instructor_task.api import (
     submit_delete_problem_state_for_all_students,
     submit_bulk_course_email,
     submit_ora2_request_task,
+    submit_calculate_students_features_csv,
 )
 
 from instructor_task.api_helper import AlreadyRunningError
@@ -26,6 +27,7 @@ from instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     InstructorTaskCourseTestCase,
     InstructorTaskModuleTestCase,
+    TestReportMixin,
     TEST_COURSE_KEY
 )
 
@@ -162,7 +164,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         self._test_submit_task(submit_delete_problem_state_for_all_students)
 
 
-class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
+class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
 
     def setUp(self):
@@ -175,17 +177,37 @@ class InstructorTaskCourseSubmitTest(InstructorTaskCourseTestCase):
         course_email = CourseEmail.create(self.course.id, self.instructor, SEND_TO_ALL, "Test Subject", "<p>This is a test message</p>")
         return course_email.id  # pylint: disable=E1101
 
-    def test_submit_bulk_email_all(self):
-        email_id = self._define_course_email()
-        instructor_task = submit_bulk_course_email(self.create_task_request(self.instructor), self.course.id, email_id)
-
-        # test resubmitting, by updating the existing record:
+    def _test_resubmission(self, api_call):
+        """
+        Tests the resubmission of an instructor task through the API.
+        The call to the API is a lambda expression passed via
+        `api_call`.  Expects that the API call returns the resulting
+        InstructorTask object, and that its resubmission raises
+        `AlreadyRunningError`.
+        """
+        instructor_task = api_call()
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)  # pylint: disable=E1101
         instructor_task.task_state = PROGRESS
         instructor_task.save()
-
         with self.assertRaises(AlreadyRunningError):
-            instructor_task = submit_bulk_course_email(self.create_task_request(self.instructor), self.course.id, email_id)
+            api_call()
+
+    def test_submit_bulk_email_all(self):
+        email_id = self._define_course_email()
+        api_call = lambda: submit_bulk_course_email(
+            self.create_task_request(self.instructor),
+            self.course.id,
+            email_id
+        )
+        self._test_resubmission(api_call)
+
+    def test_submit_calculate_students_features(self):
+        api_call = lambda: submit_calculate_students_features_csv(
+            self.create_task_request(self.instructor),
+            self.course.id,
+            features=[]
+        )
+        self._test_resubmission(api_call)
 
     def test_submit_ora2_request_task(self):
         request = self.create_task_request(self.instructor)

@@ -7,7 +7,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from markupsafe import escape
 
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from edxmako.tests import mako_middleware_process_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -15,8 +15,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from instructor.views import legacy
 
+# pylint: disable=C0111
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestXss(ModuleStoreTestCase):
     def setUp(self):
         self._request_factory = RequestFactory()
@@ -43,7 +45,7 @@ class TestXss(ModuleStoreTestCase):
         Build a request with the given action, call the instructor dashboard
         view, and check that HTML code in a user's name is properly escaped.
         """
-        req  = self._request_factory.post(
+        req = self._request_factory.post(
             "dummy_url",
             data={"action": action}
         )

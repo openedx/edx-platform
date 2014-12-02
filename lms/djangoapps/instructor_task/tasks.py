@@ -33,6 +33,8 @@ from instructor_task.tasks_helper import (
     push_grades_to_s3,
     push_student_submissions_to_s3,
     push_ora2_responses_to_s3,
+    upload_grades_csv,
+    upload_students_csv
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
@@ -138,8 +140,21 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
     """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     action_name = ugettext_noop('graded')
-    task_fn = partial(push_grades_to_s3, xmodule_instance_args)
+    task_fn = partial(upload_grades_csv, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
+def calculate_students_features_csv(entry_id, xmodule_instance_args):
+    """
+    Compute student profile information for a course and upload the
+    CSV to an S3 bucket for download.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_students_csv, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 

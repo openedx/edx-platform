@@ -18,7 +18,7 @@ from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 from xblock.fields import Scope, BlockScope, ScopeIds
 from django.test import TestCase
 from django.db import DatabaseError
-from xblock.core import KeyValueMultiSaveError
+from xblock.exceptions import KeyValueMultiSaveError
 
 
 def mock_field(scope, name):
@@ -237,7 +237,6 @@ class StorageTestBase(object):
             mock_field(self.scope, 'other_existing_field')])
         self.field_data_cache = FieldDataCache([self.mock_descriptor], course_id, self.user)
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
-
 
     def test_set_and_get_existing_field(self):
         self.kvs.set(self.key_factory('existing_field'), 'test_value')

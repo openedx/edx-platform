@@ -3,11 +3,7 @@ Tests for instructor.basic
 """
 
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.test.utils import override_settings
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from courseware.courses import get_course
 from courseware.tests.factories import StudentModuleFactory, InstructorFactory
@@ -15,18 +11,24 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon, CourseRegCodeItem
 
 from instructor_analytics.basic import (
-    sale_record_features, enrolled_students_features, course_registration_features, coupon_codes_features, student_submissions,
-    AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+    sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
+    coupon_codes_features, student_submissions, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
 )
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from course_groups.tests.helpers import CohortFactory
+from courseware.tests.factories import InstructorFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class TestAnalyticsBasic(TestCase):
+class TestAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic analytics functions. """
 
     def setUp(self):
+        super(TestAnalyticsBasic, self).setUp()
         self.course_key = SlashSeparatedCourseKey('robot', 'course', 'id')
         self.users = tuple(UserFactory() for _ in xrange(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
@@ -45,13 +47,45 @@ class TestAnalyticsBasic(TestCase):
         query_features = ('username', 'name', 'email')
         for feature in query_features:
             self.assertIn(feature, AVAILABLE_FEATURES)
-        userreports = enrolled_students_features(self.course_key, query_features)
+        with self.assertNumQueries(1):
+            userreports = enrolled_students_features(self.course_key, query_features)
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(set(userreport.keys()), set(query_features))
             self.assertIn(userreport['username'], [user.username for user in self.users])
             self.assertIn(userreport['email'], [user.email for user in self.users])
             self.assertIn(userreport['name'], [user.profile.name for user in self.users])
+
+    def test_enrolled_students_features_keys_cohorted(self):
+        course = CourseFactory.create(course_key=self.course_key)
+        course.cohort_config = {'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
+        self.store.update_item(course, self.instructor.id)
+        cohort = CohortFactory.create(name='cohort', course_id=course.id)
+        cohorted_students = [UserFactory.create() for _ in xrange(10)]
+        cohorted_usernames = [student.username for student in cohorted_students]
+        non_cohorted_student = UserFactory.create()
+        for student in cohorted_students:
+            cohort.users.add(student)
+            CourseEnrollment.enroll(student, course.id)
+        CourseEnrollment.enroll(non_cohorted_student, course.id)
+        instructor = InstructorFactory(course_key=course.id)
+        self.client.login(username=instructor.username, password='test')
+
+        query_features = ('username', 'cohort')
+        # There should be a constant of 2 SQL queries when calling
+        # enrolled_students_features.  The first query comes from the call to
+        # User.objects.filter(...), and the second comes from
+        # prefetch_related('course_groups').
+        with self.assertNumQueries(2):
+            userreports = enrolled_students_features(course.id, query_features)
+        self.assertEqual(len([r for r in userreports if r['username'] in cohorted_usernames]), len(cohorted_students))
+        self.assertEqual(len([r for r in userreports if r['username'] == non_cohorted_student.username]), 1)
+        for report in userreports:
+            self.assertEqual(set(report.keys()), set(query_features))
+            if report['username'] in cohorted_usernames:
+                self.assertEqual(report['cohort'], cohort.name)
+            else:
+                self.assertEqual(report['cohort'], '[unassigned]')
 
     def test_available_features(self):
         self.assertEqual(len(AVAILABLE_FEATURES), len(STUDENT_FEATURES + PROFILE_FEATURES))
@@ -64,6 +98,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestCourseSaleRecordsAnalyticsBasic, self).setUp()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -105,13 +140,66 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             self.assertEqual(sale_record['total_used_codes'], 0)
             self.assertEqual(sale_record['total_codes'], 5)
 
+    def test_sale_order_features(self):
+        """
+         Test Order Sales Report CSV
+        """
+        query_features = [
+            ('id', 'Order Id'),
+            ('company_name', 'Company Name'),
+            ('company_contact_name', 'Company Contact Name'),
+            ('company_contact_email', 'Company Contact Email'),
+            ('total_amount', 'Total Amount'),
+            ('total_codes', 'Total Codes'),
+            ('total_used_codes', 'Total Used Codes'),
+            ('logged_in_username', 'Login Username'),
+            ('logged_in_email', 'Login User Email'),
+            ('purchase_time', 'Date of Sale'),
+            ('customer_reference_number', 'Customer Reference Number'),
+            ('recipient_name', 'Recipient Name'),
+            ('recipient_email', 'Recipient Email'),
+            ('bill_to_street1', 'Street 1'),
+            ('bill_to_street2', 'Street 2'),
+            ('bill_to_city', 'City'),
+            ('bill_to_state', 'State'),
+            ('bill_to_postalcode', 'Postal Code'),
+            ('bill_to_country', 'Country'),
+            ('order_type', 'Order Type'),
+            ('codes', 'Registration Codes'),
+            ('course_id', 'Course Id')
+        ]
+
+        order = Order.get_cart_for_user(self.instructor)
+        order.order_type = 'business'
+        order.save()
+        order.add_billing_details(company_name='Test Company', company_contact_name='Test',
+                                  company_contact_email='test@123', recipient_name='R1',
+                                  recipient_email='', customer_reference_number='PO#23')
+        CourseRegCodeItem.add_to_order(order, self.course.id, 4)
+        order.purchase()
+
+        db_columns = [x[0] for x in query_features]
+        sale_order_records_list = sale_order_record_features(self.course.id, db_columns)
+
+        for sale_order_record in sale_order_records_list:
+            self.assertEqual(sale_order_record['recipient_email'], order.recipient_email)
+            self.assertEqual(sale_order_record['recipient_name'], order.recipient_name)
+            self.assertEqual(sale_order_record['company_name'], order.company_name)
+            self.assertEqual(sale_order_record['company_contact_name'], order.company_contact_name)
+            self.assertEqual(sale_order_record['company_contact_email'], order.company_contact_email)
+            self.assertEqual(sale_order_record['customer_reference_number'], order.customer_reference_number)
+            self.assertEqual(sale_order_record['total_used_codes'], order.registrationcoderedemption_set.all().count())
+            self.assertEqual(sale_order_record['total_codes'], len(CourseRegistrationCode.objects.filter(order=order)))
+
 
 class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic course registration codes analytics functions. """
+
     def setUp(self):
         """
         Fixtures.
         """
+        super(TestCourseRegistrationCodeAnalyticsBasic, self).setUp()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')

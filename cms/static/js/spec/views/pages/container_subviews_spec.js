@@ -1,7 +1,8 @@
-define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_helpers",
+        "js/common_helpers/template_helpers", "js/spec_helpers/edit_helpers",
         "js/views/feedback_prompt", "js/views/pages/container", "js/views/pages/container_subviews",
         "js/models/xblock_info", "js/views/utils/xblock_utils"],
-    function ($, _, str, create_sinon, edit_helpers, Prompt, ContainerPage, ContainerSubviews,
+    function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, Prompt, ContainerPage, ContainerSubviews,
               XBlockInfo, XBlockUtils) {
         var VisibilityState = XBlockUtils.VisibilityState;
 
@@ -13,11 +14,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 mockContainerXBlockHtml = readFixtures('mock/mock-empty-container-xblock.underscore');
 
             beforeEach(function () {
-                edit_helpers.installTemplate('xblock-string-field-editor');
-                edit_helpers.installTemplate('publish-xblock');
-                edit_helpers.installTemplate('publish-history');
-                edit_helpers.installTemplate('unit-outline');
-                edit_helpers.installTemplate('container-message');
+                TemplateHelpers.installTemplate('xblock-string-field-editor');
+                TemplateHelpers.installTemplate('publish-xblock');
+                TemplateHelpers.installTemplate('publish-history');
+                TemplateHelpers.installTemplate('unit-outline');
+                TemplateHelpers.installTemplate('container-message');
                 appendSetFixtures(mockContainerPage);
             });
 
@@ -38,11 +39,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             };
 
             createContainerPage = function (test, options) {
-                requests = create_sinon.requests(test);
+                requests = AjaxHelpers.requests(test);
                 model = new XBlockInfo(createXBlockInfo(options), { parse: true });
                 containerPage = new ContainerPage({
                     model: model,
-                    templates: edit_helpers.mockComponentTemplates,
+                    templates: EditHelpers.mockComponentTemplates,
                     el: $('#content'),
                     isUnitPage: true
                 });
@@ -56,7 +57,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             respondWithHtml = function(html) {
                 var requestIndex = requests.length - 1;
-                create_sinon.respondWithJson(
+                AjaxHelpers.respondWithJson(
                     requests,
                     { html: html, "resources": [] },
                     requestIndex
@@ -64,7 +65,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             };
 
             respondWithJson = function(json, requestIndex) {
-                create_sinon.respondWithJson(
+                AjaxHelpers.respondWithJson(
                     requests,
                     json,
                     requestIndex
@@ -142,7 +143,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     expect(promptSpies.constructor).toHaveBeenCalled();
                     promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
 
-                    create_sinon.expectJsonRequest(requests, "POST", "/xblock/locator-container",
+                    AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "discard_changes"}
                     );
                 };
@@ -219,7 +220,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
 
                 it('can publish private content', function () {
-                    var notificationSpy = edit_helpers.createNotificationSpy();
+                    var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
                     expect(containerPage.$(bitPublishingCss)).not.toHaveClass(hasWarningsClass);
                     expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
@@ -227,17 +228,17 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Click publish
                     containerPage.$(publishButtonCss).click();
-                    edit_helpers.verifyNotificationShowing(notificationSpy, /Publishing/);
+                    EditHelpers.verifyNotificationShowing(notificationSpy, /Publishing/);
 
-                    create_sinon.expectJsonRequest(requests, "POST", "/xblock/locator-container",
+                    AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "make_public"}
                     );
 
                     // Response to publish call
                     respondWithJson({"id": "locator-container", "data": null, "metadata":{}});
-                    edit_helpers.verifyNotificationHidden(notificationSpy);
+                    EditHelpers.verifyNotificationHidden(notificationSpy);
 
-                    create_sinon.expectJsonRequest(requests, "GET", "/xblock/locator-container");
+                    AjaxHelpers.expectJsonRequest(requests, "GET", "/xblock/locator-container");
                     // Response to fetch
                     respondWithJson(createXBlockInfo({
                         published: true, has_changes: false, visibility_state: VisibilityState.ready
@@ -258,7 +259,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     var numRequests = requests.length;
                     // Respond with failure
-                    create_sinon.respondWithError(requests);
+                    AjaxHelpers.respondWithError(requests);
 
                     expect(requests.length).toEqual(numRequests);
 
@@ -271,7 +272,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 it('can discard changes', function () {
                     var notificationSpy, renderPageSpy, numRequests;
                     createContainerPage(this);
-                    notificationSpy = edit_helpers.createNotificationSpy();
+                    notificationSpy = EditHelpers.createNotificationSpy();
                     renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').andCallThrough();
 
                     sendDiscardChangesToServer();
@@ -279,7 +280,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Respond with success.
                     respondWithJson({"id": "locator-container"});
-                    edit_helpers.verifyNotificationHidden(notificationSpy);
+                    EditHelpers.verifyNotificationHidden(notificationSpy);
 
                     // Verify other requests are sent to the server to update page state.
                     // Response to fetch, specifying the very next request (as multiple requests will be sent to server)
@@ -297,7 +298,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     numRequests = requests.length;
 
                     // Respond with failure
-                    create_sinon.respondWithError(requests);
+                    AjaxHelpers.respondWithError(requests);
 
                     expect(requests.length).toEqual(numRequests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
@@ -393,14 +394,14 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                         // If removing explicit staff lock with no implicit staff lock, click 'Yes' to confirm
                         if (!isStaffOnly && !containerPage.model.get('ancestor_has_staff_lock')) {
-                            edit_helpers.confirmPrompt(promptSpy);
+                            EditHelpers.confirmPrompt(promptSpy);
                         }
 
-                        create_sinon.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
+                        AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
                             publish: 'republish',
                             metadata: { visible_to_staff_only: isStaffOnly ? true : null }
                         });
-                        create_sinon.respondWithJson(requests, {
+                        AjaxHelpers.respondWithJson(requests, {
                             data: null,
                             id: "locator-container",
                             metadata: {
@@ -408,13 +409,13 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                             }
                         });
 
-                        create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
+                        AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                         if (isStaffOnly || containerPage.model.get('ancestor_has_staff_lock')) {
                             newVisibilityState = VisibilityState.staffOnly;
                         } else {
                             newVisibilityState = VisibilityState.live;
                         }
-                        create_sinon.respondWithJson(requests, createXBlockInfo({
+                        AjaxHelpers.respondWithJson(requests, createXBlockInfo({
                             published: containerPage.model.get('published'),
                             has_explicit_staff_lock: isStaffOnly,
                             visibility_state: newVisibilityState,
@@ -423,11 +424,12 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     };
 
                     verifyStaffOnly = function(isStaffOnly) {
+                        var visibilityCopy = containerPage.$('.wrapper-visibility .copy').text().trim();
                         if (isStaffOnly) {
-                            expect(containerPage.$('.wrapper-visibility .copy').text()).toContain('Staff Only');
+                            expect(visibilityCopy).toContain('Staff Only');
                             expect(containerPage.$(bitPublishingCss)).toHaveClass(staffOnlyClass);
                         } else {
-                            expect(containerPage.$('.wrapper-visibility .copy').text().trim()).toBe('Staff and Students');
+                            expect(visibilityCopy).toBe('Staff and Students');
                             expect(containerPage.$(bitPublishingCss)).not.toHaveClass(staffOnlyClass);
                             verifyExplicitStaffOnly(false);
                             verifyImplicitStaffOnly(false);
@@ -506,7 +508,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     });
 
                     it("can remove explicit staff only setting without having implicit staff only", function() {
-                        promptSpy = edit_helpers.createPromptSpy();
+                        promptSpy = EditHelpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
                             has_explicit_staff_lock: true,
@@ -517,7 +519,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     });
 
                     it("can remove explicit staff only setting while having implicit staff only", function() {
-                        promptSpy = edit_helpers.createPromptSpy();
+                        promptSpy = EditHelpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
                             ancestor_has_staff_lock: true,
@@ -532,7 +534,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it("does not refresh if removing staff only is canceled", function() {
                         var requestCount;
-                        promptSpy = edit_helpers.createPromptSpy();
+                        promptSpy = EditHelpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
                             visibility_state: VisibilityState.staffOnly,
                             has_explicit_staff_lock: true,
@@ -540,7 +542,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         });
                         requestCount = requests.length;
                         containerPage.$('.action-staff-lock').click();
-                        edit_helpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
+                        EditHelpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
                         expect(requests.length).toBe(requestCount);
                         verifyExplicitStaffOnly(true);
                         verifyStaffOnly(true);
@@ -551,7 +553,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockContainerXBlockHtml);
                         containerPage.$('.lock-checkbox').click();
                         requestCount = requests.length;
-                        create_sinon.respondWithError(requests);
+                        AjaxHelpers.respondWithError(requests);
                         expect(requests.length).toBe(requestCount);
                         verifyStaffOnly(false);
                     });
@@ -588,7 +590,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             describe("Message Area", function() {
                 var messageSelector = '.container-message .warning',
-                    warningMessage = 'Caution: The last published version of this unit is live. By publishing changes you will change the student experience.';
+                    warningMessage = 'Caution: The last published version of this unit is live. ' +
+                        'By publishing changes you will change the student experience.';
 
                 it('is empty for a unit that is not currently visible to students', function() {
                     renderContainerPage(this, mockContainerXBlockHtml, {

@@ -209,6 +209,15 @@ class ReportStore(object):
         elif storage_type.lower() == "localfs":
             return LocalFSReportStore.from_config()
 
+    def _get_utf8_encoded_rows(self, rows):
+        """
+        Given a list of `rows` containing unicode strings, return a
+        new list of rows with those strings encoded as utf-8 for CSV
+        compatibility.
+        """
+        for row in rows:
+            yield [unicode(item).encode('utf-8') for item in row]
+
 
 class S3ReportStore(ReportStore):
     """
@@ -306,7 +315,8 @@ class S3ReportStore(ReportStore):
         """
         output_buffer = StringIO()
         gzip_file = GzipFile(fileobj=output_buffer, mode="wb")
-        csv.writer(gzip_file).writerows(rows)
+        csvwriter = csv.writer(gzip_file)
+        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         gzip_file.close()
 
         self.store(course_id, filename, output_buffer)
@@ -384,7 +394,9 @@ class LocalFSReportStore(ReportStore):
         write this data out.
         """
         output_buffer = StringIO()
-        csv.writer(output_buffer).writerows(rows)
+        csvwriter = csv.writer(output_buffer)
+        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
+
         self.store(course_id, filename, output_buffer)
 
     def links_for(self, course_id):

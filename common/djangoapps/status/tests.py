@@ -36,7 +36,6 @@ class TestStatus(TestCase):
         "edX/toy/2012_Fall" : "A toy story"
         }"""
 
-
     # json to use, expected results for course=None (e.g. homepage),
     # for toy course, for full course.  Note that get_site_status_msg
     # is supposed to return global message even if course=None.  The

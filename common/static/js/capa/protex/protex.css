@@ -51,3 +51,7 @@
   margin: 0px;
   color: white;
 }
+
+div#protex-panel[style] {
+   overflow: scroll !important;
+}

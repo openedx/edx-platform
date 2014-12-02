@@ -132,7 +132,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     def get_transcripts_for_student(self):
         """Return transcript information necessary for rendering the XModule student view.
 
-        This is more or less a direct extraction from `get_html`. 
+        This is more or less a direct extraction from `get_html`.
 
         Returns:
             Tuple of (track_url, transcript_language, sorted_languages)
@@ -152,12 +152,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             transcript_language = u'en'
             languages = {'en': 'English'}
         else:
-            if self.transcript_language in self.transcripts:
-                transcript_language = self.transcript_language
-            elif self.sub:
-                transcript_language = u'en'
-            else:
-                transcript_language = sorted(self.transcripts.keys())[0]
+            transcript_language = self.get_default_transcript_language()
 
             native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
             languages = {
@@ -177,10 +172,43 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sorted_languages = OrderedDict(sorted_languages)
         return track_url, transcript_language, sorted_languages
 
-
     def get_html(self):
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
         sources = filter(None, self.html5_sources)
+
+        download_video_link = None
+        youtube_streams = ""
+
+        # If we have an edx_video_id, we prefer its values over what we store
+        # internally for download links (source, html5_sources) and the youtube
+        # stream.
+        if self.edx_video_id and edxval_api:
+            try:
+                val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
+                val_video_urls = edxval_api.get_urls_for_profiles(self.edx_video_id, val_profiles)
+
+                # VAL will always give us the keys for the profiles we asked for, but
+                # if it doesn't have an encoded video entry for that Video + Profile, the
+                # value will map to `None`
+
+                # add the non-youtube urls to the list of alternative sources
+                # use the last non-None non-youtube url as the link to download the video
+                for url in [val_video_urls[p] for p in val_profiles if p != "youtube"]:
+                    if url:
+                        if url not in sources:
+                            sources.append(url)
+                        if self.download_video:
+                            download_video_link = url
+
+                # set the youtube url
+                if val_video_urls["youtube"]:
+                    youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
+
+            except edxval_api.ValInternalError:
+                # VAL raises this exception if it can't find data for the edx video ID. This can happen if the
+                # course data is ported to a machine that does not have the VAL data. So for now, pass on this
+                # exception and fallback to whatever we find in the VideoDescriptor.
+                log.warning("Could not retrieve information from VAL for edx Video ID: %s.", self.edx_video_id)
 
         # If the user comes from China use China CDN for html5 videos.
         # 'CN' is China ISO 3166-1 country code.
@@ -193,24 +221,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 new_url = get_video_from_cdn(cdn_url, source_url)
                 if new_url:
                     sources[index] = new_url
-
-        download_video_link = None
-        youtube_streams = ""
-
-        # If we have an edx_video_id, we prefer its values over what we store
-        # internally for download links (source, html5_sources) and the youtube
-        # stream.
-        if self.edx_video_id and edxval_api:
-            val_video_urls = edxval_api.get_urls_for_profiles(
-                self.edx_video_id, ["desktop_mp4", "youtube"]
-            )
-            # VAL will always give us the keys for the profiles we asked for, but 
-            # if it doesn't have an encoded video entry for that Video + Profile, the
-            # value will map to `None`
-            if val_video_urls["desktop_mp4"]:
-                download_video_link = val_video_urls["desktop_mp4"]
-            if val_video_urls["youtube"]:
-                youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoDescriptor
@@ -297,6 +307,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
 
         self.source_visible = False
+        # Set download_video field to default value if its not explicitly set for backward compatibility.
+        download_video = editable_fields['download_video']
+        if not download_video['explicitly_set']:
+            self.download_video = self.download_video
+
         if self.source:
             # If `source` field value exist in the `html5_sources` field values,
             # then delete `source` field value and use value from `html5_sources` field.
@@ -305,7 +320,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 self.download_video = True
             else:  # Otherwise, `source` field value will be used.
                 self.source_visible = True
-                download_video = editable_fields['download_video']
                 if not download_video['explicitly_set']:
                     self.download_video = True
 
@@ -579,15 +593,14 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     # If the user has specified html5 sources, make sure we don't use the default video
                     if youtube_id != '' or 'html5_sources' in field_data:
                         field_data['youtube_id_{0}'.format(normalized_speed.replace('.', '_'))] = youtube_id
+            elif attr in conversions:
+                field_data[attr] = conversions[attr](value)
+            elif attr not in cls.fields:
+                field_data.setdefault('xml_attributes', {})[attr] = value
             else:
-                #  Convert XML attrs into Python values.
-                if attr in conversions:
-                    value = conversions[attr](value)
-                else:
                 # We export values with json.dumps (well, except for Strings, but
                 # for about a month we did it for Strings also).
-                    value = deserialize_field(cls.fields[attr], value)
-                field_data[attr] = value
+                field_data[attr] = deserialize_field(cls.fields[attr], value)
 
         # For backwards compatibility: Add `source` if XML doesn't have `download_video`
         # attribute.

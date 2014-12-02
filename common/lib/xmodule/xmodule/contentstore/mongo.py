@@ -167,7 +167,7 @@ class MongoContentStore(ContentStore):
                     policy.setdefault(asset['asset_key'].name, {})[attr] = value
 
         with open(assets_policy_file, 'w') as f:
-            json.dump(policy, f)
+            json.dump(policy, f, sort_keys=True, indent=4)
 
     def get_all_content_thumbnails_for_course(self, course_key):
         return self._get_all_content_for_course(course_key, get_thumbnails=True)[0]

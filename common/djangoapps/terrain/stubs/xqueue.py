@@ -214,6 +214,7 @@ class StubXQueueService(StubHttpService):
         except for 'default' and 'register_submission_url' which have special meaning
         """
         return {
-            key:val for key, val in self.config.iteritems()
+            key: value
+            for key, value in self.config.iteritems()
             if key not in self.NON_QUEUE_CONFIG_KEYS
         }.items()

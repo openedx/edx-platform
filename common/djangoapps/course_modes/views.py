@@ -17,6 +17,8 @@ from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
+from util.db import commit_on_success_with_read_committed
 from xmodule.modulestore.django import modulestore
 
 
@@ -25,10 +27,10 @@ class ChooseModeView(View):
 
     When a get request is used, shows the selection page.
 
-    When a post request is used, assumes that it is a form submission 
+    When a post request is used, assumes that it is a form submission
     from the selection page, parses the response, and then sends user
     to the next step in the flow.
-    
+
     """
 
     @method_decorator(login_required)
@@ -47,49 +49,36 @@ class ChooseModeView(View):
             Response
 
         """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
 
-        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         upgrade = request.GET.get('upgrade', False)
         request.session['attempting_upgrade'] = upgrade
 
-        # TODO (ECOM-16): Remove once the AB-test of auto-registration completes
-        auto_register = request.session.get('auto_register', False)
-
-        # Inactive users always need to re-register
-        # Verified and professional users do not need to register or upgrade
-        # Registered users who are not trying to upgrade do not need to re-register
-        if not auto_register:
-            go_to_dashboard = (
-                is_active and
-                (not upgrade or enrollment_mode in ['verified', 'professional'])
-            )
-
-        # If auto-registration is enabled, then students might already be registered,
-        # but we should still show them the "choose your track" page so they have
-        # the option to enter the verification/payment flow.
-        # TODO (ECOM-16): Based on the results of the AB-test, set the default behavior to
-        # either enable or disable auto-registration.
-        else:
-            go_to_dashboard = (
-                not upgrade and enrollment_mode in ['verified', 'professional']
-            )
-
-        if go_to_dashboard:
-            return redirect(reverse('dashboard'))
-
+        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         modes = CourseMode.modes_for_course_dict(course_key)
 
         # We assume that, if 'professional' is one of the modes, it is the *only* mode.
         # If we offer more modes alongside 'professional' in the future, this will need to route
         # to the usual "choose your track" page.
-        if "professional" in modes:
+        has_enrolled_professional = (enrollment_mode == "professional" and is_active)
+        if "professional" in modes and not has_enrolled_professional:
             return redirect(
                 reverse(
                     'verify_student_show_requirements',
                     kwargs={'course_id': course_key.to_deprecated_string()}
                 )
             )
+
+        # If there isn't a verified mode available, then there's nothing
+        # to do on this page.  The user has almost certainly been auto-registered
+        # in the "honor" track by this point, so we send the user
+        # to the dashboard.
+        if not CourseMode.has_verified_mode(modes):
+            return redirect(reverse('dashboard'))
+
+        # If a user has already paid, redirect them to the dashboard.
+        if is_active and enrollment_mode in CourseMode.VERIFIED_MODES:
+            return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(unicode(course_key), None)
@@ -105,7 +94,7 @@ class ChooseModeView(View):
             "error": error,
             "upgrade": upgrade,
             "can_audit": "audit" in modes,
-            "autoreg": auto_register
+            "responsive": True
         }
         if "verified" in modes:
             context["suggested_prices"] = [
@@ -121,6 +110,7 @@ class ChooseModeView(View):
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(login_required)
+    @method_decorator(commit_on_success_with_read_committed)
     def post(self, request, course_id):
         """Takes the form submission from the page and parses it.
 
@@ -153,11 +143,11 @@ class ChooseModeView(View):
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
-        # TODO (ECOM-16): Remove if the experimental variant wins. Functionally, 
-        #  it doesn't matter, but it will avoid hitting the database.
         if requested_mode == 'honor':
-            CourseEnrollment.enroll(user, course_key, requested_mode)
-            return redirect('dashboard')
+            # The user will have already been enrolled in the honor mode at this
+            # point, so we just redirect them to the dashboard, thereby avoiding
+            # hitting the database a second time attempting to enroll them.
+            return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]
 

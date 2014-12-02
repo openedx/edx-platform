@@ -25,7 +25,7 @@ from django.conf import settings
   </div>
 % endif
 
-<div class="problem" role="application">
+<div class="problem" aria-live="polite" aria-relevant="all">
   ${ problem['html'] }
 
   <div class="action">
@@ -41,7 +41,7 @@ from django.conf import settings
     <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
     % endif
     % if answer_available:
-    <button class="show"><span class="show-label" aria-hidden="true">${_('Show Answer')}</span> <span class="sr">${_("Reveal Answer")}</span></button>
+    <button class="show"><span class="show-label">${_('Show Answer')}</span> <span class="sr">${_("Reveal Answer")}</span></button>
     % endif
     % if attempts_allowed :
     <div class="submission_feedback">

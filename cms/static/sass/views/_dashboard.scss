@@ -17,16 +17,14 @@
   // basic layout
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend .ui-col-wide;
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend .ui-col-narrow;
   }
 
   // ====================
@@ -420,8 +418,15 @@
         pointer-events: auto;
       }
 
-      .course-title {
-        color: $orange-d1;
+      .view-live-button {
+        @extend %ui-depth3;
+        @extend %btn-primary-blue;
+        @extend %sizing;
+        @include transition(opacity $tmg-f2 ease-in-out 0);
+        @include box-sizing(border-box);
+        padding: ($baseline/2);
+        opacity: 0.0;
+        pointer-events: none;
       }
 
       .course-metadata {
@@ -439,13 +444,13 @@
     .course-link {
       @extend %ui-depth2;
       width: flex-grid(6, 9);
-      margin-right: flex-gutter();
+      @include margin-right(flex-gutter());
     }
 
     // course title
     .course-title {
       @extend %t-title4;
-      margin: 0 ($baseline*2) ($baseline/4) 0;
+      @include margin(0, ($baseline*2), ($baseline/4), 0);
       font-weight: 300;
     }
 
@@ -486,17 +491,17 @@
       @extend %ui-depth3;
       position: static;
       width: flex-grid(3, 9);
-      text-align: right;
+      @include text-align(right);
       opacity: 0;
       pointer-events: none;
 
       .action {
         display: inline-block;
         vertical-align: middle;
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
 
         &:last-child {
-          margin-right: 0;
+          @include margin-right(0);
         }
       }
 

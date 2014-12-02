@@ -1,4 +1,4 @@
-define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers"], (FileUpload, UploadDialog, Chapter, create_sinon, modal_helpers) ->
+define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/common_helpers/ajax_helpers", "js/spec_helpers/modal_helpers"], (FileUpload, UploadDialog, Chapter, AjaxHelpers, modal_helpers) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
 
@@ -98,7 +98,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec_h
                 @clock.restore()
 
             it "can upload correctly", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 @view.render()
                 @view.upload()
@@ -115,7 +115,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec_h
                 expect(@dialogResponse.pop()).toEqual("dummy_response")
 
             it "can handle upload errors", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 @view.render()
                 @view.upload()
@@ -124,7 +124,7 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec_h
                 expect(@view.remove).not.toHaveBeenCalled()
 
             it "removes itself after two seconds on successful upload", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 @view.render()
                 @view.upload()

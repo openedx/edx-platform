@@ -11,7 +11,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.enrollment import (
@@ -26,6 +26,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestSettableEnrollmentState(TestCase):
@@ -285,7 +286,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorEnrollmentStudentModule(TestCase):
     """ Test student module manipulations. """
     def setUp(self):
@@ -430,8 +431,8 @@ class TestSendBetaRoleEmail(TestCase):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestGetEmailParams(TestCase):
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestGetEmailParams(ModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
     production-like conditions.

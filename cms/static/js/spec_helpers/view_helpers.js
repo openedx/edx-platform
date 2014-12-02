@@ -1,41 +1,15 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
-define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
-    function($, NotificationView, Prompt) {
-        var installTemplate, installTemplates, installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
+define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt", "js/common_helpers/template_helpers"],
+    function($, NotificationView, Prompt, TemplateHelpers) {
+        var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
             verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
             verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
             installMockAnalytics, removeMockAnalytics, verifyPromptShowing, verifyPromptHidden;
 
-        installTemplate = function(templateName, isFirst, templateId) {
-            var template = readFixtures(templateName + '.underscore');
-            if (!templateId) {
-                templateId = templateName + '-tpl';
-            }
-
-            if (isFirst) {
-                setFixtures($('<script>', { id: templateId, type: 'text/template' }).text(template));
-            } else {
-                appendSetFixtures($('<script>', { id: templateId, type: 'text/template' }).text(template));
-            }
-        };
-
-        installTemplates = function(templateNames, isFirst) {
-            if (!$.isArray(templateNames)) {
-                templateNames = [templateNames];
-            }
-
-            $.each(templateNames, function(index, templateName) {
-                installTemplate(templateName, isFirst);
-                if (isFirst) {
-                    isFirst = false;
-                }
-            });
-        };
-
         installViewTemplates = function(append) {
-            installTemplate('system-feedback', !append);
+            TemplateHelpers.installTemplate('system-feedback', !append);
             appendSetFixtures('<div id="page-notification"></div>');
         };
 
@@ -69,11 +43,11 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
         verifyNotificationHidden = function(notificationSpy) {
             verifyFeedbackHidden.apply(this, arguments);
         };
-        
+
         createPromptSpy = function(type) {
             return createFeedbackSpy(Prompt, type || 'Warning');
         };
-        
+
         confirmPrompt = function(promptSpy, pressSecondaryButton) {
             expect(promptSpy.constructor).toHaveBeenCalled();
             if (pressSecondaryButton) {
@@ -90,7 +64,7 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
         verifyPromptHidden = function(promptSpy) {
             verifyFeedbackHidden.apply(this, arguments);
         };
-        
+
         installMockAnalytics = function() {
             window.analytics = jasmine.createSpyObj('analytics', ['track']);
             window.course_location_analytics = jasmine.createSpy();
@@ -121,8 +95,6 @@ define(["jquery", "js/views/feedback_notification", "js/views/feedback_prompt"],
         };
 
         return {
-            'installTemplate': installTemplate,
-            'installTemplates': installTemplates,
             'installViewTemplates': installViewTemplates,
             'createNotificationSpy': createNotificationSpy,
             'verifyNotificationShowing': verifyNotificationShowing,

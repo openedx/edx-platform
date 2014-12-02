@@ -5,18 +5,18 @@
 <script type="text/javascript">
 
 function setup_debug(element_id, edit_link, staff_context){
-    $('#' + element_id + '_trig').leanModal(); 
-    $('#' + element_id + '_xqa_log').leanModal();        
+    $('#' + element_id + '_trig').leanModal();
+    $('#' + element_id + '_xqa_log').leanModal();
     $('#' + element_id + '_xqa_form').submit(function () {sendlog(element_id, edit_link, staff_context);});
 
     $("#" + element_id + "_history_trig").leanModal();
-    
+
     $('#' + element_id + '_history_form').submit(
         function () {
             var username = $("#" + element_id + "_history_student_username").val();
             var location = $("#" + element_id + "_history_location").val();
 
-            $("#" + element_id + "_history_text").load('/courses/' + "${unicode(course.id)}" + 
+            $("#" + element_id + "_history_text").load('/courses/' + "${unicode(course.id) | u}" +
                 "/submission_history/" + username + "/" + location);
             return false;
         }
@@ -36,7 +36,7 @@ function sendlog(element_id, edit_link, staff_context){
             tag:$('#' + element_id + '_xqa_tag').val(),
             entry: $('#' + element_id + '_xqa_entry').val()
         };
-            
+
     $.ajax({
         url: '${xqa_server}/log',
         type: 'GET',
@@ -44,7 +44,7 @@ function sendlog(element_id, edit_link, staff_context){
         data: JSON.stringify(xqaLog),
         crossDomain: true,
         dataType: 'jsonp',
-        beforeSend: function (xhr) { 
+        beforeSend: function (xhr) {
             xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
         timeout : 1000,
         success: function(result) {

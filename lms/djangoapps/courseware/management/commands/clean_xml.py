@@ -12,7 +12,7 @@ from xmodule.modulestore.xml import XMLModuleStore
 
 
 def traverse_tree(course):
-    '''Load every descriptor in course.  Return bool success value.'''
+    """Load every descriptor in course.  Return bool success value."""
     queue = [course]
     while len(queue) > 0:
         node = queue.pop()
@@ -56,9 +56,11 @@ def import_with_checks(course_dir, verbose=True):
 
     # No default class--want to complain if it doesn't find plugins for any
     # module.
-    modulestore = XMLModuleStore(data_dir,
-                   default_class=None,
-                   course_dirs=course_dirs)
+    modulestore = XMLModuleStore(
+        data_dir,
+        default_class=None,
+        course_dirs=course_dirs
+    )
 
     def str_of_err(tpl):
         (msg, exc_str) = tpl
@@ -83,11 +85,10 @@ def import_with_checks(course_dir, verbose=True):
         print "=" * 40
         print '\n'
 
-
-    #print course
+    # print course
     validators = (
         traverse_tree,
-        )
+    )
 
     print "=" * 40
     print "Running validators..."
@@ -95,7 +96,6 @@ def import_with_checks(course_dir, verbose=True):
     for validate in validators:
         print 'Running {0}'.format(validate.__name__)
         all_ok = validate(course) and all_ok
-
 
     if all_ok:
         print 'Course passes all checks!'
@@ -105,7 +105,7 @@ def import_with_checks(course_dir, verbose=True):
 
 
 def check_roundtrip(course_dir):
-    '''Check that import->export leaves the course the same'''
+    """Check that import->export leaves the course the same"""
 
     print "====== Roundtrip import ======="
     (ok, course) = import_with_checks(course_dir)
@@ -135,7 +135,6 @@ def clean_xml(course_dir, export_dir, force):
         print "Did NOT export"
 
 
-
 class Command(BaseCommand):
     help = """Imports specified course.xml, validate it, then exports in
     a canonical format.
@@ -145,6 +144,7 @@ Usage: clean_xml PATH-TO-COURSE-DIR PATH-TO-OUTPUT-DIR [force]
 If 'force' is specified as the last argument, exports even if there
 were import errors.
 """
+
     def handle(self, *args, **options):
         n = len(args)
         if n < 2 or n > 3:

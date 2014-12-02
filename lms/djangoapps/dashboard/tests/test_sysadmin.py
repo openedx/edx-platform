@@ -19,7 +19,7 @@ from django.utils.timezone import utc as UTC
 from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 
 from student.roles import CourseStaffRole, GlobalStaff
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_DIR
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
@@ -30,6 +30,9 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+
+from xmodule.modulestore.tests.django_utils import xml_store_config
+TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, ['empty'])
 
 
 TEST_MONGODB_LOG = {
@@ -551,6 +554,33 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'Not/Real/Testing'}))
         self.assertEqual(404, response.status_code)
+
+    def test_gitlog_no_logs(self):
+        """
+        Make sure the template behaves well when rendered despite there not being any logs.
+        (This is for courses imported using methods other than the git_add_course command)
+        """
+
+        self._setstaff_login()
+        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+
+        self._add_edx4edx()
+
+        # Simulate a lack of git import logs
+        import_logs = CourseImportLog.objects.all()
+        import_logs.delete()
+
+        response = self.client.get(
+            reverse('gitlogs_detail', kwargs={
+                'course_id': 'MITx/edx4edx/edx4edx'
+            })
+        )
+        self.assertIn(
+            'No git import logs have been recorded for this course.',
+            response.content
+        )
+
+        self._rm_edx4edx()
 
     def test_gitlog_courseteam_access(self):
         """

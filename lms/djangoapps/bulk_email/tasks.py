@@ -7,7 +7,7 @@ import random
 import json
 from time import sleep
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
 from boto.ses.exceptions import (
     SESAddressNotVerifiedError,
@@ -438,9 +438,13 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
     course_title = global_email_context['course_title']
     subject = "[" + course_title + "] " + course_email.subject
-    from_addr = _get_source_address(course_email.course_id, course_title)
 
-    course_email_template = CourseEmailTemplate.get_template()
+    # use the email from address in the CourseEmail, if it is present, otherwise compute it
+    from_addr = course_email.from_addr if course_email.from_addr else \
+        _get_source_address(course_email.course_id, course_title)
+
+    # use the CourseEmailTemplate that was associated with the CourseEmail
+    course_email_template = course_email.get_template()
     try:
         connection = get_connection()
         connection.open()
@@ -686,7 +690,7 @@ def _submit_for_retry(entry_id, email_id, to_list, global_email_context, current
 
 def _statsd_tag(course_title):
     """
-    Calculate the tag we will use for DataDog.
+    Prefix the tag we will use for DataDog.
+    The tag also gets modified by our dogstats_wrapper code.
     """
-    tag = u"course_email:{0}".format(course_title).encode('utf-8')
-    return tag[:200]
+    return u"course_email:{0}".format(course_title)

@@ -1,5 +1,5 @@
-define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
-($, jasmine, create_sinon, Squire) ->
+define ["jquery", "jasmine", "js/common_helpers/ajax_helpers", "squire"],
+($, jasmine, AjaxHelpers, Squire) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
     assetLibraryTpl = readFixtures('asset-library.underscore')
@@ -72,7 +72,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
 
         describe "AJAX", ->
             it "should destroy itself on confirmation", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 @view.render().$(".remove-asset-button").click()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
@@ -92,7 +92,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@collection.contains(@model)).toBeFalsy()
 
             it "should not destroy itself if server errors", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 @view.render().$(".remove-asset-button").click()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
@@ -106,7 +106,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@collection.contains(@model)).toBeTruthy()
 
             it "should lock the asset on confirmation", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 @view.render().$(".lock-checkbox").click()
                 # AJAX request has been sent, but not yet returned
@@ -123,7 +123,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@model.get("locked")).toBeTruthy()
 
             it "should not lock the asset if server errors", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 @view.render().$(".lock-checkbox").click()
                 # return an error response
@@ -207,7 +207,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 thumbnail: null
                 id: 'idx'
             @view.addAsset(model)
-            create_sinon.respondWithJson(requests,
+            AjaxHelpers.respondWithJson(requests,
                 {
                     assets: [
                         @mockAsset1, @mockAsset2,
@@ -231,9 +231,9 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
         describe "Basic", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
             setup = ->
-                requests = create_sinon.requests(this)
+                requests = AjaxHelpers.requests(this)
                 @view.setPage(0)
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 return requests
 
             $.fn.fileupload = ->
@@ -270,11 +270,11 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect($('.ui-loading').is(':visible')).toBe(false)
 
             it "should hide the status indicator if an error occurs while loading", ->
-                requests = create_sinon.requests(this)
+                requests = AjaxHelpers.requests(this)
                 appendSetFixtures('<div class="ui-loading"/>')
                 expect($('.ui-loading').is(':visible')).toBe(true)
                 @view.setPage(0)
-                create_sinon.respondWithError(requests)
+                AjaxHelpers.respondWithError(requests)
                 expect($('.ui-loading').is(':visible')).toBe(false)
 
             it "should render both assets", ->
@@ -316,9 +316,9 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
         describe "Sorting", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
             setup = ->
-                requests = create_sinon.requests(this)
+                requests = AjaxHelpers.requests(this)
                 @view.setPage(0)
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 return requests
 
             it "should have the correct default sort order", ->
@@ -331,30 +331,30 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")
                 @view.$("#js-asset-date-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("asc")
                 @view.$("#js-asset-date-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")
 
             it "should switch the sort order when clicking on a different column", ->
                 requests = setup.call(this)
                 @view.$("#js-asset-name-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Name")
                 expect(@view.collection.sortDirection).toBe("asc")
                 @view.$("#js-asset-name-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Name")
                 expect(@view.collection.sortDirection).toBe("desc")
 
             it "should switch sort to most recent date added when a new asset is added", ->
                 requests = setup.call(this)
                 @view.$("#js-asset-name-col").click()
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 addMockAsset.call(this, requests)
-                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                AjaxHelpers.respondWithJson(requests, @mockAssetsResponse)
                 expect(@view.sortDisplayName()).toBe("Date Added")
                 expect(@view.collection.sortDirection).toBe("desc")

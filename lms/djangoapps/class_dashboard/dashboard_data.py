@@ -21,6 +21,7 @@ PROB_TYPE_LIST = [
     'lti',
 ]
 
+
 def get_problem_grade_distribution(course_id):
     """
     Returns the grade distribution per problem for the course
