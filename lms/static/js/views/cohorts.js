@@ -12,12 +12,21 @@
         },
 
         initialize: function(options) {
+            var model = this.model;
+
             this.template = _.template($('#cohorts-tpl').text());
             this.selectorTemplate = _.template($('#cohort-selector-tpl').text());
             this.addCohortFormTemplate = _.template($('#add-cohort-form-tpl').text());
             this.advanced_settings_url = options.advanced_settings_url;
             this.upload_cohorts_csv_url = options.upload_cohorts_csv_url;
-            this.model.on('sync', this.onSync, this);
+            model.on('sync', this.onSync, this);
+
+            // Update cohort counts when the user clicks back on the membership tab
+            // (for example, after uploading a csv file of cohort assignments and then
+            // checking results on data download tab).
+            $(this.getSectionCss('membership')).click(function () {
+                model.fetch();
+            });
         },
 
         render: function() {
@@ -198,8 +207,13 @@
         showSection: function(event) {
             event.preventDefault();
             var section = $(event.currentTarget).data("section");
-            $(".instructor-nav .nav-item a[data-section='" + section + "']").click();
+            $(this.getSectionCss(section)).click();
             $(window).scrollTop(0);
+        },
+
+        getSectionCss: function (section) {
+            return ".instructor-nav .nav-item a[data-section='" + section + "']";
         }
+
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderModel, FileUploaderView);
