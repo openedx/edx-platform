@@ -684,8 +684,6 @@ section.instructor-dashboard-content-2 {
 
   .file-upload-form {
     @extend %cohort-management-form;
-    border: 1px solid $gray-l5;
-    padding: $baseline ($baseline*0.75);
 
     .form-fields {
       margin-bottom: $baseline;

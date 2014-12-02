@@ -3,8 +3,8 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
     function (Backbone, $, FileUploaderModel, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
         describe("FileUploaderView", function () {
             var verifyTitle, verifyInputLabel, verifyInputTip, verifySubmitButton, verifyExtensions, verifyText,
-                verifyFileUploadOption, verifyNotificationMessage, mimicUpload, respondWithSuccess,
-                respondWithError, fileUploaderView, fileUploaderModel, url="http://test_url/";
+                verifyFileUploadOption, verifyNotificationMessage, verifySubmitButtonEnabled, mimicUpload,
+                respondWithSuccess, respondWithError, fileUploaderView, fileUploaderModel, url="http://test_url/";
 
             verifyText = function (css, expectedText) {
                 expect(fileUploaderView.$(css).text().trim()).toBe(expectedText);
@@ -28,6 +28,16 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
                 }
             };
 
+            verifySubmitButtonEnabled = function (expectedEnabled) {
+                var submitButton = fileUploaderView.$('.submit-file-button');
+                if (!expectedEnabled) {
+                   expect(submitButton).toHaveClass("is-disabled");
+                }
+                else {
+                   expect(submitButton).not.toHaveClass("is-disabled");
+                }
+            };
+
             verifyFileUploadOption = function (option, expectedValue) {
                 expect(fileUploaderView.$('#file-upload-form').fileupload('option', option)).toBe(expectedValue);
             };
@@ -41,6 +51,7 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
 
                 var param = {files: [{name: 'upload_file.txt'}]};
                 fileUploaderView.$('#file-upload-form').fileupload('add', param);
+                verifySubmitButtonEnabled(true);
                 fileUploaderView.$('.submit-file-button').click();
 
                 // No file will actually be uploaded because "uploaded_file.txt" doesn't actually exist.
@@ -75,6 +86,7 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
                 verifyInputTip("");
                 verifySubmitButton("Upload File");
                 verifyExtensions(null);
+                verifySubmitButtonEnabled(false);
             });
 
             it ('can set text values and extensions', function () {

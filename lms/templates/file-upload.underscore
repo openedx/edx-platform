@@ -9,7 +9,7 @@
 
       <div class="form-fields">
         <div class="field field-file is-required">
-          <label class="field-label" for="file-upload-form-file"><%- model.get('inputLabel') %></label>
+          <label class="field-label sr" for="file-upload-form-file"><%- model.get('inputLabel') %></label>
           <input id="file-upload-form-file" class="input input-file" name="uploaded-file" type="file"
               <% if (model.get('extensions')) { %>
                   accept="<%- model.get('extensions') %>"
@@ -20,7 +20,7 @@
       </div>
 
       <div class="form-actions">
-        <button id="file-upload-form-submit" type="submit" class="submit-file-button action action-primary action-submit"><%- model.get('submitButtonText') %></button>
+        <button id="file-upload-form-submit" type="submit" class="submit-file-button action action-primary action-submit is-disabled"><%- model.get('submitButtonText') %></button>
       </div>
   </form>
 </div>

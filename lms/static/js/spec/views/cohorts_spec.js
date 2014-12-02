@@ -91,7 +91,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             };
 
             beforeEach(function () {
-                setFixtures("<div></div>");
+                setFixtures('<ul class="instructor-nav"><li class="nav-item"><<a href data-section="membership" class="active-section">Membership</a></li></ul><div></div>');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohorts');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/add-cohort-form');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-selector');
@@ -112,6 +112,15 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 expect(cohortsView.$('.cohort-management-file-upload').text().trim()).toBe('');
             });
 
+            it("Syncs data when membership tab is clicked", function() {
+                createCohortsView(this, 1);
+                verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
+                $(cohortsView.getSectionCss("membership")).click();
+                AjaxHelpers.expectRequest(requests, 'GET', '/mock_service');
+                respondToRefresh(1001, 2);
+                verifyHeader(1, 'Cat Lovers', 1001);
+            });
+
             describe("Cohort Selector", function () {
                 it('has no initial selection', function () {
                     createCohortsView(this);
@@ -121,7 +130,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                 it('can upload a CSV of cohort assignments if a cohort exists', function () {
                     expect(cohortsView.$('.cohort-management-file-upload').text()).
-                        toContain('Assign students to cohorts via a CSV file');
+                        toContain('Assign Students to Cohort Groups by Uploading a CSV File');
                 });
 
                 it('can select a cohort', function () {
