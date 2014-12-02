@@ -485,7 +485,6 @@ urlpatterns += (
     url(r'^survey/', include('survey.urls')),
 )
 
-
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
         url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),

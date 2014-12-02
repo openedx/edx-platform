@@ -233,6 +233,7 @@ class AccountApiTest(TestCase):
         # Verify that the email was NOT changed
         self.assertEqual(account_api.account_info(self.USERNAME)['email'], self.EMAIL)
 
+    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
     def test_confirm_email_no_user_profile(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         activation_key = account_api.request_email_change(
