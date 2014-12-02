@@ -175,7 +175,7 @@ def library_blocks_view(library, response_format):
         })
 
     xblock_info = create_xblock_info(library, include_ancestor_info=False, graders=[])
-    component_templates = get_component_templates(library)
+    component_templates = get_component_templates(library, library=True)
 
     return render_to_response('library.html', {
         'context_library': library,
