@@ -223,16 +223,27 @@
           </li>
           <li class="field required text" id="field-city">
             <label for="city">${_('City')}</label>
-            <input id="city" type="text" name="city" value="" placeholder="${_('example: Quito, Pichincha, Ecuador')}" required aria-required="true" aria-describedby="city-tip"/>
+            <input id="city" type="text" name="city" value="" placeholder="${_('Ejemplo: Quito, Pichincha, Ecuador')}" required aria-required="true" aria-describedby="city-tip"/>
             <span class="tip tip-input" id="city-tip">Debe <strong>seleccionar</strong>su ciudad de la lista que se desplega<strong>cuando digite un texto.</strong></span>
             <input type="hidden" name="city_id" value="" id="city_id"/>
           </li>
+          <li class="field-group">
+            <div class="field required text" id="field-publicentity">
+              <label for="publicentity">Institución Pública (SOLO SERVIDORES PUBLICOS)</label>
+	      <input placeholder="Ejemplo: IAEN o NINGUNO" id="publicentity" name="publicentity" type="text" required aria-describedby="publicentity-tip"/>
+              <span class="tip tip-input" id="publicentity-tip"><strong>Si es servidor público, escriba su institución y seleccione de la lista.</strong></span>
+              <input type="hidden" name="entity_id" value="" id="entity_id"/>
+            </div>
 
-          <li class="field required text" id="field-publicentity">
-            <label for="publicentity">Institución Pública</label>
-	    <input placeholder="Su institución o NINGUNO" id="publicentity" name="publicentity" type="text" required aria-describedby="publicentity-tip"/>
-            <span class="tip tip-input" id="publicentity-tip"><strong>Si es servidor público, escriba su institución y seleccione de la lista.</strong></span>
-            <input type="hidden" name="entity_id" value="" id="entity_id"/>
+            <div class="field required select" id="gradosp-id">
+              <label for="gradosp">Grupo Ocupacional (SOLO SERVIDORES PUBLICOS)</label>
+              <select id="gradosp" name="gradosp">
+                <option value="">--</option>
+                %for code, grupo in UserProfile.GRADO_CHOICES:
+                <option value="${code}">${_(grupo)}</option>
+                %endfor
+              </select>
+            </div>
           </li>
         </ol>
 
