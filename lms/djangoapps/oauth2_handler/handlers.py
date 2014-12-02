@@ -34,6 +34,21 @@ class OpenIDHandler(object):
         return value
 
 
+class PermissionsHandler(object):
+    """ Permissions scope handler """
+
+    def scope_permissions(self, _data):
+        return ['administrator']
+
+    def claim_administrator(self, data):
+        """
+        Return boolean indicating user's administrator status.
+
+        For our purposes an administrator is any user with is_staff set to True.
+        """
+        return data['user'].is_staff
+
+
 class ProfileHandler(object):
     """ Basic OpenID Connect `profile` scope handler with `locale` claim. """
 
@@ -193,8 +208,9 @@ class CourseAccessHandler(object):
         return course_ids
 
 
-class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
+class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler, PermissionsHandler):
     """ Configure the ID Token handler for the LMS. """
+
     def claim_instructor_courses(self, data):
         # Don't return list of courses unless they are requested as essential.
         if data.get('essential'):
@@ -210,16 +226,13 @@ class IDTokenHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
             return None
 
 
-class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler):
+class UserInfoHandler(OpenIDHandler, ProfileHandler, CourseAccessHandler, PermissionsHandler):
     """ Configure the UserInfo handler for the LMS. """
     pass
 
 
 def _get_all_courses():
-    """
-    Utitilty function to list all available courses.
-
-    """
+    """ Utility function to list all available courses. """
 
     ms_courses = modulestore().get_courses()
     courses = [c for c in ms_courses if isinstance(c, CourseDescriptor)]
