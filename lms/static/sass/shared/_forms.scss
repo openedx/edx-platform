@@ -8,6 +8,19 @@ label {
   margin-bottom: 5px;
   text-shadow: 0 1px rgba(255,255,255, 0.4);
   -webkit-font-smoothing: antialiased;
+
+  &.register-emails {
+    font-family: $sans-serif;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 1.5em;
+    font-weight: normal;
+    width: calc( 100% - 25px );
+    padding-top: 2px;
+    position: relative;
+    float: right;
+    clear: both;
+  }
 }
 
 textarea,
