@@ -106,6 +106,9 @@ def replace_static_urls(text, data_directory, course_id=None, static_asset_path=
     """
 
     def replace_static_url(original, prefix, quote, rest):
+        """
+        Replace a single matched url.
+        """
 
         # Don't mess with things that end in '?raw'
         if rest.endswith('?raw'):
@@ -153,9 +156,14 @@ def replace_static_urls(text, data_directory, course_id=None, static_asset_path=
 
     def wrap_part_extraction(processing_function):
         """
-
+        Turn a processing function that takes several arguments into one
+        that takes a match group.
         """
         def extractor(match):
+            """
+            Unwraps a match group for the captures specified in _url_replace_regex
+            then forwards the arguments onto the passed function
+            """
             original = match.group(0)
             prefix = match.group('prefix')
             quote = match.group('quote')

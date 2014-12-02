@@ -14,11 +14,17 @@ from xmodule.modulestore.django import modulestore
 from static_replace import replace_static_urls
 
 
-def make_static_urls_absolute(request, html, course):
+def _make_static_urls_absolute(request, html, course):
+    """
+    Converts relative URLs referencing static assets to absolute URLs
+    """
     def replace(request, __, prefix, quote, rest):
+        """
+        Function to actually do a single relative -> absolute url replacement
+        """
         processed = request.build_absolute_uri(prefix + rest)
         return quote + processed + quote
-    
+
     return replace_static_urls(
         html,
         data_directory=None,
@@ -85,7 +91,7 @@ class CourseHandoutsList(generics.ListAPIView):
         course_handouts_module = get_course_info_section_module(request, course, 'handouts')
         if course_handouts_module:
             handouts_html = course_handouts_module.data
-            handouts_html = make_static_urls_absolute(self.request, handouts_html, course)
+            handouts_html = _make_static_urls_absolute(self.request, handouts_html, course)
             return Response({'handouts_html': handouts_html})
         else:
             # course_handouts_module could be None if there are no handouts
@@ -119,7 +125,7 @@ class CourseAboutDetail(generics.RetrieveAPIView):
         #
         # This can also return None, so check for that before calling strip()
         about_section_html = get_course_about_section(course, "overview")
-        about_section_html = make_static_urls_absolute(self.request, about_section_html, course)
+        about_section_html = _make_static_urls_absolute(self.request, about_section_html, course)
 
         return Response(
             {"overview": about_section_html.strip() if about_section_html else ""}

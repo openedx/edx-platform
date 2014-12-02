@@ -29,12 +29,21 @@ class TestCourseInfo(ModuleStoreTestCase, APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue('overview' in response.data)  # pylint: disable=maybe-no-member
 
-    # def test_about_static_rewrites(self):
-    #     about_usage_key = self.course.id.make_usage_key('about', 'overview')
-    #     about_module = self.store.get_item(about_usage_key)
-    #     about_html = about_module.render(STUDENT_VIEW)
-    #     print "about is %s" % about_html
-    #     self.assertEqual(about_html, False)
+    def test_about_static_rewrites(self):
+        about_usage_key = self.course.id.make_usage_key('about', 'overview')
+        about_module = self.store.get_item(about_usage_key)
+        underlying_about_html = about_module.data
+
+        # check that we start with relative static assets
+        self.assertIn('\"/static/', underlying_about_html)
+
+        url = reverse('course-about-detail', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url)
+        json_data = json.loads(response.content)
+        about_html = json_data['overview']
+
+        # but shouldn't finish with any
+        self.assertNotIn('\"/static/', about_html)
 
     def test_no_handouts(self):
         url = reverse('course-handouts-list', kwargs={'course_id': unicode(self.course.id)})
