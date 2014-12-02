@@ -159,6 +159,15 @@ div.video {
     }
 
     section.video-controls {
+
+      // .icon {
+      //   font-family: "FontAwesome";
+      //   display: inline-block;
+      //   font-size: inherit;
+      //   min-height: 16px;
+      //   min-width: 16px;
+      // }
+
       @include clearfix();
       background: #333;
       border: 1px solid #000;
@@ -180,7 +189,7 @@ div.video {
         margin: 0;
         padding: 0 0 0 15px;
         overflow: hidden;
-        text-indent: -9999px;
+        // text-indent: -9999px;
         -webkit-font-smoothing: antialiased;
         box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
         color: #fff;
@@ -262,6 +271,7 @@ div.video {
         list-style: none;
         margin: 0 lh() 0 0;
         padding: 0;
+        font-size: 90%;
 
         @media (max-width: 1120px) {
           margin-right: lh(.5);
@@ -274,9 +284,10 @@ div.video {
 
           a {
             @extend %video-button;
-            background-image: url('../images/vcr.png');
-            background-position: 15px 15px ;
-            background-repeat: no-repeat;
+            // background-image: url('../images/vcr.png');
+            // background-position: 15px 15px ;
+            // background-repeat: no-repeat;
+            text-align: center;
             border-left: none;
             box-shadow: 1px 0 0 #555;
             padding: 0 lh(.75);
@@ -291,15 +302,15 @@ div.video {
 
             &:empty {
               height: 46px;
-              background-position: 15px 15px;
+              // background-position: 15px 15px;
             }
 
             &.play {
-              background-position: 17px -114px;
+              // background-position: 17px -114px;
             }
 
             &.pause {
-              background-position: 16px -50px;
+              // background-position: 16px -50px;
             }
           }
 
@@ -316,7 +327,7 @@ div.video {
       }
 
       div.secondary-controls {
-        float: right;
+        float: left;
 
         a.speed-button,
         div.volume > a,
@@ -396,10 +407,24 @@ div.video {
           }
         }
 
+        div.branding {
+          float: left;
+          width: 20%;
+          line-height: 46px; //height of play pause buttons
+          padding-left: lh(.75);
+          @media (max-width: 1120px) {
+            padding-left: lh(.5);
+          }
+
+          img {
+            width: 100%;
+          }
+        }
+
         div.speeds {
           &.is-opened {
             .speed-button {
-              background-image: url('../images/open-arrow.png');
+              // background-image: url('../images/open-arrow.png');
             }
           }
 
@@ -414,15 +439,20 @@ div.video {
           .speed-button {
             @extend %video-button;
             @include clearfix();
-            background-image: url('../images/closed-arrow.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
+            // background-image: url('../images/closed-arrow.png');
+            // background-position: 10px center;
+            // background-repeat: no-repeat;
             min-width: 116px;
             text-indent: 0;
 
             @media (max-width: 1120px) {
               min-width: 0;
               width: 60px;
+            }
+
+            .icon {
+              float: left;
+              margin-top: 1em;
             }
 
             .label {
@@ -469,16 +499,16 @@ div.video {
 
           &.is-muted {
             & > a {
-              background-image: url('../images/mute.png');
+              // background-image: url('../images/mute.png');
             }
           }
 
           & > a {
             @extend %video-button;
             @include clearfix();
-            background-image: url('../images/volume.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
+            // background-image: url('../images/volume.png');
+            // background-position: 10px center;
+            // background-repeat: no-repeat;
             border-left: none;
             width: 30px;
             height: 46px;
@@ -529,17 +559,18 @@ div.video {
 
         a.add-fullscreen {
           @extend %video-button;
-          background: url(../images/fullscreen.png) center no-repeat;
-          border-left: none;
+          // background: url(../images/fullscreen.png) center no-repeat;
           float: left;
+          width: 24px;
           padding: 0 11px;
-          width: 30px;
+          text-align: center;
+          border-left: none;
         }
 
 
         a.quality-control {
           @extend %video-button;
-          background: url(../images/hd.png) center no-repeat;
+          // background: url(../images/hd.png) center no-repeat;
           border-left: none;
           float: left;
           padding: 0 11px;
@@ -561,11 +592,12 @@ div.video {
             @extend %video-button;
             @include transition(none);
             box-shadow: inset 1px 0 0 #555;
-            background: url('../images/cc.png') center no-repeat;
+            text-align: center;
+            // background: url('../images/cc.png') center no-repeat;
             border-left: none;
             border-right: none;
             padding: 0 11px;
-            width: 30px;
+            width: 24px;
 
             &.off {
               opacity: 0.7;
