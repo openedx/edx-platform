@@ -315,7 +315,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
-            "Your file '{}' has been uploaded. Go check... in 5 minutes.".format(filename)
+            "Your file '{}' has been uploaded. Please allow a few minutes for processing.".format(filename)
         )
 
         # student_user is moved from manual cohort group to auto cohort group

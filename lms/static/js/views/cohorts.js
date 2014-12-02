@@ -39,7 +39,7 @@
 
         renderCSVUploadAndSelector: function(selectedCohort) {
             var fileUploaderModel = new FileUploaderModel({
-                title: gettext("Assign students to cohorts via a CSV file"),
+                title: gettext("Assign Students to Cohort Groups by Uploading a CSV File"),
                 inputLabel: gettext("Choose a .csv file"),
                 inputTip: gettext("Only properly formatted .csv files will be accepted."),
                 submitButtonText: gettext("Upload File and Assign Students"),
@@ -50,7 +50,9 @@
                 model: fileUploaderModel,
                 el: this.$('.csv-upload'),
                 successNotification: function (file, event, data) {
-                    var message = interpolate_text(gettext("Your file '{file}' has been uploaded. Go check... in 5 minutes."), {file: file});
+                    var message = interpolate_text(gettext(
+                        "Your file '{file}' has been uploaded. Please allow a few minutes for processing."
+                    ), {file: file});
                     return new NotificationModel({
                         type: "confirmation",
                         title: message
