@@ -156,7 +156,6 @@ class TestVideo(BaseTestXmodule):
         response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
         self.assertEqual(json.loads(response)['success'], True)
 
-
     def tearDown(self):
         _clear_assets(self.item_descriptor.location)
 
