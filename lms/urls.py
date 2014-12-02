@@ -171,6 +171,12 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
                         'static_template_view.views.render',
                         {'template': template}, name=value),)
 
+for mktg_name, mktg_url in settings.MKTG_URL_LINK_MAP_URLS.items():
+    urlpatterns += (
+        url(r'^{}$'.format(mktg_name), 'django.views.generic.simple.redirect_to',
+            {'url': mktg_url}, name=mktg_name),
+    )
+
 
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
