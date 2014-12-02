@@ -29,6 +29,7 @@ log = logging.getLogger(__name__)
 
 # pylint: disable=missing-docstring
 
+
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 

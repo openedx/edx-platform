@@ -35,6 +35,7 @@ TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
     DATA_DIR, MAPPINGS, include_xml=True, xml_course_dirs=XML_COURSE_DIRS
 )
 
+
 class CommandsTestBase(TestCase):
     """
     Base class for testing different django commands.
