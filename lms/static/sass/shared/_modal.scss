@@ -238,6 +238,10 @@
           margin: 0 auto;
           width: 100%;
           white-space: normal;
+
+          &#report-submit {
+            margin-bottom: 20px;
+          }
         }
       }
     }
@@ -311,6 +315,10 @@
       margin-top: ($baseline/2);
       color: $lighter-base-font-color;
     }
+  }
+
+  #help_wrapper .help-buttons {
+    list-style-type: none;
   }
 
   .discussion-alert-wrapper button {

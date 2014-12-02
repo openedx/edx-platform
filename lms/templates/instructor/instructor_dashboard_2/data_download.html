@@ -26,10 +26,6 @@
 
   <p>${_("Click to download a CSV of anonymized student IDs:")}</p>
   <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}"></p>
-
-  <br>
-  <p>${_("Click to download a CSV file containing all course open assessment response data.")}</p>
-  <p><input type="button" name="ora2-response-btn" value="${_("Download Ora2 Responses")}" data-endpoint="${ section_data['get_ora2_responses_url'] }"></p>
 </div>
 
 %if settings.FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
@@ -51,6 +47,7 @@
     <p>
       <input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
       <input type="button" name="get-student-submissions" value="${_("Get Student Submissions Report")}" data-endpoint="${ section_data['get_student_submissions_url'] }"/>
+      <input type="button" name="ora2-response-btn" value="${_("Download Ora2 Responses")}" data-endpoint="${ section_data['get_ora2_responses_url'] }"/>
     </p>
   %endif
 

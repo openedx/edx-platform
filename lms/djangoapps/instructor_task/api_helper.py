@@ -275,7 +275,6 @@ def encode_problem_and_student_input(usage_key, student=None):  # pylint: disabl
 
     return task_input, task_key
 
-
 def submit_task(request, task_type, task_class, course_key, task_input, task_key):
     """
     Helper method to submit a task.
