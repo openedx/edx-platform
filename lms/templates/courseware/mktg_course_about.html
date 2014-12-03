@@ -11,19 +11,30 @@
 
 <%block name="bodyclass">view-iframe-content view-partial-mktgregister</%block>
 
-
 <%block name="js_extra">
   <script type="text/javascript">
   (function() {
     $(".register").click(function(event) {
-      if ( !$("#email-opt-in").prop("checked") ) {
-        $("input[name='email_opt_in']").val("false");
-      }
+      var el = $("input[name='email_opt_in']"),
+        emailOptIn,
+        currentHref;
 
-      var email_opt_in = $("input[name='email_opt_in']").val(),
-        current_href = $("a.register").attr("href");
-      if (current_href) {
-        $("a.register").attr("href", current_href + "&email_opt_in=" + email_opt_in)
+      // Check if the email opt-in checkbox is missing
+      if ( $("#email-opt-in").length == 0 ) {
+        // Remove the corresponding hidden form element
+        el.remove();
+      } else {
+        // Check if the email opt-in checkbox is not checked
+        if ( !$("#email-opt-in").prop("checked") ) {
+          // Set the value of the corresponding hidden form element
+          el.val("false");
+        }
+
+        emailOptIn = el.val();
+        currentHref = $("a.register").attr("href");
+        if (currentHref) {
+          $("a.register").attr("href", currentHref + "&email_opt_in=" + emailOptIn);
+        }
       }
 
       $("#class_enroll_form").submit();
@@ -31,6 +42,8 @@
     });
 
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
+      var emailOptIn = '';
+
       if(xhr.status == 200) {
         if (xhr.responseText != "") {
           window.top.location.href = xhr.responseText;
@@ -39,13 +52,14 @@
           window.top.location.href = "${reverse('dashboard')}";
         }
       } else if (xhr.status == 403) {
-        var email_opt_in = $("input[name='email_opt_in']").val();
+        // Check if the email opt-in checkbox is present
+        if ( $("#email-opt-in").length != 0 ) {
+          emailOptIn = '&email_opt_in=' + $("input[name='email_opt_in']").val();
+        }
+
+        <% href_url = 'accounts_login' if settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION") else 'register_user' %>
         ## Ugh.
-        % if settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION"):
-        window.top.location.href = $("a.register").attr("href") || "${reverse('accounts_login')}?course_id=${course.id | u}&enrollment_action=enroll&email_opt_in=" + email_opt_in;
-        % else:
-        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll&email_opt_in=" + email_opt_in;
-        % endif
+        window.top.location.href = $("a.register").attr("href") || "${reverse(href_url)}?course_id=${course.id | u}&enrollment_action=enroll" + emailOptIn;
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
@@ -70,11 +84,8 @@
         %elif allow_registration:
         <a class="action action-register register ${'has-option-verified' if len(course_modes) > 1 else ''}"
             %if not user.is_authenticated():
-                % if settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION"):
-                href="${reverse('accounts_login')}?course_id=${course.id | u}&enrollment_action=enroll"
-                % else:
-                href="${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll"
-                % endif
+              <% href_url = 'accounts_login' if settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION") else 'register_user' %>
+              href="${reverse(href_url)}?course_id=${course.id | u}&enrollment_action=enroll"
             %endif
         >${_("Enroll in")} <strong>${course.display_number_with_default | h}</strong>
             %if len(course_modes) > 1:

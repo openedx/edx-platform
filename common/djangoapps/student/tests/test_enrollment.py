@@ -110,10 +110,13 @@ class EnrollmentTest(ModuleStoreTestCase):
     @ddt.data(
         ([], 'true'),
         ([], 'false'),
+        ([], None),
         (['honor', 'verified'], 'true'),
         (['honor', 'verified'], 'false'),
+        (['honor', 'verified'], None),
         (['professional'], 'true'),
         (['professional'], 'false'),
+        (['professional'], None),
     )
     @ddt.unpack
     def test_enroll_with_email_opt_in(self, course_modes, email_opt_in, mock_update_email_opt_in):
@@ -129,8 +132,11 @@ class EnrollmentTest(ModuleStoreTestCase):
         self._change_enrollment('enroll', email_opt_in=email_opt_in)
 
         # Verify that the profile API has been called as expected
-        opt_in = email_opt_in == 'true'
-        mock_update_email_opt_in.assert_called_once_with(self.USERNAME, self.course.org, opt_in)
+        if email_opt_in is not None:
+            opt_in = email_opt_in == 'true'
+            mock_update_email_opt_in.assert_called_once_with(self.USERNAME, self.course.org, opt_in)
+        else:
+            self.assertFalse(mock_update_email_opt_in.called)
 
     def test_user_not_authenticated(self):
         # Log out, so we're no longer authenticated
