@@ -996,7 +996,7 @@ class RegistrationViewTest(ApiTestCase):
         year_options = (
             [{"value": "", "name": "--", "default": True}] + [
                 {"value": unicode(year), "name": unicode(year)}
-                for year in range(this_year, this_year - 120, -1)
+                for year in range(this_year - 13, this_year - 100, -1)
             ]
         )
         self._assert_reg_field(

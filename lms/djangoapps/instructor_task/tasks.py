@@ -30,7 +30,6 @@ from instructor_task.tasks_helper import (
     rescore_problem_module_state,
     reset_attempts_module_state,
     delete_problem_module_state,
-    push_grades_to_s3,
     push_student_submissions_to_s3,
     push_ora2_responses_to_s3,
     upload_grades_csv,

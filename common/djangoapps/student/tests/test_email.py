@@ -16,6 +16,7 @@ from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestException(Exception):
@@ -61,12 +62,12 @@ class EmailTestMixin(object):
         self.addCleanup(settings.ALLOWED_HOSTS.pop)
 
 
-class EnrollmentEmailTests(TestCase):
+class EnrollmentEmailTests(ModuleStoreTestCase):
     """ Test senging automated emails to users upon course enrollment. """
-
     def setUp(self):
         # Test Contstants
-        COURSE_SLUG = "101"
+        super(EnrollmentEmailTests, self).setUp()
+        COURSE_SLUG = "100"
         COURSE_NAME = "test_course"
         COURSE_ORG = "EDX"
 
@@ -93,6 +94,7 @@ class EnrollmentEmailTests(TestCase):
         email_result = self.send_enrollment_email()
         self.assertNotIn('email_did_fire', email_result)
         self.assertIn('is_success', email_result)
+
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')

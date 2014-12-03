@@ -30,7 +30,7 @@ TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
 from instructor_task.models import ReportStore
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
-
+from django.conf import settings
 
 @ddt.ddt
 class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
@@ -119,7 +119,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
 
-class TestInstructorOra2Report(TestCase):
+class TestInstructorOra2Report(TestReportMixin, InstructorTaskCourseTestCase):
     """
     Tests that ORA2 response report generation works.
     """

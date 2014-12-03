@@ -101,10 +101,6 @@ class Command(BaseCommand):
             writer = csv.writer(csvout, dialect='excel')
             writer.writerows(info)
             return csvout.getvalue()
-        else:
-            return json.dumps(info, indent=2, sort_keys=True)
-
-        info = dump_module(course, inherited=options['inherited'], defaults=options['inherited_defaults'])
 
         return json.dumps(info, indent=2, sort_keys=True, default=unicode)
 

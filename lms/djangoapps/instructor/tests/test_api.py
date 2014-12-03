@@ -164,7 +164,6 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.staff_level_endpoints = [
             ('students_update_enrollment', {'identifiers': 'foo@example.org', 'action': 'enroll'}),
             ('get_grading_config', {}),
-            ('get_students_features', {}),
             ('get_distribution', {}),
             ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
             ('reset_student_attempts',
@@ -2021,15 +2020,6 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             response = self.client.get(url, {})
         already_running_status = "An ORA2 responses report generation task is already in progress."
         self.assertIn(already_running_status, response.content)
-
-    def test_get_students_features_csv(self):
-        """
-        Test that some minimum of information is formatted
-        correctly in the response to get_students_features.
-        """
-        url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url + '/csv', {})
-        self.assertEqual(response['Content-Type'], 'text/csv')
 
     def test_get_distribution_no_feature(self):
         """

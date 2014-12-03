@@ -68,6 +68,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from collections import namedtuple
 
@@ -884,6 +885,13 @@ def change_enrollment(request, check_access=True):
                 CourseEnrollment.enroll(user, course_id, check_access=check_access)
             except Exception:
                 return HttpResponseBadRequest(_("Could not enroll"))
+
+            try:
+                course = modulestore().get_course(course_id)
+            except ItemNotFoundError:
+                log.warning("User {0} tried to enroll in non-existent course {1}"
+                            .format(user.username, course_id))
+                return HttpResponseBadRequest(_("Course id is invalid"))
 
             # notify the user of the enrollment via email
             enrollment_email_result = json.loads(notify_enrollment_by_email(course, user, request).content)

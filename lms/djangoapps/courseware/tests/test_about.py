@@ -347,7 +347,7 @@ class AboutSidebarHTMLTestCase(ModuleStoreTestCase):
 
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
-class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class AboutPurchaseCourseTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This test class runs through a suite of verifications regarding
     purchaseable courses
