@@ -47,7 +47,7 @@ from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
 from util.string_utils import _has_non_ascii_characters
-from student.auth import has_course_access
+from student.auth import has_course_author_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,
@@ -94,7 +94,7 @@ def _get_course_module(course_key, user, depth=0):
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
     """
-    if not has_course_access(user, course_key):
+    if not has_course_author_access(user, course_key):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module
@@ -128,7 +128,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     course_key = CourseKey.from_string(course_key_string)
 
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
-        if not has_course_access(request.user, course_key):
+        if not has_course_author_access(request.user, course_key):
             raise PermissionDenied()
         if request.method == 'GET':
             return _course_notifications_json_get(action_state_id)
@@ -218,7 +218,7 @@ def course_handler(request, course_key_string=None):
                     return JsonResponse(_course_outline_json(request, course_module))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
-            elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
+            elif not has_course_author_access(request.user, CourseKey.from_string(course_key_string)):
                 raise PermissionDenied()
             elif request.method == 'PUT':
                 raise NotImplementedError()
@@ -290,7 +290,7 @@ def _accessible_courses_list(request):
         if course.location.course == 'templates':
             return False
 
-        return has_course_access(request.user, course.id)
+        return has_course_author_access(request.user, course.id)
 
     courses = filter(course_filter, modulestore().get_courses())
     in_process_course_actions = [
@@ -298,7 +298,7 @@ def _accessible_courses_list(request):
         CourseRerunState.objects.find_all(
             exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
         )
-        if has_course_access(request.user, course.course_key)
+        if has_course_author_access(request.user, course.course_key)
     ]
     return courses, in_process_course_actions
 
@@ -621,7 +621,7 @@ def _rerun_course(request, org, number, run, fields):
     source_course_key = CourseKey.from_string(request.json.get('source_course_key'))
 
     # verify user has access to the original course
-    if not has_course_access(request.user, source_course_key):
+    if not has_course_author_access(request.user, source_course_key):
         raise PermissionDenied()
 
     # create destination course key
@@ -702,7 +702,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_course_access(request.user, usage_key.course_key):
+    if not has_course_author_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     if request.method == 'GET':

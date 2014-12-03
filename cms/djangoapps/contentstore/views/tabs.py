@@ -1,7 +1,7 @@
 """
 Views related to course tabs
 """
-from student.auth import has_course_access
+from student.auth import has_course_author_access
 from util.json_request import expect_json, JsonResponse
 
 from django.http import HttpResponseNotFound
@@ -40,7 +40,7 @@ def tabs_handler(request, course_key_string):
     Instead use the general xblock URL (see item.xblock_handler).
     """
     course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     course_item = modulestore().get_course(course_key)
