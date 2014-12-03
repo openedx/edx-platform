@@ -144,14 +144,14 @@ Get the HTML for the course about page.
                      <h2>Course Staff</h2>\n   
                      <article class=\"teacher\">\n     
                      <div class=\"teacher-image\">\n       
-                     <img src=\"/static/images/pl-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\">\n     
+                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\">\n     
                      </div>\n\n     
                      <h3>Staff Member #1</h3>\n     
                      <p>Biography of instructor/staff member #1</p>\n   
                      </article>\n\n   
                      <article class=\"teacher\">\n     
                      <div class=\"teacher-image\">\n       
-                     <img src=\"/static/images/pl-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\">\n     
+                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\">\n     
                      </div>\n\n     
                      <h3>Staff Member #2</h3>\n     
                      <p>Biography of instructor/staff member #2</p>\n   
