@@ -21,7 +21,7 @@ class DataDownload
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
-    @$grades_btn = @$section.find ".grades-download-container input[type='button']"
+    @$grades_btn = @$section.find ".reports-download-container input[type='button']"
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
