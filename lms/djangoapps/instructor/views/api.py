@@ -27,7 +27,7 @@ import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
 import urllib
-from util.file import store_uploaded_file, course_and_time_based_filename_generator
+from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -993,7 +993,7 @@ def add_users_to_cohorts(request, course_id):
                 elif "email" not in fieldnames and "username" not in fieldnames:
                     msg = _("The file must contain a 'username' column, an 'email' column, or both.")
                 if msg:
-                    raise PermissionDenied(msg)
+                    raise FileValidationException(msg)
 
         # Determine after performance testing-- what is the maximum filesize we want to enforce?
         __, filename = store_uploaded_file(
@@ -1003,7 +1003,7 @@ def add_users_to_cohorts(request, course_id):
         )
         # The task will assume the default file storage.
         instructor_task.api.submit_cohort_students(request, course_key, filename)
-    except Exception as err:  # pylint: disable=broad-except
+    except (FileValidationException, PermissionDenied) as err:
         return JsonResponse({"error": str(err)}, status=400)
 
     return JsonResponse()
