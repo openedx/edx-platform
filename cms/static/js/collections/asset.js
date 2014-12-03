@@ -1,6 +1,6 @@
 define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, AssetModel) {
     var AssetCollection = BackbonePaginator.requestPager.extend({
-        assetFilter: '',
+        assetType: '',
         model : AssetModel,
         paginator_core: {
             type: 'GET',
@@ -18,7 +18,7 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
             'page_size': function() { return this.perPage; },
             'sort': function() { return this.sortField; },
             'direction': function() { return this.sortDirection; },
-            'asset_type': function() { return this.assetFilter; },
+            'asset_type': function() { return this.assetType; },
             'format': 'json'
         },
 
