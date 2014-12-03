@@ -3,7 +3,7 @@ Instructor Views
 """
 ## NOTE: This is the code for the legacy instructor dashboard
 ## We are no longer supporting this file or accepting changes into it.
-
+# pylint: skip-file
 from contextlib import contextmanager
 import csv
 import json
@@ -11,6 +11,7 @@ import logging
 import os
 import re
 import requests
+import urllib
 
 from collections import defaultdict, OrderedDict
 from markupsafe import escape
@@ -133,8 +134,8 @@ def instructor_dashboard(request, course_id):
             'header': ['Statistic', 'Value'],
             'title': _('Course Statistics At A Glance'),
         }
-        data = [['# Enrolled', enrollment_number]]
-        data += [['Date', timezone.now().isoformat()]]
+
+        data = [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
             for field in course.fields.values():
@@ -859,7 +860,7 @@ def instructor_dashboard(request, course_id):
                 )
 
                 # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-                submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=E1101
+                submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=no-member
 
             except Exception as err:  # pylint: disable=broad-except
                 # Catch any errors and deliver a message to the user
@@ -910,7 +911,7 @@ def instructor_dashboard(request, course_id):
         """
         url = settings.ANALYTICS_SERVER_URL + \
             u"get?aname={}&course_id={}&apikey={}".format(
-                analytics_name, course_key.to_deprecated_string(), settings.ANALYTICS_API_KEY
+                analytics_name, urllib.quote(unicode(course_key)), settings.ANALYTICS_API_KEY
             )
         try:
             res = requests.get(url)
@@ -937,11 +938,10 @@ def instructor_dashboard(request, course_id):
             "StudentsDailyActivity",  # active students by day
             "StudentsDropoffPerDay",  # active students dropoff by day
             # "OverallGradeDistribution",  # overall point distribution for course
-            "StudentsActive",  # num students active in time period (default = 1wk)
-            "StudentsEnrolled",  # num students enrolled
             # "StudentsPerProblemCorrect",  # foreach problem, num students correct
             "ProblemGradeDistribution",  # foreach problem, grade distribution
         ]
+
         for analytic_name in DASHBOARD_ANALYTICS:
             analytics_results[analytic_name] = get_analytics_result(analytic_name)
 
@@ -1427,19 +1427,9 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 
 # Gradebook has moved to instructor.api.spoc_gradebook #
 
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def grade_summary(request, course_key):
-    """Display the grade summary for a course."""
-    course = get_course_with_access(request.user, 'staff', course_key)
-
-    # For now, just a page
-    context = {'course': course,
-               'staff_access': True, }
-    return render_to_response('courseware/grade_summary.html', context)
-
-
 #-----------------------------------------------------------------------------
 # enrollment
+
 
 def _do_enroll_students(course, course_key, students, secure=False, overload=False, auto_enroll=False, email_students=False, is_shib_course=False):
     """
@@ -1816,7 +1806,7 @@ def dump_grading_context(course):
             notes = ''
             if getattr(sdesc, 'score_by_attempt', False):
                 notes = ', score by attempt!'
-            msg += "      %s (grade_format=%s, Assignment=%s%s)\n" % (s.display_name, grade_format, aname, notes)
+            msg += "      %s (grade_format=%s, Assignment=%s%s)\n" % (sdesc.display_name, grade_format, aname, notes)
     msg += "all descriptors:\n"
     msg += "length=%d\n" % len(gcontext['all_descriptors'])
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')

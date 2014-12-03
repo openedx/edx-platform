@@ -2,7 +2,7 @@
 Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
-from split import SplitMongoModuleStore, EXCLUDE_ALL
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
@@ -10,9 +10,11 @@ from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 )
 from opaque_keys.edx.locator import CourseLocator
+from xmodule.modulestore.split_mongo import BlockKey
+from contracts import contract
 
 
-class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleStore):
+class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPublished):
     """
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
@@ -42,9 +44,9 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 # create any other necessary things as a side effect: ensure they populate the draft branch
                 # and rely on auto publish to populate the published branch: split's create course doesn't
                 # call super b/c it needs the auto publish above to have happened before any of the create_items
-                # in this. The explicit use of SplitMongoModuleStore is intentional
+                # in this; so, this manually calls the grandparent and above methods.
                 with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, item.id):
-                    # pylint: disable=bad-super-call
+                    # NOTE: DO NOT CHANGE THE SUPER. See comment above
                     super(SplitMongoModuleStore, self).create_course(
                         org, course, run, user_id, runtime=item.runtime, **kwargs
                     )
@@ -88,7 +90,8 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
-        descriptor.location = self._map_revision_to_branch(descriptor.location)
+        old_descriptor_locn = descriptor.location
+        descriptor.location = self._map_revision_to_branch(old_descriptor_locn)
         with self.bulk_operations(descriptor.location.course_key):
             item = super(DraftVersioningModuleStore, self).update_item(
                 descriptor,
@@ -98,6 +101,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 **kwargs
             )
             self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
+            descriptor.location = old_descriptor_locn
             return item
 
     def create_item(
@@ -129,6 +133,8 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 user_id, parent_usage_key, block_type, block_id=block_id,
                 fields=fields, **kwargs
             )
+            # Publish both the child and the parent, if the child is a direct-only category
+            self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
             self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
             return item
 
@@ -166,7 +172,9 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 branched_location = location.for_branch(branch)
                 parent_loc = self.get_parent_location(branched_location)
                 SplitMongoModuleStore.delete_item(self, branched_location, user_id)
-                self._auto_publish_no_children(parent_loc, parent_loc.category, user_id, **kwargs)
+                # publish parent w/o child if deleted element is direct only (not based on type of parent)
+                if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
+                    self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
     def _map_revision_to_branch(self, key, revision=None):
         """
@@ -224,7 +232,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         if revision == ModuleStoreEnum.RevisionOption.draft_preferred:
             revision = ModuleStoreEnum.RevisionOption.draft_only
         location = self._map_revision_to_branch(location, revision=revision)
-        return SplitMongoModuleStore.get_parent_location(self, location, **kwargs)
+        return super(DraftVersioningModuleStore, self).get_parent_location(location, **kwargs)
 
     def get_orphans(self, course_key, **kwargs):
         course_key = self._map_revision_to_branch(course_key)
@@ -237,17 +245,17 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         :return: True if the draft and published versions differ
         """
         def get_course(branch_name):
-            return self._lookup_course(xblock.location.course_key.for_branch(branch_name))['structure']
+            return self._lookup_course(xblock.location.course_key.for_branch(branch_name)).structure
 
-        def get_block(course_structure, block_id):
-            return self._get_block_from_structure(course_structure, block_id)
+        def get_block(course_structure, block_key):
+            return self._get_block_from_structure(course_structure, block_key)
 
         draft_course = get_course(ModuleStoreEnum.BranchName.draft)
         published_course = get_course(ModuleStoreEnum.BranchName.published)
 
-        def has_changes_subtree(block_id):
-            draft_block = get_block(draft_course, block_id)
-            published_block = get_block(published_course, block_id)
+        def has_changes_subtree(block_key):
+            draft_block = get_block(draft_course, block_key)
+            published_block = get_block(published_course, block_key)
             if not published_block:
                 return True
 
@@ -263,15 +271,14 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
             return False
 
-        return has_changes_subtree(xblock.location.block_id)
+        return has_changes_subtree(BlockKey.from_usage_key(xblock.location))
 
     def publish(self, location, user_id, blacklist=None, **kwargs):
         """
         Publishes the subtree under location from the draft branch to the published branch
         Returns the newly published item.
         """
-        SplitMongoModuleStore.copy(
-            self,
+        super(DraftVersioningModuleStore, self).copy(
             user_id,
             # Directly using the replace function rather than the for_branch function
             # because for_branch obliterates the version_guid and will lead to missed version conflicts.
@@ -313,17 +320,20 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             # get head version of Published branch
             published_course_structure = self._lookup_course(
                 location.course_key.for_branch(ModuleStoreEnum.BranchName.published)
-            )['structure']
-            published_block = self._get_block_from_structure(published_course_structure, location.block_id)
+            ).structure
+            published_block = self._get_block_from_structure(
+                published_course_structure,
+                BlockKey.from_usage_key(location)
+            )
             if published_block is None:
                 raise InvalidVersionError(location)
 
             # create a new versioned draft structure
-            draft_course_structure = self._lookup_course(draft_course_key)['structure']
+            draft_course_structure = self._lookup_course(draft_course_key).structure
             new_structure = self.version_structure(draft_course_key, draft_course_structure, user_id)
 
             # remove the block and its descendants from the new structure
-            self._remove_subtree(location.block_id, new_structure['blocks'])
+            self._remove_subtree(BlockKey.from_usage_key(location), new_structure['blocks'])
 
             # copy over the block and its descendants from the published branch
             def copy_from_published(root_block_id):
@@ -339,7 +349,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 for child_block_id in block.setdefault('fields', {}).get('children', []):
                     copy_from_published(child_block_id)
 
-            copy_from_published(location.block_id)
+            copy_from_published(BlockKey.from_usage_key(location))
 
             # update course structure and index
             self.update_structure(draft_course_key, new_structure)
@@ -386,8 +396,8 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         pass
 
     def _get_head(self, xblock, branch):
-        course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
-        return self._get_block_from_structure(course_structure, xblock.location.block_id)
+        course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch)).structure
+        return self._get_block_from_structure(course_structure, BlockKey.from_usage_key(xblock.location))
 
     def _get_version(self, block):
         """
@@ -406,28 +416,18 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             new_usage_key = course_key.make_usage_key(block_type, block_id)
 
             if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
-                # if importing a direct only, override existing draft
-                if block_type in DIRECT_ONLY_CATEGORIES:
-                    draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
-                    with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
-                        draft = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
-                        self._auto_publish_no_children(draft.location, block_type, user_id)
-                    return self.get_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.published))
-                # if new to published
-                elif not self.has_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.published)):
-                    # check whether it's new to draft
-                    if not self.has_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.draft)):
-                        # add to draft too
-                        draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
-                        with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
-                            draft = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
-                            return self.publish(draft.location, user_id, blacklist=EXCLUDE_ALL)
+                # override existing draft (PLAT-297, PLAT-299). NOTE: this has the effect of removing
+                # any local changes w/ the import.
+                draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
+                with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
+                    draft_block = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
+                    return self.publish(draft_block.location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
             # do the import
             partitioned_fields = self.partition_fields_by_scope(block_type, fields)
             course_key = self._map_revision_to_branch(course_key)  # cast to branch_setting
             return self._update_item_from_fields(
-                user_id, course_key, block_type, block_id, partitioned_fields, None, allow_not_found=True, force=True
+                user_id, course_key, BlockKey(block_type, block_id), partitioned_fields, None, allow_not_found=True, force=True
             ) or self.get_item(new_usage_key)
 
     def compute_published_info_internal(self, xblock):
@@ -438,3 +438,52 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         if published_block is not None:
             setattr(xblock, '_published_by', published_block['edit_info']['edited_by'])
             setattr(xblock, '_published_on', published_block['edit_info']['edited_on'])
+
+    @contract(asset_key='AssetKey')
+    def find_asset_metadata(self, asset_key, **kwargs):
+        return super(DraftVersioningModuleStore, self).find_asset_metadata(
+            self._map_revision_to_branch(asset_key), **kwargs
+        )
+
+    def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
+        return super(DraftVersioningModuleStore, self).get_all_asset_metadata(
+            self._map_revision_to_branch(course_key), asset_type, start, maxresults, sort, **kwargs
+        )
+
+    def _update_course_assets(self, user_id, asset_key, update_function):
+        """
+        Updates both the published and draft branches
+        """
+        # if one call gets an exception, don't do the other call but pass on the exception
+        super(DraftVersioningModuleStore, self)._update_course_assets(
+            user_id, self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.published_only),
+            update_function
+        )
+        super(DraftVersioningModuleStore, self)._update_course_assets(
+            user_id, self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.draft_only),
+            update_function
+        )
+
+    def _find_course_asset(self, asset_key):
+        return super(DraftVersioningModuleStore, self)._find_course_asset(
+            self._map_revision_to_branch(asset_key)
+        )
+
+    def _find_course_assets(self, course_key):
+        """
+        Split specific lookup
+        """
+        return super(DraftVersioningModuleStore, self)._find_course_assets(
+            self._map_revision_to_branch(course_key)
+        )
+
+    def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
+        """
+        Copies to and from both branches
+        """
+        for revision in [ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.draft_only]:
+            super(DraftVersioningModuleStore, self).copy_all_asset_metadata(
+                self._map_revision_to_branch(source_course_key, revision),
+                self._map_revision_to_branch(dest_course_key, revision),
+                user_id
+            )

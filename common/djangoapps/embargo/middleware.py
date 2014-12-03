@@ -166,7 +166,7 @@ class EmbargoMiddleware(object):
         profile_country = cache.get(cache_key)
         if profile_country is None:
             profile = getattr(user, 'profile', None)
-            if profile is not None and profile.country is not None:
+            if profile is not None and profile.country.code is not None:
                 profile_country = profile.country.code.upper()
             else:
                 profile_country = ""

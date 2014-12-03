@@ -217,6 +217,7 @@ class ImportTestCase(CourseTestCase):
         """
 
         def try_tar(tarpath):
+            """ Attempt to tar an unacceptable file """
             with open(tarpath) as tar:
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
@@ -293,7 +294,7 @@ class ExportTestCase(CourseTestCase):
         """
         fake_xblock = ItemFactory.create(parent_location=self.course.location, category='aawefawef')
         self.store.publish(fake_xblock.location, self.user.id)
-        self._verify_export_failure(u'/container/i4x://MITx/999/course/Robot_Super_Course')
+        self._verify_export_failure(u'/container/{}'.format(self.course.location))
 
     def test_export_failure_subsection_level(self):
         """
@@ -305,12 +306,12 @@ class ExportTestCase(CourseTestCase):
             category='aawefawef'
         )
 
-        self._verify_export_failure(u'/container/i4x://MITx/999/vertical/foo')
+        self._verify_export_failure(u'/container/{}'.format(vertical.location))
 
-    def _verify_export_failure(self, expectedText):
+    def _verify_export_failure(self, expected_text):
         """ Export failure helper method. """
         resp = self.client.get(self.url, HTTP_ACCEPT='application/x-tgz')
         self.assertEquals(resp.status_code, 200)
         self.assertIsNone(resp.get('Content-Disposition'))
         self.assertContains(resp, 'Unable to create xml for module')
-        self.assertContains(resp, expectedText)
+        self.assertContains(resp, expected_text)

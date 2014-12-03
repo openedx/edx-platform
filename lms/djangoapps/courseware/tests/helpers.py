@@ -27,6 +27,8 @@ class LoginEnrollmentTestCase(TestCase):
     Provides support for user creation,
     activation, login, and course enrollment.
     """
+    user = None
+
     def setup_user(self):
         """
         Create a user account, activate, and log in.
@@ -34,8 +36,11 @@ class LoginEnrollmentTestCase(TestCase):
         self.email = 'foo@test.com'
         self.password = 'bar'
         self.username = 'test'
-        self.user = self.create_account(self.username,
-                            self.email, self.password)
+        self.user = self.create_account(
+            self.username,
+            self.email,
+            self.password,
+        )
         self.activate_user(self.email)
         self.login(self.email, self.password)
 
@@ -116,6 +121,7 @@ class LoginEnrollmentTestCase(TestCase):
         resp = self.client.post(reverse('change_enrollment'), {
             'enrollment_action': 'enroll',
             'course_id': course.id.to_deprecated_string(),
+            'check_access': True,
         })
         result = resp.status_code == 200
         if verify:

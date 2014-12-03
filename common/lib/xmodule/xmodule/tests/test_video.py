@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=W0212
+# pylint: disable=protected-access
 """Test for Video Xmodule functional logic.
 These test data read from xml, not from mongo.
 
@@ -549,7 +549,8 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         Test XML export with defaults.
         """
         xml = self.descriptor.definition_to_xml(None)
-        expected = '<video url_name="SampleProblem"/>\n'
+        # Check that download_video field is also set to default (False) in xml for backward compatibility
+        expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
 
@@ -565,7 +566,7 @@ class VideoCdnTest(unittest.TestCase):
         original_video_url = "http://www.original_video.com/original_video.mp4"
         cdn_response_video_url = "http://www.cdn_video.com/cdn_video.mp4"
         cdn_response_content = '{{"sources":["{cdn_url}"]}}'.format(cdn_url=cdn_response_video_url)
-        cdn_response.return_value=Mock(status_code=200, content=cdn_response_content)
+        cdn_response.return_value = Mock(status_code=200, content=cdn_response_content)
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertEqual(
             get_video_from_cdn(fake_cdn_url, original_video_url),
@@ -578,6 +579,6 @@ class VideoCdnTest(unittest.TestCase):
         Test if no alternative video in CDN exists.
         """
         original_video_url = "http://www.original_video.com/original_video.mp4"
-        cdn_response.return_value=Mock(status_code=404)
+        cdn_response.return_value = Mock(status_code=404)
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))

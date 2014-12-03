@@ -4,6 +4,7 @@ Tests for the newer CyberSource API implementation.
 """
 from mock import patch
 from django.test import TestCase
+from django.conf import settings
 import ddt
 
 from student.tests.factories import UserFactory
@@ -12,7 +13,13 @@ from shoppingcart.processors.CyberSource2 import (
     processor_hash,
     process_postpay_callback,
     render_purchase_form_html,
-    get_signed_purchase_params
+    get_signed_purchase_params,
+    _get_processor_exception_html
+)
+from shoppingcart.processors.exceptions import (
+    CCProcessorSignatureException,
+    CCProcessorDataException,
+    CCProcessorWrongAmountException
 )
 
 
@@ -41,6 +48,13 @@ class CyberSource2Test(TestCase):
             unit_cost=self.COST,
             line_cost=self.COST
         )
+
+    def assert_dump_recorded(self, order):
+        """
+        Verify that this order does have a dump of information from the
+        payment processor.
+        """
+        self.assertNotEqual(order.processor_reply_dump, '')
 
     def test_render_purchase_form_html(self):
         # Verify that the HTML form renders with the payment URL specified
@@ -94,7 +108,8 @@ class CyberSource2Test(TestCase):
                 'unsigned_field_names',
                 'transaction_uuid',
                 'payment_method',
-                'override_custom_receipt_page'
+                'override_custom_receipt_page',
+                'override_custom_cancel_page',
             ])
         )
         self.assertEqual(params['unsigned_field_names'], '')
@@ -123,6 +138,7 @@ class CyberSource2Test(TestCase):
 
         # Expect that the order has been marked as purchased
         self.assertEqual(result['order'].status, 'purchased')
+        self.assert_dump_recorded(result['order'])
 
     def test_process_payment_rejected(self):
         # Simulate a callback from CyberSource indicating that the payment was rejected
@@ -132,6 +148,7 @@ class CyberSource2Test(TestCase):
         # Expect that we get an error message
         self.assertFalse(result['success'])
         self.assertIn(u"did not accept your payment", result['error_html'])
+        self.assert_dump_recorded(result['order'])
 
     def test_process_payment_invalid_signature(self):
         # Simulate a callback from CyberSource indicating that the payment was rejected
@@ -159,6 +176,9 @@ class CyberSource2Test(TestCase):
         # Expect an error
         self.assertFalse(result['success'])
         self.assertIn(u"different amount than the order total", result['error_html'])
+        # refresh data for current order
+        order = Order.objects.get(id=self.order.id)
+        self.assert_dump_recorded(order)
 
     def test_process_amount_paid_not_decimal(self):
         # Change the payment amount to a non-decimal
@@ -168,6 +188,16 @@ class CyberSource2Test(TestCase):
         # Expect an error
         self.assertFalse(result['success'])
         self.assertIn(u"badly-typed value", result['error_html'])
+
+    def test_process_user_cancelled(self):
+        # Change the payment amount to a non-decimal
+        params = self._signed_callback_params(self.order.id, self.COST, "abcd")
+        params['decision'] = u'CANCEL'
+        result = process_postpay_callback(params)
+
+        # Expect an error
+        self.assertFalse(result['success'])
+        self.assertIn(u"you have cancelled this transaction", result['error_html'])
 
     @patch.object(OrderItem, 'purchased_callback')
     def test_process_no_credit_card_digits(self, callback):
@@ -184,6 +214,7 @@ class CyberSource2Test(TestCase):
             msg="Payment was not successful: {error}".format(error=result.get('error_html'))
         )
         self.assertEqual(result['error_html'], '')
+        self.assert_dump_recorded(result['order'])
 
         # Expect that the order has placeholders for the missing credit card digits
         self.assertEqual(result['order'].bill_to_ccnum, '####')
@@ -205,9 +236,35 @@ class CyberSource2Test(TestCase):
         self.assertFalse(result['success'])
         self.assertIn(u"did not return a required parameter", result['error_html'])
 
+    @patch.object(OrderItem, 'purchased_callback')
+    def test_sign_then_verify_unicode(self, purchased_callback):
+        params = self._signed_callback_params(
+            self.order.id, self.COST, self.COST,
+            first_name=u'\u2699'
+        )
+
+        # Verify that this executes without a unicode error
+        result = process_postpay_callback(params)
+        self.assertTrue(result['success'])
+        self.assert_dump_recorded(result['order'])
+
+    @ddt.data('string', u'üñîçø∂é')
+    def test_get_processor_exception_html(self, error_string):
+        """
+        Tests the processor exception html message
+        """
+        for exception_type in [CCProcessorSignatureException, CCProcessorWrongAmountException, CCProcessorDataException]:
+            error_msg = error_string
+            exception = exception_type(error_msg)
+            html = _get_processor_exception_html(exception)
+            self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, html)
+            self.assertIn('Sorry!', html)
+            self.assertIn(error_msg, html)
+
     def _signed_callback_params(
         self, order_id, order_amount, paid_amount,
-        accepted=True, signature=None, card_number='xxxxxxxxxxxx1111'
+        accepted=True, signature=None, card_number='xxxxxxxxxxxx1111',
+        first_name='John'
     ):
         """
         Construct parameters that could be returned from CyberSource
@@ -227,6 +284,7 @@ class CyberSource2Test(TestCase):
             accepted (bool): Whether the payment was accepted or rejected.
             signature (string): If provided, use this value instead of calculating the signature.
             card_numer (string): If provided, use this value instead of the default credit card number.
+            first_name (string): If provided, the first name of the user.
 
         Returns:
             dict
@@ -306,7 +364,7 @@ class CyberSource2Test(TestCase):
             "req_transaction_uuid": "ddd9935b82dd403f9aa4ba6ecf021b1f",
             "auth_trans_ref_no": "85080648RYI23S6I",
             "req_bill_to_surname": "Doe",
-            "req_bill_to_forename": "John",
+            "req_bill_to_forename": first_name,
             "req_bill_to_email": "john@example.com",
             "req_override_custom_receipt_page": "http://localhost:8000/shoppingcart/postpay_callback/",
             "req_access_key": "abcd12345",
@@ -335,8 +393,8 @@ class CyberSource2Test(TestCase):
         """
         return processor_hash(
             ",".join([
-                "{0}={1}".format(signed_field, params[signed_field])
+                u"{0}={1}".format(signed_field, params[signed_field])
                 for signed_field
-                in params['signed_field_names'].split(",")
+                in params['signed_field_names'].split(u",")
             ])
         )

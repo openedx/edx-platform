@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.delete_column('auth_userprofile', 'city')
 
         # Adding field 'UserProfile.city_id'
-        db.add_column('auth_userprofile', 'city_id',
+        db.add_column('auth_userprofile', 'city',
                       self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['cities.City'], null=True, blank=True),
                       keep_default=False)
 
@@ -29,7 +29,7 @@ class Migration(SchemaMigration):
                       keep_default=False)
 
         # Deleting field 'UserProfile.city_id'
-        db.delete_column('auth_userprofile', 'city_id_id')
+        db.delete_column('auth_userprofile', 'city_id')
 
         # Deleting field 'UserProfile.cedula'
         db.delete_column('auth_userprofile', 'cedula')

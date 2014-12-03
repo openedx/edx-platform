@@ -10,7 +10,7 @@ sessions. Assumes structure:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from .common import *
 import os
@@ -69,21 +69,10 @@ STATICFILES_DIRS += [
 # If we don't add these settings, then Django templates that can't
 # find pipelined assets will raise a ValueError.
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
-STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
+STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
-PIPELINE_ENABLED=False
+PIPELINE_ENABLED = False
 
-# Add split as another store for testing
-MODULESTORE['default']['OPTIONS']['stores'].append(
-    {
-        'NAME': 'split',
-        'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': {
-            'render_template': 'edxmako.shortcuts.render_to_string',
-        }
-    },
-)
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,
@@ -149,7 +138,7 @@ CACHES = {
 
     'mongo_metadata_inheritance': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'LOCATION': os.path.join(tempfile.gettempdir(), 'mongo_metadata_inheritance'),
         'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
@@ -200,9 +189,6 @@ PASSWORD_HASHERS = (
 SEGMENT_IO_KEY = '***REMOVED***'
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
-
-# This is to disable a test under the common directory that will not pass when run under CMS
-FEATURES['DISABLE_RESET_EMAIL_TEST'] = True
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True

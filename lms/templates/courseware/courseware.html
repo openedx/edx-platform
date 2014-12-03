@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.template.defaultfilters import escapejs %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -58,7 +59,7 @@ ${page_title_breadcrumbs(course_name())}
   % endif
 
   <script type="text/javascript">
-    var $$course_id = "${course.id.to_deprecated_string()}";
+    var $$course_id = "${course.id | escapejs}";
 
     $(function(){
         $(".ui-accordion-header a, .ui-accordion-content .subtitle").each(function() {

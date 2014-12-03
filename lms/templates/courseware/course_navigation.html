@@ -18,22 +18,21 @@ def url_class(is_active):
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from courseware.views import notification_image_for_tab %>
-<% import waffle %>
+<%! from student.models import CourseEnrollment%>
+<%
+  user_is_enrolled = user.is_authenticated() and CourseEnrollment.is_enrolled(user, course.id)
+%>
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
     <ol class="course-tabs">
-      % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, 'staff', course, course.id)):
+      % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, 'staff', course, course.id), user_is_enrolled):
         <%
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
             tab_image = notification_image_for_tab(tab, user, course)
         %>
-        % if waffle.flag_is_active(request, 'visual_treatment'):
-          <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
-        % else:
           <li>
-        % endif
              <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
                  ${_(tab.name) | h}
                  % if tab_is_active:
@@ -63,6 +62,10 @@ def url_class(is_active):
 <script type="text/javascript">
 masq = (function(){
     var el = $('#staffstatus');
+    % if disable_student_access:
+        el.attr("disabled", true);
+        el.attr("title", "${_("Course is not yet visible to students.")}");
+    % endif
     var setstat = function(status){
         if (status=='student'){
             el.html('<font color="green">${_("Student view")}</font>');
@@ -73,6 +76,9 @@ masq = (function(){
     setstat('${masquerade}');
 
     el.click(function(){
+        if (el.attr("disabled")) {
+           return alert("${_("You cannot view the course as a student or beta tester before the course release date.")}");
+        }
         $.ajax({ url: '/masquerade/toggle',
                  type: 'GET',
                  success: function(result){

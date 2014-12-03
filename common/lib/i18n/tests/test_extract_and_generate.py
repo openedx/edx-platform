@@ -1,7 +1,10 @@
+"""
+This test tests that i18n extraction (`paver i18n_extract -v`) works properly.
+"""
 from datetime import datetime, timedelta
 import os
 import sys
-import string
+import string  # pylint: disable=deprecated-module
 import random
 import re
 
@@ -65,12 +68,14 @@ class TestGenerate(TestCase):
         generate.main(verbosity=0, strict=False)
         for locale in CONFIGURATION.translated_locales:
             for filename in ('django', 'djangojs'):
-                mofile = filename+'.mo'
+                mofile = filename + '.mo'
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
                 self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
-                self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path), UTC) >= self.start_time,
-                                msg='File not recently modified: %s' % path)
+                self.assertTrue(
+                    datetime.fromtimestamp(os.path.getmtime(path), UTC) >= self.start_time,
+                    msg='File not recently modified: %s' % path
+                )
             # Segmenting means that the merge headers don't work they way they
             # used to, so don't make this check for now. I'm not sure if we'll
             # get the merge header back eventually, or delete this code eventually.
@@ -88,12 +93,14 @@ class TestGenerate(TestCase):
 
         """
         path = os.path.join(CONFIGURATION.get_messages_dir(locale), 'django.po')
-        po = pofile(path)
+        pof = pofile(path)
         pattern = re.compile('^#-#-#-#-#', re.M)
-        match = pattern.findall(po.header)
-        self.assertEqual(len(match), 3,
-                         msg="Found %s (should be 3) merge comments in the header for %s" % \
-                         (len(match), path))
+        match = pattern.findall(pof.header)
+        self.assertEqual(
+            len(match),
+            3,
+            msg="Found %s (should be 3) merge comments in the header for %s" % (len(match), path)
+        )
 
 
 def random_name(size=6):

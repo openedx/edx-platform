@@ -13,9 +13,9 @@ from django.test.client import Client
 from django.test.utils import override_settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from nose.tools import assert_true  # pylint: disable=E0611
+from nose.tools import assert_true  # pylint: disable=no-name-in-module
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from licenses.models import CourseSoftware, UserLicense
 
 from student.tests.factories import UserFactory
@@ -144,7 +144,7 @@ class LicenseTestCase(TestCase):
         self.assertEqual(302, response.status_code)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CommandTest(ModuleStoreTestCase):
     '''Test management command for importing serial numbers'''
     def setUp(self):

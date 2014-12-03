@@ -194,7 +194,7 @@ if Backbone?
       url = @model.urlFor("endorse")
       updates =
         endorsed: is_endorsing
-        endorsement: if is_endorsing then {username: DiscussionUtil.getUser().get("username"), time: new Date().toISOString()} else null
+        endorsement: if is_endorsing then {username: DiscussionUtil.getUser().get("username"), user_id: DiscussionUtil.getUser().id, time: new Date().toISOString()} else null
       if @model.get('thread').get('thread_type') == 'question'
         if is_endorsing
           msg = gettext("We had some trouble marking this response as an answer.  Please try again.")

@@ -49,20 +49,20 @@ Eligibility:
        If the user and course is present in the certificate whitelist table
        then the student will be issued a certificate regardless of his grade,
        unless he has allow_certificate set to False.
-
 """
 
 
 class CertificateStatuses(object):
-    deleted      = 'deleted'
-    deleting     = 'deleting'
+    deleted = 'deleted'
+    deleting = 'deleting'
     downloadable = 'downloadable'
-    error        = 'error'
-    generating   = 'generating'
-    notpassing   = 'notpassing'
+    error = 'error'
+    generating = 'generating'
+    notpassing = 'notpassing'
     regenerating = 'regenerating'
-    restricted   = 'restricted'
-    unavailable  = 'unavailable'
+    restricted = 'restricted'
+    unavailable = 'unavailable'
+
 
 class CertificateWhitelist(models.Model):
     """
@@ -88,7 +88,7 @@ class GeneratedCertificate(models.Model):
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
     verify_uuid = models.CharField(max_length=32, blank=True, default='')
     download_uuid = models.CharField(max_length=32, blank=True, default='')
-    download_url = models.CharField(max_length=128, blank=True,  default='')
+    download_url = models.CharField(max_length=128, blank=True, default='')
     grade = models.CharField(max_length=5, blank=True, default='')
     key = models.CharField(max_length=32, blank=True, default='')
     distinction = models.BooleanField(default=False)
@@ -116,6 +116,7 @@ class GeneratedCertificate(models.Model):
             pass
 
         return None
+
 
 def certificate_status_for_student(student, course_id):
     '''

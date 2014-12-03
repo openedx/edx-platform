@@ -5,7 +5,7 @@ import hashlib
 import json
 import logging
 import requests
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 
 log = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ dateformat = '%Y%m%d%H%M%S'
 XQUEUE_METRIC_NAME = 'edxapp.xqueue'
 
 # Wait time for response from Xqueue.
-XQUEUE_TIMEOUT = 35 # seconds
+XQUEUE_TIMEOUT = 35  # seconds
 
 
 def make_hashkey(seed):

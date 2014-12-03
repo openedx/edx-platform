@@ -10,6 +10,7 @@ import logging
 import json
 import math
 import numpy as np
+from opaque_keys.edx.locator import BlockUsageLocator
 from scipy.optimize import curve_fit
 
 from django.conf import settings
@@ -129,7 +130,14 @@ def problems_with_psychometric_data(course_id):
     '''
     pmdset = PsychometricData.objects.using(db).filter(studentmodule__course_id=course_id)
     plist = [p['studentmodule__module_state_key'] for p in pmdset.values('studentmodule__module_state_key').distinct()]
-    problems = dict((p, pmdset.filter(studentmodule__module_state_key=p).count()) for p in plist)
+    problems = dict(
+        (
+            p,
+            pmdset.filter(
+                studentmodule__module_state_key=BlockUsageLocator.from_string(p)
+            ).count()
+        ) for p in plist
+    )
 
     return problems
 
@@ -138,7 +146,9 @@ def problems_with_psychometric_data(course_id):
 
 def generate_plots_for_problem(problem):
 
-    pmdset = PsychometricData.objects.using(db).filter(studentmodule__module_state_key=problem)
+    pmdset = PsychometricData.objects.using(db).filter(
+        studentmodule__module_state_key=BlockUsageLocator.from_string(problem)
+    )
     nstudents = pmdset.count()
     msg = ""
     plots = []

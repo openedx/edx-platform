@@ -5,16 +5,18 @@ so that we can run the lettuce acceptance tests on SauceLabs.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import os
 
-PORTS = [2000, 2001, 2020, 2109, 2222, 2310, 3000, 3001,
-        3030, 3210, 3333, 4000, 4001, 4040, 4321, 4502, 4503,
-        5050, 5555, 5432, 6060, 6666, 6543, 7000, 7070, 7774,
-        7777, 8003, 8031, 8080, 8081, 8765, 8888,
-        9080, 9090, 9876, 9999, 49221, 55001]
+PORTS = [
+    2000, 2001, 2020, 2109, 2222, 2310, 3000, 3001,
+    3030, 3210, 3333, 4000, 4001, 4040, 4321, 4502, 4503,
+    5050, 5555, 5432, 6060, 6666, 6543, 7000, 7070, 7774,
+    7777, 8003, 8031, 8080, 8081, 8765, 8888,
+    9080, 9090, 9876, 9999, 49221, 55001
+]
 
 DESIRED_CAPABILITIES = {
     'chrome': DesiredCapabilities.CHROME,

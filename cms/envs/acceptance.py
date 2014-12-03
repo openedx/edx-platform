@@ -5,7 +5,7 @@ so that we can run the lettuce acceptance tests.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from .test import *
 from lms.envs.sauce import *
@@ -50,7 +50,8 @@ update_module_store_settings(
     module_store_options={
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': TEST_ROOT / "data",
-    }
+    },
+    default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
 CONTENTSTORE = {
@@ -112,7 +113,7 @@ SELENIUM_GRID = {
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *  # pylint: disable=F0401
+    from .private import *  # pylint: disable=import-error
 except ImportError:
     pass
 

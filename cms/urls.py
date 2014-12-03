@@ -95,6 +95,8 @@ urlpatterns += patterns(
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN), 'group_configurations_list_handler'),
     url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)/?$'.format(settings.COURSE_KEY_PATTERN),
         'group_configurations_detail_handler'),
+
+    url(r'^api/val/v0/', include('edxval.urls')),
 )
 
 js_info_dict = {
@@ -103,18 +105,25 @@ js_info_dict = {
     'packages': ('openassessment',),
 }
 
-urlpatterns += patterns('',
+urlpatterns += patterns(
+    '',
     # Serve catalog of localized strings to be rendered by Javascript
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
 
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
-    urlpatterns += (url(r'^export_git/{}$'.format(settings.COURSE_KEY_PATTERN),
-                        'contentstore.views.export_git', name='export_git'),)
+    urlpatterns += (url(
+        r'^export_git/{}$'.format(
+            settings.COURSE_KEY_PATTERN,
+        ),
+        'contentstore.views.export_git',
+        name='export_git',
+    ),)
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
-    urlpatterns += patterns('',
+    urlpatterns += patterns(
+        '',
         url(r'^status/', include('service_status.urls')),
     )
 
@@ -145,7 +154,7 @@ if settings.DEBUG:
         pass
 
 # Custom error pages
-# pylint: disable=C0103
+# pylint: disable=invalid-name
 handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'
 

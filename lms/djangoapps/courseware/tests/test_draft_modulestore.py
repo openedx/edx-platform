@@ -4,11 +4,14 @@ from django.test.utils import override_settings
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestDraftModuleStore(TestCase):
+    """
+    Test the draft modulestore
+    """
     def test_get_items_with_course_items(self):
         store = modulestore()
 

@@ -21,13 +21,14 @@ log = logging.getLogger(__name__)
 
 
 def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None):
-    '''
+    """
     Check a symbolic mathematical expression using sympy.
     The input is an ascii string (not MathML) converted to math using sympy.sympify.
-    '''
+    """
 
     options = {'__MATRIX__': False, '__ABC__': False, '__LOWER__': False}
-    if extra_options: options.update(extra_options)
+    if extra_options:
+        options.update(extra_options)
     for op in options:				# find options in expect string
         if op in expect:
             expect = expect.replace(op, '')
@@ -145,6 +146,7 @@ def make_error_message(msg):
     msg = '<div class="capa_alert">%s</div>' % msg
     return msg
 
+
 def is_within_tolerance(expected, actual, tolerance):
     if expected == 0:
         return (abs(actual) < tolerance)
@@ -158,7 +160,7 @@ def is_within_tolerance(expected, actual, tolerance):
 
 
 def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None):
-    '''
+    """
     Check a symbolic mathematical expression using sympy.
     The input may be presentation MathML.  Uses formula.
 
@@ -181,7 +183,7 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
      -qubit - passed to my_sympify
      -imaginary - used in formla, presumably to signal to use i as sqrt(-1)?
      -numerical - force numerical comparison.
-    '''
+    """
 
     msg = ''
     # msg += '<p/>abname=%s' % abname
@@ -208,7 +210,6 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         msg += '<p>Error %s in parsing OUR expected answer "%s"</p>' % (err, expect)
         return {'ok': False, 'msg': make_error_message(msg)}
 
-
     ###### Sympy input #######
     # if expected answer is a number, try parsing provided answer as a number also
     try:
@@ -217,8 +218,8 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         fans = None
 
     # do a numerical comparison if both expected and answer are numbers
-    if (hasattr(fexpect, 'is_number') and fexpect.is_number 
-        and hasattr(fans, 'is_number') and fans.is_number):
+    if hasattr(fexpect, 'is_number') and fexpect.is_number \
+       and hasattr(fans, 'is_number') and fans.is_number:
         if is_within_tolerance(fexpect, fans, threshold):
             return {'ok': True, 'msg': msg}
         else:
@@ -235,7 +236,6 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
     if fexpect == fans:
         msg += '<p>You entered: %s</p>' % to_latex(fans)
         return {'ok': True, 'msg': msg}
-
 
     ###### PMathML input ######
     # convert mathml answer to formula
@@ -298,7 +298,8 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
             return {'ok': False, 'msg': make_error_message(msg)}
         except Exception, err:
             msg += "<p>Error %s in comparing expected (a list) and your answer</p>" % str(err).replace('<', '&lt;')
-            if DEBUG: msg += "<p/><pre>%s</pre>" % traceback.format_exc()
+            if DEBUG:
+                msg += "<p/><pre>%s</pre>" % traceback.format_exc()
             return {'ok': False, 'msg': make_error_message(msg)}
 
     #diff = (fexpect-fsym).simplify()

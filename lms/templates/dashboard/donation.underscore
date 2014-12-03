@@ -1,0 +1,7 @@
+<div class="donation-error-msg" />
+<form class="nav-item donate-form">
+    <span class="monetary-symbol">$</span>
+    <input class="amount" type="text" name="amount" value="5" />
+    <button class="btn action-primary action-donate" type="submit" name="Donate"><%- gettext('Donate') %></button>
+</form>
+<form class="payment-form"></form>

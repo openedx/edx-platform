@@ -1,8 +1,8 @@
 define(
     [
-        'jquery', 'underscore', 'js/spec_helpers/create_sinon', 'squire'
+        'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'squire'
     ],
-function ($, _, create_sinon, Squire) {
+function ($, _, AjaxHelpers, Squire) {
     'use strict';
     describe('FileUploader', function () {
         var FileUploaderTemplate = readFixtures(

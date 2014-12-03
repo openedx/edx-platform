@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise
+from bok_choy.promise import EmptyPromise, Promise
 
 from .course_page import CoursePage
 
@@ -348,7 +348,16 @@ class DiscussionUserProfilePage(CoursePage):
         return [elem.get_attribute("id")[7:] for elem in elems]
 
     def get_current_page(self):
-        return int(self.q(css="nav.discussion-paginator li.current-page").text[0])
+        def check_func():
+            try:
+                current_page = int(self.q(css="nav.discussion-paginator li.current-page").text[0])
+            except:
+                return False, None
+            return True, current_page
+
+        return Promise(
+            check_func, 'discussion-paginator current page has text', timeout=5,
+        ).fulfill()
 
     def _check_pager(self, text, page_number=None):
         """

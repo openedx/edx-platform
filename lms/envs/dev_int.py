@@ -12,7 +12,7 @@ use *.dev domains instead for local testing.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from .dev import *
 
@@ -20,12 +20,12 @@ FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = True
 
 COURSE_LISTINGS = {
     'default': ['BerkeleyX/CS169.1x/2012_Fall',
-                 'BerkeleyX/CS188.1x/2012_Fall',
-                 'HarvardX/CS50x/2012',
-                 'HarvardX/PH207x/2012_Fall',
-                 'MITx/3.091x/2012_Fall',
-                 'MITx/6.002x/2012_Fall',
-                 'MITx/6.00x/2012_Fall'],
+                'BerkeleyX/CS188.1x/2012_Fall',
+                'HarvardX/CS50x/2012',
+                'HarvardX/PH207x/2012_Fall',
+                'MITx/3.091x/2012_Fall',
+                'MITx/6.002x/2012_Fall',
+                'MITx/6.00x/2012_Fall'],
 
     'berkeley': ['BerkeleyX/CS169.1x/2012_Fall',
                  'BerkeleyX/CS188.1x/2012_Fall'],
@@ -33,5 +33,5 @@ COURSE_LISTINGS = {
     'harvard': ['HarvardX/CS50x/2012'],
 
     'mit': ['MITx/3.091x/2012_Fall',
-                 'MITx/6.00x/2012_Fall']
+            'MITx/6.00x/2012_Fall']
 }

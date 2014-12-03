@@ -5,8 +5,10 @@ import json
 import unittest
 import functools
 import requests
+import os
 from path import path
 from bok_choy.web_app_test import WebAppTest
+from opaque_keys.edx.locator import CourseLocator
 
 
 def skip_if_browser(browser):
@@ -67,7 +69,7 @@ def load_data_str(rel_path):
     Load a file from the "data" directory as a string.
     `rel_path` is the path relative to the data directory.
     """
-    full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=E1120
+    full_path = path(__file__).abspath().dirname() / "data" / rel_path  # pylint: disable=no-value-for-parameter
     with open(full_path) as data_file:
         return data_file.read()
 
@@ -170,8 +172,6 @@ class UniqueCourseTest(WebAppTest):
     Test that provides a unique course ID.
     """
 
-    COURSE_ID_SEPARATOR = "/"
-
     def __init__(self, *args, **kwargs):
         """
         Create a unique course ID.
@@ -190,11 +190,18 @@ class UniqueCourseTest(WebAppTest):
 
     @property
     def course_id(self):
-        return self.COURSE_ID_SEPARATOR.join([
+        """
+        Returns the serialized course_key for the test
+        """
+        # TODO - is there a better way to make this agnostic to the underlying default module store?
+        default_store = os.environ.get('DEFAULT_STORE', 'draft')
+        course_key = CourseLocator(
             self.course_info['org'],
             self.course_info['number'],
-            self.course_info['run']
-        ])
+            self.course_info['run'],
+            deprecated=(default_store == 'draft')
+        )
+        return unicode(course_key)
 
 
 class YouTubeConfigError(Exception):

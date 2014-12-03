@@ -201,17 +201,18 @@ nav.sequence-nav {
           color: #fff;
           font-family: $sans-serif;
           line-height: lh();
-          left: 0px;
+          right: 0px;
           opacity: 0.0;
           padding: 6px;
           position: absolute;
           top: 48px;
           text-shadow: 0 -1px 0 #000;
           @include transition(all .1s $ease-in-out-quart 0s);
-          white-space: pre;
+          white-space: normal;
           z-index: 99;
           visibility: hidden;
           pointer-events: none;
+
 
           &:empty {
             background: none;
@@ -226,7 +227,7 @@ nav.sequence-nav {
             content: " ";
             display: block;
             height: 10px;
-            left: 18px;
+            right: 18px;
             position: absolute;
             top: -5px;
             @include transform(rotate(45deg));
@@ -276,6 +277,7 @@ nav.sequence-nav {
           height: 100%;
           width: 40px;
           text-indent: -9999px;
+          overflow: hidden;
           @include transition(all .2s $ease-in-out-quad 0s);
 
 /*          &:focus {
@@ -294,23 +296,41 @@ nav.sequence-nav {
       }
 
       &.prev {
-        left: -10px;
-        border-radius: 35px 0 0 35px;
+        @include left(-10px);
+        @include border-radius(35px, 0, 0, 35px);
 
         a {
-          background-image: url('../images/sequence-nav/previous-icon.png');
           background-position: center 15px;
+
+          // CASE: left to right layout
+          @include ltr {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
+
+          // CASE: right to left layout
+          @include rtl {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
         }
       }
 
       &.next {
-        right: -10px;
-        border-radius: 0 35px 35px 0;
+        @include right(-10px);
+        @include border-radius(0, 35px, 35px, 0);
 
         a {
-          margin-left: 30px;
-          background-image: url('../images/sequence-nav/next-icon.png');
+          @include margin-left(30px);
           background-position: center 15px;
+
+          // CASE: left to right layout
+          @include ltr {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
+
+          // CASE: right to left layout
+          @include rtl {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
         }
       }
     }
@@ -334,7 +354,7 @@ nav.sequence-bottom {
     display: inline-block;
 
     li {
-      float: left;
+      @include float(left);
       width: 50px;
       height: 44px;
       border: 1px solid #ccc;
@@ -351,6 +371,7 @@ nav.sequence-bottom {
           display: block;
           padding: lh(.5) 4px;
           text-indent: -9999px;
+          overflow: hidden;
           @include transition(all .2s $ease-in-out-quad 0s);
 
           &:hover, &:focus {
@@ -369,21 +390,39 @@ nav.sequence-bottom {
       }
 
       &.prev {
-        border-radius: 35px 0 0 35px;
+        @include border-radius(35px, 0, 0, 35px);
 
         a {
-          background-image: url('../images/sequence-nav/previous-icon.png');
           background-position: center 15px;
+
+         // CASE: left to right layout
+         @include ltr {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
+
+          // CASE: right to left layout
+          @include rtl {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
         }
       }
 
       &.next {
-        border-radius: 0 35px 35px 0;
-        border-left: none;
+        @include border-radius(0, 35px, 35px, 0);
+        @include border-left(none);
 
         a {
-          background-image: url('../images/sequence-nav/next-icon.png');
           background-position: center 15px;
+
+          // CASE: left to right layout
+          @include ltr {
+            background-image: url('../images/sequence-nav/next-icon.png');
+          }
+
+          // CASE: right to left layout
+          @include rtl {
+            background-image: url('../images/sequence-nav/previous-icon.png');
+          }
         }
       }
     }

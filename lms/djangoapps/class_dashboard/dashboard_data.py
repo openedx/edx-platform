@@ -17,6 +17,7 @@ from opaque_keys.edx.locations import Location
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250
 
+
 def get_problem_grade_distribution(course_id):
     """
     Returns the grade distribution per problem for the course

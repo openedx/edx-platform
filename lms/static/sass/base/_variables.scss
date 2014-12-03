@@ -1,3 +1,5 @@
+// lms variables
+
 // base
 $baseline: 20px;
 
@@ -12,15 +14,6 @@ $fg-max-columns: 12;
 $fg-max-width: 1400px;
 $fg-min-width: 810px;
 
-// Card Sizes
-// breakpoints for course cards
-$bp-xl-min: 1180px;
-$bp-l-min: 980px;
-$bp-m-min: 768px;
-$bp-s-min: 320px;
-$bp-s-max: 320px;
-$bp-m-max: 768px;
-
 // ====================
 
 // FONTS
@@ -28,6 +21,12 @@ $sans-serif: 'Open Sans', $verdana, sans-serif;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
 $serif: $georgia;
+
+// FONT-WEIGHTS
+$font-light: 300;
+$font-regular: 400;
+$font-semibold: 600;
+$font-bold: 700;
 
 // ====================
 
@@ -39,6 +38,17 @@ $baseFontColor: rgb(60,60,60);
 $base-font-color: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
 $very-light-text: #fff;
+
+// ====================
+
+// TIMING - used for animation/transition mixin syncing
+$tmg-s3: 3.0s;
+$tmg-s2: 2.0s;
+$tmg-s1: 1.0s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.50s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
 
 // ====================
 
@@ -139,6 +149,7 @@ $light-gray: #ddd;
 // used by descriptor css
 $lightGrey: #edf1f5;
 $darkGrey: #8891a1;
+$lightGrey1: #ccc;
 $blue-d1: shade($blue,20%);
 $blue-d2: shade($blue,40%);
 $blue-d4: shade($blue,80%);
@@ -168,6 +179,7 @@ $m-blue-d1: #1790C7;
 $m-blue-d2: #1580B0;
 $m-blue-d3: #126F9A;
 $m-blue-d4: #0A4A67;
+$m-blue-d5: #009EE7;
 $m-blue-t0: rgba($m-blue,0.125);
 $m-blue-t1: rgba($m-blue,0.25);
 $m-blue-t2: rgba($m-blue,0.50);
@@ -396,11 +408,11 @@ $homepage__header--background: lighten($blue, 15%);
 // IMAGES: backgrounds
 $homepage-bg-image: none;
 
-$login-banner-image: url(../images/bg-banner-account.png);
-$register-banner-image: url(../images/bg-banner-account.png);
-$passwordreset-banner-image: url(../images/bg-banner-account.png);
+$login-banner-image: url(../images/edx-background-banner-account.png);
+$register-banner-image: url(../images/edx-background-banner-account.png);
+$passwordreset-banner-image: url(../images/edx-background-banner-account.png);
 
-$video-thumb-url: '../images/courses/video-thumb.jpg';
+$video-thumb-url: '../images/homepage-hero-video-thumb.jpg';
 
 // ====================
 
@@ -417,3 +429,15 @@ $header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 // SPLINT: colors
 
 $msg-bg: $action-primary-bg;
+
+
+// New Shopping Cart
+
+$dark-gray1: #4a4a4a;
+$light-gray1: #f2f2f2;
+$light-gray2: #ababab;
+$dark-gray2: #979797;
+$blue1: #4A90E2;
+$blue2: #00A1E5;
+$green1: #61A12E;
+$red1: #D0021B;

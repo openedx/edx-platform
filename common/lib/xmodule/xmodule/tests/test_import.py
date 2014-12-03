@@ -150,7 +150,6 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
 
-
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
 
@@ -207,7 +206,7 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor = system.process_xml(start_xml)
         compute_inherited_metadata(descriptor)
 
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         print(descriptor, descriptor._field_data)
         self.assertEqual(descriptor.due, ImportTestCase.date.from_json(v))
 
@@ -297,7 +296,7 @@ class ImportTestCase(BaseCourseTestCase):
         </course>'''.format(due=course_due, org=ORG, course=COURSE, url_name=url_name)
         descriptor = system.process_xml(start_xml)
         child = descriptor.get_children()[0]
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         child._field_data.set(child, 'due', child_due)
         compute_inherited_metadata(descriptor)
 

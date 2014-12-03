@@ -22,19 +22,18 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0611, W0614, C0103
+# pylint: disable=wildcard-import, unused-import, unused-wildcard-import, invalid-name
 
 import sys
 import os
 import imp
-import json
 
 from path import path
 from warnings import simplefilter
+from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
-
 from lms.lib.xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -122,6 +121,9 @@ FEATURES = {
     # This flag disables the requirement of having to agree to the TOS for users registering
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
+
+    # Toggles OAuth2 authentication provider
+    'ENABLE_OAUTH2_PROVIDER': False,
 
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
@@ -266,19 +268,37 @@ FEATURES = {
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
 
-    # Analytics Data API (for active student count)
-    # Default to false here b/c dev environments won't have the api, will override in aws.py
-    'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
+    # When a logged in user goes to the homepage ('/') should the user be
+    # redirected to the dashboard - this is default Open edX behavior. Set to
+    # False to not redirect the user
+    'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
-    # TODO: ECOM-136 remove this feature flag when new styles are available on main site.for
-    # Enable the new edX footer to be rendered. Defaults to false.
-    'ENABLE_NEW_EDX_FOOTER': False,
+    # Expose Mobile REST API. Note that if you use this, you must also set
+    # ENABLE_OAUTH2_PROVIDER to True
+    'ENABLE_MOBILE_REST_API': False,
 
-    # TODO: ECOM-136
-    # Enables the new navigation template and styles. This should be enabled
-    # when the styles appropriately match the edX.org website.
-    'ENABLE_NEW_EDX_HEADER': False,
+    # Enable the new dashboard, account, and profile pages
+    'ENABLE_NEW_DASHBOARD': False,
 
+    # Enable the combined login/registration form
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+
+    # Enable organizational email opt-in
+    'ENABLE_MKTG_EMAIL_OPT_IN': False,
+
+    # Show a section in the membership tab of the instructor dashboard
+    # to allow an upload of a CSV file that contains a list of new accounts to create
+    # and register for course.
+    'ALLOW_AUTOMATED_SIGNUPS': False,
+
+    # Display demographic data on the analytics tab in the instructor dashboard.
+    'DISPLAY_ANALYTICS_DEMOGRAPHICS': True,
+
+    # Enable display of enrollment counts in instructor and legacy analytics dashboard
+    'DISPLAY_ANALYTICS_ENROLLMENTS': True,
+
+    # Separate the verification flow from the payment flow
+    'SEPARATE_VERIFICATION_FROM_PAYMENT': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -330,6 +350,28 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
+############################ OAUTH2 Provider ###################################
+
+# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
+
+OAUTH_OIDC_ISSUER = 'https:/example.com/oauth2'
+
+# OpenID Connect claim handlers
+
+OAUTH_OIDC_ID_TOKEN_HANDLERS = (
+    'oauth2_provider.oidc.handlers.BasicIDTokenHandler',
+    'oauth2_provider.oidc.handlers.ProfileHandler',
+    'oauth2_provider.oidc.handlers.EmailHandler',
+    'oauth2_handler.IDTokenHandler'
+)
+
+OAUTH_OIDC_USERINFO_HANDLERS = (
+    'oauth2_provider.oidc.handlers.BasicUserInfoHandler',
+    'oauth2_provider.oidc.handlers.ProfileHandler',
+    'oauth2_provider.oidc.handlers.EmailHandler',
+    'oauth2_handler.UserInfoHandler'
+)
+
 ################################## EDX WEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
@@ -370,11 +412,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.open_source_footer_context_processor',
 
-    # TODO: Used for header and footer feature flags. Remove as part of ECOM-136
-    'edxmako.shortcuts.header_footer_context_processor',
-
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
+
+    # Allows the open edX footer to be leveraged in Django Templates.
+    'edxmako.shortcuts.microsite_footer_context_processor',
 )
 
 # use the ratelimit backend to prevent brute force attacks
@@ -436,6 +478,7 @@ LMS_MIGRATION_ALLOWED_IPS = []
 # too many inadvertent side effects :-(
 COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/]+)'
 COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
+COURSE_KEY_REGEX = COURSE_KEY_PATTERN.replace('P<course_key_string>', ':')
 
 USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
@@ -460,7 +503,7 @@ TRACKING_BACKENDS = {
 
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
-TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat', r'^/segmentio/event']
 
 EVENT_TRACKING_ENABLED = True
 EVENT_TRACKING_BACKENDS = {
@@ -475,6 +518,9 @@ EVENT_TRACKING_BACKENDS = {
 EVENT_TRACKING_PROCESSORS = [
     {
         'ENGINE': 'track.shim.LegacyFieldMappingProcessor'
+    },
+    {
+        'ENGINE': 'track.shim.VideoEventProcessor'
     }
 ]
 
@@ -491,6 +537,13 @@ if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
             'ENGINE': 'track.backends.django.DjangoBackend'
         }
     })
+
+TRACKING_SEGMENTIO_WEBHOOK_SECRET = None
+TRACKING_SEGMENTIO_ALLOWED_TYPES = ['track']
+TRACKING_SEGMENTIO_SOURCE_MAP = {
+    'analytics-android': 'mobile',
+    'analytics-ios': 'mobile',
+}
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
@@ -526,6 +579,9 @@ DOC_STORE_CONFIG = {
     'host': 'localhost',
     'db': 'xmodule',
     'collection': 'modulestore',
+    # If 'asset_collection' defined, it'll be used
+    # as the collection name for asset metadata.
+    # Otherwise, a default collection name will be used.
 }
 MODULESTORE = {
     'default': {
@@ -596,6 +652,7 @@ COURSES_WITH_UNSAFE_CODE = []
 DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
+SESSION_COOKIE_SECURE = False
 
 # CMS base
 CMS_BASE = 'localhost:8001'
@@ -623,12 +680,12 @@ CONTACT_EMAIL = 'info@example.com'
 BUGS_EMAIL = 'bugs@example.com'
 UNIVERSITY_EMAIL = 'university@example.com'
 PRESS_EMAIL = 'press@example.com'
+FINANCE_EMAIL = ''
 ADMINS = ()
 MANAGERS = ADMINS
 
 # Static content
 STATIC_URL = '/static/'
-ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
@@ -641,10 +698,15 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+# these languages display right to left
+LANGUAGES_BIDI = ("en@rtl", "he", "ar", "fa", "ur", "fa-ir")
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
     ('en', u'English'),
+    ('en@rtl', u'English (right-to-left)'),
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
@@ -711,6 +773,8 @@ LANGUAGES = (
     ('sl', u'Slovenščina'),  # Slovenian
     ('sq', u'shqip'),  # Albanian
     ('sr', u'Српски'),  # Serbian
+    ('sv', u'svenska'),  # Swedish
+    ('sw', u'Kiswahili'),  # Swahili
     ('ta', u'தமிழ்'),  # Tamil
     ('te', u'తెలుగు'),  # Telugu
     ('th', u'ไทย'),  # Thai
@@ -733,6 +797,9 @@ USE_L10N = True
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+# Guidelines for translators
+TRANSLATORS_GUIDE = 'https://github.com/edx/edx-platform/blob/master/docs/en_us/developers/source/i18n_translators_guide.rst'
 
 #################################### GITHUB #######################################
 # gitreload is used in LMS-workflow to pull content from github
@@ -837,14 +904,6 @@ JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 # Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
 simplefilter('ignore')
 
-################################# Waffle ###################################
-
-# Name prepended to cookies set by Waffle
-WAFFLE_COOKIE = "waffle_flag_%s"
-
-# Two weeks (in sec)
-WAFFLE_MAX_AGE = 1209600
-
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
 # various locations.
@@ -910,14 +969,14 @@ MIDDLEWARE_CLASSES = (
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
 
-    # For A/B testing
-    'waffle.middleware.WaffleMiddleware',
-
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
 
     # use Django built in clickjacking protection
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # to redirected unenrolled students to the course info page
+    'courseware.middleware.RedirectUnenrolledMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
 )
@@ -940,13 +999,27 @@ courseware_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
-main_vendor_js = [
+
+# Before a student accesses courseware, we do not
+# need many of the JS dependencies.  This includes
+# only the dependencies used everywhere in the LMS
+# (including the dashboard/account/profile pages)
+# Currently, this partially duplicates the "main vendor"
+# JavaScript file, so only one of the two should be included
+# on a page at any time.
+# In the future, we will likely refactor this to use
+# RequireJS and an optimizer.
+base_vendor_js = [
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/vendor/underscore-min.js'
+]
+
+main_vendor_js = base_vendor_js + [
     'js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/json2.js',
-    'js/vendor/jquery.min.js',
     'js/vendor/jquery-ui.min.js',
-    'js/vendor/jquery.cookie.js',
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
@@ -971,11 +1044,36 @@ main_vendor_js = [
     'js/vendor/URI.min.js',
 ]
 
+dashboard_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+rwd_header_footer_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/common_helpers/rwd_header_footer.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
+
+# JavaScript used by the student account and profile pages
+# These are not courseware, so they do not need many of the courseware-specific
+# JavaScript modules.
+student_account_js = [
+    'js/utils/rwd_header_footer.js',
+    'js/utils/edx.utils.validate.js',
+    'js/src/utility.js',
+    'js/student_account/enrollment.js',
+    'js/student_account/emailoptin.js',
+    'js/student_account/shoppingcart.js',
+    'js/student_account/models/LoginModel.js',
+    'js/student_account/models/RegisterModel.js',
+    'js/student_account/models/PasswordResetModel.js',
+    'js/student_account/views/FormView.js',
+    'js/student_account/views/LoginView.js',
+    'js/student_account/views/RegisterView.js',
+    'js/student_account/views/PasswordResetView.js',
+    'js/student_account/views/AccessView.js',
+    'js/student_account/accessApp.js',
+]
+
+student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -1018,6 +1116,25 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-app-extend2.css',
     },
+    'style-app-rtl': {
+        'source_filenames': [
+            'sass/application-rtl.css',
+            'sass/ie-rtl.css'
+        ],
+        'output_filename': 'css/lms-style-app-rtl.css',
+    },
+    'style-app-extend1-rtl': {
+        'source_filenames': [
+            'sass/application-extend1-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend1-rtl.css',
+    },
+    'style-app-extend2-rtl': {
+        'source_filenames': [
+            'sass/application-extend2-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend2-rtl.css',
+    },
     'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
@@ -1032,6 +1149,13 @@ PIPELINE_CSS = {
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-style-course.css',
+    },
+    'style-course-rtl': {
+        'source_filenames': [
+            'sass/course-rtl.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-style-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -1057,9 +1181,6 @@ common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set
 project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
 
 
-
-# test_order: Determines the position of this chunk of javascript on
-# the jasmine test page
 PIPELINE_JS = {
     'application': {
 
@@ -1073,55 +1194,65 @@ PIPELINE_JS = {
             'js/src/utility.js',
             'js/src/accessibility_tools.js',
             'js/src/ie_shim.js',
+            'js/src/string_utils.js',
         ],
         'output_filename': 'js/lms-application.js',
-
-        'test_order': 1,
     },
     'courseware': {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
-        'test_order': 2,
+    },
+    'base_vendor': {
+        'source_filenames': base_vendor_js,
+        'output_filename': 'js/lms-base-vendor.js',
     },
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
-        'test_order': 0,
     },
     'module-descriptor-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
         'output_filename': 'js/lms-module-descriptors.js',
-        'test_order': 8,
     },
     'module-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
         'output_filename': 'js/lms-modules.js',
-        'test_order': 3,
     },
     'discussion': {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js',
-        'test_order': 4,
     },
     'staff_grading': {
         'source_filenames': staff_grading_js,
         'output_filename': 'js/staff_grading.js',
-        'test_order': 5,
     },
     'open_ended': {
         'source_filenames': open_ended_js,
         'output_filename': 'js/open_ended.js',
-        'test_order': 6,
     },
     'notes': {
         'source_filenames': notes_js,
         'output_filename': 'js/notes.js',
-        'test_order': 7
     },
     'instructor_dash': {
         'source_filenames': instructor_dash_js,
         'output_filename': 'js/instructor_dash.js',
-        'test_order': 9,
+    },
+    'dashboard': {
+        'source_filenames': dashboard_js,
+        'output_filename': 'js/dashboard.js'
+    },
+    'rwd_header_footer': {
+        'source_filenames': rwd_header_footer_js,
+        'output_filename': 'js/rwd_header_footer.js'
+    },
+    'student_account': {
+        'source_filenames': student_account_js,
+        'output_filename': 'js/student_account.js'
+    },
+    'student_profile': {
+        'source_filenames': student_profile_js,
+        'output_filename': 'js/student_profile.js'
     },
 }
 
@@ -1148,7 +1279,7 @@ if os.path.isdir(DATA_DIR):
 
 
 PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_JS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
 
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
@@ -1159,7 +1290,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "common_static",
 )
 
-PIPELINE_YUI_BINARY = 'yui-compressor'
+PIPELINE_UGLIFYJS_BINARY = 'node_modules/.bin/uglifyjs'
 
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
@@ -1249,6 +1380,10 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 # parallel, and what the SES rate is.
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
+############################# Email Opt In ####################################
+
+# Minimum age for organization-wide email opt in
+EMAIL_OPTIN_MINIMUM_AGE = 13
 
 ############################## Video ##########################################
 
@@ -1298,6 +1433,7 @@ INSTALLED_APPS = (
     'circuit',
     'courseware',
     'student',
+
     'static_template_view',
     'staticbook',
     'track',
@@ -1317,6 +1453,11 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
+    # OAuth2 Provider
+    'provider',
+    'provider.oauth2',
+    'oauth2_provider',
+
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
@@ -1330,9 +1471,6 @@ INSTALLED_APPS = (
 
     # Foldit integration
     'foldit',
-
-    # For A/B testing
-    'waffle',
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
@@ -1359,6 +1497,8 @@ INSTALLED_APPS = (
 
     # Notification preferences setting
     'notification_prefs',
+
+    'notifier_api',
 
     # Different Course Modes
     'course_modes',
@@ -1389,7 +1529,13 @@ INSTALLED_APPS = (
     'edx_jsme',    # Molecular Structure
 
     # Country list
-    'django_countries'
+    'django_countries',
+
+    # edX Mobile API
+    'mobile_api',
+
+    # Surveys
+    'survey',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1450,6 +1596,7 @@ REGISTRATION_EXTRA_FIELDS = {
     'mailing_address': 'optional',
     'goals': 'optional',
     'honor_code': 'required',
+    'terms_of_service': 'hidden',
     'city': 'hidden',
     'country': 'hidden',
 }
@@ -1715,7 +1862,6 @@ ALL_LANGUAGES = (
 
 ### Apps only installed in some instances
 OPTIONAL_APPS = (
-    'edx_jsdraw',
     'mentoring',
 
     # edx-ora2
@@ -1724,7 +1870,10 @@ OPTIONAL_APPS = (
     'openassessment.assessment',
     'openassessment.fileupload',
     'openassessment.workflow',
-    'openassessment.xblock'
+    'openassessment.xblock',
+
+    # edxval
+    'edxval'
 )
 
 for app_name in OPTIONAL_APPS:
@@ -1752,7 +1901,7 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
-### Analytics data api settings
+### Analytics Data API + Dashboard (Insights) settings
 ANALYTICS_DATA_URL = ""
 ANALYTICS_DATA_TOKEN = ""
 ANALYTICS_DASHBOARD_URL = ""
@@ -1771,21 +1920,22 @@ WS_CONFIG = {
     'identity': '0103893954'
     }
 
-# TODO (ECOM-16): Remove once the A/B test of auto-registration completes
-AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
-    "HarvardX/SW12.2x/1T2014",
-    "HarvardX/SW12.3x/1T2014",
-    "HarvardX/SW12.4x/1T2014",
-    "HarvardX/SW12.5x/2T2014",
-    "HarvardX/SW12.6x/2T2014",
-    "HarvardX/HUM2.1x/3T2014",
-    "HarvardX/SW12x/2013_SOND",
-    "LinuxFoundationX/LFS101x/2T2014",
-    "HarvardX/CS50x/2014_T1",
-    "HarvardX/AmPoX.1/2014_T3",
-    "HarvardX/SW12.7x/3T2014",
-    "HarvardX/SW12.10x/1T2015",
-    "HarvardX/SW12.9x/3T2014",
-    "HarvardX/SW12.8x/3T2014",
-])
+ANALYTICS_DASHBOARD_NAME = PLATFORM_NAME + " Insights"
 
+# REGISTRATION CODES DISPLAY INFORMATION SUBTITUTIONS IN THE INVOICE ATTACHMENT
+INVOICE_CORP_ADDRESS = "Please place your corporate address\nin this configuration"
+INVOICE_PAYMENT_INSTRUCTIONS = "This is where you can\nput directions on how people\nbuying registration codes"
+
+# Country code overrides
+# Used by django-countries
+COUNTRIES_OVERRIDE = {
+    "TW": _("Taiwan"),
+}
+
+# which access.py permission name to check in order to determine if a course is visible in
+# the course catalog. We default this to the legacy permission 'see_exists'.
+COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
+
+# which access.py permission name to check in order to determine if a course about page is
+# visible. We default this to the legacy permission 'see_exists'.
+COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'

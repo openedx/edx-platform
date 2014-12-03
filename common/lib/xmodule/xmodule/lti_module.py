@@ -191,32 +191,45 @@ class LTIFields(object):
         default=False,
         scope=Scope.settings
     )
-    """
-        Users will be presented with a message indicating that their e-mail/username would be sent to a third 
-        party application. When "Open in new Page" is not selected, the tool automatically appears without any user action.
-    """
-    request_username = Boolean(
+
+    # Users will be presented with a message indicating that their e-mail/username would be sent to a third
+    # party application. When "Open in New Page" is not selected, the tool automatically appears without any user action.
+    ask_to_send_username = Boolean(
         display_name=_("Request user's username"),
+        # Translators: This is used to request the user's username for a third party service.
+        # Usernames can only be requested if "Open in New Page" is set to True.
         help=_(
-            "Requesting user's username will only work if 'Open in a new page' is set to True"
+            "Select True to request the user's username. You must also set Open in New Page to True to get the user's information."
         ),
         default=False,
         scope=Scope.settings
     )
-    request_email = Boolean(
+    ask_to_send_email = Boolean(
         display_name=_("Request user's email"),
+        # Translators: This is used to request the user's email for a third party service.
+        # Emails can only be requested if "Open in New Page" is set to True.
         help=_(
-            "Requesting user's email will only work if 'Open in a new page' is set to True"
+            "Select True to request the user's email address. You must also set Open in New Page to True to get the user's information."
         ),
         default=False,
         scope=Scope.settings
     )
 
-    text_box = String(
+    description = String(
         display_name=_("LTI Application Information"),
         help=_(
-            "Provide a description of the third party application. If requesting username and/or email, use this text box to inform users "
-            "that their username and/or email will be forwarded to a third party application."),
+            "Enter a description of the third party application. If requesting username and/or email, use this text box to inform users "
+            "why their username and/or email will be forwarded to a third party application."
+        ),
+        default="",
+        scope=Scope.settings
+    )
+
+    button_text = String(
+        display_name=_("Button Text"),
+        help=_(
+            "Enter the text on the button used to launch the third party application."
+        ),
         default="",
         scope=Scope.settings
     )
@@ -303,7 +316,13 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         Otherwise error message from LTI provider is generated.
     """
 
+    js = {
+        'js': [
+            resource_string(__name__, 'js/src/lti/lti.js')
+        ]
+    }
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
+    js_module_name = "LTI"
 
     def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
@@ -400,9 +419,10 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             'weight': self.weight,
             'module_score': self.module_score,
             'comment': sanitized_comment,
-            'text_box': self.text_box,
-            'request_username': self.request_username,
-            'request_email': self.request_email,
+            'description': self.description,
+            'ask_to_send_username': self.ask_to_send_username,
+            'ask_to_send_email': self.ask_to_send_email,
+            'button_text': self.button_text,
 
         }
 
@@ -555,20 +575,23 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         # Username and email can't be sent in studio mode, because the user object is not defined.
         # To test functionality test in LMS
-        
-        if self.runtime.get_real_user is not None:
-            real_user_object = self.runtime.get_real_user(self.runtime.anonymous_student_id)
-            self.user_email = real_user_object.email
-            self.user_username  = real_user_object.username
 
-        if self.request_username and self.user_username and self.open_in_a_new_page:
-            body.update({
-                u'lis_person_sourcedid': self.user_username
-            })
-        if self.request_email and self.user_email and self.open_in_a_new_page:
-            body.update({
-                u'lis_person_contact_email_primary': self.user_email
-            })
+        if callable(self.runtime.get_real_user):
+            real_user_object = self.runtime.get_real_user(self.runtime.anonymous_student_id)
+            try:
+                self.user_email = real_user_object.email
+            except AttributeError:
+                self.user_email = ""
+            try:
+                self.user_username = real_user_object.username
+            except AttributeError:
+                self.user_username = ""
+
+        if self.open_in_a_new_page:
+            if self.ask_to_send_username and self.user_username:
+                body["lis_person_sourcedid"] = self.user_username
+            if self.ask_to_send_email and self.user_email:
+                body["lis_person_contact_email_primary"] = self.user_email
 
         # Appending custom parameter for signing.
         body.update(custom_parameters)
@@ -729,7 +752,6 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         log.debug("[LTI]: Incorrect action.")
         return Response(response_xml_template.format(**unsupported_values), content_type='application/xml')
 
-
     @classmethod
     def parse_grade_xml_body(cls, body):
         """
@@ -751,7 +773,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text or ''
         sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
         score = root.xpath("//def:textString", namespaces=namespaces)[0].text
-        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')
+        action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{' + lti_spec_namespace + '}', '')
         # Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
         score = float(score)
         if not 0 <= score <= 1:
@@ -818,6 +840,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             if lti_id == self.lti_id.strip():
                 return key, secret
         return '', ''
+
 
 class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """

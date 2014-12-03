@@ -1,0 +1,31 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Log in or Register")}</%block>
+
+<%block name="js_extra">
+    <script src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
+    <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <script src="${static.url('js/vendor/url.min.js')}"></script>
+    <%static:js group='student_account'/>
+</%block>
+
+<%block name="header_extras">
+    % for template_name in ["account", "access", "form_field", "login", "register", "password_reset"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_account/${template_name}.underscore" />
+        </script>
+% endfor
+</%block>
+
+<div class="section-bkg-wrapper">
+    <div id="login-and-registration-container"
+        class="login-register"
+        data-initial-mode="${initial_mode}"
+        data-third-party-auth='${third_party_auth}'
+        data-platform-name='${platform_name}'
+    />
+</div>

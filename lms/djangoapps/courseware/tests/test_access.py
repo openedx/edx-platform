@@ -1,21 +1,22 @@
-import courseware.access as access
 import datetime
-
-import mock
-from mock import Mock
+import pytz
 
 from django.test import TestCase
-from django.test.utils import override_settings
-
-from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
-from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
-import pytz
+from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
+import courseware.access as access
+from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
+from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
+from xmodule.course_module import (
+    CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_ABOUT,
+    CATALOG_VISIBILITY_NONE
+)
 
+# pylint: disable=missing-docstring
 # pylint: disable=protected-access
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
+
 class AccessTestCase(TestCase):
     """
     Tests for the various access controls on the student dashboard
@@ -83,19 +84,36 @@ class AccessTestCase(TestCase):
 
         self.assertRaises(ValueError, access._has_access_string, user, 'not_staff', 'global', self.course.course_key)
 
+    def test__has_access_error_desc(self):
+        descriptor = Mock()
+
+        self.assertFalse(access._has_access_error_desc(self.student, 'load', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_staff, 'load', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_instructor, 'load', descriptor, self.course.course_key))
+
+        self.assertFalse(access._has_access_error_desc(self.student, 'staff', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_staff, 'staff', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_instructor, 'staff', descriptor, self.course.course_key))
+
+        self.assertFalse(access._has_access_error_desc(self.student, 'instructor', descriptor, self.course.course_key))
+        self.assertFalse(access._has_access_error_desc(self.course_staff, 'instructor', descriptor, self.course.course_key))
+        self.assertTrue(access._has_access_error_desc(self.course_instructor, 'instructor', descriptor, self.course.course_key))
+
+        with self.assertRaises(ValueError):
+            access._has_access_error_desc(self.course_instructor, 'not_load_or_staff', descriptor, self.course.course_key)
+
     def test__has_access_descriptor(self):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         user = Mock()
-        date = Mock()
-        date.start = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=1)  # make sure the start time is in the past
+        descriptor = Mock()
 
         # Always returns true because DISABLE_START_DATES is set in test.py
-        self.assertTrue(access._has_access_descriptor(user, 'load', date))
-        self.assertTrue(access._has_access_descriptor(user, 'instructor', date))
+        self.assertTrue(access._has_access_descriptor(user, 'load', descriptor))
+        self.assertTrue(access._has_access_descriptor(user, 'instructor', descriptor))
         with self.assertRaises(ValueError):
-            access._has_access_descriptor(user, 'not_load_or_staff', date)
+            access._has_access_descriptor(user, 'not_load_or_staff', descriptor)
 
-    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test__has_access_descriptor_staff_lock(self):
         """
         Tests that "visible_to_staff_only" overrides start date.
@@ -186,6 +204,43 @@ class AccessTestCase(TestCase):
     def test__user_passed_as_none(self):
         """Ensure has_access handles a user being passed as null"""
         access.has_access(None, 'staff', 'global', None)
+
+    def test__catalog_visibility(self):
+        """
+        Tests the catalog visibility tri-states
+        """
+        user = UserFactory.create()
+        course_id = SlashSeparatedCourseKey('edX', 'test', '2012_Fall')
+        staff = StaffFactory.create(course_key=course_id)
+
+        course = Mock(
+            id=course_id,
+            catalog_visibility=CATALOG_VISIBILITY_CATALOG_AND_ABOUT
+        )
+        self.assertTrue(access._has_access_course_desc(user, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(user, 'see_about_page', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
+
+        # Now set visibility to just about page
+        course = Mock(
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'),
+            catalog_visibility=CATALOG_VISIBILITY_ABOUT
+        )
+        self.assertFalse(access._has_access_course_desc(user, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(user, 'see_about_page', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
+
+        # Now set visibility to none, which means neither in catalog nor about pages
+        course = Mock(
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'),
+            catalog_visibility=CATALOG_VISIBILITY_NONE
+        )
+        self.assertFalse(access._has_access_course_desc(user, 'see_in_catalog', course))
+        self.assertFalse(access._has_access_course_desc(user, 'see_about_page', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_in_catalog', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'see_about_page', course))
 
 
 class UserRoleTestCase(TestCase):

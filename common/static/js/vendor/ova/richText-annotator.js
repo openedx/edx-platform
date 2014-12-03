@@ -93,6 +93,17 @@ Annotator.Plugin.RichText = (function(_super) {
                 // set the modification in the textarea of annotator
                 $(editor.element).find('textarea')[0].value = tinymce.activeEditor.getContent();
             });
+
+            // creates a function called whenever editor is resized
+            ed.on('init', function(mceInstance) {
+
+                // get win means this event activates when window is resized
+                tinymce.dom.Event.bind(ed.getWin(), 'resize', function(e){
+
+                    // mceInstance.target gets the editor, its id is used to retrieved iframe
+                    $("#"+mceInstance.target.id+"_ifr").css('min-width', '400px');
+                });
+            });
             // new button to add Rubrics of the url https://gteavirtual.org/rubric
             ed.addButton('rubric', {
                 icon: 'rubric',
@@ -130,10 +141,11 @@ Annotator.Plugin.RichText = (function(_super) {
             });
         };
 
-        // makes sure that tinymce is not initiated by checking if editors exist
-        if(tinymce.editors.length === 0) {
-            tinymce.init(this.options.tinymce);
+        // makes sure that if tinymce exists already that this removes/destroys previous version
+        if (tinymce.editors.length > 0) {
+            tinymce.remove("li.annotator-item textarea");  
         }
+        tinymce.init(this.options.tinymce);
     };
     
     /**

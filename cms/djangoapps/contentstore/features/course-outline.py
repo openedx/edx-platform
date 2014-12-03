@@ -1,9 +1,9 @@
-# pylint: disable=C0111
-# pylint: disable=W0621
+# pylint: disable=missing-docstring
+# pylint: disable=redefined-outer-name
 
 from lettuce import world, step
 from common import *
-from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=E0611
+from nose.tools import assert_true, assert_false, assert_equal  # pylint: disable=no-name-in-module
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -67,7 +67,7 @@ def i_add_a_section(step):
     add_section()
 
 
-@step(u'I press the "section" delete icon')
+@step(u'I press the section delete icon')
 def i_press_the_section_delete_icon(step):
     delete_locator = 'section .outline-section > .section-header a.delete-button'
     world.css_click(delete_locator)

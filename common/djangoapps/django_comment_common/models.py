@@ -67,8 +67,11 @@ class Role(models.Model):
     def inherit_permissions(self, role):   # TODO the name of this method is a little bit confusing,
                                          # since it's one-off and doesn't handle inheritance later
         if role.course_id and role.course_id != self.course_id:
-            logging.warning("%s cannot inherit permissions from %s due to course_id inconsistency", \
-                            self, role)
+            logging.warning(
+                "%s cannot inherit permissions from %s due to course_id inconsistency",
+                self,
+                role,
+            )
         for per in role.permissions.all():
             self.add_permission(per)
 

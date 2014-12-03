@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.template.defaultfilters import escapejs %>
 <%namespace name='static' file='/static_content.html'/>
 
 ## The JS for this is defined in xqa_interface.html
@@ -9,10 +10,10 @@ ${block_content}
       <a href="${edit_link}">Edit</a>
       % if xqa_key:
           / <a href="#${element_id}_xqa-modal" onclick="javascript:getlog('${element_id}', {
-          'location': '${location}',
-          'xqa_key': '${xqa_key}',
-          'category': '${category}',
-          'user': '${user}'
+          'location': '${location | h}',
+          'xqa_key': '${xqa_key | h}',
+          'category': '${category | h}',
+          'user': '${user | h}'
        })" id="${element_id}_xqa_log">QA</a>
       % endif
   </div>
@@ -58,10 +59,10 @@ ${block_content}
     <div class="staff_actions">
       <h3>${_('Actions')}</h3>
       <div>
-        <label for="sd_fu_${location.name}">${_('Username')}:</label>
-        <input type="text" id="sd_fu_${location.name}" placeholder="${user.username}"/>
+        <label for="sd_fu_${location.name | h}">${_('Username')}:</label>
+        <input type="text" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
       </div>
-      <div data-location="${location.to_deprecated_string()}" data-location-name="${location.name}">
+      <div data-location="${location | h}" data-location-name="${location.name | h}">
         [
         <a href="#" class="staff-debug-reset">${_('Reset Student Attempts')}</a>
         % if has_instructor_access:
@@ -72,7 +73,7 @@ ${block_content}
         % endif
         ]
       </div>
-      <div id="result_${location.name}"/>
+      <div id="result_${location.name | h}"/>
     </div>
 
     <div class="staff_info" style="display:block">
@@ -106,7 +107,7 @@ category = ${category | h}
     <form id="${element_id}_history_form">
       <label for="${element_id}_history_student_username">${_("User:")}</label>
       <input id="${element_id}_history_student_username" type="text" placeholder=""/>
-      <input type="hidden" id="${element_id}_history_location" value="${location.to_deprecated_string()}"/>
+      <input type="hidden" id="${element_id}_history_location" value="${location | h}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>
       </div>
@@ -129,7 +130,7 @@ $(function () {
         null,
         %endif
         {
-            'location': '${location.to_deprecated_string()}',
+            'location': '${location | escapejs}',
             'xqa_key': '${xqa_key}',
             'category': '${category}',
             'user': '${user}'

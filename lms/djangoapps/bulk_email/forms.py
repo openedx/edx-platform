@@ -17,11 +17,14 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger(__name__)
 
 
-class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
+class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     """Form providing validation of CourseEmail templates."""
 
-    class Meta:  # pylint: disable=C0111
+    name = forms.CharField(required=False)
+
+    class Meta:  # pylint: disable=missing-docstring
         model = CourseEmailTemplate
+        fields = ('html_template', 'plain_template', 'name')
 
     def _validate_template(self, template):
         """Check the template for required tags."""
@@ -50,11 +53,30 @@ class CourseEmailTemplateForm(forms.ModelForm):  # pylint: disable=R0924
         self._validate_template(template)
         return template
 
+    def clean_name(self):
+        """Validate the name field. Enforce uniqueness constraint on 'name' field"""
 
-class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=R0924
+        # Note that we get back a blank string in the Form for an empty 'name' field
+        # we want those to be set to None in Python and NULL in the database
+        name = self.cleaned_data.get("name").strip() or None
+
+        # if we are creating a new CourseEmailTemplate, then we need to
+        # enforce the uniquess constraint as part of the Form validation
+        if not self.instance.pk:
+            try:
+                CourseEmailTemplate.get_template(name)
+                # already exists, this is no good
+                raise ValidationError('Name of "{}" already exists, this must be unique.'.format(name))
+            except CourseEmailTemplate.DoesNotExist:
+                # this is actually the successful validation
+                pass
+        return name
+
+
+class CourseAuthorizationAdminForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     """Input form for email enabling, allowing us to verify data."""
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         model = CourseAuthorization
 
     def clean_course_id(self):

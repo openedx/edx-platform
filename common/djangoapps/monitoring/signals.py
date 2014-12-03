@@ -10,7 +10,7 @@ the recorded metrics.
 from django.db.models.signals import post_save, post_delete, m2m_changed, post_init
 from django.dispatch import receiver
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 
 def _database_tags(action, sender, kwargs):
@@ -77,6 +77,7 @@ def post_save_metrics(sender, **kwargs):
 
     tags = _database_tags(action, sender, kwargs)
     dog_stats_api.increment('edxapp.db.model', tags=tags)
+
 
 @receiver(post_delete, dispatch_uid='edxapp.monitoring.post_delete_metrics')
 def post_delete_metrics(sender, **kwargs):

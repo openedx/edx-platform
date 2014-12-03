@@ -2,7 +2,6 @@
 Provides unit tests for SSL based authentication portions
 of the external_auth app.
 """
-
 import unittest
 
 from django.conf import settings
@@ -13,17 +12,16 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import Mock
-
-import external_auth.views
 from edxmako.middleware import MakoMiddleware
 from external_auth.models import ExternalAuthMap
-from opaque_keys import InvalidKeyError
+import external_auth.views
+from mock import Mock
+
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.django_utils import (ModuleStoreTestCase,
-                                                    mixed_store_config)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
@@ -35,7 +33,6 @@ FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = Tr
 FEATURES_WITHOUT_SSL_AUTH = settings.FEATURES.copy()
 FEATURES_WITHOUT_SSL_AUTH['AUTH_USE_CERTIFICATES'] = False
 
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
 @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
 class SSLClientTest(ModuleStoreTestCase):
@@ -200,24 +197,17 @@ class SSLClientTest(ModuleStoreTestCase):
         This tests to make sure when immediate signup is on that
         the user doesn't get presented with the registration page.
         """
-        # Expect an InvalidKeyError from course page as we don't have anything else built
-        with self.assertRaisesRegexp(
-                InvalidKeyError,
-                "<class 'opaque_keys.edx.keys.CourseKey'>: None"
-        ):
-            self.client.get(
-                reverse('signup'), follow=True,
-                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
-            )
+        response = self.client.get(
+            reverse('signup'), follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
+        )
+        self.assertEqual(response.status_code, 404)
         # assert that we are logged in
         self.assertIn(SESSION_KEY, self.client.session)
 
         # Now that we are logged in, make sure we don't see the registration page
-        with self.assertRaisesRegexp(
-                InvalidKeyError,
-                "<class 'opaque_keys.edx.keys.CourseKey'>: None"
-        ):
-            self.client.get(reverse('signup'), follow=True)
+        response = self.client.get(reverse('signup'), follow=True)
+        self.assertEqual(response.status_code, 404)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
@@ -331,7 +321,7 @@ class SSLClientTest(ModuleStoreTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE,
-                       MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+                       MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
     def test_ssl_lms_redirection(self):
         """
         Auto signup auth user and ensure they return to the original

@@ -756,7 +756,7 @@ function (VideoPlayer, VideoStorage, i18n) {
         try {
             return this.metadata[this.youtubeId()].duration;
         } catch (err) {
-            return this.metadata[this.youtubeId('1.0')].duration;
+            return _.result(this.metadata[this.youtubeId('1.0')], 'duration') || 0;
         }
     }
 

@@ -1,4 +1,4 @@
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 import logging
 from .grading_service_module import GradingService
@@ -167,6 +167,7 @@ class MockControllerQueryService(object):
         @return:
         """
         pass
+
 
 def convert_seconds_to_human_readable(seconds):
     if seconds < 60:

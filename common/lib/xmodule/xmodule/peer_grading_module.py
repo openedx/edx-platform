@@ -33,7 +33,7 @@ class PeerGradingFields(object):
     use_for_single_location = Boolean(
         display_name=_("Show Single Problem"),
         help=_('When True, only the single problem specified by "Link to Problem Location" is shown. '
-             'When False, a panel is displayed with all problems available for peer grading.'),
+               'When False, a panel is displayed with all problems available for peer grading.'),
         default=False,
         scope=Scope.settings
     )
@@ -54,9 +54,9 @@ class PeerGradingFields(object):
         scope=Scope.settings)
     extended_due = Date(
         help=_("Date that this problem is due by for a particular student. This "
-             "can be set by an instructor, and will override the global due "
-             "date if it is set to a date that is later than the global due "
-             "date."),
+               "can be set by an instructor, and will override the global due "
+               "date if it is set to a date that is later than the global due "
+               "date."),
         default=None,
         scope=Scope.user_state,
     )
@@ -85,6 +85,7 @@ class PeerGradingFields(object):
         default='<peergrading></peergrading>',
         scope=Scope.content
     )
+
 
 class InvalidLinkLocation(Exception):
     """
@@ -150,7 +151,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         try:
             self.student_data_for_location = json.loads(self.student_data_for_location)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
+            # OK with this broad exception because we just want to continue on any error
             pass
 
     @property
@@ -218,9 +220,9 @@ class PeerGradingModule(PeerGradingFields, XModule):
             # This is a dev_facing_error
             return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
-        d = handlers[dispatch](data)
+        data_dict = handlers[dispatch](data)
 
-        return json.dumps(d, cls=ComplexEncoder)
+        return json.dumps(data_dict, cls=ComplexEncoder)
 
     def query_data_for_location(self, location):
         student_id = self.system.anonymous_student_id
@@ -229,13 +231,12 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         try:
             response = self.peer_gs.get_data_for_location(location, student_id)
-            count_graded = response['count_graded']
-            count_required = response['count_required']
+            _count_graded = response['count_graded']
+            _count_required = response['count_required']
             success = True
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception("Error getting location data from controller for location {0}, student {1}"
-            .format(location, student_id))
+            log.exception("Error getting location data from controller for location %s, student %s", location, student_id)
 
         return success, response
 
@@ -322,8 +323,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return response
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception("Error getting next submission.  server url: {0}  location: {1}, grader_id: {2}"
-            .format(self.peer_gs.url, location, grader_id))
+            log.exception("Error getting next submission.  server url: %s  location: %s, grader_id: %s", self.peer_gs.url, location, grader_id)
             # This is a student_facing_error
             return {'success': False,
                     'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
@@ -355,7 +355,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not success:
             return self._err_response(message)
 
-        data_dict = {k:data.get(k) for k in required}
+        data_dict = {k: data.get(k) for k in required}
         if 'rubric_scores[]' in required:
             data_dict['rubric_scores'] = data.getall('rubric_scores[]')
         data_dict['grader_id'] = self.system.anonymous_student_id
@@ -365,15 +365,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
             success, location_data = self.query_data_for_location(data_dict['location'])
             #Don't check for success above because the response = statement will raise the same Exception as the one
             #that will cause success to be false.
-            response.update({'required_done' : False})
-            if 'count_graded' in location_data and 'count_required' in location_data and int(location_data['count_graded'])>=int(location_data['count_required']):
+            response.update({'required_done': False})
+            if 'count_graded' in location_data and 'count_required' in location_data and int(location_data['count_graded']) >= int(location_data['count_required']):
                 response['required_done'] = True
             return response
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception("""Error saving grade to open ended grading service.  server url: {0}"""
-            .format(self.peer_gs.url)
-            )
+            log.exception("Error saving grade to open ended grading service.  server url: %s", self.peer_gs.url)
+
             # This is a student_facing_error
             return {
                 'success': False,
@@ -411,8 +410,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return response
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception("Error from open ended grading service.  server url: {0}, grader_id: {0}, location: {1}"
-            .format(self.peer_gs.url, grader_id, location))
+            log.exception("Error from open ended grading service.  server url: %s, grader_id: %s, location: %s", self.peer_gs.url, grader_id, location)
             # This is a student_facing_error
             return {
                 'success': False,
@@ -456,8 +454,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return response
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception("Error from open ended grading service.  server url: {0}, location: {0}"
-            .format(self.peer_gs.url, location))
+            log.exception("Error from open ended grading service.  server url: %s, location: %s", self.peer_gs.url, location)
             # This is a student_facing_error
             return {'success': False,
                     'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
@@ -492,7 +489,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not success:
             return self._err_response(message)
 
-        data_dict = {k:data.get(k) for k in required}
+        data_dict = {k: data.get(k) for k in required}
         data_dict['rubric_scores'] = data.getall('rubric_scores[]')
         data_dict['student_id'] = self.system.anonymous_student_id
         data_dict['calibration_essay_id'] = data_dict['submission_id']
@@ -619,7 +616,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         elif data.get('location') is not None:
             problem_location = self.course_id.make_usage_key_from_deprecated_string(data.get('location'))
 
-        module = self._find_corresponding_module_for_location(problem_location)
+        module = self._find_corresponding_module_for_location(problem_location)  # pylint: disable-unused-variable
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading_problem.html', {

@@ -1,6 +1,8 @@
 // studio - css architecture
 // ====================
 
+@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+
 // libs and resets *do not edit*
 @import 'bourbon/bourbon'; // lib - bourbon
 
@@ -17,7 +19,7 @@
 
 // base - assets
 @import 'assets/fonts';
-@import 'assets/graphics'; // sprites, basic img/figure/svg styling
+@import 'assets/graphics'; // sprites, basic image/figure/svg styling
 @import 'assets/anims'; // animations
 
 // base - starter
@@ -53,9 +55,6 @@
 
 // base - contexts
 @import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
-
-// temp - inherited
-@import 'assets/content-types';
 
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss

@@ -7,14 +7,15 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from mock import patch, ANY, Mock
-from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
+from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from django_comment_client.base import views
+from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
 from django_comment_client.tests.utils import CohortedContentTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_common.models import Role, FORUM_ROLE_STUDENT
+from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -26,124 +27,142 @@ log = logging.getLogger(__name__)
 
 CS_PREFIX = "http://localhost:4567/api/v1"
 
+# pylint: disable=missing-docstring
+
 
 class MockRequestSetupMixin(object):
-    def _create_repsonse_mock(self, data):
-        return Mock(text=json.dumps(data), json=Mock(return_value=data))\
+    def _create_response_mock(self, data):
+        return Mock(text=json.dumps(data), json=Mock(return_value=data))
 
     def _set_mock_request_data(self, mock_request, data):
-        mock_request.return_value = self._create_repsonse_mock(data)
+        mock_request.return_value = self._create_response_mock(data)
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class CreateCohortedThreadTestCase(CohortedContentTestCase):
-    """
-    Tests how `views.create_thread` passes `group_id` to the comments service
-    for cohorted topics.
-    """
-    def _create_thread_in_cohorted_topic(
-            self,
-            user,
+class CreateThreadGroupIdTestCase(
+        MockRequestSetupMixin,
+        CohortedContentTestCase,
+        CohortedTopicGroupIdTestMixin,
+        NonCohortedTopicGroupIdTestMixin
+):
+    cs_endpoint = "/threads"
+
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+        self._set_mock_request_data(mock_request, {})
+        mock_request.return_value.status_code = 200
+        request_data = {"body": "body", "title": "title", "thread_type": "discussion"}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().post("dummy_url", request_data)
+        request.user = user
+        request.view_name = "create_thread"
+
+        return views.create_thread(
+            request,
+            course_id=self.course.id.to_deprecated_string(),
+            commentable_id=commentable_id
+        )
+
+    def test_group_info_in_response(self, mock_request):
+        response = self.call_view(
             mock_request,
-            group_id,
-            pass_group_id=True,
-            expected_status_code=200
-    ):
-        self._create_thread(user, "cohorted_topic", mock_request, group_id, pass_group_id, expected_status_code)
-
-    def test_student_without_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.student, mock_request, None, pass_group_id=False)
-        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
-
-    def test_student_none_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.student, mock_request, None)
-        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
-
-    def test_student_with_own_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.student, mock_request, self.student_cohort.id)
-        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
-
-    def test_student_with_other_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.student, mock_request, self.moderator_cohort.id)
-        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
-
-    def test_moderator_without_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.moderator, mock_request, None, pass_group_id=False)
-        self._assert_mock_request_called_with_group_id(mock_request, self.moderator_cohort.id)
-
-    def test_moderator_none_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.moderator, mock_request, None, expected_status_code=400)
-        self.assertFalse(mock_request.called)
-
-    def test_moderator_with_own_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.moderator, mock_request, self.moderator_cohort.id)
-        self._assert_mock_request_called_with_group_id(mock_request, self.moderator_cohort.id)
-
-    def test_moderator_with_other_group_id(self, mock_request):
-        self._create_thread_in_cohorted_topic(self.moderator, mock_request, self.student_cohort.id)
-        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
-
-    def test_moderator_with_invalid_group_id(self, mock_request):
-        invalid_id = self.student_cohort.id + self.moderator_cohort.id
-        self._create_thread_in_cohorted_topic(self.moderator, mock_request, invalid_id, expected_status_code=400)
-        self.assertFalse(mock_request.called)
+            "cohorted_topic",
+            self.student,
+            None
+        )
+        self._assert_json_response_contains_group_info(response)
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class CreateNonCohortedThreadTestCase(CohortedContentTestCase):
-    """
-    Tests how `views.create_thread` passes `group_id` to the comments service
-    for non-cohorted topics.
-    """
-    def _create_thread_in_non_cohorted_topic(
+class ThreadActionGroupIdTestCase(
+        MockRequestSetupMixin,
+        CohortedContentTestCase,
+        GroupIdAssertionMixin
+):
+    def call_view(
             self,
-            user,
+            view_name,
             mock_request,
-            group_id,
-            pass_group_id=True,
-            expected_status_code=200
+            user=None,
+            post_params=None,
+            view_args=None
     ):
-        self._create_thread(user, "non_cohorted_topic", mock_request, group_id, pass_group_id, expected_status_code)
+        self._set_mock_request_data(
+            mock_request,
+            {
+                "user_id": str(self.student.id),
+                "group_id": self.student_cohort.id,
+                "closed": False,
+                "type": "thread"
+            }
+        )
+        mock_request.return_value.status_code = 200
+        request = RequestFactory().post("dummy_url", post_params or {})
+        request.user = user or self.student
+        request.view_name = view_name
 
-    def test_student_without_group_id(self, mock_request):
-        self._create_thread_in_non_cohorted_topic(self.student, mock_request, None, pass_group_id=False)
-        self._assert_mock_request_called_without_group_id(mock_request)
+        return getattr(views, view_name)(
+            request,
+            course_id=self.course.id.to_deprecated_string(),
+            thread_id="dummy",
+            **(view_args or {})
+        )
 
-    def test_student_none_group_id(self, mock_request):
-        self._create_thread_in_non_cohorted_topic(self.student, mock_request, None)
-        self._assert_mock_request_called_without_group_id(mock_request)
+    def test_update(self, mock_request):
+        response = self.call_view(
+            "update_thread",
+            mock_request,
+            post_params={"body": "body", "title": "title"}
+        )
+        self._assert_json_response_contains_group_info(response)
 
-    def test_student_with_own_group_id(self, mock_request):
-        self._create_thread_in_non_cohorted_topic(self.student, mock_request, self.student_cohort.id)
-        self._assert_mock_request_called_without_group_id(mock_request)
+    def test_delete(self, mock_request):
+        response = self.call_view("delete_thread", mock_request)
+        self._assert_json_response_contains_group_info(response)
 
-    def test_student_with_other_group_id(self, mock_request):
-        self._create_thread_in_non_cohorted_topic(self.student, mock_request, self.moderator_cohort.id)
-        self._assert_mock_request_called_without_group_id(mock_request)
+    def test_vote(self, mock_request):
+        response = self.call_view(
+            "vote_for_thread",
+            mock_request,
+            view_args={"value": "up"}
+        )
+        self._assert_json_response_contains_group_info(response)
+        response = self.call_view("undo_vote_for_thread", mock_request)
+        self._assert_json_response_contains_group_info(response)
 
-    def test_moderator_without_group_id(self, mock_request):
-        self._create_thread_in_non_cohorted_topic(self.moderator, mock_request, None, pass_group_id=False)
-        self._assert_mock_request_called_without_group_id(mock_request)
+    def test_flag(self, mock_request):
+        response = self.call_view("flag_abuse_for_thread", mock_request)
+        self._assert_json_response_contains_group_info(response)
+        response = self.call_view("un_flag_abuse_for_thread", mock_request)
+        self._assert_json_response_contains_group_info(response)
 
-    def test_moderator_none_group_id(self, mock_request):
-        self._create_thread_in_non_cohorted_topic(self.student, mock_request, None)
-        self._assert_mock_request_called_without_group_id(mock_request)
+    def test_pin(self, mock_request):
+        response = self.call_view(
+            "pin_thread",
+            mock_request,
+            user=self.moderator
+        )
+        self._assert_json_response_contains_group_info(response)
+        response = self.call_view(
+            "un_pin_thread",
+            mock_request,
+            user=self.moderator
+        )
+        self._assert_json_response_contains_group_info(response)
 
-    def test_moderator_with_own_group_id(self, mock_request):
-        self._create_thread_in_non_cohorted_topic(self.moderator, mock_request, self.moderator_cohort.id)
-        self._assert_mock_request_called_without_group_id(mock_request)
-
-    def test_moderator_with_other_group_id(self, mock_request):
-        self._create_thread_in_non_cohorted_topic(self.moderator, mock_request, self.student_cohort.id)
-        self._assert_mock_request_called_without_group_id(mock_request)
-
-    def test_moderator_with_invalid_group_id(self, mock_request):
-        invalid_id = self.student_cohort.id + self.moderator_cohort.id
-        self._create_thread_in_non_cohorted_topic(self.moderator, mock_request, invalid_id)
-        self._assert_mock_request_called_without_group_id(mock_request)
+    def test_openclose(self, mock_request):
+        response = self.call_view(
+            "openclose_thread",
+            mock_request,
+            user=self.moderator
+        )
+        self._assert_json_response_contains_group_info(
+            response,
+            lambda d: d['content']
+        )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('lms.lib.comment_client.utils.requests.request')
 class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
@@ -156,8 +175,11 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
         super(ViewsTestCase, self).setUp(create_user=False)
 
         # create a course
-        self.course = CourseFactory.create(org='MITx', course='999',
-                                           display_name='Robot Super Course')
+        self.course = CourseFactory.create(
+            org='MITx', course='999',
+            discussion_topics={"Some Topic": {"id": "some_topic"}},
+            display_name='Robot Super Course',
+        )
         self.course_id = self.course.id
         # seed the forums permissions and roles
         call_command('seed_permissions_roles', self.course_id.to_deprecated_string())
@@ -351,6 +373,23 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             mock_request
         )
 
+    def test_update_thread_course_topic(self, mock_request):
+        self._setup_mock_request(mock_request)
+        response = self.client.post(
+            reverse("update_thread", kwargs={"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()}),
+            data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
+        )
+        self.assertEqual(response.status_code, 200)
+
+    @patch('django_comment_client.base.views.get_discussion_categories_ids', return_value=["test_commentable"])
+    def test_update_thread_wrong_commentable_id(self, mock_get_discussion_id_map, mock_request):
+        self._test_request_error(
+            "update_thread",
+            {"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()},
+            {"body": "foo", "title": "foo", "commentable_id": "wrong_commentable"},
+            mock_request
+        )
+
     def test_create_comment_no_body(self, mock_request):
         self._test_request_error(
             "create_comment",
@@ -442,7 +481,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             "at_position_list": [],
             "closed": is_closed,
             "id": "518d4237b023791dca00000d",
-            "user_id": "1","username": "robot",
+            "user_id": "1", "username": "robot",
             "votes": {
                 "count": 0,
                 "up_count": 0,
@@ -711,7 +750,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
 
 @patch("lms.lib.comment_client.utils.requests.request")
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -761,9 +800,9 @@ class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         def handle_request(*args, **kwargs):
             url = args[1]
             if "/threads/" in url:
-                return self._create_repsonse_mock(thread_data)
+                return self._create_response_mock(thread_data)
             elif "/comments/" in url:
-                return self._create_repsonse_mock(comment_data)
+                return self._create_response_mock(comment_data)
             else:
                 raise ArgumentError("Bad url to mock request")
         mock_request.side_effect = handle_request
@@ -805,7 +844,7 @@ class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.assertEqual(response.status_code, 200)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -827,7 +866,7 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -835,13 +874,14 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
+    @patch('django_comment_client.base.views.get_discussion_categories_ids', return_value=["test_commentable"])
     @patch('lms.lib.comment_client.utils.requests.request')
-    def _test_unicode_data(self, text, mock_request):
+    def _test_unicode_data(self, text, mock_request, mock_get_discussion_id_map):
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
         })
-        request = RequestFactory().post("dummy_url", {"body": text, "title": text})
+        request = RequestFactory().post("dummy_url", {"body": text, "title": text, "thread_type": "question", "commentable_id": "test_commentable"})
         request.user = self.student
         request.view_name = "update_thread"
         response = views.update_thread(request, course_id=self.course.id.to_deprecated_string(), thread_id="dummy_thread_id")
@@ -850,9 +890,11 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertTrue(mock_request.called)
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
+        self.assertEqual(mock_request.call_args[1]["data"]["thread_type"], "question")
+        self.assertEqual(mock_request.call_args[1]["data"]["commentable_id"], "test_commentable")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -875,7 +917,7 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -899,7 +941,7 @@ class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -923,7 +965,7 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
@@ -994,8 +1036,8 @@ class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         response = self.make_request(username="other")
         self.assertEqual(response.status_code, 404)
         content = json.loads(response.content)
-        self.assertTrue(content.has_key("errors"))
-        self.assertFalse(content.has_key("users"))
+        self.assertIn("errors", content)
+        self.assertNotIn("users", content)
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def test_requires_matched_user_has_forum_content(self, mock_request):

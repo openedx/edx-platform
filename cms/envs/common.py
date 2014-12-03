@@ -22,7 +22,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0611, W0614
+# pylint: disable=wildcard-import, unused-import, unused-wildcard-import
 
 import imp
 import os
@@ -106,7 +106,7 @@ FEATURES = {
     'ADVANCED_SECURITY': False,
 
     # Modulestore to use for new courses
-    'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
+    'DEFAULT_STORE_FOR_NEW_COURSE': None,
 }
 ENABLE_JASMINE = False
 
@@ -269,6 +269,7 @@ MODULESTORE_BRANCH = 'draft-preferred'
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
 DEBUG = False
 TEMPLATE_DEBUG = False
+SESSION_COOKIE_SECURE = False
 
 # Site info
 SITE_ID = 1
@@ -291,7 +292,6 @@ MANAGERS = ADMINS
 
 # Static content
 STATIC_URL = '/static/' + git.revision + "/"
-ADMIN_MEDIA_PREFIX = '/static/admin/'
 STATIC_ROOT = ENV_ROOT / "staticfiles" / git.revision
 
 STATICFILES_DIRS = [
@@ -306,7 +306,11 @@ STATICFILES_DIRS = [
 # Locale/Internationalization
 TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES_BIDI = lms.envs.common.LANGUAGES_BIDI
+
 LANGUAGES = lms.envs.common.LANGUAGES
+LANGUAGE_DICT = dict(LANGUAGES)
+
 USE_I18N = True
 USE_L10N = True
 
@@ -320,8 +324,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 EMBARGO_SITE_REDIRECT_URL = None
 
 ############################### Pipeline #######################################
-
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+STATICFILES_STORAGE = 'cms.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
 from rooted_paths import rooted_glob
 
@@ -365,11 +368,29 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-app-extend1.css',
     },
+    'style-app-rtl': {
+        'source_filenames': [
+            'sass/style-app-rtl.css',
+        ],
+        'output_filename': 'css/cms-style-app-rtl.css',
+    },
+    'style-app-extend1-rtl': {
+        'source_filenames': [
+            'sass/style-app-extend1-rtl.css',
+        ],
+        'output_filename': 'css/cms-style-app-extend1-rtl.css',
+    },
     'style-xmodule': {
         'source_filenames': [
             'sass/style-xmodule.css',
         ],
         'output_filename': 'css/cms-style-xmodule.css',
+    },
+    'style-xmodule-rtl': {
+        'source_filenames': [
+            'sass/style-xmodule-rtl.css',
+        ],
+        'output_filename': 'css/cms-style-xmodule-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -433,6 +454,34 @@ STATICFILES_IGNORE_PATTERNS = (
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
+
+################################# DJANGO-REQUIRE ###############################
+
+# The baseUrl to pass to the r.js optimizer, relative to STATIC_ROOT.
+REQUIRE_BASE_URL = "./"
+
+# The name of a build profile to use for your project, relative to REQUIRE_BASE_URL.
+# A sensible value would be 'app.build.js'. Leave blank to use the built-in default build profile.
+# Set to False to disable running the default profile (e.g. if only using it to build Standalone
+# Modules)
+REQUIRE_BUILD_PROFILE = "build.js"
+
+# The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
+REQUIRE_JS = "js/vendor/require.js"
+
+# A dictionary of standalone modules to build with almond.js.
+REQUIRE_STANDALONE_MODULES = {}
+
+# Whether to run django-require in debug mode.
+REQUIRE_DEBUG = False
+
+# A tuple of files to exclude from the compilation result of r.js.
+REQUIRE_EXCLUDE = ("build.txt",)
+
+# The execution environment in which to run r.js: auto, node or rhino.
+# auto will autodetect the environment and make use of node if available and rhino if not.
+# It can also be a path to a custom class that subclasses require.environments.Environment and defines some "args" function that returns a list with the command arguments to execute.
+REQUIRE_ENVIRONMENT = "node"
 
 ################################# CELERY ######################################
 
@@ -540,6 +589,7 @@ INSTALLED_APPS = (
     'pipeline',
     'staticfiles',
     'static_replace',
+    'require',
 
     # comment common
     'django_comment_common',
@@ -635,7 +685,6 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 ### Apps only installed in some instances
 
 OPTIONAL_APPS = (
-    'edx_jsdraw',
     'mentoring',
 
     # edx-ora2
@@ -644,7 +693,10 @@ OPTIONAL_APPS = (
     'openassessment.assessment',
     'openassessment.fileupload',
     'openassessment.workflow',
-    'openassessment.xblock'
+    'openassessment.xblock',
+
+    # edxval
+    'edxval'
 )
 
 
@@ -700,12 +752,16 @@ ADVANCED_COMPONENT_TYPES = [
     'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
     'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
     'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
-    'profile', # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
+    'profile',  # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
     'split_test',
     'combinedopenended',
     'peergrading',
     'notes',
 ]
+
+# Adding components in this list will disable the creation of new problem for those
+# compoenents in studio. Existing problems will work fine and one can edit them in studio
+DEPRECATED_ADVANCED_COMPONENT_TYPES = []
 
 # Specify xblocks that should be treated as advanced problems. Each entry is a tuple
 # specifying the xblock name and an optional YAML template to be used.

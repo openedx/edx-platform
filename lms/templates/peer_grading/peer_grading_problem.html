@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <section class="container peer-grading-container">
-    <div class="peer-grading" data-ajax-url="${ajax_url}" data-location="${problem_location.to_deprecated_string()}" data-use-single-location="${use_single_location}">
+    <div class="peer-grading" data-ajax-url="${ajax_url}" data-location="${problem_location | h}" data-use-single-location="${use_single_location}">
         <div class="error-container"></div>
 
         <section class="content-panel">
@@ -48,7 +48,7 @@
                         <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
                         <div class="flag-student-container">
                             <br />
-                            <input type="checkbox" class="flag-checkbox" value="student_is_flagged"> 
+                            <input type="checkbox" class="flag-checkbox" value="student_is_flagged">
                             ${_("This submission has explicit, offensive, or (I suspect) plagiarized content. ")}
                         </div>
                     </div>

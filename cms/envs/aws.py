@@ -4,7 +4,7 @@ This is the default template for our main set of AWS servers.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 import json
 
@@ -135,6 +135,7 @@ if 'loc_cache' not in CACHES:
 
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
+SESSION_COOKIE_SECURE = ENV_TOKENS.get('SESSION_COOKIE_SECURE', SESSION_COOKIE_SECURE)
 
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
@@ -216,14 +217,8 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
 ############### XBlock filesystem field config ##########
-if 'XBLOCK-FS-STORAGE-BUCKET' in ENV_TOKENS:
-    DJFS = {
-        'type' : 's3fs',
-        'bucket' : ENV_TOKENS.get('XBLOCK-FS-STORAGE-BUCKET', None),
-        'prefix' : ENV_TOKENS.get('XBLOCK-FS-STORAGE-PREFIX', '/xblock-storage/')
-    }
-    DJFS['aws_access_key_id'] = AUTH_TOKENS.get('AWS_ACCESS_KEY_ID', None)
-    DJFS['aws_secret_access_key'] = AUTH_TOKENS.get('AWS_SECRET_ACCESS_KEY', None)
+if 'DJFS' in AUTH_TOKENS and AUTH_TOKENS['DJFS'] is not None:
+    DJFS = AUTH_TOKENS['DJFS']
 
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
@@ -303,6 +298,9 @@ ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})
 ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get('ADVANCED_COMPONENT_TYPES', ADVANCED_COMPONENT_TYPES)
 ADVANCED_PROBLEM_TYPES = ENV_TOKENS.get('ADVANCED_PROBLEM_TYPES', ADVANCED_PROBLEM_TYPES)
 
+DEPRECATED_ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get(
+    'DEPRECATED_ADVANCED_COMPONENT_TYPES', DEPRECATED_ADVANCED_COMPONENT_TYPES
+)
+
 import newrelic.agent
 newrelic.agent.initialize('/var/tmp/newrelic-cms.ini')
-

@@ -6,13 +6,15 @@ from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
 from decorator import contextmanager
 from mock import Mock, patch
-from nose.tools import assert_less_equal, assert_greater_equal, assert_equal
+from nose.tools import assert_less_equal, assert_greater_equal
+import factory
+import threading
 
 
 class Dummy(object):
@@ -35,13 +37,16 @@ class XModuleFactory(Factory):
         return modulestore()
 
 
+last_course = threading.local()
+
+
 class CourseFactory(XModuleFactory):
     """
     Factory for XModule courses.
     """
-    org = 'MITx'
-    number = '999'
-    display_name = 'Robot Super Course'
+    org = factory.Sequence(lambda n: 'org.%d' % n)
+    number = factory.Sequence(lambda n: 'course_%d' % n)
+    display_name = factory.Sequence(lambda n: 'Run %d' % n)
 
     # pylint: disable=unused-argument
     @classmethod
@@ -58,14 +63,18 @@ class CourseFactory(XModuleFactory):
         run = kwargs.get('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
+        # Pass the metadata just as field=value pairs
+        kwargs.update(kwargs.pop('metadata', {}))
+        default_store_override = kwargs.pop('default_store', None)
+
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            # Write the data to the mongo datastore
-            kwargs.update(kwargs.get('metadata', {}))
-            course_key = SlashSeparatedCourseKey(org, number, run)
-            # TODO - We really should call create_course here.  However, since create_course verifies there are no
-            # duplicates, this breaks several tests that do not clean up properly in between tests.
-            new_course = store.create_xblock(None, course_key, 'course', block_id=run, fields=kwargs)
-            store.update_item(new_course, user_id, allow_not_found=True)
+            if default_store_override is not None:
+                with store.default_store(default_store_override):
+                    new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+            else:
+                new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+
+            last_course.loc = new_course.location
             return new_course
 
 
@@ -96,7 +105,7 @@ class ItemFactory(XModuleFactory):
 
     @lazy_attribute
     def parent_location(self):
-        default_location = Location('MITx', '999', 'Robot_Super_Course', 'course', 'Robot_Super_Course', None)
+        default_location = getattr(last_course, 'loc', None)
         try:
             parent = self.parent
         # This error is raised if the caller hasn't provided either parent or parent_location
@@ -270,6 +279,17 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1):
     assert_less_equal(call_count, maximum_calls)
 
 
+def mongo_uses_error_check(store):
+    """
+    Does mongo use the error check as a separate message?
+    """
+    if hasattr(store, 'mongo_wire_version'):
+        return store.mongo_wire_version() <= 1
+    if hasattr(store, 'modulestores'):
+        return any([mongo_uses_error_check(substore) for substore in store.modulestores])
+    return False
+
+
 @contextmanager
 def check_mongo_calls(num_finds=0, num_sends=None):
     """
@@ -290,7 +310,8 @@ def check_mongo_calls(num_finds=0, num_sends=None):
         if num_sends is not None:
             with check_sum_of_calls(
                 pymongo.message,
-                ['insert', 'update', 'delete'],
+                # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
+                ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
                 num_sends,
                 num_sends
             ):

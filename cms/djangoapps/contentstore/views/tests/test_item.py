@@ -117,7 +117,6 @@ class GetItemTest(ItemTest):
         with check_mongo_calls(problem_queries):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
 
-
     def test_get_vertical(self):
         # Add a vertical
         resp = self.create_xblock(category='vertical')
@@ -131,8 +130,10 @@ class GetItemTest(ItemTest):
         root_usage_key = self._create_vertical()
         html, __ = self._get_container_preview(root_usage_key)
 
-        # Verify that the Studio wrapper is not added
-        self.assertNotIn('wrapper-xblock', html)
+        # XBlock messages are added by the Studio wrapper.
+        self.assertIn('wrapper-xblock-message', html)
+        # Make sure that "wrapper-xblock" does not appear by itself (without -message at end).
+        self.assertNotRegexpMatches(html, r'wrapper-xblock[^-]+')
 
         # Verify that the header and article tags are still added
         self.assertIn('<header class="xblock-header xblock-header-vertical">', html)
@@ -178,8 +179,9 @@ class GetItemTest(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            (r'"/container/i4x://MITx/999/wrapper/\w+" class="action-button">\s*'
-             '<span class="action-button-text">View</span>')
+            r'"/container/{}" class="action-button">\s*<span class="action-button-text">View</span>'.format(
+                wrapper_usage_key
+            )
         )
 
     def test_split_test(self):
@@ -196,7 +198,6 @@ class GetItemTest(ItemTest):
         html, __ = self._get_container_preview(split_test_usage_key)
         self.assertIn('Announcement', html)
         self.assertIn('Zooming', html)
-
 
     def test_split_test_edited(self):
         """
@@ -480,9 +481,15 @@ class TestEditItem(ItemTest):
         display_name = 'chapter created'
         resp = self.create_xblock(display_name=display_name, category='chapter')
         chap_usage_key = self.response_usage_key(resp)
+
+        # create 2 sequentials
         resp = self.create_xblock(parent_usage_key=chap_usage_key, category='sequential')
         self.seq_usage_key = self.response_usage_key(resp)
         self.seq_update_url = reverse_usage_url("xblock_handler", self.seq_usage_key)
+
+        resp = self.create_xblock(parent_usage_key=chap_usage_key, category='sequential')
+        self.seq2_usage_key = self.response_usage_key(resp)
+        self.seq2_update_url = reverse_usage_url("xblock_handler", self.seq2_usage_key)
 
         # create problem w/ boilerplate
         template_id = 'multiplechoice.yaml'
@@ -557,11 +564,8 @@ class TestEditItem(ItemTest):
         self.assertIn(chapter2_usage_key, course.children)
 
         # Remove one child from the course.
-        resp = self.client.ajax_post(
-            self.course_update_url,
-            data={'children': [unicode(chapter2_usage_key)]}
-        )
-        self.assertEqual(resp.status_code, 200)
+        resp = self.client.delete(reverse_usage_url("xblock_handler", chapter1_usage_key))
+        self.assertEqual(resp.status_code, 204)
 
         # Verify that the child is removed.
         course = self.get_item_from_modulestore(self.usage_key)
@@ -596,6 +600,79 @@ class TestEditItem(ItemTest):
         self.assertEqual(self.problem_usage_key, children[0])
         self.assertEqual(unit1_usage_key, children[2])
         self.assertEqual(unit2_usage_key, children[1])
+
+    def test_move_parented_child(self):
+        """
+        Test moving a child from one Section to another
+        """
+        unit_1_key = self.response_usage_key(
+            self.create_xblock(parent_usage_key=self.seq_usage_key, category='vertical', display_name='unit 1')
+        )
+        unit_2_key = self.response_usage_key(
+            self.create_xblock(parent_usage_key=self.seq2_usage_key, category='vertical', display_name='unit 2')
+        )
+
+        # move unit 1 from sequential1 to sequential2
+        resp = self.client.ajax_post(
+            self.seq2_update_url,
+            data={'children': [unicode(unit_1_key), unicode(unit_2_key)]}
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        # verify children
+        self.assertListEqual(
+            self.get_item_from_modulestore(self.seq2_usage_key).children,
+            [unit_1_key, unit_2_key],
+        )
+        self.assertListEqual(
+            self.get_item_from_modulestore(self.seq_usage_key).children,
+            [self.problem_usage_key],  # problem child created in setUp
+        )
+
+    def test_move_orphaned_child_error(self):
+        """
+        Test moving an orphan returns an error
+        """
+        unit_1_key = self.store.create_item(self.user.id, self.course_key, 'vertical', 'unit1').location
+
+        # adding orphaned unit 1 should return an error
+        resp = self.client.ajax_post(
+            self.seq2_update_url,
+            data={'children': [unicode(unit_1_key)]}
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
+
+        # verify children
+        self.assertListEqual(
+            self.get_item_from_modulestore(self.seq2_usage_key).children,
+            []
+        )
+
+    def test_move_child_creates_orphan_error(self):
+        """
+        Test creating an orphan returns an error
+        """
+        unit_1_key = self.response_usage_key(
+            self.create_xblock(parent_usage_key=self.seq2_usage_key, category='vertical', display_name='unit 1')
+        )
+        unit_2_key = self.response_usage_key(
+            self.create_xblock(parent_usage_key=self.seq2_usage_key, category='vertical', display_name='unit 2')
+        )
+
+        # remove unit 2 should return an error
+        resp = self.client.ajax_post(
+            self.seq2_update_url,
+            data={'children': [unicode(unit_1_key)]}
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
+
+        # verify children
+        self.assertListEqual(
+            self.get_item_from_modulestore(self.seq2_usage_key).children,
+            [unit_1_key, unit_2_key]
+        )
 
     def _is_location_published(self, location):
         """
@@ -954,44 +1031,6 @@ class TestEditSplitModule(ItemTest):
         self.assertEqual(2, len(split_test.children))
         self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
 
-    def test_delete_children(self):
-        """
-        Test that deleting a child in the group_id_to_child map updates the map.
-
-        Also test that deleting a child not in the group_id_to_child_map behaves properly.
-        """
-        # Set to first group configuration.
-        self._update_partition_id(0)
-        split_test = self._assert_children(2)
-        vertical_1_usage_key = split_test.children[1]
-
-        # Add an extra child to the split_test
-        resp = self.create_xblock(category='html', parent_usage_key=self.split_test_usage_key)
-        extra_child_usage_key = self.response_usage_key(resp)
-        self._assert_children(3)
-
-        # Remove the first child (which is part of the group configuration).
-        resp = self.client.ajax_post(
-            self.split_test_update_url,
-            data={'children': [unicode(vertical_1_usage_key), unicode(extra_child_usage_key)]}
-        )
-        self.assertEqual(resp.status_code, 200)
-        split_test = self._assert_children(2)
-
-        # Check that group_id_to_child was updated appropriately
-        group_id_to_child = split_test.group_id_to_child
-        self.assertEqual(1, len(group_id_to_child))
-        self.assertEqual(vertical_1_usage_key, group_id_to_child['1'])
-
-        # Remove the "extra" child and make sure that group_id_to_child did not change.
-        resp = self.client.ajax_post(
-            self.split_test_update_url,
-            data={'children': [unicode(vertical_1_usage_key)]}
-        )
-        self.assertEqual(resp.status_code, 200)
-        split_test = self._assert_children(1)
-        self.assertEqual(group_id_to_child, split_test.group_id_to_child)
-
     def test_add_groups(self):
         """
         Test the "fix up behavior" when groups are missing (after a group is added to a group configuration).
@@ -1164,6 +1203,43 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(ora_template.get('category'), 'openassessment')
         self.assertIsNone(ora_template.get('boilerplate_name', None))
 
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["combinedopenended", "peergrading"])
+    def test_ora1_no_advance_component_button(self):
+        """
+        Test that there will be no `Advanced` button on unit page if `combinedopenended` and `peergrading` are
+        deprecated provided that there are only 'combinedopenended', 'peergrading' modules in `Advanced Module List`
+        """
+        self.course.advanced_modules.extend(['combinedopenended', 'peergrading'])
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        self.assertNotIn('Advanced', button_names)
+
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["combinedopenended", "peergrading"])
+    def test_cannot_create_ora1_problems(self):
+        """
+        Test that we can't create ORA1 problems if `combinedopenended` and `peergrading` are deprecated
+        """
+        self.course.advanced_modules.extend(['annotatable', 'combinedopenended', 'peergrading'])
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        self.assertIn('Advanced', button_names)
+        self.assertEqual(len(templates[0]['templates']), 1)
+        template_display_names = [template['display_name'] for template in templates[0]['templates']]
+        self.assertEqual(template_display_names, ['Annotation'])
+
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
+    def test_create_ora1_problems(self):
+        """
+        Test that we can create ORA1 problems if `combinedopenended` and `peergrading` are not deprecated
+        """
+        self.course.advanced_modules.extend(['annotatable', 'combinedopenended', 'peergrading'])
+        templates = get_component_templates(self.course)
+        button_names = [template['display_name'] for template in templates]
+        self.assertIn('Advanced', button_names)
+        self.assertEqual(len(templates[0]['templates']), 3)
+        template_display_names = [template['display_name'] for template in templates[0]['templates']]
+        self.assertEqual(template_display_names, ['Annotation', 'Open Response Assessment', 'Peer Grading Interface'])
+
 
 class TestXBlockInfo(ItemTest):
     """
@@ -1233,8 +1309,8 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test course.
         """
         self.assertEqual(xblock_info['category'], 'course')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/course/Robot_Super_Course')
-        self.assertEqual(xblock_info['display_name'], 'Robot Super Course')
+        self.assertEqual(xblock_info['id'], unicode(self.course.location))
+        self.assertEqual(xblock_info['display_name'], self.course.display_name)
         self.assertTrue(xblock_info['published'])
 
         # Finally, validate the entire response for consistency
@@ -1245,7 +1321,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test chapter.
         """
         self.assertEqual(xblock_info['category'], 'chapter')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(xblock_info['id'], unicode(self.chapter.location))
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -1263,7 +1339,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test sequential.
         """
         self.assertEqual(xblock_info['category'], 'sequential')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/sequential/Lesson_1')
+        self.assertEqual(xblock_info['id'], unicode(self.sequential.location))
         self.assertEqual(xblock_info['display_name'], 'Lesson 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
@@ -1276,7 +1352,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test vertical.
         """
         self.assertEqual(xblock_info['category'], 'vertical')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/vertical/Unit_1')
+        self.assertEqual(xblock_info['id'], unicode(self.vertical.location))
         self.assertEqual(xblock_info['display_name'], 'Unit 1')
         self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
@@ -1298,7 +1374,7 @@ class TestXBlockInfo(ItemTest):
         Validate that the xblock info is correct for the test component.
         """
         self.assertEqual(xblock_info['category'], 'video')
-        self.assertEqual(xblock_info['id'], 'i4x://MITx/999/video/My_Video')
+        self.assertEqual(xblock_info['id'], unicode(self.video.location))
         self.assertEqual(xblock_info['display_name'], 'My Video')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))

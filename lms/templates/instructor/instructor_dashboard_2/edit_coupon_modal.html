@@ -29,7 +29,7 @@
           <ol class="list-input">
             <li class="field required text" id="edit-coupon-modal-field-code">
               <label for="edit_coupon_code" class="required">${_("Code")}</label>
-              <input class="field readonly" id="edit_coupon_code" type="text" name="code" maxlength="16" value="" placeholder="example: A123DS"
+              <input class="field readonly" id="edit_coupon_code" type="text" name="code" maxlength="16" value="" placeholder="${_('example: A123DS')}"
                     readonly aria-required="true"/>
             </li>
             <li class="field required text" id="edit-coupon-modal-field-discount">
@@ -49,13 +49,12 @@
               <input class="field readonly" id="edit_coupon_course_id" type="text" name="course_id" value=""
                      readonly aria-required="true"/>
             </li>
-
           </ol>
         </fieldset>
 
         <div class="submit">
           <input type="hidden" name="coupon_id" id="coupon_id"/>
-          <input name="submit" type="submit" id="update_coupon_button" value="${_('Update Coupon')}"/>
+          <input name="submit" type="button" id="update_coupon_button" value="${_('Update Coupon')}"/>
         </div>
       </form>
     </div>

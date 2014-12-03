@@ -1,10 +1,10 @@
 # disable missing docstring
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 import unittest
 
 from mock import Mock
-from nose.tools import assert_equals, assert_not_equals, assert_true, assert_false, assert_in, assert_not_in  # pylint: disable=E0611
+from nose.tools import assert_equals, assert_not_equals, assert_true, assert_false, assert_in, assert_not_in  # pylint: disable=no-name-in-module
 
 from xblock.field_data import DictFieldData
 from xblock.fields import Scope, String, Dict, Boolean, Integer, Float, Any, List
@@ -130,7 +130,6 @@ class InheritingFieldDataTest(unittest.TestCase):
         child = self.get_a_block(usage_id="child")
         child.parent = "parent"
         self.assertEqual(child.not_inherited, "nothing")
-
 
 
 class EditableMetadataFieldsTest(unittest.TestCase):
@@ -331,7 +330,6 @@ class TestDeserializeInteger(TestDeserialize):
         # 2.78 can be converted to int, so the string will be deserialized
         self.assertDeserializeEqual(-2.78, '-2.78')
 
-
     def test_deserialize_unsupported_types(self):
         self.assertDeserializeEqual('[3]', '[3]')
         # '2.78' cannot be converted to int, so input value is returned
@@ -415,7 +413,7 @@ class TestDeserializeAny(TestDeserialize):
     def test_deserialize(self):
         self.assertDeserializeEqual('hAlf', '"hAlf"')
         self.assertDeserializeEqual('false', '"false"')
-        self.assertDeserializeEqual({'bar': 'hat', 'frog' : 'green'}, '{"bar": "hat", "frog": "green"}')
+        self.assertDeserializeEqual({'bar': 'hat', 'frog': 'green'}, '{"bar": "hat", "frog": "green"}')
         self.assertDeserializeEqual([3.5, 5.6], '[3.5, 5.6]')
         self.assertDeserializeEqual('[', '[')
         self.assertDeserializeEqual(False, 'false')
@@ -457,10 +455,14 @@ class TestDeserializeTimedelta(TestDeserialize):
     test_field = Timedelta
 
     def test_deserialize(self):
-        self.assertDeserializeEqual('1 day 12 hours 59 minutes 59 seconds',
-            '1 day 12 hours 59 minutes 59 seconds')
-        self.assertDeserializeEqual('1 day 12 hours 59 minutes 59 seconds',
-            '"1 day 12 hours 59 minutes 59 seconds"')
+        self.assertDeserializeEqual(
+            '1 day 12 hours 59 minutes 59 seconds',
+            '1 day 12 hours 59 minutes 59 seconds'
+        )
+        self.assertDeserializeEqual(
+            '1 day 12 hours 59 minutes 59 seconds',
+            '"1 day 12 hours 59 minutes 59 seconds"'
+        )
         self.assertDeserializeNonString()
 
 

@@ -34,7 +34,7 @@ from verify_student.models import (
 from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
 
@@ -45,6 +45,7 @@ log = logging.getLogger(__name__)
 EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW = 'edx.course.enrollment.reverify.started'
 EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY = 'edx.course.enrollment.reverify.submitted'
 EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE = 'edx.course.enrollment.reverify.reviewed'
+
 
 class VerifyView(View):
 
@@ -59,7 +60,7 @@ class VerifyView(View):
         """
         upgrade = request.GET.get('upgrade', False)
 
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_id = CourseKey.from_string(course_id)
         # If the user has already been verified within the given time period,
         # redirect straight to the payment -- no need to verify again.
         if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
@@ -113,9 +114,6 @@ class VerifyView(View):
             "upgrade": upgrade == u'True',
             "can_audit": CourseMode.mode_for_course(course_id, 'audit') is not None,
             "modes_dict": CourseMode.modes_for_course_dict(course_id),
-
-            # TODO (ECOM-16): Remove once the AB test completes
-            "autoreg": request.session.get('auto_register', False),
             "retake": request.GET.get('retake', False),
         }
 
@@ -133,10 +131,9 @@ class VerifiedView(View):
         Handle the case where we have a get request
         """
         upgrade = request.GET.get('upgrade', False)
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_id = CourseKey.from_string(course_id)
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == ('verified', True):
             return redirect(reverse('dashboard'))
-
 
         modes_dict = CourseMode.modes_for_course_dict(course_id)
 
@@ -166,13 +163,11 @@ class VerifiedView(View):
             "upgrade": upgrade == u'True',
             "can_audit": "audit" in modes_dict,
             "modes_dict": modes_dict,
-
-            # TODO (ECOM-16): Remove once the AB test completes
-            "autoreg": request.session.get('auto_register', False),
         }
         return render_to_response('verify_student/verified.html', context)
 
 
+@require_POST
 @login_required
 def create_order(request):
     """
@@ -195,7 +190,7 @@ def create_order(request):
         attempt.save()
 
     course_id = request.POST['course_id']
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
     current_donation = donation_for_course.get(unicode(course_id), decimal.Decimal(0))
     contribution = request.POST.get("contribution", donation_for_course.get(unicode(course_id), 0))
@@ -227,12 +222,25 @@ def create_order(request):
     enrollment_mode = current_mode.slug
     CertificateItem.add_to_order(cart, course_id, amount, enrollment_mode)
 
+    # Change the order's status so that we don't accidentally modify it later.
+    # We need to do this to ensure that the parameters we send to the payment system
+    # match what we store in the database.
+    # (Ordinarily we would do this client-side when the user submits the form, but since
+    # the JavaScript on this page does that immediately, we make the change here instead.
+    # This avoids a second AJAX call and some additional complication of the JavaScript.)
+    # If a user later re-enters the verification / payment flow, she will create a new order.
+    cart.start_purchase()
+
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
     )
+
     params = get_signed_purchase_params(
-        cart, callback_url=callback_url
+        cart,
+        callback_url=callback_url,
+        extra_data=[unicode(course_id), current_mode.slug]
     )
+
     params['success'] = True
     return HttpResponse(json.dumps(params), content_type="text/json")
 
@@ -322,14 +330,16 @@ def show_requirements(request, course_id):
     Show the requirements necessary for the verification flow.
     """
     # TODO: seems borked for professional; we're told we need to take photos even if there's a pending verification
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     upgrade = request.GET.get('upgrade', False)
     if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == ('verified', True):
         return redirect(reverse('dashboard'))
     if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         return redirect(
-            reverse('verify_student_verified',
-            kwargs={'course_id': course_id.to_deprecated_string()}) + "?upgrade={}".format(upgrade)
+            reverse(
+                'verify_student_verified',
+                kwargs={'course_id': course_id.to_deprecated_string()}
+            ) + "?upgrade={}".format(upgrade)
         )
 
     upgrade = request.GET.get('upgrade', False)
@@ -345,9 +355,6 @@ def show_requirements(request, course_id):
         "is_not_active": not request.user.is_active,
         "upgrade": upgrade == u'True',
         "modes_dict": modes_dict,
-
-        # TODO (ECOM-16): Remove once the AB test completes
-        "autoreg": request.session.get('auto_register', False),
     }
     return render_to_response("verify_student/show_requirements.html", context)
 
@@ -421,7 +428,7 @@ class MidCourseReverifyView(View):
         """
         display this view
         """
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_id = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_id)
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
         course_enrollment.update_enrollment(mode="verified")
@@ -445,7 +452,7 @@ class MidCourseReverifyView(View):
         """
         try:
             now = datetime.datetime.now(UTC)
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_id = CourseKey.from_string(course_id)
             window = MidcourseReverificationWindow.get_window(course_id, now)
             if window is None:
                 raise WindowExpiredException
@@ -519,7 +526,6 @@ def toggle_failed_banner_off(request):
     return HttpResponse('Success')
 
 
-
 @login_required
 def reverification_submission_confirmation(_request):
     """
@@ -529,7 +535,7 @@ def reverification_submission_confirmation(_request):
 
 
 @login_required
-def midcourse_reverification_confirmation(_request):  # pylint: disable=C0103
+def midcourse_reverification_confirmation(_request):  # pylint: disable=invalid-name
     """
     Shows the user a confirmation page if the submission to SoftwareSecure was successful
     """

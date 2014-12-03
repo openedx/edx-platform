@@ -24,7 +24,7 @@ from urlparse import urlparse
 from collections import OrderedDict
 
 
-IFRAME_API_RESPONSE = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
+IFRAME_API_RESPONSE = None
 
 
 class StubYouTubeHandler(StubHttpRequestHandler):
@@ -35,7 +35,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
     # Default number of seconds to delay the response to simulate network latency.
     DEFAULT_DELAY_SEC = 0.5
 
-    def do_DELETE(self):  # pylint: disable=C0103
+    def do_DELETE(self):  # pylint: disable=invalid-name
         """
         Allow callers to delete all the server configurations using the /del_config URL.
         """
@@ -50,6 +50,11 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         """
         Handle a GET request from the client and sends response back.
         """
+
+        # Initialize only once if IFRAME_API_RESPONSE is none.
+        global IFRAME_API_RESPONSE  # pylint: disable=global-statement
+        if IFRAME_API_RESPONSE is None:
+            IFRAME_API_RESPONSE = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
 
         self.log_message(
             "Youtube provider received GET request to path {}".format(self.path)
@@ -90,7 +95,10 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             params = urlparse(self.path)
             youtube_id = params.path.split('/').pop()
 
-            self._send_video_response(youtube_id, "I'm youtube.")
+            if self.server.config.get('youtube_api_private_video'):
+                self._send_private_video_response(youtube_id, "I'm youtube private video.")
+            else:
+                self._send_video_response(youtube_id, "I'm youtube.")
 
         elif 'get_youtube_api' in self.path:
             if self.server.config.get('youtube_api_blocked'):
@@ -123,6 +131,30 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 'id': youtube_id,
                 'message': message,
                 'duration': youtube_metadata['data']['duration'],
+            })
+        })
+        response = "{cb}({data})".format(cb=callback, data=json.dumps(data))
+
+        self.send_response(200, content=response, headers={'Content-type': 'text/html'})
+        self.log_message("Youtube: sent response {}".format(message))
+
+    def _send_private_video_response(self, message):
+        """
+        Send private video error message back to the client for video player requests.
+        """
+        # Construct the response content
+        callback = self.get_params['callback']
+        data = OrderedDict({
+            "error": OrderedDict({
+                "code": 403,
+                "errors": [
+                    {
+                        "code": "ServiceForbiddenException",
+                        "domain": "GData",
+                        "internalReason": "Private video"
+                    }
+                ],
+                "message": message,
             })
         })
         response = "{cb}({data})".format(cb=callback, data=json.dumps(data))

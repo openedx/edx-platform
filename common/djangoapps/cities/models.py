@@ -15,7 +15,7 @@ file and check it in at the same time as your model changes. To do that,
 from django.db import models
 from django.utils.translation import ugettext as _
 
-from django_countries import CountryField
+from django_countries.fields import CountryField
 
 class State(models.Model):
     """
@@ -46,3 +46,14 @@ class City(models.Model):
     class Meta:
         verbose_name_plural = _('Cities')
     
+
+class PublicEntity(models.Model):
+    """
+    """
+    name = models.CharField(max_length=256, verbose_name="Instit. Pública")
+
+    def __unicode__(self):
+        return u'%s' % self.name
+
+    class Meta:
+        verbose_name_plural = "Instituciones Públicas"

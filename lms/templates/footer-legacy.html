@@ -1,0 +1,97 @@
+## mako
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='static_content.html'/>
+
+## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
+<div class="wrapper wrapper-footer edx-footer">
+  <footer>
+    <div class="colophon">
+      <nav class="nav-colophon">
+      <ol>
+          <li class="nav-colophon-01">
+          <a id="about" href="${marketing_link('ABOUT')}">
+              ${_("About")}
+          </a>
+          </li>
+          <li class="nav-colophon-02">
+          <a id="jobs" href="${marketing_link('JOBS')}">
+              ${_("Jobs")}
+          </a>
+          </li>
+          <li class="nav-colophon-03">
+          <a id="press" href="${marketing_link('PRESS')}">
+              ${_("Press")}
+          </a>
+          </li>
+          <li class="nav-colophon-04">
+          <a id="faq" href="${marketing_link('FAQ')}">
+              ${_("FAQ")}
+          </a>
+          </li>
+          <li class="nav-colophon-05">
+          <a id="contact" href="${marketing_link('CONTACT')}">
+              ${_("Contact")}
+          </a>
+          </li>
+      </ol>
+      </nav>
+
+      <div class="colophon-about">
+        <img src="${static.url('images/header-logo.png')}" alt="${_('edX Logo')}" />
+
+        <p>
+            ${_("{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose mission is to "
+            "bring the best of higher education to students of all ages anywhere in the world, wherever there is "
+            "Internet access. {EdX}'s free online MOOCs are interactive and subjects include computer science, public "
+            "health, and artificial intelligence.").format(EdX="EdX", Harvard="Harvard", MIT="MIT")}
+        </p>
+      </div>
+    </div>
+
+    <div class="references">
+      <nav class="nav-social">
+        <ul>
+          <li class="nav-social-01">
+            <a href="${settings.PLATFORM_MEETUP_URL}" rel="external">
+              <img src="${static.url('images/social/ico-social-meetup.png')}" alt="edX on Meetup" />
+            </a>
+          </li>
+          <li class="nav-social-02">
+            <a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" rel="external">
+              <img src="${static.url('images/social/ico-social-facebook.png')}" alt="edX on Facebook" />
+            </a>
+          </li>
+          <li class="nav-social-03">
+            <a href="${settings.PLATFORM_TWITTER_URL}" rel="external">
+              <img src="${static.url('images/social/ico-social-twitter.png')}" alt="edX on Twitter" />
+            </a>
+          </li>
+          <li class="nav-social-04">
+            <a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" rel="external">
+              <img src="${static.url('images/social/ico-social-google.png')}" alt="edX on Google+" />
+            </a>
+          </li>
+          <li class="nav-social-05">
+            <a href="http://youtube.com/user/edxonline" rel="external">
+              <img src="${static.url('images/social/ico-social-youtube.png')}" alt="edX on YouTube" />
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <p class="copyright">${_("&copy; 2014 edX, some rights reserved.")}</p>
+
+      <nav class="nav-legal">
+        <ul>
+          <li class="nav-legal-01">
+            <a href="${marketing_link('TOS')}">${_("Terms of Service and Honor Code")}</a>
+          </li>
+          <li class="nav-legal-02">
+            <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </footer>
+</div>

@@ -41,6 +41,8 @@ conf/locale/en/LC_MESSAGES/*.po
 conf/locale/en/LC_MESSAGES/*.mo
 conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
+conf/locale/eo/LC_MESSAGES/*.po
+conf/locale/eo/LC_MESSAGES/*.mo
 conf/locale/messages.mo
 
 ### Testing artifacts
@@ -55,6 +57,7 @@ cover_html/
 reports/
 jscover.log
 jscover.log.*
+.tddium*
 
 ### Installation artifacts
 *.egg-info
@@ -71,12 +74,18 @@ lms/static/css/
 lms/static/sass/*.css
 lms/static/sass/*.css.map
 lms/static/sass/application.scss
+lms/static/sass/application-rtl.scss
 lms/static/sass/application-extend1.scss
+lms/static/sass/application-extend1-rtl.scss
 lms/static/sass/application-extend2.scss
+lms/static/sass/application-extend2-rtl.scss
 lms/static/sass/course.scss
+lms/static/sass/course-rtl.scss
 cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
+
+
 
 ### Logging artifacts
 log/

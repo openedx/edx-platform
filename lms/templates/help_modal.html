@@ -37,7 +37,7 @@
 
 <%
   discussion_tab = CourseTabList.get_discussion(course) if course else None
-  discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.can_display(course, settings, True, True)) else None
+  discussion_link = discussion_tab.link_func(course, reverse) if (discussion_tab and discussion_tab.can_display(course, settings, True, True, True)) else None
 %>
 
 % if discussion_link:

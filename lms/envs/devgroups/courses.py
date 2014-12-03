@@ -1,7 +1,7 @@
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from ..dev import *
 
@@ -17,18 +17,18 @@ CLASSES_TO_DBS = {
 
 
 CACHES = {
-   'default': {
-       'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-       'LOCATION': '127.0.0.1:11211',
-       'KEY_FUNCTION': 'util.memcache.safe_key',
-   },
-   'general': {
-       'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-       'LOCATION': '127.0.0.1:11211',
-       'KEY_PREFIX': 'general',
-       'VERSION': 5,
-       'KEY_FUNCTION': 'util.memcache.safe_key',
-   }
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    },
+    'general': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+        'KEY_PREFIX': 'general',
+        'VERSION': 5,
+        'KEY_FUNCTION': 'util.memcache.safe_key',
+    }
 }
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -41,8 +41,8 @@ def path_for_db(db_name):
 def course_db_for(course_id):
     db_name = CLASSES_TO_DBS[course_id]
     return {
-               'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    'NAME': path_for_db(db_name)
-                }
-            }
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': path_for_db(db_name)
+        }
+    }

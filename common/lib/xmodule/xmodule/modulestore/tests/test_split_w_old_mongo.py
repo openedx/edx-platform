@@ -1,17 +1,21 @@
-import unittest
-import mock
 import datetime
-import uuid
 import random
+import unittest
+import uuid
 
-from xmodule.modulestore.inheritance import InheritanceMixin
+from nose.plugins.attrib import attr
+import mock
+
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
-from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.mongo import DraftMongoModuleStore
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.test_cross_modulestore_import_export import MemoryCache
 
 
+@attr('mongo')
 class SplitWMongoCourseBoostrapper(unittest.TestCase):
     """
     Helper for tests which need to construct split mongo & old mongo based courses to get interesting internal structure.
@@ -26,7 +30,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
     * split_course_key (CourseLocator): of the new course
     * old_course_key: the SlashSpecifiedCourseKey for the course
     """
-        # Snippet of what would be in the django settings envs file
+    # Snippet of what would be in the django settings envs file
     db_config = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
@@ -55,7 +59,9 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         self.addCleanup(self.split_mongo.db.connection.close)
         self.addCleanup(self.tear_down_split)
         self.draft_mongo = DraftMongoModuleStore(
-            None, self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred, **self.modulestore_options
+            None, self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
+            metadata_inheritance_cache_subsystem=MemoryCache(),
+            **self.modulestore_options
         )
         self.addCleanup(self.tear_down_mongo)
         self.old_course_key = None
@@ -67,9 +73,9 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         Remove the test collections, close the db connection
         """
         split_db = self.split_mongo.db
-        split_db.drop_collection(split_db.course_index)
-        split_db.drop_collection(split_db.structures)
-        split_db.drop_collection(split_db.definitions)
+        split_db.drop_collection(split_db.course_index.proxied_object)
+        split_db.drop_collection(split_db.structures.proxied_object)
+        split_db.drop_collection(split_db.definitions.proxied_object)
 
     def tear_down_mongo(self):
         """
@@ -77,7 +83,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         """
         split_db = self.split_mongo.db
         # old_mongo doesn't give a db attr, but all of the dbs are the same
-        split_db.drop_collection(self.draft_mongo.collection)
+        split_db.drop_collection(self.draft_mongo.collection.proxied_object)
 
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, draft=True, split=True):
         """
