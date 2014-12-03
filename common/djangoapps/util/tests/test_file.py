@@ -102,6 +102,7 @@ class StoreUploadedFileTestCase(TestCase):
         validator_data = {}
 
         def verify_file_presence(should_exist):
+            """ Verify whether or not the stored file, passed to the validator, exists. """
             self.assertEqual(should_exist, validator_data["storage"].exists(validator_data["filename"]))
 
         def validator(storage, filename):
