@@ -185,9 +185,14 @@
       %endif
       % if is_course_blocked:
         <p id="block-course-msg" class="course-block">
-            ${_('You can no longer access this course because payment has not yet been received. you can <a href="#">contact the account holder</a> to request payment, or you can')}
-            <a id="unregister_block_course" rel="leanModal" data-course-id="${course.id | h}" data-course-number="${course.number | h}" href="#unenroll-modal" > ${_('unenroll')} </a>
-            ${_('for this course.')}
+            ${_("You can no longer access this course because payment has not yet been received. You "
+	    "can {link_start}contact the account holder{link_end} to request payment, or you can "
+	    "{unenroll_link_start}unenroll{unenroll_link_end} from this course").format(
+   	        link_start='<a href="#">',
+	        link_end='</a>',
+	        unenroll_link_start='<a id="unregister_block_course" rel="leanModal" data-course-id="${course.id | h}" data-course-number="${course.number | h}" href="#unenroll-modal">',
+	        unenroll_link_end="</a>"
+	    )}
         </p>
       %endif
 
