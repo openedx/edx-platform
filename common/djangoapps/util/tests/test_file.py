@@ -105,21 +105,34 @@ class StoreUploadedFileTestCase(TestCase):
             """ Verify whether or not the stored file, passed to the validator, exists. """
             self.assertEqual(should_exist, validator_data["storage"].exists(validator_data["filename"]))
 
-        def validator(storage, filename):
-            """ Validation test function """
-            self.assertEqual("stored_file.csv", os.path.basename(filename))
-            with storage.open(filename, 'rU') as f:
-                self.assertEqual(self.file_content, f.read())
+        def store_file_data(storage, filename):
+            """ Stores file validator data for testing after validation is complete. """
             validator_data["storage"] = storage
             validator_data["filename"] = filename
             verify_file_presence(True)
+
+        def exception_validator(storage, filename):
+            """ Validation test function that throws an exception """
+            self.assertEqual("error_file.csv", os.path.basename(filename))
+            with storage.open(filename, 'rU') as f:
+                self.assertEqual(self.file_content, f.read())
+            store_file_data(storage, filename)
             raise FileValidationException("validation failed")
 
+        def success_validator(storage, filename):
+            """ Validation test function that is a no-op """
+            self.assertEqual("success_file.csv", os.path.basename(filename))
+            store_file_data(storage, filename)
+
         with self.assertRaises(FileValidationException) as error:
-            store_uploaded_file(self.request, "uploaded_file", [".csv"], "stored_file", validator=validator)
+            store_uploaded_file(self.request, "uploaded_file", [".csv"], "error_file", validator=exception_validator)
         self.verify_exception("validation failed", error)
         # Verify the file was deleted.
         verify_file_presence(False)
+
+        store_uploaded_file(self.request, "uploaded_file", [".csv"], "success_file", validator=success_validator)
+        # Verify the file stile exists
+        verify_file_presence(True)
 
     def test_file_upload_lower_case_extension(self):
         """
