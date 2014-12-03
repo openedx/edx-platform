@@ -1004,7 +1004,7 @@ def add_users_to_cohorts(request, course_id):
         # The task will assume the default file storage.
         instructor_task.api.submit_cohort_students(request, course_key, filename)
     except (FileValidationException, PermissionDenied) as err:
-        return JsonResponse({"error": str(err)}, status=400)
+        return JsonResponse({"error": unicode(err)}, status=400)
 
     return JsonResponse()
 
