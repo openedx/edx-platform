@@ -33,7 +33,7 @@ def test_js(options):
     elif mode == 'dev':
         suite = getattr(options, 'suite', None)
         coverage = False
-        port = getattr(options, 'port')
+        port = getattr(options, 'port', None)
     else:
         sys.stderr.write("Invalid mode. Please choose 'dev' or 'run'.")
         return
