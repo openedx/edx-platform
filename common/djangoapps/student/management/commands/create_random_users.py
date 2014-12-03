@@ -21,12 +21,6 @@ def get_random_post_override():
         'email': 'email_{id}@example.com'.format(id=identification),
         'password': '12345',
         'name': 'User {id}'.format(id=identification),
-        'level_of_education': 1,
-        'gender': 'other',
-        'mailing_address': '141 Portland Street',
-        'city': 'Cambridge',
-        'country': 'MA',
-        'goals': 'Rule the world',
     }
 
 
