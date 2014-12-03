@@ -47,7 +47,7 @@ from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
 from util.string_utils import _has_non_ascii_characters
-from .access import has_course_access
+from student.auth import has_course_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,

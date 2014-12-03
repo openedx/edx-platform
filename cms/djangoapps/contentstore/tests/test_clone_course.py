@@ -6,7 +6,7 @@ from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from contentstore.tests.utils import CourseTestCase
 from contentstore.tasks import rerun_course
-from contentstore.views.access import has_course_access
+from student.auth import has_course_access
 from course_action_state.models import CourseRerunState
 from course_action_state.managers import CourseRerunUIStateManager
 from mock import patch, Mock

@@ -38,7 +38,7 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptsRequestValidationException
 )
 
-from .access import has_course_access
+from student.auth import has_course_access
 
 __all__ = [
     'upload_transcripts',

@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
 from student.roles import GlobalStaff, CourseCreatorRole, CourseStaffRole, CourseInstructorRole, CourseRole, \
-    CourseBetaTesterRole
+    CourseBetaTesterRole, OrgInstructorRole, OrgStaffRole
 
 
 def has_access(user, role):
@@ -38,6 +38,30 @@ def has_access(user, role):
             CourseInstructorRole(role.course_key).has_user(user)):
         return True
     return False
+
+
+def has_course_access(user, course_key, role=CourseStaffRole):
+    """
+    Return True if user allowed to access this course_id
+    Note that the CMS permissions model is with respect to courses
+    There is a super-admin permissions if user.is_staff is set
+    Also, since we're unifying the user database between LMS and CAS,
+    I'm presuming that the course instructor (formally known as admin)
+    will not be in both INSTRUCTOR and STAFF groups, so we have to cascade our
+    queries here as INSTRUCTOR has all the rights that STAFF do.
+
+    :param user:
+    :param course_key: A course key
+    :param role: an AccessRole
+    """
+    if GlobalStaff().has_user(user):
+        return True
+    if OrgInstructorRole(org=course_key.org).has_user(user):
+        return True
+    if OrgStaffRole(org=course_key.org).has_user(user):
+        return True
+    # temporary to ensure we give universal access given a course until we impl branch specific perms
+    return has_access(user, role(course_key.for_branch(None)))
 
 
 def add_users(caller, role, *users):

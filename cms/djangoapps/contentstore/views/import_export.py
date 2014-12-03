@@ -28,7 +28,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
 
-from .access import has_course_access
+from student.auth import has_course_access
 
 from extract_tar import safetar_extractall
 from util.json_request import JsonResponse

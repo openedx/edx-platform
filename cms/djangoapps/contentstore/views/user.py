@@ -13,7 +13,7 @@ from util.json_request import JsonResponse, expect_json
 from student.roles import CourseInstructorRole, CourseStaffRole
 from course_creators.views import user_requested_access
 
-from .access import has_course_access
+from student.auth import has_course_access
 
 from student.models import CourseEnrollment
 from django.http import HttpResponseNotFound
