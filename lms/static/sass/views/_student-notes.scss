@@ -47,17 +47,21 @@
       border-top: 1px solid $gray-l4;
       border-bottom: none;
 
-      .note-excerpt {
+      .wrapper-note-excerpts {
         display: inline-block;
         width: flex-grid(9, 12);
-        vertical-align: top;
 
-        .note-excerpt-p,
-        .note-excerpt-ul,
-        .note-excerpt-ol {
-          @extend %t-copy-base;
-          padding: $baseline;
-          background: tint($blue, 85%);
+        .note-excerpt {
+          display: inline-block;
+          vertical-align: top;
+          background: tint($blue, 95%);
+
+          .note-excerpt-p,
+          .note-excerpt-ul,
+          .note-excerpt-ol {
+            @extend %t-copy-base;
+            padding: $baseline;
+          }
         }
 
         .note-comments {
@@ -65,7 +69,6 @@
           margin: 0;
           padding: 0;
           list-style: none;
-          background: tint($blue, 95%);
 
           .note-comment {
             padding: ($baseline/2) $baseline;
@@ -119,7 +122,16 @@
 
           .reference-meta {
             font-weight: $font-regular;
-            color: $gray-l2;
+            color: $m-gray-d2;
+          }
+
+          a.reference-meta {
+            color: $link-color;
+
+            &:hover, 
+            &:focus {
+              color: $link-hover;
+            }
           }
         }
       }
@@ -134,8 +146,6 @@
         padding-bottom: $baseline;
         text-transform: uppercase;
         letter-spacing: 1px;
-
-        .course-title {}
 
         .course-subtitle {
           @extend %t-copy-sub1;
