@@ -24,24 +24,45 @@ class AssetMetadata(object):
     in the modulestore.
     """
 
-    TOP_LEVEL_ATTRS = ['basename', 'internal_name', 'locked', 'contenttype', 'thumbnail', 'fields']
+    TOP_LEVEL_ATTRS = ['pathname', 'internal_name', 'locked', 'contenttype', 'thumbnail', 'fields']
     EDIT_INFO_ATTRS = ['curr_version', 'prev_version', 'edited_by', 'edited_by_email', 'edited_on']
     CREATE_INFO_ATTRS = ['created_by', 'created_by_email', 'created_on']
     ATTRS_ALLOWED_TO_UPDATE = TOP_LEVEL_ATTRS + EDIT_INFO_ATTRS
-    ALL_ATTRS = ['asset_id'] + ATTRS_ALLOWED_TO_UPDATE + CREATE_INFO_ATTRS
+    ASSET_TYPE_ATTR = 'type'
+    ASSET_BASENAME_ATTR = 'filename'
+    XML_ONLY_ATTRS = [ASSET_TYPE_ATTR, ASSET_BASENAME_ATTR]
+    XML_ATTRS = XML_ONLY_ATTRS + ATTRS_ALLOWED_TO_UPDATE + CREATE_INFO_ATTRS
 
-    # Default type for AssetMetadata objects. A constant for convenience.
-    ASSET_TYPE = 'asset'
+    # Type for assets uploaded by a course author in Studio.
+    GENERAL_ASSET_TYPE = 'asset'
+
+    # Type for video assets uploaded by VAL/VEDA.
+    VIDEO_ASSET_TYPE = 'video'
+
+    # List of all possible asset types.
+    ASSET_TYPES = (GENERAL_ASSET_TYPE, VIDEO_ASSET_TYPE)
+
+    # Asset section tag for asset metadata as XML.
+    ALL_ASSETS_XML_TAG = 'assets'
+
+    # Individual asset tag for asset metadata as XML.
+    ASSET_XML_TAG = 'asset'
+
+    # Top-level directory name in exported course XML which holds asset metadata.
+    EXPORTED_ASSET_DIR = 'assets'
+
+    # Filename of all asset metadata exported as XML.
+    EXPORTED_ASSET_FILENAME = 'assets.xml'
 
     @contract(asset_id='AssetKey',
-              basename='basestring|None', internal_name='basestring|None',
+              pathname='basestring|None', internal_name='basestring|None',
               locked='bool|None', contenttype='basestring|None',
               thumbnail='basestring|None', fields='dict|None',
               curr_version='basestring|None', prev_version='basestring|None',
               created_by='int|None', created_by_email='basestring|None', created_on='datetime|None',
               edited_by='int|None', edited_by_email='basestring|None', edited_on='datetime|None')
     def __init__(self, asset_id,
-                 basename=None, internal_name=None,
+                 pathname=None, internal_name=None,
                  locked=None, contenttype=None,
                  thumbnail=None, fields=None,
                  curr_version=None, prev_version=None,
@@ -53,7 +74,7 @@ class AssetMetadata(object):
 
         Arguments:
             asset_id (AssetKey): Key identifying this particular asset.
-            basename (str): Original path to file at asset upload time.
+            pathname (str): Original path to file at asset upload time.
             internal_name (str): Name, url, or handle for the storage system to access the file.
             locked (bool): If True, only course participants can access the asset.
             contenttype (str): MIME type of the asset.
@@ -71,7 +92,7 @@ class AssetMetadata(object):
                 Not saved.
         """
         self.asset_id = asset_id if field_decorator is None else field_decorator(asset_id)
-        self.basename = basename  # Path w/o filename.
+        self.pathname = pathname  # Path w/o filename.
         self.internal_name = internal_name
         self.locked = locked
         self.contenttype = contenttype
@@ -91,7 +112,7 @@ class AssetMetadata(object):
     def __repr__(self):
         return """AssetMetadata{!r}""".format((
             self.asset_id,
-            self.basename, self.internal_name,
+            self.pathname, self.internal_name,
             self.locked, self.contenttype, self.fields,
             self.curr_version, self.prev_version,
             self.created_by, self.created_by_email, self.created_on,
@@ -118,7 +139,7 @@ class AssetMetadata(object):
         """
         return {
             'filename': self.asset_id.path,
-            'basename': self.basename,
+            'pathname': self.pathname,
             'internal_name': self.internal_name,
             'locked': self.locked,
             'contenttype': self.contenttype,
@@ -145,7 +166,7 @@ class AssetMetadata(object):
         """
         if asset_doc is None:
             return
-        self.basename = asset_doc['basename']
+        self.pathname = asset_doc['pathname']
         self.internal_name = asset_doc['internal_name']
         self.locked = asset_doc['locked']
         self.contenttype = asset_doc['contenttype']
@@ -169,11 +190,11 @@ class AssetMetadata(object):
         for child in node:
             qname = etree.QName(child)
             tag = qname.localname
-            if tag in self.ALL_ATTRS:
+            if tag in self.XML_ATTRS:
                 value = child.text
-                if tag == 'asset_id':
-                    # Locator.
-                    value = AssetKey.from_string(value)
+                if tag in self.XML_ONLY_ATTRS:
+                    # An AssetLocator is constructed separately from these parts.
+                    continue
                 elif tag == 'locked':
                     # Boolean.
                     value = True if value == "true" else False
@@ -197,13 +218,23 @@ class AssetMetadata(object):
         Add the asset data as XML to the passed-in node.
         The node should already be created as a top-level "asset" element.
         """
-        for attr in self.ALL_ATTRS:
+        for attr in self.XML_ATTRS:
             child = etree.SubElement(node, attr)
-            value = getattr(self, attr)
+            # Get the value.
+            if attr == self.ASSET_TYPE_ATTR:
+                value = self.asset_id.asset_type
+            elif attr == self.ASSET_BASENAME_ATTR:
+                value = self.asset_id.path
+            else:
+                value = getattr(self, attr)
+
+            # Format the value.
             if isinstance(value, bool):
                 value = "true" if value else "false"
             elif isinstance(value, datetime):
                 value = value.isoformat()
+            elif isinstance(value, dict):
+                value = json.dumps(value)
             else:
                 value = unicode(value)
             child.text = value

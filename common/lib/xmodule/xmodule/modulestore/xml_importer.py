@@ -26,6 +26,8 @@ import mimetypes
 from path import path
 import json
 import re
+from contracts import contract, new_contract
+from lxml import etree
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xblock.runtime import KvsFieldData, DictKeyValueStore
@@ -38,6 +40,7 @@ from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
 import xblock
 from xmodule.tabs import CourseTabList
+from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
@@ -46,6 +49,8 @@ from xmodule.modulestore.store_utilities import draft_node_constructor, get_draf
 
 
 log = logging.getLogger(__name__)
+
+new_contract('file', file)
 
 
 def import_static_content(
@@ -223,6 +228,9 @@ def import_from_xml(
                 static_content_store, do_import_static, course_data_path, dest_course_id, verbose
             )
 
+            # Import asset metadata stored in XML.
+            _import_course_asset_metadata(store, course_data_path, dest_course_id)
+
             # STEP 3: import PUBLISHED items
             # now loop through all the modules depth first and then orphans
             with store.branch_setting(ModuleStoreEnum.Branch.published_only, dest_course_id):
@@ -283,6 +291,97 @@ def import_from_xml(
                 )
 
     return new_courses
+
+
+@contract(filename='basestring', f='file')
+def _read_xml(filename, f):
+    """
+    Takes a file object, reads the file bytes, and ensures that its contents are text.
+    Returns the file contents.
+    """
+    contents = None
+    # note, on local dev it seems like OSX will put
+    # some extra files in the directory with "quarantine"
+    # information. These files are binary files and will
+    # throw exceptions when we try to parse the file
+    # as an XML string. Let's make sure we're
+    # dealing with a string before ingesting
+    data = f.read()
+
+    try:
+        contents = data.decode('utf-8')
+    except UnicodeDecodeError, err:
+        # seems like on OSX localdev, the OS is making
+        # quarantine files in the unzip directory
+        # when importing courses so if we blindly try to
+        # enumerate through the directory, we'll try
+        # to process a bunch of binary quarantine files
+        # (which are prefixed with a '._' character which
+        # will dump a bunch of exceptions to the output,
+        # although they are harmless.
+        #
+        # Reading online docs there doesn't seem to be
+        # a good means to detect a 'hidden' file that works
+        # well across all OS environments. So for now, I'm using
+        # OSX's utilization of a leading '.' in the filename
+        # to indicate a system hidden file.
+        #
+        # Better yet would be a way to figure out if this is
+        # a binary file, but I haven't found a good way
+        # to do this yet.
+        if filename.startswith('._'):
+            return None
+        # Not a 'hidden file', then re-raise exception
+        raise err
+    return contents
+
+
+def _import_course_asset_metadata(store, data_dir, course_id):
+    """
+    Read in assets XML file, parse it, and add all asset metadata to the modulestore.
+    """
+    asset_dir = path(data_dir) / AssetMetadata.EXPORTED_ASSET_DIR
+    assets_filename = AssetMetadata.EXPORTED_ASSET_FILENAME
+    asset_xml_file = asset_dir / assets_filename
+
+    def make_asset_id(course_id, asset_xml):
+        """
+        Construct an asset ID out of a complete asset XML section.
+        """
+        asset_type = None
+        asset_name = None
+        for child in asset_xml:
+            if child.tag == AssetMetadata.ASSET_TYPE_ATTR:
+                asset_type = child.text
+            elif child.tag == AssetMetadata.ASSET_BASENAME_ATTR:
+                asset_name = child.text
+        return course_id.make_asset_key(asset_type, asset_name)
+
+    all_assets = []
+    try:
+        with open(asset_xml_file, "r") as f:
+            xml_contents = _read_xml(assets_filename, f)
+        xml_data = etree.fromstring(xml_contents)
+        assert(xml_data.tag == AssetMetadata.ALL_ASSETS_XML_TAG)
+        for asset in xml_data:
+            if asset.tag == AssetMetadata.ASSET_XML_TAG:
+                # Construct the asset key.
+                asset_key = make_asset_id(course_id, asset)
+                asset_md = AssetMetadata(asset_key)
+                asset_md.from_xml(asset)
+                all_assets.append(asset_md)
+    except IOError:
+        logging.info('No {} file is present with asset metadata.'.format(assets_filename))
+        return
+    except Exception:  # pylint: disable=W0703
+        logging.exception('Error while parsing asset xml.')
+        return
+
+    # Now add all asset metadata to the modulestore.
+    for asset in all_assets:
+        # Using edited_by for this import will be incorrect when moving courses between edX instances.
+        # The user ID will likely refer to another user entirely.
+        store.save_asset_metadata(asset, asset.edited_by)
 
 
 def _import_course_module(
@@ -534,50 +633,20 @@ def _import_course_draft(
         for child in module.get_children():
             _import_module(child)
 
-    # now walk the /vertical directory where each file in there
-    # will be a draft copy of the Vertical
+    # Now walk the /vertical directory.
+    # Each file in the directory will be a draft copy of the vertical.
 
-    # First it is necessary to order the draft items by their desired index in the child list
-    # (order os.walk returns them in is not guaranteed).
+    # First it is necessary to order the draft items by their desired index in the child list,
+    # since the order in which os.walk() returns the files is not guaranteed.
     drafts = []
     for dirname, _dirnames, filenames in os.walk(draft_dir):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
             with open(module_path, 'r') as f:
                 try:
-                    # note, on local dev it seems like OSX will put
-                    # some extra files in the directory with "quarantine"
-                    # information. These files are binary files and will
-                    # throw exceptions when we try to parse the file
-                    # as an XML string. Let's make sure we're
-                    # dealing with a string before ingesting
-                    data = f.read()
-
-                    try:
-                        xml = data.decode('utf-8')
-                    except UnicodeDecodeError, err:
-                        # seems like on OSX localdev, the OS is making
-                        # quarantine files in the unzip directory
-                        # when importing courses so if we blindly try to
-                        # enumerate through the directory, we'll try
-                        # to process a bunch of binary quarantine files
-                        # (which are prefixed with a '._' character which
-                        # will dump a bunch of exceptions to the output,
-                        # although they are harmless.
-                        #
-                        # Reading online docs there doesn't seem to be
-                        # a good means to detect a 'hidden' file that works
-                        # well across all OS environments. So for now, I'm using
-                        # OSX's utilization of a leading '.' in the filename
-                        # to indicate a system hidden file.
-                        #
-                        # Better yet would be a way to figure out if this is
-                        # a binary file, but I haven't found a good way
-                        # to do this yet.
-                        if filename.startswith('._'):
-                            continue
-                        # Not a 'hidden file', then re-raise exception
-                        raise err
+                    xml = _read_xml(filename, f)
+                    if xml is None:
+                        continue
 
                     # process_xml call below recursively processes all descendants. If
                     # we call this on all verticals in a course with verticals nested below
