@@ -131,7 +131,7 @@ class StoreUploadedFileTestCase(TestCase):
         verify_file_presence(False)
 
         store_uploaded_file(self.request, "uploaded_file", [".csv"], "success_file", validator=success_validator)
-        # Verify the file stile exists
+        # Verify the file still exists
         verify_file_presence(True)
 
     def test_file_upload_lower_case_extension(self):
