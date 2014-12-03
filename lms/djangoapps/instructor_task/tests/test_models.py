@@ -4,6 +4,7 @@ Tests for instructor_task/models.py.
 
 from cStringIO import StringIO
 import mock
+import time
 from datetime import datetime
 from unittest import TestCase
 
@@ -68,13 +69,16 @@ class ReportStoreTestMixin(object):
 
     def test_links_for_order(self):
         """
-        Test that LocalFSReportStore.links_for() returns file download links
+        Test that ReportStore.links_for() returns file download links
         in reverse chronological order.
         """
         report_store = self.create_report_store()
         report_store.store(self.course_id, 'old_file', StringIO())
+        time.sleep(1)  # Ensure we have a unique timestamp.
         report_store.store(self.course_id, 'middle_file', StringIO())
+        time.sleep(1)  # Ensure we have a unique timestamp.
         report_store.store(self.course_id, 'new_file', StringIO())
+
         self.assertEqual(
             [link[0] for link in report_store.links_for(self.course_id)],
             ['new_file', 'middle_file', 'old_file']
