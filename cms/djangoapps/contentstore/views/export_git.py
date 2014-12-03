@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext as _
 
-from .access import has_course_access
+from student.auth import has_course_access
 import contentstore.git_export_utils as git_export_utils
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore

@@ -25,7 +25,7 @@ from contentstore.views.item import create_xblock_info
 
 from opaque_keys.edx.keys import UsageKey
 
-from .access import has_course_access
+from student.auth import has_course_access
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
 

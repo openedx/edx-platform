@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url
 
-from .access import has_course_access
+from student.auth import has_course_access
 from xmodule.course_module import CourseDescriptor
 
 from django.utils.translation import ugettext

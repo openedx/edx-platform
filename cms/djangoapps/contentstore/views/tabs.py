@@ -1,7 +1,7 @@
 """
 Views related to course tabs
 """
-from access import has_course_access
+from student.auth import has_course_access
 from util.json_request import expect_json, JsonResponse
 
 from django.http import HttpResponseNotFound

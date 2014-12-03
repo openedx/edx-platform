@@ -37,7 +37,7 @@ from util.date_utils import get_default_time_display
 
 from util.json_request import expect_json, JsonResponse
 
-from .access import has_course_access
+from student.auth import has_course_access
 from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
     ancestor_has_staff_lock
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
