@@ -3353,7 +3353,7 @@ class TestBulkCohorting(ModuleStoreTestCase):
         with open(file_name, 'w') as file_pointer:
             file_pointer.write(csv_data.encode('utf-8'))
         with open(file_name, 'r') as file_pointer:
-            url = reverse('add_users_to_cohorts', kwargs={'course_id': self.course.id.to_deprecated_string()})
+            url = reverse('add_users_to_cohorts', kwargs={'course_id': unicode(self.course.id)})
             if method == 'POST':
                 return self.client.post(url, {'uploaded-file': file_pointer})
             elif method == 'GET':

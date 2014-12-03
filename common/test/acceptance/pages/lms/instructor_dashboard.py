@@ -193,9 +193,9 @@ class MembershipPageCohortManagementSection(PageObject):
 
         return self._get_messages(title_css, detail_css)
 
-    def get_cvs_messages(self):
+    def get_csv_messages(self):
         """
-        Returns array of messages related to a CSV upload of cohort assignmentse.
+        Returns array of messages related to a CSV upload of cohort assignments.
         """
         title_css = ".csv-upload .message-title"
         detail_css = ".csv-upload .summary-item"

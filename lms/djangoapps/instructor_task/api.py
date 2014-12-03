@@ -13,13 +13,15 @@ from celery.states import READY_STATES
 from xmodule.modulestore.django import modulestore
 
 from instructor_task.models import InstructorTask
-from instructor_task.tasks import (rescore_problem,
-                                   reset_problem_attempts,
-                                   delete_problem_state,
-                                   send_bulk_course_email,
-                                   calculate_grades_csv,
-                                   calculate_students_features_csv,
-                                   cohort_students)
+from instructor_task.tasks import (
+    rescore_problem,
+    reset_problem_attempts,
+    delete_problem_state,
+    send_bulk_course_email,
+    calculate_grades_csv,
+    calculate_students_features_csv,
+    cohort_students,
+)
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,

@@ -1,10 +1,10 @@
-define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader', 'js/common_helpers/template_helpers',
+define(['backbone', 'jquery', 'js/views/file_uploader', 'js/common_helpers/template_helpers',
         'js/common_helpers/ajax_helpers', 'js/models/notification', 'string_utils'],
-    function (Backbone, $, FileUploaderModel, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
+    function (Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
         describe("FileUploaderView", function () {
             var verifyTitle, verifyInputLabel, verifyInputTip, verifySubmitButton, verifyExtensions, verifyText,
                 verifyFileUploadOption, verifyNotificationMessage, verifySubmitButtonEnabled, mimicUpload,
-                respondWithSuccess, respondWithError, fileUploaderView, fileUploaderModel, url="http://test_url/";
+                respondWithSuccess, respondWithError, fileUploaderView, url="http://test_url/";
 
             verifyText = function (css, expectedText) {
                 expect(fileUploaderView.$(css).text().trim()).toBe(expectedText);
@@ -65,10 +65,10 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
 
             respondWithError = function (requests, errorMessage) {
                 if (errorMessage) {
-                    AjaxHelpers.respondWithErrorJson(requests, {error: errorMessage});
+                    AjaxHelpers.respondWithError(requests, 500, {error: errorMessage});
                 }
                 else {
-                    AjaxHelpers.respondWithErrorJson(requests, {});
+                    AjaxHelpers.respondWithError(requests);
                 }
             };
 
@@ -76,8 +76,7 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
                 setFixtures("<div></div>");
                 TemplateHelpers.installTemplate('templates/file-upload');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/notification');
-                fileUploaderModel = new FileUploaderModel({url: url});
-                fileUploaderView = new FileUploaderView({model: fileUploaderModel}).render();
+                fileUploaderView = new FileUploaderView({url: url}).render();
             });
 
             it('has default values', function () {
@@ -91,13 +90,11 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
 
             it ('can set text values and extensions', function () {
                 fileUploaderView = new FileUploaderView({
-                    model: new FileUploaderModel({
-                        title: "file upload title",
-                        inputLabel: "test label",
-                        inputTip: "test tip",
-                        submitButtonText: "upload button text",
-                        extensions: ".csv,.txt"
-                    })
+                    title: "file upload title",
+                    inputLabel: "test label",
+                    inputTip: "test tip",
+                    submitButtonText: "upload button text",
+                    extensions: ".csv,.txt"
                 }).render();
 
                 verifyTitle("file upload title");
@@ -127,7 +124,7 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
 
             it ('handles errors with custom message', function () {
                 fileUploaderView = new FileUploaderView({
-                    model: fileUploaderModel,
+                    url: url,
                     errorNotification: function (file, event, data) {
                         var message = interpolate_text("Custom error for '{file}'", {file: file});
                         return new NotificationModel({
@@ -155,7 +152,7 @@ define(['backbone', 'jquery', 'js/models/file_uploader', 'js/views/file_uploader
 
             it ('handles success with custom message', function () {
                 fileUploaderView = new FileUploaderView({
-                    model: fileUploaderModel,
+                    url: url,
                     successNotification: function (file, event, data) {
                         var message = interpolate_text("Custom success message for '{file}'", {file: file});
                         return new NotificationModel({

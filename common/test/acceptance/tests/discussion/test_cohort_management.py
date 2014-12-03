@@ -277,7 +277,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then I can download a file with results
         And appropriate events have been emitted
         """
-        # cohort_users_both_columns.cvs adds instructor_user to ManualCohort1 via username and
+        # cohort_users_both_columns.csv adds instructor_user to ManualCohort1 via username and
         # student_user to AutoCohort1 via email
         self._verify_csv_upload_acceptable_file("cohort_users_both_columns.csv")
 
@@ -291,7 +291,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then I can download a file with results
         And appropriate events have been emitted
         """
-        # cohort_users_only_email.cvs adds instructor_user to ManualCohort1 and student_user to AutoCohort1 via email
+        # cohort_users_only_email.csv adds instructor_user to ManualCohort1 and student_user to AutoCohort1 via email
         self._verify_csv_upload_acceptable_file("cohort_users_only_email.csv")
 
     def test_cohort_by_csv_only_username(self):
@@ -304,7 +304,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Then I can download a file with results
         And appropriate events have been emitted
         """
-        # cohort_users_only_username.cvs adds instructor_user to ManualCohort1 and
+        # cohort_users_only_username.csv adds instructor_user to ManualCohort1 and
         # student_user to AutoCohort1 via username
         self._verify_csv_upload_acceptable_file("cohort_users_only_username.csv")
 
@@ -418,7 +418,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         """
         # Wait for notification message to appear, indicating file has been uploaded.
         EmptyPromise(
-            lambda: 1 == len(self.cohort_management_page.get_cvs_messages()), 'Waiting for notification'
+            lambda: 1 == len(self.cohort_management_page.get_csv_messages()), 'Waiting for notification'
         ).fulfill()
-        messages = self.cohort_management_page.get_cvs_messages()
+        messages = self.cohort_management_page.get_csv_messages()
         self.assertEquals(expected_message, messages[0])
