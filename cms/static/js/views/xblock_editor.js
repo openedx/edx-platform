@@ -26,9 +26,12 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
             initializeEditors: function() {
                 var metadataEditor,
                     defaultMode = 'editor';
-                metadataEditor = this.createMetadataEditor();
-                this.metadataEditor = metadataEditor;
+
                 if (!this.hasCustomTabs()) {
+                    // TODO does this cause any problems with the video player?
+                    // Don't want to go into createMetadataEditor because tabbed editor
+                    // will be using a metadata editor, and there will be conflicts.
+                    this.metadataEditor = this.createMetadataEditor();
                     if (this.getDataEditor()) {
                         defaultMode = 'editor';
                     } else if (metadataEditor) {
@@ -77,6 +80,22 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                     }
                 }
                 return metadataView;
+            },
+
+            saveEditorTabs: function () {
+                var payload = {};
+                _.each(this.xblockElements, function(element) {
+                    var tab_id = element.element.parent().attr("data-tab-id");
+                    if (element.collectFieldData) {
+                        payload[tab_id] = {"fields": element.collectFieldData()};
+                    }
+                    else if (element.collectXmlData) {
+                        payload[tab_id] = {"xml": element.collectXmlData()};
+                    }
+                });
+
+                var handler_url = this.xblock.runtime.handlerUrl(this.xblock.element, "save_tab_data");
+                return $.post(handler_url, JSON.stringify(payload)); //.success()
             },
 
             getDataEditor: function() {
@@ -142,18 +161,27 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                 var showEditor = mode === 'editor',
                     dataEditor = this.getDataEditor(),
                     metadataEditor = this.getMetadataEditor();
-                if (dataEditor) {
-                    this.setEditorActivation(dataEditor, showEditor);
-                }
-                if (metadataEditor) {
-                    this.setEditorActivation(metadataEditor.$el, !showEditor);
+                if (dataEditor || metadataEditor) {
+                    if (dataEditor) {
+                        this.setTabViewActivation(dataEditor, showEditor);
+                    }
+                    if (metadataEditor) {
+                        this.setTabViewActivation(metadataEditor.$el, !showEditor);
+                    }
+                } else {
+                    this.$('.component-tab').removeClass('is-active');
+                    this.$('.component-tab').addClass('is-inactive is-hidden');
+                    this.setTabViewActivation(this.$('.tab-view-' + mode), true);
                 }
                 this.mode = mode;
             },
 
-            setEditorActivation: function(editor, isActive) {
-                editor.removeClass('is-active').removeClass('is-inactive');
+            setTabViewActivation: function(editor, isActive) {
+                editor.removeClass('is-active is-inactive is-hidden');
                 editor.addClass(isActive ? 'is-active' : 'is-inactive');
+                if (!isActive) {
+                    editor.addClass('is-hidden');
+                }
             }
         });
 

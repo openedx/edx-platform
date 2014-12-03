@@ -217,7 +217,11 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         if view_name == STUDIO_VIEW:
             try:
-                fragment = xblock.render(STUDIO_VIEW)
+                context = {}
+                if hasattr(xblock, 'studio_view'):
+                    fragment = xblock.render(STUDIO_VIEW, context=context)
+                else:
+                    fragment = xblock.render_tabbed_editor(context)
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
@@ -716,7 +720,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         visibility_state = None
     published = modulestore().has_published_version(xblock)
-
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
@@ -735,7 +738,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "due": xblock.fields['due'].to_json(xblock.due),
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
-        "has_changes": has_changes,
+        "has_changes": has_changes
     }
     if data is not None:
         xblock_info["data"] = data

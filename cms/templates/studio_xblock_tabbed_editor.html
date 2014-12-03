@@ -1,0 +1,23 @@
+<div class="xblock-tabbed-editor">
+    <div class="editor-with-tabs">
+        <div class="edit-header">
+            <span class="component-name"></span>
+            % if len(tabs) > 1:
+                <ul class="${'editor-tabs action-list action-modes'}">
+                    % for tab in tabs:
+                    <li class="inner_tab_wrap action-item" data-mode="${tab['id']}"><a href="#tab-editor-${loop.index}" class="tab ${tab['id']}-button ${'is-set' if tab['id'] == current_tab_id else ''}" data-tab_name="${tab['id']}">${tab['display_name']}</a></li>
+                    % endfor
+                </ul>
+            % endif
+        </div>
+        <div class="tabs-wrapper">
+            <div class="xblock-editor" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
+                % for tab in tabs:
+                <div data-tab-id="${tab['id']}" class="component-tab tab-view-${tab['id']} ${'is-hidden is-inactive' if not (tab['id'] == current_tab_id) else 'is-active'}">
+                    ${tab['rendered_view']}
+                </div>
+                % endfor
+            </div>
+        </div>
+    </div>
+</div>

@@ -23,13 +23,20 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
     "editor-mode-button", "upload-dialog", "image-modal",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message"]
+    "unit-outline", "container-message", "metadata-editor"]
 %>
 <%block name="header_extras">
 % for template_name in templates:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
+% endfor
+
+% for template_name in ["metadata-number-entry", "metadata-string-entry", "metadata-option-entry", "metadata-list-entry", "metadata-dict-entry", "metadata-file-uploader-entry", "metadata-file-uploader-item"]:
+    <script id="${template_name}" type="text/template">
+        <%static:include path="js/${template_name}.underscore" />
+    </script>
+
 % endfor
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
 </%block>
