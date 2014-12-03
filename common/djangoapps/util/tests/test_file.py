@@ -9,7 +9,7 @@ from mock import patch, Mock
 from django.http import HttpRequest
 from django.core.files.uploadedfile import SimpleUploadedFile
 import util.file
-from util.file import course_and_time_based_filename_generator, store_uploaded_file
+from util.file import course_and_time_based_filename_generator, store_uploaded_file, FileValidationException
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core import exceptions
 import os
@@ -99,16 +99,26 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Verify that a validator function can throw an exception.
         """
+        validator_data = {}
+
+        def verify_file_presence(should_exist):
+            self.assertEqual(should_exist, validator_data["storage"].exists(validator_data["filename"]))
+
         def validator(storage, filename):
             """ Validation test function """
             self.assertEqual("stored_file.csv", os.path.basename(filename))
             with storage.open(filename, 'rU') as f:
                 self.assertEqual(self.file_content, f.read())
-            raise exceptions.PermissionDenied("validation failed")
+            validator_data["storage"] = storage
+            validator_data["filename"] = filename
+            verify_file_presence(True)
+            raise FileValidationException("validation failed")
 
-        with self.assertRaises(exceptions.PermissionDenied) as error:
+        with self.assertRaises(FileValidationException) as error:
             store_uploaded_file(self.request, "uploaded_file", [".csv"], "stored_file", validator=validator)
         self.verify_exception("validation failed", error)
+        # Verify the file was deleted.
+        verify_file_presence(False)
 
     def test_file_upload_lower_case_extension(self):
         """
