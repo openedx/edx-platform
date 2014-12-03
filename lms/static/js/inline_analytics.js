@@ -117,9 +117,9 @@ window.InlineAnalytics = (function() {
                 percent = Math.round(count * 1000 / (totalAttemptCount * 10));
 
                 if (correct) {
-                    answerClass = 'right';
-                } else if (!correct) {
-                    answerClass = 'wrong';
+                    answerClass = 'inline-analytics-correct';
+                } else {
+                    answerClass = 'inline-analytics-incorrect';
                 }
                 tr = $('<tr><td class="answer_box" title="' + choiceText[valueIndex] + '">' +
                     (parseInt(valueIndex, 10) + 1) + '</td><td class="answer_box ' +
@@ -173,9 +173,9 @@ window.InlineAnalytics = (function() {
         // Insert rows between currentIndex and finalIndex
         while (currentIndex < finalIndex) {
             if ('choice_' + currentIndex === correctResponse) {
-                answerClass = 'right';
+                answerClass = 'inline-analytics-correct';
             } else {
-                answerClass = 'wrong';
+                answerClass = 'inline-analytics-incorrect';
             }
             tr = $('<tr><td class="answer_box" title="' + choiceText[currentIndex] + '">' + (currentIndex + 1) +
                 '</td><td class="answer_box ' + answerClass +
@@ -261,9 +261,9 @@ window.InlineAnalytics = (function() {
                         (correctResponse.indexOf("'" + imaginedResponse + "'") > -1 &&
                             actualResponse.indexOf(imaginedResponse) > -1)) {
 
-                        answerClass = 'right';
+                        answerClass = 'inline-analytics-correct';
                     } else {
-                        answerClass = 'wrong';
+                        answerClass = 'inline-analytics-incorrect';
                     }
                     if (actualResponse.indexOf(imaginedResponse) !== -1) {
                         checkboxChecked = '<span class="dot"></span>';
