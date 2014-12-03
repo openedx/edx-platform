@@ -105,8 +105,11 @@ class ProfileApiTest(TestCase):
         # Check that a 32-year old can opt-out
         (32, False, u"False"),
 
-        # Check that someone 13 years old can opt-in
-        (13, True, u"True"),
+        # Check that someone 14 years old can opt-in
+        (14, True, u"True"),
+
+        # Check that someone 13 years old cannot opt-in (must have turned 13 before this year)
+        (13, True, u"False"),
 
         # Check that someone 12 years old cannot opt-in
         (12, True, u"False")
