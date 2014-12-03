@@ -185,7 +185,7 @@ class TestVerifyView(ModuleStoreTestCase):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_key = SlashSeparatedCourseKey('Robot', '999', 'Test_Course')
-        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         verified_mode = CourseMode(course_id=self.course_key,
                                    mode_slug="verified",
                                    mode_display_name="Verified Certificate",
@@ -205,6 +205,10 @@ class TestVerifyView(ModuleStoreTestCase):
                       kwargs={"course_id": unicode(self.course_key)})
         response = self.client.get(url)
         self.assertIn("You are now enrolled in", response.content)
+        # make sure org, name, and number are present
+        self.assertIn(self.course.display_org_with_default, response.content)
+        self.assertIn(self.course.display_name_with_default, response.content)
+        self.assertIn(self.course.display_number_with_default, response.content)
 
     def test_valid_course_upgrade_text(self):
         url = reverse('verify_student_verify',
