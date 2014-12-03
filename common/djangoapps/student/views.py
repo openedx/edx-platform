@@ -776,8 +776,10 @@ def try_change_enrollment(request):
 
 def _update_email_opt_in(request, username, org):
     """Helper function used to hit the profile API if email opt-in is enabled."""
-    email_opt_in = request.POST.get('email_opt_in') == 'true'
-    profile_api.update_email_opt_in(username, org, email_opt_in)
+    email_opt_in = request.POST.get('email_opt_in')
+    if email_opt_in is not None:
+        email_opt_in_boolean = email_opt_in == 'true'
+        profile_api.update_email_opt_in(username, org, email_opt_in_boolean)
 
 
 @require_POST
