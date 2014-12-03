@@ -260,7 +260,7 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.jump_to', name="jump_to",
         ),
         url(
-            r'^courses/{}/jump_to_id/(?P<module_id>.*)$'.format(settings.COURSE_ID_PATTERN),
+            r'^courses/{}/jump_to_id/(?P<module_id>.*)/$'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.jump_to_id', name="jump_to_id",
         ),
 
