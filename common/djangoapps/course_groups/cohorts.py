@@ -6,7 +6,6 @@ forums, and to the cohort admin views.
 import logging
 import random
 
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.http import Http404
@@ -374,80 +373,3 @@ def add_user_to_cohort(cohort, username_or_email):
     )
     cohort.users.add(user)
     return (user, previous_cohort_name)
-
-
-def add_users_to_cohorts(course_key, users_to_cohorts):
-    """
-    Within a particular course, put all specified users in specified
-    cohorts, removing them from their current cohort if necessary.
-
-    Arguments:
-        course_id (course id): ID of the course in which to do the
-            cohorting.
-        users_to_cohorts (sequence): Each item of this sequence is a
-            dict representing a user to cohort.  The dict conatains
-            keys "username_or_email" and "cohort" to identify the user
-            and the cohort in which to add them.
-    Returns:
-        dict: Statistics regarding the cohorted users:
-            {
-                "cohort_a": {
-                    "valid": True,  # Boolean: cohort exists
-                    "added": ["user a", ...],     # list: users added
-                    "changed": ["user b", ...],   # list: users changed from prior cohort
-                    "present": ["user c", ...],   # list: users already in cohort
-                    "unknown": ["unknown_username", ...],  # list: unknown usernames/emails
-                },
-                "cohort_b": {
-                    "valid": False  # cohort with name "cohort_b" does not exist
-                    "not_added": ["user d", ...]  # lists: users not added to this non-existent cohort
-                },
-                ...
-            }
-    """
-    cohorts_status = {}
-
-    cohorts_to_users = {}
-    for assignment in users_to_cohorts:
-        username_or_email = assignment.get("username_or_email")
-        cohort_name = assignment.get("cohort")
-        if cohorts_to_users.get(cohort_name):
-            cohorts_to_users[cohort_name].append(username_or_email)
-        else:
-            cohorts_to_users[cohort_name] = [username_or_email]
-
-    for cohort_name, usernames_or_emails in cohorts_to_users.iteritems():
-        try:
-            cohort = CourseUserGroup.objects.get(
-                course_id=course_key,
-                group_type=CourseUserGroup.COHORT,
-                name=cohort_name
-            )
-            cohorts_status[cohort_name] = {"valid": True}
-        except CourseUserGroup.DoesNotExist:
-            cohorts_status[cohort_name] = {"valid": False, "not_added": usernames_or_emails}
-            continue
-
-        added = set()
-        changed = set()
-        present = set()
-        unknown = set()
-
-        for username_or_email in usernames_or_emails:
-            try:
-                __, previous_cohort_name = add_user_to_cohort(cohort, username_or_email)
-                if previous_cohort_name:
-                    changed.add(username_or_email)
-                else:
-                    added.add(username_or_email)
-            except User.DoesNotExist:
-                unknown.add(username_or_email)
-            except ValueError:
-                present.add(username_or_email)
-
-        cohorts_status[cohort_name]["added"] = list(added)
-        cohorts_status[cohort_name]["changed"] = list(changed)
-        cohorts_status[cohort_name]["present"] = list(present)
-        cohorts_status[cohort_name]["unknown"] = list(unknown)
-
-    return cohorts_status

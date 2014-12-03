@@ -2,6 +2,7 @@
 """
 Tests for file.py
 """
+from cStringIO import StringIO
 
 from django.test import TestCase
 from datetime import datetime
@@ -10,7 +11,7 @@ from mock import patch, Mock
 from django.http import HttpRequest
 from django.core.files.uploadedfile import SimpleUploadedFile
 import util.file
-from util.file import course_and_time_based_filename_generator, store_uploaded_file, FileValidationException
+from util.file import course_and_time_based_filename_generator, store_uploaded_file, FileValidationException, UniversalNewlineIterator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.core import exceptions
 import os
@@ -163,3 +164,50 @@ class StoreUploadedFileTestCase(TestCase):
         self.assertTrue(self.file_storage.exists(self.stored_file_name))
         with self.file_storage.open(self.stored_file_name, 'r') as f:
             self.assertEqual(self.file_content, f.read())
+
+
+class TestUniversalNewlineIterator(TestCase):
+    """
+    Tests for the UniversalNewlineIterator class.
+    """
+    def test_line_feeds(self):
+        self.assertEqual(
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\nbar\n'), buffer_size=1)],
+            ['foo\n', 'bar\n']
+        )
+
+    def test_carriage_returns(self):
+        self.assertEqual(
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\rbar\r'), buffer_size=1)],
+            ['foo\n', 'bar\n']
+        )
+
+    def test_carriage_returns_and_line_feeds(self):
+        self.assertEqual(
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\r\nbar\r\n'), buffer_size=1)],
+            ['foo\n', 'bar\n']
+        )
+
+    def test_no_trailing_newline(self):
+        self.assertEqual(
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\nbar'), buffer_size=1)],
+            ['foo\n', 'bar']
+        )
+
+    def test_only_one_line(self):
+        self.assertEqual(
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\n'), buffer_size=1)],
+            ['foo\n']
+        )
+
+    def test_only_one_line_no_trailing_newline(self):
+        self.assertEqual(
+            [thing for thing in UniversalNewlineIterator(StringIO('foo'), buffer_size=1)],
+            ['foo']
+        )
+
+    def test_empty_file(self):
+        self.assertEqual(
+            [thing for thing in UniversalNewlineIterator(StringIO(), buffer_size=1)],
+            []
+        )

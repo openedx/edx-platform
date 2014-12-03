@@ -109,10 +109,10 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        CohortFactory(course_id=self.course.id, name='Cohort 1')
-        CohortFactory(course_id=self.course.id, name='Cohort 2')
-        self.create_student(username=u'student_1\xec', email='student_1@example.com')
-        self.create_student(username='student_2', email='student_2@example.com')
+        self.cohort_1 = CohortFactory(course_id=self.course.id, name='Cohort 1')
+        self.cohort_2 = CohortFactory(course_id=self.course.id, name='Cohort 2')
+        self.student_1 = self.create_student(username=u'student_1\xec', email='student_1@example.com')
+        self.student_2 = self.create_student(username='student_2', email='student_2@example.com')
         self.csv_header_row = ['cohort_name', 'exists', 'students_added', 'students_changed', 'students_already_present', 'students_unknown']
 
     def _cohort_students_and_upload(self, csv_data):
@@ -137,7 +137,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             u'student_1\xec,,Cohort 1\n'
             u'student_2,,Cohort 2'
         )
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
@@ -157,7 +157,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ',student_1@example.com,Cohort 1\n'
             ',student_2@example.com,Cohort 2'
         )
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
@@ -177,7 +177,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             u'student_1\xec,student_1@example.com,Cohort 1\n'
             u'student_2,student_2@example.com,Cohort 2'
         )
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
@@ -203,7 +203,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             u'student_1\xec,student_1@example.com,Cohort 1\n'  # valid username and email
             u'Invalid,student_2@example.com,Cohort 2'      # invalid username, valid email
         )
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
                 dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
@@ -223,7 +223,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             'Invalid,,Cohort 1\n'
             'student_2,also_fake@bad.com,Cohort 2'
         )
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
         self.verify_rows_in_csv(
             [
                 dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '0', '0', 'Invalid'])),
@@ -243,7 +243,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ',student_1@example.com,Does Not Exist\n'
             'student_2,,Cohort 2'
         )
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
                 dict(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', '0', '0', ''])),
@@ -274,9 +274,114 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             u'student_1\xec,\n'
             u'student_2'
         )
-        self.assertDictContainsSubset({'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
         self.verify_rows_in_csv(
             [
                 dict(zip(self.csv_header_row, ['', 'False', '0', '0', '0', ''])),
+            ]
+        )
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_only_header_row(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            u'username,email,cohort'
+        )
+        self.assertDictContainsSubset({'total': 0, 'attempted': 0, 'succeeded': 0, 'failed': 0}, result)
+        self.verify_rows_in_csv([])
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_carriage_return(self, mock_default_storage):
+        """
+        Test that we can handle carriage returns in our file.
+        """
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            u'username,email,cohort\r'
+            u'student_1\xec,,Cohort 1\r'
+            u'student_2,,Cohort 2'
+        )
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+            ]
+        )
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_carriage_return_line_feed(self, mock_default_storage):
+        """
+        Test that we can handle carriage returns and line feeds in our file.
+        """
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        result = self._cohort_students_and_upload(
+            u'username,email,cohort\r\n'
+            u'student_1\xec,,Cohort 1\r\n'
+            u'student_2,,Cohort 2'
+        )
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+            ]
+        )
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_move_users_to_new_cohort(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        self.cohort_1.users.add(self.student_1)
+        self.cohort_2.users.add(self.student_2)
+
+        result = self._cohort_students_and_upload(
+            u'username,email,cohort\n'
+            u'student_1\xec,,Cohort 2\n'
+            u'student_2,,Cohort 1'
+        )
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '1', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '1', '0', ''])),
+            ]
+        )
+
+    @patch('instructor_task.tasks_helper.DefaultStorage')
+    def test_move_users_to_same_cohort(self, mock_default_storage):
+        # Mock out DefaultStorage's scoped `open` method with standard python
+        # `open` so that we can read from /tmp/
+        mock_default_storage.return_value = Mock()
+        mock_default_storage.return_value.open = open
+
+        self.cohort_1.users.add(self.student_1)
+        self.cohort_2.users.add(self.student_2)
+
+        result = self._cohort_students_and_upload(
+            u'username,email,cohort\n'
+            u'student_1\xec,,Cohort 1\n'
+            u'student_2,,Cohort 2'
+        )
+        self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'skipped': 2, 'failed': 0}, result)
+        self.verify_rows_in_csv(
+            [
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '0', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '0', '1', ''])),
             ]
         )

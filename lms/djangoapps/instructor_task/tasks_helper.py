@@ -18,10 +18,12 @@ from django.db import transaction, reset_queries
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 
-from xmodule.modulestore.django import modulestore
 from track.views import task_track
+from util.file import UniversalNewlineIterator
+from xmodule.modulestore.django import modulestore
 
-from course_groups.cohorts import add_users_to_cohorts
+from course_groups.models import CourseUserGroup
+from course_groups.cohorts import add_user_to_cohort
 from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
@@ -637,63 +639,82 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     start_time = time()
     start_date = datetime.now(UTC)
 
-    # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
+    # Iterate through once more to get total assignments for task progress
     with DefaultStorage().open(task_input['file_name']) as f:
-        # NOTE: There's a bug with the s3 implementation of django file
-        # storage in which passing mode='rU' does not actually open the
-        # file in universal newline mode.  Since the CSV library does not
-        # understand CR/CRLF, we are forced to read the whole file into
-        # memory via file.read().splitlines().
-        users_to_cohorts = [
-            {
-                'username_or_email': row.get('email') or row.get('username'),
-                'cohort': row.get('cohort') or ''
-            }
-            for row in unicodecsv.DictReader(f.read().splitlines(), encoding='utf-8')
-        ]
+        total_assignments = -1  # account for header row
+        for _line in UniversalNewlineIterator(f, buffer_size=4096):
+            total_assignments += 1
 
-    task_progress = TaskProgress(action_name, len(users_to_cohorts), start_time)
+    task_progress = TaskProgress(action_name, total_assignments, start_time)
     current_step = {'step': 'Cohorting Students'}
     task_progress.update_task_state(extra_meta=current_step)
 
-    cohorts_status = add_users_to_cohorts(course_id, users_to_cohorts)
+    # cohorts_status will contain metadata about the attempted
+    # cohorting on a per-cohort basis.  It is a mapping from
+    # cohort_name to metadata about that cohort.  It also acts as a
+    # cache to prevent redundant cohort queries.
+    cohorts_status = {}
 
-    # Report task progress based on how users were cohorted.
-    for cohort_name, status_dict in cohorts_status.iteritems():
-        num_added = len(status_dict.get('added', []))
-        num_changed = len(status_dict.get('changed', []))
-        num_present = len(status_dict.get('present', []))
-        num_unknown = len(status_dict.get('unknown', []))
-        task_progress.succeeded += num_added + num_changed
-        task_progress.skipped += num_present
-        task_progress.failed += num_unknown
-        task_progress.attempted += num_added + num_changed + num_present + num_unknown
-        if not status_dict.get('valid'):
-            num_attempted = len(status_dict.get('not_added', []))
-            task_progress.attempted += num_attempted
-            task_progress.failed += num_attempted
-    task_progress.update_task_state(extra_meta=current_step)
+    with DefaultStorage().open(task_input['file_name']) as f:
+        for row in unicodecsv.DictReader(UniversalNewlineIterator(f, buffer_size=4096), encoding='utf-8'):
+            # Try to use the 'email' field to identify the user.  If it's not present, use 'username'.
+            username_or_email = row.get('email') or row.get('username')
+            cohort_name = row.get('cohort') or ''
+            task_progress.attempted += 1
+
+            if not cohorts_status.get(cohort_name):
+                cohorts_status[cohort_name] = {
+                    "cohort_name": cohort_name,
+                    "students_added": 0,
+                    "students_changed": 0,
+                    "students_already_present": 0,
+                    "students_unknown": set()
+                }
+                try:
+                    cohort = CourseUserGroup.objects.get(
+                        course_id=course_id,
+                        group_type=CourseUserGroup.COHORT,
+                        name=cohort_name
+                    )
+                    cohorts_status[cohort_name]["exists"] = True
+                except CourseUserGroup.DoesNotExist:
+                    cohorts_status[cohort_name]["exists"] = False
+                    task_progress.failed += 1
+                    continue
+
+            if not cohorts_status[cohort_name]['exists']:
+                task_progress.failed += 1
+                continue
+
+            try:
+                __, previous_cohort_name = add_user_to_cohort(cohort, username_or_email)
+                if previous_cohort_name:
+                    cohorts_status[cohort_name]['students_changed'] += 1
+                    task_progress.succeeded += 1
+                else:
+                    cohorts_status[cohort_name]['students_added'] += 1
+                    task_progress.succeeded += 1
+            except User.DoesNotExist:
+                cohorts_status[cohort_name]['students_unknown'].add(username_or_email)
+                task_progress.failed += 1
+            except ValueError:
+                cohorts_status[cohort_name]['students_already_present'] += 1
+                task_progress.skipped += 1
+
+            task_progress.update_task_state(extra_meta=current_step)
 
     current_step['step'] = 'Uploading CSV'
     task_progress.update_task_state(extra_meta=current_step)
 
     # Filter the output of `add_users_to_cohorts` in order to upload the result.
-    # Since there may be many users in each of the 'added', 'changed',
-    # 'present' and 'unknown' fields, only show the full user list for
-    # 'unknown'.
     output_header = ['cohort_name', 'exists', 'students_added', 'students_changed', 'students_already_present', 'students_unknown']
-    status_keys = [None, 'valid', 'added', 'changed', 'present', 'unknown']
-    header_to_status_keys = zip(output_header, status_keys)
     output_rows = [
-        [cohort_name]
-        +
         [
-            status_dict.get(field_name, '') if field_name == 'valid'
-            else ','.join(status_dict.get(field_name, '')) if field_name == 'unknown'
-            else len(status_dict.get(field_name, ''))
-            for header, field_name in header_to_status_keys if header != 'cohort_name'
+            ','.join(status_dict.get(column_name, '')) if column_name == 'students_unknown'
+            else status_dict[column_name]
+            for column_name in output_header
         ]
-        for cohort_name, status_dict in cohorts_status.iteritems()
+        for _cohort_name, status_dict in cohorts_status.iteritems()
     ]
     output_rows.insert(0, output_header)
     upload_csv_to_report_store(output_rows, 'cohort_results', course_id, start_date)

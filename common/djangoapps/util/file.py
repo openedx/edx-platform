@@ -110,3 +110,49 @@ def course_and_time_based_filename_generator(course_id, base_name):
         base_name=get_valid_filename(base_name),
         timestamp_str=datetime.now(UTC).strftime("%Y-%m-%d-%H%M%S")  # pylint: disable=maybe-no-member
     )
+
+
+class UniversalNewlineIterator(object):
+    """
+    This iterable class can be used as a wrapper around a file-like
+    object which does not inherently support being read in
+    universal-newline mode.  It returns a line at a time.
+
+    Inspired by http://d4nt.com/parsing-large-csv-blobs-on-google-app-engine/
+    """
+    def __init__(self, original_file, buffer_size):
+        self.original_file = original_file
+        self.buffer_size = buffer_size
+
+    def __iter__(self):
+        return self.generate_lines()
+
+    @staticmethod
+    def sanitize(string):
+        """
+        Replace CR and CRLF with LF within `string`.
+        """
+        return string.replace('\r\n', '\n').replace('\r', '\n')
+
+    def generate_lines(self):
+        """
+        Return data from `self.original_file` a line at a time,
+        replacing CR and CRLF with LF.
+        """
+        buf = self.original_file.read(self.buffer_size)
+        line = ''
+        while buf:
+            for char in buf:
+                if line.endswith('\r') and char == '\n':
+                    last_line = line
+                    line = ''
+                    yield self.sanitize(last_line)
+                elif line.endswith('\r') or line.endswith('\n'):
+                    last_line = line
+                    line = char
+                    yield self.sanitize(last_line)
+                else:
+                    line += char
+            buf = self.original_file.read(self.buffer_size)
+            if not buf and line:
+                yield self.sanitize(line)

@@ -3426,3 +3426,32 @@ class TestBulkCohorting(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 204)
         self.assertTrue(mock_store_uploaded_file)
         self.assertTrue(mock_submit_cohort_students)
+
+    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('instructor.views.api.store_uploaded_file')
+    def test_success_carriage_return(self, mock_store_uploaded_file, mock_submit_cohort_students):
+        """
+        Verify that we store the input CSV and call the cohorting background
+        task when lines in the CSV are delimited by carriage returns.
+        """
+        mock_store_uploaded_file.return_value = (None, 'fake_file_name.csv')
+        self.client.login(username=self.staff_user.username, password='test')
+        response = self.call_add_users_to_cohorts('username,email,cohort\rfoo_username,bar_email,baz_cohort')
+        self.assertEqual(response.status_code, 204)
+        self.assertTrue(mock_store_uploaded_file)
+        self.assertTrue(mock_submit_cohort_students)
+
+    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('instructor.views.api.store_uploaded_file')
+    def test_success_carriage_return_line_feed(self, mock_store_uploaded_file, mock_submit_cohort_students):
+        """
+        Verify that we store the input CSV and call the cohorting background
+        task when lines in the CSV are delimited by carriage returns and line
+        feeds.
+        """
+        mock_store_uploaded_file.return_value = (None, 'fake_file_name.csv')
+        self.client.login(username=self.staff_user.username, password='test')
+        response = self.call_add_users_to_cohorts('username,email,cohort\r\nfoo_username,bar_email,baz_cohort')
+        self.assertEqual(response.status_code, 204)
+        self.assertTrue(mock_store_uploaded_file)
+        self.assertTrue(mock_submit_cohort_students)
