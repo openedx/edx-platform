@@ -43,6 +43,17 @@ div.calc-main {
     position: relative;
     top: -36px;
 
+    // UI: input help table
+    .calculator-input-help-table {
+      margin: ($baseline/2) 0;
+
+      tr th, tr td {
+        vertical-align: top;
+        border: 1px solid $gray-l4;
+        padding: ($baseline/2);
+      }
+    }
+
     form {
       @extend .clearfix;
       @include box-sizing(border-box);
@@ -151,14 +162,6 @@ div.calc-main {
 
             p, p+p {
               margin: 0;
-            }
-
-            table {
-              margin: 10px 0;
-
-              td, th {
-                padding: 2px 5px;
-              }
             }
 
             .calc-postfixes {
