@@ -66,12 +66,12 @@ class EnrollmentEmailTests(TestCase):
 
     def setUp(self):
         # Test Contstants
-        COURSE_SLUG = "100"
+        COURSE_SLUG = "101"
         COURSE_NAME = "test_course"
         COURSE_ORG = "EDX"
 
-        self.user = UserFactory.create(username="tester", email="tester@gmail.com", password="test")
-        self.course = CourseFactory.create(org=COURSE_ORG, display_name=COURSE_NAME, number=COURSE_SLUG)
+        self.user = UserFactory(username="tester", email="tester@gmail.com", password="test")
+        self.course = CourseFactory(org=COURSE_ORG, display_name=COURSE_NAME, number=COURSE_SLUG)
         self.assertIsNotNone(self.course)
         self.request = RequestFactory().post('random_url')
         self.request.user = self.user
