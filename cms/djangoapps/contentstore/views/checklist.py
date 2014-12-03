@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url
 
-from student.auth import has_course_access
+from student.auth import has_course_author_access
 from xmodule.course_module import CourseDescriptor
 
 from django.utils.translation import ugettext
@@ -36,7 +36,7 @@ def checklists_handler(request, course_key_string, checklist_index=None):
         json: updates the checked state for items within a particular checklist. checklist_index is required.
     """
     course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)

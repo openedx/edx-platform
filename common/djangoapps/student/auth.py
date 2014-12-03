@@ -40,18 +40,18 @@ def has_access(user, role):
     return False
 
 
-def has_course_access(user, course_key, role=CourseStaffRole):
+def has_course_author_access(user, course_key, role=CourseStaffRole):
     """
-    Return True if user allowed to access this course_id
-    Note that the CMS permissions model is with respect to courses
-    There is a super-admin permissions if user.is_staff is set
+    Return True if user has studio (write) access to the given course.
+    Note that the CMS permissions model is with respect to courses.
+    There is a super-admin permissions if user.is_staff is set.
     Also, since we're unifying the user database between LMS and CAS,
     I'm presuming that the course instructor (formally known as admin)
     will not be in both INSTRUCTOR and STAFF groups, so we have to cascade our
     queries here as INSTRUCTOR has all the rights that STAFF do.
 
     :param user:
-    :param course_key: A course key
+    :param course_key: a CourseKey
     :param role: an AccessRole
     """
     if GlobalStaff().has_user(user):
