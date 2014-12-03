@@ -28,7 +28,8 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 cohorts.url = '/mock_service';
                 requests = AjaxHelpers.requests(test);
                 cohortsView = new CohortsView({
-                    model: cohorts
+                    model: cohorts,
+                    upload_cohorts_csv_url: "http://upload-csv-file-url/"
                 });
                 cohortsView.render();
                 if (initialCohortID) {
@@ -129,8 +130,18 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 });
 
                 it('can upload a CSV of cohort assignments if a cohort exists', function () {
+                    createCohortsView(this);
                     expect(cohortsView.$('.cohort-management-file-upload').text()).
                         toContain('Assign Students to Cohort Groups by Uploading a CSV File');
+
+                    cohortsView.$('#file-upload-form').fileupload('add', {files: [{name: 'upload_file.txt'}]});
+                    cohortsView.$('.submit-file-button').click();
+
+                    // No file will actually be uploaded because "uploaded_file.txt" doesn't actually exist.
+                    AjaxHelpers.expectRequest(requests, 'POST', "http://upload-csv-file-url/", new FormData());
+                    AjaxHelpers.respondWithJson(requests, {});
+                    expect(cohortsView.$('.file-upload-form-result .message-confirmation .message-title').text().trim())
+                        .toBe("Your file 'upload_file.txt' has been uploaded. Please allow a few minutes for processing.");
                 });
 
                 it('can select a cohort', function () {

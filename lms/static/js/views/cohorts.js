@@ -1,4 +1,4 @@
-(function($, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderModel, FileUploaderView) {
+(function($, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderView) {
     var hiddenClass = 'is-hidden',
         disabledClass = 'is-disabled';
 
@@ -38,17 +38,14 @@
         },
 
         renderCSVUploadAndSelector: function(selectedCohort) {
-            var fileUploaderModel = new FileUploaderModel({
+            var fileUploaderView = new FileUploaderView({
+                el: this.$('.csv-upload'),
                 title: gettext("Assign Students to Cohort Groups by Uploading a CSV File"),
                 inputLabel: gettext("Choose a .csv file"),
                 inputTip: gettext("Only properly formatted .csv files will be accepted."),
                 submitButtonText: gettext("Upload File and Assign Students"),
                 extensions: ".csv",
-                url: this.upload_cohorts_csv_url
-            });
-            var fileUploaderView = new FileUploaderView({
-                model: fileUploaderModel,
-                el: this.$('.csv-upload'),
+                url: this.upload_cohorts_csv_url,
                 successNotification: function (file, event, data) {
                     var message = interpolate_text(gettext(
                         "Your file '{file}' has been uploaded. Please allow a few minutes for processing."
@@ -218,4 +215,4 @@
         }
 
     });
-}).call(this, $, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderModel, FileUploaderView);
+}).call(this, $, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderView);
