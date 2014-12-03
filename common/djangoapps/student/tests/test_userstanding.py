@@ -70,9 +70,9 @@ class UserStandingTest(TestCase):
             UserStanding.ACCOUNT_DISABLED
         )
 
-    def test_disabled_account_403s(self):
+    def test_disabled_account_redirect_to_disabled_account_page(self):
         response = self.bad_user_client.get(self.some_url)
-        self.assertEqual(response.status_code, 403)
+        self.assertRedirects(response, 'disabled_account')
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_reenable_account(self):

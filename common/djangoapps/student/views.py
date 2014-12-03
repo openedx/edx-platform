@@ -1165,6 +1165,13 @@ def disable_account_ajax(request):
     return JsonResponse(context)
 
 
+def disabled_account(request):
+    """
+    Displays an error page if the user's status is 'disabled'
+    """
+    return render_to_response('disabled_account.html')
+
+
 @login_required
 @ensure_csrf_cookie
 def change_setting(request):
