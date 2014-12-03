@@ -191,7 +191,7 @@ def update_email_opt_in(username, org, optin):
     profile = UserProfile.objects.get(user=user)
     of_age = (
         profile.year_of_birth is None or  # If year of birth is not set, we assume user is of age.
-        datetime.datetime.now(UTC).year - profile.year_of_birth >=  # pylint: disable=maybe-no-member
+        datetime.datetime.now(UTC).year - profile.year_of_birth >  # pylint: disable=maybe-no-member
         getattr(settings, 'EMAIL_OPTIN_MINIMUM_AGE', 13)
     )
 
