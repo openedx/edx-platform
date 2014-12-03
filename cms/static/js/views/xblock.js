@@ -32,7 +32,6 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
             handleXBlockFragment: function(fragment, options) {
                 var self = this,
                     wrapper = this.$el,
-                    xblockElement,
                     successCallback = options ? options.success || options.done : null,
                     errorCallback = options ? options.error || options.done : null,
                     xblock,
@@ -40,22 +39,40 @@ define(["jquery", "underscore", "js/views/baseview", "xblock/runtime.v1"],
 
                 fragmentsRendered = this.renderXBlockFragment(fragment, wrapper);
                 fragmentsRendered.always(function() {
-                    xblockElement = self.$('.xblock').first();
-                    try {
-                        xblock = XBlock.initializeBlock(xblockElement);
-                        self.xblock = xblock;
-                        self.xblockReady(xblock);
+
+                    // With tabbed xblock editor support, there will be multiple "xblock" elements.
+                    var xblockElements = self.$('.xblock');
+                    var continueInitializing = true;
+
+                    self.xblockElements = [];
+
+                    xblockElements.each(function (index, xblockElement) {
+                        if (continueInitializing) {
+                            try {
+                                xblock = XBlock.initializeBlock($(xblockElement));
+                                self.xblockElements.push(xblock);
+                            } catch (e) {
+                                console.error(e.stack);
+                                continueInitializing = false;
+                                // Add 'xblock-initialization-failed' class to every xblock??
+                                self.$('.xblock').addClass('xblock-initialization-failed');
+                            }
+                        }
+                    });
+
+                    if (continueInitializing) {
+                        // Some code (but I think only xmodule code) assumes self.xblock will exist.
+                        // Assign to the first xblockElements item for now. TODO: make more elegant.
+                        self.xblock = self.xblockElements[0];
+                        self.xblockReady(self.xblock);
                         if (successCallback) {
                             successCallback(xblock);
                         }
-                    } catch (e) {
-                        console.error(e.stack);
-                        // Add 'xblock-initialization-failed' class to every xblock
-                        self.$('.xblock').addClass('xblock-initialization-failed');
-
+                    }
+                    else {
                         // If the xblock was rendered but failed then still call xblockReady to allow
                         // drag-and-drop to be initialized.
-                        if (xblockElement) {
+                        if (xblockElements.length > 0) {
                             self.xblockReady(null);
                         }
                         if (errorCallback) {
