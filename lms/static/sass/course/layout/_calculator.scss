@@ -12,6 +12,7 @@ div.calc-main {
   }
 
   a.calc {
+    @include text-hide();
     background: url("../images/calc-icon.png") rgba(#111, .9) no-repeat center;
     border-bottom: 0;
     border-radius: 3px 3px 0 0;
