@@ -6,13 +6,16 @@ email address.
 
 """
 import datetime
+import logging
+
 from django.conf import settings
 from django.db import IntegrityError
-import logging
 from pytz import UTC
+import analytics
 
 from user_api.models import User, UserProfile, UserPreference, UserOrgTag
 from user_api.helpers import intercept_errors
+from eventtracking import tracker
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +60,7 @@ def profile_info(username):
 
     At least one of the keyword args must be provided.
 
-    Args:
+    Arguments:
         username (unicode): The username of the account to retrieve.
 
     Returns:
@@ -89,10 +92,10 @@ def profile_info(username):
 def update_profile(username, full_name=None):
     """Update a user's profile.
 
-    Args:
+    Arguments:
         username (unicode): The username associated with the account.
 
-    Keyword Args:
+    Keyword Arguments:
         full_name (unicode): If provided, set the user's full name to this value.
 
     Returns:
@@ -119,7 +122,7 @@ def update_profile(username, full_name=None):
 def preference_info(username):
     """Retrieve information about a user's preferences.
 
-    Args:
+    Arguments:
         username (unicode): The username of the account to retrieve.
 
     Returns:
@@ -141,10 +144,10 @@ def update_preferences(username, **kwargs):
 
     Sets the provided preferences for the given user.
 
-    Args:
+    Arguments:
         username (unicode): The username of the account to retrieve.
 
-    Keyword Args:
+    Keyword Arguments:
         **kwargs (unicode): Arbitrary key-value preference pairs
 
     Returns:
@@ -170,10 +173,10 @@ def update_email_opt_in(username, org, optin):
     Sets a User Org Tag defining the choice to opt in or opt out of organization-wide
     emails.
 
-    Args:
+    Arguments:
         username (str): The user to set a preference for.
         org (str): The org is used to determine the organization this setting is related to.
-        optin (boolean): True if the user is choosing to receive emails for this organization. If the user is not
+        optin (Boolean): True if the user is choosing to receive emails for this organization. If the user is not
             the correct age to receive emails, email-optin is set to False regardless.
 
     Returns:
@@ -201,5 +204,39 @@ def update_email_opt_in(username, org, optin):
         )
         preference.value = str(optin and of_age)
         preference.save()
+
+        if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+            _track_update_email_opt_in(user.id, org, optin)
+
     except IntegrityError as err:
         log.warn(u"Could not update organization wide preference due to IntegrityError: {}".format(err.message))
+
+
+def _track_update_email_opt_in(user_id, organization, opt_in):
+    """Track an email opt-in preference change.
+
+    Arguments:
+        user_id (str): The ID of the user making the preference change.
+        organization (str): The organization whose emails are being opted into or out of by the user.
+        opt_in (Boolean): Whether the user has chosen to opt-in to emails from the organization.
+
+    Returns:
+        None
+
+    """
+    event_name = 'edx.bi.user.org_email.opted_in' if opt_in else 'edx.bi.user.org_email.opted_out'
+    tracking_context = tracker.get_tracker().resolve_context()
+
+    analytics.track(
+        user_id,
+        event_name,
+        {
+            'category': 'communication',
+            'label': organization
+        },
+        context={
+            'Google Analytics': {
+                'clientId': tracking_context.get('client_id')
+            }
+        }
+    )
