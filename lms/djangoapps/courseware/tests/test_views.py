@@ -645,7 +645,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
-    def test_non_asci_grade_cutoffs(self):
+    def test_non_ascii_grade_cutoffs(self):
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
