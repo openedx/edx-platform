@@ -3,6 +3,7 @@ Library edit page in Studio
 """
 
 from bok_choy.page_object import PageObject
+from selenium.webdriver.common.keys import Keys
 from .container import XBlockWrapper
 from ...tests.helpers import disable_animations
 from .utils import confirm_prompt, wait_for_notification
@@ -73,6 +74,58 @@ class LibraryPage(PageObject):
         if confirm:
             confirm_prompt(self)  # this will also wait_for_notification()
             self.wait_for_ajax()
+
+    def nav_disabled(self, position, arrows=('next', 'previous')):
+        """
+        Verifies that pagination nav is disabled. Position can be 'top' or 'bottom'.
+
+        To specify a specific arrow, pass an iterable with a single element, 'next' or 'previous'.
+        """
+        return all([
+            self.q(css='nav.%s * a.%s-page-link.is-disabled' % (position, arrow))
+            for arrow in arrows
+        ])
+
+    def move_back(self, position):
+        """
+        Clicks one of the forward nav buttons. Position can be 'top' or 'bottom'.
+        """
+        self.q(css='nav.%s * a.previous-page-link' % position)[0].click()
+        self.wait_until_ready()
+
+    def move_forward(self, position):
+        """
+        Clicks one of the forward nav buttons. Position can be 'top' or 'bottom'.
+        """
+        self.q(css='nav.%s * a.next-page-link' % position)[0].click()
+        self.wait_until_ready()
+
+    def revisit(self):
+        """
+        Visit the page's URL, instead of refreshing, so that a new state is created.
+        """
+        self.browser.get(self.browser.current_url)
+        self.wait_until_ready()
+
+    def go_to_page(self, number):
+        """
+        Enter a number into the page number input field, and then try to navigate to it.
+        """
+        page_input = self.q(css="#page-number-input")[0]
+        page_input.click()
+        page_input.send_keys(str(number))
+        page_input.send_keys(Keys.RETURN)
+        self.wait_until_ready()
+
+    def check_page_unchanged(self, first_block_name):
+        """
+        Used to make sure that a page has not transitioned after a bogus number is given.
+        """
+        if not self.xblocks[0].name == first_block_name:
+            return False
+        if not self.q(css='#page-number-input')[0].get_attribute('value') == '':
+            return False
+        return True
 
     def _get_xblocks(self):
         """
