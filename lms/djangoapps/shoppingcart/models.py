@@ -38,10 +38,17 @@ from xmodule_django.models import CourseKeyField
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (
-    InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-    AlreadyEnrolledInCourseException, CourseDoesNotExistException,
-    MultipleCouponsNotAllowedException, RegCodeAlreadyExistException,
-    ItemDoesNotExistAgainstRegCodeException, ItemNotAllowedToRedeemRegCodeException
+    InvalidCartItem,
+    PurchasedCallbackException,
+    ItemAlreadyInCartException,
+    AlreadyEnrolledInCourseException,
+    CourseDoesNotExistException,
+    MultipleCouponsNotAllowedException,
+    RegCodeAlreadyExistException,
+    ItemDoesNotExistAgainstRegCodeException,
+    ItemNotAllowedToRedeemRegCodeException,
+    InvalidStatusToRetire,
+    UnexpectedOrderItemStatus,
 )
 
 from microsite_configuration import microsite
@@ -62,7 +69,21 @@ ORDER_STATUSES = (
 
     # The user's order has been refunded.
     ('refunded', 'refunded'),
+
+    # The user's order went through, but the order was erroneously left
+    # in 'cart'.
+    ('defunct-cart', 'defunct-cart'),
+
+    # The user's order went through, but the order was erroneously left
+    # in 'paying'.
+    ('defunct-paying', 'defunct-paying'),
 )
+
+# maps order statuses to their defunct states
+ORDER_STATUS_MAP = {
+    'cart': 'defunct-cart',
+    'paying': 'defunct-paying',
+}
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
 OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=invalid-name
@@ -484,6 +505,39 @@ class Order(models.Model):
             instruction_set.update(set_of_html)
         return instruction_dict, instruction_set
 
+    def retire(self):
+        """
+        Method to "retire" orders that have gone through to the payment service
+        but have (erroneously) not had their statuses updated.
+        This method only works on orders that satisfy the following conditions:
+        1) the order status is either "cart" or "paying" (otherwise we raise
+           an InvalidStatusToRetire error)
+        2) the order's order item's statuses match the order's status (otherwise
+           we throw an UnexpectedOrderItemStatus error)
+        """
+        # if an order is already retired, no-op:
+        if self.status in ORDER_STATUS_MAP.values():
+            return
+
+        if self.status not in ORDER_STATUS_MAP.keys():
+            raise InvalidStatusToRetire(
+                "order status {order_status} is not 'paying' or 'cart'".format(
+                    order_status=self.status
+                )
+            )
+
+        for item in self.orderitem_set.all():  # pylint: disable=no-member
+            if item.status != self.status:
+                raise UnexpectedOrderItemStatus(
+                    "order_item status is different from order status"
+                )
+
+        self.status = ORDER_STATUS_MAP[self.status]
+        self.save()
+
+        for item in self.orderitem_set.all():  # pylint: disable=no-member
+            item.retire()
+
 
 class OrderItem(TimeStampedModel):
     """
@@ -615,6 +669,15 @@ class OrderItem(TimeStampedModel):
             'quantity': self.qty,
             'category': 'N/A',
         }
+
+    def retire(self):
+        """
+        Called by the `retire` method defined in the `Order` class. Retires
+        an order item if its (and its order's) status was erroneously not
+        updated to "purchased" after the order was processed.
+        """
+        self.status = ORDER_STATUS_MAP[self.status]
+        self.save()
 
 
 class Invoice(models.Model):

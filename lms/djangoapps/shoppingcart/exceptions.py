@@ -55,3 +55,11 @@ class ReportException(Exception):
 
 class ReportTypeDoesNotExistException(ReportException):
     pass
+
+
+class InvalidStatusToRetire(Exception):
+    pass
+
+
+class UnexpectedOrderItemStatus(Exception):
+    pass
