@@ -2,6 +2,7 @@
 Tests for the EdxNotes app.
 """
 import json
+import jwt
 from mock import patch, MagicMock
 from unittest import skipUnless
 from datetime import datetime
@@ -12,6 +13,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from oauth2_provider.tests.factories import ClientFactory
+from provider.oauth2.models import Client
 
 from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.django import modulestore
@@ -517,6 +519,7 @@ class EdxNotesViewsTest(TestCase):
         self.client.login(username=self.user.username, password="edx")
         self.notes_page_url = reverse("edxnotes", args=[unicode(self.course.id)])
         self.search_url = reverse("search_notes", args=[unicode(self.course.id)])
+        self.get_token_url = reverse("get_token", args=[unicode(self.course.id)])
 
     # pylint: disable=unused-argument
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
@@ -595,3 +598,22 @@ class EdxNotesViewsTest(TestCase):
         response = self.client.get(self.search_url, {"text": "test"})
         self.assertEqual(response.status_code, 500)
         self.assertIn("error", response.content)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    def test_get_id_token(self):
+        """
+        Test generation of ID Token
+        """
+        response = self.client.get(self.get_token_url)
+        self.assertEqual(response.status_code, 200)
+        client = Client.objects.get(name='edx-notes')
+        jwt.decode(response.content, client.client_secret)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
+    def test_get_id_token_anonymous(self):
+        """
+        Test that generation of ID Token does not work for anonymous user
+        """
+        self.client.logout()
+        response = self.client.get(self.get_token_url)
+        self.assertEqual(response.status_code, 302)
