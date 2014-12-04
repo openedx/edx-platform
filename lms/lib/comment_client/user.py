@@ -87,7 +87,7 @@ class User(models.Model):
         if not self.course_id:
             raise CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
-        params = {'course_id': unicode(self.course_id)}
+        params = {'course_id': self.course_id.to_deprecated_string()}
         params = merge_dict(params, query_params)
         response = perform_request(
             'get',
@@ -103,7 +103,7 @@ class User(models.Model):
         if not self.course_id:
             raise CommentClientRequestError("Must provide course_id when retrieving subscribed threads for the user")
         url = _url_for_user_subscribed_threads(self.id)
-        params = {'course_id': unicode(self.course_id)}
+        params = {'course_id': self.course_id.to_deprecated_string()}
         params = merge_dict(params, query_params)
         response = perform_request(
             'get',
@@ -120,7 +120,7 @@ class User(models.Model):
         retrieve_params = self.default_retrieve_params.copy()
         retrieve_params.update(kwargs)
         if self.attributes.get('course_id'):
-            retrieve_params['course_id'] = unicode(self.course_id)
+            retrieve_params['course_id'] = self.course_id.to_deprecated_string()
         if self.attributes.get('group_id'):
             retrieve_params['group_id'] = self.group_id
         try:
@@ -146,20 +146,6 @@ class User(models.Model):
             else:
                 raise
         self._update_from_response(response)
-
-
-def get_course_social_stats(course_id):
-    """
-    Helper method to get the social stats from the comment service
-    """
-    url = _url_for_course_social_stats()
-    params = {'course_id': course_id}
-    response = perform_request(
-        'get',
-        url,
-        params
-    )
-    return response
 
 
 def _url_for_vote_comment(comment_id):

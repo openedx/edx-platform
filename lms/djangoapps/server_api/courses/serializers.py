@@ -1,55 +1,27 @@
 """ Django REST Framework Serializers """
 
-from server_api.util.utils import generate_base_uri
+from django.core.urlresolvers import reverse
+
 from rest_framework import serializers
 
 
-class GradeSerializer(serializers.Serializer):
-    """ Serializer for model interactions """
-    grade = serializers.Field()
-
-
-class CourseLeadersSerializer(serializers.Serializer):
-    """ Serializer for course leaderboard """
-    id = serializers.IntegerField(source='user__id')
-    username = serializers.CharField(source='user__username')
-    title = serializers.CharField(source='user__profile__title')
-    avatar_url = serializers.CharField(source='user__profile__avatar_url')
-    # Percentage grade (versus letter grade)
-    grade = serializers.FloatField(source='grade')
-    recorded = serializers.DateTimeField(source='modified')
-
-
-class CourseCompletionsLeadersSerializer(serializers.Serializer):
-    """ Serializer for course completions leaderboard """
-    id = serializers.IntegerField(source='user__id')
-    username = serializers.CharField(source='user__username')
-    title = serializers.CharField(source='user__profile__title')
-    avatar_url = serializers.CharField(source='user__profile__avatar_url')
-    completions = serializers.SerializerMethodField('get_completion_percentage')
-
-    def get_completion_percentage(self, obj):
-        """
-        formats get completions as percentage
-        """
-        total_completions = self.context['total_completions'] or 0  # pylint: disable=E1101
-        completions = obj['completions'] or 0
-        completion_percentage = 0
-        if total_completions > 0:
-            completion_percentage = min(100 * (completions / float(total_completions)), 100)
-        return completion_percentage
+class BaseSerializer(serializers.Serializer):
+    """ Base serializer for module data. """
+    id = serializers.CharField(source='location')
+    name = serializers.CharField(source='display_name')
 
 
 class CourseSerializer(serializers.Serializer):
     """ Serializer for Courses """
-    id = serializers.CharField(source='id')
-    name = serializers.CharField(source='name')
-    category = serializers.CharField(source='category')
-    number = serializers.CharField(source='number')
-    org = serializers.CharField(source='org')
-    uri = serializers.CharField(source='uri')
-    course_image_url = serializers.CharField(source='course_image_url')
-    resources = serializers.CharField(source='resources')
+    id = serializers.CharField()
+    name = serializers.CharField()
+    category = serializers.CharField()
+    course = serializers.CharField()
+    org = serializers.CharField()
+    run = serializers.CharField()
+    uri = serializers.CharField()
+    image_url = serializers.CharField()
+    resources = serializers.CharField()
     due = serializers.DateTimeField()
     start = serializers.DateTimeField()
     end = serializers.DateTimeField()
@@ -58,9 +30,25 @@ class CourseSerializer(serializers.Serializer):
         """
         Builds course detail uri
         """
-        return "{}/{}".format(generate_base_uri(self.context['request']), course.id)  # pylint: disable=E1101
+        # pylint: disable=no-member
+        request = self.context['request']
+        return request.build_absolute_uri(reverse('server_api:courses:detail', kwargs={'course_id': course.id}))
 
-    class Meta:
-        """ Serializer/field specification """
-        #lookup_field = 'id'
-        #fields = ('id', 'name', 'category', 'number', 'org', 'uri', 'due', 'start', 'end')
+
+class ProblemSerializer(BaseSerializer):
+    """ Serializer for course/assignment problems. """
+    pass
+
+
+class AssignmentSerializer(BaseSerializer):
+    """ Serializer for course assignments. """
+    assignment_type = serializers.CharField(source='format')
+    problems = ProblemSerializer(many=True)
+
+
+class GradingPolicySerializer(serializers.Serializer):
+    """ Serializer for course grading policy. """
+    assignment_type = serializers.CharField(source='type')
+    count = serializers.IntegerField(source='min_count')
+    dropped = serializers.IntegerField(source='drop_count')
+    weight = serializers.FloatField()
