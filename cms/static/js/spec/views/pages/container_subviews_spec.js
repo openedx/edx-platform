@@ -438,9 +438,11 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
 
                     verifyExplicitStaffOnly = function(isStaffOnly) {
                         if (isStaffOnly) {
-                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-check-square-o');
+                            // expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-check-square-o'); // For the Font Awesome 4.2.0 upgrade
+                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check') // Font Awesome 3.2.1
                         } else {
-                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-square-o');
+                            // expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-square-o'); // For the Font Awesome 4.2.0 upgrade
+                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check-empty'); // Font Awesome 3.2.1
                         }
                     };
 

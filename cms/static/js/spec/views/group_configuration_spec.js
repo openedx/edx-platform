@@ -35,8 +35,10 @@ define([
         usageUnit: '.group-configuration-usage-unit',
         usageUnitAnchor: '.group-configuration-usage-unit a',
         usageUnitMessage: '.group-configuration-validation-message',
-        usageUnitWarningIcon: '.group-configuration-usage-unit i.fa-warning',
-        usageUnitErrorIcon: '.group-configuration-usage-unit i.fa-exclamation-triangle',
+        // usageUnitWarningIcon: '.group-configuration-usage-unit i.fa-warning', // For the Font Awesome 4.2.0 upgrade
+        // usageUnitErrorIcon: '.group-configuration-usage-unit i.fa-exclamation-triangle', // For the Font Awesome 4.2.0 upgrade
+        usageUnitWarningIcon: '.group-configuration-usage-unit i.icon-warning-sign', // Font Awesome 3.2.1
+        usageUnitErrorIcon: '.group-configuration-usage-unit i.icon-exclamation-sign', // Font Awesome 3.2.1
         warningMessage: '.group-configuration-validation-text',
         warningIcon: '.wrapper-group-configuration-validation > i',
         note: '.wrapper-delete-button'
