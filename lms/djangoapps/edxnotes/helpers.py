@@ -51,7 +51,7 @@ def get_id_token(user):
             expires__gt=now()
         )
     except AccessToken.DoesNotExist:
-        access_token = AccessToken(client, user=user)
+        access_token = AccessToken(client=client, user=user)
         access_token.save()
 
     id_token = oidc.id_token(access_token)
