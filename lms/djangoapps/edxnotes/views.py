@@ -13,7 +13,7 @@ from courseware.courses import get_course_with_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from util.json_request import JsonResponse, JsonResponseBadRequest
-from edxnotes.exceptions import EdxNotesParseError
+from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.helpers import (
     get_notes,
     get_id_token,
@@ -35,7 +35,11 @@ def edxnotes(request, course_id):
     if not is_feature_enabled(course):
         raise Http404
 
-    notes = get_notes(request.user, course)
+    try:
+        notes = get_notes(request.user, course)
+    except EdxNotesServiceUnavailable:
+        raise Http404
+
     context = {
         "course": course,
         "search_endpoint": reverse("search_notes", kwargs={"course_id": course_id}),
@@ -63,7 +67,7 @@ def search_notes(request, course_id):
     query_string = request.GET["text"]
     try:
         search_results = search(request.user, course, query_string)
-    except EdxNotesParseError as err:
+    except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
         return JsonResponseBadRequest({"error": err.message}, status=500)
 
     return HttpResponse(search_results)
