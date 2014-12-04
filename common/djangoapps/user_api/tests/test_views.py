@@ -1528,7 +1528,7 @@ class UpdateEmailOptInTestCase(ApiTestCase):
         self.assertHttpBadRequest(response)
 
     def test_update_email_opt_in_inactive_user(self):
-        """Test that an inactive user can still update email."""
+        """Test that an inactive user can still update their email optin preference."""
         self.user.is_active = False
         self.user.save()
         # Register, which should trigger an activation email
