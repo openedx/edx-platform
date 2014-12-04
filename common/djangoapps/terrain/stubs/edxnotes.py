@@ -209,6 +209,8 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
             notes = self.server.filter_by_course_id(notes, course_id)
         if usage_id is not None:
             notes = self.server.filter_by_usage_id(notes, usage_id)
+        if user:
+            notes = self.server.filter_by_user(notes, user)
         if text:
             notes = self.server.search(notes, text)
         self.respond(content={
@@ -225,7 +227,7 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
             self.send_response(400, content="Bad Request")
             return
         notes = self.server.get_notes()
-        self.respond(content=notes)
+        self.respond(content=self.server.filter_by_user(notes, user))
 
     def _cleanup(self):
         """
