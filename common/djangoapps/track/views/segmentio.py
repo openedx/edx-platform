@@ -24,6 +24,7 @@ WARNING_IGNORED_TYPE = 'Type ignored'
 ERROR_MISSING_USER_ID = 'Required user_id missing from context'
 ERROR_USER_NOT_EXIST = 'Specified user does not exist'
 ERROR_INVALID_USER_ID = 'Unable to parse userId as an integer'
+ERROR_MISSING_DATA = 'The data field must be specified in the properties dictionary'
 ERROR_MISSING_NAME = 'The name field must be specified in the properties dictionary'
 ERROR_MISSING_TIMESTAMP = 'Required timestamp field not found'
 ERROR_MISSING_RECEIVED_AT = 'Required receivedAt field not found'
@@ -119,7 +120,7 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     full_segment_event = request.json
 
     # We mostly care about the properties
-    segment_event = full_segment_event.get('properties', {})
+    segment_properties = full_segment_event.get('properties', {})
 
     # Start with the context provided by segment.io in the "client" field if it exists
     # We should tightly control which fields actually get included in the event emitted.
@@ -136,32 +137,38 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     else:
         context['event_source'] = event_source
 
-    # Ignore types that are unsupported
+    if 'name' not in segment_properties:
+        raise EventValidationError(ERROR_MISSING_NAME)
+
+    if 'data' not in segment_properties:
+        raise EventValidationError(ERROR_MISSING_DATA)
+
+    # Ignore event types and names that are unsupported
     segment_event_type = full_segment_event.get('type')
+    segment_event_name = segment_properties['name']
     allowed_types = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_TYPES', [])]
-    if not segment_event_type or segment_event_type.lower() not in allowed_types:
+    disallowed_substring_names = [
+        a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES', [])
+    ]
+    if (
+        not segment_event_type or
+        (segment_event_type.lower() not in allowed_types) or
+        any(disallowed_subs_name in segment_event_name.lower() for disallowed_subs_name in disallowed_substring_names)
+    ):
         raise EventValidationError(WARNING_IGNORED_TYPE)
 
     if segment_context:
-        # copy required fields from segment's context dict to our custom context dict
-        for context_field_name, segment_context_field_name in [
-            ('course_id', 'course_id'),
-            ('open_in_browser_url', 'open_in_browser_url'),
-            ('agent', 'userAgent')
-        ]:
-            if segment_context_field_name in segment_context:
-                context[context_field_name] = segment_context[segment_context_field_name]
-
         # copy the entire segment's context dict as a sub-field of our custom context dict
         context['client'] = dict(segment_context)
+        context['agent'] = segment_context.get('userAgent', '')
 
         # remove duplicate and unnecessary fields from our copy
-        for field in ('traits', 'integrations', 'userAgent', 'course_id', 'open_in_browser_url'):
+        for field in ('traits', 'integrations', 'userAgent'):
             if field in context['client']:
                 del context['client'][field]
 
     # Overlay any context provided in the properties
-    context.update(segment_event.get('context', {}))
+    context.update(segment_properties.get('context', {}))
 
     user_id = full_segment_event.get('userId')
     if not user_id:
@@ -203,13 +210,10 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     else:
         raise EventValidationError(ERROR_MISSING_RECEIVED_AT)
 
-    if 'name' not in segment_event:
-        raise EventValidationError(ERROR_MISSING_NAME)
-
-    context['ip'] = segment_event.get('context', {}).get('ip', '')
+    context['ip'] = segment_properties.get('context', {}).get('ip', '')
 
     with tracker.get_tracker().context('edx.segmentio', context):
-        tracker.emit(segment_event['name'], segment_event.get('data', {}))
+        tracker.emit(segment_event_name, segment_properties.get('data', {}))
 
 
 def parse_iso8601_timestamp(timestamp):
