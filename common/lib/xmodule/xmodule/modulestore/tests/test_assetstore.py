@@ -455,14 +455,10 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         with storebuilder.build(None) as store:
             course_key = store.make_course_key("org", "course", "run")
             asset_key = course_key.make_asset_key('asset', 'foo.jpg')
-            for method in ['find_asset_metadata']:
-                with self.assertRaises(NotImplementedError):
-                    getattr(store, method)(asset_key)
-            with self.assertRaises(NotImplementedError):
-                # pylint: disable=protected-access
-                store._find_course_asset(asset_key)
-            with self.assertRaises(NotImplementedError):
-                store.get_all_asset_metadata(course_key, 'asset')
+            self.assertEquals(store.find_asset_metadata(asset_key), None)
+            # pylint: disable=protected-access
+            self.assertEquals(store._find_course_asset(asset_key), (None, None))
+            self.assertEquals(store.get_all_asset_metadata(course_key, 'asset'), [])
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_copy_all_assets_same_modulestore(self, storebuilder):
