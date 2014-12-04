@@ -25,7 +25,7 @@
   {% include "wiki/includes/editor.html" %}
   <div class="form-actions">
       <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
-        <i class="icon-ok"></i>
+        <i class="icon-check-square-o"></i>
         {% trans "Save changes" %}
       </button>
       <a class="btn btn-large" id="previewButton" href="#previewModal" rel="leanModal"
@@ -33,7 +33,7 @@
           document.article_edit_form.target='previewWindow';
           document.article_edit_form.action='{% url 'wiki:preview' path=urlpath.path article_id=article.id %}';
           document.article_edit_form.submit();">
-        <i class="icon-eye-open"></i>
+        <i class="icon-eye"></i>
         {% trans "Preview" %}
       </a>
 
@@ -57,7 +57,7 @@
     </div>
     <div class="modal-footer">
       <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
-        <i class="icon-ok"></i>
+        <i class="icon-check-square-o"></i>
         {% trans "Save changes" %}
       </button>
 

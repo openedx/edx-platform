@@ -34,7 +34,7 @@
         </fieldset>
         <% if (!_.isEmpty(usage)) { %>
             <div class="wrapper-group-configuration-validation">
-                <i class="icon-warning-sign"></i>
+                <i class="icon-warning"></i>
                 <p class="group-configuration-validation-text">
                     <%= gettext('This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.') %>
                 </p>
