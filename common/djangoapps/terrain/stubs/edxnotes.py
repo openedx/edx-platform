@@ -205,16 +205,17 @@ class StubEdxNotesServiceHandler(StubHttpRequestHandler):
             return
 
         notes = self.server.get_notes()
-        results = self.server.filter_by_user(notes, user)
         if course_id is not None:
-            results = self.server.filter_by_course_id(results, course_id)
+            notes = self.server.filter_by_course_id(notes, course_id)
         if usage_id is not None:
-            results = self.server.filter_by_usage_id(results, usage_id)
+            notes = self.server.filter_by_usage_id(notes, usage_id)
+        if user:
+            notes = self.server.filter_by_user(notes, user)
         if text:
-            results = self.server.search(results, text)
+            notes = self.server.search(notes, text)
         self.respond(content={
-            "total": len(results),
-            "rows": results,
+            "total": len(notes),
+            "rows": notes,
         })
 
     def _collection(self):
