@@ -108,6 +108,10 @@
   }
 
   // UI: visual dividers
+  .divider-lv0 {
+    border-top: ($baseline/5) solid $gray-l4;
+  }
+
   .divider-lv1 {
     border-top: ($baseline/10) solid $gray-l4;
   }
@@ -487,7 +491,6 @@ section.instructor-dashboard-content-2 {
 
   .cohort-management-nav {
     @include clearfix();
-    margin-bottom: $baseline;
 
     .cohort-management-nav-form {
       width: 60%;
@@ -553,10 +556,6 @@ section.instructor-dashboard-content-2 {
   }
 
   // cohort group
-  .cohort-management-group {
-    border: 1px solid $gray-l5;
-  }
-
   .cohort-management-group-header {
     border-bottom: ($baseline/10) solid $gray-l4;
     background: $gray-l5;
@@ -625,6 +624,7 @@ section.instructor-dashboard-content-2 {
 
   .cohort-management-group-add {
     @extend %cohort-management-form;
+    border: 1px solid $gray-l5;
     padding: $baseline $baseline 0 $baseline;
 
     .message-title {
@@ -662,6 +662,10 @@ section.instructor-dashboard-content-2 {
   }
 
   // CSV-based file upload for auto cohort assigning
+  .toggle-cohort-management-secondary {
+    @extend %t-copy-sub1;
+  }
+
   .cohort-management-file-upload {
 
     .message-title {
@@ -690,7 +694,6 @@ section.instructor-dashboard-content-2 {
       // needed to override very poor specificity and base rules for blue button
       @include font-size(14);
       margin-bottom: 0;
-      // float: right;
       font-weight: 700;
       text-shadow: none;
     }
@@ -698,7 +701,11 @@ section.instructor-dashboard-content-2 {
 
   .cohort-management-supplemental {
     @extend %t-copy-sub1;
-    margin-top: ($baseline/2);
+    margin-top: $baseline;
+    padding: ($baseline/2) $baseline;
+    background: $gray-l5;
+    border-radius: ($baseline/10);
+
 
     .icon {
       margin-right: ($baseline/4);
