@@ -1526,3 +1526,18 @@ class UpdateEmailOptInTestCase(ApiTestCase):
 
         response = self.client.post(self.url, params)
         self.assertHttpBadRequest(response)
+
+    def test_update_email_opt_in_inactive_user(self):
+        """Test that an inactive user can still update their email optin preference."""
+        self.user.is_active = False
+        self.user.save()
+        # Register, which should trigger an activation email
+        response = self.client.post(self.url, {
+            "course_id": unicode(self.course.id),
+            "email_opt_in": u"True"
+        })
+        self.assertHttpOK(response)
+        preference = UserOrgTag.objects.get(
+            user=self.user, org=self.course.id.org, key="email-optin"
+        )
+        self.assertEquals(preference.value, u"True")

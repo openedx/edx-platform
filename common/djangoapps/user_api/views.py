@@ -26,6 +26,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from edxmako.shortcuts import marketing_link
 
 import third_party_auth
+from util.authentication import SessionAuthenticationAllowInactiveUser
 from user_api.api import account as account_api, profile as profile_api
 from user_api.helpers import FormDescription, shim_student_view, require_post_params
 
@@ -842,7 +843,7 @@ class PreferenceUsersListView(generics.ListAPIView):
 
 class UpdateEmailOptInPreference(APIView):
     """View for updating the email opt in preference. """
-    authentication_classes = (authentication.SessionAuthentication,)
+    authentication_classes = (SessionAuthenticationAllowInactiveUser,)
 
     @method_decorator(require_post_params(["course_id", "email_opt_in"]))
     @method_decorator(ensure_csrf_cookie)
