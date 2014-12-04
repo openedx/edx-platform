@@ -3,7 +3,7 @@ Views related to operations on course objects
 """
 import json
 import random
-import string  # pylint: disable=W0402
+import string  # pylint: disable=deprecated-module
 import logging
 from django.utils.translation import ugettext as _
 import django.utils

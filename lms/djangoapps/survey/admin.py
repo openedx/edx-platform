@@ -7,10 +7,10 @@ from django.contrib import admin
 from survey.models import SurveyForm
 
 
-class SurveyFormAdminForm(forms.ModelForm):  # pylint: disable=R0924
+class SurveyFormAdminForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
     """Form providing validation of SurveyForm content."""
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         model = SurveyForm
         fields = ('name', 'form')
 

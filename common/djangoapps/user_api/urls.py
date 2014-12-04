@@ -20,6 +20,12 @@ urlpatterns = patterns(
         r'^v1/forum_roles/(?P<name>[a-zA-Z]+)/users/$',
         user_api_views.ForumRoleUsersListView.as_view()
     ),
+
+    url(
+        r'^v1/preferences/email_opt_in/$',
+        user_api_views.UpdateEmailOptInPreference.as_view(),
+        name="preferences_email_opt_in"
+    ),
 )
 
 if settings.FEATURES.get('ENABLE_COMBINED_LOGIN_REGISTRATION'):

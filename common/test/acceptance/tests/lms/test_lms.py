@@ -11,8 +11,6 @@ from bok_choy.web_app_test import WebAppTest
 from ..helpers import UniqueCourseTest, load_data_str
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
-from ...pages.lms.find_courses import FindCoursesPage
-from ...pages.lms.course_about import CourseAboutPage
 from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.tab_nav import TabNavPage
 from ...pages.lms.course_nav import CourseNavPage
@@ -23,48 +21,6 @@ from ...pages.lms.video.video import VideoPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
-
-
-class RegistrationTest(UniqueCourseTest):
-    """
-    Test the registration process.
-    """
-
-    def setUp(self):
-        """
-        Initialize pages and install a course fixture.
-        """
-        super(RegistrationTest, self).setUp()
-
-        self.find_courses_page = FindCoursesPage(self.browser)
-        self.course_about_page = CourseAboutPage(self.browser, self.course_id)
-
-        # Create a course to register for
-        CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        ).install()
-
-    def test_register(self):
-
-        # Visit the main page with the list of courses
-        self.find_courses_page.visit()
-
-        # Go to the course about page and click the register button
-        self.course_about_page.visit()
-        register_page = self.course_about_page.register()
-
-        # Fill in registration info and submit
-        username = "test_" + self.unique_id[0:6]
-        register_page.provide_info(
-            username + "@example.com", "test", username, "Test User"
-        )
-        dashboard = register_page.submit()
-
-        # We should end up at the dashboard
-        # Check that we're registered for the course
-        course_names = dashboard.available_courses
-        self.assertIn(self.course_info['display_name'], course_names)
 
 
 @attr('shard_1')

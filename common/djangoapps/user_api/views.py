@@ -9,10 +9,12 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from opaque_keys.edx import locator
 from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.exceptions import ParseError
@@ -836,3 +838,32 @@ class PreferenceUsersListView(generics.ListAPIView):
 
     def get_queryset(self):
         return User.objects.filter(preferences__key=self.kwargs["pref_key"]).prefetch_related("preferences")
+
+
+class UpdateEmailOptInPreference(APIView):
+    """View for updating the email opt in preference. """
+    authentication_classes = (authentication.SessionAuthentication,)
+
+    @method_decorator(require_post_params(["course_id", "email_opt_in"]))
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request):
+        """ Post function for updating the email opt in preference.
+
+        Allows the modification or creation of the email opt in preference at an
+        organizational level.
+
+        Args:
+            request (Request): The request should contain the following POST parameters:
+                * course_id: The slash separated course ID. Used to determine the organization
+                    for this preference setting.
+                * email_opt_in: "True" or "False" to determine if the user is opting in for emails from
+                    this organization. If the string does not match "True" (case insensitive) it will
+                    assume False.
+
+        """
+        course_id = request.DATA['course_id']
+        org = locator.CourseLocator.from_string(course_id).org
+        # Only check for true. All other values are False.
+        email_opt_in = request.DATA['email_opt_in'].lower() == 'true'
+        profile_api.update_email_opt_in(request.user, org, email_opt_in)
+        return HttpResponse(status=status.HTTP_200_OK)

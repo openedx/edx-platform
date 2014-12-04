@@ -7,7 +7,7 @@ from opaque_keys.edx import locator
 import unittest
 import ddt
 
-from shoppingcart.models import Order, CertificateItem  # pylint: disable=F0401
+from shoppingcart.models import Order, CertificateItem  # pylint: disable=import-error
 from course_modes.models import CourseMode
 from student.management.commands import transfer_students
 from student.models import CourseEnrollment, UNENROLL_DONE, EVENT_NAME_ENROLLMENT_DEACTIVATED, \
@@ -36,7 +36,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         """Disconnects the UNENROLL stub receiver."""
         UNENROLL_DONE.disconnect(self.assert_unenroll_signal)
 
-    def assert_unenroll_signal(self, skip_refund=False, **kwargs):   # pylint: disable=W0613
+    def assert_unenroll_signal(self, skip_refund=False, **kwargs):   # pylint: disable=unused-argument
         """ Signal Receiver stub for testing that the unenroll signal was fired. """
         self.assertFalse(self.signal_fired)
         self.assertTrue(skip_refund)
@@ -45,8 +45,8 @@ class TestTransferStudents(ModuleStoreTestCase):
     def test_transfer_students(self):
         """ Verify the transfer student command works as intended. """
         student = UserFactory.create()
-        student.set_password(self.PASSWORD)  # pylint: disable=E1101
-        student.save()   # pylint: disable=E1101
+        student.set_password(self.PASSWORD)  # pylint: disable=no-member
+        student.save()   # pylint: disable=no-member
         mode = 'verified'
         # Original Course
         original_course_location = locator.CourseLocator('Org0', 'Course0', 'Run0')
@@ -75,7 +75,7 @@ class TestTransferStudents(ModuleStoreTestCase):
         self.assertTrue(self.signal_fired)
 
         # Confirm the analytics event was emitted.
-        self.mock_tracker.emit.assert_has_calls(  # pylint: disable=E1103
+        self.mock_tracker.emit.assert_has_calls(  # pylint: disable=maybe-no-member
             [
                 call(
                     EVENT_NAME_ENROLLMENT_ACTIVATED,

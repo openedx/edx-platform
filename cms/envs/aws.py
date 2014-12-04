@@ -4,7 +4,7 @@ This is the default template for our main set of AWS servers.
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 import json
 
@@ -295,3 +295,6 @@ ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})
 
 ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get('ADVANCED_COMPONENT_TYPES', ADVANCED_COMPONENT_TYPES)
 ADVANCED_PROBLEM_TYPES = ENV_TOKENS.get('ADVANCED_PROBLEM_TYPES', ADVANCED_PROBLEM_TYPES)
+DEPRECATED_ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get(
+    'DEPRECATED_ADVANCED_COMPONENT_TYPES', DEPRECATED_ADVANCED_COMPONENT_TYPES
+)

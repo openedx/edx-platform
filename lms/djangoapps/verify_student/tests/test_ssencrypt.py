@@ -1,5 +1,4 @@
 import base64
-
 from nose.tools import assert_equals
 
 from verify_student.ssencrypt import (

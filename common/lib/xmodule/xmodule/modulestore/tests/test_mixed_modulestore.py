@@ -2,25 +2,26 @@
 """
 Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Draft, XML)
 """
+from collections import namedtuple
 import datetime
 import ddt
-import itertools
-import pymongo
-
-from collections import namedtuple
 from importlib import import_module
-from pytz import UTC
+import itertools
+import mimetypes
 from uuid import uuid4
 
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
+from nose.plugins.attrib import attr
+import pymongo
+from pytz import UTC
+
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
 from xmodule.contentstore.content import StaticContent
-import mimetypes
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from nose import SkipTest
@@ -43,6 +44,7 @@ from xmodule.tests import DATA_DIR, CourseComparisonTest
 
 
 @ddt.ddt
+@attr('mongo')
 class TestMixedModuleStore(CourseComparisonTest):
     """
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and

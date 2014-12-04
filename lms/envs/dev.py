@@ -10,7 +10,7 @@ sessions. Assumes structure:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from .common import *
 from logsettings import get_logger_config
@@ -308,6 +308,6 @@ REGISTRATION_CODE_LENGTH = 8
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=F0401
+    from .private import *      # pylint: disable=import-error
 except ImportError:
     pass

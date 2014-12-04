@@ -65,7 +65,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-11-10 09:08-0500\n"
+"POT-Creation-Date: 2014-12-01 11:37-0500\n"
 "PO-Revision-Date: 2014-10-30 23:38+0000\n"
 "Last-Translator: Edukometrija <jolitad@mruni.eu>\n"
 "Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/projects/p/edx-platform/language/lt_LT/)\n"
@@ -164,10 +164,8 @@ msgstr "Kurso dalyvis"
 #: common/djangoapps/student/middleware.py
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
-"please contact us at {link_start}{support_email}{link_end}"
+"please contact us at {support_email}"
 msgstr ""
-"Jūsų sąskaita buvo užblokuota. Jeigu manote, kad tai klaida, prašome "
-"susisiekti su mumis adresu: {link_start}{support_email}{link_end}"
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
@@ -523,6 +521,200 @@ msgstr "Būtinas vardas"
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Invalid ID"
 msgstr "Neteisingas identifikacijos numeris"
+
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's email address.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's email address.
+#. Translators: This label appears above a field on the password reset
+#. form meant to hold the user's email address.
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+#: common/djangoapps/user_api/views.py lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Email"
+msgstr "El. paštas"
+
+#. Translators: This example email address is used as a placeholder in
+#. a field on the login form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the registration form meant to hold the user's email address.
+#. Translators: This example email address is used as a placeholder in
+#. a field on the password reset form meant to hold the user's email address.
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+#: common/djangoapps/user_api/views.py
+msgid "username@domain.com"
+msgstr ""
+
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+msgid "The email address you used to register with {platform_name}"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the login form
+#. meant to hold the user's password.
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's password.
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+#: cms/templates/login.html cms/templates/register.html
+#: lms/templates/login.html lms/templates/provider_login.html
+#: lms/templates/provider_login.html lms/templates/register.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
+msgid "Password"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This phrase appears next to a checkbox on the login form
+#. which the user can check in order to remain logged in after their
+#. session ends.
+#: common/djangoapps/user_api/views.py lms/templates/login.html
+msgid "Remember me"
+msgstr ""
+
+#: common/djangoapps/user_api/views.py
+msgid ""
+"It looks like {email_address} and {username} belong to an existing account. "
+"Try again with a different email address and username."
+msgstr ""
+
+#: common/djangoapps/user_api/views.py
+msgid ""
+"It looks like {email_address} belongs to an existing account. Try again with"
+" a different email address."
+msgstr ""
+
+#: common/djangoapps/user_api/views.py
+msgid ""
+"It looks like {username} belongs to an existing account. Try again with a "
+"different username."
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's full name.
+#: common/djangoapps/user_api/views.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
+#: lms/templates/dashboard.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
+#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: lms/templates/verify_student/_modal_editname.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Full Name"
+msgstr ""
+
+#. Translators: These instructions appear on the registration form,
+#. immediately
+#. below a field meant to hold the user's full name.
+#: common/djangoapps/user_api/views.py
+msgid "The name that will appear on your certificates"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's public username.
+#: common/djangoapps/user_api/views.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/legacy.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Username"
+msgstr ""
+
+#: common/djangoapps/user_api/views.py
+msgid "The name that will identify you in your courses"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's highest completed level of education.
+#: common/djangoapps/user_api/views.py lms/templates/register.html
+msgid "Highest Level of Education Completed"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's gender.
+#: common/djangoapps/user_api/views.py lms/djangoapps/instructor/views/api.py
+#: lms/templates/register.html lms/templates/signup_modal.html
+msgid "Gender"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's year of birth.
+#: common/djangoapps/user_api/views.py lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Year of Birth"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's mailing address.
+#: common/djangoapps/user_api/views.py lms/djangoapps/instructor/views/api.py
+#: lms/templates/register.html
+msgid "Mailing Address"
+msgstr ""
+
+#: common/djangoapps/user_api/views.py
+msgid "If you'd like, tell us why you're interested in {platform_name}"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: common/djangoapps/user_api/views.py lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "City"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the country in which the user lives.
+#: common/djangoapps/user_api/views.py lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Country"
+msgstr ""
+
+#: common/djangoapps/user_api/views.py
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/static_templates/honor.html
+#: lms/templates/static_templates/honor.html
+msgid "Honor Code"
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: common/djangoapps/user_api/views.py lms/templates/footer-edx-new.html
+#: lms/templates/footer-legacy.html lms/templates/footer.html
+msgid "Terms of Service and Honor Code"
+msgstr ""
+
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+msgid "I agree to the {platform_name} {terms_of_service}."
+msgstr ""
+
+#: common/djangoapps/user_api/views.py common/djangoapps/user_api/views.py
+msgid "You must agree to the {platform_name} {terms_of_service}."
+msgstr ""
+
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This is a legal document users must agree to
+#. in order to register a new account.
+#: common/djangoapps/user_api/views.py cms/templates/widgets/footer.html
+#: lms/templates/static_templates/tos.html
+#: lms/templates/static_templates/tos.html
+msgid "Terms of Service"
+msgstr ""
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -1068,8 +1260,7 @@ msgstr "Neįmanoma {student_answer} suprasti kaip skaičiaus."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use variables ({bad_variables}) in numerical problems."
-msgstr ""
-"Skaitiniuose uždaviniuose negalima vartoti kintamųjų ({bad_variables})."
+msgstr "Skaitinėse užduotyse negalima vartoti kintamųjų ({bad_variables})."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
@@ -2456,7 +2647,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Visibility In Catalog"
-msgstr ""
+msgstr "Kurso matomumas kataloge"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2465,16 +2656,19 @@ msgid ""
 "access to about page), 'about' (only allow access to about page), 'none' (do"
 " not show in catalog and do not allow access to an about page)."
 msgstr ""
+"Nustato prieigos leidimus rodyti kursą kursų kataloge. Gali būti nustatyta "
+"viena iš trijų reikšmių: \"abu\" (rodyti kataloge ir suteikti prieigą prie "
+"puslapio \"Apie kursą\"), \"apie\" (tik suteikti prieigą prie puslapio "
+"\"Apie kursą\"), \"nė vieno\" (nerodyti kataloge ir nesuteikti prieigos prie"
+" puslapio \"Apie kursą\")."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Both"
-msgstr ""
+msgstr "Abu"
 
 #: common/lib/xmodule/xmodule/course_module.py
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
 msgid "About"
-msgstr ""
+msgstr "Apie"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -2791,10 +2985,13 @@ msgid ""
 "Select True to request the user's email address. You must also set Open in "
 "New Page to True to get the user's information."
 msgstr ""
+"Pasirinkite \"Taip\", jeigu norite paprašyti naudotojo elektroninio pašto "
+"adreso. Taip pat turite nustatyti \"Taip\" \"Atidaryti naujame puslapyje\", "
+"jeigu norite gauti naudotojo informaciją."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI Application Information"
-msgstr ""
+msgstr "LTI programos informacija"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -2802,31 +2999,41 @@ msgid ""
 "and/or email, use this text box to inform users why their username and/or "
 "email will be forwarded to a third party application."
 msgstr ""
+"Įveskite trečiosios šalies taikomosios programos aprašą. Jeigu joje prašoma "
+"pateikti naudotojo vardą ir/arba el. pašto adresą, šiame teksto lauke "
+"informuokite naudotojus, kodėl jų naudotojų vardai ir el. pašto adresai bus "
+"persiųsti trečiosios šalies taikomajai programai."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Button Text"
-msgstr ""
+msgstr "Mygtuko tekstas"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the text on the button used to launch the third party application."
 msgstr ""
+"Įveskite tekstą ant mygtuko, kuriuo paleidžiama trečiosios šalies taikomoji "
+"programa."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
 "string."
 msgstr ""
+"Negalima išanalizuoti pasirinktinio parametro {custom_parameter}. Turi būti "
+"eilutė \"x=y\"."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
 "string."
 msgstr ""
+"Negalima išanalizuoti LTI paso {lti_passport}. Turi būti eilutė "
+"\"id:key:secret\"."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Show Single Problem"
-msgstr ""
+msgstr "Rodyti vieną užduotį"
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid ""
@@ -2834,71 +3041,82 @@ msgid ""
 " is shown. When False, a panel is displayed with all problems available for "
 "peer grading."
 msgstr ""
+"Kai \"Taip\", rodoma tik viena užduotis, į kurią nurodo užduoties adreso "
+"nuoroda. Kai \"Ne\", rodomas skydas su visomis užduotimis, kurias gali "
+"vertinti bendrakursiai."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Link to Problem Location"
-msgstr ""
+msgstr "Užduoties adreso nuoroda "
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid ""
 "The location of the problem being graded. Only used when \"Show Single "
 "Problem\" is True."
 msgstr ""
+"Užduoties adresas yra vertinamas. Naudojama tik tada, kai \"Rodyti vieną "
+"užduotį\" yra \"Taip\"."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid ""
 "Defines whether the student gets credit for grading this problem. Only used "
 "when \"Show Single Problem\" is True."
 msgstr ""
+"Apibrėžia, ar įskaitomas kurso dalyvio pateiktas šios užduoties vertinimas. "
+"Naudojama tik tada, kai \"Rodyti vieną užduotį\" yra \"Taip\"."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Due date that should be displayed."
-msgstr ""
+msgstr "Rodytina pateikimo data"
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Amount of grace to give on the due date."
-msgstr ""
+msgstr "Pateikimo datos atidėjimas"
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Student data for a given peer grading problem."
-msgstr ""
+msgstr "Kurso dalyvio šios užduoties, kurią vertina bendrakursiai, duomenys."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Peer Grading Interface"
-msgstr ""
+msgstr "Bendrakursių vertinimo sąsaja"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Due Date"
-msgstr ""
+msgstr "Pateikimo data"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
-msgstr ""
+msgstr "Įveskite datą, iki kada reikia pateikti užduoties sprendimus."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
-msgstr ""
+msgstr "Grupės identifikacijos numeris {group_id}"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Not Selected"
-msgstr ""
+msgstr "Nepasirinkta"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
 "This name is used for organizing your course content, but is not shown to "
 "students."
 msgstr ""
+"Šis pavadinimas naudojamas tvarkant jūsų kurso turinį, bet nėra rodomas "
+"kurso dalyviams."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Content Experiment"
-msgstr ""
+msgstr "Turinio bandymas"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
 msgstr ""
+"Turinio bandymuose dalyvaujančių suskirstytų kurso dalyvių grupinių "
+"konfigūracijų sąrašas."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
@@ -2906,43 +3124,46 @@ msgid ""
 " Caution: Changing the group configuration of a student-visible experiment "
 "will impact the experiment data."
 msgstr ""
+"Konfigūracija apibrėžia, kaip naudotojai yra sugrupuoti šiam turinio "
+"bandymui. Įspėjimas: kurso dalyviams matomo bandymo grupinės konfigūracijos "
+"pakeitimas padarys įtaką bandymo duomenims."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group Configuration"
-msgstr ""
+msgstr "Grupinė konfigūracija"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Which child module students in a particular group_id should see"
-msgstr ""
+msgstr "Kurį susijusį modulį  group_id grupės dalyviai turėtų matyti"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "{group_name} (inactive)"
-msgstr ""
+msgstr "{group_name} (neaktyvi)"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "The experiment is not associated with a group configuration."
-msgstr ""
+msgstr "Bandymas nesusijęs su grupine konfigūracija."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Select a Group Configuration"
-msgstr ""
+msgstr "Pasirinkti grupinę konfigūraciją"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
 "The experiment uses a deleted group configuration. Select a valid group "
 "configuration or delete this experiment."
 msgstr ""
-"Bandyme naudojama pašalinta grupės konfigūracija.  Pasirinkite galiojančią "
-"grupės konfigūraciją arba pašalinkite šį bandymą."
+"Bandyme naudojama pašalinta grupinė konfigūracija.  Pasirinkite galiojančią "
+"grupinę konfigūraciją arba pašalinkite šį bandymą."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
 "The experiment does not contain all of the groups in the configuration."
-msgstr ""
+msgstr "Į bandymą įtrauktos ne visos konfigūruotos grupės."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Add Missing Groups"
-msgstr ""
+msgstr "Pridėti trūkstamas grupes"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
@@ -2955,10 +3176,20 @@ msgstr ""
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "This content experiment has issues that affect content visibility."
 msgstr ""
+"Šiame turinio bandyme yra problemų, kurios turi įtakos turinio matomumui. "
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: 'Courseware' refers to the tab in the courseware that leads to
+#. the content of a course
+#: common/lib/xmodule/xmodule/tabs.py
 #: lms/templates/courseware/courseware-error.html
+#, fuzzy
 msgid "Courseware"
-msgstr "Kursų medžiaga"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"Kurso medžiaga\n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"Kursų medžiaga"
 
 #. Translators: "Course Info" is the name of the course's information and
 #. updates page
@@ -2976,33 +3207,30 @@ msgstr "Pažanga"
 #: common/lib/xmodule/xmodule/tabs.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
-msgstr "Žinynas"
+msgstr "Vikis"
 
 #: common/lib/xmodule/xmodule/tabs.py cms/templates/textbooks.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "Vadovėliai"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: "Staff grading" appears on a tab that allows
 #. staff to view open-ended problems that require staff grading
 #: common/lib/xmodule/xmodule/tabs.py
-#: lms/templates/instructor/staff_grading.html
 msgid "Staff grading"
-msgstr ""
+msgstr "Personalo vertinimas"
 
 #. Translators: "Peer grading" appears on a tab that allows
 #. students to view open-ended problems that require grading
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "Peer grading"
-msgstr ""
+msgstr "Bendrakursių vertinimas"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: "Syllabus" appears on a tab that, when clicked, opens the
 #. syllabus of the course.
-#: common/lib/xmodule/xmodule/tabs.py lms/templates/courseware/syllabus.html
+#: common/lib/xmodule/xmodule/tabs.py
 msgid "Syllabus"
-msgstr ""
+msgstr "Kurso programa"
 
 #. Translators: 'Instructor' appears on the tab that leads to the instructor
 #. dashboard, which is
@@ -3010,132 +3238,146 @@ msgstr ""
 #. their course
 #: common/lib/xmodule/xmodule/tabs.py
 msgid "Instructor"
-msgstr ""
+msgstr "Lektorius"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
-msgstr ""
+msgstr "Teksto komentaras"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Source/Citation"
-msgstr ""
+msgstr "Šaltinis / nuoroda"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid ""
 "Optional for citing source of any material used. Automatic citation can be "
 "done using <a href=\"http://easybib.com\">EasyBib</a>"
 msgstr ""
+"Pasirinktinis naudotos medžiagos šaltinio paminėjimas. Automatinė nuoroda "
+"gali būti sukurta naudojantis <a href=\"http://easybib.com\">EasyBib</a>"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Diacritic Marks"
-msgstr ""
+msgstr "Diakritiniai ženklai"
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid ""
 "Add diacritic marks to be added to a text using the comma-separated form, "
 "i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
 msgstr ""
+"Pridėkite tekstui reikalingus diakritinius ženklus, skirdami kableliais, "
+"pvz., markname;urltomark;baseline,markname2;urltomark2;baseline2"
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Video Annotation"
-msgstr ""
+msgstr "Vaizdo įrašo komentaras"
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "The external source URL for the video."
-msgstr ""
+msgstr "Vaizdo įrašo išorinio šaltinio URL nuoroda "
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Source URL"
-msgstr ""
+msgstr "Šaltinio URL nuoroda"
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster Image URL"
-msgstr ""
+msgstr "Plakato paveikslo URL nuoroda"
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster URL"
-msgstr ""
+msgstr "Plakato URL nuoroda"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Inputs"
-msgstr ""
+msgstr "Įvestys"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Number of text boxes available for students to input words/sentences."
 msgstr ""
+"Teksto langelių, kuriuose kurso dalyviai gali įvesti žodžius / sakinius, "
+"skaičius."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Maximum Words"
-msgstr ""
+msgstr "Didžiausias žodžių skaičius"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Maximum number of words to be displayed in generated word cloud."
 msgstr ""
+"Didžiausias skaičius žodžių, kurie bus rodomi generuotame žodžių debesyje."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Show Percents"
-msgstr ""
+msgstr "Rodyti procentus"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Statistics are shown for entered words near that word."
-msgstr ""
+msgstr "Įvestų žodžių statistika rodoma šalia to žodžio."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Whether this student has posted words to the cloud."
-msgstr ""
+msgstr "Ar šis kurso dalyvis paskelbė žodžius debesyje."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Student answer."
-msgstr ""
+msgstr "Kurso dalyvio atsakymas."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "All possible words from all students."
-msgstr ""
+msgstr "Visi galimi visų kurso dalyvių žodžiai."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Top num_top_words words for word cloud."
-msgstr ""
+msgstr "num_top_words populiariausi žodžiai žodžių debesyje."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the default date by which problems are due."
 msgstr ""
+"Įveskite numatytąją datą, iki kada reikia pateikti užduočių sprendimus."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: lms/lib/xblock/mixin.py
 msgid "If true, can be seen only by course staff, regardless of start date."
 msgstr ""
+"Jeigu \"Taip\", bus matoma tik kurso personalui, neatsižvelgiant į pradžios "
+"datą."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "GIT URL"
-msgstr ""
+msgstr "GIT URL nuoroda"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the URL for the course data GIT repository."
-msgstr ""
+msgstr "Įveskite kurso duomenų GIT saugyklos URL nuorodą."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "XQA Key"
-msgstr ""
+msgstr "XQA raktas"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "This setting is not currently supported."
-msgstr ""
+msgstr "Šiuo metu šis parametras nepalaikomas."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the location of the annotation storage server. The textannotation, "
 "videoannotation, and imageannotation advanced modules require this setting."
 msgstr ""
+"Įveskite komentarų atmintinės serverio vietą. Šios nuostatos reikalauja "
+"išplėstiniai tekstinių, vaizdinių ir paveikslinių komentarų moduliai."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "URL for Annotation Storage"
-msgstr ""
+msgstr "Komentarų atmintinės URL nuoroda"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the secret string for annotation storage. The textannotation, "
 "videoannotation, and imageannotation advanced modules require this string."
 msgstr ""
+"Įveskite slaptą komentarų atmintinės eilutę. Šios eilutės reikalauja "
+"išplėstiniai tekstinių, vaizdinių ir paveikslinių komentarų moduliai."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3143,6 +3385,9 @@ msgid ""
 "are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
 "\"past_due\", and \"never\"."
 msgstr ""
+"Nurodykite, kada prie kiekvienos užduoties turi atsirasti mygtukas \"Rodyti "
+"atsakymą\". Teisingos reikšmės yra \"visada\", \"atsakyta\", \"bandyta "
+"atsakyti\", \"uždaryta\", \"baigta\", \"uždelsta\" ir \"niekada\"."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3151,34 +3396,43 @@ msgid ""
 " \"per_student\". This setting only applies to problems that have randomly "
 "generated numeric values."
 msgstr ""
+"Apibrėžkite, kaip dažnai užduoties kintamųjų reikšmės atsitiktinai "
+"atrenkamos kurso dalyviui parsisiunčiant užduotį. Teisingos reikšmės yra "
+"\"visada\", \"nustatant iš naujo\", \"niekada\" ir \"kiekvienam kurso "
+"dalyviui\". Ši nuostata taikoma tik toms užduotims, kuriose yra atsitiktinai"
+" generuojamų skaitinių reikšmių."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Days Early for Beta Users"
-msgstr ""
+msgstr "Išankstinės dienos beta versijos naudotojams"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the number of days before the start date that beta users can access "
 "the course."
 msgstr ""
+"Įveskite, kiek dienų iki pradžios datos beta versijos naudotojai gali "
+"prieiti prie kurso."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Static Asset Path"
-msgstr ""
+msgstr "Statinis komponento kelias"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the path to use for files on the Files & Uploads page. This value "
 "overrides the Studio default, c4x://."
 msgstr ""
+"Įveskite kelią naudoti failams failų ir siuntų puslapyje. Ši reikšmė pakeis "
+"numatytąją \"Studio\" reikšmę c4x://."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Text Customization"
-msgstr ""
+msgstr "Teksto tinkinimas"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter string customization substitutions for particular locations."
-msgstr ""
+msgstr "Įveskite eilučių tinkinimo pakaitalus tam tikrose vietose."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable LaTeX Compiler"
@@ -3189,6 +3443,8 @@ msgid ""
 "Enter true or false. If true, you can use the LaTeX templates for HTML "
 "components and advanced Problem components."
 msgstr ""
+"Įveskite \"Taip\" arba \"Ne\". Jeigu įvesite \"Taip\", galėsite naudoti "
+"\"LaTeX\" šablonus HTML komponentams ir papildomiems užduoties komponentams."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3199,10 +3455,17 @@ msgid ""
 "specific number, you cannot set the Maximum Attempts for individual problems"
 " to unlimited."
 msgstr ""
+"Įveskite, kiek daugiausia kartų kurso dalyvis gali bandyti atsakyti į "
+"užduotį. Numatyta, kad didžiausias bandymų skaičius yra nenurodytas, tai "
+"reiškia, kad kurso dalyviai gali bandyti išspręsti užduotis neribotą skaičių"
+" kartų. Šį visam kursui galiojantį parametrą jūs galite pakeisti atskiroms "
+"užduotims. Tačiau, jeigu visam kursui nustatytas tam tikras bandymų "
+"skaičius, tai atskiroms užduotims nustatyti neriboto bandymų skaičiaus jūs "
+"negalite."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Matlab API key"
-msgstr ""
+msgstr "Matlab API raktas"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3213,29 +3476,39 @@ msgid ""
 "obtain a key for your course, or to report an issue, please contact "
 "moocsupport@mathworks.com"
 msgstr ""
+"Įveskite MathWorks suteiktą API raktą, skirtą prisijungti prie MATLAB "
+"tarnybos. Šis raktas suteikiamas naudotis tik šiame kurse nurodytą laiko "
+"tarpą. Nesidalykite API raktu su kitais kursais. Nedelsdami praneškite "
+"MathWorks, jeigu manote, kad raktas yra neapsaugotas arba jam kyla pavojus. "
+"Norėdami gauti raktą savo kursui arba pranešti apie problemą, rašykite "
+"moocsupport@mathworks.com."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Experiment Group Configurations"
-msgstr ""
+msgstr "Bandymo grupinės konfigūracijos"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter the configurations that govern how students are grouped for content "
 "experiments."
 msgstr ""
+"Įveskite konfigūracijas, lemiančias, kaip kurso dalyviai grupuojami turinio "
+"bandymams."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable video caching system"
-msgstr ""
+msgstr "Įjungti vaizdų kaupimo sistemą"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter true or false. If true, video caching will be used for HTML5 videos."
 msgstr ""
+"Įveskite \"Taip\" arba \"Ne\". Jeigu įvesite \"Taip\", bus kaupiami HTML5 "
+"vaizdai."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Show Reset Button for Problems"
-msgstr ""
+msgstr "Užduotims rodyti mygtuką \"Atkurti\" "
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -3244,51 +3517,55 @@ msgid ""
 "settings. All existing problems are affected when this course-wide setting "
 "is changed."
 msgstr ""
+"Įveskite \"Taip\" arba \"Ne\". Jeigu nustatysite \"Taip\", bus numatyta, kad"
+" kurso užduotyse visada bus rodomas mygtukas \"Atkurti\". Tai galite "
+"pakeisti kiekvienos užduoties parametruose. Keičiant šį visam kursui "
+"galiojantį parametrą jis bus pritaikomas visoms esančioms užduotims. "
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Self"
-msgstr ""
+msgstr "Savęs"
 
 #. Translators: "AI" is used to denote an openended response that is machine-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "AI"
-msgstr ""
+msgstr "Automatinis"
 
 #. Translators: "Peer" is used to denote an openended response that is peer-
 #. graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Peer"
-msgstr ""
+msgstr "Bendrakursių"
 
 #. Translators: "Not started" is used to communicate to a student that their
 #. response
 #. has not yet been graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Not started."
-msgstr ""
+msgstr "Nepradėta"
 
 #. Translators: "Being scored." is used to communicate to a student that their
 #. response
 #. are in the process of being scored
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Being scored."
-msgstr ""
+msgstr "Vertinama"
 
 #. Translators: "Scoring finished" is used to communicate to a student that
 #. their response
 #. have been scored, but the full scoring process is not yet complete
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Scoring finished."
-msgstr ""
+msgstr "Įvertinta"
 
 #. Translators: "Complete" is used to communicate to a student that their
 #. openended response has been fully scored
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Complete."
-msgstr ""
+msgstr "Baigta"
 
 #. Translators: "Scored rubric" appears to a user as part of a longer
 #. string that looks something like: "Scored rubric from grader 1".
@@ -3297,7 +3574,7 @@ msgstr ""
 #. returned from one of the graders of their openended response problem.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "Scored rubric"
-msgstr ""
+msgstr "Įvertinta rubrika"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid ""
@@ -3309,32 +3586,32 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
 msgid "The problem state got out-of-sync. Please try reloading the page."
-msgstr ""
+msgstr "Užduoties būsena nesinchronizuota. Prašome perkrauti puslapį."
 
 #. Translators: "Self-Assessment" refers to the self-assessed mode of
 #. openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "Self-Assessment"
-msgstr ""
+msgstr "Savęs vertinimas"
 
 #. Translators: "Peer-Assessment" refers to the peer-assessed mode of
 #. openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "Peer-Assessment"
-msgstr ""
+msgstr "Bendrakursių vertinimas"
 
 #. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
 #. of openended evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "Instructor-Assessment"
-msgstr ""
+msgstr "Lektoriaus vertinimas"
 
 #. Translators: "AI-Assessment" refers to the machine-graded mode of openended
 #. evaluation
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
 msgid "AI-Assessment"
-msgstr ""
+msgstr "Automatinis vertinimas"
 
 #. Translators: 'tag' is one of 'feedback', 'submission_id',
 #. 'grader_id', or 'score'. They are categories that a student
@@ -3351,22 +3628,24 @@ msgstr ""
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "There was an error saving your feedback. Please contact course staff."
 msgstr ""
+"Išsaugant jūsų atsiliepimą įvyko klaida. Prašome susisiekti su kurso "
+"personalu."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Couldn't submit feedback."
-msgstr ""
+msgstr "Nepavyko pateikti atsiliepimo."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Successfully saved your feedback."
-msgstr ""
+msgstr "Jūsų atsiliepimas sėkmingai išsaugotas."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Unable to save your feedback. Please try again later."
-msgstr ""
+msgstr "Neįmanoma išsaugoti jūsų atsiliepimo. Prašome bandyti vėliau. "
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Successfully saved your submission."
-msgstr ""
+msgstr "Jūsų pateiktis sėkmingai išsaugota."
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -3375,7 +3654,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid ""
 "Unable to submit your submission to the grader. Please try again later."
-msgstr ""
+msgstr "Neįmanoma jūsų atsakymo pateikti vertintojui. Prašome bandyti vėliau."
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -3384,7 +3663,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Error getting feedback from grader."
-msgstr ""
+msgstr "Klaida gaunant vertintojo atsiliepimą."
 
 #. Translators: the `grader` refers to the grading service open response
 #. problems
@@ -3392,11 +3671,11 @@ msgstr ""
 #. graded.
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "No feedback available from grader."
-msgstr ""
+msgstr "Vertintojo atsiliepimo nėra."
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Error handling action. Please try again."
-msgstr ""
+msgstr "Klaida vykdant veiksmą. Prašome bandyti vėliau."
 
 #. Translators: this string appears once an openended response
 #. is submitted but before it has been graded
@@ -3404,25 +3683,26 @@ msgstr ""
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
 msgstr ""
+"Jūsų atsakymas pateiktas. Prašome vėliau pasitikrinti, kokį pažymį gavote. "
 
 #. Translators: "Not started" communicates to a student that their response
 #. has not yet been graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
 msgid "Not started"
-msgstr ""
+msgstr "Nepradėta"
 
 #. Translators: "In progress" communicates to a student that their response
 #. is currently in the grading process
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
 msgid "In progress"
-msgstr ""
+msgstr "Vykdoma"
 
 #. Translators: "Done" communicates to a student that their response
 #. has been fully graded
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
 msgid "Done"
-msgstr ""
+msgstr "Atlikta"
 
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
 msgid ""
@@ -3574,6 +3854,13 @@ msgid ""
 "the student's computer. To allow students to download these videos, set "
 "Video Download Allowed to True."
 msgstr ""
+"URL nuoroda arba nuorodos, kur jūs paskelbėte ne \"YouTube`o\" vaizdo įrašo "
+"versijas. Kiekviena URL nuoroda turi baigtis .mpeg, .mp4, .ogg arba .webm ir"
+" negali būti \"YouTube`o\" URL nuoroda. (Dėl naršyklės suderinamumo "
+"primygtinai rekomenduojame .mp4 ir .webm formatą.) Kurso dalyviai galės "
+"pažiūrėti pirmą sąraše esantį vaizdo įrašą, derantį su jų kompiuteriais. "
+"Norėdami leisti kurso dalyviams atsisiųsti šiuos vaizdo įrašus, \"Leidžiama "
+"atsisiųsti vaizdo įrašą\" nustatykite \"Taip\"."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video File URLs"
@@ -3589,6 +3876,13 @@ msgid ""
 " the URL for the transcript here. Students see a link to download that "
 "transcript below the video."
 msgstr ""
+"Numatyta, kad kai jūs nustatote \"Leidžiama atsisiųsti kopiją\" \"Taip\", "
+"kurso dalyviai gali atsisiųsti .srt arba .txt kopiją. Jeigu norite "
+"įkeliamąją kopiją pateikti kitu formatu, rekomenduojame dalijamąją medžiagą "
+"įkelti naudojantis lauku \"Įkelti dalijamąją medžiagą\". Jeigu tai "
+"neįmanoma, jūs galite kopijos failą paskelbti puslapyje \"Failai ir "
+"siuntos\" arba internete ir tada čia pridėti kopijos URL nuorodą. Kurso "
+"dalyviai mato tos kopijos atsiuntimo nuorodą po vaizdo įrašu."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Downloadable Transcript URL"
@@ -3729,19 +4023,6 @@ msgid "Name"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Username"
-msgstr ""
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Grade"
 msgstr ""
@@ -3774,7 +4055,7 @@ msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "problems"
-msgstr ""
+msgstr "užduotys"
 
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
@@ -3805,6 +4086,7 @@ msgstr ""
 #: lms/djangoapps/courseware/views.py
 msgid "User {username} has never accessed problem {location}"
 msgstr ""
+"Naudotojas {username} niekada neperskaitė užduoties {location} sąlygos"
 
 #: lms/djangoapps/courseware/features/video.py
 msgid "ERROR: No playable video sources found!"
@@ -4232,11 +4514,6 @@ msgid "User ID"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "Email"
-msgstr "El. paštas"
-
-#: lms/djangoapps/instructor/views/api.py
 msgid "Language"
 msgstr ""
 
@@ -4248,18 +4525,9 @@ msgstr ""
 msgid "Birth Year"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py lms/templates/register.html
-#: lms/templates/signup_modal.html
-msgid "Gender"
-msgstr ""
-
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Level of Education"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py lms/templates/register.html
-msgid "Mailing Address"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -4402,6 +4670,10 @@ msgid "CourseMode price updated successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Enrollment data is now available in {dashboard_link}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
 msgstr "Narystė"
 
@@ -4486,12 +4758,15 @@ msgstr ""
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to create a background task for rescoring \"{problem_url}\"."
 msgstr ""
+"Nepavyko sukurti {problem_url} įvertinimo perskaičiavimo pirminės užduoties."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
 "Failed to create a background task for rescoring \"{problem_url}\": problem "
 "not found."
 msgstr ""
+"Nepavyko sukurti {problem_url} įvertinimo perskaičiavimo pirminės užduoties:"
+" užduotis nerasta."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to create a background task for rescoring \"{url}\": {message}."
@@ -4499,13 +4774,15 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to create a background task for resetting \"{problem_url}\"."
-msgstr ""
+msgstr "Nepavyko sukurti {problem_url} atnaujinimo pirminės užduoties."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
 "Failed to create a background task for resetting \"{problem_url}\": problem "
 "not found."
 msgstr ""
+"Nepavyko sukurti {problem_url} atnaujinimo pirminės užduoties: užduotis "
+"nerasta."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to create a background task for resetting \"{url}\": {message}."
@@ -4515,7 +4792,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Could not find problem location \"{url}\"."
-msgstr ""
+msgstr "Užduoties adresas \"{url}\" nerastas."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Found module.  "
@@ -4599,7 +4876,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Student state for problem {problem}"
-msgstr "Kurso dalyvio {problem} uždavinio būsena"
+msgstr "Kurso dalyvio {problem} užduoties būsena"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Beta Testers"
@@ -4699,16 +4976,6 @@ msgid "ID"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
-#: lms/templates/dashboard.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/register.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
-#: lms/templates/verify_student/_modal_editname.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Full Name"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
 msgstr ""
 
@@ -4732,7 +4999,7 @@ msgstr ""
 msgid ""
 "Failed to find any background tasks for course \"{course}\" and module "
 "\"{problem}\"."
-msgstr ""
+msgstr "Nepavyko rasti {course} kurso {problem} modulio pirminių užduočių."
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Could not find student matching identifier: {student_identifier}"
@@ -4860,13 +5127,13 @@ msgstr ""
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem failed to be {action} for student '{student}'"
-msgstr "Kurso dalyvio {student} uždavinio nepavyko {action}"
+msgstr "Kurso dalyvio {student} užduoties nepavyko {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem successfully {action} for student '{student}'"
-msgstr "Kurso dalyvio {student} uždavinys sėkmingai {action} "
+msgstr "Kurso dalyvio {student} užduotis sėkmingai {action} "
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
@@ -4877,19 +5144,19 @@ msgstr "Neįmanoma rasti kurso dalyvių, kurių pateiktis reikia {action} "
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem failed to be {action} for any of {attempted} students"
-msgstr "Nė vienam iš {attempted} kurso dalyvių nepavyko uždavinio {action}"
+msgstr "Nė vienam iš {attempted} kurso dalyvių nepavyko užduoties {action}"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem successfully {action} for {attempted} students"
-msgstr "{attempted} kurso dalyviai sėkmingai {action} uždavinį"
+msgstr "{attempted} kurso dalyviai sėkmingai {action} užduotį"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem {action} for {succeeded} of {attempted} students"
-msgstr "{succeeded} iš {attempted} kurso dalyvių {action} uždavinį"
+msgstr "{succeeded} iš {attempted} kurso dalyvių {action} užduotį"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
@@ -4968,6 +5235,9 @@ msgid ""
 "answers to any open response assessment questions? If not, please do so and "
 "return to this page."
 msgstr ""
+"Šiame kurse nerandama atvirojo atsakymo tipo užduočių. Ar esate atsakę į "
+"bent vieną atvirojo atsakymo tipo klausimą? Jeigu ne, prašome atsakyti ir "
+"grįžti į šį puslapį."
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "AI Assessment"
@@ -5026,7 +5296,7 @@ msgstr ""
 msgid ""
 "View open ended problems that you have previously submitted for grading."
 msgstr ""
-"Peržiūrėti atvirojo atsakymų tipo užduotis, kurias prieš tai pateikėte "
+"Peržiūrėti atvirojo atsakymo tipo užduotis, kurias prieš tai pateikėte "
 "vertinimui."
 
 #: lms/djangoapps/open_ended_grading/views.py
@@ -5558,6 +5828,8 @@ msgid ""
 "            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}\n"
 "            "
 msgstr ""
+"\n"
+"Kilo problema dėl mūsų elektroninio šaltinio prekinės konfigūracijos. Prašome mums pranešti {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The requested amount exceeds the originally authorized amount."
@@ -5762,6 +6034,8 @@ msgid ""
 "            There is a problem with the information in your CyberSource account.  Please let us know at {0}\n"
 "            "
 msgstr ""
+"\n"
+"Kilo problema dėl informacijos jūsų elektroninio šaltinio sąskaitoje. Prašome mums pranešti {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The cardholder is enrolled for payer authentication"
@@ -5871,6 +6145,9 @@ msgid ""
 "Enter true or false. If true, the course is open to the public. If false, "
 "the course is open only to admins."
 msgstr ""
+"Įveskite \"Taip\" arba \"Ne\". Jeigu įvesite \"Taip\", kursas bus viešai "
+"prieinamas. Jeigu įvesite \"Ne\", kursas bus prieinamas tik "
+"administratoriams. "
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
@@ -6612,9 +6889,8 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
-"There is already a course defined with the same organization, course number,"
-" and course run. Please change either organization or course number to be "
-"unique."
+"There is already a course defined with the same organization and course "
+"number. Please change either organization or course number to be unique."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -6845,14 +7121,6 @@ msgstr ""
 msgid "Forgot password?"
 msgstr ""
 
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/register.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
-msgid "Password"
-msgstr ""
-
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
@@ -6898,11 +7166,6 @@ msgstr ""
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
 msgid "Visit your {link_start}dashboard{link_end} to see your courses."
-msgstr ""
-
-#: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
-#: lms/templates/static_templates/tos.html
-msgid "Terms of Service"
 msgstr ""
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
@@ -7371,11 +7634,6 @@ msgstr ""
 msgid "&copy; 2014 edX, some rights reserved."
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
-msgid "Terms of Service and Honor Code"
-msgstr ""
-
 #: lms/templates/footer-edx-new.html
 msgid "(Revised 4/16/2014)"
 msgstr ""
@@ -7451,6 +7709,12 @@ msgstr ""
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
+msgstr ""
+
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: lms/templates/footer.html
+msgid "Powered by Open edX"
 msgstr ""
 
 #: lms/templates/forgot_password_modal.html
@@ -7745,10 +8009,6 @@ msgstr ""
 msgid "Account Preferences"
 msgstr ""
 
-#: lms/templates/login.html
-msgid "Remember me"
-msgstr ""
-
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
 #: lms/templates/login.html
@@ -7875,8 +8135,17 @@ msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html
+msgid "How it Works"
+msgstr ""
+
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+#: lms/templates/navigation.html
 msgid "Find Courses"
 msgstr "Ieškoti kursų"
+
+#: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
+msgid "Schools & Partners"
+msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
@@ -7892,14 +8161,6 @@ msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
-msgstr ""
-
-#: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid "How it Works"
-msgstr ""
-
-#: lms/templates/navigation-edx.html
-msgid "Schools & Partners"
 msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
@@ -8174,28 +8435,7 @@ msgid "Additional Personal Information"
 msgstr ""
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "City"
-msgstr ""
-
-#: lms/templates/register.html
 msgid "example: New York"
-msgstr ""
-
-#: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Country"
-msgstr ""
-
-#: lms/templates/register.html
-msgid "Highest Level of Education Completed"
-msgstr ""
-
-#: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Year of Birth"
 msgstr ""
 
 #: lms/templates/register.html
@@ -9202,14 +9442,9 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "Note: some of these buttons are known to time out for larger courses. We "
-"have temporarily disabled those features for courses with more than "
-"{max_enrollment} students. We are urgently working on fixing this issue. "
-"Thank you for your patience as we continue working to improve the platform!"
+"have disabled those features for courses with more than {max_enrollment} "
+"students."
 msgstr ""
-"Dėmesio: kai kurie iš šių mygtukų neveikia, kai kursas yra didelis. Šios "
-"funkcijos yra laikinai išjungtos, jei kurse yra daugiau nei {max_enrollment}"
-" kurso dalyvių. Mes stengiamės kuo skubiau išspręsti šią problemą. Dėkojame "
-"už kantrybę, mes ir toliau stengiamės gerinti šią mokymosi platformą!"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Export grades to remote gradebook"
@@ -9357,27 +9592,6 @@ msgid "Section:"
 msgstr "Tema:"
 
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/membership.html
-msgid "Batch Enrollment"
-msgstr ""
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid ""
-"Enroll or un-enroll one or many students: enter emails, separated by new "
-"lines or commas;"
-msgstr ""
-"Užregistruoti arba išregistruoti vieną ar keletą kurso dalyvių: įveskite el."
-" pašto adresus, atskirtus kableliais arba iš naujos eilutės;"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Notify students by email"
-msgstr "Pranešti kurso dalyviams elektroniniu paštu"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Auto-enroll students when they activate"
-msgstr "Automatiškai užregistruoti kurso dalyvius, kai jie aktyvuojasi"
-
-#: lms/templates/courseware/instructor_dashboard.html
 msgid "Problem urlname:"
 msgstr ""
 
@@ -9470,18 +9684,6 @@ msgstr "Išsiųsto laiško atšaukti NEGALIMA."
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "No Analytics are available at this time."
 msgstr ""
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid ""
-"Students enrolled (historical count, includes those who have since "
-"unenrolled):"
-msgstr ""
-"Užsiregistravę kurso dalyviai (bendras skaičius, įskaičiuojant ir "
-"išsiregistravusius):"
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Students active in the last week:"
-msgstr "Pastarąją savaitę aktyvūs kurso dalyviai:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Student activity day by day"
@@ -9791,12 +9993,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as an honor code student"
 msgstr "Jūs esate užsiregistravęs kaip sąžiningumą deklaravęs kurso dalyvis"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/static_templates/honor.html
-#: lms/templates/static_templates/honor.html
-msgid "Honor Code"
-msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're auditing this course"
@@ -10873,8 +11069,8 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"An invoice for ${total_price} is attached. Payment is due immediately.  "
-"Information on payment methods can be found on the invoice."
+"An invoice for {currency_symbol}{total_price} is attached. Payment is due "
+"immediately.  Information on payment methods can be found on the invoice."
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10976,7 +11172,7 @@ msgid "Customer Reference Number: {reference_number}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Balance Due: ${sale_price}"
+msgid "Balance Due: {currency_symbol}{sale_price}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
@@ -10985,12 +11181,13 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid ""
-"Price:         ${course_price}  Quantity:      {quantity}  Sub-Total:    "
-"${sub_total}  Discount:  ${discount}"
+"Price:        {currency_symbol}{course_price}  Quantity:      {quantity}  "
+"Sub-Total:    {currency_symbol}{sub_total}  Discount:  "
+"{currency_symbol}{discount}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
-msgid "Total:      ${sale_price}"
+msgid "Total:      {currency_symbol}{sale_price}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
@@ -11736,6 +11933,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Batch Enrollment"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -13093,6 +13294,10 @@ msgstr ""
 
 #: lms/templates/student_account/index.html
 msgid "Student Account"
+msgstr ""
+
+#: lms/templates/student_account/login_and_register.html
+msgid "Log in or Register"
 msgstr ""
 
 #: lms/templates/student_profile/index.html

@@ -5,7 +5,7 @@ import unittest
 import ddt
 import pytz
 from third_party_auth import pipeline
-from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=F0401
+from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=import-error
 from social.apps.django_app import utils as social_utils
 from django.conf import settings
 from django.contrib.sessions.backends import cache
@@ -62,7 +62,7 @@ class PipelineEnrollmentTest(ModuleStoreTestCase):
         strategy = self._fake_strategy()
         strategy.session_set('enroll_course_id', unicode(self.course.id))
 
-        result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=E1111,E1124
+        result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
         self.assertEqual(result, {})
 
         # Check that the user was or was not enrolled
@@ -86,7 +86,7 @@ class PipelineEnrollmentTest(ModuleStoreTestCase):
         # Simulate the pipeline step for enrolling in this course
         strategy = self._fake_strategy()
         strategy.session_set('enroll_course_id', unicode(self.course.id))
-        result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=E1111,E1124
+        result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
         self.assertEqual(result, {})
 
         # Expect that the uesr is NOT enrolled in the course
@@ -109,7 +109,7 @@ class PipelineEnrollmentTest(ModuleStoreTestCase):
         # This should fail silently, with no exception
         strategy = self._fake_strategy()
         strategy.session_set('enroll_course_id', unicode(self.course.id))
-        result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=E1111,E1124
+        result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
         self.assertEqual(result, {})
 
         # Verify that we were NOT enrolled
@@ -117,7 +117,7 @@ class PipelineEnrollmentTest(ModuleStoreTestCase):
 
     def test_no_course_id_skips_enroll(self):
         strategy = self._fake_strategy()
-        result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=E1111,E1124
+        result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
         self.assertEqual(result, {})
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
 

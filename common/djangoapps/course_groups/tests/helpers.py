@@ -20,7 +20,7 @@ class CohortFactory(DjangoModelFactory):
     group_type = CourseUserGroup.COHORT
 
     @post_generation
-    def users(self, create, extracted, **kwargs):  # pylint: disable=W0613
+    def users(self, create, extracted, **kwargs):  # pylint: disable=unused-argument
         """
         Returns the users associated with the cohort.
         """

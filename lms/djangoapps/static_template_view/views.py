@@ -30,7 +30,7 @@ def index(request, template):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
+@cache_if_anonymous()
 def render(request, template):
     """
     This view function renders the template sent without checking that it
@@ -43,7 +43,7 @@ def render(request, template):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous
+@cache_if_anonymous()
 def render_press_release(request, slug):
     """
     Render a press release given a slug.  Similar to the "render" function above,

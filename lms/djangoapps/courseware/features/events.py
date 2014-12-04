@@ -1,4 +1,4 @@
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 from lettuce import step
 from lettuce import world

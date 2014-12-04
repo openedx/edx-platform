@@ -22,7 +22,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0611, W0614, C0103
+# pylint: disable=wildcard-import, unused-import, unused-wildcard-import, invalid-name
 
 import sys
 import os
@@ -283,6 +283,9 @@ FEATURES = {
     # Enable the combined login/registration form
     'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
 
+    # Enable organizational email opt-in
+    'ENABLE_MKTG_EMAIL_OPT_IN': False,
+
     # Show a section in the membership tab of the instructor dashboard
     # to allow an upload of a CSV file that contains a list of new accounts to create
     # and register for course.
@@ -293,6 +296,9 @@ FEATURES = {
 
     # Enable display of enrollment counts in instructor and legacy analytics dashboard
     'DISPLAY_ANALYTICS_ENROLLMENTS': True,
+
+    # Separate the verification flow from the payment flow
+    'SEPARATE_VERIFICATION_FROM_PAYMENT': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1046,6 +1052,7 @@ student_account_js = [
     'js/utils/edx.utils.validate.js',
     'js/src/utility.js',
     'js/student_account/enrollment.js',
+    'js/student_account/emailoptin.js',
     'js/student_account/shoppingcart.js',
     'js/student_account/models/LoginModel.js',
     'js/student_account/models/RegisterModel.js',

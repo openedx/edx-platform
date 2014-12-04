@@ -114,17 +114,15 @@ def instructor_dashboard_2(request, course_id):
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
-"""
-Section functions starting with _section return a dictionary of section data.
+## Section functions starting with _section return a dictionary of section data.
 
-The dictionary must include at least {
-    'section_key': 'circus_expo'
-    'section_display_name': 'Circus Expo'
-}
+## The dictionary must include at least {
+##     'section_key': 'circus_expo'
+##     'section_display_name': 'Circus Expo'
+## }
 
-section_key will be used as a css attribute, javascript tie-in, and template import filename.
-section_display_name will be used to generate link titles in the nav bar.
-"""  # pylint: disable=W0105
+## section_key will be used as a css attribute, javascript tie-in, and template import filename.
+## section_display_name will be used to generate link titles in the nav bar.
 
 
 def _section_e_commerce(course, access):
@@ -144,6 +142,7 @@ def _section_e_commerce(course, access):
         'section_display_name': _('E-Commerce'),
         'access': access,
         'course_id': course_key.to_deprecated_string(),
+        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
         'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_user_invoice_preference_url': reverse('get_user_invoice_preference', kwargs={'course_id': course_key.to_deprecated_string()}),

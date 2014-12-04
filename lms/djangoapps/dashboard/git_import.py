@@ -124,7 +124,7 @@ def add_repo(repo, rdir_in, branch=None):
     If branch is left as None, it will fetch the most recent
     version of the current branch.
     """
-    # pylint: disable=R0915
+    # pylint: disable=too-many-statements
 
     # Set defaults even if it isn't defined in settings
     mongo_db = {

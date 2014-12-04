@@ -1164,7 +1164,7 @@ class CourseEnrollment(models.Model):
         if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
             return False
 
-        #TODO - When Course administrators to define a refund period for paid courses then refundable will be supported. # pylint: disable=W0511
+        #TODO - When Course administrators to define a refund period for paid courses then refundable will be supported. # pylint: disable=fixme
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
         if course_mode is None:

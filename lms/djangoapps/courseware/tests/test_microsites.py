@@ -1,21 +1,20 @@
 """
 Tests related to the Microsites feature
 """
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from django.conf import settings
 
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from course_modes.models import CourseMode
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_NONE)
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This is testing of the Microsite feature
@@ -142,9 +141,9 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEquals(resp.status_code, 200)
 
-    def test_redirect_on_homepage_when_has_enrollments(self):
+    def test_no_redirect_on_homepage_when_has_enrollments(self):
         """
-        Verify that a user going to homepage will redirect to dashboard if he/she has
+        Verify that a user going to homepage will not redirect to dashboard if he/she has
         a course enrollment
         """
         self.setup_users()
@@ -154,7 +153,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.course, True)
 
         resp = self.client.get(reverse('root'), HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
-        self.assertEquals(resp.status_code, 302)
+        self.assertEquals(resp.status_code, 200)
 
     def test_microsite_course_enrollment(self):
         """

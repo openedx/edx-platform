@@ -8,7 +8,7 @@ import unittest
 
 import ddt
 from mock import patch
-from nose.tools import assert_equals, assert_false  # pylint: disable=E0611
+from nose.tools import assert_equals, assert_false  # pylint: disable=no-name-in-module
 from pytz import UTC
 
 from util.date_utils import (
@@ -70,7 +70,6 @@ def test_get_time_display_coerce():
                   get_time_display(test_time_daylight, '%b %d %H:%M', coerce_tz="US/Pacific"))
 
 
-# pylint: disable=W0232
 class NamelessTZ(tzinfo):
     """Static timezone for testing"""
 

@@ -1,4 +1,4 @@
-# pylint: disable=W0401, W0511
+# pylint: disable=wildcard-import, fixme
 
 "All view functions for contentstore, broken out into submodules"
 

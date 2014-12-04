@@ -219,7 +219,7 @@ class StorageTestBase(object):
     """
     # Disable pylint warnings that arise because of the way the child classes call
     # this base class -- pylint's static analysis can't keep up with it.
-    # pylint: disable=E1101, E1102
+    # pylint: disable=no-member, not-callable
 
     factory = None
     scope = None

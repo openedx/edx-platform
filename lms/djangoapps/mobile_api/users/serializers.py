@@ -65,7 +65,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     course = CourseField()
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course')
         lookup_field = 'username'
@@ -81,7 +81,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='username'
     )
 
-    class Meta:  # pylint: disable=C0111
+    class Meta:  # pylint: disable=missing-docstring
         model = User
         fields = ('id', 'username', 'email', 'name', 'course_enrollments')
         lookup_field = 'username'

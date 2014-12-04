@@ -2,13 +2,15 @@
     Test split modulestore w/o using any django stuff.
 """
 import datetime
+from importlib import import_module
+from path import path
 import random
 import re
 import unittest
 import uuid
+
 from contracts import contract
-from importlib import import_module
-from path import path
+from nose.plugins.attrib import attr
 
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseDescriptor
@@ -33,6 +35,7 @@ BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
 BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
 
 
+@attr('mongo')
 class SplitModuleTest(unittest.TestCase):
     '''
     The base set of tests manually populates a db w/ courses which have
@@ -865,7 +868,7 @@ class SplitModuleItemTests(SplitModuleTest):
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(locator)
 
-    # pylint: disable=W0212
+    # pylint: disable=protected-access
     def test_matching(self):
         '''
         test the block and value matches help functions
@@ -1304,7 +1307,7 @@ class TestItemCrud(SplitModuleTest):
             fields={'display_name': 'problem 2', 'data': another_payload},
             definition_locator=original.definition_locator,
         )
-        # pylint: disable=W0212
+        # pylint: disable=protected-access
         modulestore()._clear_cache()
 
         # now begin the test
@@ -1846,7 +1849,7 @@ def modulestore():
         options.update(SplitModuleTest.MODULESTORE['OPTIONS'])
         options['render_template'] = render_to_template_mock
 
-        # pylint: disable=W0142
+        # pylint: disable=star-args
         SplitModuleTest.modulestore = class_(
             None,  # contentstore
             SplitModuleTest.MODULESTORE['DOC_STORE_CONFIG'],
