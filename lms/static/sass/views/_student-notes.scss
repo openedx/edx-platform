@@ -54,14 +54,47 @@
         .note-excerpt {
           display: inline-block;
           vertical-align: top;
-          background: tint($blue, 95%);
+          background: $m-blue-l4;
 
           .note-excerpt-p,
           .note-excerpt-ul,
           .note-excerpt-ol {
             @extend %t-copy-base;
-            padding: $baseline;
+            position: relative;
+            padding: $baseline ($baseline*4) $baseline ($baseline*4);
           }
+        }
+
+        .note-excerpt > .note-excerpt-p:before, 
+        .note-excerpt > .note-excerpt-ul:before, 
+        .note-excerpt > .note-excerpt-ol:before,
+        .note-excerpt > .note-excerpt-p:after, 
+        .note-excerpt > .note-excerpt-ul:after, 
+        .note-excerpt > .note-excerpt-ol:after {
+          @extend %t-title3;
+          display: block;
+          position: absolute;
+          height: 40px;
+          width: 40px;
+          font-family: "FontAwesome";          
+          // color: $gray-l4;
+          color: $white;
+        }
+
+        .note-excerpt > .note-excerpt-p:before, 
+        .note-excerpt > .note-excerpt-ul:before, 
+        .note-excerpt > .note-excerpt-ol:before {
+          content: "\f10d";
+          top: $baseline;
+          left: $baseline;
+        }
+
+        .note-excerpt > .note-excerpt-p:after, 
+        .note-excerpt > .note-excerpt-ul:after, 
+        .note-excerpt > .note-excerpt-ol:after {
+          content: "\f10e";
+          bottom: $baseline;
+          right: $baseline;
         }
 
         .note-comments {
@@ -69,31 +102,42 @@
           margin: 0;
           padding: 0;
           list-style: none;
+          // background: $m-blue-l4;
 
           .note-comment {
             padding: ($baseline/2) $baseline;
             border-bottom: 2px solid $white;
                             
-            .note-comment-p {
-              @extend %t-copy-sub1;
+            .note-comment-p, 
+            .note-comment-ul, 
+            .note-comment-ol {
+              @extend %t-weight4;
               padding: 0;
               margin: 0;
-              font-weight: $font-regular;
               background: transparent;
+            }
+
+            .note-comment-ul, 
+            .note-comment-ol {
+              padding: auto;
+              margin: auto;
             }
           }
         }
 
         .note-comments:before {
+          @extend %t-title4;
           display: block;
           position: absolute;
-          top: -13px;
+          top: -14px;
           left: 20px;
-          height: 16px;
-          width: 16px;
+          height: 24px;
+          width: 24px;
           font-family: "FontAwesome";
+          line-height: 20px;
           content: "\f0d8";
-          color: tint($blue, 95%);
+          // color: $m-blue-l4;
+          color: $white;
         }
       }
 
