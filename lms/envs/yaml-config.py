@@ -207,14 +207,12 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 LANGUAGE_DICT = dict(LANGUAGES)
 
 # Additional installed apps
-for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
+for app in ADDL_INSTALLED_APPS:
     INSTALLED_APPS += (app,)
-
-local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=LOGGING_ENV,
-                            local_loglevel=local_loglevel,
+                            local_loglevel=LOCAL_LOGLEVEL,
                             debug=False,
                             service_variant=SERVICE_VARIANT)
 

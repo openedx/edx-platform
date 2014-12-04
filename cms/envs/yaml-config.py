@@ -196,6 +196,7 @@ for app in ADDL_INSTALLED_APPS:
 
 
 LOGGING = get_logger_config(LOG_DIR,
+                            local_loglevel=LOCAL_LOGLEVEL,
                             logging_env=LOGGING_ENV,
                             debug=False,
                             service_variant=SERVICE_VARIANT)

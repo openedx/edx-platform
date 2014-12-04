@@ -779,6 +779,8 @@ CAS_ATTRIBUTE_CALLBACK = None
 MICROSITE_ROOT_DIR = ''
 SEGMENT_IO = False
 DATADOG = {}
+ADDL_INSTALLED_APPS = []
+LOCAL_LOGLEVEL = 'INFO'
 
 
 ################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
