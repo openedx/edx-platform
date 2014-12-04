@@ -322,6 +322,14 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         # Check that registration button is not present
         self.assertNotIn(REG_STR, resp.content)
 
+    def test_course_price_is_not_visble_in_sidebar(self):
+        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        # course price is not visible ihe course_about page when the course
+        # mode is not set to honor
+        self.assertNotIn('<span class="important-dates-item-text">$10</span>', resp.content)
+
 
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
@@ -420,6 +428,10 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Enrollment is Closed", resp.content)
         self.assertNotIn("Add buyme to Cart ($10)", resp.content)
+
+        # course price is visible ihe course_about page when the course
+        # mode is set to honor and it's price is set
+        self.assertIn('<span class="important-dates-item-text">$10</span>', resp.content)
 
     def test_invitation_only(self):
         """
