@@ -1,4 +1,5 @@
 """Tests for the change enrollment step of the pipeline. """
+from collections import namedtuple
 
 import datetime
 import unittest
@@ -17,6 +18,7 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
+from user_api.models import UserOrgTag
 
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
@@ -61,6 +63,7 @@ class PipelineEnrollmentTest(ModuleStoreTestCase):
         # when they started the auth process.
         strategy = self._fake_strategy()
         strategy.session_set('enroll_course_id', unicode(self.course.id))
+        strategy.session_set('email_opt_in', u'False')
 
         result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
         self.assertEqual(result, {})
@@ -73,6 +76,11 @@ class PipelineEnrollmentTest(ModuleStoreTestCase):
             self.assertEqual(actual_mode, enrollment_mode)
         else:
             self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+
+        # Check that the Email Opt In option was set
+        tag = UserOrgTag.objects.get(user=self.user)
+        self.assertIsNotNone(tag)
+        self.assertEquals(tag.value, u"False")
 
     def test_add_white_label_to_cart(self):
         # Create a white label course (honor with a minimum price)
@@ -120,6 +128,29 @@ class PipelineEnrollmentTest(ModuleStoreTestCase):
         result = pipeline.change_enrollment(strategy, 1, user=self.user)  # pylint: disable=assignment-from-no-return,redundant-keyword-arg
         self.assertEqual(result, {})
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+
+    def test_url_creation(self):
+        strategy = self._fake_strategy()
+        strategy.session_set('enroll_course_id', unicode(self.course.id))
+        strategy.session_set('email_opt_in', u"False")
+        backend = namedtuple('backend', 'name')
+        backend.name = self.BACKEND_NAME
+        response = pipeline.ensure_user_information(
+            strategy=strategy,
+            pipeline_index=1,
+            details=None,
+            response=None,
+            uid=None,
+            is_register=True,
+            backend=backend
+        )
+        self.assertIsNotNone(response)
+        self.assertEquals(response.status_code, 302)
+
+        # Get the location
+        _, url = response._headers['location']
+        self.assertIn("email_opt_in=False", url)
+        self.assertIn("course_id=".format(id=unicode(self.course.id)), url)
 
     def _fake_strategy(self):
         """Simulate the strategy passed to the pipeline step. """
