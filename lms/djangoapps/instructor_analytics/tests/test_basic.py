@@ -5,10 +5,14 @@ Tests for instructor.basic
 from django.test import TestCase
 from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
+from mock import patch
 from student.tests.factories import UserFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon, CourseRegCodeItem
-
+from shoppingcart.models import (
+    CourseRegistrationCode, RegistrationCodeRedemption, Order,
+    Invoice, Coupon, CourseRegCodeItem, CouponRedemption
+)
+from course_modes.models import CourseMode
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
     coupon_codes_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
@@ -89,6 +93,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.assertEqual(set(AVAILABLE_FEATURES), set(STUDENT_FEATURES + PROFILE_FEATURES))
 
 
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic course sale records analytics functions. """
     def setUp(self):
@@ -97,6 +102,12 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         """
         super(TestCourseSaleRecordsAnalyticsBasic, self).setUp()
         self.course = CourseFactory.create()
+        self.cost = 40
+        self.course_mode = CourseMode(
+            course_id=self.course.id, mode_slug="honor",
+            mode_display_name="honor cert", min_price=self.cost
+        )
+        self.course_mode.save()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
@@ -162,18 +173,43 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             ('bill_to_postalcode', 'Postal Code'),
             ('bill_to_country', 'Country'),
             ('order_type', 'Order Type'),
+            ('status', 'Order Item Status'),
+            ('coupon_code', 'Coupon Code'),
+            ('unit_cost', 'Unit Price'),
+            ('list_price', 'List Price'),
             ('codes', 'Registration Codes'),
             ('course_id', 'Course Id')
         ]
-
+        # add the coupon code for the course
+        coupon = Coupon(
+            code='test_code',
+            description='test_description',
+            course_id=self.course.id,
+            percentage_discount='10',
+            created_by=self.instructor,
+            is_active=True
+        )
+        coupon.save()
         order = Order.get_cart_for_user(self.instructor)
         order.order_type = 'business'
         order.save()
-        order.add_billing_details(company_name='Test Company', company_contact_name='Test',
-                                  company_contact_email='test@123', recipient_name='R1',
-                                  recipient_email='', customer_reference_number='PO#23')
+        order.add_billing_details(
+            company_name='Test Company',
+            company_contact_name='Test',
+            company_contact_email='test@123',
+            recipient_name='R1', recipient_email='',
+            customer_reference_number='PO#23'
+        )
         CourseRegCodeItem.add_to_order(order, self.course.id, 4)
+        # apply the coupon code to the item in the cart
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': coupon.code})
+        self.assertEqual(resp.status_code, 200)
         order.purchase()
+
+        # get the updated item
+        item = order.orderitem_set.all().select_subclasses()[0]
+        # get the redeemed coupon information
+        coupon_redemption = CouponRedemption.objects.select_related('coupon').filter(order=order)
 
         db_columns = [x[0] for x in query_features]
         sale_order_records_list = sale_order_record_features(self.course.id, db_columns)
@@ -187,6 +223,10 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             self.assertEqual(sale_order_record['customer_reference_number'], order.customer_reference_number)
             self.assertEqual(sale_order_record['total_used_codes'], order.registrationcoderedemption_set.all().count())
             self.assertEqual(sale_order_record['total_codes'], len(CourseRegistrationCode.objects.filter(order=order)))
+            self.assertEqual(sale_order_record['unit_cost'], item.unit_cost)
+            self.assertEqual(sale_order_record['list_price'], item.list_price)
+            self.assertEqual(sale_order_record['status'], item.status)
+            self.assertEqual(sale_order_record['coupon_code'], coupon_redemption[0].coupon.code)
 
 
 class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
@@ -252,8 +292,11 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         ]
         for i in range(10):
             coupon = Coupon(
-                code='test_code{0}'.format(i), description='test_description', course_id=self.course.id,
-                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True
+                code='test_code{0}'.format(i),
+                description='test_description',
+                course_id=self.course.id, percentage_discount='{0}'.format(i),
+                created_by=self.instructor,
+                is_active=True
             )
             coupon.save()
         active_coupons = Coupon.objects.filter(course_id=self.course.id, is_active=True)

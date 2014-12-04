@@ -29,7 +29,8 @@ from .exceptions import (
     ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
     CourseDoesNotExistException, ReportTypeDoesNotExistException,
     RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException,
-    MultipleCouponsNotAllowedException, InvalidCartItem
+    MultipleCouponsNotAllowedException, InvalidCartItem,
+    ItemNotAllowedToRedeemRegCodeException
 )
 from .models import (
     Order, OrderTypes,
@@ -84,13 +85,24 @@ def add_course_to_cart(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     # All logging from here handled by the model
     try:
-        PaidCourseRegistration.add_to_order(cart, course_key)
+        paid_course_item = PaidCourseRegistration.add_to_order(cart, course_key)
     except CourseDoesNotExistException:
         return HttpResponseNotFound(_('The course you requested does not exist.'))
     except ItemAlreadyInCartException:
         return HttpResponseBadRequest(_('The course {0} is already in your cart.'.format(course_id)))
     except AlreadyEnrolledInCourseException:
         return HttpResponseBadRequest(_('You are already registered in course {0}.'.format(course_id)))
+    else:
+        # in case a coupon redemption code has been applied, new items should also get a discount if applicable.
+        order = paid_course_item.order
+        order_items = order.orderitem_set.all().select_subclasses()
+        redeemed_coupons = CouponRedemption.objects.filter(order=order)
+        for redeemed_coupon in redeemed_coupons:
+            if Coupon.objects.filter(code=redeemed_coupon.coupon.code, course_id=course_key, is_active=True).exists():
+                coupon = Coupon.objects.get(code=redeemed_coupon.coupon.code, course_id=course_key, is_active=True)
+                CouponRedemption.add_coupon_redemption(coupon, order, order_items)
+                break  # Since only one code can be applied to the cart, we'll just take the first one and then break.
+
     return HttpResponse(_("Course added to cart."))
 
 
@@ -121,9 +133,10 @@ def update_user_cart(request):
 
         item.qty = qty
         item.save()
-        item.order.update_order_type()
+        old_to_new_id_map = item.order.update_order_type()
         total_cost = item.order.total_cost
-        return JsonResponse({"total_cost": total_cost}, 200)
+
+        return JsonResponse({"total_cost": total_cost, "oldToNewIdMap": old_to_new_id_map}, 200)
 
     return HttpResponseBadRequest('Order item not found in request.')
 
@@ -367,6 +380,8 @@ def use_registration_code(course_reg, user):
         return HttpResponseBadRequest(_("Oops! The code '{0}' you entered is either invalid or expired".format(course_reg.code)))
     except ItemDoesNotExistAgainstRegCodeException:
         return HttpResponseNotFound(_("Code '{0}' is not valid for any course in the shopping cart.".format(course_reg.code)))
+    except ItemNotAllowedToRedeemRegCodeException:
+        return HttpResponseNotFound(_("Cart item quantity should not be greater than 1 when applying activation code"))
 
     return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
 

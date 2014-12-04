@@ -41,7 +41,7 @@ from .exceptions import (
     InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
     AlreadyEnrolledInCourseException, CourseDoesNotExistException,
     MultipleCouponsNotAllowedException, RegCodeAlreadyExistException,
-    ItemDoesNotExistAgainstRegCodeException
+    ItemDoesNotExistAgainstRegCodeException, ItemNotAllowedToRedeemRegCodeException
 )
 
 from microsite_configuration import microsite
@@ -223,6 +223,7 @@ class Order(models.Model):
                 is_order_type_business = True
 
         items_to_delete = []
+        old_to_new_id_map = []
         if is_order_type_business:
             for cart_item in cart_items:
                 if hasattr(cart_item, 'paidcourseregistration'):
@@ -232,6 +233,7 @@ class Order(models.Model):
                     course_reg_code_item.unit_cost = cart_item.unit_cost
                     course_reg_code_item.save()
                     items_to_delete.append(cart_item)
+                    old_to_new_id_map.append({"oldId": cart_item.id, "newId": course_reg_code_item.id})
         else:
             for cart_item in cart_items:
                 if hasattr(cart_item, 'courseregcodeitem'):
@@ -241,12 +243,14 @@ class Order(models.Model):
                     paid_course_registration.unit_cost = cart_item.unit_cost
                     paid_course_registration.save()
                     items_to_delete.append(cart_item)
+                    old_to_new_id_map.append({"oldId": cart_item.id, "newId": paid_course_registration.id})
 
         for item in items_to_delete:
             item.delete()
 
         self.order_type = OrderTypes.BUSINESS if is_order_type_business else OrderTypes.PERSONAL
         self.save()
+        return old_to_new_id_map
 
     def generate_registration_codes_csv(self, orderitems, site_name):
         """
@@ -690,6 +694,10 @@ class RegistrationCodeRedemption(models.Model):
         for item in cart_items:
             if getattr(item, 'course_id'):
                 if item.course_id == course_reg_code.course_id:
+                    # If the item qty is greater than 1 then the registration code should not be allowed to
+                    # redeem
+                    if item.qty > 1:
+                        raise ItemNotAllowedToRedeemRegCodeException
                     # If another account tries to use a existing registration code before the student checks out, an
                     # error message will appear.The reg code is un-reusable.
                     code_redemption = cls.objects.filter(registration_code=course_reg_code)
