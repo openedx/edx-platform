@@ -15,6 +15,14 @@ from django.views.decorators.http import require_http_methods
 from edxmako.shortcuts import render_to_response, render_to_string
 from microsite_configuration import microsite
 import third_party_auth
+from external_auth.login_and_register import (
+    login as external_auth_login,
+    register as external_auth_register
+)
+from student.views import (
+    signin_user as old_login_view,
+    register_user as old_register_view
+)
 
 from user_api.api import account as account_api
 from user_api.api import profile as profile_api
@@ -60,12 +68,25 @@ def login_and_registration_form(request, initial_mode="login"):
     the user_api.
 
     Keyword Args:
-        initial_mode (string): Either "login" or "registration".
+        initial_mode (string): Either "login" or "register".
 
     """
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
+
+    # If this is a microsite, revert to the old login/registration pages.
+    # We need to do this for now to support existing themes.
+    if microsite.is_request_in_microsite():
+        if initial_mode == "login":
+            return old_login_view(request)
+        elif initial_mode == "register":
+            return old_register_view(request)
+
+    # Allow external auth to intercept and handle the request
+    ext_auth_response = _external_auth_intercept(request, initial_mode)
+    if ext_auth_response is not None:
+        return ext_auth_response
 
     # Otherwise, render the combined login/registration page
     context = {
@@ -285,12 +306,14 @@ def _third_party_auth_context(request):
     }
 
     course_id = request.GET.get("course_id")
+    redirect_to = request.GET.get("next")
     login_urls = auth_pipeline_urls(
-        third_party_auth.pipeline.AUTH_ENTRY_LOGIN_2,
-        course_id=course_id
+        third_party_auth.pipeline.AUTH_ENTRY_LOGIN,
+        course_id=course_id,
+        redirect_url=redirect_to
     )
     register_urls = auth_pipeline_urls(
-        third_party_auth.pipeline.AUTH_ENTRY_REGISTER_2,
+        third_party_auth.pipeline.AUTH_ENTRY_REGISTER,
         course_id=course_id
     )
 
@@ -313,3 +336,20 @@ def _third_party_auth_context(request):
             context["currentProvider"] = current_provider.NAME
 
     return context
+
+
+def _external_auth_intercept(request, mode):
+    """Allow external auth to intercept a login/registration request.
+
+    Arguments:
+        request (Request): The original request.
+        mode (str): Either "login" or "register"
+
+    Returns:
+        Response or None
+
+    """
+    if mode == "login":
+        return external_auth_login(request)
+    elif mode == "register":
+        return external_auth_register(request)

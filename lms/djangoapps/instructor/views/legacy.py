@@ -1470,7 +1470,7 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
         registration_url = '{proto}://{site}{path}'.format(
             proto=protocol,
             site=stripped_site_name,
-            path=reverse('student.views.register_user')
+            path=reverse('register_user')
         )
         course_url = '{proto}://{site}{path}'.format(
             proto=protocol,
