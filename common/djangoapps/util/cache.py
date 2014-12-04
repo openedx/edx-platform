@@ -5,6 +5,7 @@ invalidation. Import these instead of django.core.cache.
 Note that 'default' is being preserved for user session caching, which we're
 not migrating so as not to inconvenience users by logging them all out.
 """
+import urllib
 from functools import wraps
 
 from django.core import cache
@@ -56,7 +57,13 @@ def cache_if_anonymous(*get_parameters):
 
                 # Include the values of GET parameters in the cache key.
                 for get_parameter in get_parameters:
-                    cache_key = cache_key + '.' + unicode(request.GET.get(get_parameter))
+                    parameter_value = request.GET.get(get_parameter)
+                    if parameter_value is not None:
+                        # urlencode expects data to be of type str, and doesn't deal well with Unicode data
+                        # since it doesn't provide a way to specify an encoding.
+                        cache_key = cache_key + '.' + urllib.urlencode({
+                            get_parameter: unicode(parameter_value).encode('utf-8')
+                        })
 
                 response = cache.get(cache_key)  # pylint: disable=maybe-no-member
                 if not response:
