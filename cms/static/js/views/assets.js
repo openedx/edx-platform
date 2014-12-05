@@ -266,14 +266,18 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             toggleFilterColumn: function(event) {
                 event.preventDefault();
                 var collection = this.collection;
-                var resetFilter = this.$el.find('.reset-filter');
+                var filterColumn = this.$el.find('.filterable-column');
+                var resetFilter = filterColumn.find('.reset-filter');
+                var title = filterColumn.find('.title');
                 if($(event.currentTarget).data('assetfilter') == this.allLabel){
                     collection.assetType = '';
                     resetFilter.hide();
+                    title.removeClass('column-selected-link');
                 }
                 else{
                     collection.assetType = $(event.currentTarget).data('assetfilter');
                     resetFilter.show();
+                    title.addClass('column-selected-link');
                 }
 
                 this.selectFilter('js-asset-type-col');
