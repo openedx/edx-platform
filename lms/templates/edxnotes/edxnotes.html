@@ -72,7 +72,7 @@
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["note-item", "tab-item"]:
+% for template_name in ["note-item", "tab-item", "course-structure-item", ]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="edxnotes/${template_name}.underscore" />
 </script>
@@ -84,7 +84,8 @@
     (function (require) {
         require(['js/edxnotes/views/page_factory'], function (NotesFactory) {
             var pageView = new NotesFactory({
-                notesList: ${notes},
+                notesList: ${notes['collection']},
+                structure: ${notes['structure']},
                 debugMode: ${debug},
                 user: '${anonymous_id_for_user(user, None)}',
                 courseId: '${course.id}'

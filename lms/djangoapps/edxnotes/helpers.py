@@ -18,6 +18,7 @@ from django.utils.translation import ugettext as _
 
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from util.date_utils import get_default_time_display
 from dateutil.parser import parse as dateutil_parse
@@ -123,11 +124,16 @@ def preprocess_collection(user, course, collection):
             if not has_access(user, "load", item, course_key=course.id):
                 continue
 
+            (course_key, chapter, section, position) = path_to_location(store, usage_key)
+
             model.update({
                 u"text": markupsafe.escape(model["text"]),
                 u"quote": markupsafe.escape(model["quote"]),
                 u"unit": get_ancestor_context(course, store, usage_key),
                 u"updated": dateutil_parse(model["updated"]),
+                u"chapter": chapter,
+                u"section": section,
+                u"position": position,
             })
             filtered_collection.append(model)
 
@@ -153,7 +159,7 @@ def search(user, course, query_string):
     return json.dumps(content, cls=NoteJSONEncoder)
 
 
-def get_notes(user, course):
+def get_notes(user, course, toc):
     """
     Returns all notes for the user.
     """
@@ -166,7 +172,12 @@ def get_notes(user, course):
     if not collection:
         return None
 
-    return json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder)
+    content = {
+        "structure": json.dumps(toc),
+        "collection": json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder),
+    }
+
+    return content
 
 
 def get_ancestor(store, usage_key):
@@ -204,6 +215,7 @@ def get_ancestor_context(course, store, usage_key):
     return {
         u"display_name": parent.display_name_with_default,
         u"url": url,
+        u"url_name": parent.url_name,
     }
 
 
