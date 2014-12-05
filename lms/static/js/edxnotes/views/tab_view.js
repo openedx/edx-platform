@@ -4,7 +4,7 @@ define([
     'underscore', 'backbone', 'js/edxnotes/models/tab'
 ], function (_, Backbone, TabModel) {
     var TabView = Backbone.View.extend({
-        SubViewConstructor: null,
+        PanelConstructor: null,
 
         tabInfo: {
             name: '',
@@ -63,12 +63,13 @@ define([
 
         getSubView: function () {
             var collection = this.getCollection();
-            return new this.SubViewConstructor({collection: collection});
+            return new this.PanelConstructor({collection: collection});
         },
 
         destroySubView: function () {
             if (this.contentView) {
                 this.contentView.remove();
+                this.contentView = null;
             }
         },
 

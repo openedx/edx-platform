@@ -1,27 +1,20 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'jquery', 'backbone'
-], function ($, Backbone) {
+    'jquery', 'backbone', 'js/edxnotes/utils/template'
+], function ($, Backbone, templateUtils) {
     var NoteItemView = Backbone.View.extend({
         tagName: 'article',
+        className: 'note',
         id: function () {
             return 'note-' + _.uniqueId();
         },
-        className: 'note',
         events: {
             'click .note-excerpt-more-link': 'moreHandler'
         },
 
         initialize: function (options) {
-            var templateSelector = '#note-item-tpl',
-                templateText = $(templateSelector).text();
-
-            if (!templateText) {
-                console.error('Failed to load note-item template');
-            }
-
-            this.template = _.template(templateText);
+            this.template = templateUtils.loadTemplate('note-item');
             this.listenTo(this.model, 'change:is_expanded', this.render);
         },
 
@@ -33,9 +26,9 @@ define([
         },
 
         getContext: function () {
-            return $.extend({}, this.model.attributes, {
+            return $.extend({
                 message: this.model.getNoteText()
-            });
+            }, this.model.toJSON());
         },
 
         toggleNote: function () {

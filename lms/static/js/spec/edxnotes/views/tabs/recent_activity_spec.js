@@ -58,7 +58,7 @@ define([
             var view = getView(this.collection, this.tabsCollection);
 
             expect(this.tabsCollection).toHaveLength(1);
-            expect(this.tabsCollection.at(0).attributes).toEqual({
+            expect(this.tabsCollection.at(0).toJSON()).toEqual({
                 name: 'Recent Activity',
                 identifier: 'view-recent-activity',
                 icon: 'icon-time',

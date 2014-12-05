@@ -40,171 +40,178 @@
       }
     }
 
-    .note {
-      @include clearfix();
-      margin: 0;
-      padding: ($baseline*1.5) 0;
-      border-top: 1px solid $gray-l4;
-      border-bottom: none;
+    .note-group {      
 
-      .wrapper-note-excerpts {
-        display: inline-block;
-        width: flex-grid(9, 12);
-
-        .note-excerpt {
-          display: inline-block;
-          vertical-align: top;
-          background: $m-blue-l4;
-
-          .note-excerpt-p,
-          .note-excerpt-ul,
-          .note-excerpt-ol {
-            @extend %t-copy-base;
-            position: relative;
-            padding: $baseline ($baseline*4) $baseline ($baseline*4);
-          }
-        }
-
-        .note-excerpt > .note-excerpt-p:before,
-        .note-excerpt > .note-excerpt-ul:before,
-        .note-excerpt > .note-excerpt-ol:before,
-        .note-excerpt > .note-excerpt-p:after,
-        .note-excerpt > .note-excerpt-ul:after,
-        .note-excerpt > .note-excerpt-ol:after {
-          @extend %t-title3;
-          display: block;
-          position: absolute;
-          height: 40px;
-          width: 40px;
-          font-family: "FontAwesome";
-          // color: $gray-l4;
-          color: $white;
-        }
-
-        .note-excerpt > .note-excerpt-p:before,
-        .note-excerpt > .note-excerpt-ul:before,
-        .note-excerpt > .note-excerpt-ol:before {
-          content: "\f10d";
-          top: 0;
-          left: $baseline;
-        }
-
-        .note-excerpt > .note-excerpt-p:after,
-        .note-excerpt > .note-excerpt-ul:after,
-        .note-excerpt > .note-excerpt-ol:after {
-          content: "\f10e";
-          bottom: ($baseline/2);
-          right: $baseline;
-        }
-
-        .note-comments {
-          position: relative;
-          margin: 0;
-          padding: 0;
-          list-style: none;
-          // background: $m-blue-l4;
-
-          .note-comment {
-            padding: ($baseline/2) $baseline;
-            border-bottom: 2px solid $white;
-
-            .note-comment-p,
-            .note-comment-ul,
-            .note-comment-ol {
-              @extend %t-weight4;
-              padding: 0;
-              margin: 0;
-              background: transparent;
-            }
-
-            .note-comment-p {
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
-
-            .note-comment-ul,
-            .note-comment-ol {
-              padding: auto;
-              margin: auto;
-            }
-
-            .note-highlight {
-              background-color: #FFFF88;
-            }
-          }
-        }
-
-        .note-comments:before {
-          @extend %t-title4;
-          display: block;
-          position: absolute;
-          top: -14px;
-          left: 20px;
-          height: 24px;
-          width: 24px;
-          font-family: "FontAwesome";
-          line-height: 20px;
-          content: "\f0d8";
-          // color: $m-blue-l4;
-          color: $white;
-        }
+      &, .note-section {
+        border-top: 2px solid $gray-l4;
+        padding-top: $baseline;
       }
 
-      .reference {
-        @extend %t-copy-sub1;
-        display: inline-block;
-        width: flex-grid(3, 12);
-        vertical-align: top;
-
-        .wrapper-reference-content {
-          padding: 0 $baseline;
-          color: $gray-l2;
-
-          .reference-title {
-            @extend %t-copy-sub1;
-            margin-top: $baseline;
-            text-transform: uppercase;
-            font-weight: $font-regular;
-            letter-spacing: 1px;
-            color: $gray-l2;
-          }
-
-          .reference-title:first-child {
-            margin-top: 0;
-          }
-
-          .reference-meta {
-            font-weight: $font-regular;
-            color: $m-gray-d2;
-          }
-
-          a.reference-meta {
-            color: $link-color;
-
-            &:hover,
-            &:focus {
-              color: $link-hover;
-            }
-          }
-        }
+      .course-title + .note-section {
+        border-top: none;
+        padding-top: 0;
       }
-    }
 
-    .note-group {
-      padding-top: ($baseline*1.5);
-      border-top: 1px solid $gray-l4;
-
-      .group-lecture {
-        border-bottom: 2px solid $gray-l4;
-        padding-bottom: $baseline;
+      .course-title, .course-subtitle {
         text-transform: uppercase;
         letter-spacing: 1px;
+      }
 
-        .course-subtitle {
+      .course-subtitle {
+        @extend %t-copy-sub1;
+        padding-bottom: $baseline;
+        font-weight: $font-light;
+        color: inherit;
+      }
+
+      .note {
+        @include clearfix();
+        margin: 0;
+        padding: ($baseline*1.5) 0;
+        border-top: 1px dotted $gray-l4;
+        border-bottom: none;
+
+        &:first-child { // Not working, but don't know why. It's like it's not even being seen although it's in the code and in the proper order (last).
+          border-top: 0px; // Grrr
+        } // Grrr
+
+        .wrapper-note-excerpts {
+          display: inline-block;
+          width: flex-grid(9, 12);
+
+          .note-excerpt {
+            display: inline-block;
+            vertical-align: top;
+            background: $m-blue-l4;
+
+            .note-excerpt-p,
+            .note-excerpt-ul,
+            .note-excerpt-ol {
+              @extend %t-copy-base;
+              position: relative;
+              padding: $baseline ($baseline*4) $baseline ($baseline*4);
+            }
+          }
+
+          .note-excerpt > .note-excerpt-p:before,
+          .note-excerpt > .note-excerpt-ul:before,
+          .note-excerpt > .note-excerpt-ol:before,
+          .note-excerpt > .note-excerpt-p:after,
+          .note-excerpt > .note-excerpt-ul:after,
+          .note-excerpt > .note-excerpt-ol:after {
+            @extend %t-title3;
+            display: block;
+            position: absolute;
+            height: 40px;
+            width: 40px;
+            font-family: "FontAwesome";
+            color: $white;
+          }
+
+          .note-excerpt > .note-excerpt-p:before,
+          .note-excerpt > .note-excerpt-ul:before,
+          .note-excerpt > .note-excerpt-ol:before {
+            content: "\f10d";
+            top: 0;
+            left: $baseline;
+          }
+
+          .note-excerpt > .note-excerpt-p:after,
+          .note-excerpt > .note-excerpt-ul:after,
+          .note-excerpt > .note-excerpt-ol:after {
+            content: "\f10e";
+            bottom: ($baseline/2);
+            right: $baseline;
+          }
+
+          .note-comments {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            .note-comment {
+              padding: ($baseline/2) $baseline;
+              border-bottom: 2px solid $white;
+
+              .note-comment-p,
+              .note-comment-ul,
+              .note-comment-ol {
+                @extend %t-weight4;
+                padding: 0;
+                margin: 0;
+                background: transparent;
+              }
+
+              .note-comment-p {
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              .note-comment-ul,
+              .note-comment-ol {
+                padding: auto;
+                margin: auto;
+              }
+
+              .note-highlight {
+                background-color: #FFFF88;
+              }
+            }
+          }
+
+          .note-comments:before {
+            @extend %t-title4;
+            display: block;
+            position: absolute;
+            top: -14px;
+            left: 20px;
+            height: 24px;
+            width: 24px;
+            font-family: "FontAwesome";
+            line-height: 20px;
+            content: "\f0d8";
+            color: $white;
+          }
+        }
+
+        .reference {
           @extend %t-copy-sub1;
-          display: block;
-          font-weight: $font-light;
-          color: inherit;
+          display: inline-block;
+          width: flex-grid(3, 12);
+          vertical-align: top;
+
+          .wrapper-reference-content {
+            padding: 0 $baseline;
+            color: $gray-l2;
+
+            .reference-title {
+              @extend %t-copy-sub1;
+              margin-top: $baseline;
+              text-transform: uppercase;
+              font-weight: $font-regular;
+              letter-spacing: 1px;
+              color: $gray-l2;
+            }
+
+            .reference-title:first-child {
+              margin-top: 0;
+            }
+
+            .reference-meta {
+              font-weight: $font-regular;
+              color: $m-gray-d2;
+            }
+
+            a.reference-meta {
+              color: $link-color;
+
+              &:hover,
+              &:focus {
+                color: $link-hover;
+              }
+            }
+          }
         }
       }
     }
@@ -217,15 +224,21 @@
     outline: none;
   }
 
+  .tab-panel.note-group {
+    padding-top: 0;
+  }
+
   .inline-error {
     color: $red;
     border-bottom: 1px solid $red;
     padding: 0 0 0.5em;
-    margin-bottom: 1em;
+    margin: 1em 0;
   }
 
   .tab-list {
     @include clearfix();
+    position: relative;
+    top: 2px;
 
     .tabs-label {
       @extend %t-copy-base;
