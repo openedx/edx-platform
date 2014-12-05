@@ -343,11 +343,11 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                             'name': 'test-app',
                             'version': 'unknown'
                         },
-                        'application': {
-                            'name': 'edx.mobileapp.android',
-                            'version': '29',
-                            'component': 'videoplayer'
-                        }
+                    },
+                    'application': {
+                        'name': 'edx.mobileapp.android',
+                        'version': '29',
+                        'component': 'videoplayer'
                     },
                     'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
                 },
