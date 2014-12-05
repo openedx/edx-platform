@@ -266,11 +266,14 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             toggleFilterColumn: function(event) {
                 event.preventDefault();
                 var collection = this.collection;
+                var resetFilter = this.$el.find('.reset-filter');
                 if($(event.currentTarget).data('assetfilter') == this.allLabel){
                     collection.assetType = '';
+                    resetFilter.hide();
                 }
                 else{
                     collection.assetType = $(event.currentTarget).data('assetfilter');
+                    resetFilter.show();
                 }
 
                 this.selectFilter('js-asset-type-col');
