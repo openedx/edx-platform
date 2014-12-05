@@ -162,6 +162,7 @@ def cohort_students(entry_id, xmodule_instance_args):
     Cohort students in bulk, and upload the results.
     """
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
