@@ -2,31 +2,48 @@
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
-from django.db import models
+from django.db import models, connection
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'CourseUserGroup'
-        db.create_table('course_groups_courseusergroup', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
-            ('group_type', self.gf('django.db.models.fields.CharField')(max_length=20)),
-        ))
-        db.send_create_signal('course_groups', ['CourseUserGroup'])
 
-        # Adding unique constraint on 'CourseUserGroup', fields ['name', 'course_id']
-        db.create_unique('course_groups_courseusergroup', ['name', 'course_id'])
+        def table_exists(name):
+            return name in connection.introspection.table_names()
 
-        # Adding M2M table for field users on 'CourseUserGroup'
-        db.create_table('course_groups_courseusergroup_users', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('courseusergroup', models.ForeignKey(orm['course_groups.courseusergroup'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique('course_groups_courseusergroup_users', ['courseusergroup_id', 'user_id'])
+        def index_exists(table_name, column_name):
+            return column_name in connection.introspection.get_indexes(connection.cursor(), table_name)
+
+        # Since this djangoapp has been converted to south migrations after-the-fact,
+        # these tables/indexes should already exist when migrating an existing installation.
+        if not (
+            table_exists('course_groups_courseusergroup') and
+            index_exists('course_groups_courseusergroup', 'name') and
+            index_exists('course_groups_courseusergroup', 'course_id') and
+            table_exists('course_groups_courseusergroup_users') and
+            index_exists('course_groups_courseusergroup_users', 'courseusergroup_id') and
+            index_exists('course_groups_courseusergroup_users', 'user_id')
+        ):
+            db.create_table('course_groups_courseusergroup', (
+                ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+                ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+                ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
+                ('group_type', self.gf('django.db.models.fields.CharField')(max_length=20)),
+            ))
+            db.send_create_signal('course_groups', ['CourseUserGroup'])
+
+            # Adding unique constraint on 'CourseUserGroup', fields ['name', 'course_id']
+            db.create_unique('course_groups_courseusergroup', ['name', 'course_id'])
+
+            # Adding M2M table for field users on 'CourseUserGroup'
+            db.create_table('course_groups_courseusergroup_users', (
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+                ('courseusergroup', models.ForeignKey(orm['course_groups.courseusergroup'], null=False)),
+                ('user', models.ForeignKey(orm['auth.user'], null=False))
+            ))
+            db.create_unique('course_groups_courseusergroup_users', ['courseusergroup_id', 'user_id'])
 
     def backwards(self, orm):
         # Removing unique constraint on 'CourseUserGroup', fields ['name', 'course_id']
