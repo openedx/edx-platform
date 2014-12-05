@@ -26,6 +26,9 @@
                     <div class="wrapper-nav-sub">
                         <div class="nav-sub">
                             <ul>
+                                <li class="nav-item reset-filter">
+                                    <a class="column-filter-link" href="" data-assetfilter="ALL">Show All</a>
+                                </li>
                             <% _.each(typeData, function(type, key){ %>
                                 <li class="nav-item">
                                     <a class="column-filter-link" href="" data-assetfilter="<%= type %>"><%= type %></a>
@@ -33,9 +36,6 @@
                             <% }) %>
                                 <li class="nav-item">
                                     <a class="column-filter-link" href="" data-assetfilter="OTHER">Other</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="column-filter-link" href="" data-assetfilter="ALL">Reset</a>
                                 </li>
                             </ul>
                         </div>

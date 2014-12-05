@@ -235,13 +235,19 @@
               }
             }
 
-            .nav-item a {
-              color: $gray-d1;
-
-              &:hover {
-                color: $blue-s1;
+            .nav-item {
+              &.reset-filter{
+                display:none;
               }
-            }
+
+              a {
+                color: $gray-d1;
+
+                &:hover {
+                  color: $blue-s1;
+                }
+              }
+          }
           }
           .nav-sub {
             @include text-align(left);
