@@ -73,7 +73,7 @@ define([
             AjaxHelpers.respondWithJson(requests, responseJson);
 
             expect(this.tabsCollection).toHaveLength(1);
-            expect(this.tabsCollection.at(0).attributes).toEqual({
+            expect(this.tabsCollection.at(0).toJSON()).toEqual({
                 name: 'Search Results',
                 identifier: 'view-search-results',
                 icon: 'icon-search',

@@ -38,14 +38,14 @@ class EdxNotesTestMixin(UniqueCourseTest):
         })
 
         self.course_fixture.add_children(
-            XBlockFixtureDesc("chapter", "Test Section").add_children(
+            XBlockFixtureDesc("chapter", "Test Section 1").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection 1").add_children(
                     XBlockFixtureDesc("vertical", "Test Unit 1").add_children(
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 1",
                             data="""
-                                <p><span class="{0}">Annotate this text!</span></p>
+                                <p><span class="{}">Annotate this text!</span></p>
                                 <p>Annotate this text</p>
                             """.format(self.selector)
                         ),
@@ -69,9 +69,26 @@ class EdxNotesTestMixin(UniqueCourseTest):
                             "html",
                             "Test HTML 4",
                             data="""
-                                <p><span class="{0}">Annotate this text!</span></p>
-                                <p>Annotate this text</p>
+                                <p><span class="{}">Annotate this text!</span></p>
                             """.format(self.selector)
+                        ),
+                    ),
+                ),
+            ),
+            XBlockFixtureDesc("chapter", "Test Section 2").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection 3").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit 4").add_children(
+                        XBlockFixtureDesc(
+                            "html",
+                            "Test HTML 5",
+                            data="""
+                                <p><span class="{}">Annotate this text!</span></p>
+                            """.format(self.selector)
+                        ),
+                        XBlockFixtureDesc(
+                            "html",
+                            "Test HTML 6",
+                            data="""<p><span class="{}">Annotate this text!</span></p>""".format(self.selector)
                         ),
                     ),
                 ),
@@ -248,31 +265,73 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         xblocks = self.course_fixture.get_nested_xblocks(category="html")
         self._add_notes([
             Note(
-                usage_id=xblocks[2].locator,
+                usage_id=xblocks[4].locator,
                 user=self.username,
                 course_id=self.course_fixture._course_key,
-                text="Third note",
-                quote="",
-                updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
-            ),
-            Note(
-                usage_id=xblocks[0].locator,
-                user=self.username,
-                course_id=self.course_fixture._course_key,
-                text="Second note",
+                text="First note",
                 quote="Annotate this text",
-                updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat(),
-                ranges=[Range(startOffset=0, endOffset=18)],
+                updated=datetime(2011, 1, 1, 1, 1, 1, 1).isoformat(),
             ),
             Note(
                 usage_id=xblocks[2].locator,
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="",
+                quote=u"Annotate this text",
+                updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
+            ),
+            Note(
+                usage_id=xblocks[0].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="Third note",
                 quote="Annotate this text",
+                updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat(),
+                ranges=[Range(startOffset=0, endOffset=18)],
+            ),
+            Note(
+                usage_id=xblocks[3].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="Fourth note",
+                quote="",
                 updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat(),
             ),
+            Note(
+                usage_id=xblocks[1].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="Fifth note",
+                quote="Annotate this text",
+                updated=datetime(2015, 1, 1, 1, 1, 1, 1).isoformat(),
+            ),
         ])
+
+    def assertNoteContent(self, item, text=None, quote=None, unit_name=None, time_updated=None):
+        if item.text is not None:
+            self.assertEqual(text, item.text)
+        else:
+            self.assertIsNone(text)
+        if item.quote is not None:
+            self.assertIn(quote, item.quote)
+        else:
+            self.assertIsNone(quote)
+        self.assertEqual(unit_name, item.unit_name)
+        self.assertEqual(time_updated, item.time_updated)
+        if text is not None and quote is not None:
+            self.assertEqual(item.title_highlighted, "HIGHLIGHTED & NOTED IN:")
+        elif text is not None:
+            self.assertEqual(item.title_highlighted, "HIGHLIGHTED IN:")
+        elif quote is not None:
+            self.assertEqual(item.title_highlighted, "NOTED IN:")
+
+    def assertGroupContent(self, item, title=None, subtitles=None):
+        self.assertEqual(item.title, title)
+        self.assertEqual(item.subtitles, subtitles)
+
+    def assertSectionContent(self, item, title=None, notes=None):
+        self.assertEqual(item.title, title)
+        self.assertEqual(item.notes, notes)
 
     def test_no_content(self):
         """
@@ -287,83 +346,187 @@ class EdxNotesPageTest(EdxNotesTestMixin):
     def test_recent_activity_view(self):
         """
         Scenario: User can view all notes by recent activity.
-        Given I have a course with 3 notes
+        Given I have a course with 5 notes
         When I open Notes page
-        Then I see 3 notes sorted by the day
+        Then I see 5 notes sorted by the updated date
         And I see correct content in the notes
         """
         self._add_default_notes()
-
-        def assertContent(item, text=None, quote=None, unit_name=None, time_updated=None):
-            if item.text is not None:
-                self.assertEqual(text, item.text)
-            else:
-                self.assertIsNone(text)
-            if item.quote is not None:
-                self.assertIn(quote, item.quote)
-            else:
-                self.assertIsNone(quote)
-            self.assertEqual(unit_name, item.unit_name)
-            self.assertEqual(time_updated, item.time_updated)
-            if text is not None and quote is not None:
-                self.assertEqual(item.title_highlighted, "HIGHLIGHTED & NOTED IN:")
-            elif text is not None:
-                self.assertEqual(item.title_highlighted, "HIGHLIGHTED IN:")
-            elif quote is not None:
-                self.assertEqual(item.title_highlighted, "NOTED IN:")
-
         self.notes_page.visit()
-        items = self.notes_page.children
-        self.assertEqual(len(items), 3)
-        assertContent(
-            items[0],
+        notes = self.notes_page.notes
+        self.assertEqual(len(notes), 5)
+
+        self.assertNoteContent(
+            notes[0],
             quote=u"Annotate this text",
-            unit_name="Test Unit 2",
+            text=u"Fifth note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2015 at 01:01 UTC"
+        )
+
+        self.assertNoteContent(
+            notes[1],
+            text=u"Fourth note",
+            unit_name="Test Unit 3",
             time_updated="Jan 01, 2014 at 01:01 UTC"
         )
 
-        assertContent(
-            items[1],
-            text=u"Second note",
+        self.assertNoteContent(
+            notes[2],
             quote="Annotate this text",
+            text=u"Third note",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC"
         )
 
-        assertContent(
-            items[2],
-            text=u"Third note",
+        self.assertNoteContent(
+            notes[3],
+            quote=u"Annotate this text",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC"
+        )
+
+        self.assertNoteContent(
+            notes[4],
+            quote=u"Annotate this text",
+            text=u"First note",
+            unit_name="Test Unit 4",
+            time_updated="Jan 01, 2011 at 01:01 UTC"
+        )
+
+    def test_course_structure_view(self):
+        """
+        Scenario: User can view all notes by course structure.
+        Given I have a course with 5 notes
+        When I open Notes page
+        And I switch to "Course Structure" view
+        Then I see 2 groups, 3 sections and 5 notes
+        And I see correct content in the notes and groups
+        """
+        self._add_default_notes()
+        self.notes_page.visit().switch_to_tab("structure")
+
+        notes = self.notes_page.notes
+        groups = self.notes_page.groups
+        sections = self.notes_page.sections
+        self.assertEqual(len(notes), 5)
+        self.assertEqual(len(groups), 2)
+        self.assertEqual(len(sections), 3)
+
+        self.assertGroupContent(
+            groups[0],
+            title=u"TEST SECTION 1",
+            subtitles=[u"TEST SUBSECTION 1", u"TEST SUBSECTION 2"]
+        )
+
+        self.assertSectionContent(
+            sections[0],
+            title=u"TEST SUBSECTION 1",
+            notes=[u"Fifth note", u"Third note", None]
+        )
+
+        self.assertNoteContent(
+            notes[0],
+            quote=u"Annotate this text",
+            text=u"Fifth note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2015 at 01:01 UTC"
+        )
+
+        self.assertNoteContent(
+            notes[1],
+            quote=u"Annotate this text",
+            text=u"Third note",
+            unit_name="Test Unit 1",
+            time_updated="Jan 01, 2013 at 01:01 UTC"
+        )
+
+        self.assertNoteContent(
+            notes[2],
+            quote=u"Annotate this text",
+            unit_name="Test Unit 2",
+            time_updated="Jan 01, 2012 at 01:01 UTC"
+        )
+
+        self.assertSectionContent(
+            sections[1],
+            title=u"TEST SUBSECTION 2",
+            notes=[u"Fourth note"]
+        )
+
+        self.assertNoteContent(
+            notes[3],
+            text=u"Fourth note",
+            unit_name="Test Unit 3",
+            time_updated="Jan 01, 2014 at 01:01 UTC"
+        )
+
+        self.assertGroupContent(
+            groups[1],
+            title=u"TEST SECTION 2",
+            subtitles=[u"TEST SUBSECTION 3"],
+        )
+
+        self.assertSectionContent(
+            sections[2],
+            title=u"TEST SUBSECTION 3",
+            notes=[u"First note"]
+        )
+
+        self.assertNoteContent(
+            notes[4],
+            quote=u"Annotate this text",
+            text=u"First note",
+            unit_name="Test Unit 4",
+            time_updated="Jan 01, 2011 at 01:01 UTC"
         )
 
     def test_easy_access_from_notes_page(self):
         """
         Scenario: Ensure that the link to the Unit works correctly.
-        Given I have a course with 3 notes
+        Given I have a course with 5 notes
         When I open Notes page
+        And I click on the first unit link
+        Then I see correct text on the unit page
+        When go back to the Notes page
+        And I switch to "Course Structure" view
         And I click on the second unit link
         Then I see correct text on the unit page
+        When go back to the Notes page
+        And I run the search with "Fifth" query
+        And I click on the first unit link
+        Then I see correct text on the unit page
         """
+        def assert_page(note):
+            quote = note.quote
+            note.go_to_unit()
+            self.courseware_page.wait_for_page()
+            self.assertIn(quote, self.courseware_page.xblock_component_html_content())
+
         self._add_default_notes()
         self.notes_page.visit()
-        item = self.notes_page.children[1]
-        text = item.quote
-        item.go_to_unit()
-        self.courseware_page.wait_for_page()
-        self.assertIn(text, self.courseware_page.xblock_component_html_content())
+        note = self.notes_page.notes[0]
+        assert_page(note)
+
+        self.notes_page.visit().switch_to_tab("structure")
+        note = self.notes_page.notes[1]
+        assert_page(note)
+
+        self.notes_page.visit().search("Fifth")
+        note = self.notes_page.notes[0]
+        assert_page(note)
 
     def test_search_behaves_correctly(self):
         """
         Scenario: Searching behaves correctly.
-        Given I have a course with 3 notes
+        Given I have a course with 5 notes
         When I open Notes page
         When I run the search with "   " query
         Then I see the following error message "Search field cannot be blank."
-        And I still can see only "Recent Activity" tab
+        And I do not see "Search Results" tab
         When I run the search with "note" query
         Then I see that error message disappears
-        And I see that "Search Results" tab appears with 2 notes found
+        And I see that "Search Results" tab appears with 4 notes found
         """
         self._add_default_notes()
         self.notes_page.visit()
@@ -373,53 +536,57 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.assertTrue(self.notes_page.is_error_visible)
         self.assertEqual(self.notes_page.error_text, u"Search field cannot be blank.")
         # Search results tab does not appear
-        self.assertEqual(len(self.notes_page.tabs), 1)
+        self.assertNotIn(u"Search Results", self.notes_page.tabs)
         # Run the search with correct query
         self.notes_page.search("note")
         # Error message disappears
         self.assertFalse(self.notes_page.is_error_visible)
         self.assertIn(u"Search Results", self.notes_page.tabs)
-        self.assertEqual(len(self.notes_page.children), 2)
+        self.assertEqual(len(self.notes_page.notes), 4)
 
     def test_tabs_behaves_correctly(self):
         """
         Scenario: Tabs behaves correctly.
-        Given I have a course with 3 notes
+        Given I have a course with 5 notes
         When I open Notes page
-        Then I see only "Recent Activity" tab with 3 notes
+        Then I see only "Recent Activity" and "Course Structure" tabs
         When I run the search with "note" query
-        And I see that "Search Results" tab appears with 2 notes found
+        And I see that "Search Results" tab appears with 4 notes found
         Then I switch to "Recent Activity" tab
-        And I see all 3 notes
+        And I see all 5 notes
+        Then I switch to "Course Structure" tab
+        And I see all 2 groups and 5 notes
         When I switch back to "Search Results" tab
-        Then I can still see 2 notes found
+        Then I can still see 4 notes found
         When I close "Search Results" tab
         Then I see that "Recent Activity" tab becomes active
         And "Search Results" tab disappears
-        And I see all 3 notes
+        And I see all 5 notes
         """
         self._add_default_notes()
         self.notes_page.visit()
 
         # We're on Recent Activity tab.
-        self.assertEqual(len(self.notes_page.tabs), 1)
-        self.assertIn(u"Recent Activity", self.notes_page.tabs)
-        self.assertEqual(len(self.notes_page.children), 3)
+        self.assertEqual(len(self.notes_page.tabs), 2)
+        self.assertEqual([u"Recent Activity", u"Course Structure"], self.notes_page.tabs)
         self.notes_page.search("note")
         # We're on Search Results tab
-        self.assertEqual(len(self.notes_page.tabs), 2)
+        self.assertEqual(len(self.notes_page.tabs), 3)
         self.assertIn(u"Search Results", self.notes_page.tabs)
-        self.assertEqual(len(self.notes_page.children), 2)
+        self.assertEqual(len(self.notes_page.notes), 4)
         # We can switch on Recent Activity tab and back.
         self.notes_page.switch_to_tab("recent")
-        self.assertEqual(len(self.notes_page.children), 3)
+        self.assertEqual(len(self.notes_page.notes), 5)
+        self.notes_page.switch_to_tab("structure")
+        self.assertEqual(len(self.notes_page.groups), 2)
+        self.assertEqual(len(self.notes_page.notes), 5)
         self.notes_page.switch_to_tab("search")
-        self.assertEqual(len(self.notes_page.children), 2)
+        self.assertEqual(len(self.notes_page.notes), 4)
         # Can close search results page
         self.notes_page.close_tab("search")
-        self.assertEqual(len(self.notes_page.tabs), 1)
-        self.assertIn(u"Recent Activity", self.notes_page.tabs)
-        self.assertEqual(len(self.notes_page.children), 3)
+        self.assertEqual(len(self.notes_page.tabs), 2)
+        self.assertNotIn(u"Search Results", self.notes_page.tabs)
+        self.assertEqual(len(self.notes_page.notes), 5)
 
     def test_open_note_when_accessed_from_notes_page(self):
         """
@@ -464,7 +631,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             ),
         ])
         self.notes_page.visit()
-        item = self.notes_page.children[0]
+        item = self.notes_page.notes[0]
         item.go_to_unit()
         self.courseware_page.wait_for_page()
         note = self.note_unit_page.notes[0]
@@ -579,7 +746,7 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
         self.assertEqual(len(self.note_unit_page.notes), 0)
         self.course_nav.go_to_sequential_position(2)
         self.assertEqual(len(self.note_unit_page.notes), 0)
-        self.course_nav.go_to_section(u"Test Section", u"Test Subsection 2")
+        self.course_nav.go_to_section(u"Test Section 1", u"Test Subsection 2")
         self.assertEqual(len(self.note_unit_page.notes), 0)
 
     def test_can_reenable_all_notes(self):
@@ -605,5 +772,5 @@ class EdxNotesToggleNotesTest(EdxNotesTestMixin):
         self.assertGreater(len(self.note_unit_page.notes), 0)
         self.course_nav.go_to_sequential_position(2)
         self.assertGreater(len(self.note_unit_page.notes), 0)
-        self.course_nav.go_to_section(u"Test Section", u"Test Subsection 2")
+        self.course_nav.go_to_section(u"Test Section 1", u"Test Subsection 2")
         self.assertGreater(len(self.note_unit_page.notes), 0)

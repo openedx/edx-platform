@@ -533,6 +533,7 @@
         'lms/include/js/spec/edxnotes/views/tab_view_spec.js',
         'lms/include/js/spec/edxnotes/views/tabs/search_results_spec.js',
         'lms/include/js/spec/edxnotes/views/tabs/recent_activity_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs/course_structure_spec.js',
         'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
         'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
         'lms/include/js/spec/edxnotes/models/tab_spec.js',
