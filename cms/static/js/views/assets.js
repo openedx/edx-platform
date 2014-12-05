@@ -15,7 +15,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 "click .filterable-column .column-filter-link": "toggleFilterColumn"
             },
 
-            typeData: ['Images', 'Documents', 'Text'],
+            typeData: ['Images', 'Documents'],
 
             allLabel: 'ALL',
 
