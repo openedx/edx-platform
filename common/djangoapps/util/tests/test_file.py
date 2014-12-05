@@ -3,6 +3,7 @@
 Tests for file.py
 """
 from cStringIO import StringIO
+import ddt
 
 from django.test import TestCase
 from datetime import datetime
@@ -166,48 +167,56 @@ class StoreUploadedFileTestCase(TestCase):
             self.assertEqual(self.file_content, f.read())
 
 
+@ddt.ddt
 class TestUniversalNewlineIterator(TestCase):
     """
     Tests for the UniversalNewlineIterator class.
     """
-    def test_line_feeds(self):
+    @ddt.data(1, 2, 999)
+    def test_line_feeds(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO('foo\nbar\n'), buffer_size=1)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\nbar\n'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
-    def test_carriage_returns(self):
+    @ddt.data(1, 2, 999)
+    def test_carriage_returns(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO('foo\rbar\r'), buffer_size=1)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\rbar\r'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
-    def test_carriage_returns_and_line_feeds(self):
+    @ddt.data(1, 2, 999)
+    def test_carriage_returns_and_line_feeds(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO('foo\r\nbar\r\n'), buffer_size=1)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\r\nbar\r\n'), buffer_size=buffer_size)],
             ['foo\n', 'bar\n']
         )
 
-    def test_no_trailing_newline(self):
+    @ddt.data(1, 2, 999)
+    def test_no_trailing_newline(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO('foo\nbar'), buffer_size=1)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\nbar'), buffer_size=buffer_size)],
             ['foo\n', 'bar']
         )
 
-    def test_only_one_line(self):
+    @ddt.data(1, 2, 999)
+    def test_only_one_line(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO('foo\n'), buffer_size=1)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo\n'), buffer_size=buffer_size)],
             ['foo\n']
         )
 
-    def test_only_one_line_no_trailing_newline(self):
+    @ddt.data(1, 2, 999)
+    def test_only_one_line_no_trailing_newline(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO('foo'), buffer_size=1)],
+            [thing for thing in UniversalNewlineIterator(StringIO('foo'), buffer_size=buffer_size)],
             ['foo']
         )
 
-    def test_empty_file(self):
+    @ddt.data(1, 2, 999)
+    def test_empty_file(self, buffer_size):
         self.assertEqual(
-            [thing for thing in UniversalNewlineIterator(StringIO(), buffer_size=1)],
+            [thing for thing in UniversalNewlineIterator(StringIO(), buffer_size=buffer_size)],
             []
         )

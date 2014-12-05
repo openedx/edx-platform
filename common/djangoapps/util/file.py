@@ -117,8 +117,6 @@ class UniversalNewlineIterator(object):
     This iterable class can be used as a wrapper around a file-like
     object which does not inherently support being read in
     universal-newline mode.  It returns a line at a time.
-
-    Inspired by http://d4nt.com/parsing-large-csv-blobs-on-google-app-engine/
     """
     def __init__(self, original_file, buffer_size):
         self.original_file = original_file
