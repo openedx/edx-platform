@@ -36,7 +36,7 @@ from lms.envs.common import (
 from path import path
 from warnings import simplefilter
 
-from lms.lib.xblock.mixin import LmsBlockMixin
+from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from dealer.git import git
 from xmodule.modulestore.edit_info import EditInfoMixin
 

@@ -34,8 +34,8 @@ def find_fixme(options):
         apps_list = ' '.join(apps)
 
         pythonpath_prefix = (
-            "PYTHONPATH={system}:{system}/djangoapps:{system}/"
-            "lib:common/djangoapps:common/lib".format(
+            "PYTHONPATH={system}:{system}/lib"
+            "common/djangoapps:common/lib".format(
                 system=system
             )
         )
@@ -83,7 +83,7 @@ def run_pylint(options):
 
         apps = [system]
 
-        for directory in ['djangoapps', 'lib']:
+        for directory in ['lib']:
             dirs = os.listdir(os.path.join(system, directory))
             apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
 

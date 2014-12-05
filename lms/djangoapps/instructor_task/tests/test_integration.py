@@ -32,7 +32,7 @@ from instructor_task.tasks_helper import upload_grades_csv
 from instructor_task.tests.test_base import (InstructorTaskModuleTestCase, TestReportMixin, TEST_COURSE_ORG,
                                              TEST_COURSE_NUMBER, OPTION_1, OPTION_2)
 from capa.responsetypes import StudentInputError
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 
 log = logging.getLogger(__name__)

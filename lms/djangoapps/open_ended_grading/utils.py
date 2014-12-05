@@ -9,7 +9,7 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
-from lms.lib.xblock.runtime import LmsModuleSystem
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
 
 

@@ -9,7 +9,7 @@ from mock import Mock
 from unittest import TestCase
 from urlparse import urlparse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from lms.lib.xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
+from lms.djangoapps.lms_xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
 
 TEST_STRINGS = [
     '',

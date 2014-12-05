@@ -19,7 +19,7 @@ from django.http import Http404
 from django.conf import settings
 from util.json_request import JsonResponse
 
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore

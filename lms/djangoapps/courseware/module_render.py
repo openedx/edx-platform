@@ -21,8 +21,8 @@ from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
-from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler

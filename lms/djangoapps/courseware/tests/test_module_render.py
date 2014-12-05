@@ -30,9 +30,10 @@ from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_XML_MODULESTORE
 )
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.models import anonymous_id_for_user
 from xmodule.lti_module import LTIDescriptor
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
