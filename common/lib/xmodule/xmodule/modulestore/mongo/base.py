@@ -1476,12 +1476,21 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             {'course_id': unicode(course_key)},
         )
 
+        # Pass back 'assets' dict but add the '_id' key to it for document update purposes.
         if course_assets is None:
             # Not found, so create.
-            course_assets = {'course_id': unicode(course_key), 'storage': 'FILLMEIN-TMP', 'assets': []}
-            course_assets['_id'] = self.asset_collection.insert(course_assets)
+            course_assets = {'course_id': unicode(course_key), 'assets': {}}
+            course_assets['assets']['_id'] = self.asset_collection.insert(course_assets)
+        else:
+            course_assets['assets']['_id'] = course_assets['_id']
 
-        return course_assets
+        return course_assets['assets']
+
+    def _make_mongo_asset_key(self, asset_type):
+        """
+        Given a asset type, form a key needed to update the proper embedded field in the Mongo doc.
+        """
+        return 'assets.{}'.format(asset_type)
 
     @contract(asset_metadata='AssetMetadata')
     def save_asset_metadata(self, asset_metadata, user_id):
@@ -1513,7 +1522,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Update the document.
         self.asset_collection.update(
             {'_id': course_assets['_id']},
-            {'$set': {asset_metadata.asset_id.block_type: all_assets.as_list()}}
+            {'$set': {self._make_mongo_asset_key(asset_metadata.asset_id.block_type): all_assets.as_list()}}
         )
         return True
 
@@ -1530,8 +1539,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         source_assets = self._find_course_assets(source_course_key)
         dest_assets = source_assets.copy()
-        dest_assets['course_id'] = unicode(dest_course_key)
         del dest_assets['_id']
+        dest_assets = {'assets': dest_assets}
+        dest_assets['course_id'] = unicode(dest_course_key)
 
         self.asset_collection.remove({'course_id': unicode(dest_course_key)})
         # Update the document.
@@ -1563,7 +1573,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Generate a Mongo doc from the metadata and update the course asset info.
         all_assets[asset_idx] = md.to_storable()
 
-        self.asset_collection.update({'_id': course_assets['_id']}, {"$set": {asset_key.block_type: all_assets}})
+        self.asset_collection.update(
+            {'_id': course_assets['_id']},
+            {"$set": {self._make_mongo_asset_key(asset_key.block_type): all_assets}}
+        )
 
     @contract(asset_key='AssetKey')
     def delete_asset_metadata(self, asset_key, user_id):
@@ -1586,7 +1599,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Update the document.
         self.asset_collection.update(
             {'_id': course_assets['_id']},
-            {'$set': {asset_key.block_type: all_asset_info}}
+            {'$set': {self._make_mongo_asset_key(asset_key.block_type): all_asset_info}}
         )
         return 1
 

@@ -24,7 +24,7 @@ class AssetMetadata(object):
     in the modulestore.
     """
 
-    TOP_LEVEL_ATTRS = ['basename', 'internal_name', 'locked', 'contenttype', 'thumbnail', 'fields']
+    TOP_LEVEL_ATTRS = ['pathname', 'internal_name', 'locked', 'contenttype', 'thumbnail', 'fields']
     EDIT_INFO_ATTRS = ['curr_version', 'prev_version', 'edited_by', 'edited_by_email', 'edited_on']
     CREATE_INFO_ATTRS = ['created_by', 'created_by_email', 'created_on']
     ATTRS_ALLOWED_TO_UPDATE = TOP_LEVEL_ATTRS + EDIT_INFO_ATTRS
@@ -34,14 +34,14 @@ class AssetMetadata(object):
     ASSET_TYPE = 'asset'
 
     @contract(asset_id='AssetKey',
-              basename='basestring|None', internal_name='basestring|None',
+              pathname='basestring|None', internal_name='basestring|None',
               locked='bool|None', contenttype='basestring|None',
               thumbnail='basestring|None', fields='dict|None',
               curr_version='basestring|None', prev_version='basestring|None',
               created_by='int|None', created_by_email='basestring|None', created_on='datetime|None',
               edited_by='int|None', edited_by_email='basestring|None', edited_on='datetime|None')
     def __init__(self, asset_id,
-                 basename=None, internal_name=None,
+                 pathname=None, internal_name=None,
                  locked=None, contenttype=None,
                  thumbnail=None, fields=None,
                  curr_version=None, prev_version=None,
@@ -53,7 +53,7 @@ class AssetMetadata(object):
 
         Arguments:
             asset_id (AssetKey): Key identifying this particular asset.
-            basename (str): Original path to file at asset upload time.
+            pathname (str): Original path to file at asset upload time.
             internal_name (str): Name, url, or handle for the storage system to access the file.
             locked (bool): If True, only course participants can access the asset.
             contenttype (str): MIME type of the asset.
@@ -71,7 +71,7 @@ class AssetMetadata(object):
                 Not saved.
         """
         self.asset_id = asset_id if field_decorator is None else field_decorator(asset_id)
-        self.basename = basename  # Path w/o filename.
+        self.pathname = pathname  # Path w/o filename.
         self.internal_name = internal_name
         self.locked = locked
         self.contenttype = contenttype
@@ -91,7 +91,7 @@ class AssetMetadata(object):
     def __repr__(self):
         return """AssetMetadata{!r}""".format((
             self.asset_id,
-            self.basename, self.internal_name,
+            self.pathname, self.internal_name,
             self.locked, self.contenttype, self.fields,
             self.curr_version, self.prev_version,
             self.created_by, self.created_by_email, self.created_on,
@@ -118,7 +118,7 @@ class AssetMetadata(object):
         """
         return {
             'filename': self.asset_id.path,
-            'basename': self.basename,
+            'pathname': self.pathname,
             'internal_name': self.internal_name,
             'locked': self.locked,
             'contenttype': self.contenttype,
@@ -145,7 +145,7 @@ class AssetMetadata(object):
         """
         if asset_doc is None:
             return
-        self.basename = asset_doc['basename']
+        self.pathname = asset_doc['pathname']
         self.internal_name = asset_doc['internal_name']
         self.locked = asset_doc['locked']
         self.contenttype = asset_doc['contenttype']
