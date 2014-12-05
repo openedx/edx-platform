@@ -8,7 +8,7 @@ from pytz import UTC
 import urllib
 
 from django.core.exceptions import PermissionDenied
-from django.core.files.storage import get_storage_class
+from django.core.files.storage import DefaultStorage
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 
@@ -21,7 +21,7 @@ class FileValidationException(Exception):
 
 
 def store_uploaded_file(
-        request, file_key, allowed_file_types, base_storage_filename, max_file_size=10240000, validator=None,
+        request, file_key, allowed_file_types, base_storage_filename, max_file_size=2000000, validator=None,
 ):
     """
     Stores an uploaded file to django file storage.
@@ -37,8 +37,8 @@ def store_uploaded_file(
         base_storage_filename (str): the filename to be used for the stored file, not including the extension.
             The same extension as the uploaded file will be appended to this value.
         max_file_size (int): the maximum file size in bytes that the uploaded file can be. If the uploaded file
-            is larger than this size, a `PermissionDenied` exception will be thrown. Default value is 10240000 bytes
-            (10,000 KB).
+            is larger than this size, a `PermissionDenied` exception will be thrown. Default value is 2000000 bytes
+            (2 MB).
         validator (function): an optional validation method that, if defined, will be passed the stored file (which
             is copied from the uploaded file). This method can do validation on the contents of the file and throw
             a `FileValidationException` if the file is not properly formatted. If any exception is thrown, the stored
@@ -65,27 +65,22 @@ def store_uploaded_file(
                 len(allowed_file_types)).format(file_types=file_types)
             raise PermissionDenied(msg)
 
-        stored_file_name = base_storage_filename + file_extension
-
-        file_storage = get_storage_class()()
-        # use default storage to store file
-        file_storage.save(stored_file_name, uploaded_file)
-
-        # check file size
-        size = file_storage.size(stored_file_name)
-        if size > max_file_size:
-            file_storage.delete(stored_file_name)
+        if uploaded_file.size > max_file_size:
             msg = _("Maximum upload file size is {file_size} bytes.").format(file_size=max_file_size)
             raise PermissionDenied(msg)
 
+        stored_file_name = base_storage_filename + file_extension
+
+        file_storage = DefaultStorage()
+        # use default storage to store file
+        file_storage.save(stored_file_name, uploaded_file)
+
         if validator:
-            validation_succeeded = False
             try:
                 validator(file_storage, stored_file_name)
-                validation_succeeded = True
-            finally:
-                if not validation_succeeded:
-                    file_storage.delete(stored_file_name)
+            except:
+                file_storage.delete(stored_file_name)
+                raise
 
     finally:
         uploaded_file.close()
