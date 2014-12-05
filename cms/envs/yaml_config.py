@@ -18,6 +18,7 @@ import yaml
 
 from .common import *
 from logsettings import get_logger_config
+from util.config_parse import convert_tokens
 import os
 
 from path import path
@@ -34,20 +35,6 @@ def construct_yaml_str(self, node):
     return self.construct_scalar(node)
 Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
 SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
-
-
-def convert_tokens(tokens):
-    """
-    This function is called on the token
-    dictionary, at the top level it converts
-    all strings containing 'None' to a literal
-    None due to a bug in Ansible which creates
-    the yaml files
-    """
-
-    for k, v in tokens.iteritems():
-        if v == 'None':
-            tokens[k] = None
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what YAML
 # configuration files are read during startup.
@@ -134,7 +121,7 @@ CELERY_QUEUES = {
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
     ENV_TOKENS = yaml.load(env_file)
 
-convert_tokens(ENV_TOKENS)
+ENV_TOKENS = convert_tokens(ENV_TOKENS)
 
 ##########################################
 # Merge settings from common.py
@@ -225,7 +212,7 @@ MICROSITE_ROOT_DIR = path(MICROSITE_ROOT_DIR)
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.yaml") as auth_file:
     AUTH_TOKENS = yaml.load(auth_file)
 
-convert_tokens(AUTH_TOKENS)
+AUTH_TOKENS = convert_tokens(AUTH_TOKENS)
 
 vars().update(AUTH_TOKENS)
 
