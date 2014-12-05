@@ -42,7 +42,7 @@ class FilenameGeneratorTestCase(TestCase):
             "__1974-06-22-010203",
             course_and_time_based_filename_generator("", "")
         )
-        course_key = SlashSeparatedCourseKey.from_deprecated_string("foo/bar/123")
+        course_key = SlashSeparatedCourseKey.from_string("foo/bar/123")
         self.assertEqual(
             "foo_bar_123_cohorted_1974-06-22-010203",
             course_and_time_based_filename_generator(course_key, "cohorted")

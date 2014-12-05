@@ -968,7 +968,7 @@ def add_users_to_cohorts(request, course_id):
     containing cohort assignments for users. This method spawns a celery task
     to do the assignments, and a CSV file with results is provided via data downloads.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
 
     try:
         def validator(file_storage, file_to_validate):
