@@ -200,11 +200,10 @@
         text-align: left;
         color: $gray;
 
-        .column-sort-link {
+        .column-sort-link, .column-selected-link {
           cursor: pointer;
           color: $blue;
         }
-
 
         .current-sort {
           @extend %t-strong;
@@ -247,8 +246,9 @@
                   color: $blue-s1;
                 }
               }
+            }
           }
-          }
+
           .nav-sub {
             @include text-align(left);
 
