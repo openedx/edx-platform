@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for file.py
 """
@@ -41,6 +42,10 @@ class FilenameGeneratorTestCase(TestCase):
         self.assertEqual(
             "__1974-06-22-010203",
             course_and_time_based_filename_generator("", "")
+        )
+        self.assertEqual(
+            u"course_base_name_ø_1974-06-22-010203",
+            course_and_time_based_filename_generator(u"course", u" base` name ø ")
         )
         course_key = SlashSeparatedCourseKey.from_string("foo/bar/123")
         self.assertEqual(

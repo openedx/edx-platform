@@ -8,7 +8,7 @@ from pytz import UTC
 import urllib
 
 from django.core.exceptions import PermissionDenied
-from django.core.files.storage import DefaultStorage
+from django.core.files.storage import DefaultStorage, get_valid_filename
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 
@@ -95,8 +95,10 @@ def course_and_time_based_filename_generator(course_id, base_name):
 
     Args:
         course_id (object): A course identification object that must support conversion to unicode.
-        base_name (str): A name describing what type of file this is. Should not include any characters
-            that are not safe for filenames.
+        base_name (str): A name describing what type of file this is. Any characters that are not safe for
+            filenames will be converted per django.core.files.storage.get_valid_filename (Specifically,
+            leading and trailing spaces are removed; other  spaces are converted to underscores; and anything
+            that is not a unicode alphanumeric, dash, underscore, or dot, is removed).
 
     Returns:
         str: a concatenation of the course_id (with backslashes replace by underscores), the base_name,
@@ -105,6 +107,6 @@ def course_and_time_based_filename_generator(course_id, base_name):
     """
     return u"{course_prefix}_{base_name}_{timestamp_str}".format(
         course_prefix=urllib.quote(unicode(course_id).replace("/", "_")),
-        base_name=base_name,
+        base_name=get_valid_filename(base_name),
         timestamp_str=datetime.now(UTC).strftime("%Y-%m-%d-%H%M%S")  # pylint: disable=maybe-no-member
     )
