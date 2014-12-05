@@ -71,6 +71,13 @@ def store_uploaded_file(
         # use default storage to store file
         file_storage.save(stored_file_name, uploaded_file)
 
+        # check file size
+        size = file_storage.size(stored_file_name)
+        if size > max_file_size:
+            file_storage.delete(stored_file_name)
+            msg = _("Maximum upload file size is {file_size} bytes.").format(file_size=max_file_size)
+            raise PermissionDenied(msg)
+
         if validator:
             validation_succeeded = False
             try:
@@ -82,13 +89,6 @@ def store_uploaded_file(
 
     finally:
         uploaded_file.close()
-
-    # check file size
-    size = file_storage.size(stored_file_name)
-    if size > max_file_size:
-        file_storage.delete(stored_file_name)
-        msg = _("Maximum upload file size is {file_size} bytes.").format(file_size=max_file_size)
-        raise PermissionDenied(msg)
 
     return file_storage, stored_file_name
 
