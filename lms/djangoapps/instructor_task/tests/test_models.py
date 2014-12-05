@@ -31,7 +31,7 @@ class MockKey(object):
 
 
 class MockBucket(object):
-    """Mocking a boto S3 Bucket object."""
+    """ Mocking a boto S3 Bucket object. """
     def __init__(self, _name):
         self.keys = []
 
@@ -45,7 +45,7 @@ class MockBucket(object):
 
 
 class MockS3Connection(object):
-    """Mocking a boto S3 Connection"""
+    """ Mocking a boto S3 Connection """
     def __init__(self, access_key, secret_key):
         pass
 
