@@ -113,7 +113,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.cohort_2 = CohortFactory(course_id=self.course.id, name='Cohort 2')
         self.student_1 = self.create_student(username=u'student_1\xec', email='student_1@example.com')
         self.student_2 = self.create_student(username='student_2', email='student_2@example.com')
-        self.csv_header_row = ['cohort_name', 'exists', 'students_added', 'students_changed', 'students_already_present', 'students_unknown']
+        self.csv_header_row = ['Cohort Name', 'Exists', 'Students Added', 'Students Not Found']
 
     def _cohort_students_and_upload(self, csv_data):
         """
@@ -140,8 +140,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', ''])),
             ]
         )
 
@@ -160,8 +160,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', ''])),
             ]
         )
 
@@ -180,8 +180,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', ''])),
             ]
         )
 
@@ -206,8 +206,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', ''])),
             ]
         )
 
@@ -226,8 +226,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '0', '0', 'Invalid'])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '0', '0', 'also_fake@bad.com'])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', 'Invalid'])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', 'also_fake@bad.com'])),
             ]
         )
 
@@ -246,8 +246,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 1, 'failed': 1}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', '0', '0', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Does Not Exist', 'False', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', ''])),
             ]
         )
 
@@ -277,7 +277,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 0, 'failed': 2}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['', 'False', '0', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['', 'False', '0', ''])),
             ]
         )
 
@@ -312,8 +312,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', ''])),
             ]
         )
 
@@ -335,8 +335,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', '0', '0', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', '0', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', ''])),
             ]
         )
 
@@ -358,8 +358,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '1', '0', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '1', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '1', ''])),
             ]
         )
 
@@ -381,7 +381,7 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         self.assertDictContainsSubset({'total': 2, 'attempted': 2, 'skipped': 2, 'failed': 0}, result)
         self.verify_rows_in_csv(
             [
-                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', '0', '1', ''])),
-                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', '0', '1', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 1', 'True', '0', ''])),
+                dict(zip(self.csv_header_row, ['Cohort 2', 'True', '0', ''])),
             ]
         )

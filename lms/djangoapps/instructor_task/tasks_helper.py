@@ -664,11 +664,9 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
 
             if not cohorts_status.get(cohort_name):
                 cohorts_status[cohort_name] = {
-                    "cohort_name": cohort_name,
-                    "students_added": 0,
-                    "students_changed": 0,
-                    "students_already_present": 0,
-                    "students_unknown": set()
+                    'Cohort Name': cohort_name,
+                    'Students Added': 0,
+                    'Students Not Found': set()
                 }
                 try:
                     cohort = CourseUserGroup.objects.get(
@@ -676,30 +674,25 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                         group_type=CourseUserGroup.COHORT,
                         name=cohort_name
                     )
-                    cohorts_status[cohort_name]["exists"] = True
+                    cohorts_status[cohort_name]["Exists"] = True
                 except CourseUserGroup.DoesNotExist:
-                    cohorts_status[cohort_name]["exists"] = False
+                    cohorts_status[cohort_name]["Exists"] = False
                     task_progress.failed += 1
                     continue
 
-            if not cohorts_status[cohort_name]['exists']:
+            if not cohorts_status[cohort_name]['Exists']:
                 task_progress.failed += 1
                 continue
 
             try:
                 with transaction.commit_on_success():
-                    __, previous_cohort_name = add_user_to_cohort(cohort, username_or_email)
-                if previous_cohort_name:
-                    cohorts_status[cohort_name]['students_changed'] += 1
-                    task_progress.succeeded += 1
-                else:
-                    cohorts_status[cohort_name]['students_added'] += 1
-                    task_progress.succeeded += 1
+                    add_user_to_cohort(cohort, username_or_email)
+                cohorts_status[cohort_name]['Students Added'] += 1
+                task_progress.succeeded += 1
             except User.DoesNotExist:
-                cohorts_status[cohort_name]['students_unknown'].add(username_or_email)
+                cohorts_status[cohort_name]['Students Not Found'].add(username_or_email)
                 task_progress.failed += 1
             except ValueError:
-                cohorts_status[cohort_name]['students_already_present'] += 1
                 task_progress.skipped += 1
 
             task_progress.update_task_state(extra_meta=current_step)
@@ -708,10 +701,10 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     task_progress.update_task_state(extra_meta=current_step)
 
     # Filter the output of `add_users_to_cohorts` in order to upload the result.
-    output_header = ['cohort_name', 'exists', 'students_added', 'students_changed', 'students_already_present', 'students_unknown']
+    output_header = ['Cohort Name', 'Exists', 'Students Added', 'Students Not Found']
     output_rows = [
         [
-            ','.join(status_dict.get(column_name, '')) if column_name == 'students_unknown'
+            ','.join(status_dict.get(column_name, '')) if column_name == 'Students Not Found'
             else status_dict[column_name]
             for column_name in output_header
         ]
