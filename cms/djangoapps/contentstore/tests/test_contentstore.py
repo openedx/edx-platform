@@ -462,6 +462,41 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         )
         self.assertEqual(len(items), 1)
 
+    def test_export_course_no_xml_attributes(self):
+        """
+        Test that a module without an `xml_attributes` attr will still be
+        exported successfully
+        """
+        content_store = contentstore()
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
+        vertical = verticals[0]
+
+        # create OpenAssessmentBlock:
+        open_assessment = ItemFactory.create(
+            parent_location=vertical.location,
+            category="openassessment",
+            display_name="untitled",
+        )
+        # convert it to draft
+        draft_open_assessment = self.store.convert_to_draft(
+            open_assessment.location, self.user.id
+        )
+
+        # note that it has no `xml_attributes` attribute
+        self.assertFalse(hasattr(draft_open_assessment, "xml_attributes"))
+
+        # export should still complete successfully
+        root_dir = path(mkdtemp_clean())
+        export_to_xml(
+            self.store,
+            content_store,
+            course_id,
+            root_dir,
+            'test_no_xml_attributes'
+        )
+
 
 class MiscCourseTests(ContentStoreTestCase):
     """
