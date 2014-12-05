@@ -687,7 +687,8 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                 continue
 
             try:
-                __, previous_cohort_name = add_user_to_cohort(cohort, username_or_email)
+                with transaction.commit_on_success():
+                    __, previous_cohort_name = add_user_to_cohort(cohort, username_or_email)
                 if previous_cohort_name:
                     cohorts_status[cohort_name]['students_changed'] += 1
                     task_progress.succeeded += 1
