@@ -1,0 +1,114 @@
+<div id="wrapper-review" class="wrapper-view">
+  <div class="review view">
+    <h3 class="title"><%- gettext( "Verify Your Submission" ) %></h3>
+    <div class="instruction">
+      <p><%- gettext( "Make sure we can verify your identity with the photos and information below." ) %></p>
+    </div>
+
+    <div class="wrapper-task">
+      <ol class="review-tasks">
+
+        <li class="review-task review-task-photos">
+          <h4 class="title"><%- gettext( "Review the Photos You've Taken" ) %></h4>
+
+          <div class="copy">
+            <p><%- gettext( "Please review the photos and verify that they meet the requirements listed below." ) %></p>
+          </div>
+
+          <ol class="wrapper-photos">
+            <li class="wrapper-photo">
+              <div class="placeholder-photo">
+                <img id="face_image" src=""/>
+              </div>
+
+              <div class="help-tips">
+                <h5 class="title"><%- gettext( "The photo above needs to meet the following requirements:" ) %></h5>
+                <ul class="list-help list-tips copy">
+                  <li class="tip"><%- gettext( "Be well lit" ) %></li>
+                  <li class="tip"><%- gettext( "Show your whole face" ) %></li>
+                  <li class="tip"><%- gettext( "The photo on your ID must match the photo of your face" ) %></li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="wrapper-photo">
+             <div class="placeholder-photo">
+               <img id="photo_id_image" src=""/>
+             </div>
+
+             <div class="help-tips">
+               <h5 class="title"><%- gettext( "The photo above needs to meet the following requirements:" ) %></h5>
+               <ul class="list-help list-tips copy">
+                 <li class="tip"><%- gettext( "Be readable (not too far away, no glare)" ) %></li>
+                 <li class="tip"><%- gettext( "The photo on your ID must match the photo of your face" ) %></li>
+                 <li class="tip"><%- gettext( "The name on your ID must match the name on your account below" ) %></li>
+               </ul>
+             </div>
+            </li>
+          </ol>
+
+          <div class="msg msg-retake msg-followup">
+            <div class="copy">
+              <p><%- gettext( "Photos don't meet the requirements?" ) %></p>
+            </div>
+
+            <ul class="list-actions">
+              <li class="action action-retakephotos">
+                <a id="retake_photos_button" class="retake-photos">
+                  <%- gettext( "Retake Your Photos" ) %>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <li class="review-task review-task-name">
+          <h4 class="title"><%- gettext( "Check Your Name" ) %></h4>
+
+          <div class="copy">
+              <p><%- _.sprintf( gettext( "Make sure your full name on your %(platformName)s account (%(fullName)s) matches your ID. We will also use this as the name on your certificate." ), { platformName: platformName, fullName: fullName } ) %></p>
+          </div>
+
+          <div class="msg msg-followup">
+            <div class="help-tip is-expandable">
+              <h5 class="title title-expand" aria-expanded="false" role="link">
+                <i class="icon-caret-down expandable-icon"></i>
+                  <%- gettext( "What if the name on my account doesn't match the name on my ID?" ) %>
+              </h5>
+
+              <div class="copy expandable-area">
+                <p><%- gettext( "You should change the name on your account to match." ) %></p>
+                <input type="text" name="new-name" id="new-name" placeholder="New name">
+              </div>
+            </div>
+          </div>
+
+      </ol>
+    </div>
+
+    <nav class="nav-wizard">
+      <div class="prompt-verify">
+        <h3 class="title"><%- gettext( "Before proceeding, please confirm that your details match" ) %></h3>
+
+        <p class="copy">
+          <%- _.sprintf( gettext( "Once you verify your details match the requirements, you can move on to step %(stepNum)s, %(stepTitle)s." ), { stepNum: nextStepNum, stepTitle: nextStepTitle } ) %>
+        </p>
+
+        <ul class="list-actions">
+          <li class="action action-verify">
+            <input type="checkbox" name="match" id="confirm_pics_good" />
+            <label for="confirm_pics_good"><%- gettext( "Yes! My details all match." ) %></label>
+          </li>
+        </ul>
+      </div>
+
+      <ol class="wizard-steps">
+        <li class="wizard-step step-proceed">
+          <a id="next_step_button" class="next action-primary is-disabled" aria-hidden="true" title="Next">
+            <%- _.sprintf( gettext( "Go to Step %s" ), nextStepNum ) %>: <%- nextStepTitle %>
+          </a>
+        </li>
+      </ol>
+    </nav>
+  </div>
+</div>
