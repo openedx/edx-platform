@@ -149,6 +149,10 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
                         # since export_from_xml (called by `add_xml_to_node`)
                         # exports a whole tree
 
+                        # ensure module has "xml_attributes" attr
+                        if not hasattr(draft_node.module, 'xml_attributes'):
+                            draft_node.module.xml_attributes = {}
+
                         draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
                         parent = modulestore.get_item(draft_node.parent_location)
                         index = parent.children.index(draft_node.module.location)
