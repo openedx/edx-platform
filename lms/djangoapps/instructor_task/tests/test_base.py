@@ -2,11 +2,11 @@
 Base test classes for LMS instructor-initiated background tasks
 
 """
-import csv
 import os
 import json
 from mock import Mock
 import shutil
+import unicodecsv
 from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
@@ -265,7 +265,7 @@ class TestReportMixin(object):
         report_csv_filename = report_store.links_for(self.course.id)[0][0]
         with open(report_store.path_to(self.course.id, report_csv_filename)) as csv_file:
             # Expand the dict reader generator so we don't lose it's content
-            csv_rows = [row for row in csv.DictReader(csv_file)]
+            csv_rows = [row for row in unicodecsv.DictReader(csv_file)]
             if verify_order:
                 self.assertEqual(csv_rows, expected_rows)
             else:
