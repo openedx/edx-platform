@@ -18,7 +18,7 @@ from contextlib import contextmanager
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XMLParsingSystem, policy_key
+from xmodule.x_module import XMLParsingSystem, policy_key, OpaqueKeyReader, AsideKeyGenerator
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
 from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.tabs import CourseTabList
@@ -27,7 +27,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from opaque_keys.edx.locator import CourseLocator
 
 from xblock.field_data import DictFieldData
-from xblock.runtime import DictKeyValueStore, IdGenerator
+from xblock.runtime import DictKeyValueStore
 
 
 from .exceptions import ItemNotFoundError
@@ -64,7 +64,6 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         """
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
-        id_generator = CourseLocationGenerator(course_id)
 
         # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
         self.course_id = course_id
@@ -175,7 +174,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 descriptor = create_block_from_xml(
                     etree.tostring(xml_data, encoding='unicode'),
                     self,
-                    id_generator,
+                    id_manager,
                 )
             except Exception as err:  # pylint: disable=broad-except
                 if not self.load_error_modules:
@@ -201,7 +200,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 descriptor = ErrorDescriptor.from_xml(
                     xml,
                     self,
-                    id_generator,
+                    id_manager,
                     err_msg
                 )
 
@@ -229,12 +228,16 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
 
+        id_manager = CourseLocationManager(course_id)
+
         super(ImportSystem, self).__init__(
             load_item=load_item,
             resources_fs=resources_fs,
             render_template=render_template,
             error_tracker=error_tracker,
             process_xml=process_xml,
+            id_generator=id_manager,
+            id_reader=id_manager,
             **kwargs
         )
 
@@ -245,12 +248,13 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         block.children.append(child_block.scope_ids.usage_id)
 
 
-class CourseLocationGenerator(IdGenerator):
+class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
     """
     IdGenerator for Location-based definition ids and usage ids
     based within a course
     """
     def __init__(self, course_id):
+        super(CourseLocationManager, self).__init__()
         self.course_id = course_id
         self.autogen_ids = itertools.count(0)
 
@@ -262,6 +266,17 @@ class CourseLocationGenerator(IdGenerator):
         if slug is None:
             slug = 'autogen_{}_{}'.format(block_type, self.autogen_ids.next())
         return self.course_id.make_usage_key(block_type, slug)
+
+    def get_definition_id(self, usage_id):
+        """Retrieve the definition that a usage is derived from.
+
+        Args:
+            usage_id: The id of the usage to query
+
+        Returns:
+            The `definition_id` the usage is derived from
+        """
+        return usage_id
 
 
 def _make_usage_key(course_key, value):

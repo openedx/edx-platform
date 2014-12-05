@@ -96,6 +96,10 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     def local_resource_url(self, block, uri):
         return local_resource_url(block, uri)
 
+    def get_asides(self, block):
+        # TODO: Implement this to enable XBlockAsides on previews in Studio
+        return []
+
 
 class StudioUserService(object):
     """
@@ -129,7 +133,8 @@ def get_available_xblock_services():
 
     return services
 
-def _preview_module_system(request, descriptor):
+
+def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
     rendering module previews.
@@ -160,7 +165,9 @@ def _preview_module_system(request, descriptor):
     descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
 
     services = get_available_xblock_services()
-
+    services.update({
+        "field-data": field_data
+    })
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -200,7 +207,7 @@ def _load_preview_module(request, descriptor):
     else:
         field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
     descriptor.bind_for_student(
-        _preview_module_system(request, descriptor),
+        _preview_module_system(request, descriptor, field_data),
         field_data
     )
     return descriptor

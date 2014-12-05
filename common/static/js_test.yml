@@ -45,6 +45,7 @@ lib_paths:
 
 # Paths to source JavaScript files
 src_paths:
+    - js/xblock
     - coffee/src
     - js/src
     - js/utils

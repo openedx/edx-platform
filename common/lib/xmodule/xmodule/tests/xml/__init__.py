@@ -7,7 +7,7 @@ from unittest import TestCase
 
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore.xml import create_block_from_xml, CourseLocationGenerator
+from xmodule.modulestore.xml import create_block_from_xml, CourseLocationManager
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from xblock.runtime import KvsFieldData, DictKeyValueStore
@@ -43,7 +43,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
         descriptor = create_block_from_xml(
             xml,
             self,
-            CourseLocationGenerator(self.course_id),
+            CourseLocationManager(self.course_id),
         )
         self._descriptors[descriptor.location.to_deprecated_string()] = descriptor
         return descriptor

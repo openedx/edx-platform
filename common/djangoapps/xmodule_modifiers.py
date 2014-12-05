@@ -72,7 +72,11 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
 
     data = {}
     data.update(extra_data)
-    css_classes = ['xblock', 'xblock-{}'.format(markupsafe.escape(view))]
+
+    css_classes = [
+        'xblock',
+        'xblock-{}'.format(markupsafe.escape(view))
+    ]
 
     if isinstance(block, (XModule, XModuleDescriptor)):
         if view in PREVIEW_VIEWS:
@@ -90,9 +94,10 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
         data['init'] = frag.js_init_fn
         data['runtime-class'] = runtime_class
         data['runtime-version'] = frag.js_init_version
-        data['block-type'] = block.scope_ids.block_type
-        data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
-        data['request-token'] = request_token
+
+    data['block-type'] = block.scope_ids.block_type
+    data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
+    data['request-token'] = request_token
 
     if block.name:
         data['name'] = block.name

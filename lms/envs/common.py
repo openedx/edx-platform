@@ -1201,7 +1201,7 @@ PIPELINE_JS = {
     'application': {
 
         # Application will contain all paths not in courseware_only_js
-        'source_filenames': sorted(common_js) + sorted(project_js) + [
+        'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
@@ -1550,6 +1550,8 @@ INSTALLED_APPS = (
 
     # Surveys
     'survey',
+
+    'lms.djangoapps.lms_xblock',
     
     # EDX API application
     'api_manager',

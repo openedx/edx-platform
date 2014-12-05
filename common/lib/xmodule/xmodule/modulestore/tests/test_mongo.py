@@ -420,7 +420,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         assert_equals(len(course_locations), 1)
         assert_in(SlashSeparatedCourseKey('edX', 'simple', '2012_Fall'), course_locations)
 
-    @Plugin.register_temp_plugin(ReferenceTestXBlock, 'ref_test')
+    @XBlock.register_temp_plugin(ReferenceTestXBlock, 'ref_test')
     def test_reference_converters(self):
         """
         Test that references types get deserialized correctly

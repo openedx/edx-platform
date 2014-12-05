@@ -21,7 +21,7 @@ from xblock.fields import ScopeIds
 
 from courseware.tests import factories
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.lib.xblock.runtime import LmsModuleSystem
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from student.roles import CourseStaffRole
 from student.models import unique_id_for_user
 from xmodule import peer_grading_module

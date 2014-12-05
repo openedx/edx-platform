@@ -1,6 +1,7 @@
 import sys
 import logging
 from contracts import contract, new_contract
+from fs.osfs import OSFS
 from lazy import lazy
 from xblock.runtime import KvsFieldData
 from xblock.fields import ScopeIds
@@ -8,13 +9,13 @@ from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, L
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from ..exceptions import ItemNotFoundError
-from .split_mongo_kvs import SplitMongoKVS
-from fs.osfs import OSFS
-from .definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import inheriting_field_data, InheritanceMixin
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
+from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
+from xmodule.modulestore.split_mongo.definition_lazy_loader import DefinitionLazyLoader
+from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
 
 log = logging.getLogger(__name__)
 
@@ -53,6 +54,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         else:
             root = modulestore.fs_root / course_entry.structure['_id']
         root.makedirs_p()  # create directory if it doesn't exist
+
+        id_manager = SplitMongoIdManager(self)
+        kwargs.setdefault('id_reader', id_manager)
+        kwargs.setdefault('id_generator', id_manager)
 
         super(CachingDescriptorSystem, self).__init__(
             field_data=None,
