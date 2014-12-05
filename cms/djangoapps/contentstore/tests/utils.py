@@ -134,6 +134,8 @@ class CourseTestCase(ModuleStoreTestCase):
         self.store.update_item(self.course, self.user.id)
 
     TEST_VERTICAL = 'vertical_test'
+    ORPHAN_DRAFT_VERTICAL = 'orphan_draft_vertical'
+    ORPHAN_DRAFT_HTML = 'orphan_draft_html'
     PRIVATE_VERTICAL = 'a_private_vertical'
     PUBLISHED_VERTICAL = 'a_published_vertical'
     SEQUENTIAL = 'vertical_sequential'
@@ -157,6 +159,18 @@ class CourseTestCase(ModuleStoreTestCase):
         orphan_vertical = self.store.get_item(vertical.location)
         self.assertEqual(orphan_vertical.location.name, 'no_references')
         self.assertEqual(len(orphan_vertical.children), len(vertical.children))
+
+        # create an orphan vertical and html; we already don't try to import
+        # the orphaned vertical, but we should make sure we don't import
+        # the orphaned vertical's child html, too
+        orphan_draft_vertical = self.store.create_item(
+            self.user.id, course_id, 'vertical', self.ORPHAN_DRAFT_VERTICAL
+        )
+        orphan_draft_html = self.store.create_item(
+            self.user.id, course_id, 'html', self.ORPHAN_DRAFT_HTML
+        )
+        orphan_draft_vertical.children.append(orphan_draft_html.location)
+        self.store.update_item(orphan_draft_vertical, self.user.id)
 
         # create a Draft vertical
         vertical = self.store.get_item(course_id.make_usage_key('vertical', self.TEST_VERTICAL), depth=1)
