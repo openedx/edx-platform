@@ -199,11 +199,10 @@
         text-align: left;
         color: $gray;
 
-        .column-sort-link {
+        .column-sort-link, .column-selected-link {
           cursor: pointer;
           color: $blue;
         }
-
 
         .current-sort {
           @extend %t-strong;
@@ -234,14 +233,21 @@
               }
             }
 
-            .nav-item a {
-              color: $gray-d1;
+            .nav-item {
+              &.reset-filter{
+                display:none;
+              }
 
-              &:hover {
-                color: $blue-s1;
+              a {
+                color: $gray-d1;
+
+                &:hover {
+                  color: $blue-s1;
+                }
               }
             }
           }
+
           .nav-sub {
             @include text-align(left);
 
