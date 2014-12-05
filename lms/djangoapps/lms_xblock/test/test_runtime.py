@@ -10,6 +10,7 @@ from unittest import TestCase
 from urlparse import urlparse
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from lms.djangoapps.lms_xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
+from xblock.fields import ScopeIds
 
 TEST_STRINGS = [
     '',
@@ -42,8 +43,7 @@ class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
-        self.block = Mock()
-        self.block.scope_ids.usage_id.to_deprecated_string.return_value.encode.return_value = 'dummy'
+        self.block = Mock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
         self.course_key = SlashSeparatedCourseKey("org", "course", "run")
         self.runtime = LmsModuleSystem(
             static_url='/static',

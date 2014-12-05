@@ -203,5 +203,6 @@ class TestLibraries(MixedSplitTestCase):
         message = u"Hello world"
         hello_render = lambda _, context: Fragment(message)
         with patch('xmodule.html_module.HtmlDescriptor.author_view', hello_render, create=True):
-            result = library.render(AUTHOR_VIEW, context)
+            with patch('xmodule.x_module.descriptor_global_get_asides', lambda block: []):
+                result = library.render(AUTHOR_VIEW, context)
         self.assertIn(message, result.content)

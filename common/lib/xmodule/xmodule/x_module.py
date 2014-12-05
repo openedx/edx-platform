@@ -18,12 +18,13 @@ from webob.multidict import MultiDict
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
-from xblock.runtime import Runtime, IdReader
+from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideDefinitionKeyV1
 from xmodule.exceptions import UndefinedContext
 import dogstats_wrapper as dog_stats_api
 
@@ -65,7 +66,7 @@ class OpaqueKeyReader(IdReader):
         Returns:
             The `definition_id` the usage is derived from
         """
-        return usage_id.definition_key
+        raise NotImplementedError("Specific Modulestores must implement get_definition_id")
 
     def get_block_type(self, def_id):
         """Retrieve the block_type of a particular definition
@@ -77,6 +78,91 @@ class OpaqueKeyReader(IdReader):
             The `block_type` of the definition
         """
         return def_id.block_type
+
+    def get_usage_id_from_aside(self, aside_id):
+        """
+        Retrieve the XBlock `usage_id` associated with this aside usage id.
+
+        Args:
+            aside_id: The usage id of the XBlockAside.
+
+        Returns:
+            The `usage_id` of the usage the aside is commenting on.
+        """
+        return aside_id.usage_key
+
+    def get_definition_id_from_aside(self, aside_id):
+        """
+        Retrieve the XBlock `definition_id` associated with this aside definition id.
+
+        Args:
+            aside_id: The usage id of the XBlockAside.
+
+        Returns:
+            The `definition_id` of the usage the aside is commenting on.
+        """
+        return aside_id.definition_key
+
+    def get_aside_type_from_usage(self, aside_id):
+        """
+        Retrieve the XBlockAside `aside_type` associated with this aside
+        usage id.
+
+        Args:
+            aside_id: The usage id of the XBlockAside.
+
+        Returns:
+            The `aside_type` of the aside.
+        """
+        return aside_id.aside_type
+
+    def get_aside_type_from_definition(self, aside_id):
+        """
+        Retrieve the XBlockAside `aside_type` associated with this aside
+        definition id.
+
+        Args:
+            aside_id: The definition id of the XBlockAside.
+
+        Returns:
+            The `aside_type` of the aside.
+        """
+        return aside_id.aside_type
+
+
+class AsideKeyGenerator(IdGenerator):  # pylint: disable=abstract-method
+    """
+    An :class:`.IdGenerator` that only provides facilities for constructing new XBlockAsides.
+    """
+    def create_aside(self, definition_id, usage_id, aside_type):
+        """
+        Make a new aside definition and usage ids, indicating an :class:`.XBlockAside` of type `aside_type`
+        commenting on an :class:`.XBlock` usage `usage_id`
+
+        Returns:
+            (aside_definition_id, aside_usage_id)
+        """
+        def_key = AsideDefinitionKeyV1(definition_id, aside_type)
+        usage_key = AsideUsageKeyV1(usage_id, aside_type)
+        return (def_key, usage_key)
+
+    def create_usage(self, def_id):
+        """Make a usage, storing its definition id.
+
+        Returns the newly-created usage id.
+        """
+        raise NotImplementedError("Specific Modulestores must provide implementations of create_usage")
+
+    def create_definition(self, block_type, slug=None):
+        """Make a definition, storing its block type.
+
+        If `slug` is provided, it is a suggestion that the definition id
+        incorporate the slug somehow.
+
+        Returns the newly-created definition id.
+
+        """
+        raise NotImplementedError("Specific Modulestores must provide implementations of create_definition")
 
 
 def dummy_track(_event_type, _event):
@@ -159,6 +245,8 @@ class XModuleMixin(XBlockMixin):
 
     Adding this Mixin to an :class:`XBlock` allows it to cooperate with old-style :class:`XModules`
     """
+
+    entry_point = "xmodule.v1"
 
     # Attributes for inspection of the descriptor
 
@@ -526,6 +614,7 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         field_data: A dictionary-like object that maps field names to values
             for those fields.
         """
+
         # Set the descriptor first so that we can proxy to it
         self.descriptor = descriptor
         super(XModule, self).__init__(*args, **kwargs)
@@ -715,7 +804,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     create a problem, and can generate XModules (which do know about student
     state).
     """
-    entry_point = "xmodule.v1"
     module_class = XModule
 
     # VS[compat].  Backwards compatibility code that can go away after
@@ -997,7 +1085,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
 
 class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
     """
-    Runtime mixin that allows for composition of many `wrap_child` wrappers
+    Runtime mixin that allows for composition of many `wrap_xblock` wrappers
     """
     def __init__(self, wrappers=None, **kwargs):
         """
@@ -1013,7 +1101,7 @@ class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
         else:
             self.wrappers = []
 
-    def wrap_child(self, block, view, frag, context):
+    def wrap_xblock(self, block, view, frag, context):
         """
         See :func:`Runtime.wrap_child`
         """
@@ -1041,6 +1129,16 @@ def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid
     See :meth:`xblock.runtime.Runtime.local_resource_url`.
     """
     raise NotImplementedError("Applications must monkey-patch this function before using local_resource_url for studio_view")
+
+
+# This function exists to give applications (LMS/CMS) a place to monkey-patch until
+# we can refactor modulestore to split out the FieldData half of its interface from
+# the Runtime part of its interface. This function matches the Runtime.get_asides interface
+def descriptor_global_get_asides(block):  # pylint: disable=unused-argument
+    """
+    See :meth:`xblock.runtime.Runtime.get_asides`.
+    """
+    raise NotImplementedError("Applications must monkey-patch this function before using get_asides from a DescriptorSystem.")
 
 
 class MetricsMixin(object):
@@ -1137,7 +1235,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         local_resource_url: an implementation of :meth:`xblock.runtime.Runtime.local_resource_url`
 
         """
-        super(DescriptorSystem, self).__init__(id_reader=OpaqueKeyReader(), **kwargs)
+        kwargs.setdefault('id_reader', OpaqueKeyReader())
+        kwargs.setdefault('id_generator', AsideKeyGenerator())
+        super(DescriptorSystem, self).__init__(**kwargs)
 
         # This is used by XModules to write out separate files during xml export
         self.export_fs = None
@@ -1214,6 +1314,19 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
             # that implements the correct local_resource_url. So, for now, instead, we will reference a
             # global function that the application can override.
             return descriptor_global_local_resource_url(block, uri)
+
+    def get_asides(self, block):
+        """
+        See :meth:`xblock.runtime.Runtime:get_asides` for documentation.
+        """
+        if getattr(block, 'xmodule_runtime', None) is not None:
+            return block.xmodule_runtime.get_asides(block)
+        else:
+            # Currently, Modulestore is responsible for instantiating DescriptorSystems
+            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
+            # that implements the correct get_asides. So, for now, instead, we will reference a
+            # global function that the application can override.
+            return descriptor_global_get_asides(block)
 
     def resource_url(self, resource):
         """
@@ -1335,7 +1448,9 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
 
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.
-        super(ModuleSystem, self).__init__(id_reader=OpaqueKeyReader(), field_data=field_data, **kwargs)
+        kwargs.setdefault('id_reader', getattr(descriptor_runtime, 'id_reader', OpaqueKeyReader()))
+        kwargs.setdefault('id_generator', getattr(descriptor_runtime, 'id_generator', AsideKeyGenerator()))
+        super(ModuleSystem, self).__init__(field_data=field_data, **kwargs)
 
         self.STATIC_URL = static_url
         self.xqueue = xqueue
@@ -1372,6 +1487,9 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime
         self.rebind_noauth_module_to_user = rebind_noauth_module_to_user
+
+        if user:
+            self.user_id = user.id
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""

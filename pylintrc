@@ -137,6 +137,8 @@ generated-members=
     category,
     name,
     revision,
+# For django models
+    _meta,
 
 [BASIC]
 

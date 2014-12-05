@@ -201,10 +201,11 @@ def _upload_asset(request, course_key):
                 'File {filename} exceeds maximum size of '
                 '{size_mb} MB. Please follow the instructions here '
                 'to upload a file elsewhere and link to it instead: '
-                '{faq_url}').format(
-                    filename=filename,
-                    size_mb=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
-                    faq_url=settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
+                '{faq_url}'
+            ).format(
+                filename=filename,
+                size_mb=settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB,
+                faq_url=settings.MAX_ASSET_UPLOAD_FILE_SIZE_URL,
             )
         }, status=413)
 

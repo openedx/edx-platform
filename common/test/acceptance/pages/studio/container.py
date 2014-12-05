@@ -51,7 +51,7 @@ class ContainerPage(PageObject):
                 num_wrappers = len(self.q(css='{} [data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
                 # Wait until all components have been loaded and marked as either initialized or failed.
                 # See:
-                #   - common/static/coffee/src/xblock/core.coffee which adds the class "xblock-initialized"
+                #   - common/static/js/xblock/core.js which adds the class "xblock-initialized"
                 #     at the end of initializeBlock.
                 #   - common/static/js/views/xblock.js which adds the class "xblock-initialization-failed"
                 #     if the xblock threw an error while initializing.

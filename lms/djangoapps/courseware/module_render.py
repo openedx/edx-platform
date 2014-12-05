@@ -23,6 +23,7 @@ from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -405,7 +406,8 @@ def get_module_system_for_user(user, field_data_cache,
         field_data_cache_real_user = FieldDataCache.cache_for_descriptor_descendents(
             course_id,
             real_user,
-            module.descriptor
+            module.descriptor,
+            asides=XBlockAsidesConfig.possible_asides(),
         )
 
         (inner_system, inner_student_data) = get_module_system_for_user(
@@ -496,6 +498,8 @@ def get_module_system_for_user(user, field_data_cache,
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)
 
+    field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+
     system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -541,11 +545,13 @@ def get_module_system_for_user(user, field_data_cache,
         services={
             'i18n': ModuleI18nService(),
             'fs': xblock.reference.plugins.FSService(),
+            'field-data': field_data,
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
         user_location=user_location,
+        request_token=request_token,
     )
 
     # pass position specified in URL to module through ModuleSystem
@@ -572,7 +578,7 @@ def get_module_system_for_user(user, field_data_cache,
     else:
         system.error_descriptor_class = NonStaffErrorDescriptor
 
-    return system, student_data
+    return system, field_data
 
 
 def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,  # pylint: disable=invalid-name
@@ -594,7 +600,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         if not has_access(user, 'load', descriptor, course_id):
             return None
 
-    (system, student_data) = get_module_system_for_user(
+    (system, field_data) = get_module_system_for_user(
         user=user,
         field_data_cache=field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
         descriptor=descriptor,
@@ -609,7 +615,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         request_token=request_token
     )
 
-    descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access
+    descriptor.bind_for_student(system, field_data)  # pylint: disable=protected-access
     descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
     return descriptor
 

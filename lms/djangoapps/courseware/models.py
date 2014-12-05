@@ -18,7 +18,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from xmodule_django.models import CourseKeyField, LocationKeyField
+from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
 
 
 class StudentModule(models.Model):
@@ -36,10 +36,7 @@ class StudentModule(models.Model):
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
-    # Key used to share state. By default, this is the module_id,
-    # but for abtests and the like, this can be set to a shared value
-    # for many instances of the module.
-    # Filename for homeworks, etc.
+    # Key used to share state. This is the XBlock usage_id
     module_state_key = LocationKeyField(max_length=255, db_index=True, db_column='module_id')
     student = models.ForeignKey(User, db_index=True)
 
@@ -150,7 +147,7 @@ class XBlockFieldBase(models.Model):
         return u'{}<{!r}'.format(
             self.__class__.__name__,
             {
-                key:getattr(self, key)
+                key: getattr(self, key)
                 for key in self._meta.get_all_field_names()
                 if key not in ('created', 'modified')
             }
@@ -174,11 +171,11 @@ class XModuleStudentPrefsField(XBlockFieldBase):
     Stores data set in the Scope.preferences scope by an xmodule field
     """
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring
         unique_together = (('student', 'module_type', 'field_name'),)
 
     # The type of the module for these preferences
-    module_type = models.CharField(max_length=64, db_index=True)
+    module_type = BlockTypeKeyField(max_length=64, db_index=True)
 
     student = models.ForeignKey(User, db_index=True)
 

@@ -45,6 +45,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js
     - xmodule_js/common_static/js/vendor/url.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
+    - xmodule_js/common_static/js/xblock
     - xmodule_js/common_static/coffee/src/xblock
     - xmodule_js/common_static/js/vendor/sinon-1.7.1.js
     - xmodule_js/src/capa/
