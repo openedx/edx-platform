@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
+<%! from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%def name="course_name()">
@@ -210,6 +211,9 @@ ${fragment.foot_html()}
 
     <section class="course-content" id="course-content">
       ${fragment.body_html()}
+      % if is_edxnotes_enabled(course):
+        <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
+      % endif
     </section>
   </div>
 </div>
