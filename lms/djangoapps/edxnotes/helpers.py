@@ -101,6 +101,21 @@ def send_request(user, course_id, path="", query_string=""):
     return response
 
 
+def get_parent_unit(xblock):
+    """
+    Find vertical that is a unit, not just some container.
+    """
+    while xblock:
+        xblock = xblock.get_parent()
+        if xblock is None:
+            return None
+        parent = xblock.get_parent()
+        if parent is None:
+            return None
+        if parent.category == 'sequential':
+            return xblock
+
+
 def preprocess_collection(user, course, collection):
     """
     Reprocess provided `collection(list)`: adds information about ancestor,
@@ -109,29 +124,103 @@ def preprocess_collection(user, course, collection):
     Raises:
         ItemNotFoundError - when appropriate module is not found.
     """
+
     store = modulestore()
     filtered_collection = list()
+    cache = {}
     with store.bulk_operations(course.id):
         for model in collection:
-            usage_key = course.id.make_usage_key_from_deprecated_string(model["usage_id"])
-            try:
-                item = store.get_item(usage_key)
-            except ItemNotFoundError:
-                log.warning("Module not found: %s", usage_key)
-                continue
-
-            if not has_access(user, "load", item, course_key=course.id):
-                continue
-
             model.update({
                 u"text": markupsafe.escape(model["text"]),
                 u"quote": markupsafe.escape(model["quote"]),
-                u"unit": get_ancestor_context(course, store, usage_key),
                 u"updated": dateutil_parse(model["updated"]),
             })
+            usage_id = model["usage_id"]
+            if usage_id in cache:
+                model.update(cache[usage_id])
+                filtered_collection.append(model)
+                continue
+
+            usage_key = course.id.make_usage_key_from_deprecated_string(usage_id)
+            try:
+                item = store.get_item(usage_key)
+            except ItemNotFoundError:
+                log.debug("Module not found: %s", usage_key)
+                continue
+
+            if not has_access(user, "load", item, course_key=course.id):
+                log.debug("User %s does not have an access to %s", user, item)
+                continue
+
+            unit = get_parent_unit(item)
+            if unit is None:
+                log.debug("Unit not found: %s", usage_key)
+                continue
+
+            section = unit.get_parent()
+            if not section:
+                log.debug("Section not found: %s", usage_key)
+                continue
+            if section in cache:
+                usage_context = cache[section]
+                usage_context.update({
+                    "unit": get_module_context(course, unit),
+                })
+                model.update(usage_context)
+                cache[usage_id] = cache[unit] = usage_context
+                filtered_collection.append(model)
+                continue
+
+            chapter = section.get_parent()
+            if not chapter:
+                log.debug("Chapter not found: %s", usage_key)
+                continue
+            if chapter in cache:
+                usage_context = cache[chapter]
+                usage_context.update({
+                    "unit": get_module_context(course, unit),
+                    "section": get_module_context(course, section),
+                })
+                model.update(usage_context)
+                cache[usage_id] = cache[unit] = cache[section] = usage_context
+                filtered_collection.append(model)
+                continue
+
+            usage_context = {
+                "unit": get_module_context(course, unit),
+                "section": get_module_context(course, section),
+                "chapter": get_module_context(course, chapter),
+            }
+            model.update(usage_context)
+            cache[usage_id] = cache[unit] = cache[section] = cache[chapter] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
+
+
+def get_module_context(course, item):
+    """
+    Returns dispay_name and url for the parent module.
+    """
+    item_dict = {
+        'location': item.location.to_deprecated_string(),
+        'display_name': item.display_name_with_default,
+    }
+
+    if item.category == 'chapter' and item.get_parent():
+        course = item.get_parent()
+        ancestor_children = [child.to_deprecated_string() for child in course.children]
+        item_dict['index'] = ancestor_children.index(item_dict['location'])
+    elif item.category == 'vertical':
+        item_dict['url'] = reverse("jump_to_id", kwargs={
+            "course_id": course.id.to_deprecated_string(),
+            "module_id": item.url_name,
+        })
+
+    if item.category in ('chapter', 'sequential'):
+        item_dict['children'] = [child.to_deprecated_string() for child in item.children]
+
+    return item_dict
 
 
 def search(user, course, query_string):
@@ -167,44 +256,6 @@ def get_notes(user, course):
         return None
 
     return json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder)
-
-
-def get_ancestor(store, usage_key):
-    """
-    Returns ancestor module for the passed `usage_key`.
-    """
-    location = store.get_parent_location(usage_key)
-    if not location:
-        log.warning("Parent location for the module not found: %s", usage_key)
-        return
-    try:
-        return store.get_item(location)
-    except ItemNotFoundError:
-        log.warning("Parent module not found: %s", location)
-        return
-
-
-def get_ancestor_context(course, store, usage_key):
-    """
-    Returns dispay_name and url for the parent module.
-    """
-    parent = get_ancestor(store, usage_key)
-
-    if not parent:
-        return {
-            u"display_name": None,
-            u"url": None,
-        }
-
-    url = reverse("jump_to", kwargs={
-        "course_id": course.id.to_deprecated_string(),
-        "location": parent.location.to_deprecated_string(),
-    })
-
-    return {
-        u"display_name": parent.display_name_with_default,
-        u"url": url,
-    }
 
 
 def get_endpoint(path=""):

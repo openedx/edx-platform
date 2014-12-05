@@ -17,7 +17,7 @@ define([
                 }
             }),
             TestView = TabView.extend({
-                SubViewConstructor: TestSubView,
+                PanelConstructor: TestSubView,
                 tabInfo: {
                     name: 'Test View Tab',
                     is_closable: true

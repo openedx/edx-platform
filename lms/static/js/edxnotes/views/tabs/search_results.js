@@ -1,27 +1,22 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'gettext', 'backbone', 'js/edxnotes/views/note_item',
-    'js/edxnotes/views/tab_view', 'js/edxnotes/views/search_box', 'jquery.highlight'
-], function (gettext, Backbone, NoteItemView, TabView, SearchBoxView) {
+    'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view',
+    'js/edxnotes/views/search_box', 'jquery.highlight'
+], function (gettext, TabPanelView, TabView, SearchBoxView) {
     var SearchResultsView = TabView.extend({
-        SubViewConstructor: Backbone.View.extend({
-            tagName: 'section',
-            className: 'tab-panel',
+        PanelConstructor: TabPanelView.extend({
             id: 'search-results-panel',
-            attributes: {
-                'tabindex': -1
+            title: 'Search Results',
+            className: function () {
+                return [
+                    TabPanelView.prototype.className,
+                    'note-group'
+                ].join(' ')
             },
             highlightMatchedText: true,
-            render: function () {
-                var container = document.createDocumentFragment();
-                container.appendChild(this.getTitle());
-                this.collection.each(function (model) {
-                    var item = new NoteItemView({model: model});
-                    container.appendChild(item.render().el);
-                });
-                this.$el.html(container);
-
+            renderContent: function () {
+                this.$el.append(this.getNotes(this.collection.toArray()));
                 if (this.highlightMatchedText) {
                     this.$('.note-comment-p').highlight(this.options.searchQuery, {
                         element: 'span',
@@ -31,28 +26,27 @@ define([
                     });
                 }
                 return this;
-            },
-
-            getTitle: function () {
-                return $('<h2></h2>', {
-                    'class': 'sr',
-                    'text': gettext('Search Results')
-                }).get(0);
             }
         }),
 
-        NoResultsViewConstructor: Backbone.View.extend({
-            tagName: 'section',
-            className: 'tab-panel',
+        NoResultsViewConstructor: TabPanelView.extend({
             id: 'no-results-panel',
-            attributes: {
-                'tabindex': -1
+            title: 'No results found',
+            className: function () {
+                return [
+                    TabPanelView.prototype.className,
+                    'note-group'
+                ].join(' ')
             },
-            render: function () {
+            renderContent: function () {
                 var message = gettext('No results found for "%(query_string)s".');
-                this.$el.html(interpolate(message, {
-                    query_string: this.options.searchQuery
-                }, true));
+
+                this.$el.append($('<p></p>', {
+                    text: interpolate(message, {
+                        query_string: this.options.searchQuery
+                    }, true)
+                }));
+
                 return this;
             }
         }),
@@ -93,7 +87,7 @@ define([
             var collection = this.getCollection();
             if (collection) {
                 if (collection.length) {
-                    return new this.SubViewConstructor({
+                    return new this.PanelConstructor({
                         collection: collection,
                         searchQuery: this.searchResults.searchQuery
                     });
