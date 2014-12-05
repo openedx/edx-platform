@@ -1,0 +1,30 @@
+<div class="placeholder-cam" id="camera">
+  <div class="placeholder-art">
+    <p class="copy"><%- gettext( "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission." ) %></p>
+  </div>
+
+  <video id="photo_id_video" autoplay></video><br/>
+  <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
+</div>
+
+<div class="controls photo-controls">
+  <ul class="list-controls">
+    <li class="control control-redo" id="webcam_reset_button" style="display: none;">
+      <a class="action action-redo">
+        <i class="icon-undo"></i> <span class="sr"><%- gettext( "Retake" ) %></span>
+      </a>
+    </li>
+
+    <li class="control control-do" id="webcam_capture_button">
+      <a class="action action-do">
+        <i class="icon-camera"></i> <span class="sr"><%- gettext( "Take photo" ) %></span>
+      </a>
+    </li>
+
+    <li class="control control-approve" id="webcam_approve_button" style="display: none;">
+      <a class="action action-approve">
+        <i class="icon-ok"></i> <span class="sr"><%- gettext( "Looks good" ) %></span>
+      </a>
+    </li>
+  </ul>
+</div>

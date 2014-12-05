@@ -1,0 +1,87 @@
+<div id="wrapper-review" class="wrapper-view">
+  <div class="review view">
+    <h3 class="title"><%- gettext( "Make Payment" ) %></h3>
+    <div class="instruction">
+      <p><%- gettext( "Make payment.  TODO: actual copy here." ) %></p>
+    </div>
+
+    <div class="wrapper-task">
+      <ol class="review-tasks">
+        <% if ( suggestedPrices.length > 0 ) { %>
+        <li class="review-task review-task-contribution">
+          <h4 class="title"><%- gettext( "Enter Your Contribution Level" ) %></h4>
+          <div class="copy">
+            <p><%- _.sprintf(
+                  gettext( "Please confirm your contribution for this course (min. $ %(minPrice)s %(currency)s)" ),
+                  { minPrice: minPrice, currency: currency }
+              ) %>
+            </p>
+          </div>
+
+          <ul class="list-fields contribution-options">
+            <% for ( var i = 0; i < suggestedPrices.length; i++ ) {
+                price = suggestedPrices[i];
+            %>
+            <li class="field contribution-option">
+              <input type="radio" name="contribution" value="<%- price %>" id="contribution-<%- price %>" />
+              <label for="contribution-<%- price %>">
+                <span class="deco-denomination">$</span>
+                <span class="label-value"><%- price %></span>
+                <span class="denomination-name"><%- currency %></span>
+              </label>
+            </li>
+            <% } %>
+
+            <li class="field contribution-option">
+              <ul class="field-group field-group-other">
+              <li class="contribution-option contribution-option-other1">
+                <input type="radio" id="contribution-other" name="contribution" value="" />
+                <label for="contribution-other"><span class="sr">Other</span></label>
+              </li>
+              <li class="contribution-option contribution-option-other2">
+                  <label for="contribution-other-amt">
+                    <span class="sr">Other Amount</span>
+                  </label>
+                  <div class="wrapper">
+                    <span class="deco-denomination">$</span>
+                    <input type="text" size="9" name="contribution-other-amt" id="contribution-other-amt" value=""/>
+                    <span class="denomination-name"><%- currency %></span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+
+        <% } else {%>
+        <li class="review-task review-task-contribution">
+          <h4 class="title"><%- gettext( "Your Course Total" ) %></h4>
+          <div class="copy">
+            <p><%- gettext( "To complete your registration, you will need to pay:" ) %></p>
+          </div>
+          <ul class="list-fields contribution-options">
+            <li class="field contribution-option">
+              <span class="deco-denomination">$</span>
+              <span class="label-value"><%- minPrice %></span>
+              <span class="denomination-name"><%- currency %></span>
+            </li>
+          </ul>
+        </li>
+        <% } %>
+      </ol>
+    </div>
+  </div>
+
+  <nav class="nav-wizard is-ready">
+    <ol class="wizard-steps">
+      <li class="wizard-step">
+        <a class="next action-primary is-disabled" id="pay_button">
+          <%- gettext( "Go to payment" ) %>
+        </a>
+      </li>
+    </ol>
+  </nav>
+
+  <form id="payment-processor-form"></form>
+
+</div>

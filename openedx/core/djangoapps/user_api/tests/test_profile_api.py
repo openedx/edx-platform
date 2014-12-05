@@ -47,7 +47,7 @@ class ProfileApiTest(TestCase):
         self.assertEqual(profile['full_name'], u'ȻħȺɍłɇs')
 
     @raises(profile_api.ProfileInvalidField)
-    @ddt.data('', 'a' * profile_api.FULL_NAME_MAX_LENGTH + 'a')
+    @ddt.data('', 'a', 'a' * profile_api.FULL_NAME_MAX_LENGTH + 'a')
     def test_update_full_name_invalid(self, invalid_name):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         profile_api.update_profile(self.USERNAME, full_name=invalid_name)
