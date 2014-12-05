@@ -285,33 +285,34 @@
         </header>
 
         <ol class="important-dates">
-          <li><i class="icon icon-info-sign"></i><p>${_("Course Number")}</p><span class="course-number">${course.display_number_with_default | h}</span></li>
+          <li class="important-dates-item"><i class="icon icon-info-sign"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
-            <li><i class="icon icon-calendar"></i><p>${_("Classes Start")}</p><span class="start-date">${course.start_datetime_text()}</span></li>
+            <li class="important-dates-item"><i class="icon icon-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
             % if get_course_about_section(course, "end_date") or course.end:
-            <li>
+            <li class="important-dates-item">
                 <i class="icon icon-calendar"></i>
-                <p>${_("Classes End")}</p><span class="final-date">
-                % if get_course_about_section(course, "end_date"):
-                    ${get_course_about_section(course, "end_date")}
-                % else:
-                    ${course.end_datetime_text()}
-                % endif
+                <p class="important-dates-item-title">${_("Classes End")}</p>
+                <span class="important-dates-item-text final-date">
+                    % if get_course_about_section(course, "end_date"):
+                        ${get_course_about_section(course, "end_date")}
+                    % else:
+                        ${course.end_datetime_text()}
+                    % endif
                 </span>
             </li>
             % endif
 
           % if get_course_about_section(course, "effort"):
-            <li><i class="icon icon-pencil"></i><p>${_("Estimated Effort")}</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
+            <li class="important-dates-item"><i class="icon icon-pencil"></i><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(course, "effort")}</span></li>
           % endif
 
-          ##<li><i class="icon icon-time"></i><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
+          ##<li class="important-dates-item"><i class="icon icon-time"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
           % if get_course_about_section(course, "prerequisites"):
-            <li class="prerequisites"><i class="icon icon-book"></i><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
+            <li class="important-dates-item"><i class="icon icon-book"></i><p class="important-dates-item-title">${_("Prerequisites")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
         </ol>
       </section>
