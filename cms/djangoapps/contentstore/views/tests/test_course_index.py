@@ -7,7 +7,7 @@ import datetime
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, add_instructor
-from contentstore.views.access import has_course_access
+from student.auth import has_course_author_access
 from contentstore.views.course import course_outline_initial_state
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.models import CourseRerunState
@@ -181,7 +181,7 @@ class TestCourseIndex(CourseTestCase):
             # delete nofications that are dismissed
             CourseRerunState.objects.get(id=rerun_state.id)
 
-        self.assertFalse(has_course_access(user2, rerun_course_key))
+        self.assertFalse(has_course_author_access(user2, rerun_course_key))
 
     def assert_correct_json_response(self, json_response):
         """

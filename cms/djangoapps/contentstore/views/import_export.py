@@ -28,7 +28,7 @@ from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
 
-from .access import has_course_access
+from student.auth import has_course_author_access
 
 from extract_tar import safetar_extractall
 from util.json_request import JsonResponse
@@ -63,7 +63,7 @@ def import_handler(request, course_key_string):
         json: import a course via the .tar.gz file specified in request.FILES
     """
     course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
@@ -313,7 +313,7 @@ def import_status_handler(request, course_key_string, filename=None):
 
     """
     course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     try:
@@ -346,7 +346,7 @@ def export_handler(request, course_key_string):
     which describes the error.
     """
     course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)

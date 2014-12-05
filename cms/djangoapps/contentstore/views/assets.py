@@ -26,7 +26,7 @@ from util.json_request import JsonResponse
 from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from pymongo import ASCENDING, DESCENDING
-from .access import has_course_access
+from student.auth import has_course_author_access
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 __all__ = ['assets_handler']
@@ -57,7 +57,7 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
         json: delete an asset
     """
     course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')

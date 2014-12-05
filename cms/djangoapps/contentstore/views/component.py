@@ -25,7 +25,7 @@ from contentstore.views.item import create_xblock_info
 
 from opaque_keys.edx.keys import UsageKey
 
-from .access import has_course_access
+from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
 
@@ -349,7 +349,7 @@ def _get_item_in_course(request, usage_key):
 
     course_key = usage_key.course_key
 
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     course = modulestore().get_course(course_key)
