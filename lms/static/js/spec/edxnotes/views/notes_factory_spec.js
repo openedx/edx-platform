@@ -1,11 +1,9 @@
 define([
     'annotator', 'js/edxnotes/views/notes_factory', 'js/common_helpers/ajax_helpers',
-    'js/spec/edxnotes/custom_matchers', 'js/spec/edxnotes/base64'
-], function(Annotator, NotesFactory, AjaxHelpers, customMatchers, base64) {
+    'js/spec/edxnotes/helpers', 'js/spec/edxnotes/custom_matchers'
+], function(Annotator, NotesFactory, AjaxHelpers, Helpers, customMatchers) {
     'use strict';
     describe('EdxNotes NotesFactory', function() {
-        var wrapper;
-
         beforeEach(function() {
             customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
@@ -18,7 +16,7 @@ define([
 
         it('can initialize annotator correctly', function() {
             var requests = AjaxHelpers.requests(this),
-                token = base64.makeToken(),
+                token = Helpers.makeToken(),
                 options = {
                     user: 'a user',
                     usage_id : 'an usage',
