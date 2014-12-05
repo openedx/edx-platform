@@ -8,12 +8,26 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_response
 from student.roles import CoursePocCoachRole
-from student.tests.factories import AdminFactory
+from student.tests.factories import (
+    AdminFactory,
+    CourseEnrollmentFactory,
+)
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-from ..models import PersonalOnlineCourse
+from xmodule.modulestore.tests.factories import (
+    CourseFactory,
+    ItemFactory,
+)
+from ..models import (
+    PersonalOnlineCourse,
+    PocMembership,
+    PocFutureMembership,
+)
 from ..overrides import get_override_for_poc
+from .factories import (
+    PocFactory,
+    PocMembershipFactory,
+    PocFutureMembershipFactory,
+)
 
 
 def intercept_renderer(path, context):
@@ -64,6 +78,14 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def make_coach(self):
         role = CoursePocCoachRole(self.course.id)
         role.add_users(self.coach)
+
+    def make_poc(self):
+        poc = PocFactory(course_id=self.course.id, coach=self.coach)
+        return poc
+
+    def get_outbox(self):
+        from django.core import mail
+        return mail.outbox
 
     def tearDown(self):
         """
@@ -157,6 +179,122 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         poc = PersonalOnlineCourse.objects.get()
         course_start = get_override_for_poc(poc, self.course, 'start')
         self.assertEqual(str(course_start)[:-9], u'2014-11-20 00:00')
+
+    def test_enroll_member_student(self):
+        self.make_coach()
+        poc = self.make_poc()
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id)
+        student = enrollment.user
+        outbox = self.get_outbox()
+        self.assertEqual(len(outbox), 0)
+
+        url = reverse(
+            'poc_invite',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'enrollment-button': 'Enroll',
+            'student-ids': u','.join([student.email, ]),
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # we were redirected to our current location
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(student.email in outbox[0].recipients())
+        # a PocMembership exists for this student
+        self.assertTrue(
+            PocMembership.objects.filter(poc=poc, student=student).exists()
+        )
+
+    def test_unenroll_member_student(self):
+        self.make_coach()
+        poc = self.make_poc()
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id)
+        student = enrollment.user
+        outbox = self.get_outbox()
+        self.assertEqual(len(outbox), 0)
+        # student is member of POC:
+        PocMembershipFactory(poc=poc, student=student)
+
+        url = reverse(
+            'poc_invite',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'enrollment-button': 'Unenroll',
+            'student-ids': u','.join([student.email, ]),
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # we were redirected to our current location
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(student.email in outbox[0].recipients())
+        # the membership for this student is gone
+        self.assertFalse(
+            PocMembership.objects.filter(poc=poc, student=student).exists()
+        )
+
+    def test_enroll_non_user_student(self):
+        test_email = "nobody@nowhere.com"
+        self.make_coach()
+        poc = self.make_poc()
+        outbox = self.get_outbox()
+        self.assertEqual(len(outbox), 0)
+
+        url = reverse(
+            'poc_invite',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'enrollment-button': 'Enroll',
+            'student-ids': u','.join([test_email, ]),
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # we were redirected to our current location
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(test_email in outbox[0].recipients())
+        self.assertTrue(
+            PocFutureMembership.objects.filter(
+                poc=poc, email=test_email
+            ).exists()
+        )
+
+    def test_unenroll_non_user_student(self):
+        test_email = "nobody@nowhere.com"
+        self.make_coach()
+        poc = self.make_poc()
+        outbox = self.get_outbox()
+        PocFutureMembershipFactory(poc=poc, email=test_email)
+        self.assertEqual(len(outbox), 0)
+
+        url = reverse(
+            'poc_invite',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'enrollment-button': 'Unenroll',
+            'student-ids': u','.join([test_email, ]),
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # we were redirected to our current location
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertEqual(len(outbox), 1)
+        self.assertTrue(test_email in outbox[0].recipients())
+        self.assertFalse(
+            PocFutureMembership.objects.filter(
+                poc=poc, email=test_email
+            ).exists()
+        )
+
 
 
 def flatten(seq):

@@ -31,6 +31,7 @@ class EmailEnrollmentState(object):
             in_poc = poc_member.exists()
             full_name = user.profile.name
         else:
+            user = None
             in_poc = False
             full_name = None
         self.user = exists_user
