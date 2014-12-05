@@ -23,7 +23,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 from xmodule.services import SettingsService, NotificationsService, CoursewareParentInfoService
 
-from lms.lib.xblock.field_data import LmsFieldData
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
 from cms.lib.xblock.runtime import local_resource_url
 

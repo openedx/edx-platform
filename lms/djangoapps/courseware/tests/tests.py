@@ -12,7 +12,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_XML_MODULESTORE as XML_MODULESTORE
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE as TOY_MODULESTORE
-from lms.lib.xblock.field_data import LmsFieldData
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
