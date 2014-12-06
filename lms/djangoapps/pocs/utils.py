@@ -101,7 +101,9 @@ def unenroll_email(poc, student_email, email_students=False, email_params=None):
         if PocFutureMembership.objects.filter(
             poc=poc, email=student_email
         ).exists():
-            PocFutureMembership.get(poc=poc, email=student_email).delete()
+            PocFutureMembership.objects.get(
+                poc=poc, email=student_email
+            ).delete()
         if email_students:
             email_params['message'] = 'allowed_unenroll'
             email_params['email_address'] = student_email
