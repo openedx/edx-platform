@@ -110,7 +110,7 @@ def xblock_studio_url(xblock, parent_xblock=None):
     elif category in ('chapter', 'sequential'):
         return u'{url}?show={usage_key}'.format(
             url=reverse_course_url('course_handler', xblock.location.course_key),
-            usage_key=urllib.quote(unicode(xblock.location))
+            usage_key=urllib.quote(unicode(xblock.location).encode('utf8'))
         )
     elif category == 'library':
         library_key = xblock.location.course_key
