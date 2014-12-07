@@ -179,6 +179,10 @@ FEATURES = {
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
 
     # Enable instructor to assign individual due dates
+    # Note: In order for this feature to work, you must also add
+    # 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
+    # the setting FIELD_OVERRIDE_PROVIDERS, in addition to setting this flag to
+    # True.
     'INDIVIDUAL_DUE_DATES': False,
 
     # Enable legacy instructor dashboard
@@ -1901,3 +1905,9 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # which access.py permission name to check in order to determine if a course about page is
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
+
+# For the fields override feature
+# If using FEATURES['INDIVIDUAL_DUE_DATES'], you should add
+# 'courseware.student_field_overrides.IndividualStudentOverrideProvider' to
+# this setting.
+FIELD_OVERRIDE_PROVIDERS = ()

@@ -294,6 +294,10 @@ if FEATURES.get('AUTH_USE_CAS'):
 # Example: {'CN': 'http://api.xuetangx.com/edx/video?s3_url='}
 VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
+# Field overrides.  To use the IDDE feature, add
+# 'courseware.student_field_overrides.IndividualStudentOverrideProvider'.
+FIELD_OVERRIDE_PROVIDERS = tuple(ENV_TOKENS.get('FIELD_OVERRIDE_PROVIDERS', []))
+
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 
