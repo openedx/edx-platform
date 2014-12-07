@@ -61,10 +61,18 @@ def segmentio_event(request):
     expected_secret = getattr(settings, 'TRACKING_SEGMENTIO_WEBHOOK_SECRET', None)
     provided_secret = request.GET.get('key')
     if not expected_secret or provided_secret != expected_secret:
+        log.warning(
+            'segmentio_event: Unauthorized access: "{0}", expected_secret="{1}", provided_secret="{2}".'.format(
+                request.body,
+                expected_secret,
+                provided_secret
+            )
+        )
         return HttpResponse(status=401)
 
     try:
         track_segmentio_event(request)
+        log.info('segmentio_event successfully logged.')
     except EventValidationError as err:
         log.warning(
             'Unable to process event received from segment.io: message="%s" event="%s"',
