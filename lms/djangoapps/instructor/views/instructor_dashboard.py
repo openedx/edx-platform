@@ -364,8 +364,8 @@ def _section_send_email(course, access):
 def _get_dashboard_link(course_key):
     """ Construct a URL to the external analytics dashboard """
     analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-    link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
-                                                              settings.ANALYTICS_DASHBOARD_NAME)
+    link = u"<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
+                                                               settings.ANALYTICS_DASHBOARD_NAME)
     return link
 
 
