@@ -373,7 +373,7 @@ def signin_user(request):
         # party auth pipeline; distinct from the actual instance of the running
         # pipeline, if any.
         'pipeline_running': 'true' if pipeline.running(request) else 'false',
-        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, course_id=course_id),
+        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, course_id=course_id, email_opt_in=email_opt_in),
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
@@ -405,7 +405,7 @@ def register_user(request, extra_context=None):
         'enrollment_action': request.GET.get('enrollment_action'),
         'name': '',
         'running_pipeline': None,
-        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, course_id=course_id),
+        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, course_id=course_id, email_opt_in=email_opt_in),
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
@@ -948,6 +948,7 @@ def accounts_login(request):
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
     redirect_to = request.GET.get('next')
+    email_opt_in = request.GET.get('email_opt_in')
     if redirect_to:
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
@@ -955,7 +956,7 @@ def accounts_login(request):
 
     context = {
         'pipeline_running': 'false',
-        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
+        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to, email_opt_in=email_opt_in),
         'platform_name': settings.PLATFORM_NAME,
     }
     return render_to_response('login.html', context)
