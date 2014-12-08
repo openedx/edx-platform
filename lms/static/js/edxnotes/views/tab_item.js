@@ -4,7 +4,7 @@ define(['gettext', 'underscore', 'backbone'],
 function (gettext, _, Backbone) {
     var TabItemView = Backbone.View.extend({
         tagName: 'li',
-        className: 'tab-item',
+        className: 'tab',
         activeClassName: 'is-active',
 
         events: {
@@ -14,10 +14,21 @@ function (gettext, _, Backbone) {
         },
 
         initialize: function (options) {
-            this.template = _.template($('#tab-item-tpl').text());
-            this.options = options;
-            this.$el.addClass(this.model.get('class_name'));
-            this.bindEvents();
+            var templateSelector = '#tab-item-tpl',
+                templateText = $(templateSelector).text();
+
+            if (!templateText) {
+                console.error('Failed to load tab-item template');
+            }
+
+            this.template = _.template(templateText);
+            this.$el.attr('id', this.model.get('identifier'));
+            this.listenTo(this.model, {
+                'change:is_active': function (model, value) {
+                    this.$el.toggleClass(this.activeClassName, value);
+                },
+                'destroy': this.remove
+            });
         },
 
         render: function () {
@@ -26,33 +37,16 @@ function (gettext, _, Backbone) {
             return this;
         },
 
-        bindEvents: function () {
-            this.model.on({
-                'change:is_active': function (model, value) {
-                    this.$el.toggleClass(this.activeClassName, value);
-                },
-                'destroy': this.remove
-            }, this);
-        },
-
         selectHandler: function (event) {
             event.preventDefault();
             if (!this.model.isActive()) {
-                this.select();
+                this.model.activate();
             }
         },
 
         closeHandler: function (event) {
             event.preventDefault();
             event.stopPropagation();
-            this.close();
-        },
-
-        select: function () {
-            this.model.activate();
-        },
-
-        close: function () {
             this.model.destroy();
         }
     });

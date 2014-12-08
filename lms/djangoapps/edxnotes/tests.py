@@ -7,7 +7,9 @@ from mock import patch, MagicMock
 from unittest import skipUnless
 from datetime import datetime
 from edxmako.shortcuts import render_to_string
+from edxnotes import helpers
 from edxnotes.decorators import edxnotes
+from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
@@ -21,9 +23,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from student.tests.factories import UserFactory
-
-from .exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
-from . import helpers
 
 
 def enable_edxnotes_for_the_course(course, user_id):
@@ -342,6 +341,31 @@ class EdxNotesHelpersTest(TestCase):
             json.loads(helpers.search(self.user, self.course, "test"))
         )
 
+    def test_preprocess_collection_escaping(self):
+        """
+        Tests the result if appropriate module is not found.
+        """
+        initial_collection = [{
+            u"quote": u"test <script>alert('test')</script>",
+            u"text": u"text \"<>&'",
+            u"usage_id": unicode(self.html_module_1.location),
+            u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat()
+        }]
+
+        self.assertItemsEqual(
+            [{
+                u"quote": u"test &lt;script&gt;alert(&#39;test&#39;)&lt;/script&gt;",
+                u"text": u"text &#34;&lt;&gt;&amp;&#39;",
+                u"unit": {
+                    u"url": self._get_jump_to_url(self.vertical),
+                    u"display_name": self.vertical.display_name_with_default,
+                },
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
+            }],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
+        )
+
     def test_preprocess_collection_no_item(self):
         """
         Tests the result if appropriate module is not found.
@@ -507,6 +531,70 @@ class EdxNotesHelpersTest(TestCase):
             }
         )
 
+    def test_get_course_position_no_chapter(self):
+        """
+        Returns `None` if no chapter found.
+        """
+        mock_course_module = MagicMock()
+        mock_course_module.position = 3
+        mock_course_module.get_display_items.return_value = []
+        self.assertIsNone(helpers.get_course_position(mock_course_module))
+
+    def test_get_course_position_to_chapter(self):
+        """
+        Returns a position that leads to COURSE/CHAPTER if this isn't the users's
+        first time.
+        """
+        mock_course_module = MagicMock()
+        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
+        mock_course_module.position = 3
+
+        mock_chapter = MagicMock()
+        mock_chapter.url_name = 'chapter_url_name'
+        mock_chapter.display_name_with_default = 'Test Chapter Display Name'
+
+        mock_course_module.get_display_items.return_value = [mock_chapter]
+
+        self.assertEqual(helpers.get_course_position(mock_course_module), {
+            'display_name': 'Test Chapter Display Name',
+            'url': '/courses/{}/courseware/chapter_url_name/'.format(self.course.id),
+        })
+
+    def test_get_course_position_no_section(self):
+        """
+        Returns `None` if no section found.
+        """
+        mock_course_module = MagicMock()
+        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
+        mock_course_module.position = None
+        mock_course_module.get_display_items.return_value = [MagicMock()]
+        self.assertIsNone(helpers.get_course_position(mock_course_module))
+
+    def test_get_course_position_to_section(self):
+        """
+        Returns a position that leads to COURSE/CHAPTER/SECTION if this is the
+        user's first time.
+        """
+        mock_course_module = MagicMock()
+        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
+        mock_course_module.position = None
+
+        mock_chapter = MagicMock()
+        mock_chapter.url_name = 'chapter_url_name'
+        mock_course_module.get_display_items.return_value = [mock_chapter]
+
+        mock_section = MagicMock()
+        mock_section.url_name = 'section_url_name'
+        mock_section.display_name_with_default = 'Test Section Display Name'
+
+        mock_chapter.get_display_items.return_value = [mock_section]
+        mock_section.get_display_items.return_value = [MagicMock()]
+
+        self.assertEqual(helpers.get_course_position(mock_course_module), {
+            'display_name': 'Test Section Display Name',
+            'url': '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id),
+        })
+
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 class EdxNotesViewsTest(TestCase):
@@ -540,7 +628,7 @@ class EdxNotesViewsTest(TestCase):
         """
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_page_url)
-        self.assertContains(response, "<h1>Notes</h1>")
+        self.assertContains(response, '<h1 class="page-title">Notes')
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_view_is_disabled(self):

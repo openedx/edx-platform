@@ -32,9 +32,9 @@ class EdxNotesPageView(PageObject):
     Base class for EdxNotes views: Recent Activity, Course Structure, Search Results.
     """
     url = None
-    BODY_SELECTOR = ".edx-notes-page-items-list"
-    TAB_SELECTOR = ".tab-item"
-    CHILD_SELECTOR = ".edx-notes-page-item"
+    BODY_SELECTOR = ".tab-panel"
+    TAB_SELECTOR = ".tab"
+    CHILD_SELECTOR = ".note"
 
     @unguarded
     def visit(self):
@@ -86,16 +86,16 @@ class RecentActivityView(EdxNotesPageView):
     """
     Helper class for Recent Activity view.
     """
-    BODY_SELECTOR = "#edx-notes-page-recent-activity"
-    TAB_SELECTOR = ".tab-item.tab-recent-activity"
+    BODY_SELECTOR = "#recent-panel"
+    TAB_SELECTOR = ".tab#view-recent-activity"
 
 
 class SearchResultsView(EdxNotesPageView):
     """
     Helper class for Search Results view.
     """
-    BODY_SELECTOR = "#edx-notes-page-search-results"
-    TAB_SELECTOR = ".tab-item.tab-search-results"
+    BODY_SELECTOR = "#search-results-panel"
+    TAB_SELECTOR = ".tab#view-search-results"
 
 
 class EdxNotesPage(CoursePage):
@@ -113,7 +113,7 @@ class EdxNotesPage(CoursePage):
         self.current_view = self.MAPPING["recent"](self.browser)
 
     def is_browser_on_page(self):
-        return self.q(css=".edx-notes-page-wrapper").present
+        return self.q(css=".wrapper-student-notes").present
 
     def switch_to_tab(self, tab_name):
         """
@@ -133,8 +133,8 @@ class EdxNotesPage(CoursePage):
         """
         Runs search with `text(str)` query.
         """
-        self.q(css=".search-box #search-field").first.fill(text)
-        self.q(css='.search-box button').first.click()
+        self.q(css="#search-notes-form #search-notes-input").first.fill(text)
+        self.q(css='#search-notes-form .search-notes-submit').first.click()
         # Frontend will automatically switch to Search results tab when search
         # is running, so the view also needs to be changed.
         self.current_view = self.MAPPING["search"](self.browser)
@@ -144,7 +144,7 @@ class EdxNotesPage(CoursePage):
         """
         Returns all tabs on the page.
         """
-        tabs = self.q(css=".tabs .tab-item-name")
+        tabs = self.q(css=".tabs .tab-label")
         if tabs:
             return tabs.text
         else:
@@ -180,7 +180,7 @@ class EdxNotesPage(CoursePage):
         """
         Returns no content message.
         """
-        element = self.q(css=".no-content").first
+        element = self.q(css=".is-empty").first
         if element:
             return element.text[0]
         else:
@@ -191,8 +191,8 @@ class EdxNotesPageItem(NoteChild):
     """
     Helper class that works with note items on Note page of the course.
     """
-    BODY_SELECTOR = ".edx-notes-page-item"
-    UNIT_LINK_SELECTOR = "a.edx-notes-item-unit-link"
+    BODY_SELECTOR = ".note"
+    UNIT_LINK_SELECTOR = "a.reference-unit-link"
 
     def _get_element_text(self, selector):
         element = self.q(css=self._bounded_selector(selector)).first
@@ -212,19 +212,19 @@ class EdxNotesPageItem(NoteChild):
 
     @property
     def text(self):
-        return self._get_element_text(".edx-notes-item-text")
+        return self._get_element_text(".note-comments")
 
     @property
     def quote(self):
-        return self._get_element_text(".edx-notes-item-quote")
+        return self._get_element_text(".note-excerpt")
 
     @property
     def time_updated(self):
-        return self._get_element_text(".edx-notes-item-last-edited-value")
+        return self._get_element_text(".reference-updated-date")
 
     @property
     def title_highlighted(self):
-        return self._get_element_text(".edx-notes-item-highlight-title")
+        return self._get_element_text(".reference-title")
 
 
 class EdxNotesUnitPage(CoursePage):

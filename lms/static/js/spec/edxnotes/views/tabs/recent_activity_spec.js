@@ -32,7 +32,7 @@ define([
             var view;
 
             options = _.defaults(options || {}, {
-                el: $('.edx-notes-page-wrapper'),
+                el: $('.wrapper-student-notes'),
                 collection: collection,
                 tabsCollection: tabsCollection,
             });
@@ -47,7 +47,7 @@ define([
             customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
-                'templates/edxnotes/recent-activity-item', 'templates/edxnotes/tab-item'
+                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
 
             this.collection = new NotesCollection(notes);
@@ -60,15 +60,16 @@ define([
             expect(this.tabsCollection).toHaveLength(1);
             expect(this.tabsCollection.at(0).attributes).toEqual({
                 name: 'Recent Activity',
-                class_name: 'tab-recent-activity',
+                identifier: 'view-recent-activity',
+                icon: 'icon-time',
                 is_active: true,
                 is_closable: false
             });
-            expect(view.$('#edx-notes-page-recent-activity')).toExist();
-            expect(view.$('.edx-notes-page-item')).toHaveLength(3);
-            _.each(view.$('.edx-notes-page-item'), function(element, index) {
-                expect($('.edx-notes-item-text', element)).toContainText(notes[index].text);
-                expect($('.edx-notes-item-quote', element)).toContainText(notes[index].quote);
+            expect(view.$('#recent-panel')).toExist();
+            expect(view.$('.note')).toHaveLength(3);
+            _.each(view.$('.note'), function(element, index) {
+                expect($('.note-comments', element)).toContainText(notes[index].text);
+                expect($('.note-excerpt', element)).toContainText(notes[index].quote);
             });
         });
     });
