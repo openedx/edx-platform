@@ -143,7 +143,8 @@ def xblock_handler(request, usage_key_string):
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
                     return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
                 # TODO: pass fields to _get_module_info and only return those
-                rsp = _get_module_info(_get_xblock(usage_key, request.user))
+                with modulestore().bulk_operations(usage_key.course_key):
+                    rsp = _get_module_info(_get_xblock(usage_key, request.user))
                 return JsonResponse(rsp)
             else:
                 return HttpResponse(status=406)
