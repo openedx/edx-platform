@@ -72,7 +72,7 @@ def instructor_dashboard_2(request, course_id):
         _section_student_admin(course_key, access),
         _section_data_download(course_key, access),
         _section_analytics(course_key, access),
-        _section_survey(course_id, access),
+        _section_survey(course_key, access),
     ]
 
     #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
@@ -408,12 +408,12 @@ def _update_active_students(course_key, section_data):
         log.exception(e)
 
 
-def _section_survey(course_id, access):
+def _section_survey(course_key, access):
     """ Provide data for the corresponding survey section """
     section_data = {
         'section_key': 'survey',
         'section_display_name': _('Survey'),
         'access': access,
-        'get_survey_url': reverse('get_survey', kwargs={'course_id': course_id}),
+        'get_survey_url': reverse('get_survey', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data

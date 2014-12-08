@@ -1750,6 +1750,8 @@ def get_survey(request, course_id):  # pylint: disable=W0613
     header = ['Unit ID', 'Survey Name', 'Created', 'User Name', 'Disabled']
     rows = []
 
+    #Note(yokose): raw() raises InterfaceError when using CourseKey
+    #course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     submissions = list(SurveySubmission.objects.raw(
         '''SELECT s.*, u.*, p.*, t.account_status
            FROM survey_surveysubmission s

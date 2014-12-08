@@ -9,6 +9,8 @@ from django.http import HttpResponseNotAllowed, Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 
+from opaque_keys.edx.locator import CourseLocator
+
 from student.tests.factories import UserFactory
 from survey.models import SurveySubmission
 from survey.tests.factories import SurveySubmissionFactory
@@ -26,7 +28,7 @@ class SuveyTests(TestCase):
 
     def setUp(self):
         self.user = UserFactory.create()
-        self.course_id = 'edX/test/course1'
+        self.course_id = CourseLocator.from_string('edX/test/course1')
         self.unit_id = '22222222222222222222222222222222'
         self.survey_name = 'survey #2'
         self.survey_answer = '{"Q1": "1", "Q2": ["2", "3"], "Q3": "test"}'

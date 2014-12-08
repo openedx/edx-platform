@@ -7,6 +7,8 @@ import logging
 from django.db import models
 from django.contrib.auth.models import User
 
+from xmodule_django.models import CourseKeyField
+
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +17,7 @@ class SurveySubmission(models.Model):
     """
     Submissions from survey form.
     """
-    course_id = models.CharField(max_length=128, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     unit_id = models.CharField(max_length=255, db_index=True)
     user = models.ForeignKey(User, related_name='survey')
     survey_name = models.CharField(max_length=255, db_index=True)

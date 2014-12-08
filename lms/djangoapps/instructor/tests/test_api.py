@@ -2963,28 +2963,28 @@ class TestInstructorAPISurveyDownload(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.user4 = UserFactory.create()
 
         self.submission1 = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': self.course.id,
             'unit_id': '11111111111111111111111111111111',
             'user': self.user1,
             'survey_name': 'survey #1',
             'survey_answer': '{"Q1": "1", "Q2": ["1", "2"], "Q3": "submission #1"}',
         }
         self.submission2 = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': self.course.id,
             'unit_id': '11111111111111111111111111111111',
             'user': self.user2,
             'survey_name': 'survey #1',
             'survey_answer': '{"Q3": "submission #2", "Q1": "1", "Q2": "2"}',
         }
         self.submission3 = {
-            'course_id': self.course.id.to_deprecated_string(),
+            'course_id': self.course.id,
             'unit_id': '22222222222222222222222222222222',
             'user': self.user3,
             'survey_name': 'survey #2',
             'survey_answer': '{"Q1": "", "Q2": "", "Q3": "", "Q4": "extra"}',
         }
         self.submission4 = {
-            'course_id': 'edX/test/dummy',
+            'course_id': SlashSeparatedCourseKey('edX', 'test', 'dummy'),
             'unit_id': '22222222222222222222222222222222',
             'user': self.user4,
             'survey_name': 'survey #2',
