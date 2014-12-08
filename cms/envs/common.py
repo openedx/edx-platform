@@ -755,3 +755,23 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
+# Files and Uploads type filter values
+FILES_AND_UPLOAD_TYPE_FILTER = {
+    "Images": ['image/png', 'image/jpeg'],
+    "Documents": [
+        'application/pdf',
+        'application/txt',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+        'application/vnd.openxmlformats-officedocument.presentationml.template',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+        'application/msword',
+        'application/vnd.ms-excel',
+        'application/vnd.ms-powerpoint',
+    ],
+}
+
