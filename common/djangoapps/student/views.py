@@ -364,8 +364,10 @@ def signin_user(request):
         return redirect(reverse('dashboard'))
 
     course_id = request.GET.get('course_id')
+    email_opt_in = request.GET.get('email_opt_in')
     context = {
         'course_id': course_id,
+        'email_opt_in': email_opt_in,
         'enrollment_action': request.GET.get('enrollment_action'),
         # Bool injected into JS to submit form if we're inside a running third-
         # party auth pipeline; distinct from the actual instance of the running
@@ -394,9 +396,11 @@ def register_user(request, extra_context=None):
         return external_auth.views.redirect_with_get('root', request.GET)
 
     course_id = request.GET.get('course_id')
+    email_opt_in = request.GET.get('email_opt_in')
 
     context = {
         'course_id': course_id,
+        'email_opt_in': email_opt_in,
         'email': '',
         'enrollment_action': request.GET.get('enrollment_action'),
         'name': '',
