@@ -119,7 +119,8 @@ class TestFindUnit(ModuleStoreTestCase):
         Test finding a nested unit.
         """
         url = self.homework.location.to_deprecated_string()
-        self.assertEqual(tools.find_unit(self.course, url), self.homework)
+        found_unit = tools.find_unit(self.course, url)
+        self.assertEqual(found_unit.location, self.homework.location)
 
     def test_find_unit_notfound(self):
         """

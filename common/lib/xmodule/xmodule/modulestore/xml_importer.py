@@ -28,7 +28,7 @@ import json
 import re
 from lxml import etree
 
-from .xml import XMLModuleStore, ImportSystem, ParentTracker
+from .xml import XMLModuleStore, ImportSystem
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleDescriptor
 from opaque_keys.edx.keys import UsageKey
@@ -479,11 +479,13 @@ def _import_module_and_update_references(
 
     fields = {}
     for field_name, field in module.fields.iteritems():
-        if field.is_set_on(module):
-            if field.scope == Scope.parent:
-                continue
+        if field.scope != Scope.parent and field.is_set_on(module):
             if isinstance(field, Reference):
-                fields[field_name] = _convert_reference_fields_to_new_namespace(field.read_from(module))
+                value = field.read_from(module)
+                if value is None:
+                    fields[field_name] = None
+                else:
+                    fields[field_name] = _convert_reference_fields_to_new_namespace(field.read_from(module))
             elif isinstance(field, ReferenceList):
                 references = field.read_from(module)
                 fields[field_name] = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
@@ -548,7 +550,6 @@ def _import_course_draft(
         course_id=source_course_id,
         course_dir=draft_course_dir,
         error_tracker=errorlog.tracker,
-        parent_tracker=ParentTracker(),
         load_error_modules=False,
         mixins=xml_module_store.xblock_mixins,
         field_data=KvsFieldData(kvs=DictKeyValueStore()),

@@ -116,9 +116,20 @@ class GetItemTest(ItemTest):
         return resp
 
     @ddt.data(
-        (1, 21, 23, 35, 37),
-        (2, 22, 24, 38, 39),
-        (3, 23, 25, 41, 41),
+        # chapter explanation:
+        # 1-3. get course, chapter, chapter's children,
+        # 4-7. chapter's published grandchildren, chapter's draft grandchildren, published & then draft greatgrand
+        # 8 compute chapter's parent
+        # 9 get chapter's parent
+        # 10-16. run queries 2-8 again
+        # 17-19. compute seq, vert, and problem's parents (odd since it's going down; so, it knows)
+        # 20-22. get course 3 times
+        # 23. get chapter
+        # 24. compute chapter's parent (course)
+        # 25. compute course's parent (None)
+        (1, 20, 20, 26, 26),
+        (2, 21, 21, 29, 28),
+        (3, 22, 22, 32, 30),
     )
     @ddt.unpack
     def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
@@ -411,21 +422,46 @@ class TestDuplicateItem(ItemTest):
         except for location and display name.
         """
         def duplicate_and_verify(source_usage_key, parent_usage_key):
+            """ Duplicates the source, parenting to supplied parent. Then does equality check. """
             usage_key = self._duplicate_item(parent_usage_key, source_usage_key)
-            self.assertTrue(check_equality(source_usage_key, usage_key), "Duplicated item differs from original")
+            self.assertTrue(
+                check_equality(source_usage_key, usage_key, parent_usage_key),
+                "Duplicated item differs from original"
+            )
 
-        def check_equality(source_usage_key, duplicate_usage_key):
+        def check_equality(source_usage_key, duplicate_usage_key, parent_usage_key=None):
+            """
+            Gets source and duplicated items from the modulestore using supplied usage keys.
+            Then verifies that they represent equivalent items (modulo parents and other
+            known things that may differ).
+            """
             original_item = self.get_item_from_modulestore(source_usage_key)
             duplicated_item = self.get_item_from_modulestore(duplicate_usage_key)
 
             self.assertNotEqual(
-                original_item.location,
-                duplicated_item.location,
+                unicode(original_item.location),
+                unicode(duplicated_item.location),
                 "Location of duplicate should be different from original"
             )
-            # Set the location and display name to be the same so we can make sure the rest of the duplicate is equal.
+
+            # Parent will only be equal for root of duplicated structure, in the case
+            # where an item is duplicated in-place.
+            if parent_usage_key and unicode(original_item.parent) == unicode(parent_usage_key):
+                self.assertEqual(
+                    unicode(parent_usage_key), unicode(duplicated_item.parent),
+                    "Parent of duplicate should equal parent of source for root xblock when duplicated in-place"
+                )
+            else:
+                self.assertNotEqual(
+                    unicode(original_item.parent), unicode(duplicated_item.parent),
+                    "Parent duplicate should be different from source"
+                )
+
+            # Set the location, display name, and parent to be the same so we can make sure the rest of the
+            # duplicate is equal.
             duplicated_item.location = original_item.location
             duplicated_item.display_name = original_item.display_name
+            duplicated_item.parent = original_item.parent
 
             # Children will also be duplicated, so for the purposes of testing equality, we will set
             # the children to the original after recursively checking the children.

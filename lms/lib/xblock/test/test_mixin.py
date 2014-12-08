@@ -1,8 +1,12 @@
 """
 Tests of the LMS XBlock Mixin
 """
+import ddt
+from django.conf import settings
 
 from xblock.validation import ValidationMessage
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.partitions.partitions import Group, UserPartition
@@ -13,9 +17,11 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
     Base class for XBlock mixin tests cases. A simple course with a single user partition is created
     in setUp for all subclasses to use.
     """
-
-    def setUp(self):
-        super(LmsXBlockMixinTestCase, self).setUp()
+    def build_course(self):
+        """
+        Build up a course tree with a UserPartition.
+        """
+        # pylint: disable=attribute-defined-outside-init
         self.user_partition = UserPartition(
             0,
             'first_partition',
@@ -31,13 +37,16 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         self.subsection = ItemFactory.create(parent=self.section, category='sequential', display_name='Test Subsection')
         self.vertical = ItemFactory.create(parent=self.subsection, category='vertical', display_name='Test Unit')
-        self.video = ItemFactory.create(parent=self.subsection, category='video', display_name='Test Video')
+        self.video = ItemFactory.create(parent=self.vertical, category='video', display_name='Test Video 1')
 
 
 class XBlockValidationTest(LmsXBlockMixinTestCase):
     """
     Unit tests for XBlock validation
     """
+    def setUp(self):
+        super(XBlockValidationTest, self).setUp()
+        self.build_course()
 
     def verify_validation_message(self, message, expected_message, expected_message_type):
         """
@@ -92,6 +101,9 @@ class XBlockGroupAccessTest(LmsXBlockMixinTestCase):
     """
     Unit tests for XBlock group access.
     """
+    def setUp(self):
+        super(XBlockGroupAccessTest, self).setUp()
+        self.build_course()
 
     def test_is_visible_to_group(self):
         """
@@ -143,3 +155,90 @@ class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
         Test has_score is true for ora2 problems.
         """
         self.assertTrue(self.open_assessment.has_score)
+
+
+@ddt.ddt
+class XBlockGetParentTest(LmsXBlockMixinTestCase):
+    """
+    Test that XBlock.get_parent returns correct results with each modulestore
+    backend.
+    """
+    def _pre_setup(self):
+        # load the one xml course into the xml store
+        update_module_store_settings(
+            settings.MODULESTORE,
+            mappings={'edX/toy/2012_Fall': ModuleStoreEnum.Type.xml},
+            xml_store_options={
+                'data_dir': settings.COMMON_TEST_DATA_ROOT  # where toy course lives
+            },
+        )
+        super(XBlockGetParentTest, self)._pre_setup()
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml)
+    def test_parents(self, modulestore_type):
+        with self.store.default_store(modulestore_type):
+
+            # setting up our own local course tree here, since it needs to be
+            # created with the correct modulestore type.
+
+            if modulestore_type == 'xml':
+                course_key = self.store.make_course_key('edX', 'toy', '2012_Fall')
+            else:
+                course_key = self.create_toy_course('edX', 'toy', '2012_Fall_copy')
+            course = self.store.get_course(course_key)
+
+            self.assertIsNone(course.get_parent())
+
+            def recurse(parent):
+                """
+                Descend the course tree and ensure the result of get_parent()
+                is the expected one.
+                """
+                visited = []
+                for child in parent.get_children():
+                    self.assertEqual(parent.location, child.get_parent().location)
+                    visited.append(child)
+                    visited += recurse(child)
+                return visited
+
+            visited = recurse(course)
+            self.assertEqual(len(visited), 28)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_parents_draft_content(self, modulestore_type):
+        # move the video to the new vertical
+        with self.store.default_store(modulestore_type):
+            self.build_course()
+            new_vertical = ItemFactory.create(parent=self.subsection, category='vertical', display_name='New Test Unit')
+            child_to_move_location = self.video.location.for_branch(None)
+            new_parent_location = new_vertical.location.for_branch(None)
+            old_parent_location = self.vertical.location.for_branch(None)
+
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                self.assertIsNone(self.course.get_parent())
+
+                with self.store.bulk_operations(self.course.id):
+                    user_id = ModuleStoreEnum.UserID.test
+
+                    old_parent = self.store.get_item(old_parent_location)
+                    old_parent.children.remove(child_to_move_location)
+                    self.store.update_item(old_parent, user_id)
+
+                    new_parent = self.store.get_item(new_parent_location)
+                    new_parent.children.append(child_to_move_location)
+                    self.store.update_item(new_parent, user_id)
+
+                    # re-fetch video from draft store
+                    video = self.store.get_item(child_to_move_location)
+
+                    self.assertEqual(
+                        new_parent_location,
+                        video.get_parent().location
+                    )
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                # re-fetch video from published store
+                video = self.store.get_item(child_to_move_location)
+                self.assertEqual(
+                    old_parent_location,
+                    video.get_parent().location.for_branch(None)
+                )

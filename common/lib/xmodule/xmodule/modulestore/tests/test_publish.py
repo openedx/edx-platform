@@ -47,14 +47,10 @@ class TestPublish(SplitWMongoCourseBoostrapper):
             # For each (4) item created
             #   - try to find draft
             #   - try to find non-draft
-            #   - retrieve draft of new parent
-            #   - get last error
-            #   - load parent
-            #   - load inheritable data
-            #   - load parent
-            #   - load ancestors
+            #   - compute what is parent
+            #   - load draft parent again & compute its parent chain up to course
             # count for updates increased to 16 b/c of edit_info updating
-            with check_mongo_calls(40, 16):
+            with check_mongo_calls(36, 16):
                 self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)
                 self._create_item(
                     'discussion', 'Discussion1',
@@ -96,22 +92,22 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         item = self.draft_mongo.get_item(vert_location, 2)
         # Finds:
         #   1 get draft vert,
-        #   2-10 for each child: (3 children x 3 queries each)
-        #      get draft and then published child
+        #   2 compute parent
+        #   3-14 for each child: (3 children x 4 queries each)
+        #      get draft, compute parent, and then published child
         #      compute inheritance
-        #   11 get published vert
-        #   12-15 get each ancestor (count then get): (2 x 2),
-        #   16 then fail count of course parent (1)
-        #   17 compute inheritance
-        #   18-19 get draft and published vert
+        #   15 get published vert
+        #   16-18 get ancestor chain
+        #   19 compute inheritance
+        #   20-22 get draft and published vert, compute parent
         # Sends:
         #   delete the subtree of drafts (1 call),
         #   update the published version of each node in subtree (4 calls),
         #   update the ancestors up to course (2 calls)
         if mongo_uses_error_check(self.draft_mongo):
-            max_find = 20
+            max_find = 23
         else:
-            max_find = 19
+            max_find = 22
         with check_mongo_calls(max_find, 7):
             self.draft_mongo.publish(item.location, self.user_id)
 
