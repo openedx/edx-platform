@@ -477,6 +477,17 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             update_function
         )
 
+    def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
+        """
+        Updates both the published and draft branches
+        """
+        asset_key = asset_metadata_list[0].asset_id
+        asset_metadata_list[0].asset_id = self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.published_only)
+        # if one call gets an exception, don't do the other call but pass on the exception
+        super(DraftVersioningModuleStore, self).save_asset_metadata_list(asset_metadata_list, user_id, import_only)
+        asset_metadata_list[0].asset_id = self._map_revision_to_branch(asset_key, ModuleStoreEnum.RevisionOption.draft_only)
+        super(DraftVersioningModuleStore, self).save_asset_metadata_list(asset_metadata_list, user_id, import_only)
+
     def _find_course_asset(self, asset_key):
         return super(DraftVersioningModuleStore, self)._find_course_asset(
             self._map_revision_to_branch(asset_key)

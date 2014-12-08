@@ -26,6 +26,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
+from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.xml import CourseLocationManager
@@ -498,3 +499,22 @@ class CourseComparisonTest(BulkAssertionTest):
             actual_thumbs = actual_store.get_all_content_thumbnails_for_course(actual_course_key)
 
             self._assertAssetsEqual(expected_course_key, expected_thumbs, actual_course_key, actual_thumbs)
+
+    def assertAssetsMetadataEqual(self, expected_modulestore, expected_course_key, actual_modulestore, actual_course_key):
+        """
+        Assert that the modulestore asset metdata for the ``expected_course_key`` and the ``actual_course_key``
+        are equivalent.
+        """
+        expected_course_assets = expected_modulestore.get_all_asset_metadata(
+            expected_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
+        )
+        actual_course_assets = actual_modulestore.get_all_asset_metadata(
+            actual_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
+        )
+        self.assertEquals(len(expected_course_assets), len(actual_course_assets))
+        for idx, __ in enumerate(expected_course_assets):
+            for attr in AssetMetadata.ATTRS_ALLOWED_TO_UPDATE:
+                if attr in ('edited_on',):
+                    # edited_on is updated upon import.
+                    continue
+                self.assertEquals(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))

@@ -2225,7 +2225,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # So use the filename as the unique identifier.
         accessor = asset_key.block_type
         for idx, asset in enumerate(structure.setdefault(accessor, [])):
-            if asset['filename'] == asset_key.block_id:
+            if asset['filename'] == asset_key.path:
                 return idx
         return None
 
@@ -2256,7 +2256,45 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 # update the index entry if appropriate
                 self._update_head(asset_key.course_key, index_entry, asset_key.branch, new_structure['_id'])
 
-    def save_asset_metadata(self, asset_metadata, user_id):
+    def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
+        """
+        A wrapper for functions wanting to manipulate assets. Gets and versions the structure,
+        passes the mutable array for all asset types as well as the idx to the function for it to
+        update, then persists the changed data back into the course.
+
+        The update function can raise an exception if it doesn't want to actually do the commit. The
+        surrounding method probably should catch that exception.
+        """
+        asset_key = asset_metadata_list[0].asset_id
+        course_key = asset_key.course_key
+
+        with self.bulk_operations(course_key):
+            original_structure = self._lookup_course(course_key).structure
+            index_entry = self._get_index_if_valid(course_key)
+            new_structure = self.version_structure(course_key, original_structure, user_id)
+
+            # Add all asset metadata to the structure at once.
+            for asset_metadata in asset_metadata_list:
+                metadata_to_insert = asset_metadata.to_storable()
+                asset_md_key = asset_metadata.asset_id
+
+                asset_idx = self._lookup_course_asset(new_structure.setdefault('assets', {}), asset_md_key)
+
+                all_assets = new_structure['assets'][asset_md_key.asset_type]
+                if asset_idx is None:
+                    all_assets.append(metadata_to_insert)
+                else:
+                    all_assets[asset_idx] = metadata_to_insert
+                new_structure['assets'][asset_md_key.asset_type] = all_assets
+
+            # update index if appropriate and structures
+            self.update_structure(course_key, new_structure)
+
+            if index_entry is not None:
+                # update the index entry if appropriate
+                self._update_head(course_key, index_entry, asset_key.branch, new_structure['_id'])
+
+    def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
         """
         The guts of saving a new or updated asset
         """
@@ -2347,7 +2385,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             index_entry = self._get_index_if_valid(dest_course_key)
             new_structure = self.version_structure(dest_course_key, original_structure, user_id)
 
-            new_structure['assets'] = source_structure.get('assets', [])
+            new_structure['assets'] = source_structure.get('assets', {})
             new_structure['thumbnails'] = source_structure.get('thumbnails', [])
 
             # update index if appropriate and structures

@@ -30,7 +30,6 @@ class TestAssetXml(unittest.TestCase):
             self.course_assets.append(asset_md)
 
         # Read in the XML schema definition and make a validator.
-        #xsd_path = path(__file__).abspath().dirname() / xsd_filename
         xsd_path = path(__file__).realpath().parent / xsd_filename
         with open(xsd_path, 'r') as f:
             schema_root = etree.XML(f.read())
@@ -51,7 +50,9 @@ class TestAssetXml(unittest.TestCase):
         new_asset_md = AssetMetadata(new_asset_key)
         new_asset_md.from_xml(asset)
         # Compare asset_md to new_asset_md.
-        for attr in AssetMetadata.ALL_ATTRS:
+        for attr in AssetMetadata.XML_ATTRS:
+            if attr in AssetMetadata.XML_ONLY_ATTRS:
+                continue
             orig_value = getattr(asset_md, attr)
             new_value = getattr(new_asset_md, attr)
             self.assertEqual(orig_value, new_value)
