@@ -8,7 +8,7 @@ define([
 
         getSearchBox = function (options) {
             options = _.defaults(options || {}, {
-                el: $('form.search-box').get(0),
+                el: $('#search-notes-form').get(0),
                 user: 'test_user',
                 courseId: 'test_course_id',
                 beforeSearchStart: jasmine.createSpy(),
@@ -21,19 +21,19 @@ define([
         };
 
         submitForm = function (searchBox, text) {
-            searchBox.$('input').val(text);
-            searchBox.$('button[type=submit]').click();
+            searchBox.$('.search-notes-input').val(text);
+            searchBox.$('.search-notes-submit').click();
         };
 
         assertBoxIsEnabled = function (searchBox) {
             expect(searchBox.$el).not.toHaveClass('is-looking');
-            expect(searchBox.$('button[type=submit]')).not.toHaveClass('is-disabled');
+            expect(searchBox.$('.search-notes-submit')).not.toHaveClass('is-disabled');
             expect(searchBox.isDisabled).toBeFalsy();
         };
 
         assertBoxIsDisabled = function (searchBox) {
             expect(searchBox.$el).toHaveClass('is-looking');
-            expect(searchBox.$('button[type=submit]')).toHaveClass('is-disabled');
+            expect(searchBox.$('.search-notes-submit')).toHaveClass('is-disabled');
             expect(searchBox.isDisabled).toBeTruthy();
         };
 
