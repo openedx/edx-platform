@@ -2,9 +2,10 @@
 Staff view of courseware
 """
 from bok_choy.page_object import PageObject
+from .courseware import CoursewarePage
 
 
-class StaffPage(PageObject):
+class StaffPage(CoursewarePage):
     """
     View of courseware pages while logged in as course staff
     """
@@ -13,6 +14,8 @@ class StaffPage(PageObject):
     STAFF_STATUS_CSS = '#staffstatus'
 
     def is_browser_on_page(self):
+        if not super(StaffPage, self).is_browser_on_page():
+            return False
         return self.q(css=self.STAFF_STATUS_CSS).present
 
     @property

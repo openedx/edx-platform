@@ -118,9 +118,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     Returns the html string
     """
     # grab the table of contents
-    user = User.objects.prefetch_related("groups").get(id=request.user.id)
-    request.user = user	 # keep just one instance of User
-    toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
+    toc = toc_for_course(request, course, chapter, section, field_data_cache)
 
     context = dict([
         ('toc', toc),
@@ -325,10 +323,15 @@ def index(request, course_id, chapter=None, section=None,
 
     request.user = user  # keep just one instance of User
     with modulestore().bulk_operations(course_key):
-        return _index_bulk_op(request, user, course_key, chapter, section, position)
+        return _index_bulk_op(request, course_key, chapter, section, position)
 
 
-def _index_bulk_op(request, user, course_key, chapter, section, position):
+# pylint: disable=too-many-statements
+def _index_bulk_op(request, course_key, chapter, section, position):
+    """
+    Render the index page for the specified course.
+    """
+    user = request.user
     course = get_course_with_access(user, 'load', course_key, depth=2)
 
     staff_access = has_access(user, 'staff', course)

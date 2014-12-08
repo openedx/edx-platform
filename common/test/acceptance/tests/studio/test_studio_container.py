@@ -678,7 +678,7 @@ class UnitPublishingTest(ContainerBase):
         """
         Verifies that the browser is on the staff page and returns a StaffPage.
         """
-        page = StaffPage(self.browser)
+        page = StaffPage(self.browser, self.course_id)
         EmptyPromise(page.is_browser_on_page, 'Browser is on staff page in LMS').fulfill()
         return page
 
