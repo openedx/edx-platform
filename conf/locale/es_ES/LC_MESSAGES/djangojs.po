@@ -22,6 +22,7 @@
 # Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
 # UAMx <uamx.dev@gmail.com>, 2014
 # valenciaupv <valenciaupv@gmail.com>, 2014
+# Valeria Freire <valtodopds@hotmail.com>, 2014
 # Vanesa Lopez- Roman Perez <vanesalrp@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -39,6 +40,7 @@
 # leosamu <leosamu@gmail.com>, 2014
 # mcolomer <mcmlilhity@gmail.com>, 2014
 # Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
+# UAMx <uamx.dev@gmail.com>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -49,6 +51,7 @@
 # Enrique Centelles <ecentelles2003@yahoo.es>, 2014
 # Steven McArthur <inactive+legallyunemployed@transifex.com>, 2014
 # MiguelSdP <miguelsdp@gmail.com>, 2014
+# Valeria Freire <valtodopds@hotmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -64,7 +67,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:35-0500\n"
+"POT-Creation-Date: 2014-12-08 08:16-0500\n"
 "PO-Revision-Date: 2014-11-02 10:11+0000\n"
 "Last-Translator: Enrique Centelles <ecentelles2003@yahoo.es>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"

@@ -99,6 +99,8 @@
 # Natalia, 2013
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # Raúl Aguilera Ortega <raguiler@db.uc3m.es>, 2014
+# UAMx <uamx.dev@gmail.com>, 2014
+# Valeria Freire <valtodopds@hotmail.com>, 2014
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -120,7 +122,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:37-0500\n"
+"POT-Creation-Date: 2014-12-08 08:18-0500\n"
 "PO-Revision-Date: 2014-10-27 15:11+0000\n"
 "Last-Translator: spentamanyu <i.delamo@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"
@@ -2070,6 +2072,7 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Advanced Module List"
 msgstr ""
 
@@ -2659,6 +2662,18 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "No email address found."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+msgid "Enter the name of the library as it should appear in Studio."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+msgid "Library Display Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+msgid "Enter the names of the advanced components to use in your library."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -4144,6 +4159,12 @@ msgid "Task is already running."
 msgstr "La tarea ya está en marcha."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Make sure that the file you upload is in CSV format with no extraneous "
+"characters or rows."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Could not read uploaded file."
 msgstr ""
 
@@ -5213,6 +5234,12 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Code '{0}' is not valid for any course in the shopping cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid ""
+"Cart item quantity should not be greater than 1 when applying activation "
+"code"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -7213,7 +7240,7 @@ msgstr "Tablero de puntuación para acertijos"
 msgid "User"
 msgstr "Usuario"
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "About edX"
 msgstr ""
 
@@ -7234,10 +7261,6 @@ msgstr ""
 
 #: lms/templates/footer-edx-new.html
 msgid "(Revised 4/16/2014)"
-msgstr ""
-
-#: lms/templates/footer-edx-new.html
-msgid "About & Company Info"
 msgstr ""
 
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
@@ -9459,6 +9482,17 @@ msgstr ""
 msgid "and proceed to verification"
 msgstr ""
 
+#. Translators: This line appears next a checkbox which users can leave
+#. checked
+#. or uncheck in order
+#. to indicate whether they want to receive emails from the organization
+#. offering the course.
+#: lms/templates/courseware/mktg_course_about.html
+msgid ""
+"I would like to receive email about other {organization_full_name} programs "
+"and offers."
+msgstr ""
+
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Enrollment Is Closed"
 msgstr ""
@@ -9670,16 +9704,9 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You can no longer access this course because payment has not yet been "
-"received. you can <a href=\"#\">contact the account holder</a> to request "
-"payment, or you can"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "unenroll"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "for this course."
+"received. You can {link_start}contact the account holder{link_end} to "
+"request payment, or you can {unenroll_link_start}unenroll{unenroll_link_end}"
+" from this course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -10329,11 +10356,7 @@ msgid "It is recommended that you change your password."
 msgstr ""
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "Sincerely yours,"
-msgstr ""
-
-#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "The {course_name} Team"
+msgid "Sincerely yours,The {course_name} Team"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -10358,7 +10381,6 @@ msgid "We hope you enjoy learning with {platform_name}!"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr ""
@@ -10532,9 +10554,25 @@ msgid "Warm regards,"
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Warm regards,<br>The {platform_name} Team"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Dear [[Name]]"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
-"(1) Register for an account at <a href='https://{site_name}' "
-">https://{site_name}</a>."
+"To enroll in ${course_names} we have provided a registration URL for you.  "
+"Please follow the instructions below to claim your access."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Your redeem url is: [[Enter Redeem URL here from the attached CSV]]"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "(1) Register for an account at {site_name}"
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
@@ -10551,13 +10589,16 @@ msgstr ""
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
 "(4) You should be able to click on 'view course' button or see your course "
-"on your student dashboard at <a "
-"href='https://{dashboard_url}'>https://{dashboard_url}</a>"
+"on your student dashboard at {url}"
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
 "(5) Course materials will not be available until the course start date."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "<p>Sincerely,</p><p>[[Your Signature]]</p>"
 msgstr ""
 
 #: lms/templates/emails/confirm_email_change.txt
@@ -10701,11 +10742,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Thanks,"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Your {platform_name} Team"
+msgid "Thanks,The {platform_name} Team"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10723,11 +10760,11 @@ msgid "Your redeem code is: [[Enter Redeem Code here from the attached CSV]]"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "(1) Register for an account at https://{site_name}."
+msgid "(1) Register for an account at {site_name}."
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "(2) Once registered, navigate to https://{course_url}"
+msgid "(2) Once registered, navigate to {course_url}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10736,8 +10773,8 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"(4) On the shopping cart page, enter your redeem code and click apply code. "
-"This will make payment equal to $0."
+"(4) On the shopping cart page, enter your redeem code and click 'Apply "
+"Code'. This will make payment equal to $0."
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10747,7 +10784,7 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
 "(6) You should be able to see your course on your student dashboard at "
-"https://{dashboard_url}"
+"{dashboard_url}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10756,11 +10793,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Sincerely,"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "[[Your Signature]]"
+msgid "Sincerely,[[Your Signature]]"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt

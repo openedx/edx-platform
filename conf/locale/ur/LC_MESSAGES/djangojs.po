@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Majid Hussain Malik <90skype@gmail.com>, 2014
 # Sara Samad <Sahabsas@gmail.com>, 2014
 # mzeeshan <zeeshanriaz@msn.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -28,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:35-0500\n"
+"POT-Creation-Date: 2014-12-08 08:16-0500\n"
 "PO-Revision-Date: 2014-10-08 18:08+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Urdu (http://www.transifex.com/projects/p/edx-platform/language/ur/)\n"

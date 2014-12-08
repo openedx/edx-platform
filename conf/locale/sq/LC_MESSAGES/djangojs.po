@@ -31,8 +31,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:35-0500\n"
-"PO-Revision-Date: 2014-11-29 18:02+0000\n"
+"POT-Creation-Date: 2014-12-08 08:16-0500\n"
+"PO-Revision-Date: 2014-12-05 16:31+0000\n"
 "Last-Translator: Faton Nuha <faton11@live.com>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/edx-platform/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -3838,7 +3838,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
 msgid "%(cohort_name)s (%(user_count)s)"
-msgstr ""
+msgstr "%(cohort_name)s (%(user_count)s)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Cohort Management"
@@ -3860,7 +3860,7 @@ msgstr ""
 
 #: lms/templates/student_account/access.underscore
 msgid "Welcome!"
-msgstr ""
+msgstr "Mirë se erdhët!"
 
 #: lms/templates/student_account/access.underscore
 msgid "Log in or register to take courses from the world's best universities."
@@ -3871,6 +3871,8 @@ msgid ""
 "Sorry, we're having some technical problems. Wait a few minutes and try "
 "again."
 msgstr ""
+"Na falni, ne kemi disa probleme teknike. Prisni disa minuta dhe pastaj "
+"provoni përsëri."
 
 #: lms/templates/student_account/access.underscore
 #: lms/templates/student_account/access.underscore
@@ -3915,7 +3917,7 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid "Log in"
-msgstr ""
+msgstr "Kyçu"
 
 #: lms/templates/student_account/login.underscore
 msgid "Log in using %(name)s"
@@ -3965,7 +3967,7 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Register"
-msgstr ""
+msgstr "Regjistrohu"
 
 #: lms/templates/student_account/register.underscore
 msgid "Required field"
