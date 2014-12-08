@@ -328,7 +328,7 @@ class EdxNotesPageTest(UniqueCourseTest):
         Then I see only "You do not have any notes within the course." message
         """
         self.notes_page.visit()
-        self.assertEqual("You do not have any notes within the course.", self.notes_page.no_content_text)
+        self.assertIn("YOU HAVEN NOT MADE ANY NOTES IN THIS COURSE YET.", self.notes_page.no_content_text)
 
     def test_recent_activity_view(self):
         """
@@ -341,10 +341,16 @@ class EdxNotesPageTest(UniqueCourseTest):
         self._add_default_notes()
 
         def assertContent(item, text=None, quote=None, unit_name=None, time_updated=None):
-            self.assertEqual(item.text, text)
-            self.assertEqual(item.quote, quote)
-            self.assertEqual(item.unit_name, unit_name)
-            self.assertEqual(item.time_updated, time_updated)
+            if item.text is not None:
+                self.assertEqual(text, item.text)
+            else:
+                self.assertIsNone(text)
+            if item.quote is not None:
+                self.assertIn(quote, item.quote)
+            else:
+                self.assertIsNone(quote)
+            self.assertEqual(unit_name, item.unit_name)
+            self.assertEqual(time_updated, item.time_updated)
             if text is not None and quote is not None:
                 self.assertEqual(item.title_highlighted, "HIGHLIGHTED & NOTED IN:")
             elif text is not None:

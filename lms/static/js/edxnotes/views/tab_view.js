@@ -28,7 +28,7 @@ define([
         createTab: function () {
             this.tabModel = new TabModel(this.tabInfo);
             this.options.tabsCollection.add(this.tabModel);
-            this.tabModel.on({
+            this.listenTo(this.tabModel, {
                 'change:is_active': function (model, value) {
                     if (value) {
                         this.render();
@@ -41,7 +41,7 @@ define([
                     this.tabModel = null;
                     this.onClose();
                 }
-            }, this);
+            });
         },
 
         /**
@@ -56,8 +56,8 @@ define([
         },
 
         renderContent: function () {
-            var contentView = this.getSubView();
-            this.$('.course-info').append(contentView.render().$el);
+            this.contentView = this.getSubView();
+            this.$('.wrapper-tabs').append(this.contentView.render().$el);
             return $.Deferred().resolve().promise();
         },
 
@@ -67,7 +67,9 @@ define([
         },
 
         destroySubView: function () {
-            this.$('.edx-notes-page-items-list').remove();
+            if (this.contentView) {
+                this.contentView.remove();
+            }
         },
 
         /**
