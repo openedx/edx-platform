@@ -12,6 +12,53 @@ from .utils.envs import Env
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("system=", "s", "System to act on"),
+])
+def find_fixme(options):
+    """
+    Run pylint on system code, only looking for fixme items.
+    """
+    num_fixme = 0
+    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+
+    for system in systems:
+        # Directory to put the pylint report in.
+        # This makes the folder if it doesn't already exist.
+        report_dir = (Env.REPORT_DIR / system).makedirs_p()
+
+        apps = [system]
+
+        for directory in ['djangoapps', 'lib']:
+            dirs = os.listdir(os.path.join(system, directory))
+            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
+
+        apps_list = ' '.join(apps)
+
+        pythonpath_prefix = (
+            "PYTHONPATH={system}:{system}/djangoapps:{system}/"
+            "lib:common/djangoapps:common/lib".format(
+                system=system
+            )
+        )
+
+        sh(
+            "{pythonpath_prefix} pylint --disable R,C,W,E --enable=fixme "
+            "-f parseable {apps} | tee {report_dir}/pylint_fixme.report".format(
+                pythonpath_prefix=pythonpath_prefix,
+                apps=apps_list,
+                report_dir=report_dir
+            )
+        )
+
+        num_fixme += _count_pylint_violations(
+            "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
+
+    print("Number of pylint fixmes: " + str(num_fixme))
+
+
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
+@cmdopts([
+    ("system=", "s", "System to act on"),
     ("errors", "e", "Check for errors only"),
     ("limit=", "l", "limit for number of acceptable violations"),
 ])
