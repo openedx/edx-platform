@@ -68,7 +68,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:35-0500\n"
+"POT-Creation-Date: 2014-12-08 08:16-0500\n"
 "PO-Revision-Date: 2014-12-01 00:10+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -2443,7 +2443,7 @@ msgstr "خطأ: لا يمكنك حذف نفسك من مجموعة أستاذ ا�
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Errors"
-msgstr ""
+msgstr "أخطاء"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following errors were generated:"
@@ -2451,7 +2451,7 @@ msgstr "نتجت الأخطاء التالية:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Warnings"
-msgstr ""
+msgstr "تحذيرات"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following warnings were generated:"
@@ -2459,7 +2459,7 @@ msgstr "نتجت التحذيرات التالية:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Success"
-msgstr ""
+msgstr "جرت العملية بنجاح"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "All accounts were created successfully."
@@ -4230,26 +4230,30 @@ msgstr ""
 
 #: lms/templates/student_account/access.underscore
 msgid "Welcome!"
-msgstr ""
+msgstr "مرحبًا!"
 
 #: lms/templates/student_account/access.underscore
 msgid "Log in or register to take courses from the world's best universities."
 msgstr ""
+"يُرجى تسجيل الدخول أو التسجيل في المساق للالتحاق بمساقات مقدّمة من أهمّ "
+"الجامعات في العالم. "
 
 #: lms/templates/student_account/access.underscore
 msgid ""
 "Sorry, we're having some technical problems. Wait a few minutes and try "
 "again."
 msgstr ""
+"عذرًا، هناك بعض المشاكل التقنية. يُرجى الانتظار بضع دقائق ثمّ إعادة "
+"المحاولة.   "
 
 #: lms/templates/student_account/access.underscore
 #: lms/templates/student_account/access.underscore
 msgid "I am a new user"
-msgstr ""
+msgstr "أنا مستخدم جديد"
 
 #: lms/templates/student_account/access.underscore
 msgid "I am a returning user"
-msgstr ""
+msgstr "أنا مستخدم عائد"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -4270,7 +4274,7 @@ msgstr "إعادة ضبط كلمة السر"
 
 #: lms/templates/student_account/form_field.underscore
 msgid "Forgot password?"
-msgstr ""
+msgstr "هل نسيت كلمة المرور؟"
 
 #: lms/templates/student_account/login.underscore
 msgid ""
@@ -4278,68 +4282,77 @@ msgid ""
 "%(currentProvider)s account isn't linked with an %(platformName)s account. "
 "To link your accounts, go to your %(platformName)s dashboard."
 msgstr ""
+"نجح تسجيل دخولك في %(currentProvider)s، لكنّ حسابك لدى %(currentProvider)s "
+"غير مرتبط بحساب %(platformName)s. لذا يُرجى الذهاب إلى لوحة معلوماتك "
+"%(platformName)s لربط حساباتك."
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't log you in."
-msgstr ""
+msgstr "عذرًا، لم نتمكّن من تسجيل دخولك. "
 
 #: lms/templates/student_account/login.underscore
 msgid "Log in"
-msgstr ""
+msgstr "تسجيل الدخول"
 
 #: lms/templates/student_account/login.underscore
 msgid "Log in using %(name)s"
-msgstr ""
+msgstr "تسجيل الدخول باستخدام %(name)s"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
 "Enter the email address you used to create your account. We'll send you a "
 "link you can use to reset your password."
 msgstr ""
+"يُرجى إدخال عنوان البريد الإكتروني الذي استخدمته لإنشاء حسابك، وسنرسل لك "
+"رابطًا يمكنك استخدامه لإعادة ضبط كلمة مرورك.  "
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "An error occurred."
-msgstr ""
+msgstr "نأسف لحدوث خطأ. "
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Reset password"
-msgstr ""
+msgstr "إعادة ضبط كلمة المرور"
 
 #: lms/templates/student_account/password_reset.underscore
 msgid "Password Reset Email Sent"
-msgstr ""
+msgstr "أرسلنا رسالة بالبريد الإلكتروني لضبط كلمة المرور."
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
 "We've sent instructions for resetting your password to the email address you"
 " provided."
 msgstr ""
+"أرسلنا لك التعليمات اللازمة لتعيد ضبط كلمة مرورك لعنوان البريد الإلكتروني "
+"الذي حدّدته.  "
 
 #: lms/templates/student_account/register.underscore
 msgid "You've successfully logged into %(currentProvider)s."
-msgstr ""
+msgstr "نجح تسجيل دخولك في %(currentProvider)s. "
 
 #: lms/templates/student_account/register.underscore
 msgid ""
 "We just need a little more information before you start learning with "
 "%(platformName)s."
 msgstr ""
+"نحتاج فقط إلى قليل من المعلومات الإضافية قبل أن تبدأ بالتعلّم مع "
+"%(platformName)s. "
 
 #: lms/templates/student_account/register.underscore
 msgid "Register using %(name)s"
-msgstr ""
+msgstr "التسجيل باستخدام %(name)s"
 
 #: lms/templates/student_account/register.underscore
 msgid "We couldn't complete your registration."
-msgstr ""
+msgstr "عذرًا، لم نتمكّن من إكمال تسجيلك. "
 
 #: lms/templates/student_account/register.underscore
 msgid "Register"
-msgstr ""
+msgstr "التسجيل"
 
 #: lms/templates/student_account/register.underscore
 msgid "Required field"
-msgstr ""
+msgstr "حقل مطلوب"
 
 #: lms/templates/student_profile/profile.underscore
 msgid "Full Name"
