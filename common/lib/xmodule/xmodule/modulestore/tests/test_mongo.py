@@ -717,15 +717,16 @@ class TestMongoKeyValueStore(object):
     def setUp(self):
         self.data = {'foo': 'foo_value'}
         self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        self.parent = self.course_id.make_usage_key('parent', 'p')
         self.children = [self.course_id.make_usage_key('child', 'a'), self.course_id.make_usage_key('child', 'b')]
         self.metadata = {'meta': 'meta_val'}
-        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata)
+        self.kvs = MongoKeyValueStore(self.data, self.parent, self.children, self.metadata)
 
     def test_read(self):
         assert_equals(self.data['foo'], self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'foo')))
+        assert_equals(self.parent, self.kvs.get(KeyValueStore.Key(Scope.parent, None, None, 'parent')))
         assert_equals(self.children, self.kvs.get(KeyValueStore.Key(Scope.children, None, None, 'children')))
         assert_equals(self.metadata['meta'], self.kvs.get(KeyValueStore.Key(Scope.settings, None, None, 'meta')))
-        assert_equals(None, self.kvs.get(KeyValueStore.Key(Scope.parent, None, None, 'parent')))
 
     def test_read_invalid_scope(self):
         for scope in (Scope.preferences, Scope.user_info, Scope.user_state):
@@ -735,7 +736,7 @@ class TestMongoKeyValueStore(object):
             assert_false(self.kvs.has(key))
 
     def test_read_non_dict_data(self):
-        self.kvs = MongoKeyValueStore('xml_data', self.children, self.metadata)
+        self.kvs = MongoKeyValueStore('xml_data', self.parent, self.children, self.metadata)
         assert_equals('xml_data', self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'data')))
 
     def _check_write(self, key, value):
@@ -746,9 +747,10 @@ class TestMongoKeyValueStore(object):
         yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'foo'), 'new_data')
         yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
         yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
+        # write Scope.parent raises InvalidScope, which is covered in test_write_invalid_scope
 
     def test_write_non_dict_data(self):
-        self.kvs = MongoKeyValueStore('xml_data', self.children, self.metadata)
+        self.kvs = MongoKeyValueStore('xml_data', self.parent, self.children, self.metadata)
         self._check_write(KeyValueStore.Key(Scope.content, None, None, 'data'), 'new_data')
 
     def test_write_invalid_scope(self):
