@@ -119,8 +119,11 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                         // Notify the runtime that the page has been successfully shown
                         xblockView.notifyRuntime('page-shown', self);
 
-                        // Render the add buttons
-                        self.renderAddXBlockComponents();
+                        // Render the add buttons. Paged containers should do this on their own.
+                        if (!self.enable_paging) {
+                            // Render the add buttons
+                            self.renderAddXBlockComponents();
+                        }
 
                         // Refresh the views now that the xblock is visible
                         self.onXBlockRefresh(xblockView);
@@ -141,8 +144,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 return this.xblockView.model.urlRoot;
             },
 
-            onXBlockRefresh: function(xblockView) {
-                this.xblockView.refresh();
+            onXBlockRefresh: function(xblockView, block_added) {
+                this.xblockView.refresh(block_added);
                 // Update publish and last modified information from the server.
                 this.model.fetch();
             },
@@ -274,10 +277,10 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     rootLocator = this.xblockView.model.id;
                 if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
                     this.render({refresh: true, block_added: block_added});
-                } else if (parentElement.hasClass('reorderable-container')) {
-                    this.refreshChildXBlock(xblockElement);
+                } else if (parentElement.hasClass('reorderable-container') || this.enable_paging) {
+                    this.refreshChildXBlock(xblockElement, block_added);
                 } else {
-                    this.refreshXBlock(this.findXBlockElement(parentElement), block_added);
+                    this.refreshXBlock(this.findXBlockElement(parentElement));
                 }
             },
 
@@ -285,9 +288,11 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
              * Refresh an xblock element inline on the page, using the specified xblockInfo.
              * Note that the element is removed and replaced with the newly rendered xblock.
              * @param xblockElement The xblock element to be refreshed.
+             * @param block_added Specifies if a block has been added, rather than just needs
+             * refreshing.
              * @returns {jQuery promise} A promise representing the complete operation.
              */
-            refreshChildXBlock: function(xblockElement) {
+            refreshChildXBlock: function(xblockElement, block_added) {
                 var self = this,
                     xblockInfo,
                     TemporaryXBlockView,
@@ -313,7 +318,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
                 return temporaryView.render({
                     success: function() {
-                        self.onXBlockRefresh(temporaryView);
+                        self.onXBlockRefresh(temporaryView, block_added);
                         temporaryView.unbind();  // Remove the temporary view
                     }
                 });
