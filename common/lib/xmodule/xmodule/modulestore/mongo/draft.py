@@ -643,6 +643,9 @@ class DraftModuleStore(MongoModuleStore):
 
         Raises:
             ItemNotFoundError: if any of the draft subtree nodes aren't found
+
+        Returns:
+            The newly published xblock
         """
         # NOTE: cannot easily use self._breadth_first b/c need to get pub'd and draft as pairs
         # (could do it by having 2 breadth first scans, the first to just get all published children
