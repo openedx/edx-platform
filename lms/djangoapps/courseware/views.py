@@ -11,6 +11,7 @@ from datetime import datetime
 from collections import defaultdict
 from django.utils import translation
 from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -803,7 +804,7 @@ def course_about(request, course_id):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous('organization_full_name')
+@cache_if_anonymous('org')
 @ensure_valid_course_key
 def mktg_course_about(request, course_id):
     """This is the button that gets put into an iframe on the Drupal site."""
@@ -844,10 +845,37 @@ def mktg_course_about(request, course_id):
     }
 
     if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
-        # Drupal will pass the organization's full name as a GET parameter. If no full name
-        # is provided, the marketing iframe won't show the email opt-in checkbox.
-        organization_full_name = request.GET.get('organization_full_name')
-        context['organization_full_name'] = cgi.escape(organization_full_name) if organization_full_name else organization_full_name
+        # Drupal will pass organization names using a GET parameter, as follows:
+        #     ?org=Harvard
+        #     ?org=Harvard,MIT
+        # If no full names are provided, the marketing iframe won't show the
+        # email opt-in checkbox.
+        org = request.GET.get('org')
+        if org:
+            org_list = org.split(',')
+            # HTML-escape the provided organization names
+            org_list = [cgi.escape(org) for org in org_list]
+            if len(org_list) > 1:
+                if len(org_list) > 2:
+                    # Translators: The join of three or more institution names (e.g., Harvard, MIT, and Dartmouth).
+                    org_name_string = _("{first_institutions}, and {last_institution}").format(
+                        first_institutions=u", ".join(org_list[:-1]),
+                        last_institution=org_list[-1]
+                    )
+                else:
+                    # Translators: The join of two institution names (e.g., Harvard and MIT).
+                    org_name_string = _("{first_institution} and {second_institution}").format(
+                        first_institution=org_list[0],
+                        second_institution=org_list[1]
+                    )
+            else:
+                org_name_string = org_list[0]
+
+            context['checkbox_label'] = ungettext(
+                "I would like to receive email from {institution_series} and learn about its other programs.",
+                "I would like to receive email from {institution_series} and learn about their other programs.",
+                len(org_list)
+            ).format(institution_series=org_name_string)
 
     # The edx.org marketing site currently displays only in English.
     # To avoid displaying a different language in the register / access button,
