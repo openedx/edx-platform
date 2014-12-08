@@ -718,7 +718,7 @@ class StaffLockTest(CourseOutlineTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_sections, 2)
-        StaffPage(self.browser).toggle_staff_view()
+        StaffPage(self.browser, self.course_id).toggle_staff_view()
         self.assertEqual(courseware.num_sections, 1)
 
     def test_locked_subsections_do_not_appear_in_lms(self):
@@ -737,7 +737,7 @@ class StaffLockTest(CourseOutlineTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_subsections, 2)
-        StaffPage(self.browser).toggle_staff_view()
+        StaffPage(self.browser, self.course_id).toggle_staff_view()
         self.assertEqual(courseware.num_subsections, 1)
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):

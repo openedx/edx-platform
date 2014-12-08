@@ -7,7 +7,7 @@
 #       http://www.apache.org/licenses/LICENSE-2.0
 #
 #   Unless required by applicable law or agreed to in writing, software
-#   distribuetd under the License is distributed on an "AS IS" BASIS,
+#   distributed under the License is distributed on an "AS IS" BASIS,
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
@@ -22,10 +22,24 @@ REQUEST_CONTEXT = threading.local()
 class MakoMiddleware(object):
 
     def process_request(self, request):
-        REQUEST_CONTEXT.context = RequestContext(request)
-        REQUEST_CONTEXT.context['is_secure'] = request.is_secure()
-        REQUEST_CONTEXT.context['site'] = safe_get_host(request)
+        """ Process the middleware request. """
+        REQUEST_CONTEXT.request = request
 
-    def process_response(self, request, response):
-        REQUEST_CONTEXT.context = None
+    def process_response(self, __, response):
+        """ Process the middleware response. """
+        REQUEST_CONTEXT.request = None
         return response
+
+
+def get_template_request_context():
+    """
+    Returns the template processing context to use for the current request,
+    or returns None if there is not a current request.
+    """
+    request = getattr(REQUEST_CONTEXT, "request", None)
+    if not request:
+        return None
+    context = RequestContext(request)
+    context['is_secure'] = request.is_secure()
+    context['site'] = safe_get_host(request)
+    return context
