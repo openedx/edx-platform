@@ -130,6 +130,34 @@ def add_component(page, item_type, specific_type):
     page.wait_for_ajax()
 
 
+def add_html_component(page, menu_index, boilerplate=None):
+    """
+    Adds an instance of the HTML component with the specified name.
+
+    menu_index specifies which instance of the menus should be used (based on vertical
+    placement within the page).
+    """
+    # Click on the HTML icon.
+    page.wait_for_component_menu()
+    click_css(page, 'a>span.large-html-icon', menu_index, require_notification=False)
+
+    # Make sure that the menu of HTML components is visible before clicking
+    page.wait_for_element_visibility('.new-component-html', 'HTML component menu is visible')
+
+    # Now click on the component to add it.
+    component_css = 'a[data-category=html]'
+    if boilerplate:
+        component_css += '[data-boilerplate={}]'.format(boilerplate)
+    else:
+        component_css += ':not([data-boilerplate])'
+
+    page.wait_for_element_visibility(component_css, 'HTML component {} is visible'.format(boilerplate))
+
+    # Adding some components will make an ajax call but we should be OK because
+    # the click_css method is written to handle that.
+    click_css(page, component_css, 0)
+
+
 @js_defined('window.jQuery')
 def type_in_codemirror(page, index, text, find_prefix="$"):
     script = """

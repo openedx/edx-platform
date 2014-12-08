@@ -21,7 +21,7 @@
 git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@9c634481dfc85a17dcb3351ca232d7098a38e10e#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@3682847a91acac6640a330fbe797ef56ce988517#egg=XBlock
 -e git+https://github.com/edx/codejail.git@2b095e820ff752a108653bb39d518b122f7154db#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
@@ -36,3 +36,4 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 -e git+https://github.com/edx/edx-val.git@ba00a5f2e0571e9a3f37d293a98efe4cbca850d5#egg=edx-val
 -e git+https://github.com/pmitros/RecommenderXBlock.git@b41ba8778b98da0ea680ffb8bbc59492d669df2d#egg=recommender-xblock
 -e git+https://github.com/edx/edx-milestones.git@4dfe78a2aae9559ccc979746d13a9b67f0ec311e#egg=edx-milestones
+-e git+https://github.com/edx/edx-search.git@04cc480a9a4c56d642deec758d2eb620e50cb30a#egg=edx-search

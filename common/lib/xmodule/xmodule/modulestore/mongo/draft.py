@@ -21,7 +21,13 @@ from xmodule.modulestore.mongo.base import (
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
+from search.search_engine_base import SearchEngine
+
 log = logging.getLogger(__name__)
+
+# Use default index and document names for now
+INDEX_NAME = "courseware_index"
+DOCUMENT_TYPE = "courseware_content"
 
 
 def wrap_draft(item):
@@ -37,6 +43,7 @@ def wrap_draft(item):
 
 
 class DraftModuleStore(MongoModuleStore):
+
     """
     This mixin modifies a modulestore to give it draft semantics.
     Edits made to units are stored to locations that have the revision DRAFT.
@@ -46,6 +53,7 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
+
     def get_item(self, usage_key, depth=0, revision=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
@@ -509,7 +517,8 @@ class DraftModuleStore(MongoModuleStore):
                 parent_locations = [draft_parent.location]
         # there could be 2 parents if
         #   Case 1: the draft item moved from one parent to another
-        #   Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single parent has 2 versions: draft and published
+        # Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single
+        # parent has 2 versions: draft and published
         for parent_location in parent_locations:
             # don't remove from direct_only parent if other versions of this still exists (this code
             # assumes that there's only one parent_location in this case)
@@ -540,6 +549,8 @@ class DraftModuleStore(MongoModuleStore):
                 ]
             )
         self._delete_subtree(location, as_functions)
+
+        self.do_index(location, delete=True)
 
     def _delete_subtree(self, location, as_functions, draft_only=False):
         """
@@ -632,6 +643,77 @@ class DraftModuleStore(MongoModuleStore):
         else:
             return False
 
+    def do_index(self, location, delete=False):
+        """
+        Main routine to index (for purposes of searching) from given location and other stuff on down
+        """
+        # TODO - inline for now, need to move this out to a celery task
+        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        if not searcher:
+            return
+
+        location_info = {
+            "course": unicode(location.course_key),
+        }
+
+        def _fetch_item(item_location):
+            """ Fetch the item from the modulestore location, log if not found, but continue """
+            try:
+                item = self.get_item(item_location, revision=ModuleStoreEnum.RevisionOption.published_only)
+            except ItemNotFoundError:
+                log.warning('Cannot find: %s', item_location)
+                return None
+
+            return item
+
+        def index_item_location(item_location, current_start_date):
+            """ add this item to the search index """
+            item = _fetch_item(item_location)
+            if item:
+                if item.start and (not current_start_date or item.start > current_start_date):
+                    current_start_date = item.start
+
+                if item.has_children:
+                    for child_loc in item.children:
+                        index_item_location(child_loc, current_start_date)
+
+                item_index = {}
+                item_index.update(location_info)
+                item_index.update(item.index_dictionary())
+                item_index.update({
+                    'id': unicode(item.scope_ids.usage_id),
+                })
+
+                if current_start_date:
+                    item_index.update({
+                        "start_date": current_start_date
+                    })
+
+                searcher.index(DOCUMENT_TYPE, item_index)
+
+        def remove_index_item_location(item_location):
+            """ remove this item from the search index """
+            item = _fetch_item(item_location)
+            if item:
+                if item.has_children:
+                    for child_loc in item.children:
+                        remove_index_item_location(child_loc)
+
+                searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
+
+        try:
+            if delete:
+                remove_index_item_location(location)
+            else:
+                index_item_location(location, None)
+        except Exception as err:  # pylint: disable=broad-except
+            # broad exception so that index operation does not prevent the rest of the application from working
+            log.exception(
+                "Indexing error encountered, courseware index may be out of date %s - %s",
+                location.course_key,
+                str(err)
+            )
+
     def publish(self, location, user_id, **kwargs):
         """
         Publish the subtree rooted at location to the live course and remove the drafts.
@@ -713,6 +795,9 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
+
+        self.do_index(location)
+
         return self.get_item(as_published(location))
 
     def unpublish(self, location, user_id, **kwargs):
