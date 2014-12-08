@@ -135,18 +135,8 @@ class User(models.Model):
             thread_count=response.get('thread_count', 0)
         )
 
-    def social_stats(self):
-        if not self.course_id:
-            raise CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
-
-        url = _url_for_user_social_stats(self.id)
-        params = {'course_id': self.course_id}
-        response = perform_request(
-            'get',
-            url,
-            params
-        )
-        return response
+    def social_stats(self, end_date=None):
+        return get_user_social_stats(self.id, self.course_id, end_date=end_date)
 
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)

@@ -40,6 +40,22 @@ from notification_prefs import NOTIFICATION_PREF_KEY
 TEST_API_KEY = str(uuid.uuid4())
 
 
+def _fake_get_user_social_stats(user_id, course_id, end_date=None):
+    if not end_date:
+        raise Exception('Expected None end_date parameter')
+
+    return {
+        '1': {'foo':'bar'}
+    }
+
+def _fake_get_user_social_stats_with_end(user_id, course_id, end_date=None):
+    if not end_date:
+        raise Exception('Expected non-None end_date parameter')
+
+    return {
+        '1': {'foo':'bar'}
+    }
+
 class SecureClient(Client):
 
     """ Django test client using a "secure" connection. """
@@ -1578,6 +1594,20 @@ class UsersApiTests(ModuleStoreTestCase):
         test_uri = '{}/12345/courses/{}/metrics/social/'.format(self.users_base_uri, self.course.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
+
+    @mock.patch("api_manager.users.views.get_user_social_stats", _fake_get_user_social_stats)
+    def test_users_social_metrics(self):
+        test_uri = '{}/{}/courses/{}/metrics/social/'.format(self.users_base_uri, self.user.id, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+
+    @mock.patch("api_manager.users.views.get_user_social_stats", _fake_get_user_social_stats_with_end)
+    def test_users_social_metrics_end_date(self):
+        course = CourseFactory.create(org='TUCGLG', run='TUCGLG1', end=datetime(2012, 1, 1))
+
+        test_uri = '{}/{}/courses/{}/metrics/social/'.format(self.users_base_uri, self.user.id, course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
 
     def test_users_roles_list_get(self):
         allow_access(self.course, self.user, 'staff')
