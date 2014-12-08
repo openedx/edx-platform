@@ -1473,7 +1473,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             course_key (CourseKey): course identifier
 
         Returns:
-            Asset info for the course
+            Dict with (at least) an '_id' key, identifying the relevant Mongo doc. If asset metadata
+            exists, other keys will be the other asset types with values as lists of asset metadata.
         """
         # Using the course_key, find or insert the course asset metadata document.
         # A single document exists per course to store the course asset metadata.
@@ -1482,11 +1483,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             {'course_id': unicode(course_key)},
         )
 
-        # Pass back 'assets' dict but add the '_id' key to it for document update purposes.
         if course_assets is None:
-            # Not found, so create.
-            course_assets = {'course_id': unicode(course_key), 'assets': {}}
-            course_assets['assets']['_id'] = self.asset_collection.insert(course_assets)
+            # Check to see if the course is created in the course collection.
+            if self.get_course(course_key) is None:
+                raise ItemNotFoundError(course_key)
+            else:
+                # Course exists, so create matching assets document.
+                course_assets = {'course_id': unicode(course_key), 'assets': {}}
+                # Pass back 'assets' dict but add the '_id' key to it for document update purposes.
+                course_assets['assets']['_id'] = self.asset_collection.insert(course_assets)
         elif isinstance(course_assets['assets'], list):
             # This record is in the old course assets format.
             # Ensure that no data exists before updating the format.
@@ -1508,39 +1513,82 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return 'assets.{}'.format(asset_type)
 
-    @contract(asset_metadata='AssetMetadata')
-    def save_asset_metadata(self, asset_metadata, user_id):
+    @contract(asset_metadata_list='list(AssetMetadata)', user_id=int)
+    def _save_asset_metadata_list(self, asset_metadata_list, user_id, import_only):
         """
-        Saves the info for a particular course's asset.
+        Internal; saves the info for a particular course's asset.
 
         Arguments:
-            asset_metadata (AssetMetadata): data about the course asset
-
-        Returns:
-            True if info save was successful, else False
+            asset_metadata_list (list(AssetMetadata)): list of data about several course assets
+            user_id (int): user ID saving the asset metadata
+            import_only (bool): True if edited_on/by data should remain unchanged.
         """
-        course_assets, asset_idx = self._find_course_asset(asset_metadata.asset_id)
-        all_assets = SortedListWithKey([], key=itemgetter('filename'))
-        # Assets should be pre-sorted, so add them efficiently without sorting.
-        # extend() will raise a ValueError if the passed-in list is not sorted.
-        all_assets.extend(course_assets[asset_metadata.asset_id.block_type])
-        asset_metadata.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
+        course_assets = self._find_course_assets(asset_metadata_list[0].asset_id.course_key)
 
-        # Translate metadata to Mongo format.
-        metadata_to_insert = asset_metadata.to_storable()
-        if asset_idx is None:
-            # Add new metadata sorted into the list.
-            all_assets.add(metadata_to_insert)
-        else:
-            # Replace existing metadata.
-            all_assets[asset_idx] = metadata_to_insert
+        changed_asset_types = set()
+        assets_by_type = {}
+        for asset_md in asset_metadata_list:
+            asset_type = asset_md.asset_id.asset_type
+            changed_asset_types.add(asset_type)
+            # Lazily create a sorted list if not already created.
+            if asset_type not in assets_by_type:
+                assets_by_type[asset_type] = SortedListWithKey(course_assets.get(asset_type, []), key=itemgetter('filename'))
+            all_assets = assets_by_type[asset_type]
+            asset_idx = self._find_asset_in_list(assets_by_type[asset_type], asset_md.asset_id)
+            if not import_only:
+                asset_md.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
+
+            # Translate metadata to Mongo format.
+            metadata_to_insert = asset_md.to_storable()
+            if asset_idx is None:
+                # Add new metadata sorted into the list.
+                all_assets.add(metadata_to_insert)
+            else:
+                # Replace existing metadata.
+                all_assets[asset_idx] = metadata_to_insert
+
+        # Build an update set with potentially multiple embedded fields.
+        updates_by_type = {}
+        for asset_type in changed_asset_types:
+            updates_by_type[self._make_mongo_asset_key(asset_type)] = assets_by_type[asset_type].as_list()
 
         # Update the document.
         self.asset_collection.update(
             {'_id': course_assets['_id']},
-            {'$set': {self._make_mongo_asset_key(asset_metadata.asset_id.block_type): all_assets.as_list()}}
+            {'$set': updates_by_type}
         )
         return True
+
+    @contract(asset_metadata='AssetMetadata', user_id=int)
+    def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
+        """
+        Saves the info for a particular course's asset.
+
+        Arguments:
+            asset_metadata (AssetMetadata): data about the course asset data
+            user_id (int): user ID saving the asset metadata
+            import_only (bool): True if importing without editing, False if editing
+
+        Returns:
+            True if info save was successful, else False
+        """
+        return self._save_asset_metadata_list([asset_metadata, ], user_id, import_only)
+
+    @contract(asset_metadata_list='list(AssetMetadata)', user_id=int)
+    def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
+        """
+        Saves the asset metadata for each asset in a list of asset metadata.
+        Optimizes the saving of many assets.
+
+        Args:
+            asset_metadata (AssetMetadata): data about the course asset data
+            user_id (int): user ID saving the asset metadata
+            import_only (bool): True if importing without editing, False if editing
+
+        Returns:
+            True if info save was successful, else False
+        """
+        return self._save_asset_metadata_list(asset_metadata_list, user_id, import_only)
 
     @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
     def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
@@ -1630,8 +1678,12 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         # Using the course_id, find the course asset metadata document.
         # A single document exists per course to store the course asset metadata.
-        course_assets = self._find_course_assets(course_key)
-        self.asset_collection.remove(course_assets['_id'])
+        try:
+            course_assets = self._find_course_assets(course_key)
+            self.asset_collection.remove(course_assets['_id'])
+        except ItemNotFoundError:
+            # When deleting asset metadata, if a course's asset metadata is not present, no big deal.
+            pass
 
     def heartbeat(self):
         """

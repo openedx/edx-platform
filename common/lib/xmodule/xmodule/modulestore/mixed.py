@@ -351,17 +351,40 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_key)
         return store.delete_course(course_key, user_id)
 
-    @contract(asset_metadata='AssetMetadata')
-    def save_asset_metadata(self, asset_metadata, user_id):
+    @contract(asset_metadata='AssetMetadata', user_id=int, import_only=bool)
+    def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
         """
         Saves the asset metadata for a particular course's asset.
 
         Args:
-        course_key (CourseKey): course identifier
         asset_metadata (AssetMetadata): data about the course asset data
+        user_id (int): user ID saving the asset metadata
+        import_only (bool): True if importing without editing, False if editing
+
+        Returns:
+            True if info save was successful, else False
         """
         store = self._get_modulestore_for_courseid(asset_metadata.asset_id.course_key)
-        return store.save_asset_metadata(asset_metadata, user_id)
+        return store.save_asset_metadata(asset_metadata, user_id, import_only)
+
+    @contract(asset_metadata_list='list(AssetMetadata)', user_id=int, import_only=bool)
+    def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
+        """
+        Saves the asset metadata for each asset in a list of asset metadata.
+        Optimizes the saving of many assets.
+
+        Args:
+        asset_metadata_list (list(AssetMetadata)): list of data about several course assets
+        user_id (int): user ID saving the asset metadata
+        import_only (bool): True if importing without editing, False if editing
+
+        Returns:
+            True if info save was successful, else False
+        """
+        if len(asset_metadata_list) == 0:
+            return True
+        store = self._get_modulestore_for_courseid(asset_metadata_list[0].asset_id.course_key)
+        return store.save_asset_metadata_list(asset_metadata_list, user_id, import_only)
 
     @strip_key
     @contract(asset_key='AssetKey')
@@ -379,7 +402,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.find_asset_metadata(asset_key, **kwargs)
 
     @strip_key
-    @contract(course_key='CourseKey', start=int, maxresults=int, sort='tuple|None')
+    @contract(course_key='CourseKey', asset_type='None | basestring', start=int, maxresults=int, sort='tuple|None')
     def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
         """
         Returns a list of static assets for a course.
@@ -387,6 +410,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         Args:
             course_key (CourseKey): course identifier
+            asset_type (str): type of asset, such as 'asset', 'video', etc. If None, return assets of all types.
             start (int): optional - start at this asset number
             maxresults (int): optional - return at most this many, -1 means no limit
             sort (array): optional - None means no sort
@@ -395,12 +419,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 sort_order - one of 'ascending' or 'descending'
 
         Returns:
-            List of asset data dictionaries, which have the following keys:
-                asset_key (AssetKey): asset identifier
-                displayname: The human-readable name of the asset
-                uploadDate (datetime.datetime): The date and time that the file was uploaded
-                contentType: The mimetype string of the asset
-                md5: An md5 hash of the asset content
+            List of AssetMetadata objects.
         """
         store = self._get_modulestore_for_courseid(course_key)
         return store.get_all_asset_metadata(course_key, asset_type, start, maxresults, sort, **kwargs)

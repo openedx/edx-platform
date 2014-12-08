@@ -331,7 +331,8 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             course_dirs=[course_data_name],
                             static_content_store=source_content,
                             target_course_id=source_course_key,
-                            create_new_course_if_not_present=True,
+                            create_course_if_not_present=True,
+                            raise_on_failure=True,
                         )
 
                         export_to_xml(
@@ -349,7 +350,8 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             course_dirs=['exported_source_course'],
                             static_content_store=dest_content,
                             target_course_id=dest_course_key,
-                            create_new_course_if_not_present=True,
+                            create_course_if_not_present=True,
+                            raise_on_failure=True,
                         )
 
 # NOT CURRENTLY USED
@@ -380,5 +382,12 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             source_content,
                             source_course_key,
                             dest_content,
+                            dest_course_key,
+                        )
+
+                        self.assertAssetsMetadataEqual(
+                            source_store,
+                            source_course_key,
+                            dest_store,
                             dest_course_key,
                         )

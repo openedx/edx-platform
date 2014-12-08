@@ -204,7 +204,7 @@ class DownloadTestCase(AssetsTestCase):
 
     def test_metadata_found_in_modulestore(self):
         # Insert asset metadata into the modulestore (with no accompanying asset).
-        asset_key = self.course.id.make_asset_key(AssetMetadata.ASSET_TYPE, 'pic1.jpg')
+        asset_key = self.course.id.make_asset_key(AssetMetadata.GENERAL_ASSET_TYPE, 'pic1.jpg')
         asset_md = AssetMetadata(asset_key, {
             'internal_name': 'EKMND332DDBK',
             'basename': 'pix/archive',
