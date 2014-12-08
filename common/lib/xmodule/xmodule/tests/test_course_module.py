@@ -36,14 +36,12 @@ class DummySystem(ImportSystem):
         course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
         course_dir = "test_dir"
         error_tracker = Mock()
-        parent_tracker = Mock()
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
             error_tracker=error_tracker,
-            parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
             field_data=KvsFieldData(DictKeyValueStore()),
         )

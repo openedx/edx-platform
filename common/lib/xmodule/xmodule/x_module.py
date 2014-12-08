@@ -918,7 +918,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
-        return (self.scope_ids == other.scope_ids and
+        return (hasattr(other, 'scope_ids') and
+                self.scope_ids == other.scope_ids and
                 self.fields.keys() == other.fields.keys() and
                 all(getattr(self, field.name) == getattr(other, field.name)
                     for field in self.fields.values()))
