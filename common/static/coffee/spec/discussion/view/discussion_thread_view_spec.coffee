@@ -43,7 +43,8 @@ describe "DiscussionThreadView", ->
             expect(view.$el.find(".load-response-button").length).toEqual(0)
 
     describe "closed and open Threads", ->
-        checkCommentForm = (originallyClosed, mode) ->
+
+        createDiscussionThreadView = (originallyClosed, mode) ->
             threadData = DiscussionViewSpecHelper.makeThreadWithProps({closed: originallyClosed})
             thread = new Thread(threadData)
             discussion = new Discussion(thread)
@@ -60,11 +61,23 @@ describe "DiscussionThreadView", ->
               (model, updates, safeAjaxParams, errorMsg) ->
                 model.set(updates)
             )
+            view
+
+        checkCommentForm = (originallyClosed, mode) ->
+            view = createDiscussionThreadView(originallyClosed, mode)
             expect(view.$('.comment-form').closest('li').is(":visible")).toBe(not originallyClosed)
             expect(view.$(".discussion-reply-new").is(":visible")).toBe(not originallyClosed)
             view.$(".action-close").click()
             expect(view.$('.comment-form').closest('li').is(":visible")).toBe(originallyClosed)
             expect(view.$(".discussion-reply-new").is(":visible")).toBe(originallyClosed)
+
+        checkVoteDisplay = (originallyClosed, mode) ->
+            view = createDiscussionThreadView(originallyClosed, mode)
+            expect(view.$('.action-vote').is(":visible")).toBe(not originallyClosed)
+            expect(view.$('.display-vote').is(":visible")).toBe(originallyClosed)
+            view.$(".action-close").click()
+            expect(view.$('.action-vote').is(":visible")).toBe(originallyClosed)
+            expect(view.$('.display-vote').is(":visible")).toBe(not originallyClosed)
 
         _.each(["tab", "inline"], (mode) =>
                 it 'Test that in #{mode} mode when a closed thread is opened the comment form is displayed', ->
@@ -72,6 +85,12 @@ describe "DiscussionThreadView", ->
 
                 it 'Test that in #{mode} mode when a open thread is closed the comment form is hidden', ->
                         checkCommentForm(false, mode)
+
+                it 'Test that in #{mode} mode when a closed thread is opened the vote button is displayed and vote count is hidden', ->
+                        checkVoteDisplay(true, mode)
+
+                it 'Test that in #{mode} mode when a open thread is closed the vote button is hidden and vote count is displayed', ->
+                        checkVoteDisplay(false, mode)
         )
 
     describe "tab mode", ->
