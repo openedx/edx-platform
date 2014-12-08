@@ -31,7 +31,7 @@ class TestXMLModuleStore(unittest.TestCase):
     Test around the XML modulestore
     """
     def test_xml_modulestore_type(self):
-        store = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
+        store = XMLModuleStore(DATA_DIR, course_dirs=[])
         self.assertEqual(store.get_modulestore_type(), ModuleStoreEnum.Type.xml)
 
     def test_unicode_chars_in_xml_content(self):
