@@ -1790,10 +1790,19 @@ class CoursesMetricsSocial(SecureListAPIView):
             slash_course_id = get_course_key(course_id, slashseparated=True)
             organization = request.QUERY_PARAMS.get('organization', None)
             # the forum service expects the legacy slash separated string format
-            data = get_course_social_stats(slash_course_id)
-            course_key = get_course_key(course_id)
-            # remove any excluded users from the aggregate
 
+            # load the course so that we can see when the course end date is
+            course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
+            if not course_descriptor:
+                raise Http404
+
+            # get the course social stats, passing along a course end date to remove any activity after the course
+            # closure from the stats
+            data = get_course_social_stats(slash_course_id, end_date=course_descriptor.end)
+
+            course_key = get_course_key(course_id)
+
+            # remove any excluded users from the aggregate
             exclude_users = get_aggregate_exclusion_user_ids(course_key)
 
             for user_id in exclude_users:

@@ -31,7 +31,11 @@ from lang_pref import LANGUAGE_KEY
 from notification_prefs.views import enable_notifications
 from lms.lib.comment_client.user import User as CommentUser
 from lms.lib.comment_client.utils import CommentClientRequestError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from lms.lib.comment_client.user import get_user_social_stats
+from notification_prefs.views import enable_notifications
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from openedx.core.djangoapps.user_api.models import UserPreference
 from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, CourseAssistantRole, UserBasedRole
@@ -1173,7 +1177,10 @@ class UsersSocialMetrics(SecureListAPIView):
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
 
-        comment_user = CommentUser.from_django_user(user)
+        # load the course so that we can see when the course end date is
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
+        if not course_descriptor:
+            raise Http404
 
         # be robust to the try of course_id we get from caller
         try:
@@ -1184,10 +1191,10 @@ class UsersSocialMetrics(SecureListAPIView):
             # assume course_id passed in is legacy format
             slash_course_id = course_id
 
-        comment_user.course_id = slash_course_id
-
         try:
-            data = (comment_user.social_stats())[user_id]
+            # get the course social stats, passing along a course end date to remove any activity after the course
+            # closure from the stats
+            data = (get_user_social_stats(user_id, slash_course_id, end_date=course_descriptor.end))[user_id]
             http_status = status.HTTP_200_OK
         except (CommentClientRequestError, ConnectionError), error:
             data = {
