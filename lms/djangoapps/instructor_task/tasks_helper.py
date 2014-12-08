@@ -649,10 +649,11 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     current_step = {'step': 'Cohorting Students'}
     task_progress.update_task_state(extra_meta=current_step)
 
-    # cohorts_status will contain metadata about the attempted
-    # cohorting on a per-cohort basis.  It is a mapping from
-    # cohort_name to metadata about that cohort.  It also acts as a
-    # cache to prevent redundant cohort queries.
+    # cohorts_status is a mapping from cohort_name to metadata about
+    # that cohort.  The metadata will include information about users
+    # successfully added to the cohort, users not found, and a cached
+    # reference to the corresponding cohort object to prevent
+    # redundant cohort queries.
     cohorts_status = {}
 
     with DefaultStorage().open(task_input['file_name']) as f:
@@ -669,7 +670,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                     'Students Not Found': set()
                 }
                 try:
-                    cohort = CourseUserGroup.objects.get(
+                    cohorts_status[cohort_name]['cohort'] = CourseUserGroup.objects.get(
                         course_id=course_id,
                         group_type=CourseUserGroup.COHORT,
                         name=cohort_name
@@ -686,7 +687,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
 
             try:
                 with transaction.commit_on_success():
-                    add_user_to_cohort(cohort, username_or_email)
+                    add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
                 cohorts_status[cohort_name]['Students Added'] += 1
                 task_progress.succeeded += 1
             except User.DoesNotExist:
