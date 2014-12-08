@@ -113,6 +113,11 @@ FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
 
 
+########################## Courseware Search #######################
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+
 #####################################################################
 # See if the developer has any local overrides.
 try:

@@ -23,8 +23,14 @@ ${page_title_breadcrumbs(course_name())}
     <%static:include path="js/${template_name}.underscore" />
 </script>
 % endfor
-</%block>
 
+% for template_name in ["search_item", "search_list", "search_loading", "search_error"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="courseware_search/${template_name}.underscore" />
+</script>
+% endfor
+
+</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -201,6 +207,16 @@ ${fragment.foot_html()}
         <a href="#">${_("close")}</a>
       </header>
 
+      % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+        <div id="courseware-search-bar" class="courseware-search-bar">
+          <form role="search-form">
+            <input type="text" class="search-field"/>
+            <button type="submit" class="search-button" aria-label="${_('Search')}">${_('search')} <i class="icon fa fa-search"></i></button>
+            <button type="button" class="cancel-button" aria-label="${_('Cancel')}"><i class="icon fa fa-remove"></i></button>
+          </form>
+        </div>
+      % endif
+
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
           % if accordion.strip():
@@ -212,10 +228,13 @@ ${fragment.foot_html()}
       </div>
     </div>
 % endif
-
     <section class="course-content" id="course-content">
       ${fragment.body_html()}
     </section>
+    % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+      <section class="courseware-search-results" id="courseware-search-results" data-course-id="${course.id}" data-course-name="${course.display_name_with_default}">
+      </section>
+    % endif
   </div>
 </div>
 

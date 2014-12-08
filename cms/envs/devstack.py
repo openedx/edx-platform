@@ -83,6 +83,9 @@ FEATURES['MILESTONES_APP'] = True
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
+################################ SEARCH INDEX ################################
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
+SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 ###############################################################################
 # See if the developer has any local overrides.

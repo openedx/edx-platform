@@ -306,3 +306,7 @@ VIDEO_UPLOAD_PIPELINE = ENV_TOKENS.get('VIDEO_UPLOAD_PIPELINE', VIDEO_UPLOAD_PIP
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 API_DATE_FORMAT = ENV_TOKENS.get('API_DATE_FORMAT', API_DATE_FORMAT)
+
+if FEATURES['ENABLE_COURSEWARE_INDEX']:
+    # Use ElasticSearch for the search engine
+    SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"

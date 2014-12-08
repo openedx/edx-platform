@@ -244,3 +244,7 @@ FEATURES['MILESTONES_APP'] = True
 # ENTRANCE EXAMS
 FEATURES['ENTRANCE_EXAMS'] = True
 ENTRANCE_EXAM_MIN_SCORE_PCT = 50
+
+# Courseware Search Index
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
+SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
