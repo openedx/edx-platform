@@ -43,7 +43,18 @@ class SecureClient(Client):
         kwargs.update({'SERVER_PORT': 443, 'wsgi.url_scheme': 'https'})
         super(SecureClient, self).__init__(*args, **kwargs)
 
-def _fake_get_get_course_social_stats(course_id):
+def _fake_get_course_social_stats(course_id, end_date=None):
+    if end_date:
+        raise Exception("Expected None for end_date parameter")
+
+    return {
+        '1': {'foo':'bar'},
+        '2': {'one': 'two'}
+    }
+
+def _fake_get_course_social_stats_date_expected(course_id, end_date=None):
+    if not end_date:
+        raise Exception("Expected non-None end_date parameter")
     return {
         '1': {'foo':'bar'},
         '2': {'one': 'two'}
@@ -57,7 +68,6 @@ def _fake_get_course_thread_stats(course_id):
     }
 
 
-@mock.patch("api_manager.courses.views.get_course_social_stats", _fake_get_get_course_social_stats)
 @mock.patch("api_manager.courses.views.get_course_thread_stats", _fake_get_course_thread_stats)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
@@ -1568,6 +1578,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         response = self.do_get(completion_uri)
         self.assertEqual(response.status_code, 404)
 
+    @mock.patch("api_manager.courses.views.get_course_social_stats", _fake_get_course_social_stats_date_expected)
     def test_courses_metrics_social_get(self):
         test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(test_uri)
@@ -1586,6 +1597,19 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertTrue(len(response.data.keys()), 1)
         users = response.data['users']
         self.assertFalse(users.get('1'))
+        self.assertTrue(users.get('2'))
+
+    @mock.patch("api_manager.courses.views.get_course_social_stats", _fake_get_course_social_stats)
+    def test_courses_metrics_social_get_no_date(self):
+        course = CourseFactory.create(
+            start=datetime(2014, 6, 16, 14, 30)
+        )
+        test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, unicode(self.course.id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.data.keys()), 2)
+        users = response.data['users']
+        self.assertTrue(users.get('1'))
         self.assertTrue(users.get('2'))
 
     def test_courses_metrics_grades_leaders_list_get(self):
