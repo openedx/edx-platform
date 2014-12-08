@@ -6,9 +6,9 @@ define(['jquery'], function($) {
                 var trimmedText = $.trim($(this.actual).text());
 
                 if (text && $.isFunction(text.test)) {
-                  return text.test(trimmedText);
+                    return text.test(trimmedText);
                 } else {
-                  return trimmedText.indexOf(text) !== -1;
+                    return trimmedText.indexOf(text) !== -1;
                 }
             },
 
@@ -22,7 +22,11 @@ define(['jquery'], function($) {
 
             toBeInRange: function (min, max) {
                 return min <= this.actual && this.actual <= max;
-            }
+            },
+
+            toBeFocused: function () {
+                return $(this.actual)[0] === $(this.actual)[0].ownerDocument.activeElement;
+            },
         });
     };
 });

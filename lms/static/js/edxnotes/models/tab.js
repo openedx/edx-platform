@@ -3,8 +3,9 @@
 define(['backbone'], function (Backbone) {
     var TabModel = Backbone.Model.extend({
         defaults: {
+            'identifier': '',
             'name': '',
-            'class_name': '',
+            'icon': '',
             'is_active': false,
             'is_closable': false
         },

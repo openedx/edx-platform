@@ -35,7 +35,7 @@ define([
 
         getView = function (tabsCollection, options) {
             options = _.defaults(options || {}, {
-                el: $('.edx-notes-page-wrapper'),
+                el: $('.wrapper-student-notes'),
                 tabsCollection: tabsCollection,
                 user: 'test_user',
                 courseId: 'course_id',
@@ -45,15 +45,15 @@ define([
         };
 
         submitForm = function (searchBox, text) {
-            searchBox.$('input').val(text);
-            searchBox.$('button[type=submit]').click();
+            searchBox.$('.search-notes-input').val(text);
+            searchBox.$('.search-notes-submit').click();
         };
 
         beforeEach(function () {
             customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
-                'templates/edxnotes/recent-activity-item', 'templates/edxnotes/tab-item'
+                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
 
             this.tabsCollection = new TabsCollection();
@@ -62,29 +62,31 @@ define([
         it('does not create a tab and content on initialization', function () {
             var view = getView(this.tabsCollection);
             expect(this.tabsCollection).toHaveLength(0);
-            expect(view.$('#edx-notes-page-search-results')).not.toExist();
+            expect(view.$('#search-results-panel')).not.toExist();
         });
 
         it('displays a tab and content on search with proper data and order', function () {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
-            submitForm(view.searchBox, 'econd');
+            submitForm(view.searchBox, 'second');
             AjaxHelpers.respondWithJson(requests, responseJson);
 
             expect(this.tabsCollection).toHaveLength(1);
             expect(this.tabsCollection.at(0).attributes).toEqual({
                 name: 'Search Results',
-                class_name: 'tab-search-results',
+                identifier: 'view-search-results',
+                icon: 'icon-search',
                 is_active: true,
                 is_closable: true
             });
-            expect(view.$('#edx-notes-page-search-results')).toExist();
-            expect(view.$('.edx-notes-item-text').eq(1)).toContainHtml(
-                '<span class="edx-notes-highlight">econd</span>'
+            expect(view.$('#search-results-panel')).toExist();
+            expect(view.$('#search-results-panel')).toBeFocused();
+            expect(view.$('.note-comments').eq(1)).toContainHtml(
+                '<span class="note-highlight">Second</span>'
             );
-            expect(view.$('.edx-notes-item-quote .edx-notes-highlight')).not.toExist();
-            expect(view.$('.edx-notes-page-item')).toHaveLength(3);
+            expect(view.$('.note-excerpt .note-highlight')).not.toExist();
+            expect(view.$('.note')).toHaveLength(3);
             view.searchResults.collection.each(function (model, index) {
                 expect(model.get('text')).toBe(notes[index].text);
             });
@@ -96,9 +98,10 @@ define([
 
             submitForm(view.searchBox, 'test query');
             expect(view.$('.ui-loading')).not.toHaveClass('is-hidden');
+            expect(view.$('.ui-loading')).toBeFocused();
             expect(this.tabsCollection).toHaveLength(1);
             expect(view.searchResults).toBeNull();
-            expect(view.$('.edx-notes-page-items-list')).not.toExist();
+            expect(view.$('.tab-panel')).not.toExist();
             AjaxHelpers.respondWithJson(requests, responseJson);
             expect(view.$('.ui-loading')).toHaveClass('is-hidden');
         });
@@ -113,10 +116,11 @@ define([
                 rows: []
             });
 
-            expect(view.$('#edx-notes-page-search-results')).not.toExist();
-            expect(view.$('#edx-notes-page-no-search-results')).toExist();
-            expect(view.$('.edx-notes-highlight')).not.toExist();
-            expect(view.$('#edx-notes-page-no-search-results')).toContainText(
+            expect(view.$('#search-results-panel')).not.toExist();
+            expect(view.$('#no-results-panel')).toBeFocused();
+            expect(view.$('#no-results-panel')).toExist();
+            expect(view.$('.note-highlight')).not.toExist();
+            expect(view.$('#no-results-panel')).toContainText(
                 'No results found for "some text".'
             );
         });
@@ -132,12 +136,12 @@ define([
 
             this.tabsCollection.add({});
             this.tabsCollection.at(1).activate();
-            expect(view.$('#edx-notes-page-search-results')).not.toExist();
+            expect(view.$('#search-results-panel')).not.toExist();
             this.tabsCollection.at(0).activate();
 
             expect(requests).toHaveLength(1);
-            expect(view.$('#edx-notes-page-search-results')).toExist();
-            expect(view.$('.edx-notes-page-item')).toHaveLength(3);
+            expect(view.$('#search-results-panel')).toExist();
+            expect(view.$('.note')).toHaveLength(3);
         });
 
         it('can clear search results if tab is closed', function () {
@@ -165,7 +169,7 @@ define([
 
             expect(view.$('.inline-error')).not.toHaveClass('is-hidden');
             expect(view.$('.inline-error')).toContainText('test error message');
-            expect(view.$('.edx-notes-highlight')).not.toExist();
+            expect(view.$('.note-highlight')).not.toExist();
             expect(view.$('.ui-loading')).toHaveClass('is-hidden');
 
             submitForm(view.searchBox, 'Second');
@@ -173,7 +177,7 @@ define([
 
             expect(view.$('.inline-error')).toHaveClass('is-hidden');
             expect(view.$('.inline-error')).toBeEmpty();
-            expect(view.$('.edx-notes-highlight')).toExist();
+            expect(view.$('.note-highlight')).toExist();
         });
 
         it('can correctly update search results', function () {
@@ -189,7 +193,7 @@ define([
             submitForm(view.searchBox, 'test_query');
             AjaxHelpers.respondWithJson(requests, responseJson);
 
-            expect(view.$('.edx-notes-page-item')).toHaveLength(3);
+            expect(view.$('.note')).toHaveLength(3);
 
             submitForm(view.searchBox, 'new_test_query');
             AjaxHelpers.respondWithJson(requests, {
@@ -197,7 +201,7 @@ define([
                 rows: newNotes
             });
 
-            expect(view.$('.edx-notes-page-item').length).toHaveLength(1);
+            expect(view.$('.note').length).toHaveLength(1);
             view.searchResults.collection.each(function (model, index) {
                 expect(model.get('text')).toBe(newNotes[index].text);
             });

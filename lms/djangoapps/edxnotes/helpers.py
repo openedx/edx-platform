@@ -3,12 +3,14 @@ Helper methods related to EdxNotes.
 """
 import json
 import logging
+import markupsafe
 import requests
 from requests.exceptions import RequestException
 from uuid import uuid4
 from json import JSONEncoder
 from datetime import datetime
 from courseware.access import has_access
+from courseware.views import get_current_child
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
@@ -122,6 +124,8 @@ def preprocess_collection(user, course, collection):
                 continue
 
             model.update({
+                u"text": markupsafe.escape(model["text"]),
+                u"quote": markupsafe.escape(model["quote"]),
                 u"unit": get_ancestor_context(course, store, usage_key),
                 u"updated": dateutil_parse(model["updated"]),
             })
@@ -221,6 +225,42 @@ def get_endpoint(path=""):
         return url + path
     except (AttributeError, KeyError):
         raise ImproperlyConfigured(_("No endpoint was provided for EdxNotes."))
+
+
+def get_course_position(course_module):
+    """
+    Return the user's current place in the course.
+
+    If this is the user's first time, leads to COURSE/CHAPTER/SECTION.
+    If this isn't the users's first time, leads to COURSE/CHAPTER.
+
+    If there is no current position in the course or chapter, then selects
+    the first child.
+    """
+    urlargs = {'course_id': course_module.id.to_deprecated_string()}
+    chapter = get_current_child(course_module, min_depth=1)
+    if chapter is None:
+        log.debug("No chapter found when loading current position in course")
+        return None
+
+    urlargs['chapter'] = chapter.url_name
+    if course_module.position is not None:
+        return {
+            'display_name': chapter.display_name_with_default,
+            'url': reverse('courseware_chapter', kwargs=urlargs),
+        }
+
+    # Relying on default of returning first child
+    section = get_current_child(chapter, min_depth=1)
+    if section is None:
+        log.debug("No section found when loading current position in course")
+        return None
+
+    urlargs['section'] = section.url_name
+    return {
+        'display_name': section.display_name_with_default,
+        'url': reverse('courseware_section', kwargs=urlargs)
+    }
 
 
 def generate_uid():
