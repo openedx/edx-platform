@@ -13,6 +13,7 @@ from contracts import contract, new_contract
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, AssetKey
+from opaque_keys.edx.locator import LibraryLocator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.assetstore import AssetMetadata
 
@@ -25,6 +26,7 @@ from .split_migrator import SplitMigrator
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
+new_contract('LibraryLocator', LibraryLocator)
 
 log = logging.getLogger(__name__)
 
@@ -259,6 +261,23 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     courses[course_id] = course
         return courses.values()
 
+    @strip_key
+    def get_libraries(self, **kwargs):
+        """
+        Returns a list containing the top level XBlock of the libraries (LibraryRoot) in this modulestore.
+        """
+        libraries = {}
+        for store in self.modulestores:
+            if not hasattr(store, 'get_libraries'):
+                continue
+            # filter out ones which were fetched from earlier stores but locations may not be ==
+            for course in store.get_libraries(**kwargs):
+                course_id = self._clean_course_id_for_mapping(course.location)
+                if course_id not in libraries:
+                    # course is indeed unique. save it in result
+                    libraries[course_id] = course
+        return libraries.values()
+
     def make_course_key(self, org, course, run):
         """
         Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
@@ -287,6 +306,24 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_key)
         try:
             return store.get_course(course_key, depth=depth, **kwargs)
+        except ItemNotFoundError:
+            return None
+
+    @strip_key
+    @contract(library_key='LibraryLocator')
+    def get_library(self, library_key, depth=0, **kwargs):
+        """
+        returns the library block associated with the given key. If no such library exists,
+        it returns None
+
+        :param library_key: must be a LibraryLocator
+        """
+        try:
+            store = self._verify_modulestore_support(library_key, 'get_library')
+            return store.get_library(library_key, depth=depth, **kwargs)
+        except NotImplementedError:
+            log.exception("Modulestore configured for %s does not have get_library method", library_key)
+            return None
         except ItemNotFoundError:
             return None
 
@@ -506,6 +543,34 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         self.mappings[course_key] = store
 
         return course
+
+    @strip_key
+    def create_library(self, org, library, user_id, fields, **kwargs):
+        """
+        Creates and returns a new library.
+
+        Args:
+            org (str): the organization that owns the course
+            library (str): the code/number/name of the library
+            user_id: id of the user creating the course
+            fields (dict): Fields to set on the course at initialization - e.g. display_name
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
+
+        Returns: a LibraryRoot
+        """
+        # first make sure an existing course/lib doesn't already exist in the mapping
+        lib_key = LibraryLocator(org=org, library=library)
+        if lib_key in self.mappings:
+            raise DuplicateCourseError(lib_key, lib_key)
+
+        # create the library
+        store = self._verify_modulestore_support(None, 'create_library')
+        library = store.create_library(org, library, user_id, fields, **kwargs)
+
+        # add new library to the mapping
+        self.mappings[lib_key] = store
+
+        return library
 
     @strip_key
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):

@@ -39,6 +39,7 @@ from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
     mongo_uses_error_check
+from xmodule.modulestore.tests.utils import create_modulestore_instance
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR, CourseComparisonTest
 
@@ -1967,35 +1968,3 @@ class TestMixedModuleStore(CourseComparisonTest):
                 with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
                     published_vertical = self.store.get_item(vertical_loc)
                 self.assertEqual(draft_vertical.display_name, published_vertical.display_name)
-
-# ============================================================================================================
-# General utils for not using django settings
-# ============================================================================================================
-
-
-def load_function(path):
-    """
-    Load a function by name.
-
-    path is a string of the form "path.to.module.function"
-    returns the imported python object `function` from `path.to.module`
-    """
-    module_path, _, name = path.rpartition('.')
-    return getattr(import_module(module_path), name)
-
-
-# pylint: disable=unused-argument
-def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None, fs_service=None):
-    """
-    This will return a new instance of a modulestore given an engine and options
-    """
-    class_ = load_function(engine)
-
-    if issubclass(class_, ModuleStoreDraftAndPublished):
-        options['branch_setting_func'] = lambda: ModuleStoreEnum.Branch.draft_preferred
-
-    return class_(
-        doc_store_config=doc_store_config,
-        contentstore=contentstore,
-        **options
-    )

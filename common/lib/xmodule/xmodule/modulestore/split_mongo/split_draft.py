@@ -9,7 +9,7 @@ from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 )
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator, LibraryUsageLocator
 from xmodule.modulestore.split_mongo import BlockKey
 from contracts import contract
 
@@ -56,6 +56,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
     def get_course(self, course_id, depth=0, **kwargs):
         course_id = self._map_revision_to_branch(course_id)
         return super(DraftVersioningModuleStore, self).get_course(course_id, depth=depth, **kwargs)
+
+    def get_library(self, library_id, depth=0, **kwargs):
+        library_id = self._map_revision_to_branch(library_id)
+        return super(DraftVersioningModuleStore, self).get_library(library_id, depth=depth, **kwargs)
 
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, revision=None, **kwargs):
         """
@@ -153,7 +157,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 Otherwise, raises a ValueError.
         """
         with self.bulk_operations(location.course_key):
-            if revision == ModuleStoreEnum.RevisionOption.published_only:
+            if isinstance(location, LibraryUsageLocator):
+                branches_to_delete = [ModuleStoreEnum.BranchName.library]  # Libraries don't yet have draft/publish support
+            elif revision == ModuleStoreEnum.RevisionOption.published_only:
                 branches_to_delete = [ModuleStoreEnum.BranchName.published]
             elif revision == ModuleStoreEnum.RevisionOption.all:
                 branches_to_delete = [ModuleStoreEnum.BranchName.published, ModuleStoreEnum.BranchName.draft]
@@ -180,18 +186,25 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         """
         Maps RevisionOptions to BranchNames, inserting them into the key
         """
+        if isinstance(key, (LibraryLocator, LibraryUsageLocator)):
+            # Libraries don't yet have draft/publish support:
+            draft_branch = ModuleStoreEnum.BranchName.library
+            published_branch = ModuleStoreEnum.BranchName.library
+        else:
+            draft_branch = ModuleStoreEnum.BranchName.draft
+            published_branch = ModuleStoreEnum.BranchName.published
 
         if revision == ModuleStoreEnum.RevisionOption.published_only:
-            return key.for_branch(ModuleStoreEnum.BranchName.published)
+            return key.for_branch(published_branch)
         elif revision == ModuleStoreEnum.RevisionOption.draft_only:
-            return key.for_branch(ModuleStoreEnum.BranchName.draft)
+            return key.for_branch(draft_branch)
         elif revision is None:
             if key.branch is not None:
                 return key
             elif self.get_branch_setting(key) == ModuleStoreEnum.Branch.draft_preferred:
-                return key.for_branch(ModuleStoreEnum.BranchName.draft)
+                return key.for_branch(draft_branch)
             else:
-                return key.for_branch(ModuleStoreEnum.BranchName.published)
+                return key.for_branch(published_branch)
         else:
             raise UnsupportedRevisionError()
 

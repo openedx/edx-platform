@@ -33,7 +33,7 @@ from importlib import import_module
 from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
@@ -875,6 +875,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         otherwise, do a case sensitive search
         """
         assert(isinstance(course_key, CourseKey))
+        if isinstance(course_key, LibraryLocator):
+            return None  # Libraries require split mongo
         course_key = self.fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         if ignore_case:
