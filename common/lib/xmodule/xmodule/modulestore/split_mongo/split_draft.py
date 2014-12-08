@@ -203,6 +203,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
+        self.do_index(location, delete=True)
+
     def _map_revision_to_branch(self, key, revision=None):
         """
         Maps RevisionOptions to BranchNames, inserting them into the key
@@ -345,6 +347,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             [location],
             blacklist=blacklist
         )
+
+        self.do_index(location)
+
         return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.published), **kwargs)
 
     def unpublish(self, location, user_id, **kwargs):

@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 import django.utils
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
@@ -75,6 +75,7 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
 from xmodule.split_test_module import get_split_user_partitions
+from student.auth import has_course_author_access
 
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -90,7 +91,7 @@ CONTENT_GROUP_CONFIGURATION_DESCRIPTION = 'The groups in this configuration can 
 CONTENT_GROUP_CONFIGURATION_NAME = 'Content Group Configuration'
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
-           'course_info_update_handler',
+           'course_info_update_handler', 'course_index_handler',
            'course_rerun_handler',
            'settings_handler',
            'grading_handler',
@@ -119,6 +120,15 @@ def get_course_and_check_access(course_key, user, depth=0):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module
+
+
+def reindex_course_and_check_access(course_key, user):
+    """
+    Internal method used to restart indexing on a course.
+    """
+    if not has_course_author_access(user, course_key):
+        raise PermissionDenied()
+    return modulestore().do_course_reindex(course_key)
 
 
 @login_required
@@ -281,6 +291,32 @@ def course_rerun_handler(request, course_key_string):
                 'course_creator_status': _get_course_creator_status(request.user),
                 'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
             })
+
+
+@login_required
+@ensure_csrf_cookie
+@require_GET
+def course_index_handler(request, course_key_string):
+    """
+    The restful handler for course indexing.
+    GET
+        html: return status of indexing task
+    """
+    # Only global staff (PMs) are able to rerun courses during the soft launch
+    if not GlobalStaff().has_user(request.user):
+        raise PermissionDenied()
+    course_key = CourseKey.from_string(course_key_string)
+    with modulestore().bulk_operations(course_key):
+        error = reindex_course_and_check_access(course_key, request.user)
+        if error:
+            return HttpResponse(
+                error,
+                status=500
+            )
+        return HttpResponse(
+            {},
+            status=200
+        )
 
 
 def _course_outline_json(request, course_module):

@@ -17,7 +17,8 @@ import textwrap
 from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
 from xmodule.edxnotes_utils import edxnotes
-
+from xmodule.annotator_mixin import html_to_text
+import re
 
 log = logging.getLogger("edx.courseware")
 
@@ -252,6 +253,24 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         non_editable_fields = super(HtmlDescriptor, self).non_editable_metadata_fields
         non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
         return non_editable_fields
+
+    def index_dictionary(self):
+        xblock_body = super(HtmlDescriptor, self).index_dictionary()
+        html_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(self.data))
+        html_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", html_content)
+        html_content = re.sub(r"<!--.*-->", "", html_content)
+        html_body = {
+            "html_content": html_content,
+            "display_name": self.display_name,
+        }
+        if "content" in xblock_body:
+            xblock_body["content"].update(html_body)
+        else:
+            xblock_body.update({"content": html_body})
+        xblock_body.update({
+            "content_type": "HTML Content"
+        })
+        return xblock_body
 
 
 class AboutFields(object):

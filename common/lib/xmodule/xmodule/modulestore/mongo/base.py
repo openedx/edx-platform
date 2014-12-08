@@ -44,6 +44,7 @@ from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
+from xmodule.modulestore.courseware_index import ModuleStoreCoursewareIndexMixin
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
@@ -275,7 +276,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     raw_metadata = json_data.get('metadata', {})
                     # published_on was previously stored as a list of time components instead of a datetime
                     if raw_metadata.get('published_date'):
-                        module._edit_info['published_date'] = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                        module._edit_info['published_date'] = datetime(
+                            *raw_metadata.get('published_date')[0:6]
+                        ).replace(tzinfo=UTC)
                     module._edit_info['published_by'] = raw_metadata.get('published_by')
 
                 # decache any computed pending field settings
@@ -482,7 +485,10 @@ class ParentLocationCache(dict):
             del self[key]
 
 
-class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, MongoBulkOpsMixin):
+class MongoModuleStore(
+        ModuleStoreDraftAndPublished, ModuleStoreWriteBase, MongoBulkOpsMixin,
+        ModuleStoreCoursewareIndexMixin
+    ):  # noqa
     """
     A Mongodb backed ModuleStore
     """
@@ -1804,3 +1810,53 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         # To allow prioritizing draft vs published material
         self.collection.create_index('_id.revision')
+
+    # Some overrides that still need to be implemented by subclasses
+    def convert_to_draft(self, location, user_id):
+        raise NotImplementedError(
+            "{function_name} needs to be implemented in subclass".format(
+                function_name=sys._getframe().f_code.co_name
+            )
+        )
+
+    def delete_item(self, location, user_id, **kwargs):
+        raise NotImplementedError(
+            "{function_name} needs to be implemented in subclass".format(
+                function_name=sys._getframe().f_code.co_name
+            )
+        )
+
+    def has_changes(self, xblock):
+        raise NotImplementedError(
+            "{function_name} needs to be implemented in subclass".format(
+                function_name=sys._getframe().f_code.co_name
+            )
+        )
+
+    def has_published_version(self, xblock):
+        raise NotImplementedError(
+            "{function_name} needs to be implemented in subclass".format(
+                function_name=sys._getframe().f_code.co_name
+            )
+        )
+
+    def publish(self, location, user_id):
+        raise NotImplementedError(
+            "{function_name} needs to be implemented in subclass".format(
+                function_name=sys._getframe().f_code.co_name
+            )
+        )
+
+    def revert_to_published(self, location, user_id):
+        raise NotImplementedError(
+            "{function_name} needs to be implemented in subclass".format(
+                function_name=sys._getframe().f_code.co_name
+            )
+        )
+
+    def unpublish(self, location, user_id):
+        raise NotImplementedError(
+            "{function_name} needs to be implemented in subclass".format(
+                function_name=sys._getframe().f_code.co_name
+            )
+        )

@@ -37,6 +37,7 @@ def wrap_draft(item):
 
 
 class DraftModuleStore(MongoModuleStore):
+
     """
     This mixin modifies a modulestore to give it draft semantics.
     Edits made to units are stored to locations that have the revision DRAFT.
@@ -46,6 +47,7 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
+
     def get_item(self, usage_key, depth=0, revision=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
@@ -509,7 +511,8 @@ class DraftModuleStore(MongoModuleStore):
                 parent_locations = [draft_parent.location]
         # there could be 2 parents if
         #   Case 1: the draft item moved from one parent to another
-        #   Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single parent has 2 versions: draft and published
+        # Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single
+        # parent has 2 versions: draft and published
         for parent_location in parent_locations:
             # don't remove from direct_only parent if other versions of this still exists (this code
             # assumes that there's only one parent_location in this case)
@@ -540,6 +543,8 @@ class DraftModuleStore(MongoModuleStore):
                 ]
             )
         self._delete_subtree(location, as_functions)
+
+        self.do_index(location, delete=True)
 
     def _delete_subtree(self, location, as_functions, draft_only=False):
         """
@@ -713,6 +718,9 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
+
+        self.do_index(location)
+
         return self.get_item(as_published(location))
 
     def unpublish(self, location, user_id, **kwargs):

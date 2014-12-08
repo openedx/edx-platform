@@ -1,0 +1,101 @@
+.course-index .courseware-search-bar {
+
+  @include box-sizing(border-box);
+  position: relative;
+  padding: 5px;
+  box-shadow: 0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset;
+  font-family: $sans-serif;
+
+  .search-field {
+    @include box-sizing(border-box);
+    top: 5px;
+    width: 100%;
+    @include border-radius(4px);
+    background: $white-t1;
+    &.is-active {
+      background: $white;
+    }
+  }
+
+  .search-button, .cancel-button {
+    @include box-sizing(border-box);
+    color: #888;
+    font-size: 14px;
+    font-weight: normal;
+    display: block;
+    position: absolute;
+    right: 12px;
+    top: 5px;
+    height: 35px;
+    line-height: 35px;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .cancel-button {
+    display: none;
+  }
+
+}
+
+
+.courseware-search-results {
+
+  display: none;
+  padding: 40px;
+
+  .search-info {
+    padding-bottom: lh(.75);
+    border-bottom: 1px solid lighten($border-color, 10%);
+    .search-count {
+      float: right;
+      color: $gray;
+    }
+  }
+
+  .search-results {
+    padding: 0;
+  }
+
+  .search-results-item {
+    position: relative;
+    border-bottom: 1px solid lighten($border-color, 10%);
+    list-style-type: none;
+    margin-bottom: lh(.75);
+    padding-bottom: lh(.75);
+    padding-right: 140px;
+
+    .sri-excerpt {
+      color: $gray;
+      margin-bottom: lh(1);
+    }
+    .sri-type {
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: $gray;
+    }
+    .sri-link {
+      position: absolute;
+      right: 0;
+      line-height: 1.6em;
+      bottom: lh(.75);
+      text-transform: uppercase;
+    }
+  }
+
+  .search-load-next {
+    display: block;
+    text-transform: uppercase;
+    color: $base-font-color;
+    border: 2px solid $link-color;
+    @include border-radius(3px);
+    padding: 1rem;
+    .icon-spin {
+      display: none;
+    }
+  }
+
+}
