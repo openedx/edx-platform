@@ -381,3 +381,10 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                             dest_content,
                             dest_course_key,
                         )
+
+                        self.assertAssetsMetadataEqual(
+                            source_store,
+                            source_course_key,
+                            dest_store,
+                            dest_course_key,
+                        )

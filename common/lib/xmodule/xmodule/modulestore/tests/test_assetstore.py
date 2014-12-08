@@ -26,7 +26,7 @@ class AssetStoreTestData(object):
     user_email = "me@example.com"
 
     asset_fields = (
-        'filename', 'internal_name', 'basename', 'locked',
+        AssetMetadata.ASSET_BASENAME_ATTR, 'internal_name', 'pathname', 'locked',
         'edited_by', 'edited_by_email', 'edited_on', 'created_by', 'created_by_email', 'created_on',
         'curr_version', 'prev_version'
     )
@@ -77,7 +77,7 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         now = datetime.now(pytz.utc)
         return AssetMetadata(
             asset_loc, internal_name='EKMND332DDBK',
-            basename='pictures/historical', contenttype='image/jpeg',
+            pathname='pictures/historical', contenttype='image/jpeg',
             locked=False, fields={'md5': '77631ca4f0e08419b70726a447333ab6'},
             edited_by=ModuleStoreEnum.UserID.test, edited_on=now,
             created_by=ModuleStoreEnum.UserID.test, created_on=now,
@@ -206,7 +206,7 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 self.assertEquals(reupdated_asset_md.locked, locked_state)
 
     ALLOWED_ATTRS = (
-        ('basename', '/new/path'),
+        ('pathname', '/new/path'),
         ('internal_name', 'new_filename.txt'),
         ('locked', True),
         ('contenttype', 'image/png'),
@@ -423,14 +423,10 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
         with storebuilder.build(None) as store:
             course_key = store.make_course_key("org", "course", "run")
             asset_key = course_key.make_asset_key('asset', 'foo.jpg')
-            for method in ['find_asset_metadata']:
-                with self.assertRaises(NotImplementedError):
-                    getattr(store, method)(asset_key)
-            with self.assertRaises(NotImplementedError):
-                # pylint: disable=protected-access
-                store._find_course_asset(asset_key)
-            with self.assertRaises(NotImplementedError):
-                store.get_all_asset_metadata(course_key, 'asset')
+            self.assertEquals(store.find_asset_metadata(asset_key), None)
+            # pylint: disable=protected-access
+            self.assertEquals(store._find_course_asset(asset_key), (None, None))
+            self.assertEquals(store.get_all_asset_metadata(course_key, 'asset'), [])
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_copy_all_assets_same_modulestore(self, storebuilder):

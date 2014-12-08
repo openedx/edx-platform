@@ -285,7 +285,8 @@ class ModuleStoreAssetInterface(object):
         Returns the container holding a dict indexed by asset block_type whose values are a list
         of raw metadata documents
         """
-        raise NotImplementedError()
+        log.warning("_find_course_assets request of ModuleStoreAssetInterface - not implemented.")
+        return None
 
     def _find_course_asset(self, asset_key):
         """

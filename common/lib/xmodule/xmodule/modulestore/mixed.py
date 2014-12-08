@@ -387,6 +387,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         Args:
             course_key (CourseKey): course identifier
+            asset_type (str): type of asset, such as 'asset', 'video', etc.
             start (int): optional - start at this asset number
             maxresults (int): optional - return at most this many, -1 means no limit
             sort (array): optional - None means no sort
@@ -395,12 +396,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 sort_order - one of 'ascending' or 'descending'
 
         Returns:
-            List of asset data dictionaries, which have the following keys:
-                asset_key (AssetKey): asset identifier
-                displayname: The human-readable name of the asset
-                uploadDate (datetime.datetime): The date and time that the file was uploaded
-                contentType: The mimetype string of the asset
-                md5: An md5 hash of the asset content
+            List of AssetMetadata objects.
         """
         store = self._get_modulestore_for_courseid(course_key)
         return store.get_all_asset_metadata(course_key, asset_type, start, maxresults, sort, **kwargs)
