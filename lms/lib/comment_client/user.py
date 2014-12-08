@@ -134,18 +134,8 @@ class User(models.Model):
             thread_count=response.get('thread_count', 0)
         )
 
-    def social_stats(self):
-        if not self.course_id:
-            raise CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
-
-        url = _url_for_user_social_stats(self.id)
-        params = {'course_id': self.course_id}
-        response = perform_request(
-            'get',
-            url,
-            params
-        )
-        return response
+    def social_stats(self, end_date=None):
+        return get_user_social_stats(self.id, self.course_id, end_date=end_date)
 
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
@@ -179,13 +169,32 @@ class User(models.Model):
                 raise
         self._update_from_response(response)
 
+def get_user_social_stats(user_id, course_id, end_date=None):
+    if not course_id:
+        raise CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
 
-def get_course_social_stats(course_id):
+    url = _url_for_user_social_stats(user_id)
+    params = {'course_id': course_id}
+    if end_date:
+        params.update({'end_date': end_date.isoformat()})
+
+    response = perform_request(
+        'get',
+        url,
+        params
+    )
+    return response
+
+
+def get_course_social_stats(course_id, end_date=None):
     """
     Helper method to get the social stats from the comment service
     """
-    url = _url_for_course_social_stats()
+    url = _url_for_course_social_stats(end_date=end_date)
     params = {'course_id': course_id}
+    if end_date:
+        params.update({'end_date': end_date.isoformat()})
+
     response = perform_request(
         'get',
         url,
@@ -217,11 +226,11 @@ def _url_for_user_stats(user_id,course_id):
     return "{prefix}/users/{user_id}/stats?course_id={course_id}".format(prefix=settings.PREFIX, user_id=user_id,course_id=course_id)
 
 
-def _url_for_user_social_stats(user_id):
+def _url_for_user_social_stats(user_id, end_date=None):
     return "{prefix}/users/{user_id}/social_stats".format(prefix=settings.PREFIX, user_id=user_id)
 
 
-def _url_for_course_social_stats():
+def _url_for_course_social_stats(end_date=None):
     return "{prefix}/users/*/social_stats".format(prefix=settings.PREFIX)
 
 
