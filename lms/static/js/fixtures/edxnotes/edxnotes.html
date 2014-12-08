@@ -1,23 +1,28 @@
-<div class="edx-notes-page-wrapper">
-    <header>
-        <div class="page-title">
-            <h1>Notes</h1>
-            <small>Highlights and personal notes you've made within the course</small>
+<div class="wrapper-student-notes">
+    <div class="title-search-container">
+        <div class="wrapper-title">
+            <h1 class="page-title">
+                Notes
+                <small class="page-subtitle">Highlights and personal notes you've made within the course</small>
+            </h1>
         </div>
-        <form method="GET" action="/search_endpoint" class="is-hidden search-box">
-            <button type="submit">Search</button>
-            <input name="text" id="search-field" required placeholder="Search Notes for..." />
-        </form>
-    </header>
-    <nav class="edx-notes-page-views is-hidden">
-        <h4>View notes by:</h4>
-    </nav>
-    <div class="container">
-        <div class="course-info">
-            <div class="inline-error is-hidden"></div>
-            <div class="ui-loading">
-                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">Loading...</span></p>
-            </div>
+        <div class="wrapper-notes-search">
+            <form role="search" action="/search_endpoint" method="GET" id="search-notes-form" class="is-hidden">
+                <label for="search-notes-input" class="sr">Search notes for:</label>
+                <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="Search Notes for...">
+                <button type="submit" class="search-notes-submit"><i class="icon-search"></i> Search</button>
+            </form>
         </div>
     </div>
+
+    <section class="wrapper-tabs">
+        <div class="tab-list is-hidden">
+            <h2 id="tab-view" class="tabs-label">View notes by:</h2>
+        </div>
+        <div class="inline-error is-hidden" tabindex="-1"></div>
+        <div class="ui-loading" tabindex="-1">
+            <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">Loading...</span></p>
+        </div>
+
+    </section>
 </div>

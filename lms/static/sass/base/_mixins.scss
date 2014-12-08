@@ -164,3 +164,20 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+// border control
+%no-border-top {
+  border-top: none;
+}
+
+%no-border-bottom {
+  border-bottom: none;
+}
+
+%no-border-left {
+  border-left: none;
+}
+
+%no-border-right {
+  border-right: none;
+}

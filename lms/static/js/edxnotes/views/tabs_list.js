@@ -9,14 +9,14 @@ define([
 
         initialize: function (options) {
             this.options = options;
-            this.collection.on({
+            this.listenTo(this.collection, {
                 'add': this.createTab,
                 'destroy': function (model, collection) {
                     if (model.isActive() && collection.length) {
                         collection.at(0).activate();
                     }
                 }
-            }, this);
+            });
         },
 
         render: function () {
