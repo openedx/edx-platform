@@ -1526,6 +1526,9 @@ INSTALLED_APPS = (
 
     # Surveys
     'survey',
+
+    # edX Server API
+    'server_api',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1901,3 +1904,7 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # which access.py permission name to check in order to determine if a course about page is
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
+
+
+############# OPEN EDX SERVER API #################
+FEATURES['SERVER_API'] = False
