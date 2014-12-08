@@ -76,7 +76,7 @@ class LibraryRoot(XBlock):
             fragment.add_frag_resources(rendered_child)
 
             contents.append({
-                'id': child.location.to_deprecated_string(),
+                'id': unicode(child.location),
                 'content': rendered_child.content
             })
 
@@ -85,7 +85,6 @@ class LibraryRoot(XBlock):
                 'items': contents,
                 'xblock_context': context,
                 'can_add': can_add,
-                'can_reorder': False,
                 'first_displayed': item_start,
                 'total_children': children_count,
                 'displayed_children': len(children_to_show)

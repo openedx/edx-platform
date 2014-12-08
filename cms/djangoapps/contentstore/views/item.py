@@ -206,6 +206,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         store = modulestore()
         xblock = store.get_item(usage_key)
         container_views = ['container_preview', 'reorderable_container_child_preview']
+        library = isinstance(usage_key, LibraryUsageLocator)
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -234,7 +235,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # are being shown in a reorderable container, so the xblock is automatically
             # added to the list.
             reorderable_items = set()
-            if view_name == 'reorderable_container_child_preview':
+            if not library and view_name == 'reorderable_container_child_preview':
                 reorderable_items.add(xblock.location)
 
             paging = None
@@ -258,7 +259,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 'is_unit_page': is_unit(xblock),
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items,
-                'paging': paging
+                'paging': paging,
             }
 
             fragment = get_preview_fragment(request, xblock, context)

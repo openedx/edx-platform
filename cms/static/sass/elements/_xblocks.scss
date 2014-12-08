@@ -105,7 +105,7 @@
 
   .container-paging-header {
     .meta-wrap {
-      margin: $baseline $baseline/2;
+      margin: $baseline ($baseline/2);
     }
     .meta {
       @extend %t-copy-sub2;
