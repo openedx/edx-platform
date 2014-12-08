@@ -1,30 +1,53 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'gettext', 'js/edxnotes/views/subview', 'js/edxnotes/views/tab_view',
-    'js/edxnotes/views/search_box', 'jquery.highlight'
-], function (gettext, SubView, TabView, SearchBoxView) {
+    'gettext', 'backbone', 'js/edxnotes/views/note_item',
+    'js/edxnotes/views/tab_view', 'js/edxnotes/views/search_box', 'jquery.highlight'
+], function (gettext, Backbone, NoteItemView, TabView, SearchBoxView) {
     var SearchResultsView = TabView.extend({
-        SubViewConstructor: SubView.extend({
-            id: 'edx-notes-page-search-results',
+        SubViewConstructor: Backbone.View.extend({
+            tagName: 'section',
+            className: 'tab-panel',
+            id: 'search-results-panel',
+            attributes: {
+                'tabindex': -1
+            },
             highlightMatchedText: true,
-            templateName: 'recent-activity-item',
             render: function () {
-                this.$el.html(this.template({collection: this.collection}));
+                var container = document.createDocumentFragment();
+                container.appendChild(this.getTitle());
+                this.collection.each(function (model) {
+                    var item = new NoteItemView({model: model});
+                    container.appendChild(item.render().el);
+                });
+                this.$el.html(container);
 
                 if (this.highlightMatchedText) {
-                    this.$('.edx-notes-item-text').highlight(this.options.searchQuery, {
+                    this.$('.note-comment-p').highlight(this.options.searchQuery, {
                         element: 'span',
-                        className: 'edx-notes-highlight',
-                        caseSensitive: false
+                        className: 'note-highlight',
+                        caseSensitive: false,
+                        wordsOnly: false
                     });
                 }
                 return this;
+            },
+
+            getTitle: function () {
+                return $('<h2></h2>', {
+                    'class': 'sr',
+                    'text': gettext('Search Results')
+                }).get(0);
             }
         }),
 
-        NoResultsViewConstructor: SubView.extend({
-            id: 'edx-notes-page-no-search-results',
+        NoResultsViewConstructor: Backbone.View.extend({
+            tagName: 'section',
+            className: 'tab-panel',
+            id: 'no-results-panel',
+            attributes: {
+                'tabindex': -1
+            },
             render: function () {
                 var message = gettext('No results found for "%(query_string)s".');
                 this.$el.html(interpolate(message, {
@@ -35,8 +58,9 @@ define([
         }),
 
         tabInfo: {
+            identifier: 'view-search-results',
             name: gettext('Search Results'),
-            class_name: 'tab-search-results',
+            icon: 'icon-search',
             is_closable: true
         },
 
@@ -45,7 +69,7 @@ define([
             TabView.prototype.initialize.call(this, options);
             this.searchResults = null;
             this.searchBox = new SearchBoxView({
-                el: this.$('form.search-box').get(0),
+                el: document.getElementById('search-notes-form'),
                 user: this.options.user,
                 courseId: this.options.courseId,
                 debug: this.options.debug,
@@ -56,10 +80,11 @@ define([
         },
 
         renderContent: function () {
+            this.getLoadingIndicator().focus();
             return this.searchPromise.done(_.bind(function () {
-                var contentView = this.getSubView();
-                if (contentView) {
-                    this.$('.course-info').append(contentView.render().$el);
+                this.contentView = this.getSubView();
+                if (this.contentView) {
+                    this.$('.wrapper-tabs').append(this.contentView.render().$el);
                 }
             }, this));
         },
@@ -117,8 +142,13 @@ define([
                 total: total,
                 searchQuery: searchQuery
             };
+
             if (this.searchDeferred) {
                 this.searchDeferred.resolve();
+            }
+
+            if (this.contentView) {
+                this.contentView.$el.focus();
             }
         },
 

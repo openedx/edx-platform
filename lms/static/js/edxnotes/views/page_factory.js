@@ -17,7 +17,7 @@ define([
         var collection = new NotesCollection(params.notesList);
 
         return new NotesPageView({
-            el: $('.edx-notes-page-wrapper').get(0),
+            el: $('.wrapper-student-notes').get(0),
             collection: collection,
             debug: params.debugMode,
             user: params.user,
