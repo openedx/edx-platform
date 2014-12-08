@@ -119,6 +119,7 @@ class LibraryContentFields(object):
         scope=Scope.settings,
     )
     mode = String(
+        display_name=_("Mode"),
         help=_("Determines how content is drawn from the library"),
         default="random",
         values=[

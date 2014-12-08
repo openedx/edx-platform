@@ -109,8 +109,9 @@ class StudioLibraryTest(WebAppTest):
     """
     Base class for all Studio library tests.
     """
+    as_staff = True
 
-    def setUp(self, is_staff=False):  # pylint: disable=arguments-differ
+    def setUp(self):  # pylint: disable=arguments-differ
         """
         Install a library with no content using a fixture.
         """
@@ -122,10 +123,11 @@ class StudioLibraryTest(WebAppTest):
         )
         self.populate_library_fixture(fixture)
         fixture.install()
+        self.library_fixture = fixture
         self.library_info = fixture.library_info
         self.library_key = fixture.library_key
         self.user = fixture.user
-        self.log_in(self.user, is_staff)
+        self.log_in(self.user, self.as_staff)
 
     def populate_library_fixture(self, library_fixture):
         """
