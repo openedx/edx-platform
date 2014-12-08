@@ -1,4 +1,5 @@
-<a href class="tab-item-name"><%- gettext(name) %></a>
-<% if (is_closable) { %>
-    <a href class="btn-close icon-close">x</a>
+<% var hasIcon = icon ? 1 : 0; %>
+<a class="tab-label <% if (hasIcon) { print('has-icon') } %>" href="#"><% if (hasIcon) { %><i class="icon <%= icon %>"></i> <% } %><%- gettext(name) %></a><% if (is_closable) { %>
+    <a href="#" class="btn-close icon-close">x</a>
 <% } %>
+
