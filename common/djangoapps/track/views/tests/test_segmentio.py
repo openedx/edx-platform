@@ -97,6 +97,11 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
     def test_segmentio_ignore_actions(self, action):
         self.post_segmentio_event(action=action)
 
+    @data('edx.bi.some_name', 'EDX.BI.CAPITAL_NAME')
+    @expect_failure_with_message(segmentio.WARNING_IGNORED_TYPE)
+    def test_segmentio_ignore_names(self, name):
+        self.post_segmentio_event(name=name)
+
     def post_segmentio_event(self, **kwargs):
         """Post a fake segment.io event to the view that processes it"""
         request = self.create_request(
@@ -305,7 +310,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                 name=name,
                 data=input_payload,
                 context={
-                    'open_in_browser_url':'https://testserver/courses/foo/bar/baz/courseware/Week_1/Activity/2',
+                    'open_in_browser_url': 'https://testserver/courses/foo/bar/baz/courseware/Week_1/Activity/2',
                     'course_id': course_id,
                     'application': {
                         'name': 'edx.mobileapp.android',
