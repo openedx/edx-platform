@@ -79,7 +79,7 @@ import external_auth.views
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
 from shoppingcart.models import DonationConfiguration
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
 import track.views
@@ -105,7 +105,7 @@ from student.helpers import (
 )
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 
 import analytics
 from eventtracking import tracker

@@ -60,7 +60,7 @@ urlpatterns = ('',  # nopep8
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^user_api/', include('user_api.urls')),
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.urls')),
 
     url(r'^notifier_api/', include('notifier_api.urls')),
 
@@ -343,21 +343,21 @@ if settings.COURSEWARE_ENABLED:
 
         # Cohorts management
         url(r'^courses/{}/cohorts$'.format(settings.COURSE_KEY_PATTERN),
-            'course_groups.views.list_cohorts', name="cohorts"),
+            'openedx.core.djangoapps.course_groups.views.list_cohorts', name="cohorts"),
         url(r'^courses/{}/cohorts/add$'.format(settings.COURSE_KEY_PATTERN),
-            'course_groups.views.add_cohort',
+            'openedx.core.djangoapps.course_groups.views.add_cohort',
             name="add_cohort"),
         url(r'^courses/{}/cohorts/(?P<cohort_id>[0-9]+)$'.format(settings.COURSE_KEY_PATTERN),
-            'course_groups.views.users_in_cohort',
+            'openedx.core.djangoapps.course_groups.views.users_in_cohort',
             name="list_cohort"),
         url(r'^courses/{}/cohorts/(?P<cohort_id>[0-9]+)/add$'.format(settings.COURSE_KEY_PATTERN),
-            'course_groups.views.add_users_to_cohort',
+            'openedx.core.djangoapps.course_groups.views.add_users_to_cohort',
             name="add_to_cohort"),
         url(r'^courses/{}/cohorts/(?P<cohort_id>[0-9]+)/delete$'.format(settings.COURSE_KEY_PATTERN),
-            'course_groups.views.remove_user_from_cohort',
+            'openedx.core.djangoapps.course_groups.views.remove_user_from_cohort',
             name="remove_from_cohort"),
         url(r'^courses/{}/cohorts/debug$'.format(settings.COURSE_KEY_PATTERN),
-            'course_groups.views.debug_cohort_mgmt',
+            'openedx.core.djangoapps.course_groups.views.debug_cohort_mgmt',
             name="debug_cohort_mgmt"),
 
         # Open Ended Notifications
