@@ -39,6 +39,7 @@
 @import 'xmodule/modules/css/module-styles.scss';
 @import 'course/courseware/courseware';
 @import 'course/courseware/sidebar';
+@import 'course/courseware/search_results';
 @import 'course/courseware/amplifier';
 
 // course - modules

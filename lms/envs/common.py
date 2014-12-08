@@ -1028,6 +1028,16 @@ courseware_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
+# Courseware Search
+# TODO: add conditional
+courseware_js += (
+    'js/search/models/SearchResult.js',
+    'js/search/collections/SearchResultCollection.js',
+    'js/search/views/SearchFormView.js',
+    'js/search/views/SearchResultsView.js',
+    'js/search/searchApp.js',
+)
+
 
 # Before a student accesses courseware, we do not
 # need many of the JS dependencies.  This includes
