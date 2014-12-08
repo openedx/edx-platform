@@ -18,7 +18,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         """
         Ensure a library exists and navigate to the library edit page.
         """
-        super(LibraryEditPageTest, self).setUp(is_staff=True)
+        super(LibraryEditPageTest, self).setUp()
         self.lib_page = LibraryPage(self.browser, self.library_key)
         self.lib_page.visit()
         self.lib_page.wait_until_ready()
@@ -156,7 +156,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         """
         Ensure a library exists and navigate to the library edit page.
         """
-        super(LibraryNavigationTest, self).setUp(is_staff=True)
+        super(LibraryNavigationTest, self).setUp()
         self.lib_page = LibraryPage(self.browser, self.library_key)
         self.lib_page.visit()
         self.lib_page.wait_until_ready()

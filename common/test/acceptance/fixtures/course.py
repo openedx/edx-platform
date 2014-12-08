@@ -375,5 +375,3 @@ class CourseFixture(XBlockContainerFixture):
         """
         super(CourseFixture, self)._create_xblock_children(parent_loc, xblock_descriptions)
         self._publish_xblock(parent_loc)
-
-
