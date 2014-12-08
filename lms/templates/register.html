@@ -361,6 +361,10 @@
       <input type="hidden" name="course_id" value="${course_id | h}" />
 % endif
 
+% if email_opt_in:
+      <input type="hidden" name="email_opt_in" value="${email_opt_in | h }" />
+% endif
+
       <div class="form-actions">
         <button name="submit" type="submit" id="submit" class="action action-primary action-update register-button">${_('Register')} <span class="orn-plus">+</span> ${_('Create My Account')}</button>
       </div>

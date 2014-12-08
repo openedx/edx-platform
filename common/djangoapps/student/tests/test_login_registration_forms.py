@@ -1,6 +1,7 @@
 """Tests for the login and registration form rendering. """
 import urllib
 import unittest
+from collections import OrderedDict
 from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -125,6 +126,29 @@ class LoginFormTest(ModuleStoreTestCase):
         )
         self.assertContains(response, expected_url)
 
+    @ddt.data(None, "true", "false")
+    def test_email_opt_in(self, opt_in_value):
+        params = {
+            'course_id': self.course_id,
+            'enrollment_action': 'enroll'
+        }
+
+        if opt_in_value is not None:
+            params['email_opt_in'] = opt_in_value
+
+        # Get the login page
+        response = self.client.get(self.url, params)
+
+        # Verify that the hidden parameter is set correctly
+        hidden_param = '<input type="hidden" name="email_opt_in" value="{val}"'.format(
+            val=opt_in_value
+        )
+
+        if opt_in_value is not None:
+            self.assertContains(response, hidden_param)
+        else:
+            self.assertNotContains(response, hidden_param)
+
 
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
@@ -182,3 +206,32 @@ class RegisterFormTest(ModuleStoreTestCase):
             redirect_url=reverse("shoppingcart.views.show_cart")
         )
         self.assertContains(response, expected_url)
+
+    @ddt.data(None, "true", "false")
+    def test_email_opt_in(self, opt_in_value):
+        params = OrderedDict()
+        params['course_id'] = self.course_id
+        params['enrollment_action'] = 'enroll'
+
+        if opt_in_value is not None:
+            params['email_opt_in'] = opt_in_value
+
+        # Get the login page
+        response = self.client.get(self.url, params)
+
+        # Verify that the hidden parameter is set correctly
+        hidden_param = '<input type="hidden" name="email_opt_in" value="{val}"'.format(
+            val=opt_in_value
+        )
+
+        if opt_in_value is not None:
+            self.assertContains(response, hidden_param)
+        else:
+            self.assertNotContains(response, hidden_param)
+
+        # Verify that the login link preserves the querystring params
+        login_link = u"{url}?{params}".format(
+            url=reverse('signin_user'),
+            params=urllib.urlencode(params)
+        )
+        self.assertContains(response, login_link)
