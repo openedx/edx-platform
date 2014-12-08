@@ -47,6 +47,9 @@ disable=
 # W0232: Class has no __init__ method
     W0232,
 
+# Disable 'fixme' so that quality builds don't fail due to them
+    W0511,
+
 # Might use these when the code is in better shape
 # C0302: Too many lines in module
 # R0201: Method could be a function

@@ -195,14 +195,12 @@ def run_quality(options):
         sh(
             "{pythonpath_prefix} diff-quality --violations=pylint "
             "{pylint_reports} {percentage_string} {compare_branch_string} "
-            "--html-report {dquality_dir}/diff_quality_pylint.html "
-            "--options='{pylint_options}'".format(
+            "--html-report {dquality_dir}/diff_quality_pylint.html ".format(
                 pythonpath_prefix=pythonpath_prefix,
                 pylint_reports=pylint_reports,
                 percentage_string=percentage_string,
                 compare_branch_string=compare_branch_string,
                 dquality_dir=dquality_dir,
-                pylint_options="--disable=fixme",
             )
         )
     except BuildFailure, error_message:
