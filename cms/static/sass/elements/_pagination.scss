@@ -2,7 +2,7 @@
 // ==========================
 
 %pagination {
-  @include clearfix;
+  @include clearfix();
   display: inline-block;
   width: flex-grid(3, 12);
 
@@ -48,7 +48,7 @@
   }
 
   .nav-label {
-    @extend .sr;
+    @extend %cont-text-sr;
   }
 
   .pagination-form,
@@ -89,7 +89,7 @@
 
     .page-number-label,
     .submit-pagination-form {
-      @extend .sr;
+      @extend %cont-text-sr;
     }
 
     .page-number-input {

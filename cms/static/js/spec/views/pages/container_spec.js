@@ -273,7 +273,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                 });
 
                 describe("xblock operations", function () {
-                    var getGroupElement,
+                    var getGroupElement, paginated,
                         NUM_COMPONENTS_PER_GROUP = 3, GROUP_TO_TEST = "A",
                         allComponentsInGroup = _.map(
                             _.range(NUM_COMPONENTS_PER_GROUP),
@@ -281,6 +281,11 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                                 return 'locator-component-' + GROUP_TO_TEST + (index + 1);
                             }
                         );
+
+                    paginated = function () {
+                        return containerPage.enable_paging;
+                    };
+
 
                     getGroupElement = function () {
                         return containerPage.$("[data-locator='locator-group-" + GROUP_TO_TEST + "']");
@@ -293,6 +298,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         beforeEach(function () {
                             promptSpy = EditHelpers.createPromptSpy();
                         });
+
 
                         clickDelete = function (componentIndex, clickNo) {
 
@@ -307,21 +313,25 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                             EditHelpers.confirmPrompt(promptSpy, clickNo);
                         };
 
-                        deleteComponent = function (componentIndex) {
+                        deleteComponent = function (componentIndex, requestOffset) {
                             clickDelete(componentIndex);
                             AjaxHelpers.respondWithJson(requests, {});
 
                             // second to last request contains given component's id (to delete the component)
                             AjaxHelpers.expectJsonRequest(requests, 'DELETE',
                                     '/xblock/locator-component-' + GROUP_TO_TEST + (componentIndex + 1),
-                                null, requests.length - 2);
+                                null, requests.length - requestOffset);
 
                             // final request to refresh the xblock info
                             AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                         };
 
                         deleteComponentWithSuccess = function (componentIndex) {
-                            deleteComponent(componentIndex);
+                            var deleteOffset;
+
+                            deleteOffset = paginated() ? 3 : 2;
+
+                            deleteComponent(componentIndex, deleteOffset);
 
                             // verify the new list of components within the group
                             expectComponents(
@@ -350,9 +360,16 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                             containerPage.$('.delete-button').first().click();
                             EditHelpers.confirmPrompt(promptSpy);
                             AjaxHelpers.respondWithJson(requests, {});
+                            var deleteOffset;
+
+                            if (paginated()) {
+                                deleteOffset = 3;
+                            } else {
+                                deleteOffset = 2;
+                            }
                             // expect the second to last request to be a delete of the xblock
                             AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/locator-broken-javascript',
-                                null, requests.length - 2);
+                                null, requests.length - deleteOffset);
                             // expect the last request to be a fetch of the xblock info for the parent container
                             AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                         });
@@ -511,7 +528,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         });
 
                         describe('Template Picker', function () {
-                            var showTemplatePicker, verifyCreateHtmlComponent;
+                            var showTemplatePicker, verifyCreateHtmlComponent, call_count;
 
                             showTemplatePicker = function () {
                                 containerPage.$('.new-component .new-component-type a.multiple-templates')[0].click();
@@ -519,6 +536,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
 
                             verifyCreateHtmlComponent = function (test, templateIndex, expectedRequest) {
                                 var xblockCount;
+                                // call_count = paginated() ? 18: 10;
                                 renderContainerPage(test, mockContainerXBlockHtml);
                                 showTemplatePicker();
                                 xblockCount = containerPage.$('.studio-xblock-wrapper').length;
@@ -557,6 +575,6 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
             { enable_paging: true, page_size: 42 },
             {
                 initial: 'mock/mock-container-paged-xblock.underscore',
-                add_response: 'mock/mock-container-paged-after-add-xblock.underscore'
+                add_response: 'mock/mock-xblock-paged.underscore'
             });
     });
