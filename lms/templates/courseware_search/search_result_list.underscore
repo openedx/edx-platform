@@ -1,0 +1,8 @@
+<div class="search-info">
+  Searching Course
+  <span class="search-count"><%- totalCount %> results</span>
+</div>
+<ol class='search-results'>
+    <%= search_result_list %>
+</ol>
+<a class="search-more" href=""><%- gettext("Load next %s results").replace("%s", pageSize) %></a>

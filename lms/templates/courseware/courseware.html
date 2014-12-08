@@ -22,8 +22,13 @@ ${page_title_breadcrumbs(course_name())}
     <%static:include path="js/${template_name}.underscore" />
 </script>
 % endfor
+<script type="text/template" id="search_result_item-tpl">
+    <%static:include path="courseware_search/search_result_item.underscore" />
+</script>
+<script type="text/template" id="search_result_list-tpl">
+    <%static:include path="courseware_search/search_result_list.underscore" />
+</script>
 </%block>
-
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -195,6 +200,15 @@ ${fragment.foot_html()}
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>
       </header>
+
+      ## TODO: add conditional
+      <div id="couserware-search" class="search-container">
+        <form role="search-form">
+          <input type="text" class="search-field"/>
+          <button class="search-button">${_('search')} <i class="icon-search"></i></button>
+          <button class="cancel-button" aria-label="${_('Cancel')}"><i class="icon-remove"></i></button>
+        </form>
+      </div>
 
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">

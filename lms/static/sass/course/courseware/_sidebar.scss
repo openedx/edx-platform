@@ -16,6 +16,39 @@
     }
   }
 
+  .search-container {
+    @include box-sizing(border-box);
+    position: relative;
+    padding: 5px;
+    box-shadow: 0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset;
+    font-family: $sans-serif;
+    .search-field {
+      @include box-sizing(border-box);
+      top: 5px;
+      width: 100%;
+      @include border-radius(4px);
+    }
+    .search-button, .cancel-button {
+      @include box-sizing(border-box);
+      color: #888;
+      font-size: 14px;
+      font-weight: normal;
+      display: block;
+      position: absolute;
+      right: 12px;
+      top: 5px;
+      height: 35px;
+      line-height: 35px;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+    .cancel-button {
+      display: none;
+    }
+  }
+
   div#accordion {
     width: auto;
     font-size: 14px;

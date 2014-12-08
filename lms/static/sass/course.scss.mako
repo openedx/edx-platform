@@ -39,6 +39,7 @@
 // courseware
 @import 'course/courseware/courseware';
 @import 'course/courseware/sidebar';
+@import 'course/courseware/search_results';
 @import 'course/courseware/amplifier';
 @import 'course/layout/calculator';
 @import 'course/layout/timer';
