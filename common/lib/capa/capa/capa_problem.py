@@ -349,10 +349,24 @@ class LoncapaProblem(object):
         """
         return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
 
+    def clean_unanswered_responses(self):
+        """
+        Clear responses which are unanswered for rescoring
+        """
+        responses_to_clean = []
+        for responder_key in self.responders:
+            if unicode(self.responders[responder_key].answer_id) not in self.student_answers.keys():
+                responses_to_clean.append(responder_key)
+
+        # delete the response using filtered responses_to_clean list
+        for responder_key in responses_to_clean:
+            del self.responders[responder_key]
+
     def rescore_existing_answers(self):
         """
         Rescore student responses.  Called by capa_module.rescore_problem.
         """
+        self.clean_unanswered_responses()
         return self._grade_answers(None)
 
     def _grade_answers(self, student_answers):
