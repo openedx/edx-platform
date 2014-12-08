@@ -4,21 +4,28 @@ Unit tests for getting the list of courses and the course outline.
 import json
 import lxml
 import datetime
+import os
+import mock
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor
 from student.auth import has_course_author_access
-from contentstore.views.course import course_outline_initial_state
+from contentstore.views.course import course_outline_initial_state, reindex_course_and_check_access
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.models import CourseRerunState
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.courseware_index import CoursewareSearchIndexer
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
+from xmodule.modulestore.courseware_index import SearchIndexingError
 from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from course_action_state.managers import CourseRerunUIStateManager
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from search.api import perform_search
 import pytz
 
 
@@ -226,6 +233,7 @@ class TestCourseOutline(CourseTestCase):
         Set up the for the course outline tests.
         """
         super(TestCourseOutline, self).setUp()
+
         self.chapter = ItemFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Week 1"
         )
@@ -330,3 +338,304 @@ class TestCourseOutline(CourseTestCase):
 
         self.assertEqual(_get_release_date(response), get_default_time_display(self.course.start))
         _assert_settings_link_present(response)
+
+
+class TestCourseReIndex(CourseTestCase):
+    """
+    Unit tests for the course outline.
+    """
+
+    TEST_INDEX_FILENAME = "test_root/index_file.dat"
+
+    def setUp(self):
+        """
+        Set up the for the course outline tests.
+        """
+
+        super(TestCourseReIndex, self).setUp()
+
+        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
+        modulestore().update_item(self.course, self.user.id)
+
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Week 1"
+        )
+        self.sequential = ItemFactory.create(
+            parent_location=self.chapter.location, category='sequential', display_name="Lesson 1"
+        )
+        self.vertical = ItemFactory.create(
+            parent_location=self.sequential.location, category='vertical', display_name='Subsection 1'
+        )
+        self.video = ItemFactory.create(
+            parent_location=self.vertical.location, category="video", display_name="My Video"
+        )
+
+        self.html = ItemFactory.create(
+            parent_location=self.vertical.location, category="html", display_name="My HTML",
+            data="<div>This is my unique HTML content</div>",
+
+        )
+
+        # create test file in which index for this test will live
+        with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
+            json.dump({}, index_file)
+
+    def test_reindex_course(self):
+        """
+        Verify that course gets reindexed.
+        """
+        index_url = reverse_course_url('course_search_index_handler', self.course.id)
+        response = self.client.get(index_url, {}, HTTP_ACCEPT='application/json')
+
+        # A course with the default release date should display as "Unscheduled"
+        self.assertEqual(response.content, '')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(index_url, {}, HTTP_ACCEPT='application/json')
+        self.assertEqual(response.content, '')
+        self.assertEqual(response.status_code, 405)
+
+        self.client.logout()
+        response = self.client.get(index_url, {}, HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 302)
+
+    def test_negative_conditions(self):
+        """
+        Test the error conditions for the access
+        """
+        index_url = reverse_course_url('course_search_index_handler', self.course.id)
+        # register a non-staff member and try to delete the course branch
+        non_staff_client, _ = self.create_non_staff_authed_user_client()
+        response = non_staff_client.get(index_url, {}, HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 403)
+
+    def test_reindex_json_responses(self):
+        """
+        Test json response with real data
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        # Start manual reindex
+        reindex_course_and_check_access(self.course.id, self.user)
+
+        self.html.display_name = "My expanded HTML"
+        modulestore().update_item(self.html, ModuleStoreEnum.UserID.test)
+
+        # Start manual reindex
+        reindex_course_and_check_access(self.course.id, self.user)
+
+        # Check results indexed now
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+    @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
+    def test_reindex_video_error_json_responses(self, mock_index_dictionary):
+        """
+        Test json response with mocked error data for video
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            reindex_course_and_check_access(self.course.id, self.user)
+
+    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    def test_reindex_html_error_json_responses(self, mock_index_dictionary):
+        """
+        Test json response with rmocked error data for html
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            reindex_course_and_check_access(self.course.id, self.user)
+
+    @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
+    def test_reindex_seq_error_json_responses(self, mock_index_dictionary):
+        """
+        Test json response with rmocked error data for sequence
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            reindex_course_and_check_access(self.course.id, self.user)
+
+    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    def test_reindex_no_item(self, mock_get_course):
+        """
+        Test system logs an error if no item found.
+        """
+        # set mocked exception response
+        err = ItemNotFoundError
+        mock_get_course.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            reindex_course_and_check_access(self.course.id, self.user)
+
+    def test_reindex_no_permissions(self):
+        # register a non-staff member and try to delete the course branch
+        user2 = UserFactory()
+        with self.assertRaises(PermissionDenied):
+            reindex_course_and_check_access(self.course.id, user2)
+
+    def test_indexing_responses(self):
+        """
+        Test add_to_search_index response with real data
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        # Start manual reindex
+        errors = CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+        self.assertEqual(errors, None)
+
+        self.html.display_name = "My expanded HTML"
+        modulestore().update_item(self.html, ModuleStoreEnum.UserID.test)
+
+        # Start manual reindex
+        errors = CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+        self.assertEqual(errors, None)
+
+        # Check results indexed now
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['total'], 1)
+
+    @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
+    def test_indexing_video_error_responses(self, mock_index_dictionary):
+        """
+        Test add_to_search_index response with mocked error data for video
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+
+    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    def test_indexing_html_error_responses(self, mock_index_dictionary):
+        """
+        Test add_to_search_index response with mocked error data for html
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+
+    @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
+    def test_indexing_seq_error_responses(self, mock_index_dictionary):
+        """
+        Test add_to_search_index response with mocked error data for sequence
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        # set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+
+    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    def test_indexing_no_item(self, mock_get_course):
+        """
+        Test system logs an error if no item found.
+        """
+        # set mocked exception response
+        err = ItemNotFoundError
+        mock_get_course.return_value = err
+
+        # Start manual reindex and check error in response
+        with self.assertRaises(SearchIndexingError):
+            CoursewareSearchIndexer.do_course_reindex(modulestore(), self.course.id)
+
+    def tearDown(self):
+        os.remove(self.TEST_INDEX_FILENAME)

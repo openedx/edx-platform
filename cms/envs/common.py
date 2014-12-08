@@ -146,6 +146,9 @@ FEATURES = {
 
     # Toggle course entrance exams feature
     'ENTRANCE_EXAMS': False,
+
+    # Enable the courseware search functionality
+    'ENABLE_COURSEWARE_INDEX': False,
 }
 
 ENABLE_JASMINE = False
@@ -867,4 +870,12 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
         'application/vnd.ms-excel',
         'application/vnd.ms-powerpoint',
     ],
+}
+
+# Default to no Search Engine
+SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+ELASTIC_FIELD_MAPPINGS = {
+    "start_date": {
+        "type": "date"
+    }
 }

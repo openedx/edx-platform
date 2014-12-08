@@ -5,6 +5,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.courseware_index import CoursewareSearchIndexer
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
@@ -203,6 +204,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
+        # Remove this location from the courseware search index so that searches
+        # will refrain from showing it as a result
+        CoursewareSearchIndexer.add_to_search_index(self, location, delete=True)
+
     def _map_revision_to_branch(self, key, revision=None):
         """
         Maps RevisionOptions to BranchNames, inserting them into the key
@@ -345,6 +350,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             [location],
             blacklist=blacklist
         )
+
+        # Now it's been published, add the object to the courseware search index so that it appears in search results
+        CoursewareSearchIndexer.add_to_search_index(self, location)
+
         return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.published), **kwargs)
 
     def unpublish(self, location, user_id, **kwargs):

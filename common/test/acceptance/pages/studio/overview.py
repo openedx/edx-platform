@@ -505,6 +505,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         self.q(css=self.EXPAND_COLLAPSE_CSS).click()
 
+    def start_reindex(self):
+        """
+        Starts course reindex by clicking reindex button
+        """
+        self.reindex_button.click()
+
     @property
     def bottom_add_section_button(self):
         """
@@ -544,6 +550,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
             return ExpandCollapseLinkState.COLLAPSE
         else:
             return ExpandCollapseLinkState.EXPAND
+
+    @property
+    def reindex_button(self):
+        """
+        Returns reindex button.
+        """
+        return self.q(css=".button.button-reindex")[0]
 
     def expand_all_subsections(self):
         """

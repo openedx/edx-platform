@@ -2,8 +2,8 @@
  * This page is used to show the user an outline of the course.
  */
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
-        "js/views/course_outline", "js/views/utils/view_utils"],
-    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils) {
+        "js/views/course_outline", "js/views/utils/view_utils", "js/views/feedback_alert"],
+    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView) {
         var expandedLocators, CourseOutlinePage;
 
         CourseOutlinePage = BasePage.extend({
@@ -23,6 +23,9 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 BasePage.prototype.initialize.call(this);
                 this.$('.button-new').click(function(event) {
                     self.outlineView.handleAddEvent(event);
+                });
+                this.$('.button.button-reindex').click(function(event) {
+                    self.handleReIndexEvent(event);
                 });
                 this.model.on('change', this.setCollapseExpandVisibility, this);
                 $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function () {
@@ -100,6 +103,32 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                         }
                     }, this);
                 }
+            },
+
+            handleReIndexEvent: function(event) {
+                var self = this;
+                event.preventDefault();
+                var target = $(event.currentTarget);
+                target.css('cursor', 'wait');
+                this.startReIndex()
+                    .done(function() {self.onIndexSuccess();})
+                    .always(function() {target.css('cursor', 'pointer');});
+            },
+
+            startReIndex: function() {
+                var locator =  window.course.id;
+                return $.ajax({
+                    url: '/course_search_index/' + locator,
+                    method: 'GET'
+                    });
+            },
+
+            onIndexSuccess: function() {
+                var msg = new AlertView.Announcement({
+                        title: gettext('Course Index'),
+                        message: gettext('Course has been successfully reindexed.')
+                    });
+                msg.show();
             }
         });
 

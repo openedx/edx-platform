@@ -1,0 +1,21 @@
+<div class="search-info">
+    <%- interpolate(gettext("Searching %s"), [courseName]) %>
+    <div class="search-count"><%- totalCountMsg %></div>
+</div>
+
+<% if (totalCount > 0 ) { %>
+
+    <ol class='search-results'></ol>
+
+    <% if (hasMoreResults) { %>
+        <a class="search-load-next" href="javascript:void(0);">
+            <%- interpolate(gettext("Load next %s results"), [pageSize]) %>
+            <i class="icon fa-spinner fa-spin"></i>
+        </a>
+    <% } %>
+
+<% } else { %>
+
+    <p><%- gettext("Sorry, no results were found.") %></p>
+
+<% } %>

@@ -278,7 +278,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     raw_metadata = json_data.get('metadata', {})
                     # published_on was previously stored as a list of time components instead of a datetime
                     if raw_metadata.get('published_date'):
-                        module._edit_info['published_date'] = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                        module._edit_info['published_date'] = datetime(
+                            *raw_metadata.get('published_date')[0:6]
+                        ).replace(tzinfo=UTC)
                     module._edit_info['published_by'] = raw_metadata.get('published_by')
 
                 # decache any computed pending field settings
@@ -1804,3 +1806,25 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         # To allow prioritizing draft vs published material
         self.collection.create_index('_id.revision')
+
+    # Some overrides that still need to be implemented by subclasses
+    def convert_to_draft(self, location, user_id):
+        raise NotImplementedError()
+
+    def delete_item(self, location, user_id, **kwargs):
+        raise NotImplementedError()
+
+    def has_changes(self, xblock):
+        raise NotImplementedError()
+
+    def has_published_version(self, xblock):
+        raise NotImplementedError()
+
+    def publish(self, location, user_id):
+        raise NotImplementedError()
+
+    def revert_to_published(self, location, user_id):
+        raise NotImplementedError()
+
+    def unpublish(self, location, user_id):
+        raise NotImplementedError()
