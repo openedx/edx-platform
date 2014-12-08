@@ -4,45 +4,75 @@
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
-<%block name="pagetitle">${_("Notes")}</%block>
+<%block name="pagetitle">${_("Student Notes")}</%block>
 <%block name="headextra">
     <%static:css group='style-course'/>
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='edxnotes'" />
-<div class="edx-notes-page-wrapper">
-    <header>
-        <div class="page-title">
-            <h1>${_('Notes')}</h1>
-            <small>${_("Highlights and personal notes you've made within the course")}</small>
-        </div>
-    % if notes:
-        <form method="GET" action="${search_endpoint}" class="is-hidden search-box">
-            <input name="text" id="search-field" required placeholder="${_('Search Notes for...')}" />
-            <button type="submit">${_('Search')}</button>
-        </form>
-    % endif
-    </header>
-    <nav class="edx-notes-page-views is-hidden">
-        <h4>${_('View notes by:')}</h4>
-    </nav>
-    <div class="container">
-        <div class="course-info">
-            <div class="inline-error is-hidden"></div>
-        % if notes:
-            <div class="ui-loading">
-                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+<section class="container wrapper-student-notes">
+    <div class="info-wrapper">
+        <section class="updates">
+            <div class="title-search-container">
+                <div class="wrapper-title">
+                    <h1 class="page-title">${_('Notes')} <small class="page-subtitle">${_("Highlights and personal notes you've made within the course")}</small></h1>
+                </div>
+            % if notes:
+                <div class="wrapper-notes-search">
+                    <form role="search" action="${search_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
+                        <label for="search-notes-input" class="sr">${_('Search notes for:')}</label>
+                        <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="${_('Search Notes for...')}">
+                        <button type="submit" class="search-notes-submit"><i class="icon-search"></i> ${_('Search')}</button>
+                    </form>
+                </div>
+            % endif
             </div>
-        % else:
-            <section class="no-content">${_('You do not have any notes within the course.')}</section>
-        % endif
-        </div>
+
+            <section class="wrapper-tabs">
+                <div class="tab-list is-hidden">
+                    <h2 id="tab-view" class="tabs-label">${_('View notes by:')}</h2>
+                </div>
+                <div class="inline-error is-hidden" tabindex="-1"></div>
+            % if notes:
+                <div class="ui-loading" tabindex="-1">
+                    <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+                </div>
+            % else:
+                <section class="is-empty">
+                    <article>
+                        <h2>${_('You have not made any notes in this course yet.')}</h2>
+                        <p>${_('Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.')}</p>
+
+                        <h2>${_('Other Students In This Course Are Using Notes To:')}</h2>
+                        <ul>
+                            <li>${_('Add study notes to course content for exams and homework.')}</li>
+                            <li>${_('Highlight important concepts for later coursework or future courses')}</li>
+                            <li>${_('Donec id elit non mi porta gravida et eget metus.')}</li>
+                            <li>${_('Praesent commodo cursus magna, vel scelerisque nisl consectetur et.')}</li>
+                        </ul>
+
+                    % if position is not None:
+                        <div class="student-notes-cta">
+                            <h3 class="sr">${_('Start creating notes')}</h3>
+                            <p>${_('Get started by making a note in something you just read, like {section_link}.').format(
+                                section_link='<a href="{url}">{section_name}</a>'.format(
+                                    url=position['url'],
+                                    section_name=position['display_name'],
+                                )
+                            )}</p>
+                        </div>
+                    % endif
+                    </article>
+                </section>
+            % endif
+            </section>
+        </section>
     </div>
-</div>
+</section>
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["recent-activity-item", "tab-item"]:
+% for template_name in ["note-item", "tab-item"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="edxnotes/${template_name}.underscore" />
 </script>

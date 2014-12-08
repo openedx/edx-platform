@@ -916,7 +916,7 @@ def _config_course_advanced_components(request, course_module):
     return filter_tabs
 
 
- # pylint: disable=invalid-name
+# pylint: disable=invalid-name
 def _config_course_settings(request, course_module, filter_tabs=True):
     """
     Check to see if the user enabled some advanced settings (boolean).
@@ -928,7 +928,7 @@ def _config_course_settings(request, course_module, filter_tabs=True):
     tab_component_map = {
         'edxnotes': ['edxnotes']
     }
-     # Check to see if the user instantiated any notes or open ended components
+    # Check to see if the user instantiated any notes or open ended components
     for tab_type in tab_component_map.keys():
         if tab_type in request.json:
             component_types = tab_component_map.get(tab_type)

@@ -53,7 +53,7 @@ define([
          * @return {String}
          */
         getSearchQuery: function () {
-            return this.$el.find('#search-field').val();
+            return this.$el.find('#search-notes-input').val();
         },
 
         /**

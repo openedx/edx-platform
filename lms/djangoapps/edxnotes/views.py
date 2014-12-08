@@ -18,7 +18,8 @@ from edxnotes.helpers import (
     get_notes,
     get_id_token,
     is_feature_enabled,
-    search
+    search,
+    get_course_position,
 )
 
 log = logging.getLogger(__name__)
@@ -45,7 +46,17 @@ def edxnotes(request, course_id):
         "search_endpoint": reverse("search_notes", kwargs={"course_id": course_id}),
         "notes": notes,
         "debug": json.dumps(settings.DEBUG),
+        'position': None,
     }
+
+    if not notes:
+        field_data_cache = FieldDataCache([course], course_key, request.user)
+        course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
+        position = get_course_position(course_module)
+        if position:
+            context.update({
+                'position': position,
+            })
 
     return render_to_response("edxnotes/edxnotes.html", context)
 
@@ -61,7 +72,7 @@ def search_notes(request, course_id):
     if not is_feature_enabled(course):
         raise Http404
 
-    if not "text" in request.GET:
+    if "text" not in request.GET:
         return HttpResponseBadRequest()
 
     query_string = request.GET["text"]
