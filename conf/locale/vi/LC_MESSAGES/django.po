@@ -119,7 +119,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:37-0500\n"
+"POT-Creation-Date: 2014-12-08 08:18-0500\n"
 "PO-Revision-Date: 2014-10-27 15:11+0000\n"
 "Last-Translator: NGUYEN HOANG AN <neyugn2909@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
@@ -1574,7 +1574,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Per Student"
-msgstr "trung bình mỗi sinh viên"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -2096,6 +2096,7 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Advanced Module List"
 msgstr ""
 
@@ -2687,6 +2688,18 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "No email address found."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+msgid "Enter the name of the library as it should appear in Studio."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+msgid "Library Display Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+msgid "Enter the names of the advanced components to use in your library."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -4176,6 +4189,12 @@ msgid "Task is already running."
 msgstr "Công việc đang được thực hiện."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Make sure that the file you upload is in CSV format with no extraneous "
+"characters or rows."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid "Could not read uploaded file."
 msgstr ""
 
@@ -4384,7 +4403,7 @@ msgstr "Thành viên"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Student Admin"
-msgstr "Quản Trị Sinh Viên"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Extensions"
@@ -4971,7 +4990,7 @@ msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "for course {0} and student {1}."
-msgstr "cho khóa học {0} và sinh viên {1}."
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
@@ -5276,6 +5295,12 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Code '{0}' is not valid for any course in the shopping cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid ""
+"Cart item quantity should not be greater than 1 when applying activation "
+"code"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -7372,7 +7397,7 @@ msgstr "Bảng Thành Tích "
 msgid "User"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "About edX"
 msgstr ""
 
@@ -7386,13 +7411,6 @@ msgid ""
 "philosophy, physics, science, statistics and more. {EdX} is a non-profit "
 "online initiative created by founding partners {Harvard} and {MIT}."
 msgstr ""
-"{EdX} mang đến những lớp học tương tác trực tuyến và MOOCs của các đại học "
-"hàng đầu trên thế giới. Các khóa học của {MITx}, {HarvardX}, {BerkeleyX}, "
-"{UTx} và nhiều trường đại học khác. Các chủ đề bao gồm Sinh học, Hóa học, "
-"Khoa học Máy tính, Kinh tế, Tài chính, Điện tử, Kỹ thuật, Lương thực và Dinh"
-" dưỡng, Lịch sử, Nhân văn, Luật, Văn học, Toán học, Y, Âm nhạc, Triết học, "
-"Vật lý, Thống kê và nhiều ngành khác nữa. {EdX} là một sản phẩm sáng tạo phi"
-" lợi nhuận tạo nên bởi hai thành viên đồng sáng lập {Harvard} và {MIT}."
 
 #: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
 msgid "&copy; 2014 edX, some rights reserved."
@@ -7401,10 +7419,6 @@ msgstr "&copy; 2014 edX, một số quyền được bảo hộ."
 #: lms/templates/footer-edx-new.html
 msgid "(Revised 4/16/2014)"
 msgstr ""
-
-#: lms/templates/footer-edx-new.html
-msgid "About & Company Info"
-msgstr "Thông Tin Về Công Ty"
 
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
 msgid "News"
@@ -9322,7 +9336,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Student-specific grade inspection and adjustment"
-msgstr "Kiểm tra và điều chỉnh điểm cho một sinh viên cụ thể"
+msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -9666,6 +9680,17 @@ msgstr ""
 msgid "and proceed to verification"
 msgstr ""
 
+#. Translators: This line appears next a checkbox which users can leave
+#. checked
+#. or uncheck in order
+#. to indicate whether they want to receive emails from the organization
+#. offering the course.
+#: lms/templates/courseware/mktg_course_about.html
+msgid ""
+"I would like to receive email about other {organization_full_name} programs "
+"and offers."
+msgstr ""
+
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Enrollment Is Closed"
 msgstr ""
@@ -9876,16 +9901,9 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You can no longer access this course because payment has not yet been "
-"received. you can <a href=\"#\">contact the account holder</a> to request "
-"payment, or you can"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "unenroll"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "for this course."
+"received. You can {link_start}contact the account holder{link_end} to "
+"request payment, or you can {unenroll_link_start}unenroll{unenroll_link_end}"
+" from this course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -10537,11 +10555,7 @@ msgid "It is recommended that you change your password."
 msgstr ""
 
 #: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "Sincerely yours,"
-msgstr ""
-
-#: lms/templates/emails/account_creation_and_enroll_emailMessage.txt
-msgid "The {course_name} Team"
+msgid "Sincerely yours,The {course_name} Team"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
@@ -10566,7 +10580,6 @@ msgid "We hope you enjoy learning with {platform_name}!"
 msgstr ""
 
 #: lms/templates/emails/activation_email.txt
-#: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The {platform_name} Team"
 msgstr ""
@@ -10732,9 +10745,25 @@ msgid "Warm regards,"
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Warm regards,<br>The {platform_name} Team"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Dear [[Name]]"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
-"(1) Register for an account at <a href='https://{site_name}' "
-">https://{site_name}</a>."
+"To enroll in ${course_names} we have provided a registration URL for you.  "
+"Please follow the instructions below to claim your access."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "Your redeem url is: [[Enter Redeem URL here from the attached CSV]]"
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "(1) Register for an account at {site_name}"
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
@@ -10751,13 +10780,16 @@ msgstr ""
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
 "(4) You should be able to click on 'view course' button or see your course "
-"on your student dashboard at <a "
-"href='https://{dashboard_url}'>https://{dashboard_url}</a>"
+"on your student dashboard at {url}"
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
 "(5) Course materials will not be available until the course start date."
+msgstr ""
+
+#: lms/templates/emails/business_order_confirmation_email.txt
+msgid "<p>Sincerely,</p><p>[[Your Signature]]</p>"
 msgstr ""
 
 #: lms/templates/emails/confirm_email_change.txt
@@ -10897,11 +10929,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Thanks,"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Your {platform_name} Team"
+msgid "Thanks,The {platform_name} Team"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10919,11 +10947,11 @@ msgid "Your redeem code is: [[Enter Redeem Code here from the attached CSV]]"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "(1) Register for an account at https://{site_name}."
+msgid "(1) Register for an account at {site_name}."
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "(2) Once registered, navigate to https://{course_url}"
+msgid "(2) Once registered, navigate to {course_url}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10932,8 +10960,8 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"(4) On the shopping cart page, enter your redeem code and click apply code. "
-"This will make payment equal to $0."
+"(4) On the shopping cart page, enter your redeem code and click 'Apply "
+"Code'. This will make payment equal to $0."
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10943,7 +10971,7 @@ msgstr ""
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
 "(6) You should be able to see your course on your student dashboard at "
-"https://{dashboard_url}"
+"{dashboard_url}"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10952,11 +10980,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Sincerely,"
-msgstr ""
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "[[Your Signature]]"
+msgid "Sincerely,[[Your Signature]]"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
@@ -14448,10 +14472,6 @@ msgid ""
 " particular discussions in the forums, announce schedule changes, and "
 "respond to student questions. You add or edit updates in HTML."
 msgstr ""
-"Sử dụng cập nhật khóa học để nhắc nhở sinh viên về những ngày quan trọng "
-"hoặc kỳ thi, làm nổi bật các cuộc thảo luận đặc biệt trong diễn đàn, thông "
-"báo những thay đổi trong lịch trình, và phản hồi câu hỏi của sinh viên. Bạn "
-"thêm hoặc thay đổi cập nhật bằng mã HTML."
 
 #: cms/templates/course_outline.html cms/templates/course_outline.html
 #: cms/templates/course_outline.html
@@ -15780,7 +15800,7 @@ msgstr "Trang Sơ Lược Khóa Học"
 
 #: cms/templates/settings.html
 msgid "(for student enrollment and access)"
-msgstr "(dành cho sinh viên ghi danh và truy cập)"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Enroll in {course_display_name}"
@@ -15799,7 +15819,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Invite your students"
-msgstr "Mời sinh viên của bạn"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Promoting Your Course with edX"
@@ -15851,7 +15871,7 @@ msgstr "Ngày Bắt Đầu Ghi Danh"
 
 #: cms/templates/settings.html
 msgid "First day students can enroll"
-msgstr "Ngày đầu tiên sinh viên có thể ghi danh"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Enrollment Start Time"
@@ -15863,7 +15883,7 @@ msgstr "Ngày Kết Thúc Ghi Danh"
 
 #: cms/templates/settings.html
 msgid "Last day students can enroll"
-msgstr "Ngày cuối cùng sinh viên có thể ghi danh"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"
@@ -15888,7 +15908,7 @@ msgstr "Giới Thiệu Khóa Học Của Bạn"
 
 #: cms/templates/settings.html
 msgid "Information for prospective students"
-msgstr "Thông tin cho sinh viên"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Short Description"
@@ -15964,7 +15984,7 @@ msgstr "Yêu Cầu"
 
 #: cms/templates/settings.html
 msgid "Expectations of the students taking this course"
-msgstr "Mong đợi ở sinh viên tham gia khóa học này"
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Hours of Effort per Week"
@@ -15983,8 +16003,6 @@ msgid ""
 "Your course's schedule determines when students can enroll in and begin a "
 "course."
 msgstr ""
-"Lịch trình khóa học của bạn quyết định thời điểm sinh viên có thể ghi danh "
-"và bắt đầu một khóa học."
 
 #: cms/templates/settings.html
 msgid ""
@@ -15993,10 +16011,6 @@ msgid ""
 "video, and estimated time requirements. Students use About pages to choose "
 "new courses to take."
 msgstr ""
-"Thông tin khác từ trang này xuất hiện trong trang About cho khóa học của "
-"bạn. Thông tin này bao gồm tổng quát khóa học, hình ảnh khóa học, video giới"
-" thiệu, và thời gian yêu cầu ước lượng để hoàn thành khóa học. Sinh viên sử "
-"dụng trang About để chọn khóa học mới để học."
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
@@ -16055,7 +16069,7 @@ msgstr "Khoảng Điểm Tổng Thể"
 
 #: cms/templates/settings_graders.html
 msgid "Your overall grading scale for student final grades"
-msgstr "Thang chấm điểm tổng thể của bạn cho điểm tổng kết của sinh viên"
+msgstr ""
 
 #: cms/templates/settings_graders.html
 msgid "Grading Rules &amp; Policies"
@@ -16064,8 +16078,6 @@ msgstr "Quy Tắc Chấm Điểm &amp; Chính Sách"
 #: cms/templates/settings_graders.html
 msgid "Deadlines, requirements, and logistics around grading student work"
 msgstr ""
-"Thời hạn, yêu cầu, và tổ chức thực tế xung quanh việc chấm điểm công việc "
-"của sinh viên"
 
 #: cms/templates/settings_graders.html
 msgid "Grace Period on Deadline:"
@@ -16131,10 +16143,6 @@ msgid ""
 "textbooks into chapters can also help students more easily find topic-based "
 "information."
 msgstr ""
-"Chia giáo trình của bạn thành nhiều chương giúp giảm thời gian tải cho sinh "
-"viên, đặc biệt cho những người có kết nối Internet chậm. Chia giáo trình "
-"thành các chương cũng có thể giúp sinh viên dễ dàng hơn để tìm kiếm thông "
-"tin dựa trên chủ đề."
 
 #: cms/templates/textbooks.html
 msgid "What if my book isn't divided into chapters?"
@@ -16370,7 +16378,7 @@ msgstr ""
 
 # empty
 msgid "This is a key string."
-msgstr ""
+msgstr "Đây là một chuỗi khóa."
 
 #: wiki/admin.py wiki/models/article.py
 msgid "created"
