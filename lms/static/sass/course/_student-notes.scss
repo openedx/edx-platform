@@ -85,7 +85,7 @@
         .note-excerpt > .note-excerpt-ul:before,
         .note-excerpt > .note-excerpt-ol:before {
           content: "\f10d";
-          top: $baseline;
+          top: 0;
           left: $baseline;
         }
 
@@ -93,7 +93,7 @@
         .note-excerpt > .note-excerpt-ul:after,
         .note-excerpt > .note-excerpt-ol:after {
           content: "\f10e";
-          bottom: $baseline;
+          bottom: ($baseline/2);
           right: $baseline;
         }
 
@@ -207,10 +207,6 @@
           color: inherit;
         }
       }
-    }
-
-    .note:first-child {
-      @extend %no-border-top;
     }
   }
 }
