@@ -262,7 +262,7 @@ class XBlockWrapperTestMixin(object):
     This is a mixin for building tests of the implementation of the XBlock
     api by wrapping XModule native functions.
 
-    You can creat an actual test case by inheriting from this class and UnitTest,
+    You can create an actual test case by inheriting from this class and UnitTest,
     and implement skip_if_invalid and check_property.
     """
 
@@ -289,6 +289,8 @@ class XBlockWrapperTestMixin(object):
         mocked_course = Mock()
         modulestore = Mock()
         modulestore.get_course.return_value = mocked_course
+        # pylint: disable=no-member
+        descriptor.runtime.id_reader.get_definition_id = Mock(return_value='a')
         descriptor.runtime.modulestore = modulestore
         self.check_property(descriptor)
 
@@ -299,6 +301,8 @@ class XBlockWrapperTestMixin(object):
         descriptor_cls, fields = cls_and_fields
         self.skip_if_invalid(descriptor_cls)
         descriptor = ContainerModuleFactory(descriptor_cls=descriptor_cls, depth=2, **fields)
+        # pylint: disable=no-member
+        descriptor.runtime.id_reader.get_definition_id = Mock(return_value='a')
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls
@@ -347,7 +351,9 @@ class TestStudioView(XBlockWrapperTestMixin, TestCase):
         """
         Assert that studio_view and get_html render the same.
         """
-        self.assertEqual(descriptor.get_html(), descriptor.render(STUDIO_VIEW).content)
+        html = descriptor.get_html()
+        rendered_content = descriptor.render(STUDIO_VIEW).content
+        self.assertEqual(html, rendered_content)
 
 
 class TestXModuleHandler(TestCase):

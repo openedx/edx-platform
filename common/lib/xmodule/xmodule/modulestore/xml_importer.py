@@ -480,6 +480,8 @@ def _import_module_and_update_references(
     fields = {}
     for field_name, field in module.fields.iteritems():
         if field.is_set_on(module):
+            if field.scope == Scope.parent:
+                continue
             if isinstance(field, Reference):
                 fields[field_name] = _convert_reference_fields_to_new_namespace(field.read_from(module))
             elif isinstance(field, ReferenceList):

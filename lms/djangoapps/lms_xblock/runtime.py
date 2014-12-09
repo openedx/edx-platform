@@ -292,7 +292,7 @@ class LmsModuleSystem(LmsHandlerUrls, LmsCourse, LmsUser, ModuleSystem):  # pyli
             extra_data,
         )
 
-    def get_asides(self, block):
+    def applicable_aside_types(self, block):
         """
         Return all of the asides which might be decorating this `block`.
 
@@ -308,8 +308,4 @@ class LmsModuleSystem(LmsHandlerUrls, LmsCourse, LmsUser, ModuleSystem):  # pyli
         if block.scope_ids.block_type in config.disabled_blocks.split():
             return []
 
-        return [
-            self.get_aside_of_type(block, aside_type)
-            for aside_type, __
-            in XBlockAside.load_classes()
-        ]
+        return super(LmsModuleSystem, self).applicable_aside_types()
