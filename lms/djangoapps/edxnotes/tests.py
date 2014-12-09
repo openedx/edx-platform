@@ -532,6 +532,70 @@ class EdxNotesHelpersTest(TestCase):
             }
         )
 
+    def test_get_course_position_no_chapter(self):
+        """
+        Returns `None` if no chapter found.
+        """
+        mock_course_module = MagicMock()
+        mock_course_module.position = 3
+        mock_course_module.get_display_items.return_value = []
+        self.assertIsNone(helpers.get_course_position(mock_course_module))
+
+    def test_get_course_position_to_chapter(self):
+        """
+        Returns a position that leads to COURSE/CHAPTER if this isn't the users's
+        first time.
+        """
+        mock_course_module = MagicMock()
+        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
+        mock_course_module.position = 3
+
+        mock_chapter = MagicMock()
+        mock_chapter.url_name = 'chapter_url_name'
+        mock_chapter.display_name_with_default = 'Test Chapter Display Name'
+
+        mock_course_module.get_display_items.return_value = [mock_chapter]
+
+        self.assertEqual(helpers.get_course_position(mock_course_module), {
+            'display_name': 'Test Chapter Display Name',
+            'url': '/courses/{}/courseware/chapter_url_name/'.format(self.course.id),
+        })
+
+    def test_get_course_position_no_section(self):
+        """
+        Returns `None` if no section found.
+        """
+        mock_course_module = MagicMock()
+        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
+        mock_course_module.position = None
+        mock_course_module.get_display_items.return_value = [MagicMock()]
+        self.assertIsNone(helpers.get_course_position(mock_course_module))
+
+    def test_get_course_position_to_section(self):
+        """
+        Returns a position that leads to COURSE/CHAPTER/SECTION if this is the
+        user's first time.
+        """
+        mock_course_module = MagicMock()
+        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
+        mock_course_module.position = None
+
+        mock_chapter = MagicMock()
+        mock_chapter.url_name = 'chapter_url_name'
+        mock_course_module.get_display_items.return_value = [mock_chapter]
+
+        mock_section = MagicMock()
+        mock_section.url_name = 'section_url_name'
+        mock_section.display_name_with_default = 'Test Section Display Name'
+
+        mock_chapter.get_display_items.return_value = [mock_section]
+        mock_section.get_display_items.return_value = [MagicMock()]
+
+        self.assertEqual(helpers.get_course_position(mock_course_module), {
+            'display_name': 'Test Section Display Name',
+            'url': '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id),
+        })
+
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
 class EdxNotesViewsTest(TestCase):
