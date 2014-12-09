@@ -35,6 +35,7 @@
 -e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.3.1#egg=oauth2-provider
 -e git+https://github.com/edx/edx-val.git@a3c54afe30375f7a5755ba6f6412a91de23c3b86#egg=edx-val
+-e git+https://github.com/edx/edx-analytics-data-api-client.git@4d934a789e3a60a516e70b4bf6617522d6ed153d#egg=edx-analytics-data-api-client
 
 # This portion of requirements.txt is now maintained only for the Stanford fork, i.e. we should update as necessary
 # Third Party XBlocks

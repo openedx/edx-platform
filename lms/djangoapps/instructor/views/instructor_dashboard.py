@@ -405,5 +405,6 @@ def _section_metrics(course, access):
         'get_students_opened_subsection_url': reverse('get_students_opened_subsection'),
         'get_students_problem_grades_url': reverse('get_students_problem_grades'),
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
+        'enrollment': CourseEnrollment.num_enrolled_in(course_key),
     }
     return section_data
