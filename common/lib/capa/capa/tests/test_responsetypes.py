@@ -1831,8 +1831,78 @@ class CustomResponseTest(ResponseTest):
         problem = self.build_problem(script=script, capa_system=capa_system)
         self.assertEqual(problem.context['num'], 17)
 
+    def test_function_code_multiple_inputs_order(self):
+        # Ensure that order must be correct according to sub-problem position
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                check1 = (int(answer_given[0]) == 1)
+                check2 = (int(answer_given[1]) == 2)
+                check3 = (int(answer_given[2]) == 3)
+                check4 = (int(answer_given[3]) == 4)
+                check5 = (int(answer_given[4]) == 5)
+                check6 = (int(answer_given[5]) == 6)
+                check7 = (int(answer_given[6]) == 7)
+                check8 = (int(answer_given[7]) == 8)
+                check9 = (int(answer_given[8]) == 9)
+                check10 = (int(answer_given[9]) == 10)
+                check11 = (int(answer_given[10]) == 11)
+                return {'overall_message': 'Overall message',
+                            'input_list': [
+                                { 'ok': check1, 'msg': '1'},
+                                { 'ok': check2, 'msg': '2'},
+                                { 'ok': check3, 'msg': '3'},
+                                { 'ok': check4, 'msg': '4'},
+                                { 'ok': check5, 'msg': '5'},
+                                { 'ok': check6, 'msg': '6'},
+                                { 'ok': check7, 'msg': '7'},
+                                { 'ok': check8, 'msg': '8'},
+                                { 'ok': check9, 'msg': '9'},
+                                { 'ok': check10, 'msg': '10'},
+                                { 'ok': check11, 'msg': '11'},
+                ]}
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func", num_inputs=11)
+
+        # Grade the inputs showing out of order
+        input_dict = {
+            '1_2_1': '1',
+            '1_2_2': '2',
+            '1_2_3': '3',
+            '1_2_4': '4',
+            '1_2_5': '5',
+            '1_2_6': '6',
+            '1_2_10': '10',
+            '1_2_11': '16',
+            '1_2_7': '7',
+            '1_2_8': '8',
+            '1_2_9': '9'
+        }
+
+        correct_order = [
+            '1_2_1', '1_2_2', '1_2_3', '1_2_4', '1_2_5', '1_2_6', '1_2_7', '1_2_8', '1_2_9', '1_2_10', '1_2_11'
+        ]
+
+        correct_map = problem.grade_answers(input_dict)
+
+        self.assertNotEqual(problem.student_answers.keys(), correct_order)
+
+        # euqal to correct order after sorting at get_score
+        self.assertListEqual(problem.responders.values()[0].context['idset'], correct_order)
+
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_9'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_11'), 'incorrect')
+
+        self.assertEqual(correct_map.get_msg('1_2_1'), '1')
+        self.assertEqual(correct_map.get_msg('1_2_9'), '9')
+        self.assertEqual(correct_map.get_msg('1_2_11'), '11')
+
 
 class SchematicResponseTest(ResponseTest):
+    """
+    Class containing setup and tests for Schematic responsetype.
+    """
     from capa.tests.response_xml_factory import SchematicResponseXMLFactory
     xml_factory_class = SchematicResponseXMLFactory
 

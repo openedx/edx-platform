@@ -1515,7 +1515,10 @@ class CustomResponse(LoncapaResponse):
         log.debug('%s: student_answers=%s', unicode(self), student_answers)
 
         # ordered list of answer id's
-        idset = sorted(self.answer_ids)
+        # sort the responses on the bases of the problem's position number
+        # which can be found in the last place in the problem id. Then convert
+        # this number into an int, so that we sort on ints instead of strings
+        idset = sorted(self.answer_ids, key=lambda x: int(x.split("_")[-1]))
         try:
             # ordered list of answers
             submission = [student_answers[k] for k in idset]
