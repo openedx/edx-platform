@@ -6,9 +6,17 @@ var edx = edx || {};
     edx.search = edx.search || {};
 
     edx.search.SearchResultsView = Backbone.View.extend({
-        el: '#course-content',
+        el: '#search-content',
         tpl: '#search_result_list-tpl',
         itemTpl: '#search_result_item-tpl',
+
+        initialize: function (options) {
+            this.tpl = $(this.tpl).html();
+            this.itemTpl = $(this.itemTpl).html();
+            this.collection = options.collection || {};
+            this.collection.on('change reset add remove', this.render, this);
+            this.$courseContent = $('#course-content')
+        },
 
         renderItem: function (searchItem) {
             var item = searchItem.attributes;
@@ -23,25 +31,37 @@ var edx = edx || {};
         },
 
         render: function () {
+            if (_.isEmpty(this.collection.models)) {
+                this.renderEmptyMessage();
+            }
+            else {
+                this.renderSearchResults();
+            }
+            this.$courseContent.hide();
+            this.$el.show();
+        },
+
+        renderEmptyMessage: function () {
+
+        },
+
+        renderSearchResults: function () {
             var self = this;
             var listHtml = '';
             _.each(self.collection.models, function (searchItem) {
                 listHtml += self.renderItem(searchItem);
             });
-
-            this.$el.html(_.template(this.tpl, {
-                totalCount: this.collection.totalCount,
-                pageSize: this.collection.pageSize,
-                search_result_list: listHtml
+            self.$el.html(_.template(self.tpl, {
+                totalCount: self.collection.totalCount,
+                pageSize: self.collection.pageSize,
+                searchResults: listHtml
             }));
-
+            console.log('hahaha')
         },
 
-        initialize: function (options) {
-            this.tpl = $(this.tpl).html();
-            this.itemTpl = $(this.itemTpl).html();
-            this.collection = options.collection || {};
-            this.collection.on('change reset add remove', this.render, this);
+        clearSearchResults: function () {
+            this.$el.hide().empty();
+            this.$courseContent.show();
         }
 
     });

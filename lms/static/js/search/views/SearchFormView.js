@@ -8,20 +8,41 @@ var edx = edx || {};
     edx.search.SearchFormView = Backbone.View.extend({
         el: '#couserware-search',
         events: {
-            'submit form': 'performSearch',
+            'submit form': 'submitForm',
+            'click .cancel-button': 'clearSearch',
+        },
+        emptySearchRegex: /^\s*$/,
+
+        initialize: function (options) {
+            this.collection = options.collection || {};
+            this.$searchField = this.$el.find('.search-field');
+            this.$searchButton = this.$el.find('.search-button');
+            this.$cancelButton = this.$el.find('.cancel-button');
         },
 
-        performSearch: function () {
-            var searchTerm = this.$el.find('[type="text"]').val();
-            this.collection.performSearch(searchTerm);
-            this.$el.find('.search-button').hide();
-            this.$el.find('.cancel-button').show();
+        submitForm: function () {
+            var searchTerm = this.$searchField.val();
+            if (this.emptySearchRegex.test(searchTerm) == false) {
+                this.performSearch(searchTerm);
+            }
+            else {
+                this.clearSearch();
+            }
             // prevent reload
             return false;
         },
 
-        initialize: function (options) {
-            this.collection = options.collection || {};
+        performSearch: function (searchTerm) {
+            this.collection.performSearch(searchTerm);
+            this.$searchButton.hide();
+            this.$cancelButton.show();
+        },
+
+        clearSearch: function () {
+            this.$searchField.val('');
+            this.$searchButton.show();
+            this.$cancelButton.hide();
+            this.trigger('SearchFormView:clearSearch');
         }
 
     });

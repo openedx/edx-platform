@@ -3,6 +3,6 @@
   <span class="search-count"><%- totalCount %> results</span>
 </div>
 <ol class='search-results'>
-    <%= search_result_list %>
+    <%= searchResults %>
 </ol>
 <a class="search-more" href=""><%- gettext("Load next %s results").replace("%s", pageSize) %></a>
