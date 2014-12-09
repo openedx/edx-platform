@@ -5,7 +5,7 @@
 
 ## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
 <div class="wrapper wrapper-footer edx-footer edx-footer-new">
-  <footer id="footer-global" class="footer-global" role="contentinfo">
+  <footer id="footer-global" class="footer-global" role="contentinfo" aria-label="Footer">
 
     <div class="footer-about">
       <h2 class="sr footer-about-title">${_("About edX")}</h2>
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div class="footer-nav">
+    <nav class="footer-nav" role="navigation" aria-label="About Us">
       <h2 class="footer-nav-title">${_("About & Company Info")}</h2>
 
       <div class="footer-nav-links">
@@ -58,30 +58,30 @@
         <a href="${marketing_link('DONATE')}" class="has-emphasis"><span class="copy">${_("Donate to edX")}</span></a>
         <a href="${marketing_link('JOBS')}" class="has-emphasis"><span class="copy">${_("Jobs at edX")}</span></a>
       </div>
-    </div>
+    </nav>
 
     <div class="footer-follow">
       <h2 class="footer-follow-title">${_("Follow Us")}</h2>
 
       <div class="footer-follow-links">
         <a href="${settings.PLATFORM_TWITTER_URL}" title="Twitter">
-          <i class="icon icon-twitter"></i>
+          <i class="icon icon-twitter element-invisible"></i>
           <span class="copy">${_("Twitter")}</span>
         </a>
         <a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" title="Facebook">
-          <i class="icon icon-facebook-sign"></i>
+          <i class="icon icon-facebook-sign element-invisible"></i>
           <span class="copy">${_("Facebook")}</span>
         </a>
         <a href="${settings.PLATFORM_MEETUP_URL}" title="Meetup">
-          <i class="icon icon-calendar"></i>
+          <i class="icon icon-calendar element-invisible"></i>
           <span class="copy">${_("Meetup")}</span>
         </a>
         <a href="${settings.PLATFORM_LINKEDIN_URL}" title="LinkedIn">
-          <i class="icon icon-linkedin-sign"></i>
+          <i class="icon icon-linkedin-sign element-invisible"></i>
           <span class="copy">${_("LinkedIn")}</span>
         </a>
         <a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" title="Google+">
-          <i class="icon icon-google-plus-sign"></i>
+          <i class="icon icon-google-plus-sign element-invisible"></i>
           <span class="copy">${_("Google+")}</span>
         </a>
       </div>

@@ -333,7 +333,6 @@ def get_codemirror_value(index=0, find_prefix="$"):
     )
 
 
-
 def attach_file(filename, sub_path):
     path = os.path.join(TEST_ROOT, sub_path, filename)
     world.browser.execute_script("$('input.file-input').css('display', 'block')")
@@ -388,4 +387,3 @@ def create_other_user(_step, name, has_extra_perms, role_name):
 @step('I log out')
 def log_out(_step):
     world.visit('logout')
-

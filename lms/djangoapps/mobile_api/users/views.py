@@ -1,31 +1,56 @@
-from django.core.exceptions import PermissionDenied
+"""
+Views for user API
+"""
 from django.shortcuts import redirect
 
 from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
-from courseware.access import has_access
-from student.forms import PasswordResetFormNoActive
 from student.models import CourseEnrollment, User
-from xmodule.modulestore.django import modulestore
+
+from mobile_api.utils import mobile_available_when_enrolled
 
 from .serializers import CourseEnrollmentSerializer, UserSerializer
 
 
 class IsUser(permissions.BasePermission):
+    """
+    Permission that checks to see if the request user matches the User models
+    """
     def has_object_permission(self, request, view, obj):
         return request.user == obj
 
 
 class UserDetail(generics.RetrieveAPIView):
-    """Read-only information about our User.
+    """
+    **Use Case**
 
-    This will be where users are redirected to after API login and will serve
-    as a place to list all useful resources this user can access.
+        Get information about the specified user and
+        access other resources the user has permissions for.
+
+        Users are redirected to this endpoint after logging in.
+
+        You can use the **course_enrollments** value in
+        the response to get a list of courses the user is enrolled in.
+
+    **Example request**:
+
+        GET /api/mobile/v0.5/users/{username}
+
+    **Response Values**
+
+        * id: The ID of the user.
+
+        * username: The username of the currently logged in user.
+
+        * email: The email address of the currently logged in user.
+
+        * name: The full name of the currently logged in user.
+
+        * course_enrollments: The URI to list the courses the currently logged
+          in user is enrolled in.
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsUser)
@@ -38,7 +63,38 @@ class UserDetail(generics.RetrieveAPIView):
 
 
 class UserCourseEnrollmentsList(generics.ListAPIView):
-    """Read-only list of courses that this user is enrolled in."""
+    """
+    **Use Case**
+
+        Get information about the courses the currently logged in user is
+        enrolled in.
+
+    **Example request**:
+
+        GET /api/mobile/v0.5/users/{username}/course_enrollments/
+
+    **Response Values**
+
+        * created: The date the course was created.
+        * mode: The type of certificate registration for this course:  honor or
+          certified.
+        * is_active: Whether the course is currently active; true or false.
+        * course: A collection of data about the course:
+
+          * course_about: The URI to get the data for the course About page.
+          * course_updates: The URI to get data for course updates.
+          * number: The course number.
+          * org: The organization that created the course.
+          * video_outline: The URI to get the list of all vides the user can
+            access in the course.
+          * id: The unique ID of the course.
+          * latest_updates:  Reserved for future use.
+          * end: The end date of the course.
+          * name: The name of the course.
+          * course_handouts: The URI to get data for course handouts.
+          * start: The data and time the course starts.
+          * course_image: The path to the course image.
+    """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsUser)
     queryset = CourseEnrollment.objects.all()
@@ -51,29 +107,26 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         ).order_by('created')
         return mobile_course_enrollments(qset, self.request.user)
 
-    def get(self, request, *args, **kwargs):
-        if request.user.username != kwargs['username']:
-            raise PermissionDenied
-
-        return super(UserCourseEnrollmentsList, self).get(self, request, *args, **kwargs)
-
 
 @api_view(["GET"])
 @authentication_classes((OAuth2Authentication, SessionAuthentication))
 @permission_classes((IsAuthenticated,))
 def my_user_info(request):
-    if not request.user:
-        raise PermissionDenied
+    """
+    Redirect to the currently-logged-in user's info page
+    """
     return redirect("user-detail", username=request.user.username)
+
 
 def mobile_course_enrollments(enrollments, user):
     """
-    Return enrollments only if courses are mobile_available (or if the user has staff access)
-    enrollments is a list of CourseEnrollments.
+    Return enrollments only if courses are mobile_available (or if the user has
+    privileged (beta, staff, instructor) access)
+
+    :param enrollments is a list of CourseEnrollments.
     """
     for enr in enrollments:
         course = enr.course
-        # The course doesn't always really exist -- we can have bad data in the enrollments
-        # pointing to non-existent (or removed) courses, in which case `course` is None.
-        if course and (course.mobile_available or has_access(user, 'staff', course)):
+
+        if mobile_available_when_enrolled(course, user):
             yield enr

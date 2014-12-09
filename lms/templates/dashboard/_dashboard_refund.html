@@ -37,7 +37,7 @@ strong {
             {% csrf_token %}
             {{form.as_p}}
             <p>
-            <input type="button" value="Cancel" onclick="javascript:location=location"/> <input type="submit" value="{% if cert %}Refund{% else %}Confirm{% endif %}" /> 
+            <input type="button" value="Cancel" onclick="javascript:location=location"/> <input type="submit" value="{% if cert %}Refund{% else %}Confirm{% endif %}" />
             </p>
         </form>
         {% if cert %}
@@ -49,7 +49,7 @@ strong {
                 <strong>{% trans "Order Id:" %}</strong> {{cert.order.id}}
             </p>
             <p>
-                <strong>{% trans "Enrollment:" %}</strong> {{enrollment.course_id}} {{enrollment.mode}} ({% if enrollment.is_active %}{% trans "enrolled" %}{% else %}{% trans "unenrolled" %}{% endif %})
+                <strong>{% trans "Enrollment:" %}</strong> {{enrollment.course_id|escape}} {{enrollment.mode}} ({% if enrollment.is_active %}{% trans "enrolled" %}{% else %}{% trans "unenrolled" %}{% endif %})
             </p>
             <p>
                 <strong>{% trans "Cost:" %}</strong> {{cert.unit_cost}} {{cert.currency}}

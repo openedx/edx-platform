@@ -42,6 +42,9 @@ class Group(namedtuple("Group", "id name")):
 
         Raises TypeError if the value doesn't have the right keys.
         """
+        if isinstance(value, Group):
+            return value
+
         for key in ('id', 'name', 'version'):
             if key not in value:
                 raise TypeError("Group dict {0} missing value key '{1}'".format(
@@ -96,6 +99,9 @@ class UserPartition(namedtuple("UserPartition", "id name description groups")):
 
         Raises TypeError if the value doesn't have the right keys.
         """
+        if isinstance(value, UserPartition):
+            return value
+
         for key in ('id', 'name', 'description', 'version', 'groups'):
             if key not in value:
                 raise TypeError("UserPartition dict {0} missing value key '{1}'"

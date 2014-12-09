@@ -7,12 +7,14 @@ Replace this with more appropriate tests for your application.
 
 from datetime import datetime, timedelta
 import pytz
+import ddt
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.test import TestCase
 from course_modes.models import CourseMode, Mode
 
 
+@ddt.ddt
 class CourseModeModelTest(TestCase):
     """
     Tests for the CourseMode model
@@ -127,3 +129,37 @@ class CourseModeModelTest(TestCase):
         mode = CourseMode.verified_mode_for_course(self.course_key)
 
         self.assertEqual(mode.slug, 'professional')
+
+    def test_course_has_payment_options(self):
+        # Has no payment options.
+        honor, _ = self.create_mode('honor', 'Honor')
+        self.assertFalse(CourseMode.has_payment_options(self.course_key))
+
+        # Now we do have a payment option.
+        verified, _ = self.create_mode('verified', 'Verified', min_price=5)
+        self.assertTrue(CourseMode.has_payment_options(self.course_key))
+
+        # Unset verified's minimum price.
+        verified.min_price = 0
+        verified.save()
+        self.assertFalse(CourseMode.has_payment_options(self.course_key))
+
+        # Finally, give the honor mode payment options
+        honor.suggested_prices = '5, 10, 15'
+        honor.save()
+        self.assertTrue(CourseMode.has_payment_options(self.course_key))
+
+    @ddt.data(
+        ([], True),
+        ([("honor", 0), ("audit", 0), ("verified", 100)], True),
+        ([("honor", 100)], False),
+        ([("professional", 100)], False),
+    )
+    @ddt.unpack
+    def test_can_auto_enroll(self, modes_and_prices, can_auto_enroll):
+        # Create the modes and min prices
+        for mode_slug, min_price in modes_and_prices:
+            self.create_mode(mode_slug, mode_slug.capitalize(), min_price=min_price)
+
+        # Verify that we can or cannot auto enroll
+        self.assertEqual(CourseMode.can_auto_enroll(self.course_key), can_auto_enroll)

@@ -59,7 +59,13 @@ def collect_ora2_data(course_id):
 
     return header, cursor.fetchall()
 
+
+# pylint: disable=invalid-name
 def ora2_data_queries():
+    """
+    Wraps a raw SQL query which retrieves all ORA2 responses for a course.
+    """
+
     RAW_QUERY = """
 SET SESSION group_concat_max_len = 1000000;
 SELECT `sub`.`uuid` AS `submission_uuid`,

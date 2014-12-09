@@ -29,6 +29,14 @@ def check_update(_step, text):
     assert_in(text, update_html)
 
 
+@step(u'I should see the asset update to "([^"]*)"$')
+def check_asset_update(_step, asset_file):
+    update_css = 'div.update-contents'
+    update_html = world.css_find(update_css).html
+    asset_key = world.scenario_dict['COURSE'].id.make_asset_key(asset_type='asset', path=asset_file)
+    assert_in(unicode(asset_key), update_html)
+
+
 @step(u'I should not see the update "([^"]*)"$')
 def check_no_update(_step, text):
     update_css = 'div.update-contents'
@@ -88,6 +96,14 @@ def edit_handouts(_step, text):
 def check_handout(_step, handout):
     handout_css = 'div.handouts-content'
     assert_in(handout, world.css_html(handout_css))
+
+
+@step(u'I see the handout image link "([^"]*)"$')
+def check_handout_image_link(_step, image_file):
+    handout_css = 'div.handouts-content'
+    handout_html = world.css_html(handout_css)
+    asset_key = world.scenario_dict['COURSE'].id.make_asset_key(asset_type='asset', path=image_file)
+    assert_in(unicode(asset_key), handout_html)
 
 
 @step(u'I see the handout error text')

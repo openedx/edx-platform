@@ -4,14 +4,13 @@ import logging
 from django.http import Http404
 from django.test.utils import override_settings
 from django.test.client import Client, RequestFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from edxmako.tests import mako_middleware_process_request
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
 from django_comment_client.tests.group_id import (
-    GroupIdAssertionMixin,
     CohortedTopicGroupIdTestMixin,
     NonCohortedTopicGroupIdTestMixin
 )
@@ -20,17 +19,21 @@ from django_comment_client.tests.utils import CohortedContentTestCase
 from django_comment_client.forum import views
 from django_comment_client.utils import strip_none
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_DIR
 from courseware.courses import UserNotEnrolled
 from nose.tools import assert_true  # pylint: disable=E0611
 from mock import patch, Mock, ANY, call
 
 from course_groups.models import CourseUserGroup
 
+TEST_DATA_MONGO_MODULESTORE = mixed_store_config(TEST_DATA_DIR, {}, include_xml=False)
+
 log = logging.getLogger(__name__)
 
+# pylint: disable=C0111
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -97,13 +100,13 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
 
-def make_mock_thread_data(text, thread_id, include_children, group_id=None, group_name=None):
+def make_mock_thread_data(text, thread_id, include_children, group_id=None, group_name=None, commentable_id=None):
     thread_data = {
         "id": thread_id,
         "type": "thread",
         "title": text,
         "body": text,
-        "commentable_id": "dummy_commentable_id",
+        "commentable_id": commentable_id or "dummy_commentable_id",
         "resp_total": 42,
         "resp_skip": 25,
         "resp_limit": 5,
@@ -120,13 +123,13 @@ def make_mock_thread_data(text, thread_id, include_children, group_id=None, grou
     return thread_data
 
 
-def make_mock_request_impl(text, thread_id="dummy_thread_id", group_id=None):
+def make_mock_request_impl(text, thread_id="dummy_thread_id", group_id=None, commentable_id=None):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
         data = None
         if url.endswith("threads") or url.endswith("user_profile"):
             data = {
-                "collection": [make_mock_thread_data(text, thread_id, False, group_id=group_id)]
+                "collection": [make_mock_thread_data(text, thread_id, False, group_id=group_id, commentable_id=commentable_id)]
             }
         elif thread_id and url.endswith(thread_id):
             data = make_mock_thread_data(text, thread_id, True, group_id=group_id)
@@ -168,7 +171,7 @@ class PartialDictMatcher(object):
         ])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch('requests.request')
 class SingleThreadTestCase(ModuleStoreTestCase):
     def setUp(self):
@@ -277,7 +280,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch('requests.request')
 class SingleCohortedThreadTestCase(CohortedContentTestCase):
     def _create_mock_cohorted_thread(self, mock_request):
@@ -566,11 +569,18 @@ class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicG
             response, lambda d: d['discussion_data'][0]
         )
 
+
 @patch('lms.lib.comment_client.utils.requests.request')
 class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/active_threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+    def call_view_for_profiled_user(
+            self, mock_request, requesting_user, profiled_user, group_id, pass_group_id, is_ajax=False
+    ):
+        """
+        Calls "user_profile" view method on behalf of "requesting_user" to get information about
+        the user "profiled_user".
+        """
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
@@ -587,12 +597,17 @@ class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopi
             data=request_data,
             **headers
         )
-        request.user = user
+        request.user = requesting_user
         mako_middleware_process_request(request)
         return views.user_profile(
             request,
             self.course.id.to_deprecated_string(),
-            user.id
+            profiled_user.id
+        )
+
+    def call_view(self, mock_request, _commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+        return self.call_view_for_profiled_user(
+            mock_request, user, user, group_id, pass_group_id=pass_group_id, is_ajax=is_ajax
         )
 
     def test_group_info_in_html_response(self, mock_request):
@@ -616,6 +631,109 @@ class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopi
         self._assert_json_response_contains_group_info(
             response, lambda d: d['discussion_data'][0]
         )
+
+    def _test_group_id_passed_to_user_profile(
+            self, mock_request, expect_group_id_in_request, requesting_user, profiled_user, group_id, pass_group_id
+    ):
+        """
+        Helper method for testing whether or not group_id was passed to the user_profile request.
+        """
+
+        def get_params_from_user_info_call(for_specific_course):
+            """
+            Returns the request parameters for the user info call with either course_id specified or not,
+            depending on value of 'for_specific_course'.
+            """
+            # There will be 3 calls from user_profile. One has the cs_endpoint "active_threads", and it is already
+            # tested. The other 2 calls are for user info; one of those calls is for general information about the user,
+            # and it does not specify a course_id. The other call does specify a course_id, and if the caller did not
+            # have discussion moderator privileges, it should also contain a group_id.
+            for r_call in mock_request.call_args_list:
+                if not r_call[0][1].endswith(self.cs_endpoint):
+                    params = r_call[1]["params"]
+                    has_course_id = "course_id" in params
+                    if (for_specific_course and has_course_id) or (not for_specific_course and not has_course_id):
+                        return params
+            self.assertTrue(
+                False,
+                "Did not find appropriate user_profile call for 'for_specific_course'=" + for_specific_course
+            )
+
+        mock_request.reset_mock()
+        self.call_view_for_profiled_user(
+            mock_request,
+            requesting_user,
+            profiled_user,
+            group_id,
+            pass_group_id=pass_group_id,
+            is_ajax=False
+        )
+        # Should never have a group_id if course_id was not included in the request.
+        params_without_course_id = get_params_from_user_info_call(False)
+        self.assertNotIn("group_id", params_without_course_id)
+
+        params_with_course_id = get_params_from_user_info_call(True)
+        if expect_group_id_in_request:
+            self.assertIn("group_id", params_with_course_id)
+            self.assertEqual(group_id, params_with_course_id["group_id"])
+        else:
+            self.assertNotIn("group_id", params_with_course_id)
+
+    def test_group_id_passed_to_user_profile_student(self, mock_request):
+        """
+        Test that the group id is always included when requesting user profile information for a particular
+        course if the requester does not have discussion moderation privileges.
+        """
+        def verify_group_id_always_present(profiled_user, pass_group_id):
+            """
+            Helper method to verify that group_id is always present for student in course
+            (non-privileged user).
+            """
+            self._test_group_id_passed_to_user_profile(
+                mock_request, True, self.student, profiled_user, self.student_cohort.id, pass_group_id
+            )
+
+        # In all these test cases, the requesting_user is the student (non-privileged user).
+        # The profile returned on behalf of the student is for the profiled_user.
+        verify_group_id_always_present(profiled_user=self.student, pass_group_id=True)
+        verify_group_id_always_present(profiled_user=self.student, pass_group_id=False)
+        verify_group_id_always_present(profiled_user=self.moderator, pass_group_id=True)
+        verify_group_id_always_present(profiled_user=self.moderator, pass_group_id=False)
+
+    def test_group_id_user_profile_moderator(self, mock_request):
+        """
+        Test that the group id is only included when a privileged user requests user profile information for a
+        particular course and user if the group_id is explicitly passed in.
+        """
+        def verify_group_id_present(profiled_user, pass_group_id, requested_cohort=self.moderator_cohort):
+            """
+            Helper method to verify that group_id is present.
+            """
+            self._test_group_id_passed_to_user_profile(
+                mock_request, True, self.moderator, profiled_user, requested_cohort.id, pass_group_id
+            )
+
+        def verify_group_id_not_present(profiled_user, pass_group_id, requested_cohort=self.moderator_cohort):
+            """
+            Helper method to verify that group_id is not present.
+            """
+            self._test_group_id_passed_to_user_profile(
+                mock_request, False, self.moderator, profiled_user, requested_cohort.id, pass_group_id
+            )
+
+        # In all these test cases, the requesting_user is the moderator (privileged user).
+
+        # If the group_id is explicitly passed, it will be present in the request.
+        verify_group_id_present(profiled_user=self.student, pass_group_id=True)
+        verify_group_id_present(profiled_user=self.moderator, pass_group_id=True)
+        verify_group_id_present(
+            profiled_user=self.student, pass_group_id=True, requested_cohort=self.student_cohort
+        )
+
+        # If the group_id is not explicitly passed, it will not be present because the requesting_user
+        # has discussion moderator privileges.
+        verify_group_id_not_present(profiled_user=self.student, pass_group_id=False)
+        verify_group_id_not_present(profiled_user=self.moderator, pass_group_id=False)
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
@@ -655,7 +773,37 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, Cohorted
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class InlineDiscussionTestCase(ModuleStoreTestCase):
+    def setUp(self):
+        self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+        self.discussion1 = ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id="discussion1",
+            display_name='Discussion1',
+            discussion_category="Chapter",
+            discussion_target="Discussion1"
+        )
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_courseware_data(self, mock_request):
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        mock_request.side_effect = make_mock_request_impl("dummy content", commentable_id=self.discussion1.discussion_id)
+
+        response = views.inline_discussion(request, self.course.id.to_deprecated_string(), "dummy_discussion_id")
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/i4x://TestX/101/discussion/Discussion1'
+        expected_courseware_title = 'Chapter / Discussion1'
+        self.assertEqual(response_data['discussion_data'][0]['courseware_url'], expected_courseware_url)
+        self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch('requests.request')
 class UserProfileTestCase(ModuleStoreTestCase):
 
@@ -767,7 +915,7 @@ class UserProfileTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 405)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch('requests.request')
 class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -828,7 +976,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -848,7 +996,7 @@ class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -869,7 +1017,32 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def _test_unicode_data(self, text, mock_request):
+        mock_request.side_effect = make_mock_request_impl(text)
+        data = {
+            "ajax": 1,
+            "text": text,
+        }
+        request = RequestFactory().get("dummy_url", data)
+        request.user = self.student
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
+
+        response = views.forum_form_discussion(request, self.course.id.to_deprecated_string())
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data["discussion_data"][0]["title"], text)
+        self.assertEqual(response_data["discussion_data"][0]["body"], text)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -891,7 +1064,7 @@ class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["content"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -912,7 +1085,7 @@ class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -933,7 +1106,7 @@ class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class EnrollmentTestCase(ModuleStoreTestCase):
     """
     Tests for the behavior of views depending on if the student is enrolled

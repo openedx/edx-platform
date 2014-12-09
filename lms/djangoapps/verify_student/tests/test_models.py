@@ -10,7 +10,6 @@ from django.test import TestCase
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from django.test.utils import override_settings
 from django.conf import settings
-import requests
 import requests.exceptions
 
 from student.tests.factories import UserFactory
@@ -18,10 +17,11 @@ from verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationException,
 )
 from reverification.tests.factories import MidcourseReverificationWindowFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
-        "FACE_IMAGE_AES_KEY" : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "FACE_IMAGE_AES_KEY": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
         "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
         "RSA_PUBLIC_KEY": """-----BEGIN PUBLIC KEY-----
@@ -75,6 +75,7 @@ class MockS3Connection(object):
     def get_bucket(self, bucket_name):
         return MockBucket(bucket_name)
 
+
 def mock_software_secure_post(url, headers=None, data=None, **kwargs):
     """
     Mocks our interface when we post to Software Secure. Does basic assertions
@@ -103,6 +104,7 @@ def mock_software_secure_post(url, headers=None, data=None, **kwargs):
 
     return response
 
+
 def mock_software_secure_post_error(url, headers=None, data=None, **kwargs):
     """
     Simulates what happens if our post to Software Secure is rejected, for
@@ -111,6 +113,7 @@ def mock_software_secure_post_error(url, headers=None, data=None, **kwargs):
     response = requests.Response()
     response.status_code = 400
     return response
+
 
 def mock_software_secure_post_unavailable(url, headers=None, data=None, **kwargs):
     """Simulates a connection failure when we try to submit to Software Secure."""
@@ -188,7 +191,7 @@ class TestPhotoVerification(TestCase):
         was when you submitted it.
         """
         user = UserFactory.create()
-        user.profile.name = u"Jack \u01B4" # gratuious non-ASCII char to test encodings
+        user.profile.name = u"Jack \u01B4"  # gratuious non-ASCII char to test encodings
 
         attempt = SoftwareSecurePhotoVerification(user=user)
         user.profile.name = u"Clyde \u01B4"
@@ -420,10 +423,12 @@ class TestPhotoVerification(TestCase):
 @patch('verify_student.models.S3Connection', new=MockS3Connection)
 @patch('verify_student.models.Key', new=MockKey)
 @patch('verify_student.models.requests.post', new=mock_software_secure_post)
-class TestMidcourseReverification(TestCase):
+class TestMidcourseReverification(ModuleStoreTestCase):
     """ Tests for methods that are specific to midcourse SoftwareSecurePhotoVerification objects """
+
     def setUp(self):
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        super(TestMidcourseReverification, self).setUp()
+        self.course = CourseFactory.create()
         self.user = UserFactory.create()
 
     def test_user_is_reverified_for_all(self):

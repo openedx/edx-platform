@@ -180,6 +180,7 @@ class @Problem
   # and specify the function to be called by the check button before sending
   # off @answers
   check_save_waitfor: (callback) =>
+    flag = false
     for inp in @inputs
       if ($(inp).is("input[waitfor]"))
         try
@@ -193,9 +194,10 @@ class @Problem
           else
             alert "Could not grade your answer. The submission was aborted."
           throw e
-        return true
+        flag = true
       else
-        return false
+        flag = false
+    return flag
 
 
   ###

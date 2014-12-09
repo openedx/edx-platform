@@ -3,11 +3,11 @@ Tests related to the cohorting feature.
 """
 from uuid import uuid4
 
-from helpers import BaseDiscussionMixin
-from ...pages.lms.auto_auth import AutoAuthPage
+from .helpers import BaseDiscussionMixin
+from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest
+from ...pages.lms.auto_auth import AutoAuthPage
 from ...fixtures.course import (CourseFixture, XBlockFixtureDesc)
-from ...fixtures import LMS_BASE_URL
 
 from ...pages.lms.discussion import (DiscussionTabSingleThreadPage, InlineDiscussionThreadPage, InlineDiscussionPage)
 from ...pages.lms.courseware import CoursewarePage
@@ -17,7 +17,7 @@ from nose.plugins.attrib import attr
 
 class NonCohortedDiscussionTestMixin(BaseDiscussionMixin):
     """
-    Mixin for tests of non-cohorted courses.
+    Mixin for tests of discussion in non-cohorted courses.
     """
     def setup_cohorts(self):
         """
@@ -30,45 +30,31 @@ class NonCohortedDiscussionTestMixin(BaseDiscussionMixin):
         self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
 
-class CohortedDiscussionTestMixin(BaseDiscussionMixin):
+class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
     """
-    Mixin for tests of cohorted courses.
+    Mixin for tests of discussion in cohorted courses.
     """
-    def add_cohort(self, name):
-        """
-        Adds a cohort group by name, returning the ID for the group.
-        """
-        url = LMS_BASE_URL + "/courses/" + self.course_fixture._course_key + '/cohorts/add'
-        data = {"name": name}
-        response = self.course_fixture.session.post(url, data=data, headers=self.course_fixture.headers)
-        self.assertTrue(response.ok, "Failed to create cohort")
-        return response.json()['cohort']['id']
-
     def setup_cohorts(self):
         """
         Sets up the course to use cohorting with a single defined cohort group.
         """
-        self.course_fixture._update_xblock(self.course_fixture._course_location, {
-            "metadata": {
-                u"cohort_config": {
-                    "auto_cohort_groups": [],
-                    "auto_cohort": False,
-                    "cohorted_discussions": [],
-                    "cohorted": True
-                },
-            },
-        })
+        self.setup_cohort_config(self.course_fixture)
         self.cohort_1_name = "Cohort Group 1"
-        self.cohort_1_id = self.add_cohort(self.cohort_1_name)
+        self.cohort_1_id = self.add_manual_cohort(self.course_fixture, self.cohort_1_name)
 
     def test_cohort_visibility_label(self):
         # Must be moderator to view content in a cohort other than your own
         AutoAuthPage(self.browser, course_id=self.course_id, roles="Moderator").visit()
-        self.setup_thread(1, group_id=self.cohort_1_id)
+        self.thread_id = self.setup_thread(1, group_id=self.cohort_1_id)
         self.assertEquals(
             self.thread_page.get_group_visibility_label(),
             "This post is visible only to {}.".format(self.cohort_1_name)
         )
+
+        # Disable cohorts and verify that the post now shows as visible to everyone.
+        self.disable_cohorting(self.course_fixture)
+        self.refresh_thread_page(self.thread_id)
+        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
 
 class DiscussionTabSingleThreadTest(UniqueCourseTest):
@@ -86,6 +72,11 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest):
     def setup_thread_page(self, thread_id):
         self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint:disable=W0201
         self.thread_page.visit()
+
+    # pylint:disable=W0613
+    def refresh_thread_page(self, thread_id):
+        self.browser.refresh()
+        self.thread_page.wait_for_page()
 
 
 @attr('shard_1')
@@ -132,11 +123,18 @@ class InlineDiscussionTest(UniqueCourseTest):
 
     def setup_thread_page(self, thread_id):
         CoursewarePage(self.browser, self.course_id).visit()
+        self.show_thread(thread_id)
+
+    def show_thread(self, thread_id):
         discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         discussion_page.expand_discussion()
         self.assertEqual(discussion_page.get_num_displayed_threads(), 1)
         self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint:disable=W0201
         self.thread_page.expand()
+
+    def refresh_thread_page(self, thread_id):
+        self.browser.refresh()
+        self.show_thread(thread_id)
 
 
 @attr('shard_1')

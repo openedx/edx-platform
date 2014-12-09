@@ -10,6 +10,7 @@ from contracts import contract
 from importlib import import_module
 from path import path
 
+from xblock.fields import Reference, ReferenceList, ReferenceValueDict
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (
@@ -883,6 +884,11 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertFalse(modulestore()._value_matches('I need some help', re.compile(r'Help')))
         self.assertTrue(modulestore()._value_matches(['I need some help', 'today'], re.compile(r'Help', re.IGNORECASE)))
 
+        self.assertTrue(modulestore()._value_matches('gotcha', {'$in': ['a', 'bunch', 'of', 'gotcha']}))
+        self.assertFalse(modulestore()._value_matches('gotcha', {'$in': ['a', 'bunch', 'of', 'gotchas']}))
+        self.assertFalse(modulestore()._value_matches('gotcha', {'$nin': ['a', 'bunch', 'of', 'gotcha']}))
+        self.assertTrue(modulestore()._value_matches('gotcha', {'$nin': ['a', 'bunch', 'of', 'gotchas']}))
+
         self.assertTrue(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 1}))
         self.assertFalse(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 2}))
         self.assertFalse(modulestore()._block_matches({'a': 1, 'b': 2}, {'c': 1}))
@@ -1592,7 +1598,7 @@ class TestInheritance(SplitModuleTest):
 
         # unset on parent, retrieve child, verify unset
         chapter = modulestore().get_item(chapter.location.version_agnostic())
-        chapter.fields['visible_to_staff_only'].delete_from(chapter)
+        del chapter.visible_to_staff_only
         modulestore().update_item(chapter, self.user_id)
 
         problem = modulestore().get_item(problem.location.version_agnostic())
@@ -1756,11 +1762,25 @@ class TestPublish(SplitModuleTest):
             for field in source.fields.values():
                 if field.name == 'children':
                     self._compare_children(field.read_from(source), field.read_from(pub_copy), unexpected_blocks)
+                elif isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):
+                    self.assertReferenceEqual(field.read_from(source), field.read_from(pub_copy))
                 else:
                     self.assertEqual(field.read_from(source), field.read_from(pub_copy))
         for unexp in unexpected_blocks:
             with self.assertRaises(ItemNotFoundError):
                 modulestore().get_item(dest_course_loc.make_usage_key(unexp.type, unexp.id))
+
+    def assertReferenceEqual(self, expected, actual):
+        if isinstance(expected, BlockUsageLocator):
+            expected = BlockKey.from_usage_key(expected)
+            actual = BlockKey.from_usage_key(actual)
+        elif isinstance(expected, list):
+            expected = [BlockKey.from_usage_key(key) for key in expected]
+            actual = [BlockKey.from_usage_key(key) for key in actual]
+        elif isinstance(expected, dict):
+            expected = {key: BlockKey.from_usage_key(val) for (key, val) in expected}
+            actual = {key: BlockKey.from_usage_key(val) for (key, val) in actual}
+        self.assertEqual(expected, actual)
 
     @contract(
         source_children="list(BlockUsageLocator)",

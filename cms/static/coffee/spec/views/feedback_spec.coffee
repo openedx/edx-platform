@@ -76,7 +76,8 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
             expect(@renderSpy).not.toHaveBeenCalled()
             expect(@showSpy).not.toHaveBeenCalled()
 
-        it "renders the template", ->
+        # Disabled flaky test TNL-559
+        xit "renders the template", ->
             view = new AlertView.Confirmation(@options)
             view.show()
 
@@ -85,7 +86,8 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
             expect(view.$el).toContainText(@options.title)
             expect(view.$el).toContainText(@options.message)
 
-        it "close button sends a .hide() message", ->
+        # Disabled flaky test TNL-559
+        xit "close button sends a .hide() message", ->
             view = new AlertView.Confirmation(@options).show()
             view.$(".action-close").click()
             expect(@hideSpy).toHaveBeenCalled()
@@ -116,7 +118,8 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
         it "should have closeIcon set to false by default", ->
             expect(@view.options.closeIcon).toBeFalsy()
 
-    describe "SystemFeedback click events", ->
+    # Disabled flaky test TNL-559
+    xdescribe "SystemFeedback click events", ->
         beforeEach ->
             @primaryClickSpy = jasmine.createSpy('primaryClick')
             @secondaryClickSpy = jasmine.createSpy('secondaryClick')
@@ -161,7 +164,8 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
             @view.$(".action-secondary").click()
             expect("click").toHaveBeenPreventedOn(".action-secondary")
 
-    describe "SystemFeedback not preventing events", ->
+    # Disabled flaky test TNL-559
+    xdescribe "SystemFeedback not preventing events", ->
         beforeEach ->
             @clickSpy = jasmine.createSpy('clickSpy')
             @view = new AlertView.Confirmation(
@@ -181,7 +185,8 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
             expect("click").not.toHaveBeenPreventedOn(".action-primary")
             expect(@clickSpy).toHaveBeenCalled()
 
-    describe "SystemFeedback multiple secondary actions", ->
+    # Disabled flaky test TNL-559
+    xdescribe "SystemFeedback multiple secondary actions", ->
         beforeEach ->
             @secondarySpyOne = jasmine.createSpy('secondarySpyOne')
             @secondarySpyTwo = jasmine.createSpy('secondarySpyTwo')
@@ -231,12 +236,14 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
         afterEach ->
             @clock.restore()
 
-        it "should not have minShown or maxShown by default", ->
+        # Disabled flaky test TNL-559
+        xit "should not have minShown or maxShown by default", ->
             view = new NotificationView.Confirmation()
             expect(view.options.minShown).toEqual(0)
             expect(view.options.maxShown).toEqual(Infinity)
 
-        it "a minShown view should not hide too quickly", ->
+        # Disabled flaky test TNL-559
+        xit "a minShown view should not hide too quickly", ->
             view = new NotificationView.Confirmation({minShown: 1000})
             view.show()
             expect(view.$('.wrapper')).toBeShown()
@@ -249,7 +256,8 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
             @clock.tick(1001)
             expect(view.$('.wrapper')).toBeHiding()
 
-        it "a maxShown view should hide by itself", ->
+        # Disabled flaky test TNL-559
+        xit "a maxShown view should hide by itself", ->
             view = new NotificationView.Confirmation({maxShown: 1000})
             view.show()
             expect(view.$('.wrapper')).toBeShown()
@@ -258,7 +266,8 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
             @clock.tick(1001)
             expect(view.$('.wrapper')).toBeHiding()
 
-        it "a minShown view can stay visible longer", ->
+        # Disabled flaky test TNL-559
+        xit "a minShown view can stay visible longer", ->
             view = new NotificationView.Confirmation({minShown: 1000})
             view.show()
             expect(view.$('.wrapper')).toBeShown()
@@ -272,7 +281,8 @@ define ["jquery", "js/views/feedback", "js/views/feedback_notification", "js/vie
             view.hide()
             expect(view.$('.wrapper')).toBeHiding()
 
-        it "a maxShown view can hide early", ->
+        # Disabled flaky test TNL-559
+        xit "a maxShown view can hide early", ->
             view = new NotificationView.Confirmation({maxShown: 1000})
             view.show()
             expect(view.$('.wrapper')).toBeShown()

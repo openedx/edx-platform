@@ -15,18 +15,18 @@ from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
-from django.http import Http404, HttpResponse, HttpResponseNotFound
+from django.http import Http404
 from django.conf import settings
+from util.json_request import JsonResponse
 
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_cms_course_link
+from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
@@ -35,12 +35,9 @@ from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-
-from analyticsclient.client import Client
-from analyticsclient.exceptions import ClientError
-
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +48,6 @@ def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=None)
-    is_studio_course = (modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml)
 
     access = {
         'admin': request.user.is_staff,
@@ -67,11 +63,11 @@ def instructor_dashboard_2(request, course_id):
         raise Http404()
 
     sections = [
-        _section_course_info(course_key, access),
-        _section_membership(course_key, access),
-        _section_student_admin(course_key, access),
-        _section_data_download(course_key, access),
-        _section_analytics(course_key, access),
+        _section_course_info(course, access),
+        _section_membership(course, access),
+        _section_student_admin(course, access),
+        _section_data_download(course, access),
+        _section_analytics(course, access),
     ]
 
     #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
@@ -85,25 +81,17 @@ def instructor_dashboard_2(request, course_id):
 
     # Gate access to course email by feature flag & by course-specific authorization
     if bulk_email_is_enabled_for_course(course_key):
-        sections.append(_section_send_email(course_key, access, course))
+        sections.append(_section_send_email(course, access))
 
     # Gate access to Metrics tab by featue flag and staff authorization
     if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
-        sections.append(_section_metrics(course_key, access))
+        sections.append(_section_metrics(course, access))
 
      # Gate access to Ecommerce tab
     if course_mode_has_price:
-        sections.append(_section_e_commerce(course_key, access))
+        sections.append(_section_e_commerce(course, access))
 
-    studio_url = None
-    if is_studio_course:
-        studio_url = get_cms_course_link(course)
-
-    enrollment_count = sections[0]['enrollment_count']['total']
-    disable_buttons = False
-    max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    if max_enrollment_for_buttons is not None:
-        disable_buttons = enrollment_count > max_enrollment_for_buttons
+    disable_buttons = not _is_small_course(course_key)
 
     analytics_dashboard_message = None
     if settings.ANALYTICS_DASHBOARD_URL:
@@ -117,7 +105,7 @@ def instructor_dashboard_2(request, course_id):
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'studio_url': studio_url,
+        'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message
@@ -139,8 +127,9 @@ section_display_name will be used to generate link titles in the nav bar.
 """  # pylint: disable=W0105
 
 
-def _section_e_commerce(course_key, access):
+def _section_e_commerce(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
     total_amount = None
     course_price = None
@@ -163,6 +152,7 @@ def _section_e_commerce(course_key, access):
         'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_purchase_transaction_url': reverse('get_purchase_transaction', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_sale_order_records_url': reverse('get_sale_order_records', kwargs={'course_id': course_key.to_deprecated_string()}),
         'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_registration_code_csv_url': reverse('get_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
         'generate_registration_code_csv_url': reverse('generate_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
@@ -188,15 +178,19 @@ def set_course_mode_price(request, course_id):
     try:
         course_price = int(request.POST['course_price'])
     except ValueError:
-        return HttpResponseNotFound(_("Please Enter the numeric value for the course price"))
+        return JsonResponse(
+            {'message': _("Please Enter the numeric value for the course price")},
+            status=400)  # status code 400: Bad Request
+
     currency = request.POST['currency']
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     course_honor_mode = CourseMode.objects.filter(mode_slug='honor', course_id=course_key)
     if not course_honor_mode:
-        return HttpResponseNotFound(
-            _("CourseMode with the mode slug({mode_slug}) DoesNotExist").format(mode_slug='honor')
-        )
+        return JsonResponse(
+            {'message': _("CourseMode with the mode slug({mode_slug}) DoesNotExist").format(mode_slug='honor')},
+            status=400)  # status code 400: Bad Request
+
     CourseModesArchive.objects.create(
         course_id=course_id, mode_slug='honor', mode_display_name='Honor Code Certificate',
         min_price=getattr(course_honor_mode[0], 'min_price'), currency=getattr(course_honor_mode[0], 'currency'),
@@ -206,12 +200,12 @@ def set_course_mode_price(request, course_id):
         min_price=course_price,
         currency=currency
     )
-    return HttpResponse(_("CourseMode price updated successfully"))
+    return JsonResponse({'message': _("CourseMode price updated successfully")})
 
 
-def _section_course_info(course_key, access):
+def _section_course_info(course, access):
     """ Provide data for the corresponding dashboard section """
-    course = get_course_by_id(course_key, depth=None)
+    course_key = course.id
 
     section_data = {
         'section_key': 'course_info',
@@ -219,51 +213,69 @@ def _section_course_info(course_key, access):
         'access': access,
         'course_id': course_key,
         'course_display_name': course.display_name,
-        'enrollment_count': CourseEnrollment.enrollment_counts(course_key),
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
 
+    if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
+        section_data['enrollment_count'] = CourseEnrollment.enrollment_counts(course_key)
+
+    if settings.ANALYTICS_DASHBOARD_URL:
+        dashboard_link = _get_dashboard_link(course_key)
+        message = _("Enrollment data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
+        section_data['enrollment_message'] = message
+
     try:
         advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
         section_data['grade_cutoffs'] = reduce(advance, course.grade_cutoffs.items(), "")[:-2]
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
     # section_data['offline_grades'] = offline_grades_available(course_key)
 
     try:
         section_data['course_errors'] = [(escape(a), '') for (a, _unused) in modulestore().get_course_errors(course.id)]
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         section_data['course_errors'] = [('Error fetching errors', '')]
 
     return section_data
 
 
-def _section_membership(course_key, access):
+def _section_membership(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     section_data = {
         'section_key': 'membership',
         'section_display_name': _('Membership'),
         'access': access,
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': course_key.to_deprecated_string()}),
         'modify_beta_testers_button_url': reverse('bulk_beta_modify_access', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_key.to_deprecated_string()}),
         'modify_access_url': reverse('modify_access', kwargs={'course_id': course_key.to_deprecated_string()}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_key.to_deprecated_string()}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': course_key.to_deprecated_string()}),
+        'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
     }
     return section_data
 
 
-def _section_student_admin(course_key, access):
-    """ Provide data for the corresponding dashboard section """
+def _is_small_course(course_key):
+    """ Compares against MAX_ENROLLMENT_INSTR_BUTTONS to determine if course enrollment is considered small. """
     is_small_course = False
     enrollment_count = CourseEnrollment.num_enrolled_in(course_key)
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
         is_small_course = enrollment_count <= max_enrollment_for_buttons
+    return is_small_course
+
+
+def _section_student_admin(course, access):
+    """ Provide data for the corresponding dashboard section """
+    course_key = course.id
+    is_small_course = _is_small_course(course_key)
 
     section_data = {
         'section_key': 'student_admin',
@@ -295,8 +307,9 @@ def _section_extensions(course):
     return section_data
 
 
-def _section_data_download(course_key, access):
+def _section_data_download(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     section_data = {
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
@@ -313,8 +326,10 @@ def _section_data_download(course_key, access):
     return section_data
 
 
-def _section_send_email(course_key, access, course):
+def _section_send_email(course, access):
     """ Provide data for the corresponding bulk email section """
+    course_key = course.id
+
     # This HtmlDescriptor is only being used to generate a nice text editor.
     html_module = HtmlDescriptor(
         course.system,
@@ -350,8 +365,17 @@ def _section_send_email(course_key, access, course):
     return section_data
 
 
-def _section_analytics(course_key, access):
+def _get_dashboard_link(course_key):
+    """ Construct a URL to the external analytics dashboard """
+    analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+    link = "<a href=\"{0}\" target=\"_blank\">{1}</a>".format(analytics_dashboard_url,
+                                                              settings.ANALYTICS_DASHBOARD_NAME)
+    return link
+
+
+def _section_analytics(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     section_data = {
         'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
@@ -360,14 +384,17 @@ def _section_analytics(course_key, access):
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
 
-    if settings.FEATURES.get('ENABLE_ANALYTICS_ACTIVE_COUNT'):
-        _update_active_students(course_key, section_data)
+    if settings.ANALYTICS_DASHBOARD_URL:
+        dashboard_link = _get_dashboard_link(course_key)
+        message = _("Demographic data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
+        section_data['demographic_message'] = message
 
     return section_data
 
 
-def _section_metrics(course_key, access):
+def _section_metrics(course, access):
     """Provide data for the corresponding dashboard section """
+    course_key = course.id
     section_data = {
         'section_key': 'metrics',
         'section_display_name': _('Metrics'),
@@ -380,31 +407,3 @@ def _section_metrics(course_key, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
-
-
-def _update_active_students(course_key, section_data):
-    auth_token = settings.ANALYTICS_DATA_TOKEN
-    base_url = settings.ANALYTICS_DATA_URL
-
-    section_data['active_student_count'] = 'N/A'
-    section_data['active_student_count_start'] = 'N/A'
-    section_data['active_student_count_end'] = 'N/A'
-
-    try:
-        client = Client(base_url=base_url, auth_token=auth_token)
-        course = client.courses(unicode(course_key))
-
-        recent_activity = course.recent_activity()
-        section_data['active_student_count'] = recent_activity['count']
-
-        def format_date(value):
-            return value.split('T')[0]
-
-        start = recent_activity['interval_start']
-        end = recent_activity['interval_end']
-
-        section_data['active_student_count_start'] = format_date(start)
-        section_data['active_student_count_end'] = format_date(end)
-
-    except (ClientError, KeyError) as e:
-        log.exception(e)

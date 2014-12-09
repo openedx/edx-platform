@@ -46,6 +46,9 @@ if Backbone?
       @thread.set("unread_comments_count", 0)
       @thread.set("read", true)
       @setActiveThread()
+      @showMain()
+
+    showMain: =>
       if(@main)
         @main.cleanup()
         @main.undelegateEvents()
@@ -54,10 +57,16 @@ if Backbone?
       if(@newPost.is(":visible"))
         @newPost.fadeOut()
 
-      @main = new DiscussionThreadView(el: $(".forum-content"), model: @thread, mode: "tab")
+      @main = new DiscussionThreadView(
+        el: $(".forum-content"),
+        model: @thread,
+        mode: "tab",
+        course_settings: @course_settings,
+      )
       @main.render()
       @main.on "thread:responses:rendered", =>
         @nav.updateSidebar()
+      @thread.on "thread:thread_type_updated", @showMain
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)

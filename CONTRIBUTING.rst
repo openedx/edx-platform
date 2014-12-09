@@ -13,9 +13,30 @@ Step 0: Join the Conversation
 
 Got an idea for how to improve the codebase? Fantastic, we'd love to hear about
 it! Before you dive in and spend a lot of time and effort making a pull request,
-it's a good idea to discuss your idea with other interested developers. You may
-get some valuable feedback that changes how you think about your idea, or you
-may find other developers who have the same idea and want to work together.
+it's a good idea to discuss your idea with other interested developers and/or the 
+edX product team. You may get some valuable feedback that changes how you think
+about your idea, or you may find other developers who have the same idea and want
+to work together.
+
+If you've got an idea for a new feature or new functionality for an existing feature,
+please start a discussion on the `edx-code`_ mailing list to get feedback from
+the community about the idea and your implementation choices.
+
+.. _edx-code: https://groups.google.com/forum/#!forum/edx-code
+
+If you then plan to contribute your code upstream, please `start a discussion on JIRA`_
+(you may first need to `create a free JIRA account`_).
+Start a discussion by visiting the JIRA website and clicking the "Create" button at the
+top of the page. Choose the project "Open Source Pull Requests" and the issue type
+"Feature Proposal". In the description give us as much detail as you can for the feature
+or functionality you are thinking about implementing. Include a link to any relevant
+edx-code mailing list discussions about your idea. We encourage you to do this before
+you begin implementing your feature, in order to get valuable feedback from the edX
+product team early on in your journey and increase the likelihood of a successful
+pull request.
+
+.. _start a discussion on JIRA: https://openedx.atlassian.net/secure/Dashboard.jspa
+.. _create a free JIRA account: https://openedx.atlassian.net/admin/users/sign-up
 
 For real-time conversation, we use `IRC`_: we all hang out in the
 `#edx-code channel on Freenode`_. Come join us! The channel tends to be most

@@ -55,6 +55,15 @@ span {
   font: inherit;
 }
 
+.text-center {
+  text-align: center;
+}
+
+.text-dark-grey {
+  color: $dark-gray1;
+  font-size: 24px;
+}
+
 p + p, ul + p, ol + p {
   margin-top: 20px;
 }
@@ -107,6 +116,7 @@ a:focus {
 
 .container {
   @include clearfix;
+  @include box-sizing(border-box);
   margin: 0 auto 0;
   padding: 0px 30px;
   max-width: grid-width(12);
@@ -222,7 +232,7 @@ mark {
   }
 }
 
-.help-tab {
+.help-tab, .report-tab {
   @include transform(rotate(-90deg));
   @include transform-origin(0 0);
   top: 250px;
@@ -247,6 +257,10 @@ mark {
       background: $link-color;
     }
   }
+}
+
+.report-tab {
+  top: 442px;
 }
 
 .help-buttons {
@@ -278,7 +292,7 @@ mark {
   }
 }
 
-#feedback_form {
+#feedback_form, #report-form {
   input, textarea {
     font: normal 1em/1.4em $sans-serif;
   }
@@ -287,7 +301,7 @@ mark {
   }
 }
 
-#feedback_success_wrapper {
+#feedback_success_wrapper, #report-success-wrapper {
   p {
     padding: 0 20px 20px 20px;
   }
@@ -298,6 +312,11 @@ mark {
 // UI - disabled state
 .is-disabled {
   @extend %ui-disabled;
+}
+
+// UI - is hidden
+.is-hidden {
+  display: none;
 }
 
 // UI - semantically hide text

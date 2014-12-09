@@ -62,11 +62,13 @@ lib_paths:
 src_paths:
     - coffee/src
     - js
+    - js/common_helpers
 
 # Paths to spec (test) JavaScript files
 spec_paths:
     - coffee/spec/main.js
     - coffee/spec
+    - js/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.

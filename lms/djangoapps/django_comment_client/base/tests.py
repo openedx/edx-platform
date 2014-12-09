@@ -10,12 +10,12 @@ from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
 from django_comment_client.tests.utils import CohortedContentTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_common.models import Role, FORUM_ROLE_STUDENT
+from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
@@ -26,6 +26,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 log = logging.getLogger(__name__)
 
 CS_PREFIX = "http://localhost:4567/api/v1"
+
+# pylint: disable=C0111
 
 
 class MockRequestSetupMixin(object):
@@ -160,8 +162,7 @@ class ThreadActionGroupIdTestCase(
         )
 
 
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch('lms.lib.comment_client.utils.requests.request')
 class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
@@ -174,8 +175,11 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
         super(ViewsTestCase, self).setUp(create_user=False)
 
         # create a course
-        self.course = CourseFactory.create(org='MITx', course='999',
-                                           display_name='Robot Super Course')
+        self.course = CourseFactory.create(
+            org='MITx', course='999',
+            discussion_topics={"Some Topic": {"id": "some_topic"}},
+            display_name='Robot Super Course',
+        )
         self.course_id = self.course.id
         # seed the forums permissions and roles
         call_command('seed_permissions_roles', self.course_id.to_deprecated_string())
@@ -369,6 +373,23 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             mock_request
         )
 
+    def test_update_thread_course_topic(self, mock_request):
+        self._setup_mock_request(mock_request)
+        response = self.client.post(
+            reverse("update_thread", kwargs={"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()}),
+            data={"body": "foo", "title": "foo", "commentable_id": "some_topic"}
+        )
+        self.assertEqual(response.status_code, 200)
+
+    @patch('django_comment_client.base.views.get_discussion_categories_ids', return_value=["test_commentable"])
+    def test_update_thread_wrong_commentable_id(self, mock_get_discussion_id_map, mock_request):
+        self._test_request_error(
+            "update_thread",
+            {"thread_id": "dummy", "course_id": self.course_id.to_deprecated_string()},
+            {"body": "foo", "title": "foo", "commentable_id": "wrong_commentable"},
+            mock_request
+        )
+
     def test_create_comment_no_body(self, mock_request):
         self._test_request_error(
             "create_comment",
@@ -460,7 +481,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             "at_position_list": [],
             "closed": is_closed,
             "id": "518d4237b023791dca00000d",
-            "user_id": "1","username": "robot",
+            "user_id": "1", "username": "robot",
             "votes": {
                 "count": 0,
                 "up_count": 0,
@@ -729,7 +750,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
 
 @patch("lms.lib.comment_client.utils.requests.request")
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -823,7 +844,7 @@ class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.assertEqual(response.status_code, 200)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -845,7 +866,7 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -853,13 +874,14 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
+    @patch('django_comment_client.base.views.get_discussion_categories_ids', return_value=["test_commentable"])
     @patch('lms.lib.comment_client.utils.requests.request')
-    def _test_unicode_data(self, text, mock_request):
+    def _test_unicode_data(self, text, mock_request, mock_get_discussion_id_map):
         self._set_mock_request_data(mock_request, {
             "user_id": str(self.student.id),
             "closed": False,
         })
-        request = RequestFactory().post("dummy_url", {"body": text, "title": text})
+        request = RequestFactory().post("dummy_url", {"body": text, "title": text, "thread_type": "question", "commentable_id": "test_commentable"})
         request.user = self.student
         request.view_name = "update_thread"
         response = views.update_thread(request, course_id=self.course.id.to_deprecated_string(), thread_id="dummy_thread_id")
@@ -868,9 +890,11 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertTrue(mock_request.called)
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
+        self.assertEqual(mock_request.call_args[1]["data"]["thread_type"], "question")
+        self.assertEqual(mock_request.call_args[1]["data"]["commentable_id"], "test_commentable")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -893,7 +917,7 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -917,7 +941,7 @@ class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         self.course = CourseFactory.create()
@@ -941,7 +965,7 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):

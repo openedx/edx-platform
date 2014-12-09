@@ -1,13 +1,13 @@
 /**
  * Provides helper methods for invoking Validation modal in Jasmine tests.
  */
-define(['jquery', 'js/spec_helpers/modal_helpers', 'js/spec_helpers/view_helpers'],
-    function($, modal_helpers, view_helpers) {
+define(['jquery', 'js/spec_helpers/modal_helpers', 'js/common_helpers/template_helpers'],
+    function($, ModalHelpers, TemplateHelpers) {
         var installValidationTemplates, checkErrorContents, undoChanges;
 
         installValidationTemplates = function () {
-            modal_helpers.installModalTemplates();
-            view_helpers.installTemplate('validation-error-modal');
+            ModalHelpers.installModalTemplates();
+            TemplateHelpers.installTemplate('validation-error-modal');
         };
 
         checkErrorContents = function(validationModal, errorObjects) {
@@ -23,10 +23,10 @@ define(['jquery', 'js/spec_helpers/modal_helpers', 'js/spec_helpers/view_helpers
         };
 
         undoChanges = function(validationModal) {
-            modal_helpers.pressModalButton('.action-undo', validationModal);
+            ModalHelpers.pressModalButton('.action-undo', validationModal);
         };
 
-        return $.extend(modal_helpers, {
+        return $.extend(ModalHelpers, {
             'installValidationTemplates': installValidationTemplates,
             'checkErrorContents': checkErrorContents,
             'undoChanges': undoChanges,

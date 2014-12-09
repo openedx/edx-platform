@@ -21,17 +21,16 @@ class DataDownload
     @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
     @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
     @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
-    @$grades_btn = @$section.find ".grades-download-container input[type='button']"
-    @$ora2_btn = @$section.find("input[name='ora2-response-btn']'")
+    @$grades_btn = @$section.find ".reports-download-container input[type='button']"
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
     @$download_display_text           = @$download.find '.data-display-text'
-    @$download_display_table          = @$download.find '.data-display-table'
     @$download_request_response_error = @$download.find '.request-response-error'
-    @$grades                        = @$section.find '.grades-download-container'
-    @$grades_request_response       = @$grades.find '.request-response'
-    @$grades_request_response_error = @$grades.find '.request-response-error'
+    @$reports                         = @$section.find '.reports-download-container'
+    @$download_display_table          = @$reports.find '.data-display-table'
+    @$reports_request_response        = @$reports.find '.request-response'
+    @$reports_request_response_error  = @$reports.find '.request-response-error'
 
 
     @report_downloads = new ReportDownloads(@$section)
@@ -47,16 +46,22 @@ class DataDownload
     # this handler binds to both the download
     # and the csv button
     @$list_studs_csv_btn.click (e) =>
+      @clear_display()
+
       url = @$list_studs_csv_btn.data 'endpoint'
       # handle csv special case
       # redirect the document to the csv file.
       url += '/csv'
-      location.href = url
 
-    # Handles an Ora2 data request
-    @$ora2_btn.click (e) =>
-      url = @$ora2_btn.data 'endpoint'
-      location.href = url
+      $.ajax
+        dataType: 'json'
+        url: url
+        error: (std_ajax_err) =>
+          @$reports_request_response_error.text gettext("Error generating student profile information. Please try again.")
+          $(".msg-error").css({"display":"block"})
+        success: (data) =>
+          @$reports_request_response.text data['status']
+          $(".msg-confirm").css({"display":"block"})
 
     @$list_studs_btn.click (e) =>
       url = @$list_studs_btn.data 'endpoint'
@@ -69,7 +74,7 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: std_ajax_err =>
+        error: (std_ajax_err) =>
           @clear_display()
           @$download_request_response_error.text gettext("Error getting student list.")
         success: (data) =>
@@ -96,7 +101,7 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: std_ajax_err =>
+        error: (std_ajax_err) =>
           @clear_display()
           @$download_request_response_error.text gettext("Error retrieving grading configuration.")
         success: (data) =>
@@ -109,14 +114,16 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: std_ajax_err =>
+        error: (std_ajax_err) =>
           if e.target.name == 'calculate-grades-csv'
-            @$grades_request_response_error.text gettext("Error generating grades. Please try again.")
-          else
-            @$grades_request_response_error.text gettext("Error getting student submissions. Please try again.")
+            @$reports_request_response_error.text gettext("Error generating grades. Please try again.")
+          else if e.target.name == 'get-student-submissions'
+            @$reports_request_response_error.text gettext("Error getting student submissions. Please try again.")
+          else if e.target.name == 'ora2-response-btn'
+            @$reports_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
-          @$grades_request_response.text data['status']
+          @$reports_request_response.text data['status']
           $(".msg-confirm").css({"display":"block"})
 
   # handler for when the section title is clicked.
@@ -136,8 +143,8 @@ class DataDownload
     @$download_display_text.empty()
     @$download_display_table.empty()
     @$download_request_response_error.empty()
-    @$grades_request_response.empty()
-    @$grades_request_response_error.empty()
+    @$reports_request_response.empty()
+    @$reports_request_response_error.empty()
     # Clear any CSS styling from the request-response areas
     $(".msg-confirm").css({"display":"none"})
     $(".msg-error").css({"display":"none"})
@@ -149,7 +156,7 @@ class ReportDownloads
 
     @$report_downloads_table = @$section.find ".report-downloads-table"
 
-    POLL_INTERVAL = 1000 * 60 * 5 # 5 minutes in ms
+    POLL_INTERVAL = 20000 # 20 seconds, just like the "pending instructor tasks" table
     @downloads_poller = new window.InstructorDashboard.util.IntervalManager(
       POLL_INTERVAL, => @reload_report_downloads()
     )
@@ -164,7 +171,7 @@ class ReportDownloads
           @create_report_downloads_table data.downloads
         else
           console.log "No reports ready for download"
-      error: std_ajax_err => console.error "Error finding report downloads"
+      error: (std_ajax_err) => console.error "Error finding report downloads"
 
   create_report_downloads_table: (report_downloads_data) ->
     @$report_downloads_table.empty()

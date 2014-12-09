@@ -4,11 +4,12 @@ window.InlineAnalytics = (function() {
 
     function processResponse(response,
         partsToGet,
-        questionTypes,
+        questionTypesByPart,
         correctResponses) {
 
         var dataByPart = response.data_by_part;
         var countByPart = response.count_by_part;
+        var messageByPart = response.message_by_part;
         var lastUpdateDate = response.last_update_date;
         var totalAttemptCount;
         var totalCorrectCount;
@@ -21,6 +22,13 @@ window.InlineAnalytics = (function() {
         var arrayLength = partsToGet.length;
         for (index = 0; index < arrayLength; index++) {
             partId = partsToGet[index];
+            
+            if (messageByPart[partId]) {
+            	// An error was encountered processing the API data so set the appropriate
+            	// error message and continue.
+            	setErrorMessageOnPart(partId, messageByPart[partId]);
+            	continue;
+            }
 
             if (countByPart[partId]) {
                 totalAttemptCount = countByPart[partId]['totalAttemptCount'];
@@ -32,7 +40,7 @@ window.InlineAnalytics = (function() {
                 totalIncorrectCount = 0;
             }
 
-            if (questionTypes[partId] === 'radio') {
+            if (questionTypesByPart[partId] === 'radio') {
                 renderRadioAnalytics(dataByPart[partId],
                     partId,
                     totalAttemptCount,
@@ -40,7 +48,7 @@ window.InlineAnalytics = (function() {
                     totalIncorrectCount,
                     correctResponses[partId],
                     lastUpdateDate);
-            } else if (questionTypes[partId] === 'checkbox') {
+            } else if (questionTypesByPart[partId] === 'checkbox') {
                 renderCheckboxAnalytics(dataByPart[partId],
                     partId,
                     totalAttemptCount,
@@ -117,9 +125,9 @@ window.InlineAnalytics = (function() {
                 percent = Math.round(count * 1000 / (totalAttemptCount * 10));
 
                 if (correct) {
-                    answerClass = 'right';
-                } else if (!correct) {
-                    answerClass = 'wrong';
+                    answerClass = 'inline-analytics-correct';
+                } else {
+                    answerClass = 'inline-analytics-incorrect';
                 }
                 tr = $('<tr><td class="answer_box" title="' + choiceText[valueIndex] + '">' +
                     (parseInt(valueIndex, 10) + 1) + '</td><td class="answer_box ' +
@@ -173,9 +181,9 @@ window.InlineAnalytics = (function() {
         // Insert rows between currentIndex and finalIndex
         while (currentIndex < finalIndex) {
             if ('choice_' + currentIndex === correctResponse) {
-                answerClass = 'right';
+                answerClass = 'inline-analytics-correct';
             } else {
-                answerClass = 'wrong';
+                answerClass = 'inline-analytics-incorrect';
             }
             tr = $('<tr><td class="answer_box" title="' + choiceText[currentIndex] + '">' + (currentIndex + 1) +
                 '</td><td class="answer_box ' + answerClass +
@@ -261,9 +269,9 @@ window.InlineAnalytics = (function() {
                         (correctResponse.indexOf("'" + imaginedResponse + "'") > -1 &&
                             actualResponse.indexOf(imaginedResponse) > -1)) {
 
-                        answerClass = 'right';
+                        answerClass = 'inline-analytics-correct';
                     } else {
-                        answerClass = 'wrong';
+                        answerClass = 'inline-analytics-incorrect';
                     }
                     if (actualResponse.indexOf(imaginedResponse) !== -1) {
                         checkboxChecked = '<span class="dot"></span>';
@@ -363,6 +371,13 @@ window.InlineAnalytics = (function() {
         return 0;
     }
 
+
+    function setErrorMessageOnPart(elementId, message) {
+        // Set the error message on the element
+    	$('#' + elementId + '_analytics').html(message);
+    }
+
+
     function runDocReady(elementId) {
 
 
@@ -386,10 +401,11 @@ window.InlineAnalytics = (function() {
             $('#' + elementId + '_analytics_error_message').hide();
 
             var partsToGet = [];
-            var questionTypes = {};
+            var questionTypesByPart = {};
             var correctResponses = {};
             var index;
             var id, partId;
+            var numOptionsByPart = {};
 
             var divs = $('.' + elementId + '_analytics_div');
 
@@ -403,25 +419,33 @@ window.InlineAnalytics = (function() {
                 }
 
                 // Build dict of question types
-                questionTypes[partId] = divs[index].dataset.question_type;
+                questionTypesByPart[partId] = divs[index].dataset.question_type;
 
                 // Build dict of correct responses
                 correctResponses[partId] = divs[index].dataset.correct_response;
+
+                // Build dict of number of options (choices)
+                numOptionsByPart[partId] = getChoiceTexts(partId).length;
             }
+
+            var data = {
+            		module_id: location,
+            		question_types_by_part: questionTypesByPart,
+            		num_options_by_part: numOptionsByPart,
+            };
 
             if (partsToGet.length > 0) {
                 $.ajax({
                     context: this,
                     url: answerDistUrl,
-                    type: 'GET',
-                    data: {
-                        module_id: location
-                    },
+                    type: 'POST',
+                    data: {data: JSON.stringify(data)},
                     dataType: 'json',
+                    contentType: "application/json",
 
                     success: function(response) {
                         if (response) {
-                            window.InlineAnalytics.processResponse(response, partsToGet, questionTypes, correctResponses);
+                            window.InlineAnalytics.processResponse(response, partsToGet, questionTypesByPart, correctResponses);
                             // Store that we retrieved data for this problem
                             elementsRetrieved.push(elementId);
                             // Show all the graphics

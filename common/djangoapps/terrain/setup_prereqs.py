@@ -11,6 +11,7 @@ from terrain.stubs.youtube import StubYouTubeService
 from terrain.stubs.xqueue import StubXQueueService
 from terrain.stubs.lti import StubLtiService
 from terrain.stubs.video_source import VideoSourceHttpService
+from selenium.common.exceptions import NoAlertPresentException
 
 import re
 import requests
@@ -56,7 +57,7 @@ def stop_video_server(_total):
         video_server.shutdown()
 
 
-@before.each_scenario
+@before.each_scenario  # pylint: disable=E1101
 def process_requires_tags(scenario):
     """
     Process the scenario tags to make sure that any
@@ -124,7 +125,7 @@ def is_youtube_available(urls):
     return True
 
 
-@after.each_scenario
+@after.each_scenario  # pylint: disable=E1101
 def stop_stubs(_scenario):
     """
     Shut down any stub services that were started up for the scenario.
@@ -133,3 +134,21 @@ def stop_stubs(_scenario):
         stub_server = getattr(world, name, None)
         if stub_server is not None:
             stub_server.shutdown()
+
+
+@after.each_scenario  # pylint: disable=E1101
+def clear_alerts(_scenario):
+    """
+    Clear any alerts that might still exist, so that
+    the next scenario will not fail due to their existence.
+
+    Note that the splinter documentation indicates that
+    get_alert should return None if no alert is present,
+    however that is not the case. Instead a
+    NoAlertPresentException is raised.
+    """
+    try:
+        with world.browser.get_alert() as alert:
+            alert.dismiss()
+    except NoAlertPresentException:
+        pass

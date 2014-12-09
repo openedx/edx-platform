@@ -17,6 +17,7 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
+from xblock.core import XBlock
 from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -41,6 +42,14 @@ from lms.lib.xblock.runtime import quote_slashes
 from xmodule.modulestore import ModuleStoreEnum
 
 
+class PureXBlock(XBlock):
+    """
+    Pure XBlock to use in tests.
+    """
+    pass
+
+
+@ddt.ddt
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -209,6 +218,17 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(403, response.status_code)
         self.assertEquals('Unauthenticated', response.content)
 
+    @ddt.data('pure', 'vertical')
+    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
+    def test_rebinding_same_user(self, block_type):
+        request = self.request_factory.get('')
+        request.user = self.mock_user
+        course = CourseFactory()
+        descriptor = ItemFactory(category=block_type, parent=course)
+        field_data_cache = FieldDataCache([self.toy_course, descriptor], self.toy_course.id, self.mock_user)
+        render.get_module_for_descriptor(self.mock_user, request, descriptor, field_data_cache, self.toy_course.id)
+        render.get_module_for_descriptor(self.mock_user, request, descriptor, field_data_cache, self.toy_course.id)
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -374,19 +394,29 @@ class TestTOC(ModuleStoreTestCase):
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory()
         self.modulestore = self.store._get_modulestore_for_courseid(self.course_key)
-        with check_mongo_calls(num_finds, num_sends):
-            self.toy_course = self.store.get_course(self.toy_loc, depth=2)
-            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                self.toy_loc, self.request.user, self.toy_course, depth=2
-            )
+        with self.modulestore.bulk_operations(self.course_key):
+            with check_mongo_calls(num_finds, num_sends):
+                self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+                self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                    self.toy_loc, self.request.user, self.toy_course, depth=2
+                )
 
-    # TODO: LMS-11220: Document why split find count is 9
-    # TODO: LMS-11220: Document why mongo find count is 4
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 9, 0))
+    # Mongo makes 3 queries to load the course to depth 2:
+    #     - 1 for the course
+    #     - 1 for its children
+    #     - 1 for its grandchildren
+    # Split makes 6 queries to load the course to depth 2:
+    #     - load the structure
+    #     - load 5 definitions
+    # Split makes 2 queries to render the toc:
+    #     - it loads the active version at the start of the bulk operation
+    #     - it loads the course definition for inheritance, because it's outside
+    #     the bulk-operation marker that loaded the course descriptor
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 2))
     @ddt.unpack
-    def test_toc_toy_from_chapter(self, default_ms, num_finds, num_sends):
+    def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
-            self.setup_modulestore(default_ms, num_finds, num_sends)
+            self.setup_modulestore(default_ms, setup_finds, setup_sends)
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
                             'format': u'Lecture Sequence', 'due': None, 'active': False},
@@ -402,20 +432,29 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False}],
                           'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-            with check_mongo_calls(0, 0):
+            with check_mongo_calls(toc_finds):
                 actual = render.toc_for_course(
                     self.request.user, self.request, self.toy_course, self.chapter, None, self.field_data_cache
                 )
         for toc_section in expected:
             self.assertIn(toc_section, actual)
 
-    # TODO: LMS-11220: Document why split find count is 9
-    # TODO: LMS-11220: Document why mongo find count is 4
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 9, 0))
+    # Mongo makes 3 queries to load the course to depth 2:
+    #     - 1 for the course
+    #     - 1 for its children
+    #     - 1 for its grandchildren
+    # Split makes 6 queries to load the course to depth 2:
+    #     - load the structure
+    #     - load 5 definitions
+    # Split makes 2 queries to render the toc:
+    #     - it loads the active version at the start of the bulk operation
+    #     - it loads the course definition for inheritance, because it's outside
+    #     the bulk-operation marker that loaded the course descriptor
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 2))
     @ddt.unpack
-    def test_toc_toy_from_section(self, default_ms, num_finds, num_sends):
+    def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
-            self.setup_modulestore(default_ms, num_finds, num_sends)
+            self.setup_modulestore(default_ms, setup_finds, setup_sends)
             section = 'Welcome'
             expected = ([{'active': True, 'sections':
                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
@@ -432,7 +471,8 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False}],
                           'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-            actual = render.toc_for_course(self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache)
+            with check_mongo_calls(toc_finds):
+                actual = render.toc_for_course(self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache)
             for toc_section in expected:
                 self.assertIn(toc_section, actual)
 
@@ -606,6 +646,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
 
         descriptor = ItemFactory.create(
             category='vertical',
+            parent_location=course.location,
         )
 
         child_descriptor = ItemFactory.create(

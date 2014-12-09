@@ -1,5 +1,6 @@
 import re
 import logging
+from collections import namedtuple
 
 import uuid
 
@@ -71,3 +72,30 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
             logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", source_course_id, text, str(exc))
 
     return text
+
+
+def draft_node_constructor(module, url, parent_url, location=None, parent_location=None, index=None):
+    """
+    Contructs a draft_node namedtuple with defaults.
+    """
+    draft_node = namedtuple('draft_node', ['module', 'location', 'url', 'parent_location', 'parent_url', 'index'])
+    return draft_node(module, location, url, parent_location, parent_url, index)
+
+
+def get_draft_subtree_roots(draft_nodes):
+    """
+    Takes a list of draft_nodes, which are namedtuples, each of which identify
+    itself and its parent.
+
+    If a draft_node is in `draft_nodes`, then we expect for all its children
+    should be in `draft_nodes` as well. Since `_import_draft` is recursive,
+    we only want to import the roots of any draft subtrees contained in
+    `draft_nodes`.
+
+    This generator yields those roots.
+    """
+    urls = [draft_node.url for draft_node in draft_nodes]
+
+    for draft_node in draft_nodes:
+        if draft_node.parent_url not in urls:
+            yield draft_node

@@ -24,6 +24,11 @@ _ = lambda text: text
 
 DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
+CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
+CATALOG_VISIBILITY_ABOUT = "about"
+CATALOG_VISIBILITY_NONE = "none"
+
+
 class StringOrDate(Date):
     def from_json(self, value):
         """
@@ -253,7 +258,7 @@ class CourseFields(object):
     )
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
-        help=_("Enter pairs of dates between which students cannot post to discussion forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to include the \"T\" between the date and time)."),
+        help=_("Enter pairs of dates between which students cannot post to discussion forums. Each pair should be formatted as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (be sure to include the \"T\" between the date and time). An entry defining more than one blackout period might look like this: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", \"2014-10-08\"]]"),
         scope=Scope.settings
     )
     discussion_topics = Dict(
@@ -273,7 +278,7 @@ class CourseFields(object):
     )
     cohort_config = Dict(
         display_name=_("Cohort Configuration"),
-        help=_("Cohorts are not currently supported by edX."),
+        help=_("Enter policy keys and values to enable the cohort feature, define automated student assignment to groups, or identify any course-wide discussion topics as private to cohort members."),
         scope=Scope.settings
     )
     is_new = Boolean(
@@ -613,6 +618,34 @@ class CourseFields(object):
                               help="Whether to restrict enrollment to invitation by the course staff.",
                               default=False,
                               scope=Scope.settings)
+
+    course_survey_name = String(
+        display_name=_("Pre-Course Survey Name"),
+        help=_("Name of SurveyForm to display as a pre-course survey to the user."),
+        default=None,
+        scope=Scope.settings,
+        deprecated=True
+    )
+
+    course_survey_required = Boolean(
+        display_name=_("Pre-Course Survey Required"),
+        help=_("Specify whether students must complete a survey before they can view your course content. If you set this value to true, you must add a name for the survey to the Course Survey Name setting above."),
+        default=False,
+        scope=Scope.settings,
+        deprecated=True
+    )
+
+    catalog_visibility = String(
+        display_name=_("Course Visibility In Catalog"),
+        help=_("Defines the access permissions for showing the course in the course catalog. This can be set to one of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access to about page), 'none' (do not show in catalog and do not allow access to an about page)."),
+        default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+        scope=Scope.settings,
+        values=[
+            {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
+            {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},
+            {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]
+    )
+
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
@@ -1009,10 +1042,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """Return the course_id for this course"""
         return self.location.course_key
 
-    @property
-    def start_date_text(self):
+    def start_datetime_text(self, format_string="SHORT_DATE"):
         """
-        Returns the desired text corresponding the course's start date.  Prefers .advertised_start,
+        Returns the desired text corresponding the course's start date and time in UTC.  Prefers .advertised_start,
         then falls back to .start
         """
         i18n = self.runtime.service(self, "i18n")
@@ -1025,7 +1057,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 if result is None:
                     result = text.title()
                 else:
-                    result = strftime(result, "SHORT_DATE")
+                    result = strftime(result, format_string)
+                    if format_string == "DATE_TIME":
+                        result = self._add_timezone_string(result)
             except ValueError:
                 result = text.title()
 
@@ -1039,7 +1073,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return _('TBD')
         else:
             when = self.advertised_start or self.start
-            return strftime(when, "SHORT_DATE")
+
+            if format_string == "DATE_TIME":
+                return self._add_timezone_string(strftime(when, format_string))
+
+            return strftime(when, format_string)
 
     @property
     def start_date_is_still_default(self):
@@ -1049,10 +1087,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         return self.advertised_start is None and self.start == CourseFields.start.default
 
-    @property
-    def end_date_text(self):
+    def end_datetime_text(self, format_string="SHORT_DATE"):
         """
-        Returns the end date for the course formatted as a string.
+        Returns the end date or date_time for the course formatted as a string.
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
@@ -1060,7 +1097,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return ''
         else:
             strftime = self.runtime.service(self, "i18n").strftime
-            return strftime(self.end, "SHORT_DATE")
+            date_time = strftime(self.end, format_string)
+            return date_time if format_string == "SHORT_DATE" else self._add_timezone_string(date_time)
+
+    def _add_timezone_string(self, date_time):
+        """
+        Adds 'UTC' string to the end of start/end date and time texts.
+        """
+        return date_time + u" UTC"
 
     @property
     def forum_posts_allowed(self):

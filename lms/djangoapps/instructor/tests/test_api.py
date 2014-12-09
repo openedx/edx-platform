@@ -9,6 +9,7 @@ import requests
 import datetime
 import ddt
 import random
+import io
 from urllib import quote
 from django.test import TestCase
 from nose.tools import raises
@@ -17,17 +18,19 @@ from django.conf import settings
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
-from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA, Role
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
 from django.core import mail
 from django.utils.timezone import utc
 from django.test import RequestFactory
 
 from django.contrib.auth.models import User
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from student.tests.factories import UserFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
 from student.roles import CourseBetaTesterRole
@@ -39,8 +42,8 @@ from courseware.models import StudentModule
 
 # modules which are mocked in test cases.
 import instructor_task.api
-from instructor.access import allow_access
 import instructor.views.api
+from instructor.views.api import generate_unique_password
 from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -49,12 +52,31 @@ from shoppingcart.models import (
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode
 )
 from course_modes.models import CourseMode
+from django.core.files.uploadedfile import SimpleUploadedFile
+from student.models import NonExistentCourseError
 
 from .test_tools import msk_from_problem_urlname
 from ..views.tools import get_extended_due
 
 EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","customer_reference_number","internal_reference"'
 EXPECTED_COUPON_CSV_HEADER = '"course_id","percentage_discount","code_redeemed_count","description"'
+
+# ddt data for test cases involving reports
+REPORTS_DATA = (
+    {
+        'report_type': 'grade',
+        'instructor_api_endpoint': 'calculate_grades_csv',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_grades_csv',
+        'extra_instructor_api_kwargs': {}
+    },
+    {
+        'report_type': 'enrolled student profile',
+        'instructor_api_endpoint': 'get_students_features',
+        'task_api_endpoint': 'instructor_task.api.submit_calculate_students_features_csv',
+        'extra_instructor_api_kwargs': {'csv': '/csv'}
+    }
+)
+
 
 @common_exceptions_400
 def view_success(request):  # pylint: disable=W0613
@@ -114,7 +136,7 @@ class TestCommonExceptions400(unittest.TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -142,7 +164,6 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.staff_level_endpoints = [
             ('students_update_enrollment', {'identifiers': 'foo@example.org', 'action': 'enroll'}),
             ('get_grading_config', {}),
-            ('get_students_features', {}),
             ('get_distribution', {}),
             ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
             ('reset_student_attempts',
@@ -157,6 +178,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('list_report_downloads', {}),
             ('calculate_grades_csv', {}),
             ('get_ora2_responses', {}),
+            ('get_students_features', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -269,8 +291,244 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
 
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test Bulk account creation and enrollment from csv file
+    """
+    def setUp(self):
+        self.request = RequestFactory().request()
+        self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+        self.url = reverse('register_and_enroll_students', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        self.not_enrolled_student = UserFactory(
+            username='NotEnrolledStudent',
+            email='nonenrolled@test.com',
+            first_name='NotEnrolled',
+            last_name='Student'
+        )
+
+    @patch('instructor.views.api.log.info')
+    def test_account_creation_and_enrollment_with_csv(self, info_log):
+        """
+        Happy path test to create a single new user
+        """
+        csv_content = "test_student@example.com,test_student_1,tester1,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        # test the log for email that's send to new created user.
+        info_log.assert_called_with('email sent to new created user at test_student@example.com')
+
+    @patch('instructor.views.api.log.info')
+    def test_account_creation_and_enrollment_with_csv_with_blank_lines(self, info_log):
+        """
+        Happy path test to create a single new user
+        """
+        csv_content = "\ntest_student@example.com,test_student_1,tester1,USA\n\n"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        # test the log for email that's send to new created user.
+        info_log.assert_called_with('email sent to new created user at test_student@example.com')
+
+    @patch('instructor.views.api.log.info')
+    def test_email_and_username_already_exist(self, info_log):
+        """
+        If the email address and username already exists
+        and the user is enrolled in the course, do nothing (including no email gets sent out)
+        """
+        csv_content = "test_student@example.com,test_student_1,tester1,USA\n" \
+                      "test_student@example.com,test_student_1,tester2,US"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        # test the log for email that's send to new created user.
+        info_log.assert_called_with("user already exists with username '{username}' and email '{email}'".format(username='test_student_1', email='test_student@example.com'))
+
+    def test_bad_file_upload_type(self):
+        """
+        Try uploading some non-CSV file and verify that it is rejected
+        """
+        uploaded_file = SimpleUploadedFile("temp.jpg", io.BytesIO(b"some initial binary data: \x00\x01").read())
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['general_errors']), 0)
+        self.assertEquals(data['general_errors'][0]['response'], 'Could not read uploaded file.')
+
+    def test_insufficient_data(self):
+        """
+        Try uploading a CSV file which does not have the exact four columns of data
+        """
+        csv_content = "test_student@example.com,test_student_1\n"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 1)
+        self.assertEquals(data['general_errors'][0]['response'], 'Data in row #1 must have exactly four columns: email, username, full name, and country')
+
+    def test_invalid_email_in_csv(self):
+        """
+        Test failure case of a poorly formatted email field
+        """
+        csv_content = "test_student.example.com,test_student_1,tester1,USA"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+        self.assertEquals(data['row_errors'][0]['response'], 'Invalid email {0}.'.format('test_student.example.com'))
+
+    @patch('instructor.views.api.log.info')
+    def test_csv_user_exist_and_not_enrolled(self, info_log):
+        """
+        If the email address and username already exists
+        and the user is not enrolled in the course, enrolled him/her and iterate to next one.
+        """
+        csv_content = "nonenrolled@test.com,NotEnrolledStudent,tester1,USA"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        info_log.assert_called_with('user {username} enrolled in the course {course}'.format(username='NotEnrolledStudent', course=self.course.id))
+
+    def test_user_with_already_existing_email_in_csv(self):
+        """
+        If the email address already exists, but the username is different,
+        assume it is the correct user and just register the user in the course.
+        """
+        csv_content = "test_student@example.com,test_student_1,tester1,USA\n" \
+                      "test_student@example.com,test_student_2,tester2,US"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        warning_message = 'An account with email {email} exists but the provided username {username} ' \
+                          'is different. Enrolling anyway with {email}.'.format(email='test_student@example.com', username='test_student_2')
+        self.assertNotEquals(len(data['warnings']), 0)
+        self.assertEquals(data['warnings'][0]['response'], warning_message)
+        user = User.objects.get(email='test_student@example.com')
+        self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
+
+    def test_user_with_already_existing_username_in_csv(self):
+        """
+        If the username already exists (but not the email),
+        assume it is a different user and fail to create the new account.
+        """
+        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
+                      "test_student2@example.com,test_student_1,tester2,US"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['row_errors']), 0)
+        self.assertEquals(data['row_errors'][0]['response'], 'Username {user} already exists.'.format(user='test_student_1'))
+
+    def test_csv_file_not_attached(self):
+        """
+        Test when the user does not attach a file
+        """
+        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
+                      "test_student2@example.com,test_student_1,tester2,US"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+
+        response = self.client.post(self.url, {'file_not_found': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['general_errors']), 0)
+        self.assertEquals(data['general_errors'][0]['response'], 'File is not attached.')
+
+    def test_raising_exception_in_auto_registration_and_enrollment_case(self):
+        """
+        Test that exceptions are handled well
+        """
+        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
+                      "test_student2@example.com,test_student_1,tester2,US"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        with patch('instructor.views.api.create_and_enroll_user') as mock:
+            mock.side_effect = NonExistentCourseError()
+            response = self.client.post(self.url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['row_errors']), 0)
+        self.assertEquals(data['row_errors'][0]['response'], 'NonExistentCourseError')
+
+    def test_generate_unique_password(self):
+        """
+        generate_unique_password should generate a unique password string that excludes certain characters.
+        """
+        password = generate_unique_password([], 12)
+        self.assertEquals(len(password), 12)
+        for letter in password:
+            self.assertNotIn(letter, 'aAeEiIoOuU1l')
+
+    def test_users_created_and_enrolled_successfully_if_others_fail(self):
+
+        csv_content = "test_student1@example.com,test_student_1,tester1,USA\n" \
+                      "test_student3@example.com,test_student_1,tester3,CA\n" \
+                      "test_student2@example.com,test_student_2,tester2,USA"
+
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertNotEquals(len(data['row_errors']), 0)
+        self.assertEquals(data['row_errors'][0]['response'], 'Username {user} already exists.'.format(user='test_student_1'))
+        self.assertTrue(User.objects.filter(username='test_student_1', email='test_student1@example.com').exists())
+        self.assertTrue(User.objects.filter(username='test_student_2', email='test_student2@example.com').exists())
+        self.assertFalse(User.objects.filter(email='test_student3@example.com').exists())
+
+    @patch.object(instructor.views.api, 'generate_random_string',
+                  Mock(side_effect=['first', 'first', 'second']))
+    def test_generate_unique_password_no_reuse(self):
+        """
+        generate_unique_password should generate a unique password string that hasn't been generated before.
+        """
+        generated_password = ['first']
+        password = generate_unique_password(generated_password, 12)
+        self.assertNotEquals(password, 'first')
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': False})
+    def test_allow_automated_signups_flag_not_set(self):
+        csv_content = "test_student1@example.com,test_student_1,tester1,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.url, {'students_list': uploaded_file})
+        self.assertEquals(response.status_code, 403)
+
+
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test enrollment modification endpoint.
@@ -306,8 +564,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.about_path = '/courses/MITx/999/Robot_Super_Course/about'
-        self.course_path = '/courses/MITx/999/Robot_Super_Course/'
+        self.about_path = '/courses/{}/about'.format(self.course.id)
+        self.course_path = '/courses/{}/'.format(self.course.id)
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -487,16 +745,17 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been enrolled in Robot Super Course'
+            u'You have been enrolled in {}'.format(self.course.display_name)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear NotEnrolled Student\n\nYou have been enrolled in Robot Super Course "
+            "Dear NotEnrolled Student\n\nYou have been enrolled in {} "
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
             "{proto}://{site}{course_path}\n\n----\n"
             "This email was automatically sent from edx.org to NotEnrolled Student".format(
+                self.course.display_name,
                 proto=protocol, site=self.site_name, course_path=self.course_path
             )
         )
@@ -513,17 +772,17 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for Robot Super Course'
+            u'You have been invited to register for {}'.format(self.course.display_name)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {} at edx.org by a member of the course staff.\n\n"
             "To finish your registration, please visit {proto}://{site}/register and fill out the "
             "registration form making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, "
             "visit {proto}://{site}{about_path} to join the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name, about_path=self.about_path
+                self.course.display_name, proto=protocol, site=self.site_name, about_path=self.about_path
             )
         )
 
@@ -538,12 +797,12 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
             "To finish your registration, please visit {proto}://{site}/register and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
-            "You can then enroll in Robot Super Course.\n\n----\n"
+            "You can then enroll in {display_name}.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name
+                display_name=self.course.display_name, proto=protocol, site=self.site_name
             )
         )
 
@@ -561,16 +820,16 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for Robot Super Course'
+            u'You have been invited to register for {}'.format(self.course.display_name)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
             "To finish your registration, please visit {proto}://{site}/register and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
-            "Once you have registered and activated your account, you will see Robot Super Course listed on your dashboard.\n\n----\n"
+            "Once you have registered and activated your account, you will see {display_name} listed on your dashboard.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name
+                proto=protocol, site=self.site_name, display_name=self.course.display_name
             )
         )
 
@@ -653,15 +912,17 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been un-enrolled from Robot Super Course'
+            'You have been un-enrolled from {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear Enrolled Student\n\nYou have been un-enrolled in Robot Super Course "
+            "Dear Enrolled Student\n\nYou have been un-enrolled in {display_name} "
             "at edx.org by a member of the course staff. "
             "The course will no longer appear on your edx.org dashboard.\n\n"
             "Your other courses have not been affected.\n\n----\n"
-            "This email was automatically sent from edx.org to Enrolled Student"
+            "This email was automatically sent from edx.org to Enrolled Student".format(
+                display_name=self.course.display_name,
+            )
         )
 
     def test_unenroll_with_email_allowed_student(self):
@@ -700,13 +961,15 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been un-enrolled from Robot Super Course'
+            'You have been un-enrolled from {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear Student,\n\nYou have been un-enrolled from course Robot Super Course by a member of the course staff. "
+            "Dear Student,\n\nYou have been un-enrolled from course {display_name} by a member of the course staff. "
             "Please disregard the invitation previously sent.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-allowed@robot.org"
+            "This email was automatically sent from edx.org to robot-allowed@robot.org".format(
+                display_name=self.course.display_name,
+            )
         )
 
     @ddt.data('http', 'https')
@@ -724,15 +987,16 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for Robot Super Course'
+            'You have been invited to register for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
             "To access the course visit {proto}://{site}{about_path} and register for the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                proto=protocol, site=self.site_name, about_path=self.about_path
+                proto=protocol, site=self.site_name, about_path=self.about_path,
+                display_name=self.course.display_name,
             )
         )
 
@@ -750,8 +1014,10 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n----\n"
-            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+            "Dear student,\n\nYou have been invited to join {} at edx.org by a member of the course staff.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
+                self.course.display_name,
+            )
         )
 
     @ddt.data('http', 'https')
@@ -771,21 +1037,54 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for Robot Super Course'
+            'You have been invited to register for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the course staff.\n\n"
             "To access the course visit {proto}://{site}{course_path} and login.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
+                display_name=self.course.display_name,
                 proto=protocol, site=self.site_name, course_path=self.course_path
             )
         )
 
+    def test_enroll_already_enrolled_student(self):
+        """
+        Ensure that already enrolled "verified" students cannot be downgraded
+        to "honor"
+        """
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.enrolled_student, course_id=self.course.id
+        )
+        # make this enrollment "verified"
+        course_enrollment.mode = u'verified'
+        course_enrollment.save()
+        self.assertEqual(course_enrollment.mode, u'verified')
+
+        # now re-enroll the student through the instructor dash
+        url = reverse(
+            'students_update_enrollment',
+            kwargs={'course_id': self.course.id.to_deprecated_string()},
+        )
+        params = {
+            'identifiers': self.enrolled_student.email,
+            'action': 'enroll',
+            'email_students': True,
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+
+        # affirm that the student is still in "verified" mode
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.enrolled_student, course_id=self.course.id
+        )
+        self.assertEqual(course_enrollment.mode, u"verified")
+
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test bulk beta modify access endpoint.
@@ -815,8 +1114,8 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.about_path = '/courses/MITx/999/Robot_Super_Course/about'
-        self.course_path = '/courses/MITx/999/Robot_Super_Course/'
+        self.about_path = '/courses/{}/about'.format(self.course.id)
+        self.course_path = '/courses/{}/'.format(self.course.id)
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -918,16 +1217,17 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to a beta test for Robot Super Course'
+            'You have been invited to a beta test for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
             mail.outbox[0].body,
             u"Dear {student_name}\n\nYou have been invited to be a beta tester "
-            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "for {display_name} at edx.org by a member of the course staff.\n\n"
             "Visit {proto}://{site}{about_path} to join "
             "the course and begin the beta test.\n\n----\n"
             "This email was automatically sent from edx.org to {student_email}".format(
+                display_name=self.course.display_name,
                 student_name=self.notenrolled_student.profile.name,
                 student_email=self.notenrolled_student.email,
                 proto=protocol,
@@ -964,16 +1264,17 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to a beta test for Robot Super Course'
+            'You have been invited to a beta test for {display_name}'.format(display_name=self.course.display_name)
         )
 
         self.assertEqual(
             mail.outbox[0].body,
             u"Dear {student_name}\n\nYou have been invited to be a beta tester "
-            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "for {display_name} at edx.org by a member of the course staff.\n\n"
             "To start accessing course materials, please visit "
             "https://{site}/dashboard\n\n----\n"
             "This email was automatically sent from edx.org to {student_email}".format(
+                display_name=self.course.display_name,
                 student_name=self.notenrolled_student.profile.name,
                 student_email=self.notenrolled_student.email,
                 site=self.site_name,
@@ -990,11 +1291,12 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             mail.outbox[0].body,
-            u"Dear {0}\n\nYou have been invited to be a beta tester "
-            "for Robot Super Course at edx.org by a member of the course staff.\n\n"
+            u"Dear {}\n\nYou have been invited to be a beta tester "
+            "for {} at edx.org by a member of the course staff.\n\n"
             "Visit edx.org to enroll in the course and begin the beta test.\n\n----\n"
-            "This email was automatically sent from edx.org to {1}".format(
+            "This email was automatically sent from edx.org to {}".format(
                 self.notenrolled_student.profile.name,
+                self.course.display_name,
                 self.notenrolled_student.email,
             )
         )
@@ -1077,23 +1379,24 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been removed from a beta test for Robot Super Course'
+            u'You have been removed from a beta test for {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
             "Dear {full_name}\n\nYou have been removed as a beta tester for "
-            "Robot Super Course at edx.org by a member of the course staff. "
+            "{display_name} at edx.org by a member of the course staff. "
             "The course will remain on your dashboard, but you will no longer "
             "be part of the beta testing group.\n\n"
             "Your other courses have not been affected.\n\n----\n"
             "This email was automatically sent from edx.org to {email_address}".format(
+                display_name=self.course.display_name,
                 full_name=self.beta_tester.profile.name,
                 email_address=self.beta_tester.email
             )
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
@@ -1299,35 +1602,22 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         # Seed forum roles for course.
         seed_permissions_roles(self.course.id)
 
-        # Test add discussion admin with email.
-        self.assert_update_forum_role_membership(self.other_user.email, "Administrator", "allow")
+        for user in [self.instructor, self.other_user]:
+            for identifier_attr in [user.email, user.username]:
+                for rolename in ["Administrator", "Moderator", "Community TA"]:
+                    for action in ["allow", "revoke"]:
+                        self.assert_update_forum_role_membership(user, identifier_attr, rolename, action)
 
-        # Test revoke discussion admin with email.
-        self.assert_update_forum_role_membership(self.other_user.email, "Administrator", "revoke")
-
-        # Test add discussion moderator with username.
-        self.assert_update_forum_role_membership(self.other_user.username, "Moderator", "allow")
-
-        # Test revoke discussion moderator with username.
-        self.assert_update_forum_role_membership(self.other_user.username, "Moderator", "revoke")
-
-        # Test add discussion community TA with email.
-        self.assert_update_forum_role_membership(self.other_user.email, "Community TA", "allow")
-
-        # Test revoke discussion community TA with username.
-        self.assert_update_forum_role_membership(self.other_user.username, "Community TA", "revoke")
-
-    def assert_update_forum_role_membership(self, unique_student_identifier, rolename, action):
+    def assert_update_forum_role_membership(self, current_user, identifier, rolename, action):
         """
         Test update forum role membership.
         Get unique_student_identifier, rolename and action and update forum role.
         """
-
         url = reverse('update_forum_role_membership', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(
             url,
             {
-                'unique_student_identifier': unique_student_identifier,
+                'unique_student_identifier': identifier,
                 'rolename': rolename,
                 'action': action,
             }
@@ -1336,20 +1626,23 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         # Status code should be 200.
         self.assertEqual(response.status_code, 200)
 
-        user_roles = self.other_user.roles.filter(course_id=self.course.id).values_list("name", flat=True)
+        user_roles = current_user.roles.filter(course_id=self.course.id).values_list("name", flat=True)
         if action == 'allow':
             self.assertIn(rolename, user_roles)
         elif action == 'revoke':
             self.assertNotIn(rolename, user_roles)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@ddt.ddt
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints that show data without side effects.
     """
 
     def setUp(self):
+        super(TestInstructorAPILevelsDataDump, self).setUp()
         self.course = CourseFactory.create()
         self.course_mode = CourseMode(course_id=self.course.id,
                                       mode_slug="honor",
@@ -1427,6 +1720,21 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
         url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url + '/csv', {})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+
+    def test_get_sale_order_records_features_csv(self):
+        """
+        Test that the response from get_sale_order_records is in csv format.
+        """
+        self.cart.order_type = 'business'
+        self.cart.save()
+        self.cart.add_billing_details(company_name='Test Company', company_contact_name='Test',
+                                      company_contact_email='test@123', recipient_name='R1',
+                                      recipient_email='', customer_reference_number='PO#23')
+        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        self.cart.purchase()
+        sale_order_url = reverse('get_sale_order_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(sale_order_url)
         self.assertEqual(response['Content-Type'], 'text/csv')
 
     def test_get_sale_records_features_csv(self):
@@ -1613,6 +1921,21 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
 
+    @ddt.data(True, False)
+    def test_get_students_features_cohorted(self, is_cohorted):
+        """
+        Test that get_students_features includes cohort info when the course is
+        cohorted, and does not when the course is not cohorted.
+        """
+        url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
+        self.course.cohort_config = {'cohorted': is_cohorted}
+        self.store.update_item(self.course, self.instructor.id)
+
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+
+        self.assertEqual('cohort' in res_json['feature_names'], is_cohorted)
+
     @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
     @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
     def test_get_anon_ids(self):
@@ -1625,9 +1948,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(
             '"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
-            '\n"2","41","42"\n'
+            '\n"3","41","42"\n'
         ))
-        self.assertTrue(body.endswith('"7","41","42"\n'))
+        self.assertTrue(body.endswith('"8","41","42"\n'))
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -1655,32 +1978,48 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected_response)
 
-    def test_calculate_grades_csv_success(self):
-        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id.to_deprecated_string()})
+    @ddt.data(*REPORTS_DATA)
+    @ddt.unpack
+    def test_calculate_report_csv_success(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
+        kwargs = {'course_id': unicode(self.course.id)}
+        kwargs.update(extra_instructor_api_kwargs)
+        url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
-        with patch('instructor_task.api.submit_calculate_grades_csv') as mock_cal_grades:
-            mock_cal_grades.return_value = True
+        with patch(task_api_endpoint):
             response = self.client.get(url, {})
-        success_status = "Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section."
+        success_status = "Your {report_type} report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
-    def test_calculate_grades_csv_already_running(self):
-        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id.to_deprecated_string()})
+    @ddt.data(*REPORTS_DATA)
+    @ddt.unpack
+    def test_calculate_report_csv_already_running(self, report_type, instructor_api_endpoint, task_api_endpoint, extra_instructor_api_kwargs):
+        kwargs = {'course_id': unicode(self.course.id)}
+        kwargs.update(extra_instructor_api_kwargs)
+        url = reverse(instructor_api_endpoint, kwargs=kwargs)
 
-        with patch('instructor_task.api.submit_calculate_grades_csv') as mock_cal_grades:
-            mock_cal_grades.side_effect = AlreadyRunningError()
+        with patch(task_api_endpoint) as mock:
+            mock.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
-        already_running_status = "A grade report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below."
+        already_running_status = "{report_type} report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.".format(report_type=report_type)
         self.assertIn(already_running_status, response.content)
 
-    def test_get_students_features_csv(self):
-        """
-        Test that some minimum of information is formatted
-        correctly in the response to get_students_features.
-        """
-        url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url + '/csv', {})
-        self.assertEqual(response['Content-Type'], 'text/csv')
+    def test_get_ora2_responses_success(self):
+        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
+            mock_submit_ora2_task.return_value = True
+            response = self.client.get(url, {})
+        success_status = "The ORA2 responses report is being generated."
+        self.assertIn(success_status, response.content)
+
+    def test_get_ora2_responses_already_running(self):
+        url = reverse('get_ora2_responses', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        with patch('instructor_task.api.submit_ora2_request_task') as mock_submit_ora2_task:
+            mock_submit_ora2_task.side_effect = AlreadyRunningError()
+            response = self.client.get(url, {})
+        already_running_status = "An ORA2 responses report generation task is already in progress."
+        self.assertIn(already_running_status, response.content)
 
     def test_get_distribution_no_feature(self):
         """
@@ -1757,7 +2096,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(response.status_code, 400)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change student grades.
@@ -1897,7 +2236,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertTrue(act.called)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -1979,7 +2318,7 @@ class MockCompletionInfo(object):
         return False, 'Task Errored In Some Way'
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test instructor task list endpoint.
@@ -2141,7 +2480,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(actual_tasks, expected_tasks)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch.object(instructor_task.api, 'get_instructor_task_history')
 class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -2276,7 +2615,8 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.assertDictEqual(expected_info, returned_info)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@ddt.ddt
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @override_settings(ANALYTICS_SERVER_URL="http://robotanalyticsserver.netbot:900/")
 @override_settings(ANALYTICS_API_KEY="robot_api_key")
 class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -2303,25 +2643,84 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
+    @ddt.data((ModuleStoreEnum.Type.mongo, False), (ModuleStoreEnum.Type.split, True))
+    @ddt.unpack
     @patch.object(instructor.views.api.requests, 'get')
-    def test_analytics_proxy_url(self, act):
+    def test_analytics_proxy_url(self, store_type, assert_wo_encoding, act):
         """ Test legacy analytics proxy url generation. """
+        with modulestore().default_store(store_type):
+            course = CourseFactory.create()
+            instructor_local = InstructorFactory(course_key=course.id)
+            self.client.login(username=instructor_local.username, password='test')
+
+            act.return_value = self.FakeProxyResponse()
+
+            url = reverse('proxy_legacy_analytics', kwargs={'course_id': course.id.to_deprecated_string()})
+            response = self.client.get(url, {
+                'aname': 'ProblemGradeDistribution'
+            })
+            self.assertEqual(response.status_code, 200)
+
+            # Make request URL pattern - everything but course id.
+            url_pattern = "{url}get?aname={aname}&course_id={course_id}&apikey={api_key}".format(
+                url="http://robotanalyticsserver.netbot:900/",
+                aname="ProblemGradeDistribution",
+                course_id="{course_id!s}",
+                api_key="robot_api_key",
+            )
+
+            if assert_wo_encoding:
+                # Format url with no URL-encoding of parameters.
+                assert_url = url_pattern.format(course_id=course.id.to_deprecated_string())
+                with self.assertRaises(AssertionError):
+                    act.assert_called_once_with(assert_url)
+
+            # Format url *with* URL-encoding of parameters.
+            expected_url = url_pattern.format(course_id=quote(course.id.to_deprecated_string()))
+            act.assert_called_once_with(expected_url)
+
+    @override_settings(ANALYTICS_SERVER_URL="")
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_server_url(self, act):
+        """
+        Test legacy analytics when empty server url.
+        """
         act.return_value = self.FakeProxyResponse()
 
         url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {
             'aname': 'ProblemGradeDistribution'
         })
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 501)
 
-        # check request url
-        expected_url = "{url}get?aname={aname}&course_id={course_id!s}&apikey={api_key}".format(
-            url="http://robotanalyticsserver.netbot:900/",
-            aname="ProblemGradeDistribution",
-            course_id=self.course.id.to_deprecated_string(),
-            api_key="robot_api_key",
-        )
-        act.assert_called_once_with(expected_url)
+    @override_settings(ANALYTICS_API_KEY="")
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_api_key(self, act):
+        """
+        Test legacy analytics when empty server API key.
+        """
+        act.return_value = self.FakeProxyResponse()
+
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'aname': 'ProblemGradeDistribution'
+        })
+        self.assertEqual(response.status_code, 501)
+
+    @override_settings(ANALYTICS_SERVER_URL="")
+    @override_settings(ANALYTICS_API_KEY="")
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_empty_url_and_api_key(self, act):
+        """
+        Test legacy analytics when empty server url & API key.
+        """
+        act.return_value = self.FakeProxyResponse()
+
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'aname': 'ProblemGradeDistribution'
+        })
+        self.assertEqual(response.status_code, 501)
 
     @patch.object(instructor.views.api.requests, 'get')
     def test_analytics_proxy(self, act):
@@ -2399,7 +2798,7 @@ class TestInstructorAPIHelpers(TestCase):
         msk_from_problem_urlname(*args)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test data dumps for reporting.
@@ -2588,7 +2987,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 self.user1.profile.name, self.user1.username)})
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
 class TestCourseRegistrationCodes(ModuleStoreTestCase):
     """

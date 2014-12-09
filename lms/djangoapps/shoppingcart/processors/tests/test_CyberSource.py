@@ -263,7 +263,6 @@ class CyberSourceTests(TestCase):
         # finally, tests an accepted order
         self.assertTrue(payment_accepted(params)['accepted'])
 
-
     @patch('shoppingcart.processors.CyberSource.render_to_string', autospec=True)
     def test_render_purchase_form_html(self, render):
         """
