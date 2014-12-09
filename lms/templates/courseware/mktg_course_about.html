@@ -58,7 +58,7 @@
         }
 
         ## Ugh.
-        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll&email_opt_in=" + email_opt_in;
+        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll&email_opt_in=" + emailOptIn;
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
