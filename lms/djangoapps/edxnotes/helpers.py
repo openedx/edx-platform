@@ -4,6 +4,7 @@ Helper methods related to EdxNotes.
 import json
 import requests
 import logging
+import markupsafe
 from uuid import uuid4
 from json import JSONEncoder
 from datetime import datetime
@@ -118,6 +119,8 @@ def preprocess_collection(user, course, collection):
                 continue
 
             model.update({
+                u"text": markupsafe.escape(model["text"]),
+                u"quote": markupsafe.escape(model["quote"]),
                 u"unit": get_ancestor_context(course, store, usage_key),
                 u"updated": dateutil_parse(model["updated"]),
             })

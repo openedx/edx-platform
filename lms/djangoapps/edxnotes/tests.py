@@ -342,6 +342,31 @@ class EdxNotesHelpersTest(TestCase):
             json.loads(helpers.search(self.user, self.course, "test"))
         )
 
+    def test_preprocess_collection_escaping(self):
+        """
+        Tests the result if appropriate module is not found.
+        """
+        initial_collection = [{
+            u"quote": u"test <script>alert('test')</script>",
+            u"text": u"text \"<>&'",
+            u"usage_id": unicode(self.html_module_1.location),
+            u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat()
+        }]
+
+        self.assertItemsEqual(
+            [{
+                u"quote": u"test &lt;script&gt;alert(&#39;test&#39;)&lt;/script&gt;",
+                u"text": u"text &#34;&lt;&gt;&amp;&#39;",
+                u"unit": {
+                    u"url": self._get_jump_to_url(self.vertical),
+                    u"display_name": self.vertical.display_name_with_default,
+                },
+                u"usage_id": unicode(self.html_module_1.location),
+                u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
+            }],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
+        )
+
     def test_preprocess_collection_no_item(self):
         """
         Tests the result if appropriate module is not found.
