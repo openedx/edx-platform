@@ -1713,6 +1713,7 @@ class DiscussionService(object):
 
         unsafethreads, query_params = get_threads(request, course_id)
         threads = [utils.prepare_content(thread, course_id) for thread in unsafethreads]
+        utils.add_courseware_context(threads, course, user)
 
         flag_moderator = has_permission(user, 'openclose_thread', course_id) or \
                          has_access(user, 'staff', course)
