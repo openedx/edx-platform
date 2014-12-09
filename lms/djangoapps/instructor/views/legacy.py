@@ -3,7 +3,6 @@ Instructor Views
 """
 ## NOTE: This is the code for the legacy instructor dashboard
 ## We are no longer supporting this file or accepting changes into it.
-# pylint: skip-file
 from contextlib import contextmanager
 import csv
 import json
@@ -27,38 +26,22 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.utils import timezone
 
-from xmodule_modifiers import wrap_xblock, request_token
 import xmodule.graders as xmgraders
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.html_module import HtmlDescriptor
-from opaque_keys import InvalidKeyError
-from lms.lib.xblock.runtime import quote_slashes
 
-from submissions import api as sub_api  # installed from the edx-submissions repository
-
-from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
-from student.roles import (
-    CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
-)
 from courseware.models import StudentModule
-from django_comment_common.models import (
-    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-)
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
 from instructor.views.tools import strip_if_string, bulk_email_is_enabled_for_course, add_block_ids
 from instructor_task.api import (
     get_running_instructor_tasks,
     get_instructor_task_history,
-    submit_rescore_problem_for_all_students,
-    submit_rescore_problem_for_student,
-    submit_reset_problem_attempts_for_all_students
 )
 from instructor_task.views import get_task_completion_info
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -67,12 +50,8 @@ from psychometrics import psychoanalyze
 from student.models import (
     CourseEnrollment,
     CourseEnrollmentAllowed,
-    unique_id_for_user,
-    anonymous_id_for_user
 )
 import track.views
-from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
@@ -107,10 +86,6 @@ def instructor_dashboard(request, course_id):
     forum_admin_access = has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
-    email_msg = ''
-    email_to_option = None
-    email_subject = None
-    html_message = ''
     show_email_tab = False
     problems = []
     plots = []
@@ -170,23 +145,6 @@ def instructor_dashboard(request, course_id):
             ]
             writer.writerow(encoded_row)
         return response
-
-    def get_student_from_identifier(unique_student_identifier):
-        """Gets a student object using either an email address or username"""
-        unique_student_identifier = strip_if_string(unique_student_identifier)
-        msg = ""
-        try:
-            if "@" in unique_student_identifier:
-                student = User.objects.get(email=unique_student_identifier)
-            else:
-                student = User.objects.get(username=unique_student_identifier)
-            msg += _("Found a single student.  ")
-        except User.DoesNotExist:
-            student = None
-            msg += "<font color='red'>{text}</font>".format(
-                text=_("Couldn't find student with that email or username.")
-            )
-        return msg, student
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -266,8 +224,9 @@ def instructor_dashboard(request, course_id):
         datatable = {'header': ['Student  email', 'Match?']}
         rg_students = [x['email'] for x in rg_stud_data['retdata']]
 
-        def domatch(x):
-            return 'yes' if x.email in rg_students else 'No'
+        def domatch(student):
+            """Returns 'yes' if student is pressent in the remote gradebook student list, else returns 'No'"""
+            return 'yes' if student.email in rg_students else 'No'
         datatable['data'] = [[x.email, domatch(x)] for x in stud_data['students']]
         datatable['title'] = action
 
@@ -429,7 +388,7 @@ def instructor_dashboard(request, course_id):
     analytics_results = {}
 
     if idash_mode == 'Analytics':
-        DASHBOARD_ANALYTICS = [
+        dashboard_analytics = [
             # "StudentsAttemptedProblems",  # num students who tried given problem
             "StudentsDailyActivity",  # active students by day
             "StudentsDropoffPerDay",  # active students dropoff by day
@@ -438,7 +397,7 @@ def instructor_dashboard(request, course_id):
             "ProblemGradeDistribution",  # foreach problem, grade distribution
         ]
 
-        for analytic_name in DASHBOARD_ANALYTICS:
+        for analytic_name in dashboard_analytics:
             analytics_results[analytic_name] = get_analytics_result(analytic_name)
 
     #----------------------------------------
@@ -522,31 +481,31 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
     '''
     Perform remote gradebook action.  Returns msg, datatable.
     '''
-    rg = course.remote_gradebook
-    if not rg:
+    rgb = course.remote_gradebook
+    if not rgb:
         msg = _("No remote gradebook defined in course metadata")
         return msg, {}
 
-    rgurl = settings.FEATURES.get('REMOTE_GRADEBOOK_URL', '')
-    if not rgurl:
+    rgburl = settings.FEATURES.get('REMOTE_GRADEBOOK_URL', '')
+    if not rgburl:
         msg = _("No remote gradebook url defined in settings.FEATURES")
         return msg, {}
 
-    rgname = rg.get('name', '')
-    if not rgname:
+    rgbname = rgb.get('name', '')
+    if not rgbname:
         msg = _("No gradebook name defined in course remote_gradebook metadata")
         return msg, {}
 
     if args is None:
         args = {}
-    data = dict(submit=action, gradebook=rgname, user=user.email)
+    data = dict(submit=action, gradebook=rgbname, user=user.email)
     data.update(args)
 
     try:
-        resp = requests.post(rgurl, data=data, verify=False, files=files)
+        resp = requests.post(rgburl, data=data, verify=False, files=files)
         retdict = json.loads(resp.content)
     except Exception as err:  # pylint: disable=broad-except
-        msg = _("Failed to communicate with gradebook server at {url}").format(url=rgurl) + "<br/>"
+        msg = _("Failed to communicate with gradebook server at {url}").format(url=rgburl) + "<br/>"
         msg += _("Error: {err}").format(err=err)
         msg += "<br/>resp={resp}".format(resp=resp.content)
         msg += "<br/>data={data}".format(data=data)
@@ -564,6 +523,7 @@ def _do_remote_gradebook(user, course, action, args=None, files=None):
         datatable = {}
 
     return msg, datatable
+
 
 def _role_members_table(role, title, course_key):
     """
@@ -784,7 +744,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
         datarow = [student.id, student.username, student.profile.name, student.email]
         try:
             datarow.append(student.externalauthmap.external_email)
-        except:  # ExternalAuthMap.DoesNotExist
+        except Exception:  # pylint: disable=broad-except
             datarow.append('')
 
         if get_grades:
@@ -843,12 +803,12 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
 
     if overload:  # delete all but staff
         todelete = CourseEnrollment.objects.filter(course_id=course_key)
-        for ce in todelete:
-            if not has_access(ce.user, 'staff', course) and ce.user.email.lower() not in new_students_lc:
-                status[ce.user.email] = 'deleted'
-                ce.deactivate()
+        for enrollee in todelete:
+            if not has_access(enrollee.user, 'staff', course) and enrollee.user.email.lower() not in new_students_lc:
+                status[enrollee.user.email] = 'deleted'
+                enrollee.deactivate()
             else:
-                status[ce.user.email] = 'is staff'
+                status[enrollee.user.email] = 'is staff'
         ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_key)
         for cea in ceaset:
             status[cea.email] = 'removed from pending enrollment list'
@@ -882,7 +842,7 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
             )
 
         # Composition of email
-        d = {
+        email_data = {
             'site_name': stripped_site_name,
             'registration_url': registration_url,
             'course': course,
@@ -897,11 +857,11 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
             user = User.objects.get(email=student)
         except User.DoesNotExist:
 
-            #Student not signed up yet, put in pending enrollment allowed table
+            # Student not signed up yet, put in pending enrollment allowed table
             cea = CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_key)
 
-            #If enrollmentallowed already exists, update auto_enroll flag to however it was set in UI
-            #Will be 0 or 1 records as there is a unique key on email + course_id
+            # If enrollmentallowed already exists, update auto_enroll flag to however it was set in UI
+            # Will be 0 or 1 records as there is a unique key on email + course_id
             if cea:
                 cea[0].auto_enroll = auto_enroll
                 cea[0].save()
@@ -909,7 +869,7 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
                     + ('on' if auto_enroll else 'off')
                 continue
 
-            #EnrollmentAllowed doesn't exist so create it
+            # EnrollmentAllowed doesn't exist so create it
             cea = CourseEnrollmentAllowed(email=student, course_id=course_key, auto_enroll=auto_enroll)
             cea.save()
 
@@ -918,9 +878,9 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
 
             if email_students:
                 # User is allowed to enroll but has not signed up yet
-                d['email_address'] = student
-                d['message'] = 'allowed_enroll'
-                send_mail_ret = send_mail_to_student(student, d)
+                email_data['email_address'] = student
+                email_data['message'] = 'allowed_enroll'
+                send_mail_ret = send_mail_to_student(student, email_data)
                 status[student] += (', email sent' if send_mail_ret else '')
             continue
 
@@ -936,13 +896,13 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
 
             if email_students:
                 # User enrolled for first time, populate dict with user specific info
-                d['email_address'] = student
-                d['full_name'] = user.profile.name
-                d['message'] = 'enrolled_enroll'
-                send_mail_ret = send_mail_to_student(student, d)
+                email_data['email_address'] = student
+                email_data['full_name'] = user.profile.name
+                email_data['message'] = 'enrolled_enroll'
+                send_mail_ret = send_mail_to_student(student, email_data)
                 status[student] += (', email sent' if send_mail_ret else '')
 
-        except:
+        except Exception:  # pylint: disable=broad-except
             status[student] = 'rejected'
 
     datatable = {'header': ['StudentEmail', 'action']}
@@ -977,15 +937,17 @@ def _do_unenroll_students(course_key, students, email_students=False):
     )
     if email_students:
         course = modulestore().get_course(course_key)
-        #Composition of email
-        d = {'site_name': stripped_site_name,
-             'course': course}
+        # Composition of email
+        data = {
+            'site_name': stripped_site_name,
+            'course': course
+        }
 
     for student in old_students:
 
         isok = False
         cea = CourseEnrollmentAllowed.objects.filter(course_id=course_key, email=student)
-        #Will be 0 or 1 records as there is a unique key on email + course_id
+        # Will be 0 or 1 records as there is a unique key on email + course_id
         if cea:
             cea[0].delete()
             status[student] = "un-enrolled"
@@ -996,25 +958,25 @@ def _do_unenroll_students(course_key, students, email_students=False):
         except User.DoesNotExist:
 
             if isok and email_students:
-                #User was allowed to join but had not signed up yet
-                d['email_address'] = student
-                d['message'] = 'allowed_unenroll'
-                send_mail_ret = send_mail_to_student(student, d)
+                # User was allowed to join but had not signed up yet
+                data['email_address'] = student
+                data['message'] = 'allowed_unenroll'
+                send_mail_ret = send_mail_to_student(student, data)
                 status[student] += (', email sent' if send_mail_ret else '')
 
             continue
 
-        #Will be 0 or 1 records as there is a unique key on user + course_id
+        # Will be 0 or 1 records as there is a unique key on user + course_id
         if CourseEnrollment.is_enrolled(user, course_key):
             try:
                 CourseEnrollment.unenroll(user, course_key)
                 status[student] = "un-enrolled"
                 if email_students:
-                    #User was enrolled
-                    d['email_address'] = student
-                    d['full_name'] = user.profile.name
-                    d['message'] = 'enrolled_unenroll'
-                    send_mail_ret = send_mail_to_student(student, d)
+                    # User was enrolled
+                    data['email_address'] = student
+                    data['full_name'] = user.profile.name
+                    data['message'] = 'enrolled_unenroll'
+                    send_mail_ret = send_mail_to_student(student, data)
                     status[student] += (', email sent' if send_mail_ret else '')
 
             except Exception:  # pylint: disable=broad-except
@@ -1025,8 +987,7 @@ def _do_unenroll_students(course_key, students, email_students=False):
     datatable['data'] = [[x, status[x]] for x in sorted(status)]
     datatable['title'] = _('Un-enrollment of students')
 
-    data = dict(datatable=datatable)
-    return data
+    return dict(datatable=datatable)
 
 
 def send_mail_to_student(student, param_dict):
@@ -1123,15 +1084,15 @@ def get_answers_distribution(request, course_key):
 
     dist = grades.answer_distributions(course.id)
 
-    d = {}
-    d['header'] = ['url_name', 'display name', 'answer id', 'answer', 'count']
+    dist = {}
+    dist['header'] = ['url_name', 'display name', 'answer id', 'answer', 'count']
 
-    d['data'] = [
+    dist['data'] = [
         [url_name, display_name, answer_id, a, answers[a]]
         for (url_name, display_name, answer_id), answers in sorted(dist.items())
         for a in answers
     ]
-    return d
+    return dist
 
 
 #-----------------------------------------------------------------------------
@@ -1153,8 +1114,8 @@ def compute_course_stats(course):
         children = module.get_children()
         category = module.__class__.__name__  # HtmlDescriptor, CapaDescriptor, ...
         counts[category] += 1
-        for c in children:
-            walk(c)
+        for child in children:
+            walk(child)
 
     walk(course)
     stats = dict(counts)  # number of each kind of module
