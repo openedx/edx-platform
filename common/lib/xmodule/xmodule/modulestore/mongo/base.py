@@ -1486,7 +1486,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         elif isinstance(course_assets['assets'], list):
             # This record is in the old course assets format.
             # Ensure that no data exists before updating the format.
-            assert(len(course_assets['assets']), 0)
+            assert(len(course_assets['assets']) == 0)
             # Update the format to a dict.
             self.asset_collection.update(
                 {'_id': course_assets['_id']},
