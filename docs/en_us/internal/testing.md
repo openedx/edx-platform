@@ -404,6 +404,10 @@ More specific options are below.
 
 		paver run_quality --percentage=100
 
+* Note that 'fixme' violations are not counted with run_quality. To see all 'TODO' lines, use:
+
+		paver find_fixme --system=lms
+`system` is an optional argument here. It defaults to `cms,lms,common`.
 
 
 ## Testing using queue servers
