@@ -158,11 +158,11 @@
       }
     }
 
-    // CASE: xblock has specific access set
-    &.has-access-set {
+    // CASE: xblock has specific visibility set
+    &.has-visibility-set {
 
-      .action-access .access-button {
-        background: tint($color-access-set, 85%);
+      .action-visibility .visibility-button.visibility-button { // needed to cascade in front of overscoped header-actions CSS rule
+        color: $color-visibility-set;
       }
     }
   }

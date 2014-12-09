@@ -6,7 +6,20 @@
 
 // ====================
 
+// view-specific utilities
+// --------------------
+%status-value-base {
+  @extend %t-title7;
+  @extend %t-strong;
+}
+
+%status-value-sub1 {
+  @extend %t-title8;
+  display: block;
+}
+
 // UI: container page view
+// --------------------
 .view-container {
   @extend %two-col-1;
 
@@ -160,19 +173,18 @@
       .wrapper-release {
 
         .release-date {
-          @extend %t-strong;
+          @extend %status-value-base;
         }
 
         .release-with {
-          @extend %t-title8;
-          display: block;
+          @extend %status-value-sub1;
         }
       }
 
       .wrapper-visibility {
 
         .copy {
-          @extend %t-strong;
+          @extend %status-value-base;
           margin-bottom: ($baseline/10);
         }
 
@@ -182,19 +194,16 @@
         }
 
         .inherited-from {
-          @extend %t-title8;
-          display: block;
+          @extend %status-value-sub1;
         }
 
         // UI: note about specific access
-        .note-access {
-          @extend %t-strong;
-          @extend %t-copy-sub2;
-          margin-top: ($baseline/4); // needed since this element may be conditionally placed and its sibling UI elements will always be present.
-          padding: ($baseline/2);
-          border-radius: ($baseline/10);
-          background: tint($color-access-set, 85%);
-          color: $color-access-set;
+        .note-visibility {
+          @extend %status-value-sub1;
+
+          .icon {
+            margin-right: ($baseline/4);
+          }
         }
       }
 
@@ -255,8 +264,7 @@
       .wrapper-unit-id {
 
         .unit-id-value {
-          @extend %cont-text-wrap;
-          @extend %t-copy-sub1;
+          @extend %status-value-base;
           display: inline-block;
           width: 100%;
         }
