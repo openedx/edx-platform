@@ -1065,15 +1065,20 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertTrue(context['any_refunds'])
 
     @patch('shoppingcart.views.render_to_response', render_mock)
-    def test_show_receipt_success_custom_receipt_page(self):
-        cert_item = CertificateItem.add_to_order(self.cart, self.course_key, self.cost, 'honor')
+    def test_custom_redirect_for_order_item(self):
+        """Test that custom redirects will be leveraged on specific order item types."""
+        course_mode = CourseMode(
+            course_id=self.course_key, mode_slug="verified", mode_display_name="Verified", min_price=self.cost
+        )
+        course_mode.save()
+        cert_item = CertificateItem.add_to_order(self.cart, self.course_key, self.cost, 'verified')
         self.cart.purchase()
         self.login_user()
         receipt_url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
         resp = self.client.get(receipt_url)
-        self.assertEqual(resp.status_code, 200)
-        ((template, _context), _tmp) = render_mock.call_args
-        self.assertEqual(template, cert_item.single_item_receipt_template)
+        self.assertEqual(resp.status_code, 302)
+        _, url = resp._headers['location']  # pylint: disable=W0212
+        self.assertEqual(url, cert_item.redirect_url)
 
     def _assert_404(self, url, use_post=False):
         """

@@ -565,27 +565,20 @@ class OrderItem(TimeStampedModel):
         return self.pk_with_subclass, set([])
 
     @property
+    def redirect_url(self):
+        """
+        Returns a redirect URL specific to the order item. If no redirect url is necessary for
+        this order item, returns an empty string.
+        """
+        return ''
+
+    @property
     def pk_with_subclass(self):
         """
         Returns a named tuple that annotates the pk of this instance with its class, to fully represent
         a pk of a subclass (inclusive) of OrderItem
         """
         return OrderItemSubclassPK(type(self), self.pk)
-
-    @property
-    def single_item_receipt_template(self):
-        """
-        The template that should be used when there's only one item in the order
-        """
-        return 'shoppingcart/receipt.html'
-
-    @property
-    def single_item_receipt_context(self):
-        """
-        Extra variables needed to render the template specified in
-        `single_item_receipt_template`
-        """
-        return {}
 
     @property
     def additional_instruction_text(self):
@@ -1267,28 +1260,9 @@ class CertificateItem(OrderItem):
         self.course_enrollment.activate()
 
     @property
-    def single_item_receipt_template(self):
+    def redirect_url(self):
         if self.mode in ('verified', 'professional'):
-            return 'shoppingcart/verified_cert_receipt.html'
-        else:
-            return super(CertificateItem, self).single_item_receipt_template
-
-    @property
-    def single_item_receipt_context(self):
-        course = modulestore().get_course(self.course_id)
-        return {
-            "course_id": self.course_id,
-            "course_name": course.display_name_with_default,
-            "course_org": course.display_org_with_default,
-            "course_num": course.display_number_with_default,
-            "course_start_date_text": course.start_datetime_text(),
-            "course_has_started": course.start > datetime.today().replace(tzinfo=pytz.utc),
-            "course_root_url": reverse(
-                'course_root',
-                kwargs={'course_id': self.course_id.to_deprecated_string()}  # pylint: disable=no-member
-            ),
-            "dashboard_url": reverse('dashboard'),
-        }
+            return 'redirect_url Will gives me'
 
     @property
     def additional_instruction_text(self):
@@ -1491,12 +1465,6 @@ class Donation(OrderItem):
         # The donation is for the organization as a whole, not a specific course
         else:
             return _(u"Donation for {platform_name}").format(platform_name=settings.PLATFORM_NAME)
-
-    @property
-    def single_item_receipt_context(self):
-        return {
-            'receipt_has_donation_item': True,
-        }
 
     def analytics_data(self):
         """Simple function used to construct analytics data for the OrderItem.

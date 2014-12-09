@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 import logging
 import datetime
 import decimal
@@ -716,11 +717,14 @@ def show_receipt(request, ordernum):
         'registration_codes': registration_codes,
         'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
     }
-    # we want to have the ability to override the default receipt page when
-    # there is only one item in the order
+
+    # When there is only one order item, choose to redirect to a new page, or provide
+    # item specific context.
     if order_items.count() == 1:
-        receipt_template = order_items[0].single_item_receipt_template
-        context.update(order_items[0].single_item_receipt_context)
+        redirect_url = order_items[0].redirect_url
+        if redirect_url:
+            redirect(redirect_url)
+        context['receipt_has_donation_item'] = type(order_items[0]) is Donation
 
     return render_to_response(receipt_template, context)
 
