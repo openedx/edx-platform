@@ -136,7 +136,7 @@ function goto( mode)
       <a class="instructor-info-action beta-button" href="${ standard_dashboard_url }">${_("Back To Instructor Dashboard")}</a>
     </div>
 
-    <h1>${_("Instructor Dashboard")}</h1>
+    <h1>${_("Legacy Instructor Dashboard")}</h1>
 
     %if settings.FEATURES.get('IS_EDX_DOMAIN', False):
     ## Only show this banner on the edx.org website (other sites may choose to show this if they wish)
@@ -201,19 +201,8 @@ function goto( mode)
     </div>
     % endif
 
-    <p class="is-deprecated">
-      ${_("To view the Gradebook (small courses only), please visit the 'Student Admin' section of the instructor dashboard.")}
-    </p>
     <p>
     <input type="submit" name="action" value="Dump list of enrolled students" class="${'is-disabled' if disable_buttons else ''}">
-    </p>
-
-    <p class="deprecated">
-      ${_("To perform grade downloads, please visit the 'Data Download' section of the instructor dashboard.")}
-    </p>
-
-    <p class="is-deprecated">
-      ${_("To download student grades, please visit the 'Data Download' section of the instructor dashboard.")}
     </p>
 
     <p>
@@ -226,7 +215,10 @@ function goto( mode)
     <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}">
   %endif
     <p  class="is-deprecated">
-      ${_("To view the graded assignments configuration, please visit the 'Data Download' section of the instructor dashboard.")}
+      ${_("To download student grades and view the grading configuration for your course, visit the Data Download section of the Instructor Dashboard.")}
+    </p>
+    <p class="is-deprecated">
+      ${_("To view the Gradebook (only available for courses with a small number of enrolled students), visit the Student Admin section of the Instructor Dashboard.")}
     </p>
     </p>
     <hr width="40%" style="align:left">
@@ -267,13 +259,13 @@ function goto( mode)
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <H2>${_("Course-specific grade adjustment")}</h2>
 
-    <p class="is-deprecated">${_("To perform these actions, please visit the 'Student Admin' section of the instructor dashboard.")}</p>
+    <p class="is-deprecated">${_("To perform these actions, visit the Student Admin section of the Instructor Dashboard.")}</p>
 
   %endif
 
     <h2>${_("Student-specific grade inspection and adjustment")}</h2>
 
-    <p class="is-deprecated">${_("To perform these actions, please visit the 'Student Admin' section of the instructor dashboard.")}</p>
+    <p class="is-deprecated">${_("To perform these actions, visit the Student Admin section of the Instructor Dashboard.")}</p>
 
  %endif
 
@@ -301,12 +293,8 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
 
-  %if instructor_access:
-    <p class="is-deprecated">${_("To add or remove course staff, please visit the 'Membership' section of the instructor dashboard.")}</p>
-  %endif
-
-  %if admin_access:
-    <p class="is-deprecated">${_("To add or remove course instructors, please visit the 'Membership' section of the instructor dashboard.")}</p>
+  %if instructor_access or admin_access:
+    <p class="is-deprecated">${_("To add or remove course staff or instructors, visit the Membership section of the Instructor Dashboard.")}</p>
   %endif
 
   %if settings.FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
@@ -318,7 +306,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Forum Admin'):
-    <p class="is-deprecated">${_("To manage forum roles, please visit the 'Membership' section of the instructor dashboard.")}</p>
+    <p class="is-deprecated">${_("To manage forum roles, visit the Membership section of the Instructor Dashboard.")}</p>
 %endif
 
 ##-----------------------------------------------------------------------------
@@ -369,17 +357,13 @@ function goto( mode)
 
 %if modeflag.get('Data'):
     <hr width="40%" style="align:left">
-    <p class="is-deprecated">
-      ${_("To download student profile data, please visit the 'Data Download' section of the instructor dashboard.")}
-    </p>
-
     <p> ${_("Problem urlname:")}
         <input type="text" name="problem_to_dump" size="40">
         <input type="submit" name="action" value="Download CSV of all responses to problem">
     </p>
 
     <p class="is-deprecated">
-      ${_("To download student anonymized IDs, please visit the 'Data Download' section of the instructor dashboard.")}
+      ${_("To download student profile data and anonymized IDs, visit the Data Download section of the Instructor Dashboard.")}
     </p>
     <hr width="40%" style="align:left">
 %endif
@@ -388,19 +372,18 @@ function goto( mode)
 
 %if modeflag.get('Manage Groups'):
   %if instructor_access:
-    <p class="is-deprecated">${_("To manage beta tester roles, please visit the 'Membership' section of the instructor dashboard.")}</p>
-
     %if course.is_cohorted:
-    <p class="is-deprecated">${_("To manage course cohorts, please visit the 'Membership' section of the instructor dashboard.")}</p>
+      <p class="is-deprecated">${_("To manage beta tester roles and cohort groups, visit the Membership section of the Instructor Dashboard.")}</p>
+    %else:
+      <p class="is-deprecated">${_("To manage beta tester roles, visit the Membership section of the Instructor Dashboard.")}</p>
     %endif
-
   %endif
 %endif
 
 ##-----------------------------------------------------------------------------
 
 %if modeflag.get('Email'):
-    <p class="is-deprecated">${_("To send email, please visit the 'Email' section of the instructor dashboard.")}</p>
+    <p class="is-deprecated">${_("To send email, visit the Email section of the Instructor Dashboard.")}</p>
 %endif
 
     </form>
@@ -698,7 +681,7 @@ function goto( mode)
     <br/>
     <h2>${_("Course Statistics At A Glance")}</h2>
     <p class="is-deprecated">
-      ${_("These statistics can be viewed under the 'Admin' tab of the legacy instructor dashboard.")}
+      ${_("View course statistics in the Admin section of this legacy instructor dashboard.")}
     </p>
 %endif
 
