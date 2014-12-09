@@ -427,13 +427,13 @@ from django_comment_client.permissions import has_permission
             ${'<% if (allow_anonymous) { %>'}
             <label class="post-option">
                 <input type="checkbox" name="anonymous" class="post-option-input js-anon">
-                ${_("post anonymously")}
+                <span class="js-anon-label">${_("post anonymously")}</span>
             </label>
             ${'<% } %>'}
             ${'<% if (allow_anonymous_to_peers) { %>'}
             <label class="post-option">
                 <input type="checkbox" name="anonymous_to_peers" class="post-option-input js-anon-peers">
-                ${_("post anonymously to classmates")}
+                <span class="js-anon-peers-label">${_("post anonymously to classmates")}</span>
             </label>
             ${'<% } %>'}
         </div>
