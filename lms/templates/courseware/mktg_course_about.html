@@ -58,7 +58,7 @@
         }
 
         ## Ugh.
-        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll&email_opt_in=" + email_opt_in;
+        window.top.location.href = $("a.register").attr("href") || "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll&email_opt_in=" + emailOptIn;
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
@@ -102,17 +102,11 @@
         </a>
 
         % if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
-          ## We only display the email opt-in checkbox if we've been given a valid full name (i.e., not None)
-          % if organization_full_name:
+          ## We only display the email opt-in checkbox if we've been given one or more organization names.
+          % if checkbox_label:
             <p class="form-field">
               <input id="email-opt-in" type="checkbox" name="opt-in" class="email-opt-in" value="true" checked>
-              <label for="email-opt-in" class="register-emails">
-                ## Translators: This line appears next a checkbox which users can leave checked or uncheck in order
-                ## to indicate whether they want to receive emails from the organization offering the course.
-                ${_("I would like to receive email about other {organization_full_name} programs and offers.").format(
-                  organization_full_name=organization_full_name
-                )}
-              </label>
+              <label for="email-opt-in" class="register-emails">${checkbox_label}</label>
             </p>
           % endif
         % endif

@@ -101,10 +101,12 @@ from . import provider
 # `AUTH_ENROLL_COURSE_ID_KEY` provides the course ID that a student
 # is trying to enroll in, used to generate analytics events
 # and auto-enroll students.
+from user_api.api import profile
 
 AUTH_ENTRY_KEY = 'auth_entry'
 AUTH_REDIRECT_KEY = 'next'
 AUTH_ENROLL_COURSE_ID_KEY = 'enroll_course_id'
+AUTH_EMAIL_OPT_IN_KEY = 'email_opt_in'
 
 AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
@@ -250,7 +252,7 @@ def _get_enabled_provider_by_name(provider_name):
     return enabled_provider
 
 
-def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None, enroll_course_id=None):
+def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None, enroll_course_id=None, email_opt_in=None):
     """Creates a URL to hook into social auth endpoints."""
     kwargs = {'backend': backend_name}
     url = reverse(view_name, kwargs=kwargs)
@@ -264,6 +266,9 @@ def _get_url(view_name, backend_name, auth_entry=None, redirect_url=None, enroll
 
     if enroll_course_id:
         query_params[AUTH_ENROLL_COURSE_ID_KEY] = enroll_course_id
+
+    if email_opt_in:
+        query_params[AUTH_EMAIL_OPT_IN_KEY] = email_opt_in
 
     return u"{url}?{params}".format(
         url=url,
@@ -309,7 +314,7 @@ def get_disconnect_url(provider_name):
     return _get_url('social:disconnect', enabled_provider.BACKEND_CLASS.name)
 
 
-def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id=None):
+def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id=None, email_opt_in=None):
     """Gets the login URL for the endpoint that kicks off auth with a provider.
 
     Args:
@@ -326,6 +331,11 @@ def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id
         enroll_course_id (string): If provided, auto-enroll the user in this
             course upon successful authentication.
 
+        email_opt_in (string): If set to 'true' (case insensitive), user will
+            be opted into organization-wide email. Any other string will
+            equate to False, and the user will be opted out of organization-wide
+            email.
+
     Returns:
         String. URL that starts the auth pipeline for a provider.
 
@@ -339,7 +349,8 @@ def get_login_url(provider_name, auth_entry, redirect_url=None, enroll_course_id
         enabled_provider.BACKEND_CLASS.name,
         auth_entry=auth_entry,
         redirect_url=redirect_url,
-        enroll_course_id=enroll_course_id
+        enroll_course_id=enroll_course_id,
+        email_opt_in=email_opt_in
     )
 
 
@@ -425,7 +436,6 @@ def running(request):
 def parse_query_params(strategy, response, *args, **kwargs):
     """Reads whitelisted query params, transforms them into pipeline args."""
     auth_entry = strategy.session.get(AUTH_ENTRY_KEY)
-
     if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
         raise AuthEntryError(strategy.backend, 'auth_entry missing or invalid')
 
@@ -499,7 +509,6 @@ def ensure_user_information(
     user_unset = user is None
     dispatch_to_login = is_login and (user_unset or user_inactive)
     reject_api_request = is_api and (user_unset or user_inactive)
-
     if reject_api_request:
         # Content doesn't matter; we just want to exit the pipeline
         return HttpResponseBadRequest()
@@ -512,20 +521,49 @@ def ensure_user_information(
         return
 
     if dispatch_to_login:
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN], name='signin_user')
+        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN], strategy))
 
     # TODO (ECOM-369): Consolidate this with `dispatch_to_login`
     # once the A/B test completes. # pylint: disable=fixme
     if dispatch_to_login_2:
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN_2])
+        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN_2], strategy))
 
     if is_register and user_unset:
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER], name='register_user')
+        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER], strategy))
 
     # TODO (ECOM-369): Consolidate this with `is_register`
     # once the A/B test completes. # pylint: disable=fixme
     if is_register_2 and user_unset:
-        return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER_2])
+        return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER_2], strategy))
+
+
+def _create_redirect_url(url, strategy):
+    """ Given a URL and a Strategy, construct the appropriate redirect URL.
+
+    Construct a redirect URL and append the URL parameters that should be preserved.
+
+    Args:
+        url (string): The base URL to use for the redirect.
+        strategy (Strategy): Used to determine which URL parameters to append to the redirect.
+
+    Returns:
+        A string representation of the URL, with parameters, for redirect.
+    """
+    url_params = {}
+    enroll_course_id = strategy.session_get(AUTH_ENROLL_COURSE_ID_KEY)
+    if enroll_course_id:
+        url_params['course_id'] = enroll_course_id
+        url_params['enrollment_action'] = 'enroll'
+    email_opt_in = strategy.session_get(AUTH_EMAIL_OPT_IN_KEY)
+    if email_opt_in:
+        url_params[AUTH_EMAIL_OPT_IN_KEY] = email_opt_in
+    if url_params:
+        return u'{url}?{params}'.format(
+            url=url,
+            params=urllib.urlencode(url_params)
+        )
+    else:
+        return url
 
 
 @partial.partial
@@ -639,6 +677,11 @@ def change_enrollment(strategy, user=None, *args, **kwargs):
     if enroll_course_id:
         course_id = CourseKey.from_string(enroll_course_id)
         modes = CourseMode.modes_for_course_dict(course_id)
+        # If the email opt in parameter is found, set the preference.
+        email_opt_in = strategy.session_get(AUTH_EMAIL_OPT_IN_KEY)
+        if email_opt_in:
+            opt_in = email_opt_in.lower() == 'true'
+            profile.update_email_opt_in(user.username, course_id.org, opt_in)
         if CourseMode.can_auto_enroll(course_id, modes_dict=modes):
             try:
                 CourseEnrollment.enroll(user, course_id, check_access=True)

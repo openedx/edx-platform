@@ -258,6 +258,8 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         # and assert that they contain the created modules
         self.assertIn(self.DRAFT_HTML + ".xml", draft_dir.listdir('html'))
         self.assertIn(self.DRAFT_VIDEO + ".xml", draft_dir.listdir('video'))
+        # and assert the child of the orphaned draft wasn't exported
+        self.assertNotIn(self.ORPHAN_DRAFT_HTML + ".xml", draft_dir.listdir('html'))
 
         # check for grading_policy.json
         filesystem = OSFS(root_dir / 'test_export/policies/2012_Fall')
