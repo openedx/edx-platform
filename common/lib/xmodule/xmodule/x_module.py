@@ -1686,6 +1686,7 @@ class DiscussionService(object):
         # for some reason pylint reports courseware.access, courseware.courses and django_comment_client.forum.views
         # pylint: disable=import-error
         import json
+        from django.conf import settings
         from django.http import HttpRequest
         import lms.lib.comment_client as cc
         from courseware.access import has_access
@@ -1726,6 +1727,7 @@ class DiscussionService(object):
 
         context = {
             'user': user,
+            'settings': settings,
             'course': course,
             'course_id': course_id,
             'staff_access': has_access(user, 'staff', course),
