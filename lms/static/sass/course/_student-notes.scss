@@ -246,6 +246,11 @@
         .tab-label {
           display: inline-block;
           padding: ($baseline/2) $baseline;
+          -webkit-transition: none;
+          -moz-transition: none;
+          -ms-transition: none;
+          -o-transition: none;
+          transition: none;
         }
 
         &.is-active {
