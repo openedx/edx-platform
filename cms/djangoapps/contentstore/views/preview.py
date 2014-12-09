@@ -95,7 +95,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     def local_resource_url(self, block, uri):
         return local_resource_url(block, uri)
 
-    def get_asides(self, block):
+    def applicable_aside_types(self, block):
         # TODO: Implement this to enable XBlockAsides on previews in Studio
         return []
 

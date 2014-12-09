@@ -15,8 +15,9 @@ from pkg_resources import (
 from webob import Response
 from webob.multidict import MultiDict
 
-from xblock.core import XBlock
-from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
+from xblock.core import XBlock, XBlockAside
+from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict, ScopeIds, Reference, \
+    ReferenceList, ReferenceValueDict
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule.fields import RelativeTime
@@ -852,6 +853,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         """
         Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
+        # It'd be great to not reserialize and deserialize the xml
         xml = etree.tostring(node)
         block = cls.from_xml(xml, runtime, id_generator)
         return block
@@ -1131,14 +1133,13 @@ def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid
     raise NotImplementedError("Applications must monkey-patch this function before using local_resource_url for studio_view")
 
 
-# This function exists to give applications (LMS/CMS) a place to monkey-patch until
-# we can refactor modulestore to split out the FieldData half of its interface from
-# the Runtime part of its interface. This function matches the Runtime.get_asides interface
-def descriptor_global_get_asides(block):  # pylint: disable=unused-argument
+# pylint: disable=invalid-name
+def descriptor_global_applicable_aside_types(block):  # pylint: disable=unused-argument
     """
-    See :meth:`xblock.runtime.Runtime.get_asides`.
+    See :meth:`xblock.runtime.Runtime.applicable_aside_types`.
     """
-    raise NotImplementedError("Applications must monkey-patch this function before using get_asides from a DescriptorSystem.")
+    raise NotImplementedError("Applications must monkey-patch this function before using applicable_aside_types"
+                              " from a DescriptorSystem.")
 
 
 class MetricsMixin(object):
@@ -1315,18 +1316,18 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
             # global function that the application can override.
             return descriptor_global_local_resource_url(block, uri)
 
-    def get_asides(self, block):
+    def applicable_aside_types(self, block):
         """
-        See :meth:`xblock.runtime.Runtime:get_asides` for documentation.
+        See :meth:`xblock.runtime.Runtime:applicable_aside_types` for documentation.
         """
         if getattr(block, 'xmodule_runtime', None) is not None:
-            return block.xmodule_runtime.get_asides(block)
+            return block.xmodule_runtime.applicable_aside_types(block)
         else:
             # Currently, Modulestore is responsible for instantiating DescriptorSystems
             # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
             # that implements the correct get_asides. So, for now, instead, we will reference a
             # global function that the application can override.
-            return descriptor_global_get_asides(block)
+            return descriptor_global_applicable_aside_types(block)
 
     def resource_url(self, resource):
         """
@@ -1356,6 +1357,103 @@ class XMLParsingSystem(DescriptorSystem):
 
         super(XMLParsingSystem, self).__init__(**kwargs)
         self.process_xml = process_xml
+
+    def _usage_id_from_node(self, node, parent_id, id_generator=None):
+        """Create a new usage id from an XML dom node.
+
+        Args:
+            node (lxml.etree.Element): The DOM node to interpret.
+            parent_id: The usage ID of the parent block
+            id_generator (IdGenerator): The :class:`.IdGenerator` to use
+                for creating ids
+        Returns:
+            UsageKey: the usage key for the new xblock
+        """
+        return self.xblock_from_node(node, parent_id, id_generator).scope_ids.usage_id
+
+    def xblock_from_node(self, node, parent_id, id_generator=None):
+        """
+        Create an XBlock instance from XML data.
+
+        Args:
+            xml_data (string): A string containing valid xml.
+            system (XMLParsingSystem): The :class:`.XMLParsingSystem` used to connect the block
+                to the outside world.
+            id_generator (IdGenerator): An :class:`~xblock.runtime.IdGenerator` that
+                will be used to construct the usage_id and definition_id for the block.
+
+        Returns:
+            XBlock: The fully instantiated :class:`~xblock.core.XBlock`.
+
+        """
+        id_generator = id_generator or self.id_generator
+        # leave next line commented out - useful for low-level debugging
+        # log.debug('[_usage_id_from_node] tag=%s, class=%s' % (node.tag, xblock_class))
+
+        block_type = node.tag
+        # remove xblock-family from elements
+        node.attrib.pop('xblock-family', None)
+
+        url_name = node.get('url_name')  # difference from XBlock.runtime
+        def_id = id_generator.create_definition(block_type, url_name)
+        usage_id = id_generator.create_usage(def_id)
+
+        keys = ScopeIds(None, block_type, def_id, usage_id)
+        block_class = self.mixologist.mix(self.load_block_type(block_type))
+
+        self.parse_asides(node, def_id, usage_id, id_generator)
+
+        block = block_class.parse_xml(node, self, keys, id_generator)
+        self._convert_reference_fields_to_keys(block)  # difference from XBlock.runtime
+        block.parent = parent_id
+        block.save()
+
+        return block
+
+    def parse_asides(self, node, def_id, usage_id, id_generator):
+        """pull the asides out of the xml payload and instantiate them"""
+        aside_children = []
+        for child in node.iterchildren():
+            # get xblock-family from node
+            xblock_family = child.attrib.pop('xblock-family', None)
+            if xblock_family:
+                xblock_family = self._family_id_to_superclass(xblock_family)
+                if issubclass(xblock_family, XBlockAside):
+                    aside_children.append(child)
+        # now process them & remove them from the xml payload
+        for child in aside_children:
+            self._aside_from_xml(child, def_id, usage_id, id_generator)
+            node.remove(child)
+
+    def _make_usage_key(self, course_key, value):
+        """
+        Makes value into a UsageKey inside the specified course.
+        If value is already a UsageKey, returns that.
+        """
+        if isinstance(value, UsageKey):
+            return value
+        return course_key.make_usage_key_from_deprecated_string(value)
+
+    def _convert_reference_fields_to_keys(self, xblock):  # pylint: disable=invalid-name
+        """
+        Find all fields of type reference and convert the payload into UsageKeys
+        """
+        course_key = xblock.scope_ids.usage_id.course_key
+
+        for field in xblock.fields.itervalues():
+            if field.is_set_on(xblock):
+                field_value = getattr(xblock, field.name)
+                if field_value is None:
+                    continue
+                elif isinstance(field, Reference):
+                    setattr(xblock, field.name, self._make_usage_key(course_key, field_value))
+                elif isinstance(field, ReferenceList):
+                    setattr(xblock, field.name, [self._make_usage_key(course_key, ele) for ele in field_value])
+                elif isinstance(field, ReferenceValueDict):
+                    for key, subvalue in field_value.iteritems():
+                        assert isinstance(subvalue, basestring)
+                        field_value[key] = self._make_usage_key(course_key, subvalue)
+                    setattr(xblock, field.name, field_value)
 
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method

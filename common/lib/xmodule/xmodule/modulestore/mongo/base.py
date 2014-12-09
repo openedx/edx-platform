@@ -1275,8 +1275,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         jsonfields = {}
         for field_name, field in xblock.fields.iteritems():
-            if (field.scope == scope and field.is_set_on(xblock)):
-                if isinstance(field, Reference):
+            if field.scope == scope and field.is_set_on(xblock):
+                if field.scope == Scope.parent:
+                    continue
+                elif isinstance(field, Reference):
                     jsonfields[field_name] = unicode(field.read_from(xblock))
                 elif isinstance(field, ReferenceList):
                     jsonfields[field_name] = [
