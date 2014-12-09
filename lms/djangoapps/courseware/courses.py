@@ -373,6 +373,15 @@ def sort_by_announcement(courses):
     return courses
 
 
+def sort_by_start_date(courses):
+    """
+    Returns a list of courses sorted by their start date, latest first.
+    """
+    courses = sorted(courses, key=lambda course: (course.start is None, course.start), reverse=False)
+
+    return courses
+
+
 def get_cms_course_link(course, page='course'):
     """
     Returns a link to course_index for editing the course in cms,
