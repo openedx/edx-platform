@@ -170,7 +170,7 @@ PROBLEM_DICT = {
     'image': {
         'factory': ImageResponseXMLFactory(),
         'kwargs': {
-            'src': '/static/images/mit_dome.jpg',
+            'src': '/static/images/placeholder-image.png',
             'rectangle': '(50,50)-(100,100)'
         },
         'correct': ['span.correct'],
