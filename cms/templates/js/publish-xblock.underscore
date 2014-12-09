@@ -79,7 +79,10 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <% } %>
 
             <!-- NOTE: @andyarmstrong, here's the new copy we're adding to the visibility summary UI to make sure we're as accurate as we can be at the final state of the unit/container's visibility -->
-            <p class="note-access"><%= gettext("Some content in this unit is only accessible to particular groups") %></p>
+            <p class="note-visibility">
+                <i class="icon icon-eye-open"></i>
+                <span class="note-copy"><%= gettext("Some content in this unit is only visibile to particular groups") %></span>
+            </p>
 
         <ul class="actions-inline">
             <li class="action-inline">
