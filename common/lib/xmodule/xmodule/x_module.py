@@ -1287,6 +1287,7 @@ class DiscussionService(object):
 
         unsafethreads, query_params = get_threads(request, course_id)
         threads = [utils.safe_content(thread, course_id) for thread in unsafethreads]
+        utils.add_courseware_context(threads, course)
 
         flag_moderator = cached_has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
 
