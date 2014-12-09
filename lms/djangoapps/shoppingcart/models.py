@@ -338,7 +338,7 @@ class Order(models.Model):
                 'email_from_address',
                 settings.PAYMENT_SUPPORT_EMAIL
             )
-            # send a unique email for each recipient, don't put all email addresses in a single email
+            # Send a unique email for each recipient. Don't put all email addresses in a single email.
             for recipient in recipient_list:
                 message = render_to_string(
                     'emails/business_order_confirmation_email.txt' if is_order_type_business else 'emails/order_confirmation_email.txt',
@@ -365,8 +365,7 @@ class Order(models.Model):
                     to=[recipient[1]]
                 )
 
-                # only the business order is HTML formatted
-                # the single seat is simple text
+                # Only the business order is HTML formatted. A single seat order confirmation is plain text.
                 if is_order_type_business:
                     email.content_subtype = "html"
 
@@ -653,7 +652,7 @@ class OrderItem(TimeStampedModel):
         """
         Individual instructions for this order item.
 
-        Currently, only used for e-mails.
+        Currently, only used for emails.
         """
         return ''
 
@@ -1364,11 +1363,28 @@ class CertificateItem(OrderItem):
 
     @property
     def additional_instruction_text(self):
-        return _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option "
-                 "and receive a full refund. To receive your refund, contact {billing_email}. "
-                 "Please include your order number in your e-mail. "
-                 "Please do NOT include your credit card information.").format(
-                     billing_email=settings.PAYMENT_SUPPORT_EMAIL)
+        refund_reminder = _(
+            "You have up to two weeks into the course to unenroll from the Verified Certificate option "
+            "and receive a full refund. To receive your refund, contact {billing_email}. "
+            "Please include your order number in your email. "
+            "Please do NOT include your credit card information."
+        ).format(billing_email=settings.PAYMENT_SUPPORT_EMAIL)
+
+        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+            domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+            path = reverse('verify_student_verify_later', args=[unicode(self.course_id)])
+            verification_url = "http://{domain}{path}".format(domain=domain, path=path)
+
+            verification_reminder = _(
+                "If you haven't verified your identity yet, please start the verification process ({verification_url})."
+            ).format(verification_url=verification_url)
+
+            return "{verification_reminder} {refund_reminder}".format(
+                verification_reminder=verification_reminder,
+                refund_reminder=refund_reminder
+            )
+        else:
+            return refund_reminder
 
     @classmethod
     def verified_certificates_count(cls, course_id, status):

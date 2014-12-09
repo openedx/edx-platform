@@ -268,6 +268,16 @@ class OrderTest(ModuleStoreTestCase):
             context={'Google Analytics': {'clientId': None}}
         )
 
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
+    def test_payment_separate_from_verification_email(self):
+        cart = Order.get_cart_for_user(user=self.user)
+        item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
+        cart.purchase()
+
+        self.assertEquals(len(mail.outbox), 1)
+        # Verify that the verification reminder appears in the sent email.
+        self.assertIn(item.additional_instruction_text, mail.outbox[0].body)
+
     def test_purchase_item_failure(self):
         # once again, we're testing against the specific implementation of
         # CertificateItem
