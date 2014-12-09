@@ -21,6 +21,8 @@ from xmodule.modulestore.mongo.base import (
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
+from search.manager import SearchEngine
+
 log = logging.getLogger(__name__)
 
 
@@ -634,6 +636,22 @@ class DraftModuleStore(MongoModuleStore):
         # list of published ones.)
         to_be_deleted = []
 
+        searcher = SearchEngine.get_search_engine("courseware_index")
+        location_info = {
+            "course": unicode(location.course_key),
+        }
+
+        def index_item(item):
+            item_index = {}
+            item_index.update(location_info)
+            item_index.update(item.index_view())
+            item_index.update({
+                'id': unicode(item.scope_ids.usage_id),
+            })
+            searcher.index("courseware_content", item_index)
+
+        index_items = []
+
         def _internal_depth_first(item_location, is_root):
             """
             Depth first publishing from the given location
@@ -683,6 +701,7 @@ class DraftModuleStore(MongoModuleStore):
             super(DraftModuleStore, self).update_item(
                 item, user_id, isPublish=True, is_publish_root=is_root, allow_not_found=True
             )
+            index_items.append(item)
             to_be_deleted.append(as_draft(item_location).to_deprecated_son())
 
         # verify input conditions
@@ -694,7 +713,14 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
-        return self.get_item(as_published(location))
+
+        published_item = self.get_item(as_published(location))
+        index_item(published_item)
+
+        for item in index_items:
+            index_item(item)
+
+        return published_item
 
     def unpublish(self, location, user_id, **kwargs):
         """

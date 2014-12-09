@@ -8,7 +8,7 @@ var edx = edx || {};
     edx.search.SearchResult = Backbone.Model.extend({
         defaults: {
             location: {},
-            contentType: '',
+            content_type: '',
             excerpt: '',
         }
     });
