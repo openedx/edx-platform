@@ -72,7 +72,7 @@
       .copy {
         @extend %t-copy-sub1;
         max-width: 85%;
-        color: $gray-l4;
+        color: $white;
       }
     }
 
@@ -273,29 +273,29 @@
     }
   }
 
-  // component: access modal
-  .xblock-access-modal {
+  // component: visibility modal
+  .xblock-visibility-modal {
 
-    // UI: access summary
-    .access-summary-title {
+    // UI: visibility summary
+    .visibility-summary-title {
       margin-bottom: ($baseline*0.75);
       padding-bottom: ($baseline*0.75);
     }
 
 
-    .access-summary-value {
+    .visibility-summary-value {
       display: inline-block;
       vertical-align: top;
       margin-left: ($baseline/4);
       @extend %t-strong;
     }
 
-    .access-controls-secondary {
+    .visibility-controls-secondary {
       max-height: 100%;
       overflow-y: scroll;
     }
 
-    .access-controls-title {
+    .visibility-controls-title {
       @extend %t-title8;
       @extend %t-strong;
       margin-bottom: ($baseline/4);
@@ -304,7 +304,7 @@
       color: $gray-l2;
     }
 
-    .access-controls-group {
+    .visibility-controls-group {
       @extend %wipe-last-child;
       margin-bottom: $baseline;
     }
@@ -353,17 +353,33 @@
         // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
         label, input, textarea {
           display: inline-block;
-          vertical-align: middle;
+          vertical-align: text-top;
         }
 
         label {
-          margin-left: ($baseline/2);
+          margin-left: ($baseline/4);
         }
       }
     }
   }
 
-  // CASE: no groups configured for access
+  // CASE: content group has been removed
+  .field-visibility-content-group.was-removed {
+
+    .input-checkbox:checked ~ label {
+      color: $color-error;
+    }
+
+    .note {
+      @extend %t-copy-sub2;
+      @extend %t-regular;
+      display: block;
+      margin-top: ($baseline/4);
+      color: $color-error;
+    }
+  }
+
+  // CASE: no groups configured for visibility
   .is-not-configured {
     @extend %no-content;
     text-align: left; // reset for %no-content's default styling
