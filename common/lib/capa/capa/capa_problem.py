@@ -351,7 +351,7 @@ class LoncapaProblem(object):
 
     def filter_responses_for_cleaning(self, response_key, student_answers_keys):
         """
-        Filter single response if it is in student given answers
+        Filter single response if it is not in student given answers
         """
         if hasattr(self.responders[response_key], 'answer_id'):
             return self.responders[response_key].answer_id in student_answers_keys
@@ -365,8 +365,9 @@ class LoncapaProblem(object):
         Clear responses which are unanswered for re-scoring
         """
         student_answers_keys = map(str, self.student_answers.keys())
-        self.responders = {key: response for (key, response) in self.responders.iteritems()
-                           if self.filter_responses_for_cleaning(key, student_answers_keys)}
+        if student_answers_keys:  # Must contain some answers so it will trigger only when new response is added to existing problem
+            self.responders = {key: response for (key, response) in self.responders.iteritems()
+                               if self.filter_responses_for_cleaning(key, student_answers_keys)}
 
     def rescore_existing_answers(self):
         """
