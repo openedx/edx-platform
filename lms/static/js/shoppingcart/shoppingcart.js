@@ -117,6 +117,14 @@ var edx = edx || {};
     $(document).ready(function() {
         // (click on the payment submit button).
         $('.cart-view form input[type="submit"]').click(function(event) {
+            // check if there is code exists in the inout_code field
+            // before going to make payment
+            // if exists then trigger click event of the apply code button
+            var code = $('div.code-input input#input_code').val();
+            if (typeof(code) != 'undefined' && code != ''){
+                 $('div.code-input #submit-code').trigger('click');
+                return false;
+            }
             var container = $('.confirm-enrollment.cart-view form');
             var view = new edx.shoppingcart.showcart.CartView({
                 el:container

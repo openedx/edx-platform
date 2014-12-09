@@ -798,8 +798,6 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
         ('company_contact_name', 'Company Contact Name'),
         ('company_contact_email', 'Company Contact Email'),
         ('total_amount', 'Total Amount'),
-        ('total_codes', 'Total Codes'),
-        ('total_used_codes', 'Total Used Codes'),
         ('logged_in_username', 'Login Username'),
         ('logged_in_email', 'Login User Email'),
         ('purchase_time', 'Date of Sale'),
@@ -817,8 +815,6 @@ def get_sale_order_records(request, course_id):  # pylint: disable=unused-argume
         ('coupon_code', 'Coupon Code'),
         ('unit_cost', 'Unit Price'),
         ('list_price', 'List Price'),
-        ('codes', 'Registration Codes'),
-        ('course_id', 'Course Id')
     ]
 
     db_columns = [x[0] for x in query_features]
@@ -1156,7 +1152,7 @@ def generate_registration_codes(request, course_id):
         generated_registration_code = save_registration_code(request.user, course_id, sale_invoice, order=None)
         registration_codes.append(generated_registration_code)
 
-    site_name = microsite.get_value('SITE_NAME', 'localhost')
+    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
     course = get_course_by_id(course_id, depth=None)
     course_honor_mode = CourseMode.mode_for_course(course_id, 'honor')
     course_price = course_honor_mode.min_price

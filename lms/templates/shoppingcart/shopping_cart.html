@@ -100,9 +100,7 @@ from django.utils.translation import ugettext as _
       </div>
       <div class="col-two">
           <div class="col-2 relative">
-             % if amount == 0:
-                <input type="submit" value = "Register" id="register" >
-             % elif order_type == 'business':
+             % if order_type == 'business':
               <div name="billing">
                   <input type="submit" value = "Billing Details" name="billing-details"><i class="icon-caret-right"></i>
                     <p>
@@ -172,8 +170,14 @@ from django.utils.translation import ugettext as _
               }
       )
       .success(function(data) {
-                  location.reload(true);
-              })
+        if (data.coupon_code_applied) {
+          location.reload(true); // Reload the page if the coupon code was applied.
+        }
+        else {
+          // Redirect to the redemption URL if the Registration code was applied.
+          location.href = data.redemption_url;
+        }
+      })
       .error(function(data,status) {
                   if(status=="parsererror"){
                        location.reload(true);
@@ -199,23 +203,15 @@ from django.utils.translation import ugettext as _
                })
    });
 
-   $('#register').click(function(event){
-       event.preventDefault();
-       var post_url = "${reverse('shoppingcart.views.register_courses')}";
-       $.post(post_url)
-       .success(function(data) {
-                   window.location.href = "${reverse('dashboard')}";
-               })
-       .error(function(data,status) {
-                   if(status=="parsererror"){
-                       location.reload(true);
-                   }else{
-                        showErrorMsgs(data.responseText)
-                      }
-               })
-   });
-
    $("input[name='billing-details']").click(function(event){
+       // check if there is code exists in the inout_code field
+       // before going to billing details page
+       // if exists then trigger click event of the apply code button
+       var code = $('div.code-input input#input_code').val();
+       if (code!= ''){
+          $('div.code-input #submit-code').trigger('click');
+          return false;
+       }
        event.preventDefault();
        location.href = "${reverse('shoppingcart.views.billing_details')}";
    });
