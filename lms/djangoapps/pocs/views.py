@@ -1,8 +1,11 @@
+import csv
 import datetime
 import functools
 import json
 import logging
 import pytz
+
+from cStringIO import StringIO
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
@@ -16,10 +19,12 @@ from django.contrib.auth.models import User
 
 from courseware.courses import get_course_by_id
 from courseware.field_overrides import disable_overrides
+from courseware.grades import iterate_grades_for
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.roles import CoursePocCoachRole
 
+from instructor.offline_gradecalc import student_grades
 from instructor.views.api import _split_input_list
 from instructor.views.tools import get_student_from_identifier
 
@@ -68,6 +73,10 @@ def dashboard(request, course):
         'schedule': json.dumps(schedule, indent=4),
         'save_url': reverse('save_poc', kwargs={'course_id': course.id}),
         'poc_members': PocMembership.objects.filter(poc=poc),
+        'gradebook_url': reverse('poc_gradebook',
+                                 kwargs={'course_id': course.id}),
+        'grades_csv_url': reverse('poc_grades_csv',
+                                 kwargs={'course_id': course.id}),
     }
     if not poc:
         context['create_poc_url'] = reverse(
@@ -242,3 +251,77 @@ def poc_invite(request, course):
             pass  # maybe log this?
     url = reverse('poc_coach_dashboard', kwargs={'course_id': course.id})
     return redirect(url)
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
+def poc_gradebook(request, course):
+    """
+    Show the gradebook for this POC.
+    """
+    poc = get_poc_for_coach(course, request.user)
+    enrolled_students = User.objects.filter(
+        pocmembership__poc=poc,
+        pocmembership__active=1
+    ).order_by('username').select_related("profile")
+
+    student_info = [
+        {
+            'username': student.username,
+            'id': student.id,
+            'email': student.email,
+            'grade_summary': student_grades(student, request, course),
+            'realname': student.profile.name,
+        }
+        for student in enrolled_students
+    ]
+
+    return render_to_response('courseware/gradebook.html', {
+        'students': student_info,
+        'course': course,
+        'course_id': course.id,
+        'staff_access': request.user.is_staff,
+        'ordered_grades': sorted(
+            course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
+    })
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
+def poc_grades_csv(request, course):
+    poc = get_poc_for_coach(course, request.user)
+    enrolled_students = User.objects.filter(
+        pocmembership__poc=poc,
+        pocmembership__active=1
+    ).order_by('username').select_related("profile")
+    grades = iterate_grades_for(course.id, enrolled_students)
+
+    header = None
+    rows = []
+    for student, gradeset, err_msg in grades:
+        if gradeset:
+            # We were able to successfully grade this student for this course.
+            if not header:
+                # Encode the header row in utf-8 encoding in case there are
+                # unicode characters
+                header = [section['label'].encode('utf-8')
+                          for section in gradeset[u'section_breakdown']]
+                rows.append(["id", "email", "username", "grade"] + header)
+
+            percents = {
+                section['label']: section.get('percent', 0.0)
+                for section in gradeset[u'section_breakdown']
+                if 'label' in section
+            }
+
+            row_percents = [percents.get(label, 0.0) for label in header]
+            rows.append([student.id, student.email, student.username,
+                         gradeset['percent']] + row_percents)
+
+    buffer = StringIO()
+    writer = csv.writer(buffer)
+    for row in rows:
+        writer.writerow(row)
+
+    return HttpResponse(buffer.getvalue(), content_type='text/csv')
+

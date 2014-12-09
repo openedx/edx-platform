@@ -4,6 +4,8 @@ import re
 import pytz
 from mock import patch
 
+from capa.tests.response_xml_factory import StringResponseXMLFactory
+from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_response
@@ -11,7 +13,9 @@ from student.roles import CoursePocCoachRole
 from student.tests.factories import (
     AdminFactory,
     CourseEnrollmentFactory,
+    UserFactory,
 )
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
@@ -295,6 +299,86 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ).exists()
         )
 
+USER_COUNT = 2
+
+class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Tests for Personal Online Courses views.
+    """
+    def setUp(self):
+        """
+        Set up tests
+        """
+        self.course = course = CourseFactory.create()
+
+        # Create instructor account
+        self.coach = coach = AdminFactory.create()
+        self.client.login(username=coach.username, password="test")
+
+        # Create a course outline
+        self.mooc_start = start = datetime.datetime(
+            2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
+        chapter = ItemFactory.create(
+            start=start, parent=course, category='sequential')
+        section = ItemFactory.create(
+            parent=chapter,
+            category="sequential",
+            metadata={'graded': True, 'format': 'Homework'}
+        )
+
+        role = CoursePocCoachRole(self.course.id)
+        role.add_users(coach)
+        self.poc = poc = PocFactory(course_id=self.course.id, coach=self.coach)
+
+        self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
+        for user in self.users:
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+            PocMembershipFactory(poc=poc, student=user, active=True)
+
+        for i in xrange(USER_COUNT - 1):
+            category = "problem"
+            item = ItemFactory.create(
+                parent_location=section.location,
+                category=category,
+                data=StringResponseXMLFactory().build_xml(answer='foo'),
+                metadata={'rerandomize': 'always'}
+            )
+
+            for j, user in enumerate(self.users):
+                StudentModuleFactory.create(
+                    grade=1 if i < j else 0,
+                    max_grade=1,
+                    student=user,
+                    course_id=self.course.id,
+                    module_state_key=item.location
+                )
+
+
+    @patch('pocs.views.render_to_response', intercept_renderer)
+    def test_gradebook(self):
+        url = reverse(
+            'poc_gradebook',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        student_info = response.mako_context['students']
+        self.assertEqual(len(student_info), USER_COUNT)
+        self.assertEqual(student_info[0]['grade_summary']['percent'], 0.0)
+        self.assertEqual(student_info[1]['grade_summary']['percent'], 0.02)
+        self.assertEqual(
+            student_info[1]['grade_summary']['grade_breakdown'][0]['percent'],
+            0.015)
+
+    def test_grades_csv(self):
+        url = reverse(
+            'poc_grades_csv',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            len(response.content.strip().split('\n')), USER_COUNT + 1)
 
 
 def flatten(seq):
