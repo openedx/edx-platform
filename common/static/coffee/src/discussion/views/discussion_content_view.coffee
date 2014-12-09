@@ -211,8 +211,9 @@ if Backbone?
       DiscussionUtil.updateWithUndo(
         @model,
         updates,
-        {url: url, type: "POST", data: {endorsed: is_endorsing}, beforeSend: beforeFunc, $elem: $(event.currentTarget)},
-        msg
+        {url: url, type: "POST", data: {endorsed: is_endorsing}, $elem: $(event.currentTarget)},
+        msg,
+        beforeFunc
       ).always(@trigger("comment:endorse")) # ensures UI components get updated to the correct state when ajax completes
 
     toggleVote: (event) =>

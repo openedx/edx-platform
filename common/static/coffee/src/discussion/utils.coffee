@@ -181,11 +181,13 @@ class @DiscussionUtil
           params["$loading"].loaded()
     return request
 
-  @updateWithUndo: (model, updates, safeAjaxParams, errorMsg) ->
+  @updateWithUndo: (model, updates, safeAjaxParams, errorMsg, beforeSend) ->
     if errorMsg
       safeAjaxParams.error = => @discussionAlert(gettext("Sorry"), errorMsg)
     undo = _.pick(model.attributes, _.keys(updates))
     model.set(updates)
+    if beforeSend?
+      beforeSend()
     @safeAjax(safeAjaxParams).fail(() -> model.set(undo))
 
   @bindLocalEvents: ($local, eventsHandler) ->
