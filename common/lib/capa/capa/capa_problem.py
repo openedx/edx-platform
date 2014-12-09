@@ -349,18 +349,24 @@ class LoncapaProblem(object):
         """
         return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
 
+    def filter_responses_for_cleaning(self, response_key, student_answers_keys):
+        """
+        Filter single response if it is in student given answers
+        """
+        if hasattr(self.responders[response_key], 'answer_id'):
+            return self.responders[response_key].answer_id in student_answers_keys
+        if hasattr(self.responders[response_key], 'answer_ids'):
+            self.responders[response_key].answer_ids = [answer_id for answer_id in self.responders[response_key].answer_ids
+                                                        if answer_id in student_answers_keys]
+        return True
+
     def clean_unanswered_responses(self):
         """
-        Clear responses which are unanswered for rescoring
+        Clear responses which are unanswered for re-scoring
         """
-        responses_to_clean = []
-        for responder_key in self.responders:
-            if unicode(self.responders[responder_key].answer_id) not in self.student_answers.keys():
-                responses_to_clean.append(responder_key)
-
-        # delete the response using filtered responses_to_clean list
-        for responder_key in responses_to_clean:
-            del self.responders[responder_key]
+        student_answers_keys = map(str, self.student_answers.keys())
+        self.responders = {key: response for (key, response) in self.responders.iteritems()
+                           if self.filter_responses_for_cleaning(key, student_answers_keys)}
 
     def rescore_existing_answers(self):
         """
