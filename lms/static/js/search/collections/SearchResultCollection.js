@@ -12,6 +12,31 @@ var edx = edx || {};
         nextPage: 1,
 
         performSearch: function (searchTerm) {
+            var self = this;
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                url: "/search",
+                data: {
+                search_string: searchTerm
+                },
+                success: function(data){
+                    self.totalCount = data.total;
+                    var results_array = data.results;
+                    var data_array = [];
+                    for(var i=0; i<results_array.length; ++i){
+                        data_array.push(results_array[i].data);
+                    }
+                    self.reset(data_array);
+                    self.trigger('sync');
+                },
+                error: function(){
+                    alert('error running search');
+                }
+            });
+
+/*
             this.totalCount = 47;
             this.reset([
                 {
@@ -52,6 +77,7 @@ var edx = edx || {};
                 }
             ]);
             this.trigger('sync');
+*/
         },
 
         loadMore: function () {

@@ -1,6 +1,6 @@
 <li class='search-results-item' role="region" aria-label="search result">
-  <div class='sri-excerpt'><%- item.excerpt %> &hellip;</div>
-  <span class='sri-type'><%- item.contentType %></span>
+  <div class='sri-excerpt'><%= item.excerpt %></div>
+  <span class='sri-type'><%- item.content_type %></span>
   <span class='sri-location'><%- item.locationPathString %></span>
   <a class="sri-link" href="<%- item.url %>"><%= gettext("View") %> <i class="icon-arrow-right"></i></a>
 </li>

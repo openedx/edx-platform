@@ -314,6 +314,9 @@ FEATURES = {
 
     # let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
+
+    # Enable the courseware search functionality
+    'ENABLE_COURSEWARE_SEARCH': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1994,3 +1997,6 @@ PDF_RECEIPT_LOGO_HEIGHT_MM = 12
 PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/logo.png'
 # Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
+
+from search.elastic import ElasticSearchEngine
+SEARCH_ENGINE = ElasticSearchEngine

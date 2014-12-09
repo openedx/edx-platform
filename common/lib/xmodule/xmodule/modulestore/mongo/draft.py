@@ -21,6 +21,8 @@ from xmodule.modulestore.mongo.base import (
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
+from search.manager import SearchEngine
+
 log = logging.getLogger(__name__)
 
 
@@ -541,7 +543,9 @@ class DraftModuleStore(MongoModuleStore):
             )
         self._delete_subtree(location, as_functions)
 
-    def _delete_subtree(self, location, as_functions, draft_only=False):
+        self.do_index(location, delete=True)
+
+    def _delete_subtree(self, location, as_functions):
         """
         Internal method for deleting all of the subtree whose revisions match the as_functions
         """
@@ -632,6 +636,53 @@ class DraftModuleStore(MongoModuleStore):
         else:
             return False
 
+    def do_index(self, location, delete=False):
+        # TODO - inline for now, need to move this out to a celery task
+        INDEX_NAME = "courseware_index"
+        DOCUMENT_TYPE = "courseware_content"
+
+        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        location_info = {
+            "course": unicode(location.course_key),
+        }
+
+        def _fetch_item(item_location):
+            try:
+                item = self.get_item(item_location)
+            except:
+                log.warning('Cannot find: %s', item_location)
+                return None
+
+            return item
+
+        def index_item_location(item_location):
+            item = _fetch_item(item_location)
+            if item:
+                if item.has_children:
+                    for child_loc in item.children:
+                        index_item_location(child_loc)
+
+                item_index = {}
+                item_index.update(location_info)
+                item_index.update(item.index_view())
+                item_index.update({
+                    'id': unicode(item.scope_ids.usage_id),
+                })
+                searcher.index(DOCUMENT_TYPE, item_index)
+
+        def remove_index_item_location(item_location):
+            item = _fetch_item(item_location)
+            if item:
+                if item.has_children:
+                    for child_loc in item.children:
+                        remove_index_item_location(child_loc)
+                searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
+
+        if delete:
+            remove_index_item_location(location)
+        else:
+            index_item_location(location)
+
     def publish(self, location, user_id, **kwargs):
         """
         Publish the subtree rooted at location to the live course and remove the drafts.
@@ -713,6 +764,9 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
+
+        self.do_index(location)
+
         return self.get_item(as_published(location))
 
     def unpublish(self, location, user_id, **kwargs):
