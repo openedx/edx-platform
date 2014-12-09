@@ -32,16 +32,26 @@ var edx = edx || {};
             return false;
         },
 
-        performSearch: function (searchTerm) {
-            this.collection.performSearch(searchTerm);
+        setActiveStyle: function () {
+            this.$searchField.addClass('is-active');
             this.$searchButton.hide();
             this.$cancelButton.show();
         },
 
-        clearSearch: function () {
-            this.$searchField.val('');
+        setInitialStyle: function () {
+            this.$searchField.removeClass('is-active');
             this.$searchButton.show();
             this.$cancelButton.hide();
+        },
+
+        performSearch: function (searchTerm) {
+            this.setActiveStyle();
+            this.collection.performSearch(searchTerm);
+        },
+
+        clearSearch: function () {
+            this.$searchField.val('');
+            this.setInitialStyle();
             this.trigger('SearchFormView:clearSearch');
         }
 

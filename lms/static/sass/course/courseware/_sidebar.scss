@@ -27,6 +27,10 @@
       top: 5px;
       width: 100%;
       @include border-radius(4px);
+      background: $white-t1;
+      &.is-active {
+        background: $white;
+      }
     }
     .search-button, .cancel-button {
       @include box-sizing(border-box);
