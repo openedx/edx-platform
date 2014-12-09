@@ -3,6 +3,7 @@ Helper methods related to EdxNotes.
 """
 import json
 import logging
+import markupsafe
 import requests
 from requests.exceptions import RequestException
 from uuid import uuid4
@@ -122,6 +123,8 @@ def preprocess_collection(user, course, collection):
                 continue
 
             model.update({
+                u"text": markupsafe.escape(model["text"]),
+                u"quote": markupsafe.escape(model["quote"]),
                 u"unit": get_ancestor_context(course, store, usage_key),
                 u"updated": dateutil_parse(model["updated"]),
             })

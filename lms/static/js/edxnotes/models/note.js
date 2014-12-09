@@ -23,13 +23,13 @@ define(['backbone', 'underscore.string'], function (Backbone) {
         textSize: 300,
 
         initialize: function () {
-            if (this.escape('quote').length > this.textSize) {
+            if (this.get('quote').length > this.textSize) {
                 this.set('show_link', true);
             }
         },
 
         getNoteText: function () {
-            var message = this.escape('quote');
+            var message = this.get('quote');
 
             if (!this.get('is_expanded') && this.get('show_link')) {
                 message = _.str.prune(message, this.textSize);
