@@ -1,8 +1,11 @@
 if Backbone?
   class @DiscussionRouter extends Backbone.Router
     initialize: (options) ->
-        @route("#{DiscussionUtil.route_prefix}", "allThreads")
-        @route("#{DiscussionUtil.route_prefix}:forum_name/threads/:thread_id", "showThread")
+        @allThreadsRoute = DiscussionUtil.route_prefix
+        @singleThreadRoute = @getSingleThreadRoute(":forum_name", ":thread_id")
+
+        @route(@allThreadsRoute, "allThreads")
+        @route(@singleThreadRoute, "showThread")
 
         @discussion = options['discussion']
         @course_settings = options['course_settings']
@@ -29,6 +32,12 @@ if Backbone?
         @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )
         $('.new-post-btn').bind "click", @showNewPost
         $('.new-post-btn').bind "keydown", (event) => DiscussionUtil.activateOnSpace(event, @showNewPost)
+
+    getSingleThreadRoute: (commentable_id, thread_id) ->
+      base_route = "#{commentable_id}/threads/#{thread_id}"
+      if DiscussionUtil.route_prefix
+        base_route = "#{DiscussionUtil.route_prefix}/#{base_route}"
+      base_route
 
     allThreads: ->
       @nav.updateSidebar()
@@ -70,10 +79,10 @@ if Backbone?
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
-      @navigate("#{DiscussionUtil.route_prefix}#{thread.get("commentable_id")}/threads/#{thread_id}", trigger: true)
+      @navigate(@getSingleThreadRoute(thread.get("commentable_id"), thread_id), trigger: true)
 
     navigateToAllThreads: =>
-      @navigate("#{DiscussionUtil.route_prefix}", trigger: true)
+      @navigate(@allThreadsRoute, trigger: true)
 
     showNewPost: (event) =>
       $('.forum-content').fadeOut(
