@@ -351,13 +351,13 @@ browser and pasting the output.  When that file changes, this one should be rege
             <% if (allow_anonymous) { %>
             <label class="post-option">
                 <input type="checkbox" name="anonymous" class="post-option-input js-anon">
-                post anonymously
+                <span class="js-anon-label">post anonymously</span>
             </label>
             <% } %>
             <% if (allow_anonymous_to_peers) { %>
             <label class="post-option">
                 <input type="checkbox" name="anonymous_to_peers" class="post-option-input js-anon-peers">
-                post anonymously to classmates
+                <span class="js-anon-peers-label">post anonymously to classmates</span>
             </label>
             <% } %>
         </div>
