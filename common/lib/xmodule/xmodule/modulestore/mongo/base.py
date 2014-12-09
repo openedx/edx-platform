@@ -1483,6 +1483,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             # Not found, so create.
             course_assets = {'course_id': unicode(course_key), 'assets': {}}
             course_assets['assets']['_id'] = self.asset_collection.insert(course_assets)
+        elif isinstance(course_assets['assets'], list):
+            # This record is in the old course assets format.
+            # Ensure that no data exists before updating the format.
+            assert(len(course_assets['assets']), 0)
+            # Update the format to a dict.
+            self.asset_collection.update(
+                {'_id': course_assets['_id']},
+                {'$set': {'assets': {}}}
+            )
+            course_assets['assets'] = {'_id': course_assets['_id']}
         else:
             course_assets['assets']['_id'] = course_assets['_id']
 
