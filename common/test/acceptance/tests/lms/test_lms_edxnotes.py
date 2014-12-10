@@ -40,34 +40,36 @@ class EdxNotesTestMixin(UniqueCourseTest):
         self.course_fixture.add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection 1").add_children(
-                    XBlockFixtureDesc("vertical", "Test Vertical").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit 1").add_children(
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 1",
                             data="""
-                                <p><span class="{0}">Annotate</span> this text!</p>
+                                <p><span class="{0}">Annotate this text!</span></p>
                                 <p>Annotate this text</p>
                             """.format(self.selector)
                         ),
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 2",
-                            data="""<p>Annotate <span class="{}">this text!</span></p>""".format(self.selector)
+                            data="""<p><span class="{}">Annotate this text!</span></p>""".format(self.selector)
                         ),
                     ),
-                    XBlockFixtureDesc(
-                        "html",
-                        "Test HTML 3",
-                        data="""<p><span class="{}">Annotate this text!</span></p>""".format(self.selector)
+                    XBlockFixtureDesc("vertical", "Test Unit 2").add_children(
+                        XBlockFixtureDesc(
+                            "html",
+                            "Test HTML 3",
+                            data="""<p><span class="{}">Annotate this text!</span></p>""".format(self.selector)
+                        ),
                     ),
                 ),
                 XBlockFixtureDesc("sequential", "Test Subsection 2").add_children(
-                    XBlockFixtureDesc("vertical", "Test Vertical").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit 3").add_children(
                         XBlockFixtureDesc(
                             "html",
                             "Test HTML 4",
                             data="""
-                                <p><span class="{0}">Annotate</span> this text!</p>
+                                <p><span class="{0}">Annotate this text!</span></p>
                                 <p>Annotate this text</p>
                             """.format(self.selector)
                         ),
@@ -234,58 +236,10 @@ class EdxNotesDefaultInteractionsTest(EdxNotesTestMixin):
         self.assert_notes_are_removed(components)
 
 
-class EdxNotesPageTest(UniqueCourseTest):
+class EdxNotesPageTest(EdxNotesTestMixin):
     """
     Tests for Notes page.
     """
-    def setUp(self):
-        """
-        Initialize pages and install a course fixture.
-        """
-        super(EdxNotesPageTest, self).setUp()
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.notes_page = EdxNotesPage(self.browser, self.course_id)
-
-        self.username = str(uuid4().hex)[:5]
-        self.email = "{}@email.com".format(self.username)
-
-        self.edxnotes_fixture = EdxNotesFixture()
-        self.course_fixture = CourseFixture(
-            self.course_info["org"], self.course_info["number"],
-            self.course_info["run"], self.course_info["display_name"]
-        )
-
-        self.course_fixture.add_advanced_settings({
-            u"edxnotes": {u"value": True}
-        })
-
-        self.course_fixture.add_children(
-            XBlockFixtureDesc("chapter", "Test Section").add_children(
-                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
-                    XBlockFixtureDesc("vertical", "Test Unit 1").add_children(
-                        XBlockFixtureDesc(
-                            "html",
-                            "Test HTML 1",
-                            data="""<p>Annotate this text!</p>"""
-                        ),
-                    ),
-                    XBlockFixtureDesc("vertical", "Test Unit 2").add_children(
-                        XBlockFixtureDesc("vertical", "Test Unit 2").add_children(
-                            XBlockFixtureDesc(
-                                "html",
-                                "Test HTML 2",
-                                data="""<p>Third text!</p>"""
-                            ),
-                        ),
-                    ),
-                ),
-            )).install()
-
-        AutoAuthPage(self.browser, username=self.username, email=self.email, course_id=self.course_id).visit()
-
-    def tearDown(self):
-        self.edxnotes_fixture.cleanup()
-
     def _add_notes(self, notes_list):
         self.edxnotes_fixture.create_notes(notes_list)
         self.edxnotes_fixture.install()
@@ -294,10 +248,10 @@ class EdxNotesPageTest(UniqueCourseTest):
         xblocks = self.course_fixture.get_nested_xblocks(category="html")
         self._add_notes([
             Note(
-                usage_id=xblocks[1].locator,
+                usage_id=xblocks[2].locator,
                 user=self.username,
                 course_id=self.course_fixture._course_key,
-                text="Third text",
+                text="Third note",
                 quote="",
                 updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
             ),
@@ -305,17 +259,17 @@ class EdxNotesPageTest(UniqueCourseTest):
                 usage_id=xblocks[0].locator,
                 user=self.username,
                 course_id=self.course_fixture._course_key,
-                text="Annotate this text",
-                quote="Second note",
+                text="Second note",
+                quote="Annotate this text",
                 updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat(),
                 ranges=[Range(startOffset=0, endOffset=18)],
             ),
             Note(
-                usage_id=xblocks[1].locator,
+                usage_id=xblocks[2].locator,
                 user=self.username,
                 course_id=self.course_fixture._course_key,
                 text="",
-                quote="First note",
+                quote="Annotate this text",
                 updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat(),
             ),
         ])
@@ -363,22 +317,22 @@ class EdxNotesPageTest(UniqueCourseTest):
         self.assertEqual(len(items), 3)
         assertContent(
             items[0],
-            quote=u"First note",
+            quote=u"Annotate this text",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2014 at 01:01 UTC"
         )
 
         assertContent(
             items[1],
-            text="Annotate this text",
-            quote=u"Second note",
+            text=u"Second note",
+            quote="Annotate this text",
             unit_name="Test Unit 1",
             time_updated="Jan 01, 2013 at 01:01 UTC"
         )
 
         assertContent(
             items[2],
-            text=u"Third text",
+            text=u"Third note",
             unit_name="Test Unit 2",
             time_updated="Jan 01, 2012 at 01:01 UTC"
         )
@@ -394,7 +348,7 @@ class EdxNotesPageTest(UniqueCourseTest):
         self._add_default_notes()
         self.notes_page.visit()
         item = self.notes_page.children[1]
-        text = item.text
+        text = item.quote
         item.go_to_unit()
         self.courseware_page.wait_for_page()
         self.assertIn(text, self.courseware_page.xblock_component_html_content())
@@ -407,7 +361,7 @@ class EdxNotesPageTest(UniqueCourseTest):
         When I run the search with "   " query
         Then I see the following error message "Search field cannot be blank."
         And I still can see only "Recent Activity" tab
-        When I run the search with "text" query
+        When I run the search with "note" query
         Then I see that error message disappears
         And I see that "Search Results" tab appears with 2 notes found
         """
@@ -421,7 +375,7 @@ class EdxNotesPageTest(UniqueCourseTest):
         # Search results tab does not appear
         self.assertEqual(len(self.notes_page.tabs), 1)
         # Run the search with correct query
-        self.notes_page.search("text")
+        self.notes_page.search("note")
         # Error message disappears
         self.assertFalse(self.notes_page.is_error_visible)
         self.assertIn(u"Search Results", self.notes_page.tabs)
@@ -433,7 +387,7 @@ class EdxNotesPageTest(UniqueCourseTest):
         Given I have a course with 3 notes
         When I open Notes page
         Then I see only "Recent Activity" tab with 3 notes
-        When I run the search with "text" query
+        When I run the search with "note" query
         And I see that "Search Results" tab appears with 2 notes found
         Then I switch to "Recent Activity" tab
         And I see all 3 notes
@@ -451,7 +405,7 @@ class EdxNotesPageTest(UniqueCourseTest):
         self.assertEqual(len(self.notes_page.tabs), 1)
         self.assertIn(u"Recent Activity", self.notes_page.tabs)
         self.assertEqual(len(self.notes_page.children), 3)
-        self.notes_page.search("text")
+        self.notes_page.search("note")
         # We're on Search Results tab
         self.assertEqual(len(self.notes_page.tabs), 2)
         self.assertIn(u"Search Results", self.notes_page.tabs)
@@ -466,6 +420,63 @@ class EdxNotesPageTest(UniqueCourseTest):
         self.assertEqual(len(self.notes_page.tabs), 1)
         self.assertIn(u"Recent Activity", self.notes_page.tabs)
         self.assertEqual(len(self.notes_page.children), 3)
+
+    def test_open_note_when_accessed_from_notes_page(self):
+        """
+        Scenario: Ensure that the link to the Unit opens a note only once.
+        Given I have a course with 2 sequentials that contain respectively one note and two notes
+        When I open Notes page
+        And I click on the first unit link
+        Then I see the note opened on the unit page
+        When I switch to the second sequential
+        I do not see any note opened
+        When I switch back to first sequential
+        I do not see any note opened
+        """
+        xblocks = self.course_fixture.get_nested_xblocks(category="html")
+        self._add_notes([
+            Note(
+                usage_id=xblocks[1].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="Third note",
+                quote="Annotate this text",
+                updated=datetime(2012, 1, 1, 1, 1, 1, 1).isoformat(),
+                ranges=[Range(startOffset=0, endOffset=19)],
+            ),
+            Note(
+                usage_id=xblocks[2].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="Second note",
+                quote="Annotate this text",
+                updated=datetime(2013, 1, 1, 1, 1, 1, 1).isoformat(),
+                ranges=[Range(startOffset=0, endOffset=19)],
+            ),
+            Note(
+                usage_id=xblocks[0].locator,
+                user=self.username,
+                course_id=self.course_fixture._course_key,
+                text="First note",
+                quote="Annotate this text",
+                updated=datetime(2014, 1, 1, 1, 1, 1, 1).isoformat(),
+                ranges=[Range(startOffset=0, endOffset=19)],
+            ),
+        ])
+        self.notes_page.visit()
+        item = self.notes_page.children[0]
+        item.go_to_unit()
+        self.courseware_page.wait_for_page()
+        note = self.note_unit_page.notes[0]
+        self.assertTrue(note.is_visible)
+        note = self.note_unit_page.notes[1]
+        self.assertFalse(note.is_visible)
+        self.course_nav.go_to_sequential_position(2)
+        note = self.note_unit_page.notes[0]
+        self.assertFalse(note.is_visible)
+        self.course_nav.go_to_sequential_position(1)
+        note = self.note_unit_page.notes[0]
+        self.assertFalse(note.is_visible)
 
 
 class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):

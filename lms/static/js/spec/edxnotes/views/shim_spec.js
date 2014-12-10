@@ -42,6 +42,7 @@ define([
                 spyOn(annotator, 'onHighlightMouseover').andCallThrough();
                 spyOn(annotator, 'startViewerHideTimer').andCallThrough();
             });
+            spyOn($.fn, 'off').andCallThrough();
         });
 
         afterEach(function () {
@@ -111,6 +112,14 @@ define([
 
             // Check that second one doesn't have a bound click.edxnotes:freeze
             checkClickEventsNotBound('edxnotes:freeze' + annotators[1].uid);
+        });
+
+        it('should unbind onNotesLoaded on destruction', function() {
+            annotators[0].destroy();
+            expect($.fn.off).toHaveBeenCalledWith(
+                'click',
+                annotators[0].onNoteClick
+            );
         });
     });
 });
