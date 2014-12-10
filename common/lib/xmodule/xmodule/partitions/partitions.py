@@ -150,7 +150,7 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
             # If no scheme was provided, set it to the default ('random')
             scheme_id = UserPartition.VERSION_1_SCHEME
         elif value["version"] == UserPartition.VERSION:
-            if not "scheme" in value:
+            if "scheme" not in value:
                 raise TypeError("UserPartition dict {0} missing value key 'scheme'".format(value))
             scheme_id = value["scheme"]
         else:

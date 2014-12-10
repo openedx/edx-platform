@@ -9,7 +9,7 @@ Settings for load testing.
 from .aws import *
 
 # Disable CSRF for load testing
-EXCLUDE_CSRF = lambda elem: not elem in [
+EXCLUDE_CSRF = lambda elem: elem not in [
     'django.core.context_processors.csrf',
     'django.middleware.csrf.CsrfViewMiddleware'
 ]

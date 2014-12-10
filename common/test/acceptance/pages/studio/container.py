@@ -331,7 +331,7 @@ class XBlockWrapper(PageObject):
             grandkids.extend(descendant.children)
 
         grand_locators = [grandkid.locator for grandkid in grandkids]
-        return [descendant for descendant in descendants if not descendant.locator in grand_locators]
+        return [descendant for descendant in descendants if descendant.locator not in grand_locators]
 
     @property
     def preview_selector(self):

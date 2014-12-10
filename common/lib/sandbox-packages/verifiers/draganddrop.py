@@ -191,7 +191,7 @@ class DragAndDrop(object):
                             self.user_positions[index]['user'], flag=rule):
                         return False
             if not rules_executed:  # no correct rules for current group
-            # probably xml content mistake - wrong rules names
+                # probably xml content mistake - wrong rules names
                 return False
 
         return True

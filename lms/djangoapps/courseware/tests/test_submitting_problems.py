@@ -333,18 +333,20 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         grading_policy = {
-            "GRADER": [{
-                "type": "Homework",
-                "min_count": 1,
-                "drop_count": 0,
-                "short_label": "HW",
-                "weight": 0.25
-            }, {
-                "type": "Final",
-                "name": "Final Section",
-                "short_label": "Final",
-                "weight": 0.75
-            }]
+            "GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW",
+                    "weight": 0.25
+                }, {
+                    "type": "Final",
+                    "name": "Final Section",
+                    "short_label": "Final",
+                    "weight": 0.75
+                }
+            ]
         }
         self.add_grading_policy(grading_policy)
 
@@ -361,13 +363,14 @@ class TestCourseGrader(TestSubmittingProblems):
 
         grading_policy = {
             "GRADER": [
-            {
-                "type": "Homework",
-                "min_count": 3,
-                "drop_count": 1,
-                "short_label": "HW",
-                "weight": 1
-            }]
+                {
+                    "type": "Homework",
+                    "min_count": 3,
+                    "drop_count": 1,
+                    "short_label": "HW",
+                    "weight": 1
+                }
+            ]
         }
         self.add_grading_policy(grading_policy)
 

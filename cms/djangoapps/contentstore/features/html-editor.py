@@ -285,7 +285,7 @@ def use_code_editor(action):
 
 
 def perform_action_in_plugin(action):
-     # Wait for the plugin window to open.
+    # Wait for the plugin window to open.
     world.wait_for_visible('.mce-window')
 
     # Trigger the action

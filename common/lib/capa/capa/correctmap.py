@@ -122,7 +122,7 @@ class CorrectMap(object):
             return npoints
         elif self.is_correct(answer_id):
             return 1
-         # if not correct and no points have been assigned, return 0
+        # if not correct and no points have been assigned, return 0
         return 0
 
     def set_property(self, answer_id, property, value):

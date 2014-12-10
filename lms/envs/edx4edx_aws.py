@@ -35,8 +35,8 @@ STATICFILES_DIRS = [
     ("handouts", DATA_DIR / "handouts"),
     ("subs", DATA_DIR / "subs"),
 
-# This is how you would use the textbook images locally
-#    ("book", ENV_ROOT / "book_images"),
+    # This is how you would use the textbook images locally
+    # ("book", ENV_ROOT / "book_images"),
 ]
 
 MAKO_TEMPLATES['course'] = [DATA_DIR, EDX4EDX_ROOT]

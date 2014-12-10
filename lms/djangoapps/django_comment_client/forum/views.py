@@ -324,8 +324,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
             add_courseware_context(threads, course)
 
         for thread in threads:
-            #patch for backward compatibility with comments service
-            if not "pinned" in thread:
+            # patch for backward compatibility with comments service
+            if "pinned" not in thread:
                 thread["pinned"] = False
 
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]

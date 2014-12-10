@@ -13,7 +13,9 @@ class Content:
 
 
 class CachingTestCase(TestCase):
-#   Tests for https://edx.lighthouseapp.com/projects/102637/tickets/112-updating-asset-does-not-refresh-the-cached-copy
+    """
+    Tests for https://edx.lighthouseapp.com/projects/102637/tickets/112-updating-asset-does-not-refresh-the-cached-copy
+    """
     unicodeLocation = Location(u'c4x', u'mitX', u'800', u'run', u'thumbnail', u'monsters.jpg')
     # Note that some of the parts are strings instead of unicode strings
     nonUnicodeLocation = Location('c4x', u'mitX', u'800', u'run', 'thumbnail', 'monsters.jpg')

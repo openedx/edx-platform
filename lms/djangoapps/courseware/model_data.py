@@ -349,8 +349,8 @@ class DjangoKeyValueStore(KeyValueStore):
                 state[field.field_name] = kv_dict[field]
                 field_object.state = json.dumps(state)
             else:
-            # The remaining scopes save fields on different rows, so
-            # we don't have to worry about conflicts
+                # The remaining scopes save fields on different rows, so
+                # we don't have to worry about conflicts
                 field_object.value = json.dumps(kv_dict[field])
 
         for field_object in field_objects:

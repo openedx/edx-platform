@@ -55,7 +55,7 @@ def store_uploaded_file(
     uploaded_file = request.FILES[file_key]
     try:
         file_extension = os.path.splitext(uploaded_file.name)[1].lower()
-        if not file_extension in allowed_file_types:
+        if file_extension not in allowed_file_types:
             file_types = "', '".join(allowed_file_types)
             msg = ungettext(
                 "The file must end with the extension '{file_types}'.",

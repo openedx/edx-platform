@@ -277,7 +277,7 @@ MIXED_MODULESTORE_SETUPS = (
 )
 DIRECT_MODULESTORE_SETUPS = (
     MongoModulestoreBuilder(),
-#     VersioningModulestoreBuilder(),  # FUTUREDO: LMS-11227
+    # VersioningModulestoreBuilder(),  # FUTUREDO: LMS-11227
 )
 MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
 

@@ -150,8 +150,8 @@ def create_thread(request, course_id, commentable_id):
     event_data = {'forum_id': commentable_id, 'thread_id': thread.id}
     track_forum_event(request, 'forum.thread.created', event_data)
 
-    #patch for backward compatibility to comments service
-    if not 'pinned' in thread.attributes:
+    # patch for backward compatibility to comments service
+    if 'pinned' not in thread.attributes:
         thread['pinned'] = False
 
     if post.get('auto_subscribe', 'false').lower() == 'true':

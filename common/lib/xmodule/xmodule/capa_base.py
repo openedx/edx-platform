@@ -263,8 +263,11 @@ class CapaMixin(CapaFields):
                 msg += u'<p><pre>{tb}</pre></p>'.format(
                     # just the traceback, no message - it is already present above
                     tb=cgi.escape(
-                        u''.join(['Traceback (most recent call last):\n'] +
-                        traceback.format_tb(sys.exc_info()[2])))
+                        u''.join(
+                            ['Traceback (most recent call last):\n'] +
+                            traceback.format_tb(sys.exc_info()[2])
+                        )
+                    )
                 )
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
@@ -987,8 +990,8 @@ class CapaMixin(CapaFields):
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-             # pylint: disable=maybe-no-member
-             # pylint is unable to verify that .total_seconds() exists
+            # pylint: disable=maybe-no-member
+            # pylint is unable to verify that .total_seconds() exists
             if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
                 msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
@@ -1126,7 +1129,7 @@ class CapaMixin(CapaFields):
 
             if permutation_option is not None:
                 # Add permutation record tuple: (one of:'shuffle'/'answerpool', [as-displayed list])
-                if not 'permutation' in event_info:
+                if 'permutation' not in event_info:
                     event_info['permutation'] = {}
                 event_info['permutation'][response.answer_id] = (permutation_option, response.unmask_order())
 

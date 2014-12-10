@@ -870,10 +870,13 @@ class CourseTabList(List):
         """
         count = sum(1 for tab in tabs if tab.get('type') == tab_type)
         if count > max_num:
-            raise InvalidTabsException(
-                "Tab of type '{0}' appears {1} time(s). Expected maximum of {2} time(s).".format(
-                tab_type, count, max_num
-                ))
+            msg = (
+                "Tab of type '{type}' appears {count} time(s). "
+                "Expected maximum of {max} time(s)."
+            ).format(
+                type=tab_type, count=count, max=max_num,
+            )
+            raise InvalidTabsException(msg)
 
     def to_json(self, values):
         """

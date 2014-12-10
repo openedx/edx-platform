@@ -580,7 +580,7 @@ class CourseTabListTestCase(TabListTestCase):
         )):
             self.assertEquals(tab.type, self.course.tabs[i].type)
 
-       # enumerate the tabs and verify textbooks and the instructor tab
+        # enumerate the tabs and verify textbooks and the instructor tab
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
             self.course,
             self.settings,
