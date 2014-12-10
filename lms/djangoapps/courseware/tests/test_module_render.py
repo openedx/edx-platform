@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Test for lms courseware app, module render unit
 """
@@ -176,6 +177,44 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(dispatch_url, {'position': 2})
         self.assertEquals(403, response.status_code)
         self.assertEquals('Unauthenticated', response.content)
+
+    def test_missing_position_handler(self):
+        """
+        Test that sending POST request without or invalid position argument don't raise server error
+        """
+        self.client.login(username=self.mock_user.username, password="test")
+        dispatch_url = reverse(
+            'xblock_handler',
+            args=[
+                self.course_key.to_deprecated_string(),
+                quote_slashes(self.course_key.make_usage_key('videosequence', 'Toy_Videos').to_deprecated_string()),
+                'xmodule_handler',
+                'goto_position'
+            ]
+        )
+        response = self.client.post(dispatch_url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': ''})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': '-1'})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': "string"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': u"Φυσικά"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': None})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
 
     @ddt.data('pure', 'vertical')
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
