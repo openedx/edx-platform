@@ -13,7 +13,7 @@
         </div>
     <% } %>
     <% if (text) { %>
-        <ol class="note-comments" role="region" aria-label="<%- gettext('Your notes and comments') %>">
+        <ol class="note-comments" role="region" aria-label="<%- gettext('Note') %>">
             <li class="note-comment">
                 <p class="note-comment-p"><%= text %></p>
             </li>
