@@ -1,49 +1,54 @@
-<% _.each(structure, function (chapter) { %>
-<article id="edx-notes-page-item-<%=_.uniqueId()%>" class="edx-notes-page-item edx-notes-page-item-chapter">
-    <p><%- chapter.display_name %></p>
-    <p><%- chapter.url_name %></p>
-    <ul>
-    <% _.each(chapter.sections, function (section) { %>
-        <li class="edx-notes-page-item-section">
-            <p><%- section.display_name %></p>
-            <p><%- section.url_name %></p>
-            <ul>
-                <% _.each(section.units, function (unit) { %>
-                    <% if (unit.notes && unit.notes.length) { %>
-                        <% _.each(unit.notes, function (model) { %>
-                        <article id="edx-notes-page-item-<%=_.uniqueId()%>" class="edx-notes-page-item">
-                            <div class="col-left">
-                            <% if (model.get('quote')) { %>
-                                <div class="edx-notes-item-quote"><%= model.escape('quote') %></div>
-                            <% } %>
-                            <% if (model.get('text')) { %>
-                                <div class="edx-notes-item-text"><%= model.escape('text') %></div>
-                            <% } %>
-                            </div>
-                            <div class="col-right">
-                                <dl>
-                                <% if (model.get('text') && model.get('quote')) { %>
-                                    <dt class="edx-notes-item-highlight-title"><%- gettext("Highlighted & Noted in:") %></dt>
-                                <% } else if (model.get('text')) { %>
-                                    <dt class="edx-notes-item-highlight-title"><%- gettext("Highlighted in:") %></dt>
-                                <% } else if (model.get('quote')) { %>
-                                    <dt class="edx-notes-item-highlight-title"><%- gettext("Noted in:") %></dt>
-                                <% } %>
-                                    <dd><a class="edx-notes-item-unit-link" href="<%= model.get('unit').url %>" title="<%- gettext('Visit the unit.') %>"><%- model.get('unit').display_name %></a></dd>
-                                <% if (model.get('updated')) { %>
-                                    <dt class="edx-notes-item-last-edited-title"><%- gettext("Last Edited:") %></dt>
-                                    <dd class="edx-notes-item-last-edited-value"><%- model.get('updated') %></dd>
-                                <% } %>
-                                </dl>
-                            </div>
-                        </article>
-                        <% }); %>
-                    <% } %>
-                <% }); %>
-            </ul>
-        </li>
-    <% }); %>
-    </ul>
-</article>
+<%
+var currentChapter = '',
+    currentSection = '';
+%>
+<% _.each(structure, function (note) { %>
+    <%
+    var chapter = note.get('chapter').display_name,
+        section = note.get('section').display_name;
+    %>
+
+    <% if (currentChapter !== chapter) { %>
+        <article id="edx-notes-page-item-<%=_.uniqueId()%>" class="edx-notes-page-item edx-notes-page-item-chapter">
+        <p><%- chapter %></p>
+    <% } %>
+
+    <% if (currentSection !== section) { %>
+        <p><%- section %></p>
+        <% currentSection = section; %>
+    <% } %>
+
+
+        <article id="edx-notes-page-item-<%=_.uniqueId()%>" class="edx-notes-page-item">
+            <div class="col-left">
+            <% if (note.get('quote')) { %>
+                <div class="edx-notes-item-quote"><%= note.escape('quote') %></div>
+            <% } %>
+            <% if (note.get('text')) { %>
+                <div class="edx-notes-item-text"><%= note.escape('text') %></div>
+            <% } %>
+            </div>
+            <div class="col-right">
+                <dl>
+                <% if (note.get('text') && note.get('quote')) { %>
+                    <dt class="edx-notes-item-highlight-title"><%- gettext("Highlighted & Noted in:") %></dt>
+                <% } else if (note.get('text')) { %>
+                    <dt class="edx-notes-item-highlight-title"><%- gettext("Highlighted in:") %></dt>
+                <% } else if (note.get('quote')) { %>
+                    <dt class="edx-notes-item-highlight-title"><%- gettext("Noted in:") %></dt>
+                <% } %>
+                    <dd><a class="edx-notes-item-unit-link" href="<%= note.get('unit').url %>" title="<%- gettext('Visit the unit.') %>"><%- note.get('unit').display_name %></a></dd>
+                <% if (note.get('updated')) { %>
+                    <dt class="edx-notes-item-last-edited-title"><%- gettext("Last Edited:") %></dt>
+                    <dd class="edx-notes-item-last-edited-value"><%- note.get('updated') %></dd>
+                <% } %>
+                </dl>
+            </div>
+        </article>
+
+    <% if (currentChapter !== chapter) { %>
+        </article>
+        <% currentChapter = chapter; %>
+    <% } %>
 <% }); %>
 

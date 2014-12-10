@@ -21,7 +21,6 @@ define([
             collection: collection,
             debug: params.debugMode,
             user: params.user,
-            structure: params.structure,
             courseId: params.courseId,
             endpoint: params.endpoint
         });

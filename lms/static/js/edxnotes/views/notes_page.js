@@ -16,7 +16,6 @@ define([
             this.courseStructureView = new CourseStructureView({
                 el: this.el,
                 collection: this.collection,
-                structure: this.options.structure,
                 tabsCollection: this.tabsCollection
             });
 

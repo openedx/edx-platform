@@ -32,12 +32,14 @@ def edxnotes(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, "load", course_key)
+    field_data_cache = FieldDataCache([course], course_key, request.user)
+    course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
 
     if not is_feature_enabled(course):
         raise Http404
 
     try:
-        notes = get_notes(request.user, course)
+        notes = get_notes(request.user, course_module)
     except EdxNotesServiceUnavailable:
         raise Http404
 
@@ -68,6 +70,8 @@ def search_notes(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, "load", course_key)
+    field_data_cache = FieldDataCache([course], course_key, request.user)
+    course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
 
     if not is_feature_enabled(course):
         raise Http404
@@ -77,7 +81,7 @@ def search_notes(request, course_id):
 
     query_string = request.GET["text"]
     try:
-        search_results = search(request.user, course, query_string)
+        search_results = search(request.user, course_module, query_string)
     except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
         return JsonResponseBadRequest({"error": err.message}, status=500)
 
