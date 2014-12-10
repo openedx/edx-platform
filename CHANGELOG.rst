@@ -11,6 +11,8 @@ LMS: Add support for user partitioning based on cohort.  TNL-710
 
 Platform: Add base support for cohorted group configurations.  TNL-649
 
+LMS: Support assigning students to cohorts via a CSV file upload. TNL-735
+
 Common: Add configurable reset button to units
 
 Studio: Add support xblock validation messages on Studio unit/container page. TNL-683

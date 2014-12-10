@@ -60,6 +60,7 @@
             'js/staff_debug_actions': 'js/staff_debug_actions',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
+            'js/views/file_uploader': 'js/views/file_uploader',
             'js/models/cohort': 'js/models/cohort',
             'js/collections/cohort': 'js/collections/cohort',
             'js/views/cohort_editor': 'js/views/cohort_editor',
@@ -82,7 +83,8 @@
                 exports: 'gettext'
             },
             'string_utils': {
-                deps: ['underscore']
+                deps: ['underscore'],
+                exports: 'interpolate_text'
             },
             'date': {
                 exports: 'Date'
@@ -283,7 +285,9 @@
             },
             'js/views/cohorts': {
                 exports: 'CohortsView',
-                deps: ['backbone', 'js/views/cohort_editor']
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'string_utils', 'js/views/cohort_editor',
+                    'js/views/notification', 'js/models/notification', 'js/views/file_uploader'
+                ]
             },
             'js/models/notification': {
                 exports: 'NotificationModel',
@@ -292,6 +296,12 @@
             'js/views/notification': {
                 exports: 'NotificationView',
                 deps: ['backbone', 'jquery', 'underscore']
+            },
+            'js/views/file_uploader': {
+                exports: 'FileUploaderView',
+                deps: ['backbone', 'jquery', 'underscore', 'gettext', 'string_utils', 'js/views/notification',
+                    'js/models/notification', 'jquery.fileupload'
+                ]
             },
             'js/student_account/enrollment': {
                 exports: 'edx.student.account.EnrollmentInterface',
@@ -385,6 +395,7 @@
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
+        'lms/include/js/spec/views/file_uploader_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
         'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',

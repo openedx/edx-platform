@@ -77,13 +77,20 @@ define(['sinon', 'underscore'], function(sinon, _) {
             JSON.stringify(jsonResponse));
     };
 
-    respondWithError = function(requests, requestIndex) {
+    respondWithError = function(requests, statusCode, jsonResponse, requestIndex) {
         if (_.isUndefined(requestIndex)) {
             requestIndex = requests.length - 1;
         }
-        requests[requestIndex].respond(500,
+        if (_.isUndefined(statusCode)) {
+            statusCode = 500;
+        }
+        if (_.isUndefined(jsonResponse)) {
+            jsonResponse = {};
+        }
+        requests[requestIndex].respond(statusCode,
             { 'Content-Type': 'application/json' },
-            JSON.stringify({ }));
+            JSON.stringify(jsonResponse)
+        );
     };
 
     respondToDelete = function(requests, requestIndex) {
