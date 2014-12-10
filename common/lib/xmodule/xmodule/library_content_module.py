@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
@@ -280,9 +281,21 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 )
             )
             return validation
-        for library_key, version in self.source_libraries:  # pylint: disable=unused-variable
+        for library_key, version in self.source_libraries:
             library = _get_library(self.runtime.descriptor_runtime.modulestore, library_key)
-            if library is None:
+            if library is not None:
+                latest_version = library.location.library_key.version_guid
+                if version is None or version != latest_version:
+                    validation.set_summary(
+                        StudioValidationMessage(
+                            StudioValidationMessage.WARNING,
+                            _(u'This component is out of date. The library has new content.'),
+                            action_class='library-update-btn',  # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                            action_label=_(u"↻ Update now")
+                        )
+                    )
+                    break
+            else:
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.ERROR,
@@ -298,7 +311,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
     def author_view(self, context):
         """
         Renders the Studio views.
-        Normal studio view: displays library status and has an "Update" button.
+        Normal studio view: If block is properly configured, displays library status summary
         Studio container view: displays a preview of all possible children.
         """
         fragment = Fragment()
@@ -311,45 +324,25 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 fragment.add_content(self.system.render_template("library-block-author-preview-header.html", {
                     'max_count': self.max_count,
                     'display_name': self.display_name or self.url_name,
-                    'mode': self.mode,
                 }))
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
-            else:
-                fragment.add_content(u'<p>{}</p>'.format(
-                    _('No matching content found in library, no library configured, or not yet loaded from library.')
-                ))
         else:
-            UpdateStatus = enum(  # pylint: disable=invalid-name
-                CANNOT=0,  # Cannot update - library is not set, invalid, deleted, etc.
-                NEEDED=1,  # An update is needed - prompt the user to update
-                UP_TO_DATE=2,  # No update necessary - library is up to date
-            )
             # When shown on a unit page, don't show any sort of preview - just the status of this block.
-            library_ok = bool(self.source_libraries)  # True if at least one source library is defined
             library_names = []
-            update_status = UpdateStatus.UP_TO_DATE
-            for library_key, version in self.source_libraries:
+            for library_key, version in self.source_libraries:  # pylint: disable=unused-variable
                 library = _get_library(self.runtime.descriptor_runtime.modulestore, library_key)
-                if library is None:
-                    update_status = UpdateStatus.CANNOT
-                    library_ok = False
-                    break
-                library_names.append(library.display_name)
-                latest_version = library.location.library_key.version_guid
-                if version is None or version != latest_version:
-                    update_status = UpdateStatus.NEEDED
+                if library is not None:
+                    library_names.append(library.display_name)
 
-            fragment.add_content(self.system.render_template('library-block-author-view.html', {
-                'library_names': library_names,
-                'library_ok': library_ok,
-                'UpdateStatus': UpdateStatus,
-                'update_status': update_status,
-                'max_count': self.max_count,
-                'mode': self.mode,
-                'num_children': len(self.children),  # pylint: disable=no-member
-            }))
-            fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
-            fragment.initialize_js('LibraryContentAuthorView')
+            if library_names:
+                fragment.add_content(self.system.render_template('library-block-author-view.html', {
+                    'library_names': library_names,
+                    'max_count': self.max_count,
+                    'num_children': len(self.children),  # pylint: disable=no-member
+                }))
+        # The following JS is used to make the "Update now" button work on the unit page and the container view:
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
+        fragment.initialize_js('LibraryContentAuthorView')
         return fragment
 
     def get_child_descriptors(self):

@@ -337,6 +337,45 @@ class XBlockWrapper(PageObject):
         return [descendant for descendant in descendants if descendant.locator not in grand_locators]
 
     @property
+    def has_validation_message(self):
+        """ Is a validation warning/error/message shown? """
+        return self.q(css=self._bounded_selector('.xblock-message.validation')).present
+
+    def _validation_paragraph(self, css_class):
+        """ Helper method to return the <p> element of a validation warning """
+        return self.q(css=self._bounded_selector('.xblock-message.validation p.{}'.format(css_class)))
+
+    @property
+    def has_validation_warning(self):
+        """ Is a validation warning shown? """
+        return self._validation_paragraph('warning').present
+
+    @property
+    def has_validation_error(self):
+        """ Is a validation error shown? """
+        return self._validation_paragraph('error').present
+
+    @property
+    def has_validation_not_configured_warning(self):
+        """ Is a validation "not configured" message shown? """
+        return self._validation_paragraph('not-configured').present
+
+    @property
+    def validation_warning_text(self):
+        """ Get the text of the validation warning. """
+        return self._validation_paragraph('warning').text[0]
+
+    @property
+    def validation_error_text(self):
+        """ Get the text of the validation error. """
+        return self._validation_paragraph('error').text[0]
+
+    @property
+    def validation_not_configured_warning_text(self):
+        """ Get the text of the validation "not configured" message. """
+        return self._validation_paragraph('not-configured').text[0]
+
+    @property
     def preview_selector(self):
         return self._bounded_selector('.xblock-student_view,.xblock-author_view')
 
