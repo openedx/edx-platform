@@ -101,7 +101,7 @@ from . import provider
 # `AUTH_ENROLL_COURSE_ID_KEY` provides the course ID that a student
 # is trying to enroll in, used to generate analytics events
 # and auto-enroll students.
-from user_api.api import profile
+from openedx.core.djangoapps.user_api.api import profile
 
 AUTH_ENTRY_KEY = 'auth_entry'
 AUTH_REDIRECT_KEY = 'next'
