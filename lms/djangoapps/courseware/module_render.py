@@ -92,7 +92,7 @@ def make_track_function(request):
     return function
 
 
-def toc_for_course(user, request, course, active_chapter, active_section, field_data_cache):
+def toc_for_course(request, course, active_chapter, active_section, field_data_cache):
     '''
     Create a table of contents from the module store
 
@@ -117,7 +117,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     '''
 
     with modulestore().bulk_operations(course.id):
-        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
+        course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course.id)
         if course_module is None:
             return None
 
