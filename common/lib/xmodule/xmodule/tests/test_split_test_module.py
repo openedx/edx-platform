@@ -59,7 +59,8 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
                     MockUserPartitionScheme()
                 )
             ],
-            runtime=self.module_system,
+            user=Mock(username='ma', email='ma@edx.org', is_staff=False, is_active=True),
+            course_id=self.course.id,
             track_function=Mock(name='track_function'),
         )
         self.module_system._services['partitions'] = self.partitions_service  # pylint: disable=protected-access

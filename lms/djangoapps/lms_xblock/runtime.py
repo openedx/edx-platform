@@ -135,7 +135,7 @@ class LmsPartitionService(PartitionService):
     """
     @property
     def course_partitions(self):
-        course = modulestore().get_course(self.runtime.course_id)
+        course = modulestore().get_course(self._course_id)
         return course.user_partitions
 
 
@@ -195,7 +195,8 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
         services = kwargs.setdefault('services', {})
         services['user_tags'] = UserTagsService(self)
         services['partitions'] = LmsPartitionService(
-            runtime=self,
+            user=kwargs.get('user'),
+            course_id=kwargs.get('course_id'),
             track_function=kwargs.get('track_function', None),
         )
         services['fs'] = xblock.reference.plugins.FSService()
