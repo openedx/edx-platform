@@ -51,11 +51,17 @@ class PureXBlock(XBlock):
     pass
 
 
-class EmptyXModule(XModule):
+class EmptyXModule(XModule):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
     pass
 
 
-class EmptyXModuleDescriptor(XModuleDescriptor):
+class EmptyXModuleDescriptor(XModuleDescriptor):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
     module_class = EmptyXModule
 
 
@@ -1118,6 +1124,9 @@ class TestRebindModule(TestSubmittingProblems):
 @ddt.ddt
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Tests of event publishing for both XModules and XBlocks.
+    """
 
     def setUp(self):
         """
@@ -1138,7 +1147,7 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         request.user = self.mock_user
         course = CourseFactory()
         descriptor = ItemFactory(category=block_type, parent=course)
-        field_data_cache = FieldDataCache([course, descriptor], course.id, self.mock_user)
+        field_data_cache = FieldDataCache([course, descriptor], course.id, self.mock_user)  # pylint: disable=no-member
         block = render.get_module(self.mock_user, request, descriptor.location, field_data_cache)
 
         event_type = 'event_type'
@@ -1148,8 +1157,4 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         mock_track_function.assert_called_once_with(request)
 
-        if block_type == 'xblock':
-            self.assertFalse(mock_track_function.return_value.called)
-        else:
-            mock_track_function.return_value.assert_called_once_with(event_type, event)
-
+        mock_track_function.return_value.assert_called_once_with(event_type, event)

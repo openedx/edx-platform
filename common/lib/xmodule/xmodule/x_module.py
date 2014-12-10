@@ -286,15 +286,7 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def runtime(self):
-        # Handle XModule backwards compatibility. If this is a pure
-        # XBlock, and it has an xmodule_runtime defined, then we're in
-        # an XModule context, not an XModuleDescriptor context,
-        # so we should use the xmodule_runtime (ModuleSystem) as the runtime.
-        if (not isinstance(self, (XModule, XModuleDescriptor)) and
-                self.xmodule_runtime is not None):
-            return PureSystem(self.xmodule_runtime, self._runtime)
-        else:
-            return self._runtime
+        return CombinedSystem(self.xmodule_runtime, self._runtime)
 
     @runtime.setter
     def runtime(self, value):
@@ -424,6 +416,9 @@ class XModuleMixin(XBlockMixin):
             for child_loc in self.children:
                 try:
                     child = self.runtime.get_block(child_loc)
+                    if child is None:
+                        continue
+
                     child.runtime.export_fs = self.runtime.export_fs
                 except ItemNotFoundError:
                     log.warning(u'Unable to load item {loc}, skipping'.format(loc=child_loc))
@@ -1273,39 +1268,22 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
             result['default_value'] = field.to_json(field.default)
         return result
 
-    def render(self, block, view_name, context=None):
-        if view_name in PREVIEW_VIEWS:
-            assert block.xmodule_runtime is not None
-            if isinstance(block, (XModule, XModuleDescriptor)):
-                to_render = block._xmodule
-            else:
-                to_render = block
-            return block.xmodule_runtime.render(to_render, view_name, context)
-        else:
-            return super(DescriptorSystem, self).render(block, view_name, context)
-
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        if block.xmodule_runtime is not None:
-            return block.xmodule_runtime.handler_url(block, handler_name, suffix, query, thirdparty)
-        else:
-            # Currently, Modulestore is responsible for instantiating DescriptorSystems
-            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
-            # that implements the correct handler url. So, for now, instead, we will reference a
-            # global function that the application can override.
-            return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
+        # Currently, Modulestore is responsible for instantiating DescriptorSystems
+        # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
+        # that implements the correct handler url. So, for now, instead, we will reference a
+        # global function that the application can override.
+        return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
     def local_resource_url(self, block, uri):
         """
         See :meth:`xblock.runtime.Runtime:local_resource_url` for documentation.
         """
-        if block.xmodule_runtime is not None:
-            return block.xmodule_runtime.local_resource_url(block, uri)
-        else:
-            # Currently, Modulestore is responsible for instantiating DescriptorSystems
-            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
-            # that implements the correct local_resource_url. So, for now, instead, we will reference a
-            # global function that the application can override.
-            return descriptor_global_local_resource_url(block, uri)
+        # Currently, Modulestore is responsible for instantiating DescriptorSystems
+        # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
+        # that implements the correct local_resource_url. So, for now, instead, we will reference a
+        # global function that the application can override.
+        return descriptor_global_local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
         """
@@ -1323,17 +1301,14 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         """
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
-    def publish(self, block, event_type, event):
-        """
-        See :meth:`xblock.runtime.Runtime:publish` for documentation.
-        """
-        if block.xmodule_runtime is not None:
-            return block.xmodule_runtime.publish(block, event_type, event)
-
     def add_block_as_child_node(self, block, node):
         child = etree.SubElement(node, "unknown")
         child.set('url_name', block.url_name)
         block.add_xml_to_node(child)
+
+    def publish(self, block, event_type, event):
+        # A stub publish method that doesn't emit any events from XModuleDescriptors.
+        pass
 
 
 class XMLParsingSystem(DescriptorSystem):
@@ -1585,9 +1560,6 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         """provide uniform access to attributes (like etree)"""
         self.__dict__[attr] = val
 
-    def __repr__(self):
-        return repr(self.__dict__)
-
     def __str__(self):
         return str(self.__dict__)
 
@@ -1609,11 +1581,15 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         pass
 
 
-class PureSystem(ModuleSystem, DescriptorSystem):
+class CombinedSystem(object):
     """
-    A subclass of both ModuleSystem and DescriptorSystem to provide pure (non-XModule) XBlocks
-    a single Runtime interface for both the ModuleSystem and DescriptorSystem, when available.
+    This class is a shim to allow both pure XBlocks and XModuleDescriptors
+    that have been bound as XModules to access both the attributes of ModuleSystem
+    and of DescriptorSystem as a single runtime.
     """
+
+    __slots__ = ('_module_system', '_descriptor_system')
+
     # This system doesn't override a number of methods that are provided by ModuleSystem and DescriptorSystem,
     # namely handler_url, local_resource_url, query, and resource_url.
     #
@@ -1621,11 +1597,73 @@ class PureSystem(ModuleSystem, DescriptorSystem):
     #
     # pylint: disable=abstract-method
     def __init__(self, module_system, descriptor_system):
-        # N.B. This doesn't call super(PureSystem, self).__init__, because it is only inheriting from
-        # ModuleSystem and DescriptorSystem to pass isinstance checks.
-        # pylint: disable=super-init-not-called
+        # These attributes are set directly to __dict__ below to avoid a recursion in getattr/setattr.
         self._module_system = module_system
         self._descriptor_system = descriptor_system
+
+    def _get_student_block(self, block):
+        """
+        If block is an XModuleDescriptor that has been bound to a student, return
+        the corresponding XModule, instead of the XModuleDescriptor.
+
+        Otherwise, return block.
+        """
+        if isinstance(block, XModuleDescriptor) and block.xmodule_runtime:
+            return block._xmodule  # pylint: disable=protected-access
+        else:
+            return block
+
+    def render(self, block, view_name, context=None):
+        """
+        Render a block by invoking its view.
+
+        Finds the view named `view_name` on `block`.  The default view will be
+        used if a specific view hasn't be registered.  If there is no default
+        view, an exception will be raised.
+
+        The view is invoked, passing it `context`.  The value returned by the
+        view is returned, with possible modifications by the runtime to
+        integrate it into a larger whole.
+
+        """
+        if view_name in PREVIEW_VIEWS:
+            block = self._get_student_block(block)
+
+        return self.__getattr__('render')(block, view_name, context)
+
+    def service(self, block, service_name):
+        """Return a service, or None.
+
+        Services are objects implementing arbitrary other interfaces.  They are
+        requested by agreed-upon names, see [XXX TODO] for a list of possible
+        services.  The object returned depends on the service requested.
+
+        XBlocks must announce their intention to request services with the
+        `XBlock.needs` or `XBlock.wants` decorators.  Use `needs` if you assume
+        that the service is available, or `wants` if your code is flexible and
+        can accept a None from this method.
+
+        Runtimes can override this method if they have different techniques for
+        finding and delivering services.
+
+        Arguments:
+            block (an XBlock): this block's class will be examined for service
+                decorators.
+            service_name (string): the name of the service requested.
+
+        Returns:
+            An object implementing the requested service, or None.
+
+        """
+        service = None
+
+        if self._module_system:
+            service = self._module_system.service(block, service_name)
+
+        if service is None:
+            service = self._descriptor_system.service(block, service_name)
+
+        return service
 
     def __getattr__(self, name):
         """
@@ -1637,6 +1675,30 @@ class PureSystem(ModuleSystem, DescriptorSystem):
             return getattr(self._module_system, name)
         except AttributeError:
             return getattr(self._descriptor_system, name)
+
+    def __setattr__(self, name, value):
+        """
+        If the ModuleSystem is set, set the attr on it.
+        Always set the attr on the DescriptorSystem.
+        """
+        if name in self.__slots__:
+            return super(CombinedSystem, self).__setattr__(name, value)
+
+        if self._module_system:
+            setattr(self._module_system, name, value)
+        setattr(self._descriptor_system, name, value)
+
+    def __delattr__(self, name):
+        """
+        If the ModuleSystem is set, delete the attribute from it.
+        Always delete the attribute from the DescriptorSystem.
+        """
+        if self._module_system:
+            delattr(self._module_system, name)
+        delattr(self._descriptor_system, name)
+
+    def __repr__(self):
+        return "CombinedSystem({!r}, {!r})".format(self._module_system, self._descriptor_system)
 
 
 class DoNothingCache(object):
