@@ -23,9 +23,10 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.tests.factories import UserFactory, AdminFactory
 from courseware.tests.factories import StaffFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from progress.models import CourseModuleCompletion
+from progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
 from courseware.model_data import FieldDataCache
 from courseware import module_render
+from util.signals import course_deleted
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(STUDENT_GRADEBOOK=True)
@@ -271,3 +272,22 @@ class CourseModuleCompletionTests(TestCase):
                 course_id=self.course.id,
                 content_id=self.problem4.location
             )
+
+    def test_receiver_on_course_deleted(self):
+        self._create_course(start=datetime(2010, 1, 1, tzinfo=UTC()), end=datetime(2020, 1, 1, tzinfo=UTC()))
+        module = self.get_module_for_user(self.user, self.course, self.problem)
+        module.system.publish(module, 'progress', {})
+
+        progress = StudentProgress.objects.all()
+        self.assertEqual(len(progress), 1)
+
+        history = StudentProgressHistory.objects.all()
+        self.assertEqual(len(history), 1)
+
+        course_deleted.send(sender=None, course_key=self.course.id)
+
+        progress = StudentProgress.objects.all()
+        self.assertEqual(len(progress), 0)
+
+        history = StudentProgressHistory.objects.all()
+        self.assertEqual(len(history), 0)
