@@ -1,6 +1,6 @@
 <div class="wrapper-note-excerpts">
     <% if (message) { %>
-        <div class="note-excerpt" role="region" aria-label="Highlighted text">
+        <div class="note-excerpt" role="region" aria-label="<%- gettext('Highlighted text') %>">
             <p class="note-excerpt-p"><%= message %>
                 <% if (show_link) { %>
                     <% if (is_expanded) { %>
@@ -13,14 +13,14 @@
         </div>
     <% } %>
     <% if (text) { %>
-        <ol class="note-comments" role="region" aria-label="Your notes and comments">
+        <ol class="note-comments" role="region" aria-label="<%- gettext('Your notes and comments') %>">
             <li class="note-comment">
                 <p class="note-comment-p"><%= text %></p>
             </li>
         </ol>
     <% } %>
 </div>
-<footer class="reference" role="complementary" aria-label="References">
+<footer class="reference" role="complementary" aria-label="<%- gettext('References') %>">
     <div class="wrapper-reference-content">
         <% if (text && quote) { %>
             <h3 class="reference-title"><%- gettext("Highlighted & Noted in:") %></h3>
