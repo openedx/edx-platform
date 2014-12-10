@@ -19,7 +19,7 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
-from user_api.models import UserOrgTag
+from openedx.core.djangoapps.user_api.models import UserOrgTag
 
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
