@@ -97,6 +97,11 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
     def test_segmentio_ignore_actions(self, action):
         self.post_segmentio_event(action=action)
 
+    @data('edx.bi.some_name', 'EDX.BI.CAPITAL_NAME')
+    @expect_failure_with_message(segmentio.WARNING_IGNORED_TYPE)
+    def test_segmentio_ignore_names(self, name):
+        self.post_segmentio_event(name=name)
+
     def post_segmentio_event(self, **kwargs):
         """Post a fake segment.io event to the view that processes it"""
         request = self.create_request(
@@ -114,6 +119,9 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             "properties": {
                 'name': kwargs.get('name', str(sentinel.name)),
                 'data': kwargs.get('data', {}),
+                'context': {
+                    'course_id': kwargs.get('course_id') or '',
+                }
             },
             "channel": 'server',
             "context": {
@@ -122,7 +130,6 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                     "version": "unknown"
                 },
                 'userAgent': str(sentinel.user_agent),
-                'course_id': kwargs.get('course_id') or '',
             },
             "receivedAt": "2014-08-27T16:33:39.100Z",
             "timestamp": "2014-08-27T16:33:39.215Z",
@@ -139,10 +146,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         }
 
         if 'context' in kwargs:
-            sample_event['context'].update(kwargs['context'])
-
-        if 'open_in_browser_url' in kwargs:
-            sample_event['context']['open_in_browser_url'] = kwargs['open_in_browser_url']
+            sample_event['properties']['context'].update(kwargs['context'])
 
         return sample_event
 
@@ -305,8 +309,8 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             data=self.create_segmentio_event_json(
                 name=name,
                 data=input_payload,
-                open_in_browser_url='https://testserver/courses/foo/bar/baz/courseware/Week_1/Activity/2',
                 context={
+                    'open_in_browser_url': 'https://testserver/courses/foo/bar/baz/courseware/Week_1/Activity/2',
                     'course_id': course_id,
                     'application': {
                         'name': 'edx.mobileapp.android',
@@ -344,11 +348,11 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                             'name': 'test-app',
                             'version': 'unknown'
                         },
-                        'application': {
-                            'name': 'edx.mobileapp.android',
-                            'version': '29',
-                            'component': 'videoplayer'
-                        }
+                    },
+                    'application': {
+                        'name': 'edx.mobileapp.android',
+                        'version': '29',
+                        'component': 'videoplayer'
                     },
                     'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
                 },
