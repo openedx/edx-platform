@@ -79,7 +79,7 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
             // We are destroying the instance that has the popup visible, revert to default,
             // unfreeze all instances and set their isFrozen to false
             if (this === Annotator.frozenSrc) {
-                _.invoke(Annotator._instances, 'unfreeze');
+                this.unfreezeAll();
             } else {
                 // Unfreeze only this instance and unbound associated 'click.edxnotes:freeze' handler
                 $(document).off('click.edxnotes:freeze' + this.uid);
@@ -89,6 +89,8 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
             if (this.logger && this.logger.destroy) {
                 this.logger.destroy();
             }
+            // Unbind onNoteClick from click
+            this.viewer.element.off('click', this.onNoteClick);
         }
     );
 
@@ -112,6 +114,17 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
         '</li>'
     ].join('');
 
+    /**
+     * Modifies Annotator._setupViewer to add a "click" event on viewer.
+     **/
+    Annotator.prototype._setupViewer = _.compose(
+        function () {
+            this.viewer.element.on('click', _.bind(this.onNoteClick, this));
+            return this;
+        },
+        Annotator.prototype._setupViewer
+    );
+
     $.extend(true, Annotator.prototype, {
         events: {
             '.annotator-hl click': 'onHighlightClick',
@@ -129,7 +142,7 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                 this.onHighlightMouseover.call(this, event);
             }
             Annotator.frozenSrc = this;
-            _.invoke(Annotator._instances, 'freeze');
+            this.freezeAll();
         },
 
         onNoteClick: function (event) {
@@ -137,7 +150,7 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
             Annotator.Util.preventEventDefault(event);
             if (!$(event.target).is('.annotator-delete')) {
                 Annotator.frozenSrc = this;
-                _.invoke(Annotator._instances, 'freeze');
+                this.freezeAll();
             }
         },
 
@@ -147,7 +160,7 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                 this.removeEvents();
                 this.viewer.element.unbind('mouseover mouseout');
                 this.uid = _.uniqueId();
-                $(document).on('click.edxnotes:freeze'+this.uid, this.unfreeze.bind(this));
+                $(document).on('click.edxnotes:freeze' + this.uid, _.bind(this.unfreeze, this));
                 this.isFrozen = true;
             }
         },
@@ -165,6 +178,19 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                 this.isFrozen = false;
                 Annotator.frozenSrc = null;
             }
+        },
+
+        freezeAll: function () {
+            _.invoke(Annotator._instances, 'freeze');
+        },
+
+        unfreezeAll: function () {
+            _.invoke(Annotator._instances, 'unfreeze');
+        },
+
+        showFrozenViewer: function (annotations, location) {
+            this.showViewer(annotations, location);
+            this.freezeAll();
         }
     });
 });
