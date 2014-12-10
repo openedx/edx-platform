@@ -23,16 +23,6 @@ function (gettext, _, Backbone) {
 
             this.template = _.template(templateText);
             this.$el.attr('id', this.model.get('identifier'));
-            this.bindEvents();
-        },
-
-        render: function () {
-            var html = this.template(this.model.toJSON());
-            this.$el.html(html);
-            return this;
-        },
-
-        bindEvents: function () {
             this.listenTo(this.model, {
                 'change:is_active': function (model, value) {
                     this.$el.toggleClass(this.activeClassName, value);
@@ -41,24 +31,22 @@ function (gettext, _, Backbone) {
             });
         },
 
+        render: function () {
+            var html = this.template(this.model.toJSON());
+            this.$el.html(html);
+            return this;
+        },
+
         selectHandler: function (event) {
             event.preventDefault();
             if (!this.model.isActive()) {
-                this.select();
+                this.model.activate();
             }
         },
 
         closeHandler: function (event) {
             event.preventDefault();
             event.stopPropagation();
-            this.close();
-        },
-
-        select: function () {
-            this.model.activate();
-        },
-
-        close: function () {
             this.model.destroy();
         }
     });
