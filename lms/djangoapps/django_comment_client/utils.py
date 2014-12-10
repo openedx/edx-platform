@@ -1,6 +1,7 @@
 import json
 import pytz
 from collections import defaultdict
+from collections import OrderedDict
 import logging
 from datetime import datetime
 
@@ -59,8 +60,8 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def _get_discussion_modules(course):
-    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+def _get_discussion_modules(course, sort=None):
+    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'}, chronological=sort)
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
@@ -135,9 +136,9 @@ def _sort_map_entries(category_map, sort_alpha):
 def get_discussion_category_map(course):
     course_id = course.id
 
-    unexpanded_category_map = defaultdict(list)
+    unexpanded_category_map = OrderedDict()
 
-    modules = _get_discussion_modules(course)
+    modules = _get_discussion_modules(course, not course.discussion_sort_alpha)
 
     is_course_cohorted = course.is_cohorted
     cohorted_discussion_ids = course.cohorted_discussions
@@ -149,9 +150,9 @@ def get_discussion_category_map(course):
         category = " / ".join([x.strip() for x in module.discussion_category.split("/")])
         #Handle case where module.start is None
         entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
-        unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
+        unexpanded_category_map.setdefault(category, []).append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
 
-    category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
+    category_map = {"entries": OrderedDict(), "subcategories": OrderedDict()}
     for category_path, entries in unexpanded_category_map.items():
         node = category_map["subcategories"]
         path = [x.strip() for x in category_path.split("/")]
@@ -164,8 +165,8 @@ def get_discussion_category_map(course):
 
         for level in path[:-1]:
             if level not in node:
-                node[level] = {"subcategories": defaultdict(dict),
-                               "entries": defaultdict(dict),
+                node[level] = {"subcategories": OrderedDict(),
+                               "entries": OrderedDict(),
                                "sort_key": level,
                                "start_date": category_start_date}
             else:
@@ -175,8 +176,8 @@ def get_discussion_category_map(course):
 
         level = path[-1]
         if level not in node:
-            node[level] = {"subcategories": defaultdict(dict),
-                           "entries": defaultdict(dict),
+            node[level] = {"subcategories": OrderedDict(),
+                           "entries": OrderedDict(),
                            "sort_key": level,
                            "start_date": category_start_date}
         else:
