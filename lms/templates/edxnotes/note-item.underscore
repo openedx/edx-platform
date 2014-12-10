@@ -1,26 +1,26 @@
 <div class="wrapper-note-excerpts">
     <% if (message) { %>
-        <div class="note-excerpt">
-        <p class="note-excerpt-p"><%= message %>
-        <% if (show_link) { %>
-            <% if (is_expanded) { %>
-                <a href="#" class="note-excerpt-more-link"><%- gettext('(Show less)') %></a>
-            <% } else { %>
-                <a href="#" class="note-excerpt-more-link"><%- gettext('More') %></a>
-            <% } %>
-        <% } %>
-        </p>
+        <div class="note-excerpt" role="region" aria-label="Highlighted text">
+            <p class="note-excerpt-p"><%= message %>
+                <% if (show_link) { %>
+                    <% if (is_expanded) { %>
+                        <a href="#" class="note-excerpt-more-link"><%- gettext('(Show less)') %></a>
+                    <% } else { %>
+                        <a href="#" class="note-excerpt-more-link"><%- gettext('More') %></a>
+                    <% } %>
+                <% } %>
+            </p>
         </div>
     <% } %>
     <% if (text) { %>
-        <ol class="note-comments">
+        <ol class="note-comments" role="region" aria-label="Your notes and comments">
             <li class="note-comment">
                 <p class="note-comment-p"><%= text %></p>
             </li>
         </ol>
     <% } %>
 </div>
-<aside class="reference" role="complementary">
+<footer class="reference" role="complementary" aria-label="References">
     <div class="wrapper-reference-content">
         <% if (text && quote) { %>
             <h3 class="reference-title"><%- gettext("Highlighted & Noted in:") %></h3>
@@ -33,4 +33,4 @@
         <h3 class="reference-title"><%- gettext("Last Edited:") %></h3>
         <span class="reference-meta reference-updated-date"><%- updated %></span>
     </div>
-</aside>
+</footer>
