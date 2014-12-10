@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
 
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.search import path_to_location, NoPathToItem
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from util.date_utils import get_default_time_display
 from dateutil.parser import parse as dateutil_parse
@@ -124,7 +124,10 @@ def preprocess_collection(user, course, collection):
             if not has_access(user, "load", item, course_key=course.id):
                 continue
 
-            (course_key, chapter, section, position) = path_to_location(store, usage_key, False)
+            try:
+                (course_key, chapter, section, position) = path_to_location(store, usage_key, False)
+            except (NoPathToItem, ValueError):
+                continue
 
             chapter = store.get_item(chapter)
             chapter_dict = get_ancestor_context(course, store, course, chapter)
@@ -142,7 +145,6 @@ def preprocess_collection(user, course, collection):
                 u"chapter": chapter_dict,
                 u"section": section_dict,
                 u"updated": dateutil_parse(model["updated"]),
-                u"position": position,
             })
             filtered_collection.append(model)
 
@@ -168,7 +170,7 @@ def search(user, course, query_string):
     return json.dumps(content, cls=NoteJSONEncoder)
 
 
-def get_notes(user, course, toc):
+def get_notes(user, course):
     """
     Returns all notes for the user.
     """
@@ -181,12 +183,7 @@ def get_notes(user, course, toc):
     if not collection:
         return None
 
-    content = {
-        "structure": json.dumps(toc),
-        "collection": json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder),
-    }
-
-    return content
+    return json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder)
 
 
 def get_ancestor(store, usage_key):
@@ -203,6 +200,7 @@ def get_ancestor(store, usage_key):
         log.warning("Parent module not found: %s", location)
         return
 
+
 def get_ancestor_context(course, store, ancestor, item):
     """
     Returns dispay_name and url for the parent module.
@@ -212,10 +210,10 @@ def get_ancestor_context(course, store, ancestor, item):
         'location': item.location.to_deprecated_string(),
         'children': [child.to_deprecated_string() for child in item.children],
         'display_name': item.display_name_with_default,
-        'url':  reverse("jump_to", kwargs={
-                    "course_id": course.id.to_deprecated_string(),
-                    "location": item.location.to_deprecated_string(),
-                })
+        'url': reverse("jump_to", kwargs={
+            "course_id": course.id.to_deprecated_string(),
+            "location": item.location.to_deprecated_string(),
+        })
     }
     item_dict['index'] = ancestor_children.index(item_dict['location'])
     return item_dict
