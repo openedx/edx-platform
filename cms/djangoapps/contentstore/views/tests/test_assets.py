@@ -165,8 +165,6 @@ class PaginationTestCase(AssetsTestCase):
                     self.assertIn(extension, requested_file_types)
 
 
-
-
 @ddt
 class UploadTestCase(AssetsTestCase):
     """

@@ -146,7 +146,7 @@ def _assets_json(request, course_key):
     # If the query is beyond the final page, then re-query the final page so
     # that at least one asset is returned
     if requested_page > 0 and start >= total_count:
-        options['current_page'] = current_page= int(math.floor((total_count - 1) / requested_page_size))
+        options['current_page'] = current_page = int(math.floor((total_count - 1) / requested_page_size))
         start = current_page * requested_page_size
         assets, total_count = _get_assets_for_page(request, course_key, options)
         end = start + len(assets)
