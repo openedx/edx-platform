@@ -81,7 +81,56 @@
     }
   }
 
+  function setup_management_form() {
+
+    $(".member-lists-management form").on("submit", function (event) {
+      var target, action;
+      target = $(event.target);
+      if (target.serialize().indexOf('student-action') < 0) {
+        action = $('<input />', {
+          type: 'hidden',
+          name: 'student-action',
+          value: 'add'
+        });
+        target.append(action);
+      }
+    });
+
+    $(".member-lists-management form .add, .member-lists-management form .revoke").on("click", function(event) {
+        var target, form, action, studentId, selectedStudent;
+        event.preventDefault();
+        target = $(event.target);
+        form = target.parents('form').first();
+        if (target.hasClass('add')) {
+          // adding a new student, add the student-action input and submit
+          action = $('<input />', {
+            type: 'hidden',
+            name: 'student-action',
+            // this is untenable, tied to a translated value.  Fix it.
+            value: 'add'
+          });
+          form.append(action).submit();
+        } else if (target.hasClass('revoke')) {
+          // revoking access for a student, get set form values and submit
+          // get the email address of the student, since they might not be 'enrolled' yet.
+          selectedStudent = target.parent('td').siblings().last().text();
+          action = $('<input />', {
+            type: 'hidden',
+            name: 'student-action',
+            value: 'revoke'
+          });
+          studentId = $('<input />', {
+            type: 'hidden',
+            name: 'student-id',
+            value: selectedStudent
+          });
+          form.append(action, studentId).submit();
+        }
+    });
+  }
+
   $(setup_tabs);
+  $(setup_management_form)
 
 
 </script>

@@ -185,6 +185,8 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(str(course_start)[:-9], u'2014-11-20 00:00')
 
     def test_enroll_member_student(self):
+        """enroll a list of students who are members of the class
+        """
         self.make_coach()
         poc = self.make_poc()
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
@@ -213,6 +215,8 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def test_unenroll_member_student(self):
+        """unenroll a list of students who are members of the class
+        """
         self.make_coach()
         poc = self.make_poc()
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
@@ -243,6 +247,8 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def test_enroll_non_user_student(self):
+        """enroll a list of students who are not users yet
+        """
         test_email = "nobody@nowhere.com"
         self.make_coach()
         poc = self.make_poc()
@@ -271,6 +277,8 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def test_unenroll_non_user_student(self):
+        """unenroll a list of students who are not users yet
+        """
         test_email = "nobody@nowhere.com"
         self.make_coach()
         poc = self.make_poc()
@@ -299,7 +307,70 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ).exists()
         )
 
+    def test_manage_add_single_student(self):
+        """enroll a single student who is a member of the class already
+        """
+        self.make_coach()
+        poc = self.make_poc()
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id)
+        student = enrollment.user
+        # no emails have been sent so far
+        outbox = self.get_outbox()
+        self.assertEqual(len(outbox), 0)
+
+        url = reverse(
+            'poc_manage_student',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'student-action': 'add',
+            'student-id': u','.join([student.email, ]),
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # we were redirected to our current location
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertEqual(len(outbox), 0)
+        # a PocMembership exists for this student
+        self.assertTrue(
+            PocMembership.objects.filter(poc=poc, student=student).exists()
+        )
+
+    def test_manage_remove_single_student(self):
+        """unenroll a single student who is a member of the class already
+        """
+        self.make_coach()
+        poc = self.make_poc()
+        enrollment = CourseEnrollmentFactory(course_id=self.course.id)
+        student = enrollment.user
+        PocMembershipFactory(poc=poc, student=student)
+        # no emails have been sent so far
+        outbox = self.get_outbox()
+        self.assertEqual(len(outbox), 0)
+
+        url = reverse(
+            'poc_manage_student',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'student-action': 'revoke',
+            'student-id': u','.join([student.email, ]),
+        }
+        response = self.client.post(url, data=data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # we were redirected to our current location
+        self.assertEqual(len(response.redirect_chain), 1)
+        self.assertTrue(302 in response.redirect_chain[0])
+        self.assertEqual(len(outbox), 0)
+        # a PocMembership exists for this student
+        self.assertFalse(
+            PocMembership.objects.filter(poc=poc, student=student).exists()
+        )
+
+
 USER_COUNT = 2
+
 
 class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """

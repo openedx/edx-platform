@@ -46,6 +46,8 @@
 </div>
 
 <div class="member-lists-management" style="float:left;width:50%">
+  <form method="POST" action="poc_manage_student">
+  <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <div class="auth-list-container active">
     <div class="member-list-widget">
       <div class="member-list">
@@ -70,9 +72,10 @@
         </table>
       </div>
       <div class="bottom-bar">
-        <input name="add-field" class="add-field" placeholder="Enter username or email" type="text">
-        <input name="add" class="add" value="Add Student" type="button">
+        <input name="student-id" class="add-field" placeholder="Enter username or email" type="text">
+        <input name="student-action" class="add" value="Add Student" type="button">
       </div>
     </div>
   </div>
+  </form>
 </div> 

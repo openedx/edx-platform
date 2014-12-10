@@ -253,6 +253,37 @@ def poc_invite(request, course):
     return redirect(url)
 
 
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
+def poc_student_management(request, course):
+    """Manage the enrollment of individual students in a POC
+    """
+    poc = get_poc_for_coach(course, request.user)
+    action = request.POST.get('student-action', None)
+    student_id = request.POST.get('student-id', '')
+    user = email = None
+    try:
+        user = get_student_from_identifier(student_id)
+    except User.DoesNotExist:
+        email = student_id
+    else:
+        email = user.email
+
+    try:
+        validate_email(email)
+        if action == 'add':
+            # by decree, no emails sent to students added this way
+            enroll_email(poc, email, email_students=False)
+        elif action == 'revoke':
+            unenroll_email(poc, email, email_students=False)
+    except ValidationError:
+        pass  # XXX: log, report?
+
+    url = reverse('poc_coach_dashboard', kwargs={'course_id': course.id})
+    return redirect(url)
+
+
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def poc_gradebook(request, course):
@@ -324,4 +355,3 @@ def poc_grades_csv(request, course):
         writer.writerow(row)
 
     return HttpResponse(buffer.getvalue(), content_type='text/csv')
-
