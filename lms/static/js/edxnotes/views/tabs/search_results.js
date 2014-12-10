@@ -24,7 +24,7 @@ define([
                         element: 'span',
                         className: 'note-highlight',
                         caseSensitive: false,
-                        wordsOnly: true
+                        wordsOnly: false
                     });
                 }
                 return this;
