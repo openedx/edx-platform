@@ -1,6 +1,7 @@
 import factory
 from factory.django import DjangoModelFactory
 from certificates.models import CertificateWhitelist, GeneratedCertificate
+from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from datetime import datetime
 from pytz import UTC
@@ -10,7 +11,7 @@ class CertificateWhitelistFactory(DjangoModelFactory):
     FACTORY_FOR = CertificateWhitelist
 
     user = factory.SubFactory(UserFactory)
-    course_id = "org/num/run"
+    course_id = CourseLocator.from_string("org/num/run")
     whitelist = True
 
 
@@ -18,7 +19,7 @@ class GeneratedCertificateFactory(DjangoModelFactory):
     FACTORY_FOR = GeneratedCertificate
 
     user = factory.SubFactory(UserFactory)
-    course_id = "org/num/run"
+    course_id = CourseLocator.from_string("org/num/run")
     verify_uuid = ''
     download_uuid = ''
     download_url = "http://example.com/"

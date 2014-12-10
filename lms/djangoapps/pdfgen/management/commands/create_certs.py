@@ -1,17 +1,19 @@
 """Django management command to force certificate generation"""
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseLocator
 from pdfgen.certificate import CertificatePDF
-from xmodule.modulestore import Location
 #from resource import setrlimit, RLIMIT_NOFILE
 
 
 def check_course_id(course_id):
     """Check course_id."""
-    match = Location.COURSE_ID_RE.match(course_id)
-    if match is None:
+    try:
+        CourseLocator.from_string(course_id)
+    except InvalidKeyError:
         raise CommandError(
-            "{} is not of form ORG/COURSE/NAME".format(course_id)
+            "'{}' is an invalid course_id".format(course_id)
         )
 
 
@@ -70,6 +72,7 @@ class Command(BaseCommand):
         #setrlimit(RLIMIT_NOFILE, (fd, fd))
         operation, course_id = args
         check_course_id(course_id)
+        course_id = CourseLocator.from_string(course_id)
         certpdf = CertificatePDF(user, course_id, debug, noop, prefix, exclude)
 
         if operation == "create":

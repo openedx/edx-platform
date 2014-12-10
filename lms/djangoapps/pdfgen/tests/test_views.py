@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.conf import settings
 from django.test.utils import override_settings
 from mock import Mock, patch, ANY, create_autospec, mock_open
+from opaque_keys.edx.locator import CourseLocator
 from pdfgen.views import (CertificateBase, CertificateHonor, CertStoreBase,
                           CertS3Store, create_cert_pdf, delete_cert_pdf, CertPDF,
                           PDFBaseNotFound, PDFBaseIsNotPDF, PDFBaseIsNotImage,
@@ -45,7 +46,7 @@ class CertificateHonorTestCase(TestCase):
     def setUp(self):
         self.username = "username"
         self.display_name = "display_name"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.course_name = "course_name"
         self.file_prefix = "prefix-"
         self.grade = 1
@@ -136,7 +137,7 @@ class CertPDFTestCase(TestCase):
     def setUp(self):
         self.fp = StringIO.StringIO()
         self.username = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.course_name = "testcoursename"
         self.file_prefix = "prefix-"
 
@@ -273,7 +274,7 @@ class CertS3StoreSuccesses(TestCase):
 
     def setUp(self):
         self.username = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.filepath = "/file/is/not/exists"
         self.bucket_name = settings.PDFGEN_BUCKET_NAME
 
@@ -325,7 +326,7 @@ class CertS3StoreSuccesses(TestCase):
 class CertS3StoreErrors(TestCase):
     def setUp(self):
         self.username = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.filepath = "/file/is/not/exists"
         self.bucket_name = settings.PDFGEN_BUCKET_NAME
         self.location = Location.APNortheast
@@ -380,7 +381,7 @@ class MethodTestCase(TestCase):
     def setUp(self):
         self.display_name = "testusername"
         self.username = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.course_name = "testcoursename"
         self.grade = 1
         self.key = hashlib.md5()

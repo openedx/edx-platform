@@ -165,7 +165,7 @@ class CertificatePDF(object):
                 if not self.noop:
                     cert.save()
             else:
-                key = self._make_hashkey(self.course_id + student.username)
+                key = self._make_hashkey(self.course_id.to_deprecated_string() + student.username)
                 cert.key = key
 
                 if not self.noop:
@@ -272,7 +272,7 @@ class CertificatePDF(object):
             if self.file_prefix:
                 base_dir = settings.PDFGEN_BASE_PDF_DIR
                 include_file = base_dir + "/" + self.file_prefix + "-".join(
-                    self.course_id.split('/')) + ".list"
+                    self.course_id.to_deprecated_string().split('/')) + ".list"
 
                 include_list = self._get_students_list(include_file)
                 students = active_students.filter(

@@ -6,6 +6,7 @@ from django.test.utils import override_settings
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from pdfgen.management.commands import create_certs as cc
 from pdfgen.tests.factories import GeneratedCertificateFactory
@@ -28,7 +29,6 @@ class GenerateCertCommandTestCase(TestCase):
         self.args_report = ["report", "org/num/run"]
         self.args_publish = ["publish", "org/num/run"]
         self.args_invalid_operation = ["invalid", "org/num/run"]
-        self.args_invalid_course_id = ["create", "invalid"]
 
         self.kwargs = {
             "noop": False, "username": "testuser",
@@ -54,7 +54,7 @@ class GenerateCertCommandTestCase(TestCase):
 
         check_mock.assert_called_with(self.args_create[1])
         self.cert_mock.assert_called_with(
-            self.kwargs['username'], self.args_create[1], self.kwargs['debug'],
+            self.kwargs['username'], CourseLocator.from_string(self.args_create[1]), self.kwargs['debug'],
             self.kwargs['noop'], self.kwargs['prefix'], self.kwargs['exclude'])
         self.cert_mock().create.assert_called_with()
 
@@ -64,7 +64,7 @@ class GenerateCertCommandTestCase(TestCase):
 
         check_mock.assert_called_with(self.args_delete[1])
         self.cert_mock.assert_called_with(
-            self.kwargs['username'], self.args_delete[1], self.kwargs['debug'],
+            self.kwargs['username'], CourseLocator.from_string(self.args_delete[1]), self.kwargs['debug'],
             self.kwargs['noop'], self.kwargs['prefix'], self.kwargs['exclude'])
         self.cert_mock().delete.assert_called_with()
 
@@ -74,7 +74,7 @@ class GenerateCertCommandTestCase(TestCase):
 
         check_mock.assert_called_with(self.args_report[1])
         self.cert_mock.assert_called_with(
-            self.kwargs['username'], self.args_report[1], self.kwargs['debug'],
+            self.kwargs['username'], CourseLocator.from_string(self.args_report[1]), self.kwargs['debug'],
             self.kwargs['noop'], self.kwargs['prefix'], self.kwargs['exclude'])
         self.cert_mock().report.assert_called_with()
 
@@ -84,7 +84,7 @@ class GenerateCertCommandTestCase(TestCase):
 
         check_mock.assert_called_with(self.args_publish[1])
         self.cert_mock.assert_called_with(
-            self.kwargs['username'], self.args_publish[1], self.kwargs['debug'],
+            self.kwargs['username'], CourseLocator.from_string(self.args_publish[1]), self.kwargs['debug'],
             self.kwargs['noop'], self.kwargs['prefix'], self.kwargs['exclude'])
         self.cert_mock().publish.assert_called_with()
 
@@ -119,7 +119,7 @@ class GenerateCertCommandTestCase(TestCase):
 
         self.assertEqual(
             e.exception.message,
-            "{} is not of form ORG/COURSE/NAME".format(self.invalid_course_id))
+            "'{}' is an invalid course_id".format(self.invalid_course_id))
 
 
 @override_settings(
@@ -146,10 +146,10 @@ class GenerateCertCommandIntegrationTestCase(TestCase):
         self.course.save()
 
         self.prog_name = "create_certs"
-        self.args_create = ["create", self.course.id]
-        self.args_delete = ["delete", self.course.id]
-        self.args_report = ["report", self.course.id]
-        self.args_publish = ["publish", self.course.id]
+        self.args_create = ["create", self.course.id.to_deprecated_string()]
+        self.args_delete = ["delete", self.course.id.to_deprecated_string()]
+        self.args_report = ["report", self.course.id.to_deprecated_string()]
+        self.args_publish = ["publish", self.course.id.to_deprecated_string()]
         self.kwargs = {
             "noop": False, "username": False,
             "debug": False, "prefix": "", "exclude": None}
@@ -168,7 +168,7 @@ class GenerateCertCommandIntegrationTestCase(TestCase):
         self.s3key_mock().generate_url.return_value = "http://example.com"
 
         self.pdf_path = settings.PDFGEN_BASE_PDF_DIR + "/" + self.kwargs['prefix'] + "-".join(
-            self.course.id.split('/')) + ".pdf"
+            self.course.id.to_deprecated_string().split('/')) + ".pdf"
         self.base_pdf = canvas.Canvas(self.pdf_path, pagesize=landscape(A4))
         self.base_pdf.showPage()
         self.base_pdf.save()
@@ -198,7 +198,7 @@ class GenerateCertCommandIntegrationTestCase(TestCase):
             query_auth=False, expires_in=0, force_http=True)
         self.s3key_mock().close.assert_any_call()
 
-        self.assertEqual(std_mock.getvalue(), '\nFetching course data for org/num/test_course.\nFetching enrollment for students(org/num/test_course).\nUser robot1: Grade 100% - Pass : Status generating\nUser robot2: Grade 100% - Pass : Status generating\nUser robot3: Grade 100% - Pass : Status generating\n')
+        self.assertEqual(std_mock.getvalue(), '\nFetching course data for org/num/run.\nFetching enrollment for students(org/num/run).\nUser robot1: Grade 100% - Pass : Status generating\nUser robot2: Grade 100% - Pass : Status generating\nUser robot3: Grade 100% - Pass : Status generating\n')
 
     def test_delete(self):
         cert = GeneratedCertificateFactory(
@@ -224,7 +224,7 @@ class GenerateCertCommandIntegrationTestCase(TestCase):
         with patch('sys.stdout', new_callable=StringIO) as std_mock:
             call_command(self.prog_name, *self.args_report, **self.kwargs)
 
-        self.assertEqual(std_mock.getvalue(), '\nFetching course data for org/num/test_course\nSummary Report: Course Name [test_course]\n  User Name [robot1] (Grade :0.0% - None)\n\n\nTotal: Users 3, Pass 0( No grade.)\n')
+        self.assertEqual(std_mock.getvalue(), '\nFetching course data for org/num/run\nSummary Report: Course Name [test_course]\n  User Name [robot1] (Grade :0.0% - None)\n\n\nTotal: Users 3, Pass 0( No grade.)\n')
 
     def test_publish(self):
         cert = GeneratedCertificateFactory(
@@ -233,4 +233,4 @@ class GenerateCertCommandIntegrationTestCase(TestCase):
         with patch('sys.stdout', new_callable=StringIO) as std_mock:
             call_command(self.prog_name, *self.args_publish, **self.kwargs)
 
-        self.assertEqual(std_mock.getvalue(), "\nFetching course data for org/num/test_course\nFetching enrollment for students(org/num/test_course).\nPublish robot1's certificate : Status downloadable\n")
+        self.assertEqual(std_mock.getvalue(), "\nFetching course data for org/num/run\nFetching enrollment for students(org/num/run).\nPublish robot1's certificate : Status downloadable\n")

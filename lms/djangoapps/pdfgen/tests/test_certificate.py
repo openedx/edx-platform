@@ -1,6 +1,7 @@
 from django.test import TestCase
 from mock import MagicMock, patch, ANY, mock_open
 from django.contrib.auth.models import User
+from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory, UserProfileFactory
 from pdfgen.tests.factories import GeneratedCertificateFactory
 from pdfgen.certificate import CertificatePDF, CertPDFException
@@ -15,7 +16,7 @@ import itertools
 class CertificatePDF_create_TestCase(TestCase):
     def setUp(self):
         self.user = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.debug = False
         self.noop = False
         self.student = UserFactory.create()
@@ -90,7 +91,7 @@ class CertificatePDF_create_TestCase(TestCase):
         profile_mock.assert_called_once_with(user=self.student)
         white_mock.assert_called_with(
             user=self.student, course_id=self.course_id, whitelist=True)
-        hash_mock.assert_called_once_with(self.course_id + self.student.username)
+        hash_mock.assert_called_once_with(self.course_id.to_deprecated_string() + self.student.username)
         cert_mock.assert_called_once_with(
             self.student.username, self.course_id, self.cert.key, self.cert.name,
             course_mock.display_name, self.grade['percent'], self.file_prefix)
@@ -230,7 +231,7 @@ class CertificatePDF_create_TestCase(TestCase):
         profile_mock.assert_called_once_with(user=self.student)
         white_mock.assert_called_with(
             user=self.student, course_id=self.course_id, whitelist=True)
-        hash_mock.assert_called_once_with(self.course_id + self.student.username)
+        hash_mock.assert_called_once_with(self.course_id.to_deprecated_string() + self.student.username)
         cert_mock.assert_called_once_with(
             self.student.username, self.course_id, self.cert.key, self.cert.name,
             course_mock.display_name, self.grade['percent'], self.file_prefix)
@@ -244,7 +245,7 @@ class CertificatePDF_delete_TestCase(TestCase):
 
     def setUp(self):
         self.user = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.debug = False
         self.noop = False
         self.file_prefix = ""
@@ -331,7 +332,7 @@ class CertificatePDF_report_TestCase(TestCase):
 
     def setUp(self):
         self.user = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.debug = False
         self.noop = False
         self.file_prefix = ""
@@ -434,7 +435,7 @@ class CertificatePDF_report_TestCase(TestCase):
 class CertificatePDF_publish_TestCase(TestCase):
     def setUp(self):
         self.user = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.debug = False
         self.noop = False
         self.file_prefix = ""
@@ -520,7 +521,7 @@ class CertificatePDF_publish_TestCase(TestCase):
 class CertificatePDF_other_TestCase(TestCase):
     def setUp(self):
         self.user = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.debug = False
         self.noop = False
         self.file_prefix = ""
@@ -558,7 +559,7 @@ class CertificatePDF_other_TestCase(TestCase):
 class CertificatePDF_get_students_TestCase(TestCase):
     def setUp(self):
         self.user = "testusername"
-        self.course_id = "org/num/run"
+        self.course_id = CourseLocator.from_string("org/num/run")
         self.debug = False
         self.noop = False
         self.file_prefix = ""
