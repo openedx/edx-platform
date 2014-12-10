@@ -124,15 +124,24 @@ def preprocess_collection(user, course, collection):
             if not has_access(user, "load", item, course_key=course.id):
                 continue
 
-            (course_key, chapter, section, position) = path_to_location(store, usage_key)
+            (course_key, chapter, section, position) = path_to_location(store, usage_key, False)
+
+            chapter = store.get_item(chapter)
+            chapter_dict = get_ancestor_context(course, store, course, chapter)
+
+            section = store.get_item(section)
+            section_dict = get_ancestor_context(course, store, chapter, section)
+
+            unit = get_ancestor(store, usage_key)
+            unit_dict = get_ancestor_context(course, store, section, unit)
 
             model.update({
                 u"text": markupsafe.escape(model["text"]),
                 u"quote": markupsafe.escape(model["quote"]),
-                u"unit": get_ancestor_context(course, store, usage_key),
+                u"unit": unit_dict,
+                u"chapter": chapter_dict,
+                u"section": section_dict,
                 u"updated": dateutil_parse(model["updated"]),
-                u"chapter": chapter,
-                u"section": section,
                 u"position": position,
             })
             filtered_collection.append(model)
@@ -194,29 +203,22 @@ def get_ancestor(store, usage_key):
         log.warning("Parent module not found: %s", location)
         return
 
-
-def get_ancestor_context(course, store, usage_key):
+def get_ancestor_context(course, store, ancestor, item):
     """
     Returns dispay_name and url for the parent module.
     """
-    parent = get_ancestor(store, usage_key)
-
-    if not parent:
-        return {
-            u"display_name": None,
-            u"url": None,
-        }
-
-    url = reverse("jump_to", kwargs={
-        "course_id": course.id.to_deprecated_string(),
-        "location": parent.location.to_deprecated_string(),
-    })
-
-    return {
-        u"display_name": parent.display_name_with_default,
-        u"url": url,
-        u"url_name": parent.url_name,
+    ancestor_children = [child.to_deprecated_string() for child in ancestor.children]
+    item_dict = {
+        'location': item.location.to_deprecated_string(),
+        'children': [child.to_deprecated_string() for child in item.children],
+        'display_name': item.display_name_with_default,
+        'url':  reverse("jump_to", kwargs={
+                    "course_id": course.id.to_deprecated_string(),
+                    "location": item.location.to_deprecated_string(),
+                })
     }
+    item_dict['index'] = ancestor_children.index(item_dict['location'])
+    return item_dict
 
 
 def get_endpoint(path=""):

@@ -1,7 +1,7 @@
 from .exceptions import (ItemNotFoundError, NoPathToItem)
 
 
-def path_to_location(modulestore, usage_key):
+def path_to_location(modulestore, usage_key, just_names=True):
     '''
     Try to find a course_id/chapter/section[/position] path to location in
     modulestore.  The courseware insists that the first level in the course is
@@ -79,8 +79,13 @@ def path_to_location(modulestore, usage_key):
         n = len(path)
         course_id = path[0].course_key
         # pull out the location names
-        chapter = path[1].name if n > 1 else None
-        section = path[2].name if n > 2 else None
+
+        chapter = path[1] if n > 1 else None
+        section = path[2] if n > 2 else None
+        if just_names:
+            chapter = chapter.name
+            section = section.name
+
         # Figure out the position
         position = None
 
