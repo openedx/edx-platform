@@ -17,6 +17,7 @@ from student.models import CourseEnrollment, UserProfile
 from courseware.models import CoursePreference
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from sneakpeek_deeplink.middleware import SneakPeekDeepLinkMiddleware
 
@@ -27,7 +28,7 @@ NO_SNEAKPEEK_PATHS = [
 ]
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class SneakPeekDeeplinkMiddlewareTests(TestCase):
+class SneakPeekDeeplinkMiddlewareTests(ModuleStoreTestCase):
     """
     Tests of Sneakpek deeplink middleware
     """

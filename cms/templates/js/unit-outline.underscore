@@ -1,5 +1,5 @@
 <% if (parentInfo) { %>
-    <li class="outline-item outline-<%= xblockType %> <%= visibilityClass %>"
+    <li class="outline-item outline-<%= xblockType %> <%= visibilityClass %> <%= xblockInfo.get('id') === currentUnitId ? 'is-current' : '' %>"
         data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
         <div class="<%= xblockType %>-header">
             <h3 class="<%= xblockType %>-header-details">

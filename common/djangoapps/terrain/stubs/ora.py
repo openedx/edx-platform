@@ -45,7 +45,7 @@ class StudentState(object):
 
     @property
     def num_pending(self):
-        return max(self.INITIAL_ESSAYS_AVAILABLE- self.num_graded, 0)
+        return max(self.INITIAL_ESSAYS_AVAILABLE - self.num_graded, 0)
 
     @property
     def num_required(self):
@@ -300,7 +300,6 @@ class StubOraHandler(StubHttpRequestHandler):
         """
         self._success_response({'problem_list': self.server.problem_list})
 
-
     @require_params('POST', 'grader_id', 'location', 'submission_id', 'score', 'feedback', 'submission_key')
     def _save_grade(self):
         """
@@ -420,7 +419,6 @@ class StubOraHandler(StubHttpRequestHandler):
                     "Grader payload should contain 'location' and 'problem_id' keys: {0}".format(payload)
                 )
                 self.send_response(400)
-
 
     def _student(self, method, key='student_id'):
         """

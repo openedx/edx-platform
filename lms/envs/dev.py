@@ -171,12 +171,12 @@ EDX_PLATFORM_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read()
 ############################ Open ended grading config  #####################
 
 OPEN_ENDED_GRADING_INTERFACE = {
-    'url' : 'http://127.0.0.1:3033/',
-    'username' : 'lms',
-    'password' : 'abcd',
-    'staff_grading' : 'staff_grading',
-    'peer_grading' : 'peer_grading',
-    'grading_controller' : 'grading_controller'
+    'url': 'http://127.0.0.1:3033/',
+    'username': 'lms',
+    'password': 'abcd',
+    'staff_grading': 'staff_grading',
+    'peer_grading': 'peer_grading',
+    'grading_controller': 'grading_controller'
 }
 
 ############################## LMS Migration ##################################
@@ -230,20 +230,20 @@ MIDDLEWARE_CLASSES += (
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
-   'debug_toolbar.panels.version.VersionDebugPanel',
-   'debug_toolbar.panels.timer.TimerDebugPanel',
-   'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-   'debug_toolbar.panels.headers.HeaderDebugPanel',
-   'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-   'debug_toolbar.panels.sql.SQLDebugPanel',
-   'debug_toolbar.panels.signals.SignalDebugPanel',
-   'debug_toolbar.panels.logger.LoggingPanel',
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
 
-#  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
-#  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
-#  hit twice). So you can uncomment when you need to diagnose performance
-#  problems, but you shouldn't leave it on.
-#  'debug_toolbar.panels.profiling.ProfilingDebugPanel',
+    # Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
+    # Django=1.3.1/1.4 where requests to views get duplicated (your method gets
+    # hit twice). So you can uncomment when you need to diagnose performance
+    # problems, but you shouldn't leave it on.
+    # 'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {
@@ -273,10 +273,6 @@ PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon
 
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
-
-ANALYTICS_DATA_URL = "http://127.0.0.1:8080"
-ANALYTICS_DATA_TOKEN = ""
-FEATURES['ENABLE_ANALYTICS_ACTIVE_COUNT'] = False
 
 ##### Segment.io  ######
 

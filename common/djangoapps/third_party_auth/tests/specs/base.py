@@ -142,7 +142,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             self.assertEqual('link' if linked else 'unlink', icon_state)
             self.assertEqual(self.PROVIDER_CLASS.NAME, provider_name)
 
-    def assert_exception_redirect_looks_correct(self, auth_entry=None):
+    def assert_exception_redirect_looks_correct(self, expected_uri, auth_entry=None):
         """Tests middleware conditional redirection.
 
         middleware.ExceptionMiddleware makes sure the user ends up in the right
@@ -157,13 +157,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assertEqual(302, response.status_code)
         self.assertIn('canceled', location)
         self.assertIn(self.backend_name, location)
-
-        if auth_entry:
-            # Custom redirection to form.
-            self.assertTrue(location.startswith('/' + auth_entry))
-        else:
-            # Stock framework redirection to root.
-            self.assertTrue(location.startswith('/?'))
+        self.assertTrue(location.startswith(expected_uri + '?'))
 
     def assert_first_party_auth_trumps_third_party_auth(self, email=None, password=None, success=None):
         """Asserts first party auth was used in place of third party auth.
@@ -220,7 +214,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
-        self.assertEqual(401, response.status_code)
+        self.assertEqual(403, response.status_code)
         self.assertIn("successfully logged into your %s account, but this account isn't linked" % self.PROVIDER_CLASS.NAME, response.content)
 
     def assert_json_failure_response_is_username_collision(self, response):
@@ -394,16 +388,35 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         """Gets a user by email, using the given strategy."""
         return strategy.storage.user.user_model().objects.get(email=email)
 
+    def assert_logged_in_cookie_redirect(self, response):
+        """Verify that the user was redirected in order to set the logged in cookie. """
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response["Location"],
+            pipeline.get_complete_url(self.PROVIDER_CLASS.BACKEND_CLASS.name)
+        )
+        self.assertEqual(response.cookies[django_settings.EDXMKTG_COOKIE_NAME].value, 'true')
+
+    def set_logged_in_cookie(self, request):
+        """Simulate setting the marketing site cookie on the request. """
+        request.COOKIES[django_settings.EDXMKTG_COOKIE_NAME] = 'true'
+
     # Actual tests, executed once per child.
 
     def test_canceling_authentication_redirects_to_login_when_auth_entry_login(self):
-        self.assert_exception_redirect_looks_correct(auth_entry=pipeline.AUTH_ENTRY_LOGIN)
+        self.assert_exception_redirect_looks_correct('/login', auth_entry=pipeline.AUTH_ENTRY_LOGIN)
 
     def test_canceling_authentication_redirects_to_register_when_auth_entry_register(self):
-        self.assert_exception_redirect_looks_correct(auth_entry=pipeline.AUTH_ENTRY_REGISTER)
+        self.assert_exception_redirect_looks_correct('/register', auth_entry=pipeline.AUTH_ENTRY_REGISTER)
+
+    def test_canceling_authentication_redirects_to_login_when_auth_login_2(self):
+        self.assert_exception_redirect_looks_correct('/account/login/', auth_entry=pipeline.AUTH_ENTRY_LOGIN_2)
+
+    def test_canceling_authentication_redirects_to_login_when_auth_register_2(self):
+        self.assert_exception_redirect_looks_correct('/account/register/', auth_entry=pipeline.AUTH_ENTRY_REGISTER_2)
 
     def test_canceling_authentication_redirects_to_root_when_auth_entry_not_set(self):
-        self.assert_exception_redirect_looks_correct()
+        self.assert_exception_redirect_looks_correct('/')
 
     def test_full_pipeline_succeeds_for_linking_account(self):
         # First, create, the request and strategy that store pipeline state,
@@ -430,6 +443,16 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.assert_dashboard_response_looks_correct(student_views.dashboard(request), request.user, linked=False)
         self.assert_social_auth_does_not_exist_for_user(request.user, strategy)
 
+        # We should be redirected back to the complete page, setting
+        # the "logged in" cookie for the marketing site.
+        self.assert_logged_in_cookie_redirect(actions.do_complete(
+            request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+            redirect_field_name=auth.REDIRECT_FIELD_NAME
+        ))
+
+        # Set the cookie and try again
+        self.set_logged_in_cookie(request)
+
         # Fire off the auth pipeline to link.
         self.assert_redirect_to_dashboard_looks_correct(actions.do_complete(
             request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
@@ -448,6 +471,9 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
         self.assert_social_auth_exists_for_user(user, strategy)
+
+        # We're already logged in, so simulate that the cookie is set correctly
+        self.set_logged_in_cookie(request)
 
         # Instrument the pipeline to get to the dashboard with the full
         # expected state.
@@ -561,6 +587,17 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # redirects to /auth/complete. In the browser ajax handlers will
         # redirect the user to the dashboard; we invoke it manually here.
         self.assert_json_success_response_looks_correct(student_views.login_user(strategy.request))
+
+        # We should be redirected back to the complete page, setting
+        # the "logged in" cookie for the marketing site.
+        self.assert_logged_in_cookie_redirect(actions.do_complete(
+            request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+            redirect_field_name=auth.REDIRECT_FIELD_NAME
+        ))
+
+        # Set the cookie and try again
+        self.set_logged_in_cookie(request)
+
         self.assert_redirect_to_dashboard_looks_correct(
             actions.do_complete(strategy, social_views._do_login, user=user))
         self.assert_dashboard_response_looks_correct(student_views.dashboard(request), user)
@@ -651,6 +688,16 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # At this point the user object exists, but there is no associated
         # social auth.
         self.assert_social_auth_does_not_exist_for_user(created_user, strategy)
+
+        # We should be redirected back to the complete page, setting
+        # the "logged in" cookie for the marketing site.
+        self.assert_logged_in_cookie_redirect(actions.do_complete(
+            request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+            redirect_field_name=auth.REDIRECT_FIELD_NAME
+        ))
+
+        # Set the cookie and try again
+        self.set_logged_in_cookie(request)
 
         # Pick the pipeline back up. This will create the account association
         # and send the user to the dashboard, where the association will be

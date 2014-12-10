@@ -23,6 +23,7 @@ def page_title_breadcrumbs(*crumbs, **kwargs):
     else:
         return platform_name()
 
+
 @register.simple_tag(name="page_title_breadcrumbs", takes_context=True)
 def page_title_breadcrumbs_tag(context, *crumbs):
     """
@@ -42,7 +43,7 @@ def platform_name():
 
 
 @register.simple_tag(name="favicon_path")
-def favicon_path(default=getattr(settings,'FAVICON_PATH', 'images/favicon.ico')):
+def favicon_path(default=getattr(settings, 'FAVICON_PATH', 'images/favicon.ico')):
     """
     Django template tag that outputs the configured favicon:
     {% favicon_path %}

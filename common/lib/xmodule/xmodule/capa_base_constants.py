@@ -5,6 +5,9 @@ Constants for capa_base problems
 
 
 class SHOWANSWER:
+    """
+    Constants for when to show answer
+    """
     ALWAYS = "always"
     ANSWERED = "answered"
     ATTEMPTED = "attempted"
@@ -16,6 +19,9 @@ class SHOWANSWER:
 
 
 class RANDOMIZATION:
+    """
+    Constants for problem randomization
+    """
     ALWAYS = "always"
     ONRESET = "onreset"
     NEVER = "never"

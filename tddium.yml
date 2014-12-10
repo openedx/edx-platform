@@ -1,0 +1,100 @@
+tddium:
+  :firefox: '28.0'
+  :timeout: 5400
+  :timeout_hook: 900
+  :tool_config:
+    git:
+      :version: "1.8.5.5"
+  :hooks:
+    :pre_setup: "virtualenv $HOME/python-env && $HOME/python-env/bin/pip install -r requirements/edx/paver.txt && $HOME/python-env/bin/pip install -r requirements/edx/pre.txt && $HOME/python-env/bin/pip install -r requirements/edx/base.txt && $HOME/python-env/bin/pip install -r requirements/edx/github.txt && $HOME/python-env/bin/pip install -r requirements/edx/local.txt && $HOME/python-env/bin/pip install -r requirements/edx/post.txt"
+    :post_worker: 'python ./scripts/post_worker.py'
+  :cache:
+    :key_paths:
+      - requirements/edx/paver.txt
+      - requirements/edx/pre.txt
+      - requirements/edx/base.txt
+      - requirements/edx/github.txt
+      - requirements/edx/local.txt
+      - requirements/edx/post.txt
+      - package.json
+  :mongodb:
+    :version: "2.6.4"
+  :mysql:
+    :version: "5.5"
+  :python:
+    :python_version: "2.7"
+  :headless: true
+  :java:
+    :java_version: "java-7-openjdk"
+  :test_pattern: 'none'
+  :tests:
+    - :type: custom
+      :command: paver run_quality && bash ./scripts/post_quality_build.sh
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/diff_quality/diff_quality_pylint.html"
+    - :type: junit
+      :mode: basic
+      :command: bash ./scripts/run_unit_tests.sh
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/cms/nosetests.xml"
+      - "reports/common/lib/capa/nosetests.xml"
+      - "reports/common/lib/calc/nosetests.xml"
+      - "reports/common/lib/chem/nosetests.xml"
+      - "reports/common/lib/sandbox-packages/nosetests.xml"
+      - "reports/common/lib/symmath/nosetests.xml"
+      - "reports/common/lib/xmodule/nosetests.xml"
+      - "reports/lms/nosetests.xml"
+      - "reports/javascript/javascript_xunit.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s lms --extra_args="-v 3 --tag shard_1"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/lms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s lms --extra_args="-v 3 --tag shard_2"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/lms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s cms --extra_args="-v 3 --tag shard_1"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/cms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s cms --extra_args="-v 3 --tag shard_2 --tag shard_3"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/cms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_bokchoy --extra_args="-a shard_1" && bash ./scripts/coverage.sh shard1
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/bok_choy/xunit.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_bokchoy --extra_args="-a shard_2" && bash ./scripts/coverage.sh shard2
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/bok_choy/xunit.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False" && bash ./scripts/coverage.sh shard3
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/bok_choy/xunit.xml"

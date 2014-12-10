@@ -45,8 +45,9 @@ class GetPreviewHtmlTestCase(TestCase):
         html = get_preview_fragment(request, html, context).content
 
         # Verify student view html is returned, and the usage ID is as expected.
+        html_pattern = unicode(course.id.make_usage_key('html', 'html_')).replace('html_', r'html_[0-9]*')
         self.assertRegexpMatches(
             html,
-            'data-usage-id="i4x://MITx/999/html/html_[0-9]*"'
+            'data-usage-id="{}"'.format(html_pattern)
         )
         self.assertRegexpMatches(html, '<html>foobar</html>')

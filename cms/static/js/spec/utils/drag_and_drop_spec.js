@@ -1,5 +1,5 @@
-define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_helpers/create_sinon", "jquery", "underscore"],
-    function (ContentDragger, Notification, create_sinon, $, _) {
+define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/common_helpers/ajax_helpers", "jquery", "underscore"],
+    function (ContentDragger, Notification, AjaxHelpers, $, _) {
         describe("Overview drag and drop functionality", function () {
             beforeEach(function () {
                 setFixtures(readFixtures('mock/mock-outline.underscore'));
@@ -310,7 +310,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                 });
                 it("should send an update on reorder from one parent to another", function () {
                     var requests, savingOptions;
-                    requests = create_sinon["requests"](this);
+                    requests = AjaxHelpers["requests"](this);
                     ContentDragger.dragState.dropDestination = $('#unit-4');
                     ContentDragger.dragState.attachMethod = "after";
                     ContentDragger.dragState.parentList = $('#subsection-2');
@@ -341,7 +341,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     expect($('#subsection-2').data('refresh')).toHaveBeenCalled();
                 });
                 it("should send an update on reorder within the same parent", function () {
-                    var requests = create_sinon["requests"](this);
+                    var requests = AjaxHelpers["requests"](this);
                     ContentDragger.dragState.dropDestination = $('#unit-2');
                     ContentDragger.dragState.attachMethod = "after";
                     ContentDragger.dragState.parentList = $('#subsection-1');

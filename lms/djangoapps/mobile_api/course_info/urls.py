@@ -1,7 +1,8 @@
-from django.conf.urls import patterns, url, include
+"""
+URLs for course_info API
+"""
+from django.conf.urls import patterns, url
 from django.conf import settings
-from rest_framework import routers
-from rest_framework.urlpatterns import format_suffix_patterns
 
 from .views import CourseAboutDetail, CourseUpdatesList, CourseHandoutsList
 
@@ -23,4 +24,3 @@ urlpatterns = patterns(
         name='course-updates-list'
     ),
 )
-

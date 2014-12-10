@@ -1,5 +1,5 @@
 define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/modal_helpers"],
-    function ($, _, BaseModal, modal_helpers) {
+    function ($, _, BaseModal, ModelHelpers) {
 
         describe("BaseModal", function() {
             var MockModal, modal, showMockModal;
@@ -18,29 +18,29 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
             };
 
             beforeEach(function () {
-                modal_helpers.installModalTemplates();
+                ModelHelpers.installModalTemplates();
             });
 
             afterEach(function() {
-                modal_helpers.hideModalIfShowing(modal);
+                ModelHelpers.hideModalIfShowing(modal);
             });
 
             describe("Single Modal", function() {
                 it('is visible after show is called', function () {
                     showMockModal();
-                    expect(modal_helpers.isShowingModal(modal)).toBeTruthy();
+                    expect(ModelHelpers.isShowingModal(modal)).toBeTruthy();
                 });
 
                 it('is removed after hide is called', function () {
                     showMockModal();
                     modal.hide();
-                    expect(modal_helpers.isShowingModal(modal)).toBeFalsy();
+                    expect(ModelHelpers.isShowingModal(modal)).toBeFalsy();
                 });
 
                 it('is removed after cancel is clicked', function () {
                     showMockModal();
-                    modal_helpers.cancelModal(modal);
-                    expect(modal_helpers.isShowingModal(modal)).toBeFalsy();
+                    ModelHelpers.cancelModal(modal);
+                    expect(ModelHelpers.isShowingModal(modal)).toBeFalsy();
                 });
             });
 
@@ -57,32 +57,32 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
                 };
 
                 afterEach(function() {
-                    if (nestedModal && modal_helpers.isShowingModal(nestedModal)) {
+                    if (nestedModal && ModelHelpers.isShowingModal(nestedModal)) {
                         nestedModal.hide();
                     }
                 });
 
                 it('is visible after show is called', function () {
                     showNestedModal();
-                    expect(modal_helpers.isShowingModal(nestedModal)).toBeTruthy();
+                    expect(ModelHelpers.isShowingModal(nestedModal)).toBeTruthy();
                 });
 
                 it('is removed after hide is called', function () {
                     showNestedModal();
                     nestedModal.hide();
-                    expect(modal_helpers.isShowingModal(nestedModal)).toBeFalsy();
+                    expect(ModelHelpers.isShowingModal(nestedModal)).toBeFalsy();
 
                     // Verify that the parent modal is still showing
-                    expect(modal_helpers.isShowingModal(modal)).toBeTruthy();
+                    expect(ModelHelpers.isShowingModal(modal)).toBeTruthy();
                 });
 
                 it('is removed after cancel is clicked', function () {
                     showNestedModal();
-                    modal_helpers.cancelModal(nestedModal);
-                    expect(modal_helpers.isShowingModal(nestedModal)).toBeFalsy();
+                    ModelHelpers.cancelModal(nestedModal);
+                    expect(ModelHelpers.isShowingModal(nestedModal)).toBeFalsy();
 
                     // Verify that the parent modal is still showing
-                    expect(modal_helpers.isShowingModal(modal)).toBeTruthy();
+                    expect(ModelHelpers.isShowingModal(modal)).toBeTruthy();
                 });
             });
         });

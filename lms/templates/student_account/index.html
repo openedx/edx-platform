@@ -1,0 +1,26 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Student Account")}</%block>
+
+<%block name="js_extra">
+    <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <%static:js group='student_account'/>
+</%block>
+
+<%block name="header_extras">
+% for template_name in ["account"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="student_account/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<h1>Student Account</h1>
+
+<p>This is a placeholder for the student's account page.</p>
+
+<div id="account-container"></div>

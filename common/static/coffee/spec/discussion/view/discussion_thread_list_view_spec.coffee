@@ -16,6 +16,7 @@ describe "DiscussionThreadListView", ->
                     <label>
                         <span class="sr">Search</span>
                         <input class="forum-nav-search-input" type="text" placeholder="Search all posts">
+                        <i class="icon icon-search"></i>
                     </label>
                 </form>
             </div>
@@ -103,6 +104,7 @@ describe "DiscussionThreadListView", ->
             id: "1",
             title: "Thread1",
             votes: {up_count: '20'},
+            pinned: true,
             comments_count: 1,
             created_at: '2013-04-03T20:08:39Z',
           }),
@@ -119,6 +121,14 @@ describe "DiscussionThreadListView", ->
             votes: {up_count: '12'},
             comments_count: 3,
             created_at: '2013-04-03T20:06:39Z',
+          }),
+          DiscussionViewSpecHelper.makeThreadWithProps({
+            id: "4",
+            title: "Thread4",
+            votes: {up_count: '25'},
+            comments_count: 0,
+            pinned: true,
+            created_at: '2013-04-03T20:05:39Z',
           }),
         ]
 
@@ -199,10 +209,11 @@ describe "DiscussionThreadListView", ->
         expect(@view.$(".forum-nav-filter-main-control").val()).toEqual("all")
 
     checkThreadsOrdering =  (view, sort_order, type) ->
-      expect(view.$el.find(".forum-nav-thread").children().length).toEqual(3)
+      expect(view.$el.find(".forum-nav-thread").children().length).toEqual(4)
       expect(view.$el.find(".forum-nav-thread:nth-child(1) .forum-nav-thread-title").text()).toEqual(sort_order[0])
       expect(view.$el.find(".forum-nav-thread:nth-child(2) .forum-nav-thread-title").text()).toEqual(sort_order[1])
       expect(view.$el.find(".forum-nav-thread:nth-child(3) .forum-nav-thread-title").text()).toEqual(sort_order[2])
+      expect(view.$el.find(".forum-nav-thread:nth-child(4) .forum-nav-thread-title").text()).toEqual(sort_order[3])
       expect(view.$el.find(".forum-nav-sort-control").val()).toEqual(type)
 
     describe "thread rendering should be correct", ->
@@ -211,17 +222,17 @@ describe "DiscussionThreadListView", ->
             view = makeView(discussion)
             view.render()
             checkThreadsOrdering(view, sort_order, type)
-            expect(view.$el.find(".forum-nav-thread-comments-count:visible").length).toEqual(if type == "votes" then 0 else 3)
-            expect(view.$el.find(".forum-nav-thread-votes-count:visible").length).toEqual(if type == "votes" then 3 else 0)
+            expect(view.$el.find(".forum-nav-thread-comments-count:visible").length).toEqual(if type == "votes" then 0 else 4)
+            expect(view.$el.find(".forum-nav-thread-votes-count:visible").length).toEqual(if type == "votes" then 4 else 0)
 
         it "with sort preference date", ->
-            checkRender(@threads, "date", [ "Thread1", "Thread2", "Thread3"])
+            checkRender(@threads, "date", ["Thread1", "Thread4", "Thread2", "Thread3"])
 
         it "with sort preference votes", ->
-            checkRender(@threads, "votes", [ "Thread2", "Thread1", "Thread3"])
+            checkRender(@threads, "votes", ["Thread4", "Thread1", "Thread2", "Thread3"])
 
         it "with sort preference comments", ->
-            checkRender(@threads, "comments", [ "Thread3", "Thread2", "Thread1"])
+            checkRender(@threads, "comments", ["Thread1", "Thread4", "Thread3", "Thread2"])
 
     describe "Sort change should be correct", ->
       changeSorting = (threads, selected_type, new_type, sort_order) ->
@@ -232,11 +243,11 @@ describe "DiscussionThreadListView", ->
         expect(sortControl.val()).toEqual(selected_type)
         sorted_threads = []
         if new_type == 'date'
-          sorted_threads = [threads[0], threads[1], threads[2]]
+          sorted_threads = [threads[0], threads[3], threads[1], threads[2]]
         else if new_type == 'comments'
-          sorted_threads = [threads[2], threads[1], threads[0]]
+          sorted_threads = [threads[0], threads[3], threads[2], threads[1]]
         else if new_type == 'votes'
-          sorted_threads = [threads[1], threads[0], threads[2]]
+          sorted_threads = [threads[3], threads[0], threads[1], threads[2]]
         $.ajax.andCallFake((params) =>
           params.success(
                 {"discussion_data":sorted_threads, page:1, num_pages:1}
@@ -248,13 +259,13 @@ describe "DiscussionThreadListView", ->
         checkThreadsOrdering(view, sort_order, new_type)
 
       it "with sort preference date", ->
-          changeSorting(@threads, "comments", "date", ["Thread1", "Thread2", "Thread3"])
+          changeSorting(@threads, "comments", "date", ["Thread1", "Thread4", "Thread2", "Thread3"])
 
       it "with sort preference votes", ->
-          changeSorting(@threads, "date", "votes", ["Thread2", "Thread1", "Thread3"])
+          changeSorting(@threads, "date", "votes", ["Thread4", "Thread1", "Thread2", "Thread3"])
 
       it "with sort preference comments", ->
-          changeSorting(@threads, "votes", "comments", ["Thread3", "Thread2", "Thread1"])
+          changeSorting(@threads, "votes", "comments", ["Thread1", "Thread4", "Thread3", "Thread2"])
 
     describe "search alerts", ->
 
@@ -320,6 +331,20 @@ describe "DiscussionThreadListView", ->
             spyOn(@view, "renderThread")
             @view.collection.trigger("change", new Thread({id: 1}))
             expect(@view.clearSearchAlerts).toHaveBeenCalled()
+
+    describe "Search events", ->
+
+      it "perform search when enter pressed inside search textfield", ->
+        setupAjax()
+        spyOn(@view, "searchFor")
+        @view.$el.find(".forum-nav-search-input").trigger($.Event("keydown", {which: 13}))
+        expect(@view.searchFor).toHaveBeenCalled()
+
+      it "perform search when search icon is clicked", ->
+        setupAjax()
+        spyOn(@view, "searchFor")
+        @view.$el.find(".icon-search").click()
+        expect(@view.searchFor).toHaveBeenCalled()
 
     describe "username search", ->
 
@@ -549,6 +574,7 @@ describe "DiscussionThreadListView", ->
             ,
             "Following"
           )
+          expect($.ajax.mostRecentCall.args[0].data.group_id).toBeUndefined();
 
         it "should get threads for the selected leaf", ->
           testSelectionRequest(

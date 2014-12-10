@@ -117,7 +117,7 @@ def split_mongo_store_config(data_dir):
     return store
 
 
-def xml_store_config(data_dir):
+def xml_store_config(data_dir, course_dirs=None):
     """
     Defines default module store using XMLModuleStore.
     """
@@ -128,6 +128,7 @@ def xml_store_config(data_dir):
             'OPTIONS': {
                 'data_dir': data_dir,
                 'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                'course_dirs': course_dirs,
             }
         }
     }

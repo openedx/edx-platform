@@ -12,7 +12,7 @@ import sys
 
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
-    from dogapi import dog_stats_api
+    import dogstats_wrapper as dog_stats_api
 except ImportError:
     # pylint: disable=invalid-name
     dog_stats_api = None
@@ -29,7 +29,8 @@ from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 from .util.duedate import get_extended_due_date
-from capa_base_constants import RANDOMIZATION, SHOWANSWER
+from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
+from django.conf import settings
 
 log = logging.getLogger("edx.courseware")
 
@@ -142,11 +143,14 @@ class CapaFields(object):
         scope=Scope.settings,
         default=False
     )
+    reset_key = "DEFAULT_SHOW_RESET_BUTTON"
+    default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
     show_reset_button = Boolean(
         display_name=_("Show Reset Button"),
-        help=_('Determines whether a "Reset" button is shown so the user may reset their answer.'),
+        help=_("Determines whether a 'Reset' button is shown so the user may reset their answer. "
+               "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
-        default=True
+        default=default_reset_button
     )
     rerandomize = Randomization(
         display_name=_("Randomization"),
@@ -490,17 +494,17 @@ class CapaMixin(CapaFields):
         # If the problem is closed (and not a survey question with max_attempts==0),
         # then do NOT show the reset button.
         if (self.closed() and not is_survey_question):
-                return False
-
-        # Never show the button if the problem is correct
-        if self.is_correct():
             return False
 
         # Button only shows up for randomized problems if the question has been submitted
         if self.rerandomize in [RANDOMIZATION.ALWAYS, RANDOMIZATION.ONRESET] and self.is_submitted():
             return True
         else:
-            return self.show_reset_button
+            # Do NOT show the button if the problem is correct
+            if self.is_correct():
+                return False
+            else:
+                return self.show_reset_button
 
     def should_show_save_button(self):
         """
@@ -854,7 +858,10 @@ class CapaMixin(CapaFields):
         new_answers = dict()
         for answer_id in answers:
             try:
-                new_answer = {answer_id: self.runtime.replace_urls(answers[answer_id])}
+                answer_content = self.runtime.replace_urls(answers[answer_id])
+                if self.runtime.replace_jump_to_id_urls:
+                    answer_content = self.runtime.replace_jump_to_id_urls(answer_content)
+                new_answer = {answer_id: answer_content}
             except TypeError:
                 log.debug(u'Unable to perform URL substitution on answers[%s]: %s',
                           answer_id, answers[answer_id])
@@ -1412,7 +1419,7 @@ class CapaMixin(CapaFields):
     def reset_problem(self, _data):
         """
         Changes problem state to unfinished -- removes student answers,
-        causes problem to rerender itself if randomization is enabled.
+        Causes problem to rerender itself if randomization is enabled.
 
         Returns a dictionary of the form:
           {'success': True/False,

@@ -7,6 +7,7 @@ import urllib2
 import requests
 from terrain.stubs.lti import StubLtiService
 
+
 class StubLtiServiceTest(unittest.TestCase):
     """
     A stub of the LTI provider that listens on a local
@@ -34,7 +35,7 @@ class StubLtiServiceTest(unittest.TestCase):
             'launch_presentation_return_url': '',
             'lis_outcome_service_url': 'http://localhost:8001/test_callback',
             'lis_result_sourcedid': '',
-            'resource_link_id':'',
+            'resource_link_id': '',
         }
 
     def test_invalid_request_url(self):

@@ -33,7 +33,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.factory = RequestFactory()
         self.course = CourseFactory.create(
             days_early_for_beta=5,
-            enrollment_start=datetime.datetime.now(UTC)+datetime.timedelta(days=3),
+            enrollment_start=datetime.datetime.now(UTC) + datetime.timedelta(days=3),
             user_id=self.user.id,
         )
 

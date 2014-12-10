@@ -8,21 +8,22 @@ import pytz
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import (
+    CourseDescriptor, CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_ABOUT)
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock
 
-from student.models import CourseEnrollmentAllowed, UserProfile
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
-from student.models import CourseEnrollment
 from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, UserProfile
 from opaque_keys.edx.keys import CourseKey, UsageKey
 DEBUG_ACCESS = False
 
@@ -111,6 +112,8 @@ def _has_access_course_desc(user, action, course):
                   ACCESS_REQUIRE_STAFF_FOR_COURSE,
     'see_exists' -- can see that the course exists.
     'staff' -- staff access to course.
+    'see_in_catalog' -- user is able to see the course listed in the course catalog.
+    'see_about_page' -- user is able to see the course about page.
     """
     def can_load():
         """
@@ -216,6 +219,29 @@ def _has_access_course_desc(user, action, course):
 
         return can_enroll() or can_load()
 
+    def can_see_in_catalog():
+        """
+        Implements the "can see course in catalog" logic if a course should be visible in the main course catalog
+        In this case we use the catalog_visibility property on the course descriptor
+        but also allow course staff to see this.
+        """
+        return (
+            course.catalog_visibility == CATALOG_VISIBILITY_CATALOG_AND_ABOUT or
+            _has_staff_access_to_descriptor(user, course, course.id)
+        )
+
+    def can_see_about_page():
+        """
+        Implements the "can see course about page" logic if a course about page should be visible
+        In this case we use the catalog_visibility property on the course descriptor
+        but also allow course staff to see this.
+        """
+        return (
+            course.catalog_visibility == CATALOG_VISIBILITY_CATALOG_AND_ABOUT or
+            course.catalog_visibility == CATALOG_VISIBILITY_ABOUT or
+            _has_staff_access_to_descriptor(user, course, course.id)
+        )
+
     checkers = {
         'load': can_load,
         'load_forum': can_load_forum,
@@ -224,6 +250,8 @@ def _has_access_course_desc(user, action, course):
         'within_enrollment_period': within_enrollment_period,
         'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
         'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id),
+        'see_in_catalog': can_see_in_catalog,
+        'see_about_page': can_see_about_page,
     }
 
     return _dispatch(checkers, action, user, course)

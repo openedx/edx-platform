@@ -10,6 +10,9 @@ Change Log
 
    * - Date
      - Change
+   * - 11/07/14
+     - Created the :ref:`edX Modulestores` section and added the :ref:`Split
+       Mongo Modulestore` chapter.
    * - 06/23/14
      - Added a :ref:`Preface` with resources for course teams, developers, researchers, and students. 
    * - 05/20/14

@@ -9,6 +9,7 @@ def use_read_replica_if_available(queryset):
     """
     return queryset.using("read_replica") if "read_replica" in settings.DATABASES else queryset
 
+
 def get_read_replica_cursor_if_available(db):
     """
     Returns cursor to read_replica or default if not available
@@ -19,4 +20,3 @@ def get_read_replica_cursor_if_available(db):
         cursor = db.connection.cursor()
 
     return cursor
-    

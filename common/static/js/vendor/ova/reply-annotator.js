@@ -64,14 +64,24 @@ Annotator.Plugin.Reply = (function(_super) {
 	
 	// New JSON for the database
 	Reply.prototype.pluginSubmit = function(field, annotation) {
-		var replyItem = $(this.annotator.editor.element).find(".reply-item span.parent-annotation"),
-			parent = replyItem.html()!=''?replyItem.html():'0';
-                console.log(parent);
-                console.log(replyItem.html());
-		if (parent!='0') annotation.media = 'comment';
-		annotation.parent = parent;//set 0, because it is not a reply
-		console.log(annotation.parent);
-                return annotation.parent;
+		// since each annotation has their own reply item, this "find" is element specific
+		var replyItem = $(this.annotator.editor.element).find(".reply-item span.parent-annotation");
+		// checks to see if the current annotation is a reply by checking parent numbers
+		var parent = replyItem.html() !== '' ? replyItem.html() : '0';
+		// if the parent number is not empty or zero, we know that this is a comment
+		if (parent !== '0') {
+			annotation.media = 'comment';
+		}
+
+		// apparently some browsers continue adding <font> tags here for nonreplies
+		// this will check and set to 0 (nonreply) if it fails
+		if (parseInt(parent, 10) === NaN){
+			parent = '0';
+		}
+		
+		// set 0, because it is not a reply
+		annotation.parent = parent;
+		return annotation.parent;
 	};
 	
 

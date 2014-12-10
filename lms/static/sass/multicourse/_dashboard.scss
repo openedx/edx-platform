@@ -5,30 +5,10 @@
   @include clearfix;
   padding: ($baseline*2) 0 0 0;
 
-  .dashboard-banner {
-    background: $yellow;
-    border: 1px solid rgb(200,200,200);
-    box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
-    padding: 10px;
-    margin-bottom: 30px;
-
-    &:empty {
-      display: none;
-      background-color: #FFF;
-    }
-
-    h2 {
-      margin-bottom: 0;
-    }
-
-    p {
-      margin-bottom: 0;
-    }
-  }
-
   .profile-sidebar {
-    float: left;
-    margin-right: flex-gutter();
+    background: transparent;
+    @include float(left);
+    @include margin-right(flex-gutter());
     width: flex-grid(3);
     background: transparent;
     box-shadow: 0 0 1px $shadow-l1;
@@ -299,7 +279,7 @@
 
   // course listings
   .my-courses {
-    float: left;
+    @include float(left);
     margin: 0px;
     width: flex-grid(9);
 
@@ -376,7 +356,7 @@
         @include transition(all 0.15s linear 0s);
         overflow: hidden;
         position: relative;
-        float: left;
+        @include float(left);
         height: 100%;
         max-height: 100%;
         width: 200px;
@@ -395,7 +375,7 @@
 
       .info {
         @include clearfix;
-        padding: 0 10px 0 230px;
+        @include padding(0, 10px, 0, 230px);
 
         > hgroup {
           padding: 0;
@@ -414,7 +394,7 @@
           .date-block {
             position: absolute;
             top: 0;
-            right: 0;
+            @include right(0);
             font-family: $sans-serif;
             font-size: 13px;
             font-style: italic;
@@ -472,7 +452,7 @@
           @include box-sizing(border-box);
           border-radius: 3px;
           display: block;
-          float: left;
+          @include float(left);
           font: normal 15px/1.6rem $sans-serif;
           letter-spacing: 0;
           padding: 6px 32px 7px;
@@ -499,7 +479,7 @@
       .sts-enrollment {
         position: absolute;
         top: 105px;
-        left: 0;
+        @include left(0);
         display: inline-block;
         text-align: center;
         width: 200px;
@@ -722,12 +702,19 @@
 
         .ui-toggle-expansion {
           @include transition(all 0.25s ease-in-out 0s);
-          @include transform(rotate(-90deg));
           @include transform-origin(50% 50%);
           @include font-size(21);
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/4);
+
+          @include rtl {
+            @include transform(rotate(90deg));
+          }
+
+          @include ltr {
+            @include transform(rotate(-90deg));
+          }
         }
 
         .message-copy {
@@ -909,7 +896,7 @@
     }
 
     a.unenroll {
-      float: right;
+      @include float(right);
       display: block;
       font-style: italic;
       color: $lighter-base-font-color;
@@ -924,7 +911,7 @@
 
     a.email-settings {
       @extend a.unenroll;
-      margin-right: 10px;
+      @include margin-right(10px);
     }
   }
 
@@ -1165,4 +1152,79 @@
     @extend .cover;
     opacity: 0.5;
   }
+
+.dashboard-banner {
+
+  &:empty {
+    display: none;
+  }
+
+  .wrapper-msg {
+    padding-bottom: 0;
+
+    .msg {
+      @include clearfix();
+      font-family: $sans-serif;
+      padding-bottom: $baseline;
+      border-bottom: thin solid $gray;
+
+      &.title {
+        @extend %t-title5;
+        @extend %t-weight4;
+        font-family: $f-sans-serif;
+
+        // Overriding Platform h2 styles
+        text-transform: none;
+        letter-spacing: 0;
+      }
+
+      &.has-actions {
+
+        .donate-content {
+          width: flex-grid(8, 12);
+        }
+
+        .donate-actions {
+          width: flex-grid(4, 12);
+          vertical-align: bottom;
+          display: inline-block;
+
+          .monetary-symbol {
+            vertical-align: middle;
+            color: $white;
+            font-weight: 600;
+          }
+
+          .amount {
+            height: 40px;
+            width: 80px;
+            vertical-align: middle;
+            text-align: left;
+            border: 2px solid $white;
+
+            &.validation-error {
+              border: 2px solid $error-color;
+            }
+          }
+
+          .action-donate {
+            @extend %btn-primary-blue;
+            vertical-align: middle;
+            padding-top: ($baseline/2);
+            padding-bottom: ($baseline/2);
+            text-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            color: $white;
+            font-weight: 600;
+          }
+
+          .donation-error-msg {
+            padding: ($baseline/2) 0;
+          }
+        }
+      }
+    }
+  }
+}
 

@@ -11,6 +11,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo.base import location_to_query
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_from_xml
+from django.conf import settings
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 class ExportAllCourses(ModuleStoreTestCase):
@@ -30,7 +33,7 @@ class ExportAllCourses(ModuleStoreTestCase):
         import_from_xml(
             self.module_store,
             '**replace_user**',
-            'common/test/data/',
+            TEST_DATA_DIR,
             ['dot-underscore'],
             static_content_store=self.content_store,
             do_import_static=True,

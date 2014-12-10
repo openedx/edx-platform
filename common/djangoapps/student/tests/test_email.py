@@ -15,9 +15,9 @@ from django.conf import settings
 from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
-from textwrap import dedent
-from microsite_configuration import microsite
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
 
 class TestException(Exception):
     """Exception used for testing that nothing will catch explicitly"""
@@ -61,17 +61,18 @@ class EmailTestMixin(object):
         settings.ALLOWED_HOSTS.append(hostname)
         self.addCleanup(settings.ALLOWED_HOSTS.pop)
 
-class EnrollmentEmailTests(TestCase):
-    """ Test senging automated emails to users upon course enrollment. """
 
+class EnrollmentEmailTests(ModuleStoreTestCase):
+    """ Test senging automated emails to users upon course enrollment. """
     def setUp(self):
         # Test Contstants
+        super(EnrollmentEmailTests, self).setUp()
         COURSE_SLUG = "100"
         COURSE_NAME = "test_course"
         COURSE_ORG = "EDX"
 
-        self.user = UserFactory.create(username="tester", email="tester@gmail.com", password="test")
-        self.course = CourseFactory.create(org=COURSE_ORG, display_name=COURSE_NAME, number=COURSE_SLUG)
+        self.user = UserFactory(username="tester", email="tester@gmail.com", password="test")
+        self.course = CourseFactory(org=COURSE_ORG, display_name=COURSE_NAME, number=COURSE_SLUG)
         self.assertIsNotNone(self.course)
         self.request = RequestFactory().post('random_url')
         self.request.user = self.user
@@ -93,6 +94,7 @@ class EnrollmentEmailTests(TestCase):
         email_result = self.send_enrollment_email()
         self.assertNotIn('email_did_fire', email_result)
         self.assertIn('is_success', email_result)
+
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')
@@ -305,9 +307,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.check_confirm_email_change('email_exists.html', {})
         self.assertFailedBeforeEmailing(email_user)
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-                         dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
-                                If LMS tests print this message, that needs to be fixed."""))
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     def test_old_email_fails(self, email_user):
         email_user.side_effect = [Exception, None]
         self.check_confirm_email_change('email_change_failed.html', {
@@ -316,9 +316,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.assertRolledBack()
         self.assertChangeEmailSent(email_user)
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-                         dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
-                                If LMS tests print this message, that needs to be fixed."""))
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     def test_new_email_fails(self, email_user):
         email_user.side_effect = [None, Exception]
         self.check_confirm_email_change('email_change_failed.html', {
@@ -327,9 +325,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.assertRolledBack()
         self.assertChangeEmailSent(email_user)
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-                         dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
-                                If LMS tests print this message, that needs to be fixed."""))
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     def test_successful_email_change(self, email_user):
         self.check_confirm_email_change('email_change_successful.html', {
             'old_email': self.user.email,

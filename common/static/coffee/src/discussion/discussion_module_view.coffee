@@ -98,8 +98,18 @@ if Backbone?
         @$el.append($discussion)
 
       @newPostForm = $('.new-post-article')
-      @threadviews = @discussion.map (thread) ->
-        new DiscussionThreadView el: @$("article#thread_#{thread.id}"), model: thread, mode: "inline"
+      @threadviews = @discussion.map (thread) =>
+        view = new DiscussionThreadView(
+          el: @$("article#thread_#{thread.id}"),
+          model: thread,
+          mode: "inline",
+          course_settings: @course_settings,
+          topicId: discussionId
+        )
+        thread.on "thread:thread_type_updated", ->
+          view.rerender()
+          view.expand()
+        return view
       _.each @threadviews, (dtv) -> dtv.render()
       DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info)
       @newPostView = new NewPostView(
@@ -123,7 +133,14 @@ if Backbone?
       # TODO: When doing pagination, this will need to repaginate. Perhaps just reload page 1?
       article = $("<article class='discussion-thread' id='thread_#{thread.id}'></article>")
       @$('section.discussion > .threads').prepend(article)
-      threadView = new DiscussionThreadView el: article, model: thread, mode: "inline"
+
+      threadView = new DiscussionThreadView(
+        el: article,
+        model: thread,
+        mode: "inline",
+        course_settings: @course_settings,
+        topicId: @$el.data("discussion-id")
+      )
       threadView.render()
       @threadviews.unshift threadView
 

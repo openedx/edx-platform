@@ -25,29 +25,12 @@
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
-
-require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
-  function(doc, $, CourseDetailsModel, MainView) {
-    // highlighting labels when fields are focused in
-    $("form :input").focus(function() {
-      $("label[for='" + this.id + "']").addClass("is-focused");
-    }).blur(function() {
-      $("label").removeClass("is-focused");
-      });
-    var model = new CourseDetailsModel();
-    model.urlRoot = '${details_url}';
-    model.fetch({
-      success: function(model) {
-        var editor = new MainView({
-            el: $('.settings-details'),
-            model: model
-        });
-        editor.render();
-      },
-      reset: true
-    });
-});
   </script>
+</%block>
+<%block name="requirejs">
+    require(["js/factories/settings"], function(SettingsFactory) {
+        SettingsFactory("${details_url}");
+    });
 </%block>
 
 <%block name="content">
@@ -152,7 +135,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <div class="field time" id="field-course-start-time">
                 <label for="course-start-time">${_("Course Start Time")}</label>
                 <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
-                <span class="tip tip-stacked" id="timezone"></span>
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
 
@@ -166,7 +149,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <div class="field time" id="field-course-end-time">
                 <label for="course-end-time">${_("Course End Time")}</label>
                 <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
-                <span class="tip tip-stacked" id="timezone"></span>
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
           </ol>
@@ -182,7 +165,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <div class="field time" id="field-enrollment-start-time">
                 <label for="course-enrollment-start-time">${_("Enrollment Start Time")}</label>
                 <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
-                <span class="tip tip-stacked" id="timezone"></span>
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
 
@@ -196,7 +179,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
               <div class="field time" id="field-enrollment-end-time">
                 <label for="course-enrollment-end-time">${_("Enrollment End Time")}</label>
                 <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
-                <span class="tip tip-stacked" id="timezone"></span>
+                <span class="tip tip-stacked timezone">${_("(UTC)")}</span>
               </div>
             </li>
           </ol>
@@ -275,7 +258,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
 
                   <div class="wrapper-input">
                     <div class="input">
-                      <input type="text" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
+                      <input type="text" dir="ltr" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
                       <span class="tip tip-stacked">${_("Please provide a valid path and name to your course image (Note: only JPEG or PNG format supported)")}</span>
                     </div>
                     <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
@@ -295,7 +278,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   </div>
 
                   <div class="input">
-                    <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
+                    <input type="text"  dir="ltr" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
                     <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
                   </div>
                 </li>
@@ -382,7 +365,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           % endif
       </form>
     </article>
-    <aside class="content-supplementary" role="complimentary">
+    <aside class="content-supplementary" role="complementary">
      <div class="bit">
         <h3 class="title-3">${_("How are these settings used?")}</h3>
         <p>${_("Your course's schedule determines when students can enroll in and begin a course.")}</p>

@@ -12,6 +12,7 @@ from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
 from edxmako.shortcuts import render_to_string
 
+
 class CourseDetails(object):
     def __init__(self, org, course_id, run):
         # still need these for now b/c the client's screen shows these 3 fields

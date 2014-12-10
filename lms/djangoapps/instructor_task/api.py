@@ -19,6 +19,7 @@ from instructor_task.tasks import (
     delete_problem_state,
     send_bulk_course_email,
     calculate_grades_csv,
+    calculate_students_features_csv,
     get_student_submissions,
     get_ora2_responses,
 )
@@ -246,5 +247,19 @@ def submit_ora2_request_task(request, course_key):
     task_class = get_ora2_responses
     task_input = {}
     task_key = ''
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_calculate_students_features_csv(request, course_key, features):
+    """
+    Submits a task to generate a CSV containing student profile info.
+
+    Raises AlreadyRunningError if said CSV is already being updated.
+    """
+    task_type = 'profile_info_csv'
+    task_class = calculate_students_features_csv
+    task_input = {'features': features}
+    task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

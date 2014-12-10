@@ -192,13 +192,12 @@ class TabsPageTests(CourseTestCase):
         self.assertIn('<span data-tooltip="Drag to reorder" class="drag-handle action"></span>', html)
 
 
-
 class PrimitiveTabEdit(TestCase):
     """Tests for the primitive tab edit data manipulations"""
 
     def test_delete(self):
         """Test primitive tab deletion."""
-        course = CourseFactory.create(org='edX', course='999')
+        course = CourseFactory.create()
         with self.assertRaises(ValueError):
             tabs.primitive_delete(course, 0)
         with self.assertRaises(ValueError):
@@ -212,7 +211,7 @@ class PrimitiveTabEdit(TestCase):
 
     def test_insert(self):
         """Test primitive tab insertion."""
-        course = CourseFactory.create(org='edX', course='999')
+        course = CourseFactory.create()
         tabs.primitive_insert(course, 2, 'notes', 'aname')
         self.assertEquals(course.tabs[2], {'type': 'notes', 'name': 'aname'})
         with self.assertRaises(ValueError):
@@ -222,7 +221,7 @@ class PrimitiveTabEdit(TestCase):
 
     def test_save(self):
         """Test course saving."""
-        course = CourseFactory.create(org='edX', course='999')
+        course = CourseFactory.create()
         tabs.primitive_insert(course, 3, 'notes', 'aname')
         course2 = modulestore().get_course(course.id)
         self.assertEquals(course2.tabs[3], {'type': 'notes', 'name': 'aname'})

@@ -1,5 +1,6 @@
 import json
 import logging
+import warnings
 
 from lxml import etree
 
@@ -48,19 +49,31 @@ class SequenceFields(object):
 class SequenceModule(SequenceFields, XModule):
     ''' Layout module which lays out content in a temporal sequence
     '''
-    js = {'coffee': [resource_string(__name__,
-                                     'js/src/sequence/display.coffee')],
-          'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')]}
-    css = {'scss': [resource_string(__name__, 'css/sequence/display.scss')]}
+    js = {
+        'coffee': [resource_string(__name__, 'js/src/sequence/display.coffee')],
+        'js': [resource_string(__name__, 'js/src/sequence/display/jquery.sequence.js')],
+    }
+    css = {
+        'scss': [resource_string(__name__, 'css/sequence/display.scss')],
+    }
     js_module_name = "Sequence"
-
 
     def __init__(self, *args, **kwargs):
         super(SequenceModule, self).__init__(*args, **kwargs)
 
-        # if position is specified in system, then use that instead
-        if getattr(self.system, 'position', None) is not None:
-            self.position = int(self.system.position)
+        # If position is specified in system, then use that instead.
+        position = getattr(self.system, 'position', None)
+        if position is not None:
+            try:
+                self.position = int(self.system.position)
+            except (ValueError, TypeError):
+                # Check for https://openedx.atlassian.net/browse/LMS-6496
+                warnings.warn(
+                    "Sequential position cannot be converted to an integer: {pos!r}".format(
+                        pos=self.system.position,
+                    ),
+                    RuntimeWarning,
+                )
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
@@ -135,7 +148,9 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
-    js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
+    js = {
+        'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')],
+    }
     js_module_name = "SequenceDescriptor"
 
     @classmethod

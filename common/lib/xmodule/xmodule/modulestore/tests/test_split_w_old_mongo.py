@@ -70,9 +70,9 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         Remove the test collections, close the db connection
         """
         split_db = self.split_mongo.db
-        split_db.drop_collection(split_db.course_index)
-        split_db.drop_collection(split_db.structures)
-        split_db.drop_collection(split_db.definitions)
+        split_db.drop_collection(split_db.course_index.proxied_object)
+        split_db.drop_collection(split_db.structures.proxied_object)
+        split_db.drop_collection(split_db.definitions.proxied_object)
 
     def tear_down_mongo(self):
         """
@@ -80,7 +80,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         """
         split_db = self.split_mongo.db
         # old_mongo doesn't give a db attr, but all of the dbs are the same
-        split_db.drop_collection(self.draft_mongo.collection)
+        split_db.drop_collection(self.draft_mongo.collection.proxied_object)
 
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, draft=True, split=True):
         """

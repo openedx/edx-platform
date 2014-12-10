@@ -30,7 +30,7 @@ from courseware.courses import course_image_url, get_course_about_section
         <div class="course-title">
           <h1>
             ${_("{course_name}").format(course_name=course.display_name)}
-              <span class="course-dates">${_("{start_date}").format(start_date=course.start_date_text)} -  ${_("{end_date}").format(end_date=course.end_date_text)}
+              <span class="course-dates">${_("{start_date}").format(start_date=course.start_datetime_text())} -  ${_("{end_date}").format(end_date=course.end_datetime_text())}
               </span>
           </h1>
         </div>

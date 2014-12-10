@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 import logging
 import requests
 from django.conf import settings
@@ -40,8 +40,8 @@ def request_timer(request_id, method, url, tags=None):
     duration = end - start
 
     log.info(
-        "comment_client_request_log: request_id={request_id}, method={method}, "
-        "url={url}, duration={duration}".format(
+        u"comment_client_request_log: request_id={request_id}, method={method}, "
+        u"url={url}, duration={duration}".format(
             request_id=request_id,
             method=method,
             url=url,

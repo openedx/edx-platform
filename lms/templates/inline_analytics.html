@@ -21,7 +21,7 @@ ${block_content}
           <p><strong></strong></p>
         </div>
       % elif question_type == 'radio':
-        <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-correct_response="${correct_response}" data-question_type="${question_type}">
+        <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item" data-correct_response="${correct_response}" data-question_type="${question_type}">
           <section aria-hidden="true" >
             <div class="grid-wrapper radio">
               <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
@@ -39,7 +39,7 @@ ${block_content}
           </section>
         </div>
       % elif question_type == 'checkbox':
-        <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-correct_response="${correct_response}" data-question_type="${question_type}">
+        <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item" data-correct_response="${correct_response}" data-question_type="${question_type}">
           <section aria-hidden="true" >
             <div class="grid-wrapper checkbox">
               <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>

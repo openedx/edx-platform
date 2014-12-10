@@ -1,10 +1,9 @@
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
-from django.utils.translation import ugettext as _
 import json
 import logging
 import re
@@ -27,11 +26,11 @@ def json_http_response(data):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-def split_by_comma_and_whitespace(s):
+def split_by_comma_and_whitespace(cstr):
     """
     Split a string both by commas and whitespice.  Returns a list.
     """
-    return re.split(r'[\s,]+', s)
+    return re.split(r'[\s,]+', cstr)
 
 
 @ensure_csrf_cookie
@@ -48,8 +47,15 @@ def list_cohorts(request, course_key_string):
 
     course = get_course_with_access(request.user, 'staff', course_key)
 
-    all_cohorts = [{'name': c.name, 'id': c.id, 'user_count': c.users.count()}
-                   for c in cohorts.get_course_cohorts(course)]
+    all_cohorts = [
+        {
+            'name': c.name,
+            'id': c.id,
+            'user_count': c.users.count(),
+            'assignment_type': cohorts.CohortAssignmentType.get(c, course)
+        }
+        for c in cohorts.get_course_cohorts(course)
+    ]
 
     return json_http_response({'success': True,
                                'cohorts': all_cohorts})
@@ -77,19 +83,21 @@ def add_cohort(request, course_key_string):
     name = request.POST.get("name")
     if not name:
         return json_http_response({'success': False,
-                                'msg': "No name specified"})
+                                   'msg': "No name specified"})
 
     try:
         cohort = cohorts.add_cohort(course_key, name)
     except ValueError as err:
         return json_http_response({'success': False,
-                                'msg': str(err)})
+                                   'msg': str(err)})
 
-    return json_http_response({'success': 'True',
-                            'cohort': {
-                                'id': cohort.id,
-                                'name': cohort.name
-                                }})
+    return json_http_response({
+        'success': 'True',
+        'cohort': {
+            'id': cohort.id,
+            'name': cohort.name
+        }
+    })
 
 
 @ensure_csrf_cookie
@@ -119,10 +127,11 @@ def users_in_cohort(request, course_key_string, cohort_id):
     try:
         page = int(request.GET.get('page'))
     except (TypeError, ValueError):
-        return HttpResponseBadRequest(_('Requested page must be numeric'))
+        # These strings aren't user-facing so don't translate them
+        return HttpResponseBadRequest('Requested page must be numeric')
     else:
         if page < 0:
-            return HttpResponseBadRequest(_('Requested page must be greater than zero'))
+            return HttpResponseBadRequest('Requested page must be greater than zero')
 
     try:
         users = paginator.page(page)

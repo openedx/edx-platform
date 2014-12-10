@@ -50,7 +50,6 @@ class MathRenderer(object):
             mathstr = mathstr.replace(r'\displaystyle', '')
         self.mathstr = mathstr.replace('mathjaxinline]', '%s]' % mtag)
 
-
     def get_html(self):
         """
         Return the contents of this tag, rendered to html, as an etree element.

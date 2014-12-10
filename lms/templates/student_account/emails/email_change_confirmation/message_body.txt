@@ -1,0 +1,19 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+## TODO: Get sign-off from Product on new copy, and think about
+## turning this into a large, multi-line message for i18n purposes.
+## Greeting
+${_("Hi there,")}
+
+## Preamble
+${_("You successfully changed the email address associated with your "
+    "{platform_name} account from {old_email} to {new_email}.").format(
+        platform_name=settings.PLATFORM_NAME,
+        old_email=old_email,
+        new_email=new_email
+    )
+}
+
+## Farewell
+${_("Thanks,")}
+${_("- The edX Team")}

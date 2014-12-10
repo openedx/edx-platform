@@ -7,7 +7,6 @@ import urllib
 import urllib2
 import json
 from util.json_request import JsonResponse
-from datetime import datetime
 from pytz import timezone
 
 from datetime import datetime
@@ -29,7 +28,6 @@ from edxmako.shortcuts import render_to_response, render_to_string, marketing_li
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
-from functools import wraps
 from markupsafe import escape
 
 from courseware import grades
@@ -44,7 +42,7 @@ from course_modes.models import CourseMode
 
 from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment, UserProfile
-from student.views import single_course_reverification_info
+from student.views import single_course_reverification_info, is_course_blocked
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
@@ -54,15 +52,20 @@ from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEnd
 from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
 from shoppingcart.models import CourseRegistrationCode
+from shoppingcart.utils import is_shopping_cart_enabled
 from opaque_keys import InvalidKeyError
-
-from mako.exceptions import TopLevelLookupException
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor.enrollment import uses_shib
 from util.date_utils import get_time_display
 
+from util.db import commit_on_success_with_read_committed
+
+import survey.utils
+import survey.views
+
+from util.views import ensure_valid_course_key
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
@@ -91,25 +94,6 @@ def user_groups(user):
         cache.set(key, group_names, cache_expiration)
 
     return group_names
-
-
-def verify_course_id(view_func):
-    """
-    This decorator should only be used with views whose kwargs must contain course_id.
-    If course_id is not valid raise 404.
-    """
-
-    @wraps(view_func)
-    def _decorated(request, *args, **kwargs):
-        course_id = kwargs.get("course_id")
-        try:
-            SlashSeparatedCourseKey.from_deprecated_string(course_id)
-        except InvalidKeyError:
-            raise Http404
-        response = view_func(request, *args, **kwargs)
-        return response
-
-    return _decorated
 
 
 @ensure_csrf_cookie
@@ -273,7 +257,8 @@ def chat_settings(course, user):
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@verify_course_id
+@ensure_valid_course_key
+@commit_on_success_with_read_committed
 def index(request, course_id, chapter=None, section=None,
           position=None):
     """
@@ -303,21 +288,42 @@ def index(request, course_id, chapter=None, section=None,
 
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
 
-    # Redirecting to dashboard if the course is blocked due to un payment.
-    redeemed_registration_codes = CourseRegistrationCode.objects.filter(course_id=course_key, registrationcoderedemption__redeemed_by=request.user)
-    for redeemed_registration in redeemed_registration_codes:
-        if not getattr(redeemed_registration.invoice, 'is_valid'):
-            log.warning(u'User %s cannot access the course %s because payment has not yet been received', user, course_key.to_deprecated_string())
-            return redirect(reverse('dashboard'))
+    redeemed_registration_codes = CourseRegistrationCode.objects.filter(
+        course_id=course_key,
+        registrationcoderedemption__redeemed_by=request.user
+    )
+
+    # Redirect to dashboard if the course is blocked due to non-payment.
+    if is_course_blocked(request, redeemed_registration_codes, course_key):
+        # registration codes may be generated via Bulk Purchase Scenario
+        # we have to check only for the invoice generated registration codes
+        # that their invoice is valid or not
+        log.warning(
+            u'User %s cannot access the course %s because payment has not yet been received',
+            user,
+            course_key.to_deprecated_string()
+        )
+        return redirect(reverse('dashboard'))
 
     request.user = user  # keep just one instance of User
+    with modulestore().bulk_operations(course_key):
+        return _index_bulk_op(request, user, course_key, chapter, section, position)
+
+
+def _index_bulk_op(request, user, course_key, chapter, section, position):
     course = get_course_with_access(user, 'load', course_key, depth=2)
+
     staff_access = has_access(user, 'staff', course)
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
+
+    # check to see if there is a required survey that must be taken before
+    # the user can access the course.
+    if survey.utils.must_answer_survey(course, user):
+        return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
     masq = setup_masquerade(request, staff_access)
 
@@ -514,7 +520,7 @@ def index(request, course_id, chapter=None, section=None,
 
 
 @ensure_csrf_cookie
-@verify_course_id
+@ensure_valid_course_key
 def jump_to_id(request, course_id, module_id):
     """
     This entry point allows for a shorter version of a jump to where just the id of the element is
@@ -573,7 +579,7 @@ def jump_to(request, course_id, location):
 
 
 @ensure_csrf_cookie
-@verify_course_id
+@ensure_valid_course_key
 def course_info(request, course_id):
     """
     Display the course's info.html, or 404 if there is no such course.
@@ -583,45 +589,52 @@ def course_info(request, course_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    course = get_course_with_access(request.user, 'load', course_key)
-    staff_access = has_access(request.user, 'staff', course)
-    masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
-    reverifications = fetch_reverify_banner_info(request, course_key)
-    studio_url = get_studio_url(course, 'course_info')
+    with modulestore().bulk_operations(course_key):
+        course = get_course_with_access(request.user, 'load', course_key)
 
-    # link to where the student should go to enroll in the course:
-    # about page if there is not marketing site, SITE_NAME if there is
-    url_to_enroll = reverse(course_about, args=[course_id])
-    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
-        url_to_enroll = marketing_link('COURSES')
+        # check to see if there is a required survey that must be taken before
+        # the user can access the course.
+        if request.user.is_authenticated() and survey.utils.must_answer_survey(course, request.user):
+            return redirect(reverse('course_survey', args=[unicode(course.id)]))
 
-    show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(request.user, course.id)
+        staff_access = has_access(request.user, 'staff', course)
+        masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
+        reverifications = fetch_reverify_banner_info(request, course_key)
+        studio_url = get_studio_url(course, 'course_info')
 
-    context = {
-        'request': request,
-        'course_id': course_key.to_deprecated_string(),
-        'cache': None,
-        'course': course,
-        'staff_access': staff_access,
-        'masquerade': masq,
-        'studio_url': studio_url,
-        'reverifications': reverifications,
-        'show_enroll_banner': show_enroll_banner,
-        'url_to_enroll': url_to_enroll,
-    }
+        # link to where the student should go to enroll in the course:
+        # about page if there is not marketing site, SITE_NAME if there is
+        url_to_enroll = reverse(course_about, args=[course_id])
+        if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+            url_to_enroll = marketing_link('COURSES')
 
-    now = datetime.now(UTC())
-    effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
-    if staff_access and now < effective_start:
-        # Disable student view button if user is staff and
-        # course is not yet visible to students.
-        context['disable_student_access'] = True
+        show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(request.user, course.id)
 
-    return render_to_response('courseware/info.html', context)
+        context = {
+            'request': request,
+            'course_id': course_key.to_deprecated_string(),
+            'cache': None,
+            'course': course,
+            'staff_access': staff_access,
+            'masquerade': masq,
+            'studio_url': studio_url,
+            'reverifications': reverifications,
+            'show_enroll_banner': show_enroll_banner,
+            'url_to_enroll': url_to_enroll,
+        }
+
+        now = datetime.now(UTC())
+        effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
+        if staff_access and now < effective_start:
+            # Disable student view button if user is staff and
+            # course is not yet visible to students.
+            context['disable_student_access'] = True
+
+        return render_to_response('courseware/info.html', context)
 
 
 @ensure_csrf_cookie
-@verify_course_id
+@ensure_valid_course_key
 def static_tab(request, course_id, tab_slug):
     """
     Display the courses tab with the given name.
@@ -655,7 +668,7 @@ def static_tab(request, course_id, tab_slug):
 
 
 @ensure_csrf_cookie
-@verify_course_id
+@ensure_valid_course_key
 def syllabus(request, course_id):
     """
     Display the course's syllabus.html, or 404 if there is no such course.
@@ -691,15 +704,15 @@ def get_course_display_price(course, registration_price):
     Return Course Price as a string preceded by correct currency, or 'Free'
     """
     currency_symbol = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
-    
+
     price = course.display_price
     if registration_price > 0:
         price = registration_price
-    
+
     if price:
         return "{}{}".format(currency_symbol, price)
     else:
-        return  _('Free')
+        return _('Free')
 
 
 @ensure_csrf_cookie
@@ -712,7 +725,12 @@ def course_about(request, course_id):
     """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'see_exists', course_key)
+
+    permission_name = microsite.get_value(
+        'COURSE_ABOUT_VISIBILITY_PERMISSION',
+        settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+    )
+    course = get_course_with_access(request.user, permission_name, course_key)
 
     if microsite.get_value(
         'ENABLE_MKTG_SITE',
@@ -737,13 +755,15 @@ def course_about(request, course_id):
     registration_price = 0
     in_cart = False
     reg_then_add_to_cart_link = ""
-    if (settings.FEATURES.get('ENABLE_SHOPPING_CART') and
-        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+
+    _is_shopping_cart_enabled = is_shopping_cart_enabled()
+    if (_is_shopping_cart_enabled):
         registration_price = CourseMode.min_course_price_for_currency(course_key,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
             cart = shoppingcart.models.Order.get_cart_for_user(request.user)
-            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key)
+            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
+                shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
 
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
@@ -789,12 +809,17 @@ def course_about(request, course_id):
         'invitation_only': invitation_only,
         'active_reg_button': active_reg_button,
         'is_shib_course': is_shib_course,
+         # We do not want to display the internal courseware header, which is used when the course is found in the
+         # context. This value is therefor explicitly set to render the appropriate header.
+        'disable_courseware_header': True,
+        'is_shopping_cart_enabled': _is_shopping_cart_enabled,
+        'cart_link': reverse('shoppingcart.views.show_cart'),
     })
 
 
 @ensure_csrf_cookie
 @cache_if_anonymous
-@verify_course_id
+@ensure_valid_course_key
 def mktg_course_about(request, course_id):
     """
     This is the button that gets put into an iframe on the Drupal site
@@ -803,8 +828,12 @@ def mktg_course_about(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     try:
-        course = get_course_with_access(request.user, 'see_exists', course_key)
-    except (ValueError, Http404) as e:
+        permission_name = microsite.get_value(
+            'COURSE_ABOUT_VISIBILITY_PERMISSION',
+            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+        )
+        course = get_course_with_access(request.user, permission_name, course_key)
+    except (ValueError, Http404):
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response(
@@ -853,7 +882,7 @@ def mktg_course_about(request, course_id):
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @transaction.commit_manually
-@verify_course_id
+@ensure_valid_course_key
 def progress(request, course_id, student_id=None):
     """
     Wraps "_progress" with the manual_transaction context manager just in case
@@ -862,8 +891,9 @@ def progress(request, course_id, student_id=None):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    with grades.manual_transaction():
-        return _progress(request, course_key, student_id)
+    with modulestore().bulk_operations(course_key):
+        with grades.manual_transaction():
+            return _progress(request, course_key, student_id)
 
 
 def _progress(request, course_key, student_id):
@@ -875,6 +905,12 @@ def _progress(request, course_key, student_id):
     Course staff are allowed to see the progress of students in their class.
     """
     course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
+
+    # check to see if there is a required survey that must be taken before
+    # the user can access the course.
+    if survey.utils.must_answer_survey(course, request.user):
+        return redirect(reverse('course_survey', args=[unicode(course.id)]))
+
     staff_access = has_access(request.user, 'staff', course)
 
     if student_id is None or student_id == request.user.id:
@@ -934,7 +970,7 @@ def fetch_reverify_banner_info(request, course_key):
 
 
 @login_required
-@verify_course_id
+@ensure_valid_course_key
 def submission_history(request, course_id, student_username, location):
     """Render an HTML fragment (meant for inclusion elsewhere) that renders a
     history of all state changes made by this user for this problem location.
@@ -1042,7 +1078,7 @@ def get_static_tab_contents(request, course, tab):
 
 
 @require_GET
-@verify_course_id
+@ensure_valid_course_key
 def get_course_lti_endpoints(request, course_id):
     """
     View that, given a course_id, returns the a JSON object that enumerates all of the LTI endpoints for that course.
@@ -1100,7 +1136,6 @@ def get_course_lti_endpoints(request, course_id):
     return HttpResponse(json.dumps(endpoints), content_type='application/json')
 
 
-@require_GET
 def get_analytics_answer_dist(request):
     """
     Calls the the analytics answer distribution api. Retrieves answer distribution data for the in-line analytics display.
@@ -1112,8 +1147,12 @@ def get_analytics_answer_dist(request):
         (django response object):  JSON response.  404 if api url is not found, 500 if server error, otherwise 200 with JSON body.
     """
 
-    # Construct api request
-    module_id = request.GET['module_id']
+    all_data = json.loads(request.POST['data'])
+    module_id = all_data['module_id']
+    question_types_by_part = all_data['question_types_by_part']
+    num_options_by_part = all_data['num_options_by_part']
+
+    # Contruct API call
     url = getattr(settings, 'ANALYTICS_ANSWER_DIST_URL')
     if url:
         url = url.format(module_id=module_id)
@@ -1141,15 +1180,18 @@ def get_analytics_answer_dist(request):
     except urllib2.URLError, error:
         log.warning('Analytics API error: ' + str(error))
         return HttpResponseServerError(_("A problem has occurred retrieving the data, to report the problem click {url}").format(url="<a href=\"https://stanfordonline.zendesk.com/hc/en-us/requests/new\">here</a>"))
-    return process_analytics_answer_dist(data)
+
+    return process_analytics_answer_dist(data, question_types_by_part, num_options_by_part)
 
 
-def process_analytics_answer_dist(data):
+def process_analytics_answer_dist(data, question_types_by_part, num_options_by_part):
     """
     Aggregates the analytics answer dist data. From the data, gets the date/time the data was last updated and reformats to the client TZ.
 
     Arguments:
         data: response from the analytics api
+        question_types_by_part: dict of question types
+        num_options_by_part: dict of number of options by question
 
     Returns:
         A json payload of:
@@ -1164,8 +1206,27 @@ def process_analytics_answer_dist(data):
     # Each element in data_by_part is an array of dicts of {value_id, correct, count}
     data_by_part = {}
 
+    # For errors discovered during analytics data processing use message_by_part
+    message_by_part = {}
+
+    # Count rows returned for each part for integrity check
+    num_rows_by_part = {}
+
     for item in data:
         part_id = item['part_id']
+
+        num_rows_by_part[part_id] = num_rows_by_part.get(part_id, 0) + 1
+
+        # If we detect an issue with the data, set error message and continue
+        if _issue_with_data(
+            item,
+            part_id,
+            message_by_part,
+            question_types_by_part,
+            num_options_by_part,
+            num_rows_by_part
+        ):
+            continue
 
         # Add count to appropriate aggregates
         count_dict = count_by_part.get(part_id, {
@@ -1198,7 +1259,70 @@ def process_analytics_answer_dist(data):
     response_payload = {
         'data_by_part': data_by_part,
         'count_by_part': count_by_part,
+        'message_by_part': message_by_part,
         'last_update_date': formatted_date_string,
     }
 
     return JsonResponse(response_payload)
+
+
+@login_required
+def course_survey(request, course_id):
+    """
+    URL endpoint to present a survey that is associated with a course_id
+    Note that the actual implementation of course survey is handled in the
+    views.py file in the Survey Djangoapp
+    """
+
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
+
+    redirect_url = reverse('info', args=[course_id])
+
+    # if there is no Survey associated with this course,
+    # then redirect to the course instead
+    if not course.course_survey_name:
+        return redirect(redirect_url)
+
+    return survey.views.view_student_survey(
+        request.user,
+        course.course_survey_name,
+        course=course,
+        redirect_url=redirect_url,
+        is_required=course.course_survey_required,
+    )
+
+
+def _issue_with_data(item, part_id, message_by_part, question_types_by_part, num_options_by_part, num_rows_by_part):
+    """
+    A function where issues with the data returned by the analytics API are detected
+    and an appropriate message formulated.
+
+    Arguments:
+        item: current row returned by the analytics API
+        part_id: the part_id of the current row
+        message_by_part: dictionary for storing error messages for parts
+        question_types_by_part: dict of question types
+        num_options_by_part: dict of number of options by question
+        num_rows_by_part: dict of count of rows returned by API
+
+    Returns:
+        True: if an error was detected
+        False: if no error was detected
+    """
+    # Check variant (randomization) and if set, generate an error message
+    if item['variant']:
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as randomization was set at one time."
+        return True
+
+    # Check number of rows returned for radio question is consistent with definition
+    if question_types_by_part[part_id] == 'radio' and num_rows_by_part[part_id] > num_options_by_part[part_id]:
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+        return True
+
+    # Check number of rows returned for checkbox question is consistent with definition
+    if question_types_by_part[part_id] == 'checkbox' and num_rows_by_part[part_id] > pow(2, num_options_by_part[part_id]):
+        message_by_part[part_id] = "The analytics cannot be displayed for this question as the number of rows returned did not match the question definition."
+        return True
+
+    return False

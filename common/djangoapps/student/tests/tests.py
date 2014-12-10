@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
@@ -176,18 +177,14 @@ class CourseEndingTest(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class DashboardTest(TestCase):
+class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
     """
-    # arbitrary constant
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-    COURSE_ORG = "EDX"
 
     def setUp(self):
-        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        self.assertIsNotNone(self.course)
+        super(DashboardTest, self).setUp()
+        self.course = CourseFactory.create()
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
         self.client = Client()
 
@@ -268,6 +265,7 @@ class DashboardTest(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @patch('courseware.views.log.warning')
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_blocked_course_scenario(self, log_warning):
 
         self.client.login(username="jack", password="test")
@@ -670,16 +668,11 @@ class PaidRegistrationTest(ModuleStoreTestCase):
     """
     Tests for paid registration functionality (not verified student), involves shoppingcart
     """
-    # arbitrary constant
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-    COURSE_ORG = "EDX"
-
     def setUp(self):
+        super(PaidRegistrationTest, self).setUp()
         # Create course
+        self.course = CourseFactory.create()
         self.req_factory = RequestFactory()
-        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        self.assertIsNotNone(self.course)
         self.user = UserFactory(username="jack", email="jack@fake.edx.org")
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
@@ -704,18 +697,13 @@ class PaidRegistrationTest(ModuleStoreTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class AnonymousLookupTable(TestCase):
+class AnonymousLookupTable(ModuleStoreTestCase):
     """
     Tests for anonymous_id_functions
     """
-    # arbitrary constant
-    COURSE_SLUG = "100"
-    COURSE_NAME = "test_course"
-    COURSE_ORG = "EDX"
-
     def setUp(self):
-        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
-        self.assertIsNotNone(self.course)
+        super(AnonymousLookupTable, self).setUp()
+        self.course = CourseFactory.create()
         self.user = UserFactory()
         CourseModeFactory.create(
             course_id=self.course.id,
@@ -736,3 +724,11 @@ class AnonymousLookupTable(TestCase):
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, self.course.id, save=False))
+
+    def test_roundtrip_with_unicode_course_id(self):
+        course2 = CourseFactory.create(display_name=u"Omega Course Ω")
+        CourseEnrollment.enroll(self.user, course2.id)
+        anonymous_id = anonymous_id_for_user(self.user, course2.id)
+        real_user = user_by_anonymous_id(anonymous_id)
+        self.assertEqual(self.user, real_user)
+        self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))

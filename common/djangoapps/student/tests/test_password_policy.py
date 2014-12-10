@@ -15,6 +15,7 @@ from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 from student.views import create_account
 
+
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 class TestPasswordPolicy(TestCase):
     """

@@ -70,13 +70,13 @@ file. This file can be useful for validation and debugging.
 Documenting Events
 *******************
 
-The *edX Platform Developer Documentation* provides guidelines for `Contributing
-to Open edX
-<http://edx.readthedocs.org/projects/userdocs/en/latest/process/index.html>`_`.
-As part of your effort to add events to the platform, consider including
-comments that identify the purpose of the events and the fields emitted for
-them. A description can assure that researchers and other members of the open
-edX community understand your intent and use the event correctly.
+The *edX Platform Developer's Guide* provides guidelines for `Contributing to
+Open edX <http://edx.readthedocs.org/projects/edx-developer-
+guide/en/latest/process/index.html>`_. As part of your effort to add events to
+the platform, consider including comments that identify the purpose of the
+events and the fields emitted for them. A description can assure that
+researchers and other members of the open edX community understand your intent
+and use the event correctly.
 
 The `edX Research Guide
 <http://edx.readthedocs.org/projects/devdata/en/latest/>`_ includes reference
@@ -85,7 +85,10 @@ information for emitted events that are included in tracking logs.
 Request Context Middleware
 **********************************
 
-The platform includes a middleware class that enriches all events emitted during the processing of a given request with details about the request that greatly simplify downstream processing. This is called the ``TrackMiddleware`` and can be found in ``edx-platform/common/djangoapps/track/middleware.py``.
+The platform includes a middleware class that enriches all events emitted
+during the processing of a given request with details about the request that
+greatly simplify downstream processing. This is called the ``TrackMiddleware``
+and can be found in ``edx-platform/common/djangoapps/track/middleware.py``.
 
 Legacy Application Event Processor
 **********************************

@@ -7,6 +7,7 @@ from nose.tools import assert_in, assert_true  # pylint: disable=no-name-in-modu
 from common import i_am_registered_for_the_course, visit_scenario_item
 from problems_setup import add_problem_to_course, answer_problem
 
+
 @steps
 class ConditionalSteps(object):
     COURSE_NUM = 'test_course'

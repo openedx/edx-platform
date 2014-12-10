@@ -109,7 +109,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
         if self.runtime.get_real_user is not None:
             try:
                 self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
-            except:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 self.user_email = _("No email address found.")
 
     def _extract_instructions(self, xmltree):

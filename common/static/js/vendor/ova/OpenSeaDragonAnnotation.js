@@ -187,7 +187,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             }
             
             // if the colored highlights by tags plugin it is notified to colorize
-               annotator.publish('colorizeHighlight', [an]);
+            annotator.publish('externalCallToHighlightTags', [an]);
         },
         
         /**
@@ -231,7 +231,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 var span = document.createElement('span');
                 var rectPosition = an.rangePosition;
                 span.className = "annotator-hl";
-                span.style.border = '2px solid rgba(0,0,0,0.5)';
+                
+                // outline and border below create a double line one black and one white
+                // so to be able to differentiate when selecting dark or light images
+                span.style.border = '2px solid rgb(255, 255, 255)';
+                span.style.outline = '2px solid rgb(0, 0, 0)';
                 span.style.background = 'rgba(0,0,0,0)';
                 
                 // Adds listening items for the viewer and editor
@@ -305,7 +309,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 viewer.innerTracker.setTracking(false);
                 this.rect = document.createElement('div');
                 this.rect.style.background = 'rgba(0,0,0,0)';
-                this.rect.style.border = '2px solid rgba(0,0,0,0.5)';
+                
+                // outline and border below create a double line one black and one white
+                // so to be able to differentiate when selecting dark or light images
+                this.rect.style.border = '2px solid rgb(255, 255, 255)';
+                this.rect.style.outline = '2px solid rgb(0, 0, 0)';
+                
                 this.rect.style.position = 'absolute';
                 this.rect.className = 'DrawingRect';
                 // set the initial position
@@ -1026,6 +1035,10 @@ OpenSeadragonAnnotation = function (element, options) {
     function reloadEditor(){
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, "annotator-field-0");
         tinymce.EditorManager.execCommand('mceAddEditor',true, "annotator-field-0");
+        
+        // if person hits into/out of fullscreen before closing the editor should close itself
+        // ideally we would want to keep it open and reposition, this would make a great TODO in the future
+        annotator.editor.hide();
     }
 
     var self = this;
@@ -1044,6 +1057,14 @@ OpenSeadragonAnnotation = function (element, options) {
     document.addEventListener("msfullscreenchange", function () {
         reloadEditor();
     }, false);
+
+    // for some reason the above doesn't work when person hits ESC to exit full screen...
+    $(document).keyup(function(e) {
+        // esc key reloads editor as well
+        if (e.keyCode == 27) { 
+            reloadEditor();
+        }   
+    });
     
     this.options = options;
 

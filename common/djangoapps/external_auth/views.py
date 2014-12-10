@@ -6,6 +6,7 @@ import re
 import string       # pylint: disable=W0402
 import fnmatch
 import unicodedata
+import urllib
 
 from textwrap import dedent
 from external_auth.models import ExternalAuthMap
@@ -596,7 +597,11 @@ def course_specific_login(request, course_id):
         return redirect_with_get('signin_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
-    if settings.FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
+    if (
+        settings.FEATURES.get('AUTH_USE_SHIB') and
+        course.enrollment_domain and
+        course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
+    ):
         return redirect_with_get('shib-login', request.GET)
 
     # Default fallthrough to normal signin page
@@ -616,7 +621,11 @@ def course_specific_register(request, course_id):
         return redirect_with_get('register_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
-    if settings.FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
+    if (
+        settings.FEATURES.get('AUTH_USE_SHIB') and
+        course.enrollment_domain and
+        course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
+    ):
         # shib-login takes care of both registration and login flows
         return redirect_with_get('shib-login', request.GET)
 
@@ -810,7 +819,8 @@ def provider_login(request):
                 # remember request and original path
                 request.session['openid_setup'] = {
                     'request': openid_request,
-                    'url': request.get_full_path()
+                    'url': request.get_full_path(),
+                    'post_params': request.POST,
                 }
 
                 # user failed login on previous attempt
@@ -831,6 +841,20 @@ def provider_login(request):
         openid_setup = request.session['openid_setup']
         openid_request = openid_setup['request']
         openid_request_url = openid_setup['url']
+        post_params = openid_setup['post_params']
+        # We need to preserve the parameters, and the easiest way to do this is
+        # through the URL
+        url_post_params = {
+            param: post_params[param] for param in post_params if param.startswith('openid')
+        }
+
+        encoded_params = urllib.urlencode(url_post_params)
+
+        if '?' not in openid_request_url:
+            openid_request_url = openid_request_url + '?' + encoded_params
+        else:
+            openid_request_url = openid_request_url + '&' + encoded_params
+
         del request.session['openid_setup']
 
         # don't allow invalid trust roots
