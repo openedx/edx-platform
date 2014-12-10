@@ -611,15 +611,30 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
                 representing their grades we expect to see in the CSV.
                 For example: [student_a: {'grade': 1.0, 'HW': 1.0}]
         """
-        def merge_dicts(dict_1, dict_2):
-            """Return the union of dict_1 and dict_2"""
-            return dict(dict_1.items() + dict_2.items())
+        def merge_dicts(*dicts):
+            """
+            Return the union of dicts
+
+            Arguments:
+                dicts: tuple of dicts
+            """
+            return dict([item for d in dicts for item in d.items()])
+
+        def user_partition_group(user):
+            """Return a dict having single key with value equals to students group in partition"""
+            group_config_hdr_tpl = 'Group Configuration Group Name ({})'
+            return {
+                group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(   # pylint: disable=E1101
+                    self.course.id, user, self.partition, track_function=None
+                ).name
+            }
 
         self.verify_rows_in_csv(
             [
                 merge_dicts(
                     {'id': str(student.id), 'username': student.username, 'email': student.email},
-                    grades
+                    grades,
+                    user_partition_group(student)
                 )
                 for student_grades in students_grades for student, grades in student_grades.iteritems()
             ]

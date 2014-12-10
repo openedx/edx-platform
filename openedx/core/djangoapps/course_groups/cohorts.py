@@ -208,7 +208,7 @@ def get_cohorted_commentables(course_key):
     return ans
 
 
-def get_cohort(user, course_key):
+def get_cohort(user, course_key, assign=True):
     """
     Given a Django user and a CourseKey, return the user's cohort in that
     cohort.
@@ -216,6 +216,7 @@ def get_cohort(user, course_key):
     Arguments:
         user: a Django User object.
         course_key: CourseKey
+        assign (bool): if False then we don't assign a group to user
 
     Returns:
         A CourseUserGroup object if the course is cohorted and the User has a
@@ -242,7 +243,8 @@ def get_cohort(user, course_key):
         )
     except CourseUserGroup.DoesNotExist:
         # Didn't find the group.  We'll go on to create one if needed.
-        pass
+        if not assign:
+            return None
 
     choices = course.auto_cohort_groups
     if len(choices) > 0:

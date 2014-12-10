@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Unit tests for LMS instructor-initiated background tasks helper functions.
 
@@ -7,8 +9,12 @@ Tests that CSV grade report generation works with unicode emails.
 import ddt
 from mock import Mock, patch
 import tempfile
+import unicodecsv
 
 from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
+from xmodule.partitions.partitions import Group, UserPartition
 
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from instructor_task.models import ReportStore
@@ -56,6 +62,82 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
 
         report_store = ReportStore.from_config()
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
+
+    def _verify_cohort_data(self, course_id, expected_cohort_groups):
+        """
+        Verify cohort data.
+        """
+        cohort_groups_in_csv = []
+        with patch('instructor_task.tasks_helper._get_current_task'):
+            result = upload_grades_csv(None, None, course_id, None, 'graded')
+            self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
+            report_store = ReportStore.from_config()
+            report_csv_filename = report_store.links_for(course_id)[0][0]
+            with open(report_store.path_to(course_id, report_csv_filename)) as csv_file:
+                for row in unicodecsv.DictReader(csv_file):
+                    cohort_groups_in_csv.append(row['Cohort Group Name'])
+
+        self.assertEqual(cohort_groups_in_csv, expected_cohort_groups)
+
+    def test_cohort_data_in_grading(self):
+        """
+        Test that cohort data is included in grades csv if cohort configuration is enabled for course.
+        """
+        cohort_groups = ['cohort 1', 'cohort 2']
+        course = CourseFactory.create(cohort_config={'cohorted': True, 'auto_cohort': True,
+                                                     'auto_cohort_groups': cohort_groups})
+        for _ in range(2):
+            CourseEnrollment.enroll(UserFactory.create(), course.id)
+
+        # In auto cohorting a group will be assigned to a user only when user visits a problem
+        # In grading calculation we only add a group in csv if group is already assigned to
+        # user rather than creating a group automatically at runtime
+        expected_groups = ['', '']
+        self._verify_cohort_data(course.id, expected_groups)
+
+    def test_unicode_cohort_data_in_grading(self):
+        """
+        Test that cohort groups can contain unicode characters.
+        """
+        cohort_groups = [u'ÞrÖfessÖr X', u'MàgnëtÖ']
+        course = CourseFactory.create(cohort_config={'cohorted': True})
+
+        # Create users and manually assign cohort groups
+        user1 = UserFactory.create(username='user1')
+        user2 = UserFactory.create(username='user2')
+        CourseEnrollment.enroll(user1, course.id)
+        CourseEnrollment.enroll(user2, course.id)
+        cohort1 = CohortFactory(course_id=course.id, name=u'ÞrÖfessÖr X')
+        cohort2 = CohortFactory(course_id=course.id, name=u'MàgnëtÖ')
+        cohort1.users.add(user1)
+        cohort2.users.add(user2)
+
+        self._verify_cohort_data(course.id, cohort_groups)
+
+    def test_unicode_user_partitions(self):
+        """
+        Test that user partition groups can contain unicode characters.
+        """
+        user_groups = [u'ÞrÖfessÖr X', u'MàgnëtÖ']
+        user_partition = UserPartition(
+            0,
+            'x_man',
+            'X Man',
+            [
+                Group(0, user_groups[0]),
+                Group(1, user_groups[1])
+            ]
+        )
+
+        # Create course with group configurations
+        self.initialize_course(
+            course_factory_kwargs={
+                'user_partitions': [user_partition]
+            }
+        )
+
+        _groups = [group.name for group in self.course.user_partitions[0].groups]
+        self.assertEqual(_groups, user_groups)
 
 
 @ddt.ddt

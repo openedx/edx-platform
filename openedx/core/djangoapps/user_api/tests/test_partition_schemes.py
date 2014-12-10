@@ -58,6 +58,24 @@ class TestRandomUserPartitionScheme(PartitionTestCase):
             group2_id = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, self.user_partition)
             self.assertEqual(group1_id, group2_id)
 
+    def test_get_group_for_user_with_assign(self):
+        """
+        Make sure get_group_for_user returns None if no group is already
+        assigned to a user instead of assigning/creating a group automatically
+        """
+        # We should not get any group because assign is False which will
+        # protect us from automatically creating a group for user
+        group = RandomUserPartitionScheme.get_group_for_user(
+            self.MOCK_COURSE_ID, self.user, self.user_partition, assign=False
+        )
+
+        self.assertIsNone(group)
+
+        # We should get a group automatically assigned to user
+        group = RandomUserPartitionScheme.get_group_for_user(self.MOCK_COURSE_ID, self.user, self.user_partition)
+
+        self.assertIsNotNone(group)
+
     def test_empty_partition(self):
         empty_partition = UserPartition(
             self.TEST_ID,

@@ -15,15 +15,16 @@ class RandomUserPartitionScheme(object):
     RANDOM = random.Random()
 
     @classmethod
-    def get_group_for_user(cls, course_id, user, user_partition, track_function=None):
+    def get_group_for_user(cls, course_id, user, user_partition, assign=True, track_function=None):
         """
         Returns the group from the specified user position to which the user is assigned.
-        If the user has not yet been assigned, a group will be randomly chosen for them.
+        If the user has not yet been assigned, a group will be randomly chosen for them if assign flag is True.
         """
         partition_key = cls._key_for_partition(user_partition)
         group_id = course_tag_api.get_course_tag(user, course_id, partition_key)
         group = user_partition.get_group(int(group_id)) if not group_id is None else None
-        if group is None:
+
+        if group is None and assign:
             if not user_partition.groups:
                 raise UserPartitionError('Cannot assign user to an empty user partition')
 
