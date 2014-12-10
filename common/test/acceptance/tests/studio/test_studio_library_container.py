@@ -94,40 +94,61 @@ class StudioLibraryContainerTest(ContainerBase, StudioLibraryTest):
         And I edit set library key to none
         Then I can see that library content block is misconfigured
         """
-        expected_text = 'No library or filters configured. Press "Edit" to configure.'
+        expected_text = 'A library has not yet been selected.'
+        expected_action = 'Select a Library'
         library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
 
-        # precondition check - assert library is configured before we remove it
-        self.assertNotIn(expected_text, library_container.header_text)
+        # precondition check - the library block should be configured before we remove the library setting
+        self.assertFalse(library_container.has_validation_not_configured_warning)
 
         edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
         edit_modal.library_key = None
-
         library_container.save_settings()
 
-        self.assertIn(expected_text, library_container.header_text)
+        self.assertTrue(library_container.has_validation_not_configured_warning)
+        self.assertIn(expected_text, library_container.validation_not_configured_warning_text)
+        self.assertIn(expected_action, library_container.validation_not_configured_warning_text)
 
-    @ddt.data(
-        'library-v1:111+111',
-        'library-v1:edX+L104',
-    )
-    def test_set_missing_library_shows_correct_label(self, library_key):
+    def test_set_missing_library_shows_correct_label(self):
         """
         Scenario: Given I have a library, a course and library content xblock in a course
         When I go to studio unit page for library content block
         And I edit set library key to non-existent library
         Then I can see that library content block is misconfigured
         """
+        nonexistent_lib_key = 'library-v1:111+111'
         expected_text = "Library is invalid, corrupt, or has been deleted."
 
         library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
 
         # precondition check - assert library is configured before we remove it
-        self.assertNotIn(expected_text, library_container.header_text)
+        self.assertFalse(library_container.has_validation_error)
 
         edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
-        edit_modal.library_key = library_key
+        edit_modal.library_key = nonexistent_lib_key
 
         library_container.save_settings()
 
-        self.assertIn(expected_text, library_container.header_text)
+        self.assertTrue(library_container.has_validation_error)
+        self.assertIn(expected_text, library_container.validation_error_text)
+
+    def test_out_of_date_message(self):
+        """
+        Scenario: Given I have a library, a course and library content xblock in a course
+        When I go to studio unit page for library content block
+        Then I can see that library content block needs to be updated
+        When I click on the update link
+        Then I can see that the content no longer needs to be updated
+        """
+        expected_text = "This component is out of date. The library has new content."
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+
+        self.assertTrue(library_container.has_validation_warning)
+        self.assertIn(expected_text, library_container.validation_warning_text)
+
+        library_container.refresh_children()
+
+        self.unit_page.wait_for_page()  # Wait for the page to reload
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+
+        self.assertFalse(library_container.has_validation_message)
