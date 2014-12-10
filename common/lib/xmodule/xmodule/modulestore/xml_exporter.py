@@ -131,21 +131,18 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
                             draft_module.location,
                             revision=ModuleStoreEnum.RevisionOption.draft_preferred
                         )
-
-                        # if module has no parent, set its parent_url to `None`
-                        parent_url = None
+                        # Don't try to export orphaned items.
                         if parent_loc is not None:
-                            parent_url = parent_loc.to_deprecated_string()
+                            logging.debug('parent_loc = {0}'.format(parent_loc))
+                            draft_node = draft_node_constructor(
+                                draft_module,
+                                location=draft_module.location,
+                                url=draft_module.location.to_deprecated_string(),
+                                parent_location=parent_loc,
+                                parent_url=parent_loc.to_deprecated_string(),
+                            )
 
-                        draft_node = draft_node_constructor(
-                            draft_module,
-                            location=draft_module.location,
-                            url=draft_module.location.to_deprecated_string(),
-                            parent_location=parent_loc,
-                            parent_url=parent_url,
-                        )
-
-                        draft_node_list.append(draft_node)
+                            draft_node_list.append(draft_node)
 
                     for draft_node in get_draft_subtree_roots(draft_node_list):
                         # only export the roots of the draft subtrees
@@ -155,13 +152,6 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
                         # ensure module has "xml_attributes" attr
                         if not hasattr(draft_node.module, 'xml_attributes'):
                             draft_node.module.xml_attributes = {}
-
-                        # Don't try to export orphaned items
-                        # and their descendents
-                        if draft_node.parent_location is None:
-                            continue
-
-                        logging.debug('parent_loc = {0}'.format(draft_node.parent_location))
 
                         draft_node.module.xml_attributes['parent_url'] = draft_node.parent_url
                         parent = modulestore.get_item(draft_node.parent_location)
