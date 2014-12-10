@@ -108,6 +108,15 @@
       color: $gray-d2;
     }
 
+    .modal-subsection-title {
+      @extend %t-title8;
+      @extend %t-strong;
+      margin-bottom: ($baseline/4);
+      text-transform: uppercase;
+      letter-spacing: 0.1rem;
+      color: $gray-l2;
+    }
+
     .modal-section-content {
 
       .list-fields, .list-actions {
@@ -282,7 +291,6 @@
       padding-bottom: ($baseline*0.75);
     }
 
-
     .visibility-summary-value {
       display: inline-block;
       vertical-align: top;
@@ -293,15 +301,7 @@
     .visibility-controls-secondary {
       max-height: 100%;
       overflow-y: scroll;
-    }
-
-    .visibility-controls-title {
-      @extend %t-title8;
-      @extend %t-strong;
-      margin-bottom: ($baseline/4);
-      text-transform: uppercase;
-      letter-spacing: 0.1rem;
-      color: $gray-l2;
+      margin: ($baseline*0.75) 0 0 $baseline;
     }
 
     .visibility-controls-group {
@@ -349,12 +349,6 @@
 
       // UI: radio and checkbox inputs
       .field-radio, .field-checkbox {
-
-        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
-        label, input, textarea {
-          display: inline-block;
-          vertical-align: text-top;
-        }
 
         label {
           margin-left: ($baseline/4);

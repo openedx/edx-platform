@@ -52,11 +52,10 @@
 
                 <!-- NOTE: @andyarmstrong, if you need this wrapper to show and hide, great. If not, please remove it from the DOM -->
                 <div class="wrapper-visibility-specific">
-                  <hr class="divider-visual">
 
                   <section class="visibility-controls-secondary">
                     <div class="visibility-controls-group">
-                      <h4 class="visibility-controls-title sr">Content Groups</h4>
+                      <h4 class="visibility-controls-title modal-subsection-title sr">Content Groups</h4>
                       <ul class="list-fields list-checkbox">
                         <li class="field field-checkbox field-visibility-content-group">
                           <input type="checkbox" id="visibility-content-group-NAME1" name="visibility-content-group" value="" class="input input-checkbox visibility-content-group-NAME1" />
@@ -77,11 +76,13 @@
                           <input type="checkbox" id="visibility-content-group-NAME4" name="visibility-content-group" value="" class="input input-checkbox visibility-content-group-NAME4" />
                           <label for="visibility-content-group-NAME4" class="label">Content Group NAME 4</label>
                         </li>
+
+                        <!-- NOTE: @andyarmstrong, here's an example of how we would treat a group that was deleted/removed - we need a .was removed class and an additional UI element called a .note -->
                         <li class="field field-checkbox field-visibility-content-group was-removed">
-                          <input type="checkbox" id="visibility-content-group-deleted1" name="visibility-content-group" value="" class="input input-checkbox visibility-content-group-deleted" />
+                          <input type="checkbox" id="visibility-content-group-deleted1" name="visibility-content-group" value="" class="input input-checkbox visibility-content-group-deleted" checked="checked" />
                           <label for="visibility-content-group-deleted1" class="label">
                             Deleted Content Group
-                            <span class="note">Content group no longer exists. Please relabel this business</span>
+                            <span class="note">Content group no longer exists. Please choose another or allow access to All Students and staff</span>
                           </label>
                         </li>
                       </ul>
