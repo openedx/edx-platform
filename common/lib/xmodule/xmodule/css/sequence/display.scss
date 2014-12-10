@@ -208,7 +208,7 @@ nav.sequence-nav {
           top: 48px;
           text-shadow: 0 -1px 0 #000;
           @include transition(all .1s $ease-in-out-quart 0s);
-          white-space: normal;
+          white-space: pre;
           z-index: 99;
           visibility: hidden;
           pointer-events: none;
