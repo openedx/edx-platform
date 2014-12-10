@@ -609,6 +609,10 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         Called from Studio view.
         """
+        user_service = self.runtime.service(self, 'user')
+        if user_service is None:
+            return Response()
+
         user_partition = self.get_selected_partition()
 
         changed = False

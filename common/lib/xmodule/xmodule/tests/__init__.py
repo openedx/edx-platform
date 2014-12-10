@@ -92,16 +92,36 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
-    user = Mock(is_staff=False)
+    user = Mock(name='get_test_system.user', is_staff=False)
+
+    descriptor_system = get_test_descriptor_system(),
+
+    def get_module(descriptor):
+        """Mocks module_system get_module function"""
+        # pylint: disable=protected-access
+
+        # Unlike XBlock Runtimes or DescriptorSystems,
+        # each XModule is provided with a new ModuleSystem.
+        # Construct one for the new XModule.
+        module_system = get_test_system()
+
+        # Descriptors can all share a single DescriptorSystem.
+        # So, bind to the same one as the current descriptor.
+        module_system.descriptor_runtime = descriptor.runtime._descriptor_system
+
+        descriptor.bind_for_student(module_system, descriptor._field_data)
+
+        return descriptor
+
     return TestModuleSystem(
         static_url='/static',
-        track_function=Mock(),
-        get_module=Mock(),
+        track_function=Mock(name='get_test_system.track_function'),
+        get_module=get_module,
         render_template=mock_render_template,
         replace_urls=str,
         user=user,
         get_real_user=lambda(__): user,
-        filestore=Mock(),
+        filestore=Mock(name='get_test_system.filestore'),
         debug=True,
         hostname="edx.org",
         xqueue={
@@ -109,16 +129,16 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
             'callback_url': '/',
             'default_queuename': 'testqueue',
             'waittime': 10,
-            'construct_callback': Mock(side_effect="/"),
+            'construct_callback': Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
         },
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         anonymous_student_id='student',
         open_ended_grading_interface=open_ended_grading_interface,
         course_id=course_id,
         error_descriptor_class=ErrorDescriptor,
-        get_user_role=Mock(is_staff=False),
-        descriptor_runtime=get_test_descriptor_system(),
-        user_location=Mock(),
+        get_user_role=Mock(name='get_test_system.get_user_role', is_staff=False),
+        user_location=Mock(name='get_test_system.user_location'),
+        descriptor_runtime=descriptor_system,
     )
 
 
@@ -128,15 +148,17 @@ def get_test_descriptor_system():
     """
     field_data = DictFieldData({})
 
-    return MakoDescriptorSystem(
-        load_item=Mock(),
-        resources_fs=Mock(),
-        error_tracker=Mock(),
+    descriptor_system = MakoDescriptorSystem(
+        load_item=Mock(name='get_test_descriptor_system.load_item'),
+        resources_fs=Mock(name='get_test_descriptor_system.resources_fs'),
+        error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
         render_template=mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
         field_data=field_data,
         services={'field-data': field_data},
     )
+    descriptor_system.get_asides = lambda block: []
+    return descriptor_system
 
 
 def mock_render_template(*args, **kwargs):

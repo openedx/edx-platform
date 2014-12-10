@@ -64,14 +64,14 @@ class ConditionalFactory(object):
                 error_msg='random error message'
             )
         else:
-            source_descriptor = Mock()
+            source_descriptor = Mock(name='source_descriptor')
             source_descriptor.location = source_location
 
         source_descriptor.runtime = descriptor_system
         source_descriptor.render = lambda view, context=None: descriptor_system.render(source_descriptor, view, context)
 
         # construct other descriptors:
-        child_descriptor = Mock()
+        child_descriptor = Mock(name='child_descriptor')
         child_descriptor._xmodule.student_view.return_value.content = u'<p>This is a secret</p>'
         child_descriptor.student_view = child_descriptor._xmodule.student_view
         child_descriptor.displayable_items.return_value = [child_descriptor]
@@ -84,6 +84,8 @@ class ConditionalFactory(object):
             child_descriptor.location: child_descriptor,
             source_location: source_descriptor
         }.get
+
+        system.descriptor_runtime = descriptor_system
 
         # construct conditional module:
         cond_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
