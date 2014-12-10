@@ -148,7 +148,7 @@ class Command(BaseCommand):
             gname = raw_input("Add group (tab to autocomplete, empty line to end): ")
             if not gname:
                 break
-            if not gname in groups:
+            if gname not in groups:
                 print "Unknown group %s" % gname
                 continue
             g = Group.objects.get(name=gname)

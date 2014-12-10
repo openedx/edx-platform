@@ -184,40 +184,44 @@ class CourseFields(object):
         help=_("Enter the date you want to advertise as the course start date, if this date is different from the set start date. To advertise the set start date, enter null."),
         scope=Scope.settings
     )
-    grading_policy = Dict(help="Grading policy definition for this class",
-                          default={"GRADER": [
-                              {
-                                  "type": "Homework",
-                                  "min_count": 12,
-                                  "drop_count": 2,
-                                  "short_label": "HW",
-                                  "weight": 0.15
-                              },
-                              {
-                                  "type": "Lab",
-                                  "min_count": 12,
-                                  "drop_count": 2,
-                                  "weight": 0.15
-                              },
-                              {
-                                  "type": "Midterm Exam",
-                                  "short_label": "Midterm",
-                                  "min_count": 1,
-                                  "drop_count": 0,
-                                  "weight": 0.3
-                              },
-                              {
-                                  "type": "Final Exam",
-                                  "short_label": "Final",
-                                  "min_count": 1,
-                                  "drop_count": 0,
-                                  "weight": 0.4
-                              }
-                          ],
-                              "GRADE_CUTOFFS": {
-                                  "Pass": 0.5
-                              }},
-                          scope=Scope.content)
+    grading_policy = Dict(
+        help="Grading policy definition for this class",
+        default={
+            "GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 12,
+                    "drop_count": 2,
+                    "short_label": "HW",
+                    "weight": 0.15,
+                },
+                {
+                    "type": "Lab",
+                    "min_count": 12,
+                    "drop_count": 2,
+                    "weight": 0.15,
+                },
+                {
+                    "type": "Midterm Exam",
+                    "short_label": "Midterm",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "weight": 0.3,
+                },
+                {
+                    "type": "Final Exam",
+                    "short_label": "Final",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "weight": 0.4,
+                }
+            ],
+            "GRADE_CUTOFFS": {
+                "Pass": 0.5,
+            },
+        },
+        scope=Scope.content
+    )
     show_calculator = Boolean(
         display_name=_("Show Calculator"),
         help=_("Enter true or false. When true, students can see the calculator in the course."),

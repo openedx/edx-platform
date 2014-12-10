@@ -336,7 +336,6 @@ class ModuleStoreTestCase(TestCase):
             block_info_tree = default_block_info_tree
 
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
-#             with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
             course = self.store.create_course(org, course, run, self.user.id, fields=course_fields)
             self.course_loc = course.location  # pylint: disable=attribute-defined-outside-init
 

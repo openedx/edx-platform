@@ -277,8 +277,9 @@ def _grade(student, request, course, keep_raw_scores):
     grade_summary['grade'] = letter_grade
     grade_summary['totaled_scores'] = totaled_scores  	# make this available, eg for instructor download & debugging
     if keep_raw_scores:
-        grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
-                                                        # so grader can be double-checked
+        # way to get all RAW scores out to instructor
+        # so grader can be double-checked
+        grade_summary['raw_scores'] = raw_scores
     return grade_summary
 
 

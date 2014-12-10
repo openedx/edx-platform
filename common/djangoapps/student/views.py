@@ -1002,7 +1002,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                 _("Use your {platform_name} username and password to log into {platform_name} below, "
                   "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
                       platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
-                  )
+                )
                 + "<br/><br/>" +
                 _("If you don't have an {platform_name} account yet, click <strong>Register Now</strong> at the top of the page.").format(
                     platform_name=settings.PLATFORM_NAME

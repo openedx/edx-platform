@@ -731,7 +731,7 @@ class StringResponseTest(ResponseTest):
             case_sensitive=False,
             hints=hints,
         )
-         # We should get a hint for Wisconsin
+        # We should get a hint for Wisconsin
         input_dict = {'1_2_1': 'Wisconsin'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'),

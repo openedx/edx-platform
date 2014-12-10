@@ -1028,7 +1028,7 @@ def textbooks_list_handler(request, course_key_string):
     with store.bulk_operations(course_key):
         course = _get_course_module(course_key, request.user)
 
-        if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
+        if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
             # return HTML page
             upload_asset_url = reverse_course_url('assets_handler', course_key)
             textbook_url = reverse_course_url('textbooks_list_handler', course_key)
@@ -1050,7 +1050,7 @@ def textbooks_list_handler(request, course_key_string):
 
             tids = set(t["id"] for t in textbooks if "id" in t)
             for textbook in textbooks:
-                if not "id" in textbook:
+                if "id" not in textbook:
                     tid = assign_textbook_id(textbook, tids)
                     textbook["id"] = tid
                     tids.add(tid)
@@ -1347,7 +1347,7 @@ def group_configurations_list_handler(request, course_key_string):
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':
-            # create a new group configuration for the course
+                # create a new group configuration for the course
                 try:
                     new_configuration = GroupConfiguration(request.body, course).get_user_partition()
                 except GroupConfigurationsValidationError as err:

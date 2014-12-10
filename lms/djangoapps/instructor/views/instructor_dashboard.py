@@ -87,7 +87,7 @@ def instructor_dashboard_2(request, course_id):
     if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
         sections.append(_section_metrics(course, access))
 
-     # Gate access to Ecommerce tab
+    # Gate access to Ecommerce tab
     if course_mode_has_price:
         sections.append(_section_e_commerce(course, access))
 

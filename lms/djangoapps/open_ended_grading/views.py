@@ -332,8 +332,8 @@ def take_action_on_flags(request, course_id):
     except GradingServiceError:
         log.exception(
             u"Error taking action on flagged peer grading submissions, "
-            u"submission_id: {0}, action_type: {1}, grader_id: {2}".format(
-            submission_id, action_type, student_id)
+            u"submission_id: {0}, action_type: {1}, grader_id: {2}"
+            .format(submission_id, action_type, student_id)
         )
         response = {
             'success': False,
