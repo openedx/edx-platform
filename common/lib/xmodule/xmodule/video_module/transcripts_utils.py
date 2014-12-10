@@ -532,10 +532,10 @@ class VideoTranscriptsMixin(object):
 
         # If we're not verifying the assets, we just trust our field values
         if not verify_assets:
-            if self.sub:
-                translations = ['en']
-            translations += list(self.transcripts)
-            return translations
+            translations = list(self.transcripts)
+            if not translations or self.sub:
+                translations += ['en']
+            return set(translations)
 
         # If we've gotten this far, we're going to verify that the transcripts
         # being referenced are actually in the contentstore.
