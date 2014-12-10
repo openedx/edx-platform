@@ -26,7 +26,7 @@ define(['jquery'], function($) {
 
             toBeFocused: function () {
                 return $(this.actual)[0] === $(this.actual)[0].ownerDocument.activeElement;
-            },
+            }
         });
     };
 });
