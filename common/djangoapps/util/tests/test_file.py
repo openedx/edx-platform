@@ -151,7 +151,7 @@ class StoreUploadedFileTestCase(TestCase):
 
         def success_validator(storage, filename):
             """ Validation test function that is a no-op """
-            self.assertEqual("success_file.csv", os.path.basename(filename))
+            self.assertTrue("success_file" in os.path.basename(filename))
             store_file_data(storage, filename)
 
         with self.assertRaises(FileValidationException) as error:
@@ -173,26 +173,46 @@ class StoreUploadedFileTestCase(TestCase):
         """
         Tests uploading a file with lower case extension. Verifies that the stored file contents are correct.
         """
-        self.file_storage, self.stored_file_name = store_uploaded_file(
+        file_storage, stored_file_name = store_uploaded_file(
             self.request, "uploaded_file", [".csv"], "stored_file", self.default_max_size
         )
-        self._verify_successful_upload()
+        self._verify_successful_upload(file_storage, stored_file_name, self.file_content)
 
     def test_file_upload_upper_case_extension(self):
         """
         Tests uploading a file with upper case extension. Verifies that the stored file contents are correct.
         """
-        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.CSV", self.file_content)}
-        self.file_storage, self.stored_file_name = store_uploaded_file(
+        file_content = "uppercase"
+        self.request.FILES = {"uploaded_file": SimpleUploadedFile("tempfile.CSV", file_content)}
+        file_storage, stored_file_name = store_uploaded_file(
             self.request, "uploaded_file", [".gif", ".csv"], "second_stored_file", self.default_max_size
         )
-        self._verify_successful_upload()
+        self._verify_successful_upload(file_storage, stored_file_name, file_content)
 
-    def _verify_successful_upload(self):
+    def test_unique_filenames(self):
+        """
+        Test that the file storage method will create a unique filename if the file already exists.
+        """
+        requested_file_name = "nonunique_store"
+        file_content = "copy"
+
+        self.request.FILES = {"nonunique_file": SimpleUploadedFile("nonunique.txt", file_content)}
+        _, first_stored_file_name = store_uploaded_file(
+            self.request, "nonunique_file", [".txt"], requested_file_name, self.default_max_size
+        )
+
+        file_storage, second_stored_file_name = store_uploaded_file(
+            self.request, "nonunique_file", [".txt"], requested_file_name, self.default_max_size
+        )
+        self.assertNotEqual(first_stored_file_name, second_stored_file_name)
+        self.assertTrue(requested_file_name in second_stored_file_name)
+        self._verify_successful_upload(file_storage, second_stored_file_name, file_content)
+
+    def _verify_successful_upload(self, storage, file_name, expected_content):
         """ Helper method that checks that the stored version of the uploaded file has the correct content """
-        self.assertTrue(self.file_storage.exists(self.stored_file_name))
-        with self.file_storage.open(self.stored_file_name, 'r') as f:
-            self.assertEqual(self.file_content, f.read())
+        self.assertTrue(storage.exists(file_name))
+        with storage.open(file_name, 'r') as f:
+            self.assertEqual(expected_content, f.read())
 
 
 @ddt.ddt

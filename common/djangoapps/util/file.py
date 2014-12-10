@@ -70,7 +70,8 @@ def store_uploaded_file(
         stored_file_name = base_storage_filename + file_extension
 
         file_storage = DefaultStorage()
-        file_storage.save(stored_file_name, uploaded_file)
+        # If a file already exists with the supplied name, file_storage will make the filename unique.
+        stored_file_name = file_storage.save(stored_file_name, uploaded_file)
 
         if validator:
             try:
