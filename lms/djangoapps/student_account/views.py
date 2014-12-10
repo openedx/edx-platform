@@ -285,16 +285,13 @@ def _third_party_auth_context(request):
     }
 
     course_id = request.GET.get("course_id")
-    email_opt_in = request.GET.get('email_opt_in')
     login_urls = auth_pipeline_urls(
         third_party_auth.pipeline.AUTH_ENTRY_LOGIN_2,
-        course_id=course_id,
-        email_opt_in=email_opt_in
+        course_id=course_id
     )
     register_urls = auth_pipeline_urls(
         third_party_auth.pipeline.AUTH_ENTRY_REGISTER_2,
-        course_id=course_id,
-        email_opt_in=email_opt_in
+        course_id=course_id
     )
 
     if third_party_auth.is_enabled():
