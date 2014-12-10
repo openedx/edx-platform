@@ -426,8 +426,9 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                     else:
                         try:
                             value = field.from_json(value)
-                        except ValueError:
-                            return JsonResponse({"error": "Invalid data"}, 400)
+                        except ValueError as verr:
+                            reason = _("Invalid data ({details})").format(details=verr.message) if verr.message else _("Invalid data")
+                            return JsonResponse({"error": reason}, 400)
                         field.write_to(xblock, value)
 
         # update the xblock and call any xblock callbacks

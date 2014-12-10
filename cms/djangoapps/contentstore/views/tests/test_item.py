@@ -894,6 +894,29 @@ class TestEditItem(ItemTest):
         self._verify_published_with_draft(unit_usage_key)
         self._verify_published_with_draft(html_usage_key)
 
+    def test_field_value_errors(self):
+        """
+        Test that if the user's input causes a ValueError on an XBlock field,
+        we provide a friendly error message back to the user.
+        """
+        response = self.create_xblock(parent_usage_key=self.seq_usage_key, category='video')
+        video_usage_key = self.response_usage_key(response)
+        update_url = reverse_usage_url('xblock_handler', video_usage_key)
+
+        response = self.client.ajax_post(
+            update_url,
+            data={
+                'id': unicode(video_usage_key),
+                'metadata': {
+                    'saved_video_position': "Not a valid relative time",
+                },
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        parsed = json.loads(response.content)
+        self.assertIn("error", parsed)
+        self.assertIn("Incorrect RelativeTime value", parsed["error"])  # See xmodule/fields.py
+
 
 class TestEditSplitModule(ItemTest):
     """

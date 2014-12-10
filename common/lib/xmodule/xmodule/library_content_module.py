@@ -1,11 +1,12 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
-from bson.objectid import ObjectId
+from bson.objectid import ObjectId, InvalidId
 from collections import namedtuple
 from copy import copy
 import hashlib
 from .mako_module import MakoModuleDescriptor
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator
 import random
 from webob import Response
@@ -46,7 +47,10 @@ class LibraryVersionReference(namedtuple("LibraryVersionReference", "library_id 
                 version = library_id.version_guid
             library_id = library_id.for_version(None)
         if version and not isinstance(version, ObjectId):
-            version = ObjectId(version)
+            try:
+                version = ObjectId(version)
+            except InvalidId:
+                raise ValueError(version)
         return super(LibraryVersionReference, cls).__new__(cls, library_id, version)
 
     @staticmethod
@@ -86,7 +90,14 @@ class LibraryList(List):
                 val = val.strip(' []')
                 parts = val.rsplit(',', 1)
                 val = [parts[0], parts[1] if len(parts) > 1 else None]
-            return LibraryVersionReference.from_json(val)
+            try:
+                return LibraryVersionReference.from_json(val)
+            except InvalidKeyError:
+                try:
+                    friendly_val = val[0]  # Just get the library key part, not the version
+                except IndexError:
+                    friendly_val = unicode(val)
+                raise ValueError(_('"{value}" is not a valid library ID.').format(value=friendly_val))
         return [parse(v) for v in values]
 
     def to_json(self, values):
