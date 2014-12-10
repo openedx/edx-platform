@@ -801,4 +801,3 @@ FILES_AND_UPLOAD_TYPE_FILTER = {
         'application/vnd.ms-powerpoint',
     ],
 }
-
