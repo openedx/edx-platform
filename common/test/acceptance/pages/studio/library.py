@@ -246,13 +246,6 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
         """
         return cls(xblock_wrapper.browser, xblock_wrapper.locator)
 
-    @property
-    def header_text(self):
-        """
-        Gets library content text
-        """
-        return self.get_body_paragraphs().first.text[0]
-
     def get_body_paragraphs(self):
         """
         Gets library content body paragraphs
@@ -263,5 +256,7 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
         """
         Click "Update now..." button
         """
-        refresh_button = self.q(css=self._bounded_selector(".library-update-btn"))
+        btn_selector = self._bounded_selector(".library-update-btn")
+        refresh_button = self.q(css=btn_selector)
         refresh_button.click()
+        self.wait_for_element_absence(btn_selector, 'Wait for the XBlock to reload')
