@@ -282,8 +282,151 @@
     }
   }
 
-  // component: visibility modal
-  .xblock-visibility-modal {
+  // xblock custom actions
+  .modal-window .editor-with-buttons {
+    margin-bottom: ($baseline*3);
+
+    // temporary fix until xblock structure is set
+    &.wrapper-comp-settings .list-input.settings-list {
+      height: 375px;
+    }
+
+    // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
+    .xblock-actions {
+      background-color: $gray-l4;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+    }
+  }
+
+
+  // MODAL TYPE: component - video modal (includes special overrides for xblock-related editing view)
+  .modal-lg.modal-type-video {
+
+    .modal-content {
+      box-shadow: none;
+      height: auto;
+      overflow-y: hidden;
+
+      // modal within a modal
+      .wrapper-modal-window-assetupload {
+
+        .modal-window {
+          top: 10% !important;
+          left: 10% !important;
+        }
+
+        .modal-header {
+          margin: ($baseline/2) 2%;
+
+          .title {
+            width: auto;
+            margin: 0 0 ($baseline/4) 0;
+          }
+
+          .editor-modes {
+            display: none;
+          }
+        }
+
+        .modal-content {
+          padding: 2%;
+
+          .message {
+            margin: 0 ($baseline/4) ($baseline/4) ($baseline/4);
+          }
+
+          input[type="file"] {
+            margin: 0;
+          }
+        }
+
+        .modal-actions {
+          padding: ($baseline/2) 0;
+        }
+      }
+    }
+
+    .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs {
+
+      .edit-header {
+        border: 0;
+        background-color: $gray-l4;
+        padding: ($baseline/2);
+
+        .component-name {
+          @extend %t-title5;
+          @extend %t-strong;
+          display: inline-block;
+          vertical-align: middle;
+          width: 48%;
+          margin-left: ($baseline/2);
+          color: $black;
+
+          em {
+            color: inherit;
+            display: inline;
+          }
+        }
+
+        .editor-tabs {
+          display: inline-block;
+          width: 48%;
+          position: relative;
+          top: auto;
+          right: auto;
+          padding: 0;
+          text-align: right;
+
+          .inner_tab_wrap {
+            padding: 0;
+
+            a.tab {
+              @extend %btn-secondary-gray;
+              @extend %t-copy-sub1;
+              @extend %t-regular;
+              background-image: none;
+              box-shadow: none;
+              border: 0;
+              padding: ($baseline/4) ($baseline/2);
+              text-transform: uppercase;
+
+              &.current {
+                background-color: $gray-d1;
+                color: $white;
+              }
+            }
+          }
+        }
+      }
+
+      .tabs-wrapper {
+        height: ($baseline*24);
+        overflow-y: scroll;
+        border: 1px solid $gray-l2;
+
+        .component-tab {
+          border-top: 0;
+        }
+      }
+    }
+  }
+
+  .modal-window-overlay {
+    @extend %ui-depth3;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+  }
+
+  // MODAL TYPE: component - visibility modal
+  .xblock-visibility_view {
 
     // UI: visibility summary
     .visibility-summary-title {
@@ -355,57 +498,57 @@
         }
       }
     }
-  }
 
-  // CASE: content group has been removed
-  .field-visibility-content-group.was-removed {
+    // CASE: content group has been removed
+    .field-visibility-content-group.was-removed {
 
-    .input-checkbox:checked ~ label {
-      color: $color-error;
-    }
+      .input-checkbox:checked ~ label {
+        color: $color-error;
+      }
 
-    .note {
-      @extend %t-copy-sub2;
-      @extend %t-regular;
-      display: block;
-      margin-top: ($baseline/4);
-      color: $color-error;
-    }
-  }
-
-  // CASE: no groups configured for visibility
-  .is-not-configured {
-    @extend %no-content;
-    text-align: left; // reset for %no-content's default styling
-
-    .title {
-      @extend %t-title6;
-      font-weight: 600;  // needed for poorly scoped .title rule in modals
-      margin: 0 0 ($baseline/2) 0; // needed for poorly scoped .title rule in modals
-    }
-
-    .copy {
-      @extend %t-copy-sub1;
-
-       p {
-        @extend %wipe-last-child;
-        margin-bottom: $baseline;
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        display: block;
+        margin-top: ($baseline/4);
+        color: $color-error;
       }
     }
 
-    &.has-actions {
+    // CASE: no groups configured for visibility
+    .is-not-configured {
+      @extend %no-content;
+      text-align: left; // reset for %no-content's default styling
 
-      .actions {
-        margin-top: $baseline;
+      .title {
+        @extend %t-title6;
+        font-weight: 600;  // needed for poorly scoped .title rule in modals
+        margin: 0 0 ($baseline/2) 0; // needed for poorly scoped .title rule in modals
       }
 
-      .action {
-        margin-left: 0; // reset for %no-content's default styling
+      .copy {
+        @extend %t-copy-sub1;
+
+         p {
+          @extend %wipe-last-child;
+          margin-bottom: $baseline;
+        }
+      }
+
+      &.has-actions {
+
+        .actions {
+          margin-top: $baseline;
+        }
+
+        .action {
+          margin-left: 0; // reset for %no-content's default styling
+        }
       }
     }
   }
 
-  // outline: edit item settings
+  // MODAL TYPE: outline - edit item settings
   .wrapper-modal-window-bulkpublish-section,
   .wrapper-modal-window-bulkpublish-subsection,
   .wrapper-modal-window-bulkpublish-unit,
@@ -540,148 +683,5 @@
         margin-bottom: 0;
       }
     }
-  }
-
-  // xblock custom actions
-  .modal-window .editor-with-buttons {
-    margin-bottom: ($baseline*3);
-
-    // temporary fix until xblock structure is set
-    &.wrapper-comp-settings .list-input.settings-list {
-      height: 375px;
-    }
-
-    // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
-    .xblock-actions {
-      background-color: $gray-l4;
-      position: absolute;
-      width: 100%;
-      bottom: 0;
-    }
-  }
-
-
-  // special overrides for video module editor/hidden tab editors
-  .modal-lg.modal-type-video {
-
-    .modal-content {
-      box-shadow: none;
-      height: auto;
-      overflow-y: hidden;
-
-      // modal within a modal
-      .wrapper-modal-window-assetupload {
-
-        .modal-window {
-          top: 10% !important;
-          left: 10% !important;
-        }
-
-        .modal-header {
-          margin: ($baseline/2) 2%;
-
-          .title {
-            width: auto;
-            margin: 0 0 ($baseline/4) 0;
-          }
-
-          .editor-modes {
-            display: none;
-          }
-        }
-
-        .modal-content {
-          padding: 2%;
-
-          .message {
-            margin: 0 ($baseline/4) ($baseline/4) ($baseline/4);
-          }
-
-          input[type="file"] {
-            margin: 0;
-          }
-        }
-
-        .modal-actions {
-          padding: ($baseline/2) 0;
-        }
-      }
-    }
-
-    .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs {
-
-      .edit-header {
-        border: 0;
-        background-color: $gray-l4;
-        padding: ($baseline/2);
-
-        .component-name {
-          @extend %t-title5;
-          @extend %t-strong;
-          display: inline-block;
-          vertical-align: middle;
-          width: 48%;
-          margin-left: ($baseline/2);
-          color: $black;
-
-          em {
-            color: inherit;
-            display: inline;
-          }
-        }
-
-        .editor-tabs {
-          display: inline-block;
-          width: 48%;
-          position: relative;
-          top: auto;
-          right: auto;
-          padding: 0;
-          text-align: right;
-
-          .inner_tab_wrap {
-            padding: 0;
-
-            a.tab {
-              @extend %btn-secondary-gray;
-              @extend %t-copy-sub1;
-              @extend %t-regular;
-              background-image: none;
-              box-shadow: none;
-              border: 0;
-              padding: ($baseline/4) ($baseline/2);
-              text-transform: uppercase;
-
-              &.current {
-                background-color: $gray-d1;
-                color: $white;
-              }
-            }
-          }
-        }
-      }
-
-      .tabs-wrapper {
-        height: ($baseline*24);
-        overflow-y: scroll;
-        border: 1px solid $gray-l2;
-
-        .component-tab {
-          border-top: 0;
-        }
-      }
-    }
-  }
-
-  .modal-window-overlay {
-    @extend %ui-depth3;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    opacity: 0.5;
-    filter: alpha(opacity=50);
   }
 }
