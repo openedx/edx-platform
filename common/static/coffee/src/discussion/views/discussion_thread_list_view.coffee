@@ -261,10 +261,7 @@ if Backbone?
         url: url
         type: "GET"
         success: (response, textStatus) =>
-          if response.status
-            $('input.email-setting').attr('checked','checked')
-          else
-            $('input.email-setting').removeAttr('checked')
+          $('input.email-setting').prop('checked', response.status)
       #select all threads
 
     isBrowseMenuVisible: =>
@@ -516,17 +513,11 @@ if Backbone?
       @retrieveFirstPage()
 
     updateEmailNotifications: () =>
-      if $('input.email-setting').attr('checked')
-        DiscussionUtil.safeAjax
-          url: DiscussionUtil.urlFor("enable_notifications")
-          type: "POST"
-          error: () =>
-            $('input.email-setting').removeAttr('checked')
-      else
-        DiscussionUtil.safeAjax
-          url: DiscussionUtil.urlFor("disable_notifications")
-          type: "POST"
-          error: () =>
-            $('input.email-setting').attr('checked','checked')
-
-
+      checkbox = $('input.email-setting')
+      checked = checkbox.prop('checked')
+      url_name = if checked then "enable_notifications" else "disable_notifications"
+      DiscussionUtil.safeAjax
+        url: DiscussionUtil.urlFor(url_name)
+        type: "POST"
+        error: () =>
+          checkbox.prop('checked', !checked)
