@@ -39,7 +39,7 @@ from util.json_request import expect_json, JsonResponse
 
 from student.auth import has_studio_write_access, has_studio_read_access
 from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
-    ancestor_has_staff_lock
+    ancestor_has_staff_lock, has_children_visible_to_specific_content_groups
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock
 from contentstore.views.preview import get_preview_fragment
@@ -48,8 +48,11 @@ from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
+from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 
-__all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler']
+__all__ = [
+    'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
+]
 
 log = logging.getLogger(__name__)
 
@@ -58,7 +61,6 @@ CREATE_IF_NOT_FOUND = ['course_info']
 # Useful constants for defining predicates
 NEVER = lambda x: False
 ALWAYS = lambda x: True
-
 
 # In order to allow descriptors to use a handler url, we need to
 # monkey-patch the x_module library.
@@ -144,8 +146,8 @@ def xblock_handler(request, usage_key_string):
                     return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
                 # TODO: pass fields to _get_module_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
-                    rsp = _get_module_info(_get_xblock(usage_key, request.user))
-                return JsonResponse(rsp)
+                    response = _get_module_info(_get_xblock(usage_key, request.user))
+                return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
 
@@ -226,14 +228,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
             request_token=request_token(request),
         ))
 
-        if view_name == STUDIO_VIEW:
+        if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
             try:
-                fragment = xblock.render(STUDIO_VIEW)
+                fragment = xblock.render(view_name)
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
             except Exception as exc:                          # pylint: disable=broad-except
-                log.debug("unable to render studio_view for %r", xblock, exc_info=True)
+                log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
         elif view_name in (PREVIEW_VIEWS + container_views):
@@ -330,6 +332,32 @@ def xblock_outline_handler(request, usage_key_string):
             course_outline=True,
             include_children_predicate=lambda xblock: not xblock.category == 'vertical'
         ))
+    else:
+        return Http404
+
+
+# pylint: disable=unused-argument
+@require_http_methods(("GET"))
+@login_required
+@expect_json
+def xblock_container_handler(request, usage_key_string):
+    """
+    The restful handler for requests for XBlock information about the block and its children.
+    This is used by the container page in particular to get additional information about publish state
+    and ancestor state.
+    """
+    usage_key = usage_key_with_run(usage_key_string)
+
+    if not has_course_author_access(request.user, usage_key.course_key):
+        raise PermissionDenied()
+
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        with modulestore().bulk_operations(usage_key.course_key):
+            response = _get_module_info(
+                _get_xblock(usage_key, request.user), include_ancestor_info=True, include_publishing_info=True
+            )
+        return JsonResponse(response)
     else:
         return Http404
 
@@ -696,7 +724,7 @@ def _get_xblock(usage_key, user):
             return JsonResponse({"error": "Can't find item by location: " + unicode(usage_key)}, 404)
 
 
-def _get_module_info(xblock, rewrite_static_links=True):
+def _get_module_info(xblock, rewrite_static_links=True, include_ancestor_info=False, include_publishing_info=False):
     """
     metadata, data, id representation of a leaf module fetcher.
     :param usage_key: A UsageKey
@@ -716,7 +744,12 @@ def _get_module_info(xblock, rewrite_static_links=True):
             modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
 
         # Note that children aren't being returned until we have a use case.
-        return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
+        xblock_info = create_xblock_info(
+            xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=include_ancestor_info
+        )
+        if include_publishing_info:
+            add_container_page_publishing_info(xblock, xblock_info)
+        return xblock_info
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
@@ -736,24 +769,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     In addition, an optional include_children_predicate argument can be provided to define whether or
     not a particular xblock should have its children included.
     """
-
-    def safe_get_username(user_id):
-        """
-        Guard against bad user_ids, like the infamous "**replace_user**".
-        Note that this will ignore our special known IDs (ModuleStoreEnum.UserID).
-        We should consider adding special handling for those values.
-
-        :param user_id: the user id to get the username of
-        :return: username, or None if the user does not exist or user_id is None
-        """
-        if user_id:
-            try:
-                return User.objects.get(id=user_id).username
-            except:  # pylint: disable=bare-except
-                pass
-
-        return None
-
     is_library_block = isinstance(xblock.location, LibraryUsageLocator)
     is_xblock_unit = is_unit(xblock, parent_xblock)
     # this should not be calculated for Sections and Subsections on Unit page or for library blocks
@@ -779,8 +794,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         child_info = None
 
-    # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
-    release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
     if xblock.category != 'course':
         visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
     else:
@@ -796,7 +809,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "published_on": get_default_time_display(xblock.published_on) if published and xblock.published_on else None,
         "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
-        "release_date": release_date,
+        "release_date": _get_release_date(xblock),
         "visibility_state": visibility_state,
         "has_explicit_staff_lock": xblock.fields['visible_to_staff_only'].is_set_on(xblock),
         "start": xblock.fields['start'].to_json(xblock.start),
@@ -820,19 +833,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         xblock_info["ancestor_has_staff_lock"] = False
 
-    # Currently, 'edited_by', 'published_by', and 'release_date_from' are only used by the
-    # container page when rendering a unit. Since they are expensive to compute, only include them for units
-    # that are not being rendered on the course outline.
-    if is_xblock_unit and not course_outline:
-        xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
-        xblock_info["published_by"] = safe_get_username(xblock.published_by)
-        xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
-        if release_date:
-            xblock_info["release_date_from"] = _get_release_date_from(xblock)
-        if visibility_state == VisibilityState.staff_only:
-            xblock_info["staff_lock_from"] = _get_staff_lock_from(xblock)
-        else:
-            xblock_info["staff_lock_from"] = None
     if course_outline:
         if xblock_info["has_explicit_staff_lock"]:
             xblock_info["staff_only_message"] = True
@@ -842,6 +842,40 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             xblock_info["staff_only_message"] = False
 
     return xblock_info
+
+
+def add_container_page_publishing_info(xblock, xblock_info):  # pylint: disable=invalid-name
+    """
+    Adds information about the xblock's publish state to the supplied
+    xblock_info for the container page.
+    """
+    def safe_get_username(user_id):
+        """
+        Guard against bad user_ids, like the infamous "**replace_user**".
+        Note that this will ignore our special known IDs (ModuleStoreEnum.UserID).
+        We should consider adding special handling for those values.
+
+        :param user_id: the user id to get the username of
+        :return: username, or None if the user does not exist or user_id is None
+        """
+        if user_id:
+            try:
+                return User.objects.get(id=user_id).username
+            except:  # pylint: disable=bare-except
+                pass
+
+        return None
+
+    xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
+    xblock_info["published_by"] = safe_get_username(xblock.published_by)
+    xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
+    xblock_info["has_content_group_components"] = has_children_visible_to_specific_content_groups(xblock)
+    if xblock_info["release_date"]:
+        xblock_info["release_date_from"] = _get_release_date_from(xblock)
+    if xblock_info["visibility_state"] == VisibilityState.staff_only:
+        xblock_info["staff_lock_from"] = _get_staff_lock_from(xblock)
+    else:
+        xblock_info["staff_lock_from"] = None
 
 
 class VisibilityState(object):
@@ -961,6 +995,14 @@ def _create_xblock_child_info(xblock, course_outline, graders, include_children_
             ) for child in xblock.get_children()
         ]
     return child_info
+
+
+def _get_release_date(xblock):
+    """
+    Returns the release date for the xblock, or None if the release date has never been set.
+    """
+    # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
+    return get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
 
 
 def _get_release_date_from(xblock):

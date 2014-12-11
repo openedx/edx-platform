@@ -10,8 +10,8 @@ from path import path
 from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from xmodule.partitions.partitions import UserPartition
+from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 
 
 def skip_if_browser(browser):

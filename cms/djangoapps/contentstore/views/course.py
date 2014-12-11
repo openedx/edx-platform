@@ -1410,7 +1410,7 @@ def group_configurations_list_handler(request, course_key_string):
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
-                'configurations': configurations if should_show_group_configurations_page(course) else None,
+                'configurations': configurations,
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':
@@ -1487,16 +1487,6 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             course.user_partitions.pop(index)
             store.update_item(course, request.user.id)
             return JsonResponse(status=204)
-
-
-def should_show_group_configurations_page(course):
-    """
-    Returns true if Studio should show the "Group Configurations" page for the specified course.
-    """
-    return (
-        SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and
-        SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
-    )
 
 
 def _get_course_creator_status(user):

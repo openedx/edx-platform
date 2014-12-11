@@ -153,6 +153,13 @@ class ContainerPage(PageObject):
         return self.q(css='.bit-publishing .wrapper-visibility .copy .inherited-from').visible
 
     @property
+    def sidebar_visibility_message(self):
+        """
+        Returns the text within the sidebar visibility section.
+        """
+        return self.q(css='.bit-publishing .wrapper-visibility').first.text[0]
+
+    @property
     def publish_action(self):
         """
         Returns the link for publishing a unit.
@@ -243,7 +250,7 @@ class ContainerPage(PageObject):
         """
         Clicks the "edit" button for the first component on the page.
         """
-        return _click_edit(self)
+        return _click_edit(self, '.edit-button', '.xblock-studio_view')
 
     def add_missing_groups(self):
         """
@@ -282,6 +289,7 @@ class XBlockWrapper(PageObject):
     url = None
     BODY_SELECTOR = '.studio-xblock-wrapper'
     NAME_SELECTOR = '.xblock-display-name'
+    VALIDATION_SELECTOR = '.xblock-message.validation'
     COMPONENT_BUTTONS = {
         'basic_tab': '.editor-tabs li.inner_tab_wrap:nth-child(1) > a',
         'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
@@ -348,11 +356,11 @@ class XBlockWrapper(PageObject):
     @property
     def has_validation_message(self):
         """ Is a validation warning/error/message shown? """
-        return self.q(css=self._bounded_selector('.xblock-message.validation')).present
+        return self.q(css=self._bounded_selector(self.VALIDATION_SELECTOR)).present
 
     def _validation_paragraph(self, css_class):
         """ Helper method to return the <p> element of a validation warning """
-        return self.q(css=self._bounded_selector('.xblock-message.validation p.{}'.format(css_class)))
+        return self.q(css=self._bounded_selector('{} p.{}'.format(self.VALIDATION_SELECTOR, css_class)))
 
     @property
     def has_validation_warning(self):
@@ -381,6 +389,10 @@ class XBlockWrapper(PageObject):
         return self._validation_paragraph('error').text[0]
 
     @property
+    def validation_error_messages(self):
+        return self.q(css=self._bounded_selector('{} .xblock-message-item.error'.format(self.VALIDATION_SELECTOR))).text
+
+    @property
     # pylint: disable=invalid-name
     def validation_not_configured_warning_text(self):
         """ Get the text of the validation "not configured" message. """
@@ -389,6 +401,10 @@ class XBlockWrapper(PageObject):
     @property
     def preview_selector(self):
         return self._bounded_selector('.xblock-student_view,.xblock-author_view')
+
+    @property
+    def has_group_visibility_set(self):
+        return self.q(css=self._bounded_selector('.wrapper-xblock.has-group-visibility-set')).is_present()
 
     def go_to_container(self):
         """
@@ -401,7 +417,13 @@ class XBlockWrapper(PageObject):
         """
         Clicks the "edit" button for this xblock.
         """
-        return _click_edit(self, self._bounded_selector)
+        return _click_edit(self, '.edit-button', '.xblock-studio_view', self._bounded_selector)
+
+    def edit_visibility(self):
+        """
+        Clicks the edit visibility button for this xblock.
+        """
+        return _click_edit(self, '.visibility-button', '.xblock-visibility_view', self._bounded_selector)
 
     def open_advanced_tab(self):
         """
@@ -478,13 +500,13 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('span.message-text a')).first.text[0]
 
 
-def _click_edit(page_object, bounded_selector=lambda(x): x):
+def _click_edit(page_object, button_css, view_css, bounded_selector=lambda(x): x):
     """
-    Click on the first edit button found and wait for the Studio editor to be present.
+    Click on the first editing button found and wait for the Studio editor to be present.
     """
-    page_object.q(css=bounded_selector('.edit-button')).first.click()
+    page_object.q(css=bounded_selector(button_css)).first.click()
     EmptyPromise(
-        lambda: page_object.q(css='.xblock-studio_view').present,
+        lambda: page_object.q(css=view_css).present,
         'Wait for the Studio editor to be present'
     ).fulfill()
 
