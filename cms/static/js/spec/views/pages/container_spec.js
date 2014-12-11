@@ -11,7 +11,8 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                 mockBadContainerXBlockHtml = readFixtures('mock/mock-bad-javascript-container-xblock.underscore'),
                 mockBadXBlockContainerXBlockHtml = readFixtures('mock/mock-bad-xblock-container-xblock.underscore'),
                 mockUpdatedContainerXBlockHtml = readFixtures('mock/mock-updated-container-xblock.underscore'),
-                mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
+                mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore'),
+                mockXBlockVisibilityEditorHtml = readFixtures('mock/mock-xblock-visibility-editor.underscore');
 
             beforeEach(function () {
                 var newDisplayName = 'New Display Name';
@@ -204,6 +205,21 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                     editButtons[0].click();
                     AjaxHelpers.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
+                        resources: []
+                    });
+                    expect(EditHelpers.isShowingModal()).toBeTruthy();
+                });
+
+                it('can show a visibility modal for a child xblock', function() {
+                    var visibilityButtons;
+                    renderContainerPage(this, mockContainerXBlockHtml);
+                    visibilityButtons = containerPage.$('.wrapper-xblock .visibility-button');
+                    expect(visibilityButtons.length).toBe(6);
+                    visibilityButtons[0].click();
+                    expect(str.startsWith(lastRequest().url, '/xblock/locator-component-A1/visibility_view'))
+                        .toBeTruthy();
+                    AjaxHelpers.respondWithJson(requests, {
+                        html: mockXBlockVisibilityEditorHtml,
                         resources: []
                     });
                     expect(EditHelpers.isShowingModal()).toBeTruthy();
