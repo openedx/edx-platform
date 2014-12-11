@@ -313,6 +313,14 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('.xblock-student_view'))[0].text
 
     @property
+    def author_content(self):
+        """
+        Returns the text content of the xblock as displayed on the container page.
+        (For blocks which implement a distinct author_view).
+        """
+        return self.q(css=self._bounded_selector('.xblock-author_view'))[0].text
+
+    @property
     def name(self):
         titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
         if titles:
