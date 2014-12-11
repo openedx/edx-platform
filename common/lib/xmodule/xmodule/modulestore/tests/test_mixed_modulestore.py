@@ -723,7 +723,7 @@ class TestMixedModuleStore(CourseComparisonTest):
     # Split:
     #    queries: active_versions, draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data(('draft', 8, 2), ('split', 2, 2))
+    @ddt.data(('draft', 9, 2), ('split', 2, 2))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
