@@ -12,7 +12,10 @@ from edxmako.shortcuts import render_to_response
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.http import (
+    HttpResponse, HttpResponseBadRequest,
+    HttpResponseRedirect, Http404
+)
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -165,6 +168,458 @@ class VerifiedView(View):
             "modes_dict": modes_dict,
         }
         return render_to_response('verify_student/verified.html', context)
+
+
+class PayAndVerifyView(View):
+    """View for the "verify and pay" flow.
+
+    This view is somewhat complicated, because the user
+    can enter it from a number of different places:
+
+    * From the "choose your track" page.
+    * After completing payment.
+    * From the dashboard in order to complete verification.
+    * From the dashboard in order to upgrade to a verified track.
+
+    The page will display different steps and requirements
+    depending on:
+
+    * Whether the user has submitted a photo verification recently.
+    * Whether the user has paid for the course.
+    * How the user reached the page (mostly affects messaging)
+
+    We are also super-paranoid about how users reach this page.
+    If they somehow aren't enrolled, or the course doesn't exist,
+    or they've unenrolled, or they've already paid/verified,
+    ... then we try to redirect them to the page with the
+    most appropriate messaging (including the dashboard).
+
+    Note that this page does NOT handle re-verification
+    (photo verification that was denied or had an error);
+    that is handled by the "reverify" view.
+
+    """
+
+    # Step definitions
+    #
+    # These represent the numbered steps a user sees in
+    # the verify / payment flow.
+    #
+    # Steps can either be:
+    # - displayed or hidden
+    # - complete or incomplete
+    #
+    # For example, when a user enters the verification/payment
+    # flow for the first time, the user will see steps
+    # for both payment and verification.  As the user
+    # completes these steps (for example, submitting a photo)
+    # the steps will be marked "complete".
+    #
+    # If a user has already verified for another course,
+    # then the verification steps will be hidden,
+    # since the user has already completed them.
+    #
+    # If a user re-enters the flow from another application
+    # (for example, after completing payment through
+    # a third-party payment processor), then the user
+    # will resume the flow at an intermediate step.
+    #
+    INTRO_STEP = 'intro'
+    MAKE_PAYMENT_STEP = 'make-payment'
+    PAYMENT_CONFIRMATION_STEP = 'payment-confirmation'
+    FACE_PHOTO_STEP = 'face-photo'
+    ID_PHOTO_STEP = 'id-photo'
+    REVIEW_PHOTOS_STEP = 'review-photos'
+    ENROLLMENT_CONFIRMATION_STEP = 'enrollment-confirmation'
+
+    ALL_STEPS = [
+        INTRO_STEP,
+        MAKE_PAYMENT_STEP,
+        PAYMENT_CONFIRMATION_STEP,
+        FACE_PHOTO_STEP,
+        ID_PHOTO_STEP,
+        REVIEW_PHOTOS_STEP,
+        ENROLLMENT_CONFIRMATION_STEP
+    ]
+
+    PAYMENT_STEPS = [
+        MAKE_PAYMENT_STEP,
+        PAYMENT_CONFIRMATION_STEP
+    ]
+
+    VERIFICATION_STEPS = [
+        FACE_PHOTO_STEP,
+        ID_PHOTO_STEP,
+        REVIEW_PHOTOS_STEP,
+        ENROLLMENT_CONFIRMATION_STEP
+    ]
+
+    STEPS_WITHOUT_PAYMENT = [
+        step for step in ALL_STEPS
+        if step not in PAYMENT_STEPS
+    ]
+
+    STEPS_WITHOUT_VERIFICATION = [
+        step for step in ALL_STEPS
+        if step not in VERIFICATION_STEPS
+    ]
+
+    # Messages
+    #
+    # Depending on how the user entered reached the page,
+    # we will display different text messaging.
+    # For example, we show users who are upgrading
+    # slightly different copy than users who are verifying
+    # for the first time.
+    #
+    FIRST_TIME_VERIFY_MSG = 'first-time-verify'
+    VERIFY_NOW_MSG = 'verify-now'
+    VERIFY_LATER_MSG = 'verify-later'
+    UPGRADE_MSG = 'upgrade'
+    PAYMENT_CONFIRMATION_MSG = 'payment-confirmation'
+
+    MESSAGES = {
+        FIRST_TIME_VERIFY_MSG: 'first-time-verify',
+        VERIFY_NOW_MSG: 'verify-now',
+        VERIFY_LATER_MSG: 'verify-later',
+        UPGRADE_MSG: 'upgrade',
+        PAYMENT_CONFIRMATION_MSG: 'payment-confirmation'
+    }
+
+    # Requirements
+    #
+    # These explain to the user what he or she
+    # will need to successfully pay and/or verify.
+    #
+    # These are determined by the steps displayed
+    # to the user; for example, if the user does not
+    # need to complete the verification steps,
+    # then the photo ID and webcam requirements are hidden.
+    #
+    PHOTO_ID_REQ = "photo-id-required"
+    WEBCAM_REQ = "webcam-required"
+    CREDIT_CARD_REQ = "credit-card-required"
+
+    STEP_REQUIREMENTS = {
+        ID_PHOTO_STEP: [PHOTO_ID_REQ, WEBCAM_REQ],
+        FACE_PHOTO_STEP: [WEBCAM_REQ],
+        MAKE_PAYMENT_STEP: [CREDIT_CARD_REQ],
+    }
+
+    @method_decorator(login_required)
+    def get(
+        self, request, course_id,
+        always_show_payment=False,
+        current_step=INTRO_STEP,
+        message=FIRST_TIME_VERIFY_MSG
+    ):
+        """Render the pay/verify requirements page.
+
+        Arguments:
+            request (HttpRequest): The request object.
+            course_id (unicode): The ID of the course the user is trying
+                to enroll in.
+
+        Keyword Arguments:
+            always_show_payment (bool): If True, show the payment steps
+                even if the user has already paid.  This is useful
+                for users returning to the flow after paying.
+            current_step (string): The current step in the flow.
+            message (string): The messaging to display.
+
+        Returns:
+            HttpResponse
+
+        Raises:
+            Http404: The course does not exist or does not
+                have a verified mode.
+
+        """
+        # Parse the course key
+        # The URL regex should guarantee that the key format is valid.
+        course_key = CourseKey.from_string(course_id)
+
+        # Verify that the course exists and has a verified mode
+        if modulestore().has_course(course_key) is None:
+            raise Http404
+
+        # Verify that the course has a verified mode
+        if CourseMode.verified_mode_for_course(course_key) is None:
+            raise Http404
+
+        # Check whether the user has verified, paid, and enrolled.
+        # A user is considered "paid" if he or she has an enrollment
+        # with a paid course mode (such as "verified").
+        # For this reason, every paid user is enrolled, but not
+        # every enrolled user is paid.
+        already_verified = self._check_already_verified(request.user)
+        already_paid, is_enrolled = self._check_enrollment(request.user, course_key)
+
+        # Redirect the user to a more appropriate page if the
+        # messaging won't make sense based on the user's
+        # enrollment / payment / verification status.
+        redirect_response = self._redirect_if_necessary(
+            message,
+            already_verified,
+            already_paid,
+            is_enrolled,
+            course_key
+        )
+        if redirect_response is not None:
+            return redirect_response
+
+        display_steps = self._display_steps(
+            always_show_payment,
+            already_verified,
+            already_paid
+        )
+
+        completed_steps = self._completed_steps(display_steps, current_step)
+
+        # Determine the requirements (e.g. webcam, credit card)
+        # based on the steps the user needs to complete.
+        requirements = self._requirements(display_steps)
+
+        # DEBUG: generate a JSON object describing what we'll pass to the template
+        description = json.dumps({
+            'course_key': unicode(course_key),
+            'course_mode': self._verified_course_mode(course_key),
+            'display_steps': self._steps_dict(display_steps),
+            'completed_steps': self._steps_dict(completed_steps),
+            'requirements': requirements,
+            'show_payment': requirements[self.CREDIT_CARD_REQ],
+            'message': message
+        }, indent=4)
+        return HttpResponse(description, content_type="text/plain")
+
+    def _redirect_if_necessary(
+        self,
+        message,
+        already_verified,
+        already_paid,
+        is_enrolled,
+        course_key
+    ):
+        """Redirect the user to a more appropriate page if necessary.
+
+        In some cases, a user may visit this page with
+        verification / enrollment / payment state that
+        we don't anticipate.  For example, a user may unenroll
+        from the course after paying for it, then visit the
+        "verify now" page to complete verification.
+
+        When this happens, we try to redirect the user to
+        the most appropriate page.
+
+        Arguments:
+
+            message (string): The messaging of the page.  Should be a key
+                in `MESSAGES`.
+
+            already_verified (bool): Whether the user has submitted
+                a verification request recently.
+
+            already_paid (bool): Whether the user is enrolled in a paid
+                course mode.
+
+            is_enrolled (bool): Whether the user has an active enrollment
+                in the course.
+
+            course_key (CourseKey): The key for the course.
+
+        Returns:
+            HttpResponse or None
+
+        """
+        url = None
+        course_kwargs = {'course_id': unicode(course_key)}
+
+        if already_verified and already_paid:
+            # If they've already paid and verified, there's nothing else to do,
+            # so redirect them to the dashboard.
+            if message != self.PAYMENT_CONFIRMATION_MSG:
+                url = reverse('dashboard')
+        elif message in [self.VERIFY_NOW_MSG, self.VERIFY_LATER_MSG, self.PAYMENT_CONFIRMATION_MSG]:
+            if is_enrolled:
+                # If the user is already enrolled but hasn't yet paid,
+                # then the "upgrade" messaging is more appropriate.
+                if not already_paid:
+                    url = reverse('verify_student_upgrade_and_verify', kwargs=course_kwargs)
+            else:
+                # If the user is NOT enrolled, then send him/her
+                # to the first time verification page.
+                url = reverse('verify_student_start_verification', kwargs=course_kwargs)
+        elif message == self.UPGRADE_MSG:
+            if is_enrolled:
+                # If upgrading and we've paid but haven't verified,
+                # then the "verify later" messaging makes more sense.
+                if already_paid:
+                    url = reverse('verify_student_verify_later', kwargs=course_kwargs)
+            else:
+                url = reverse('verify_student_start_verification', kwargs=course_kwargs)
+
+        # Redirect if necessary, otherwise implicitly return None
+        if url is not None:
+            return redirect(url)
+
+    def _display_steps(self, always_show_payment, already_verified, already_paid):
+        """Determine which steps to display to the user.
+
+        Includes all steps by default, but removes steps
+        if the user has already completed them.
+
+        Arguments:
+            always_show_payment (bool): If True, display the payment steps
+                even if the user has already paid.
+
+            already_verified (bool): Whether the user has submitted
+                a verification request recently.
+
+            already_paid (bool): Whether the user is enrolled in a paid
+                course mode.
+
+        Returns:
+            list
+
+        """
+        display_steps = self.ALL_STEPS
+        remove_steps = set()
+
+        if already_verified:
+            remove_steps |= set(self.VERIFICATION_STEPS)
+
+        if already_paid and not always_show_payment:
+            remove_steps |= set(self.PAYMENT_STEPS)
+
+        return [
+            step for step in display_steps
+            if step not in remove_steps
+        ]
+
+    def _completed_steps(self, display_steps, current_step):
+        """Determine which steps the user has completed.
+
+        Every step before and including the current step
+        is marked "completed".
+
+        Arguments:
+            display_steps (list): List of steps displayed.
+            current_step (string): The name of the step the user is
+                currently on.
+
+        Returns:
+            list
+
+        """
+        completed_steps = []
+        for step in display_steps:
+            completed_steps.append(step)
+            if step == current_step:
+                break
+        return completed_steps
+
+    def _steps_dict(self, include_steps):
+        """Return a dictionary of steps.
+
+        Each key in the dictionary is a step.
+        The value is True if the step is
+        in `step_list` and False otherwise.
+
+        This is a more convenient representation
+        for templates.
+
+        Arguments:
+            step_list (list): The list of steps to include.
+
+        Returns:
+            dict
+
+        """
+        include_steps_set = set(include_steps)
+        return {
+            step_name: (step_name in include_steps_set)
+            for step_name in self.ALL_STEPS
+        }
+
+    def _requirements(self, display_steps):
+        """Determine which requirements to show the user.
+
+        For example, if the user needs to submit a photo
+        verification, tell the user that she will need
+        a photo ID and a webcam.
+
+        Arguments:
+            display_steps (list): The steps to display to the user.
+
+        Returns:
+            dict: Keys are requirement names, values are booleans
+                indicating whether to show the requirement.
+
+        """
+        all_requirements = {
+            self.PHOTO_ID_REQ: False,
+            self.WEBCAM_REQ: False,
+            self.CREDIT_CARD_REQ: False
+        }
+
+        for step, step_requirements in self.STEP_REQUIREMENTS.iteritems():
+            if step in display_steps:
+                for requirement in step_requirements:
+                    all_requirements[requirement] = True
+
+        return all_requirements
+
+    def _verified_course_mode(self, course_key):
+        """Check whether the course has a verified mode.
+
+        Arguments:
+            course_key (CourseKey): The key for the course to check.
+
+        Returns:
+            bool
+
+        """
+        mode = CourseMode.verified_mode_for_course(course_key)
+        if mode is not None:
+            return mode.slug
+
+    def _check_already_verified(self, user):
+        """Check whether the user has a valid or pending verification.
+
+        Note that this includes cases in which the user's verification
+        has not been accepted (either because it hasn't been processed,
+        or there was an error).
+
+        This should return True if the user has done their part:
+        submitted photos within the expiration period.
+
+        """
+        return SoftwareSecurePhotoVerification.user_has_valid_or_pending(user)
+
+    def _check_enrollment(self, user, course_key):
+        """Check whether the user has an active enrollment and has paid.
+
+        If a user is enrolled in a paid course mode, we assume
+        that the user has paid.
+
+        Arguments:
+            user (User): The user to check.
+            course_key (CourseKey): The key of the course to check.
+
+        Returns:
+            Tuple `(has_paid, is_active)` indicating whether the user
+            has paid and whether the user has an active account.
+
+        """
+        enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course_key)
+        has_paid = False
+
+        if enrollment_mode is not None and is_active:
+            all_modes = CourseMode.modes_for_course_dict(course_key)
+            course_mode = all_modes.get(enrollment_mode)
+            has_paid = (course_mode and course_mode.min_price > 0)
+
+        return (has_paid, bool(is_active))
 
 
 @require_POST
