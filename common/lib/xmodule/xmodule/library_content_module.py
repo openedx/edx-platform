@@ -363,7 +363,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     js_module_name = "VerticalDescriptor"
 
     @XBlock.handler
-    def refresh_children(self, request, suffix):  # pylint: disable=unused-argument
+    def refresh_children(self, request, suffix, update_db=True):  # pylint: disable=unused-argument
         """
         Refresh children:
         This method is to be used when any of the libraries that this block
@@ -375,8 +375,12 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         This method will update this block's 'source_libraries' field to store
         the version number of the libraries used, so we easily determine if
         this block is up to date or not.
+
+        If update_db is True (default), this will explicitly persist the changes
+        to the modulestore by calling update_item()
         """
-        user_id = self.runtime.service(self, 'user').user_id
+        user_service = self.runtime.service(self, 'user')
+        user_id = user_service.user_id if user_service else None  # May be None when creating bok choy test fixtures
         root_children = []
 
         store = self.system.modulestore
@@ -395,6 +399,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             new_libraries = []
             for library_key, old_version in self.source_libraries:  # pylint: disable=unused-variable
                 library = _get_library(self.system.modulestore, library_key)  # pylint: disable=protected-access
+                if library is None:
+                    raise ValueError("Required library not found.")
 
                 def copy_children_recursively(from_block):
                     """
@@ -434,8 +440,20 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 new_libraries.append(LibraryVersionReference(library_key, library.location.library_key.version_guid))
             self.source_libraries = new_libraries
             self.children = root_children  # pylint: disable=attribute-defined-outside-init
-            self.system.modulestore.update_item(self, user_id)
+            if update_db:
+                self.system.modulestore.update_item(self, user_id)
         return Response()
+
+    def editor_saved(self, user, old_metadata, old_content):
+        """
+        If source_libraries has been edited, refresh_children automatically.
+        """
+        old_source_libraries = LibraryList().from_json(old_metadata.get('source_libraries', []))
+        if set(old_source_libraries) != set(self.source_libraries):
+            try:
+                self.refresh_children(None, None, update_db=False)  # update_db=False since update_item() is about to be called anyways
+            except ValueError:
+                pass  # The validation area will display an error message, no need to do anything now.
 
     def has_dynamic_children(self):
         """
