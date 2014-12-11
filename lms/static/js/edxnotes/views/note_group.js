@@ -2,7 +2,7 @@
 'use strict';
 define([
     'gettext', 'underscore', 'backbone'
-], function (gettext, _, Backbon) {
+], function (gettext, _, Backbone) {
     var NoteGroupView = Backbone.View.extend({
         tagName: 'section',
         className: 'note-group',
