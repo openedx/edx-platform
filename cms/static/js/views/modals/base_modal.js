@@ -1,5 +1,23 @@
 /**
  * This is a base modal implementation that provides common utilities.
+ *
+ * A modal implementation should override the following methods:
+ *
+ *   getTitle():
+ *     returns the title for the modal.
+ *   getHTMLContent():
+ *     returns the HTML content to be shown inside the modal.
+ *
+ * A modal implementation should also provide the following options:
+ *
+ *   modalName: A string identifying the modal.
+ *   modalType: A string identifying the type of the modal.
+ *   modalSize: A string, either 'sm', 'med', or 'lg' indicating the
+ *     size of the modal.
+ *   viewSpecificClasses: A string of CSS classes to be attached to
+ *     the modal window.
+ *   addSaveButton: A boolean indicating whether to include a save
+ *     button on the modal.
  */
 define(["jquery", "underscore", "gettext", "js/views/baseview"],
     function($, _, gettext, BaseView) {
@@ -41,12 +59,16 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                     name: this.options.modalName,
                     type: this.options.modalType,
                     size: this.options.modalSize,
-                    title: this.options.title,
+                    title: this.getTitle(),
                     viewSpecificClasses: this.options.viewSpecificClasses
                 }));
                 this.addActionButtons();
                 this.renderContents();
                 this.parentElement.append(this.$el);
+            },
+
+            getTitle: function() {
+                return this.options.title;
             },
 
             renderContents: function() {

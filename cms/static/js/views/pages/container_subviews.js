@@ -100,7 +100,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             onSync: function(model) {
                 if (ViewUtils.hasChangedAttributes(model, [
-                    'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state', 'has_explicit_staff_lock'
+                    'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state',
+                    'has_explicit_staff_lock', 'has_content_group_components'
                 ])) {
                    this.render();
                 }
@@ -120,7 +121,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     releaseDate: this.model.get('release_date'),
                     releaseDateFrom: this.model.get('release_date_from'),
                     hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
-                    staffLockFrom: this.model.get('staff_lock_from')
+                    staffLockFrom: this.model.get('staff_lock_from'),
+                    hasContentGroupComponents: this.model.get('has_content_group_components')
                 }));
 
                 return this;

@@ -70,29 +70,51 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         validation = self.video.validate()
         self.assertEqual(len(validation.messages), 0)
 
-    def test_validate_invalid_user_partition(self):
+    def test_validate_invalid_user_partitions(self):
         """
-        Test the validation messages produced for an xblock referring to a non-existent user partition.
+        Test the validation messages produced for an xblock referring to non-existent user partitions.
         """
         self.video.group_access[999] = [self.group1.id]
         validation = self.video.validate()
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This xblock refers to a deleted or invalid content group configuration.",
+            u"This component refers to deleted or invalid content group configurations.",
             ValidationMessage.ERROR,
         )
 
-    def test_validate_invalid_group(self):
+        # Now add a second invalid user partition and validate again.
+        # Note that even though there are two invalid configurations,
+        # only a single error message will be returned.
+        self.video.group_access[998] = [self.group2.id]
+        validation = self.video.validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            u"This component refers to deleted or invalid content group configurations.",
+            ValidationMessage.ERROR,
+        )
+
+    def test_validate_invalid_groups(self):
         """
-        Test the validation messages produced for an xblock referring to a non-existent group.
+        Test the validation messages produced for an xblock referring to non-existent groups.
         """
         self.video.group_access[self.user_partition.id] = [self.group1.id, 999]    # pylint: disable=no-member
         validation = self.video.validate()
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
-            u"This xblock refers to a deleted or invalid content group.",
+            u"This component refers to deleted or invalid content groups.",
+            ValidationMessage.ERROR,
+        )
+
+        # Now try again with two invalid group ids
+        self.video.group_access[self.user_partition.id] = [self.group1.id, 998, 999]    # pylint: disable=no-member
+        validation = self.video.validate()
+        self.assertEqual(len(validation.messages), 1)
+        self.verify_validation_message(
+            validation.messages[0],
+            u"This component refers to deleted or invalid content groups.",
             ValidationMessage.ERROR,
         )
 

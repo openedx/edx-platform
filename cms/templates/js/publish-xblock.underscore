@@ -77,13 +77,12 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <% } else { %>
             <p class="visbility-copy copy"><%= gettext("Staff and Students") %></p>
         <% } %>
-
-            <!-- NOTE: @andyarmstrong, here's the new copy we're adding to the visibility summary UI to make sure we're as accurate as we can be at the final state of the unit/container's visibility -->
-            <p class="note-visibility">
-                <i class="icon icon-eye-open"></i>
-                <span class="note-copy"><%= gettext("Some content in this unit is only visible to particular groups") %></span>
-            </p>
-
+            <% if (hasContentGroupComponents) { %>
+                <p class="note-visibility">
+                    <i class="icon icon-eye-open"></i>
+                    <span class="note-copy"><%= gettext("Some content in this unit is only visible to particular groups") %></span>
+                </p>
+            <% } %>
         <ul class="actions-inline">
             <li class="action-inline">
                 <a href="" class="action-staff-lock" role="button" aria-pressed="<%= hasExplicitStaffLock %>">

@@ -208,17 +208,6 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertContains(response, 'First name')
         self.assertContains(response, 'Group C')
 
-    def test_view_index_disabled(self):
-        """
-        Check that group configuration page is not displayed when turned off.
-        """
-        if SPLIT_TEST_COMPONENT_TYPE in self.course.advanced_modules:
-            self.course.advanced_modules.remove(SPLIT_TEST_COMPONENT_TYPE)
-            self.store.update_item(self.course, self.user.id)
-
-        resp = self.client.get(self._url())
-        self.assertContains(resp, "module is disabled")
-
     def test_unsupported_http_accept_header(self):
         """
         Test if not allowed header present in request.
