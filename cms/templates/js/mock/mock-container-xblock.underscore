@@ -46,6 +46,9 @@
                                                         <li class="action-item action-edit">
                                                             <a href="#" class="edit-button action-button"></a>
                                                         </li>
+                                                        <li class="action-item action-visibility">
+                                                            <a href="#" class="visibility-button action-button"></a>
+                                                        </li>
                                                         <li class="action-item action-duplicate">
                                                             <a href="#" class="duplicate-button action-button"></a>
                                                         </li>
@@ -71,6 +74,9 @@
                                                         <li class="action-item action-edit">
                                                             <a href="#" class="edit-button action-button"></a>
                                                         </li>
+                                                        <li class="action-item action-visibility">
+                                                            <a href="#" class="visibility-button action-button"></a>
+                                                        </li>
                                                         <li class="action-item action-duplicate">
                                                             <a href="#" class="duplicate-button action-button"></a>
                                                         </li>
@@ -95,6 +101,9 @@
                                                     <ul class="actions-list">
                                                         <li class="action-item action-edit">
                                                             <a href="#" class="edit-button action-button"></a>
+                                                        </li>
+                                                        <li class="action-item action-visibility">
+                                                            <a href="#" class="visibility-button action-button"></a>
                                                         </li>
                                                         <li class="action-item action-duplicate">
                                                             <a href="#" class="duplicate-button action-button"></a>
@@ -151,6 +160,9 @@
                                                         <li class="action-item action-edit">
                                                             <a href="#" class="edit-button action-button"></a>
                                                         </li>
+                                                        <li class="action-item action-visibility">
+                                                            <a href="#" class="visibility-button action-button"></a>
+                                                        </li>
                                                         <li class="action-item action-duplicate">
                                                             <a href="#" class="duplicate-button action-button"></a>
                                                         </li>
@@ -176,6 +188,9 @@
                                                         <li class="action-item action-edit">
                                                             <a href="#" class="edit-button action-button"></a>
                                                         </li>
+                                                        <li class="action-item action-visibility">
+                                                            <a href="#" class="visibility-button action-button"></a>
+                                                        </li>
                                                         <li class="action-item action-duplicate">
                                                             <a href="#" class="duplicate-button action-button"></a>
                                                         </li>
@@ -200,6 +215,9 @@
                                                     <ul class="actions-list">
                                                         <li class="action-item action-edit">
                                                             <a href="#" class="edit-button action-button"></a>
+                                                        </li>
+                                                        <li class="action-item action-visibility">
+                                                            <a href="#" class="visibility-button action-button"></a>
                                                         </li>
                                                         <li class="action-item action-duplicate">
                                                             <a href="#" class="duplicate-button action-button"></a>

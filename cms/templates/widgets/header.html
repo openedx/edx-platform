@@ -3,7 +3,6 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from contentstore.context_processors import doc_url
-  from contentstore.views.course import should_show_group_configurations_page
 %>
 <%page args="online_help_token"/>
 
@@ -93,11 +92,9 @@
                   <li class="nav-item nav-course-settings-team">
                     <a href="${course_team_url}">${_("Course Team")}</a>
                   </li>
-                  % if should_show_group_configurations_page(context_course):
-                    <li class="nav-item nav-course-settings-group-configurations">
-                      <a href="${reverse('contentstore.views.group_configurations_list_handler', kwargs={'course_key_string': unicode(course_key)})}">${_("Group Configurations")}</a>
-                    </li>
-                  % endif
+                  <li class="nav-item nav-course-settings-group-configurations">
+                    <a href="${reverse('contentstore.views.group_configurations_list_handler', kwargs={'course_key_string': unicode(course_key)})}">${_("Group Configurations")}</a>
+                  </li>
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>

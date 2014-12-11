@@ -47,17 +47,9 @@
   <div class="wrapper-content wrapper">
     <section class="content">
       <article class="content-primary" role="main">
-      % if configurations is None:
-        <div class="notice notice-incontext notice-moduledisabled">
-            <p class="copy">
-                ${_("This module is disabled at the moment.")}
-            </p>
-        </div>
-      % else:
         <div class="ui-loading">
             <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
         </div>
-      % endif
       </article>
       <aside class="content-supplementary" role="complementary">
       <div class="bit">
