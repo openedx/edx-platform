@@ -6,7 +6,7 @@ from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.response import Response
 
-from courseware.courses import get_course_about_section, get_course_info_section_module
+from courseware.courses import get_course_about_section, get_course_info_section_module, get_course_with_access
 from opaque_keys.edx.keys import CourseKey
 
 from xmodule.modulestore.django import modulestore
@@ -40,7 +40,7 @@ class CourseUpdatesList(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         course_id = CourseKey.from_string(kwargs['course_id'])
-        course = modulestore().get_course(course_id)
+        course = get_course_with_access(request.user, 'load', course_id)
         course_updates_module = get_course_info_section_module(request, course, 'updates')
         update_items = reversed(getattr(course_updates_module, 'items', []))
 
@@ -79,7 +79,7 @@ class CourseHandoutsList(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         course_id = CourseKey.from_string(kwargs['course_id'])
-        course = modulestore().get_course(course_id)
+        course = get_course_with_access(request.user, 'load', course_id)
         course_handouts_module = get_course_info_section_module(request, course, 'handouts')
         if course_handouts_module:
             handouts_html = course_handouts_module.data
