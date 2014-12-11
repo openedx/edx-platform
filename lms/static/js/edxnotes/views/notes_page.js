@@ -13,13 +13,13 @@ define([
             this.options = options;
             this.tabsCollection = new TabsCollection();
 
-            this.courseStructureView = new CourseStructureView({
+            this.recentActivityView = new RecentActivityView({
                 el: this.el,
                 collection: this.collection,
                 tabsCollection: this.tabsCollection
             });
 
-            this.recentActivityView = new RecentActivityView({
+            this.courseStructureView = new CourseStructureView({
                 el: this.el,
                 collection: this.collection,
                 tabsCollection: this.tabsCollection

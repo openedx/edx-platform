@@ -6,21 +6,33 @@ define([
     var NotesCollection = Backbone.Collection.extend({
         model: NoteModel,
 
-        getSortedByCourseStructure: (function () {
-            var sortedCollection = null;
+        getCourseStructure: (function () {
+            var courseStructure = null;
             return function () {
-                if (!sortedCollection) {
-                    sortedCollection = this.sortBy(function (note) {
-                        var index = '';
-                            index += note.get('chapter').index;
-                            index += note.get('section').index;
-                            index += note.get('unit').index;
+                var chapters = {},
+                    sections = {},
+                    units = {};
 
-                        return Number(index);
+                if (!courseStructure) {
+                    this.each(function (note) {
+                        var chapter = note.get('chapter'),
+                            section = note.get('section'),
+                            unit = note.get('unit');
+
+                        chapters[chapter.location] = chapter;
+                        sections[section.location] = section;
+                        units[unit.location] = units[unit.location] || [];
+                        units[unit.location].push(note);
                     });
+
+                    courseStructure = {
+                        chapters: _.sortBy(_.toArray(chapters), function (c) {return c.index;}),
+                        sections: sections,
+                        units: units
+                    };
                 }
 
-                return sortedCollection;
+                return courseStructure;
             };
         }())
     });
