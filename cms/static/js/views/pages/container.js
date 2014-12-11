@@ -5,10 +5,10 @@
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/view_utils",
         "js/views/container", "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock",
         "js/models/xblock_info", "js/views/xblock_string_field_editor", "js/views/pages/container_subviews",
-        "js/views/unit_outline", "js/views/utils/xblock_utils", "js/views/modals/visibility_modal"],
+        "js/views/unit_outline", "js/views/utils/xblock_utils"],
     function ($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
               EditXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews, UnitOutlineView,
-              XBlockUtils, VisibilityModal) {
+              XBlockUtils) {
         'use strict';
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
@@ -137,10 +137,10 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
             },
 
-            editXBlock: function(event) {
+            editXBlock: function(event, options) {
                 var xblockElement = this.findXBlockElement(event.target),
                     self = this,
-                    modal = new EditXBlockModal({ });
+                    modal = new EditXBlockModal(options);
                 event.preventDefault();
 
                 modal.edit(xblockElement, this.model, {
@@ -151,15 +151,9 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             },
 
             editVisibilitySettings: function(event) {
-                var xblockElement = this.findXBlockElement(event.target),
-                    self = this,
-                    modal = new VisibilityModal();
-                event.preventDefault();
-
-                modal.edit(xblockElement, this.model, {
-                    refresh: function() {
-                        self.refreshXBlock(xblockElement);
-                    }
+                this.editXBlock(event, {
+                    view: 'visibility_view',
+                    titleFormat: gettext("Editing visibility for: %(title)s")
                 });
             },
 

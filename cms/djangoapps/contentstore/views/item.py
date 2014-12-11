@@ -47,6 +47,7 @@ from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import UsageKey, CourseKey
+from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler']
 
@@ -57,7 +58,6 @@ CREATE_IF_NOT_FOUND = ['course_info']
 # Useful constants for defining predicates
 NEVER = lambda x: False
 ALWAYS = lambda x: True
-
 
 # In order to allow descriptors to use a handler url, we need to
 # monkey-patch the x_module library.
@@ -215,14 +215,14 @@ def xblock_view_handler(request, usage_key_string, view_name):
             request_token=request_token(request),
         ))
 
-        if view_name == STUDIO_VIEW:
+        if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
             try:
-                fragment = xblock.render(STUDIO_VIEW)
+                fragment = xblock.render(view_name)
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
             except Exception as exc:                          # pylint: disable=broad-except
-                log.debug("unable to render studio_view for %r", xblock, exc_info=True)
+                log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
         elif view_name in (PREVIEW_VIEWS + container_views):
