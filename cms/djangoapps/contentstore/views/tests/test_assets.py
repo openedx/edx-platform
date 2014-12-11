@@ -109,7 +109,7 @@ class PaginationTestCase(AssetsTestCase):
         self.assert_correct_sort_response(self.url, 'display_name', 'desc')
         self.assert_correct_filter_response(self.url, 'asset_type', '')
         self.assert_correct_filter_response(self.url, 'asset_type', 'OTHER')
-        self.assert_correct_filter_response(self.url, 'asset_type', 'Text')
+        self.assert_correct_filter_response(self.url, 'asset_type', 'Documents')
 
         # Verify querying outside the range of valid pages
         self.assert_correct_asset_response(self.url + "?page_size=2&page=-1", 0, 2, 3)
