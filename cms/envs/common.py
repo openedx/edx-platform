@@ -784,8 +784,9 @@ ADVANCED_PROBLEM_TYPES = [
 ]
 
 # Files and Uploads type filter values
+
 FILES_AND_UPLOAD_TYPE_FILTER = {
-    "Images": ['image/png', 'image/jpeg'],
+    "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif'],
     "Documents": [
         'application/pdf',
         'application/txt',
