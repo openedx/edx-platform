@@ -4,6 +4,7 @@ Tests for video outline API
 import copy
 import ddt
 from uuid import uuid4
+from collections import namedtuple
 
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -232,6 +233,34 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         course_outline = self._get_video_summary_list()
         self.assertEqual(len(course_outline), 0)
 
+    def test_course_list_language(self):
+        video = ItemFactory.create(
+            parent_location=self.nameless_unit.location,
+            category="video",
+            edx_video_id=self.edx_video_id,
+            display_name=u"test draft video omega 2 \u03a9"
+        )
+
+        language_case = namedtuple('language_case', ['transcripts', 'expected_language'])
+        language_cases = [
+            # defaults to english
+            language_case({}, "en"),
+            # supports english
+            language_case({"en": 1}, "en"),
+            # supports another language
+            language_case({"lang1": 1}, "lang1"),
+            # returns first alphabetically-sorted language
+            language_case({"lang1": 1, "en": 2}, "en"),
+            language_case({"lang1": 1, "lang2": 2}, "lang1"),
+        ]
+
+        for case in language_cases:
+            video.transcripts = case.transcripts
+            modulestore().update_item(video, self.user.id)
+            course_outline = self._get_video_summary_list()
+            self.assertEqual(len(course_outline), 1)
+            self.assertEqual(course_outline[0]['summary']['language'], case.expected_language)
+
     def test_course_list_transcripts(self):
         video = ItemFactory.create(
             parent_location=self.nameless_unit.location,
@@ -239,20 +268,33 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
             edx_video_id=self.edx_video_id,
             display_name=u"test draft video omega 2 \u03a9"
         )
+
+        transcript_case = namedtuple('transcript_case', ['transcripts', 'english_subtitle', 'expected_transcripts'])
         transcript_cases = [
-            ({}, "en"),
-            ({"en": 1}, "en"),
-            ({"lang1": 1}, "lang1"),
-            ({"lang1": 1, "en": 2}, "en"),
-            ({"lang1": 1, "lang2": 2}, "lang1"),
+            # defaults to english
+            transcript_case({}, "", ["en"]),
+            transcript_case({}, "en-sub", ["en"]),
+            # supports english
+            transcript_case({"en": 1}, "", ["en"]),
+            transcript_case({"en": 1}, "en-sub", ["en"]),
+            # keeps both english and other languages
+            transcript_case({"lang1": 1, "en": 2}, "", ["lang1", "en"]),
+            transcript_case({"lang1": 1, "en": 2}, "en-sub", ["lang1", "en"]),
+            # adds english to list of languages only if english_subtitle is specified
+            transcript_case({"lang1": 1, "lang2": 2}, "", ["lang1", "lang2"]),
+            transcript_case({"lang1": 1, "lang2": 2}, "en-sub", ["lang1", "lang2", "en"]),
         ]
 
-        for transcript_case in transcript_cases:
-            video.transcripts = transcript_case[0]
+        for case in transcript_cases:
+            video.transcripts = case.transcripts
+            video.sub = case.english_subtitle
             modulestore().update_item(video, self.user.id)
             course_outline = self._get_video_summary_list()
             self.assertEqual(len(course_outline), 1)
-            self.assertEqual(course_outline[0]['summary']['language'], transcript_case[1])
+            self.assertSetEqual(
+                set(course_outline[0]['summary']['transcripts'].keys()),
+                set(case.expected_transcripts)
+            )
 
     def test_transcripts_detail(self):
         video = self._create_video_with_subs()
