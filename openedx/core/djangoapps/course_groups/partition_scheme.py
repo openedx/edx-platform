@@ -90,6 +90,8 @@ class CohortPartitionScheme(object):
             # fail silently
             return None
 
+        return group
+
 
 def get_cohorted_user_partition(course_key):
     """
