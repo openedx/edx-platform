@@ -1,0 +1,4 @@
+<h3 class="group-lecture">
+    <span class="course-title"><%- chapterName %></span>
+    <span class="course-subtitle"><%- sectionName %></span>
+</h3>

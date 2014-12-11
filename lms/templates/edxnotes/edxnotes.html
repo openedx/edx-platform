@@ -72,7 +72,7 @@
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["note-item", "tab-item", "course-structure-item", ]:
+% for template_name in ["note-item", "tab-item", "note-group", ]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="edxnotes/${template_name}.underscore" />
 </script>
