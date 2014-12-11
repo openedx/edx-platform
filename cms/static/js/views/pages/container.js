@@ -5,16 +5,17 @@
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/view_utils",
         "js/views/container", "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock",
         "js/models/xblock_info", "js/views/xblock_string_field_editor", "js/views/pages/container_subviews",
-        "js/views/unit_outline", "js/views/utils/xblock_utils"],
+        "js/views/unit_outline", "js/views/utils/xblock_utils", "js/views/modals/visibility_modal"],
     function ($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
               EditXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews, UnitOutlineView,
-              XBlockUtils) {
+              XBlockUtils, VisibilityModal) {
         'use strict';
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
 
             events: {
                 "click .edit-button": "editXBlock",
+                "click .visibility-button": "editVisibilitySettings",
                 "click .duplicate-button": "duplicateXBlock",
                 "click .delete-button": "deleteXBlock"
             },
@@ -140,6 +141,19 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 var xblockElement = this.findXBlockElement(event.target),
                     self = this,
                     modal = new EditXBlockModal({ });
+                event.preventDefault();
+
+                modal.edit(xblockElement, this.model, {
+                    refresh: function() {
+                        self.refreshXBlock(xblockElement);
+                    }
+                });
+            },
+
+            editVisibilitySettings: function(event) {
+                var xblockElement = this.findXBlockElement(event.target),
+                    self = this,
+                    modal = new VisibilityModal();
                 event.preventDefault();
 
                 modal.edit(xblockElement, this.model, {
