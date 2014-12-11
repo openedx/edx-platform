@@ -1084,10 +1084,20 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # check for the enrollment codes content
         self.assertIn('Please send each professional one of these unique registration codes to enroll into the course.', resp.content)
 
+        # fetch the newly generated registration codes
+        course_registration_codes = CourseRegistrationCode.objects.filter(order=self.cart)
+
         ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
+        # now check for all the registration codes in the receipt
+        # and all the codes should be unused at this point
+        self.assertIn(course_registration_codes[0].code, context['reg_code_info_list'][0]['code'])
+        self.assertIn(course_registration_codes[1].code, context['reg_code_info_list'][1]['code'])
+        self.assertFalse(context['reg_code_info_list'][0]['is_redeemed'])
+        self.assertFalse(context['reg_code_info_list'][1]['is_redeemed'])
+
         self.assertIn(self.cart.purchase_time.strftime("%B %d, %Y"), resp.content)
         self.assertIn(self.cart.company_name, resp.content)
         self.assertIn(self.cart.company_contact_name, resp.content)
@@ -1096,6 +1106,25 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn("Invoice #{order_id}".format(order_id=self.cart.id), resp.content)
         self.assertIn('You have successfully purchased <b>{total_registration_codes} course registration codes'
                       .format(total_registration_codes=context['total_registration_codes']), resp.content)
+
+        # now redeem one of registration code from the previous order
+        redeem_url = reverse('register_code_redemption', args=[context['reg_code_info_list'][0]['code']])
+
+        #now activate the user by enrolling him/her to the course
+        response = self.client.post(redeem_url, **{'HTTP_HOST': 'localhost'})
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('View Course' in response.content)
+
+        # now view the receipt page again to see if any registration codes
+        # has been expired or not
+        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+        self.assertEqual(resp.status_code, 200)
+        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        self.assertEqual(template, 'shoppingcart/receipt.html')
+        # now check for all the registration codes in the receipt
+        # and one of code should be used at this point
+        self.assertTrue(context['reg_code_info_list'][0]['is_redeemed'])
+        self.assertFalse(context['reg_code_info_list'][1]['is_redeemed'])
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_upgrade(self):

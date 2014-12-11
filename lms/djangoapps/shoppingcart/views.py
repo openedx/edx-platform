@@ -750,16 +750,26 @@ def _show_receipt_html(request, order):
         request.session['attempting_upgrade'] = False
 
     recipient_list = []
-    registration_codes = None
     total_registration_codes = None
+    reg_code_info_list = []
     recipient_list.append(getattr(order.user, 'email'))
     if order_type == OrderTypes.BUSINESS:
-        registration_codes = CourseRegistrationCode.objects.filter(order=order)
-        total_registration_codes = registration_codes.count()
         if order.company_contact_email:
             recipient_list.append(order.company_contact_email)
         if order.recipient_email:
             recipient_list.append(order.recipient_email)
+
+        for __, course in shoppingcart_items:
+            course_registration_codes = CourseRegistrationCode.objects.filter(order=order, course_id=course.id)
+            total_registration_codes = course_registration_codes.count()
+            for course_registration_code in course_registration_codes:
+                reg_code_info_list.append({
+                    'course_name': course.display_name,
+                    'redemption_url': reverse('register_code_redemption', args=[course_registration_code.code]),
+                    'code': course_registration_code.code,
+                    'is_redeemed': RegistrationCodeRedemption.objects.filter(
+                        registration_code=course_registration_code).exists(),
+                })
 
     appended_recipient_emails = ", ".join(recipient_list)
 
@@ -775,7 +785,7 @@ def _show_receipt_html(request, order):
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
         'total_registration_codes': total_registration_codes,
-        'registration_codes': registration_codes,
+        'reg_code_info_list': reg_code_info_list,
         'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
     }
     # we want to have the ability to override the default receipt page when

@@ -48,6 +48,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from mako.exceptions import TopLevelLookupException
 
 from course_modes.models import CourseMode
+from shoppingcart.api import order_history
 from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
@@ -78,7 +79,6 @@ import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
-from shoppingcart.models import DonationConfiguration
 from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 from notification_prefs.views import enable_notifications
@@ -105,7 +105,7 @@ from student.helpers import (
     check_verify_status_by_course
 )
 from xmodule.error_module import ErrorDescriptor
-from shoppingcart.models import CourseRegistrationCode
+from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 from openedx.core.djangoapps.user_api.api import profile as profile_api
 
 import analytics
@@ -642,6 +642,9 @@ def dashboard(request):
         # otherwise, use the default language
         current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
 
+    # Populate the Order History for the side-bar.
+    order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
+
     context = {
         'enrollment_message': enrollment_message,
         'course_enrollment_pairs': course_enrollment_pairs,
@@ -671,6 +674,7 @@ def dashboard(request):
         'platform_name': settings.PLATFORM_NAME,
         'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
+        'order_history_list': order_history_list
     }
 
     if third_party_auth.is_enabled():
