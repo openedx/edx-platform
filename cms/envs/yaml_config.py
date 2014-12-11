@@ -22,7 +22,6 @@ from util.config_parse import convert_tokens
 import os
 
 from path import path
-from dealer.git import git
 from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # https://stackoverflow.com/questions/2890146/how-to-force-pyyaml-to-load-strings-as-unicode-objects
@@ -171,10 +170,10 @@ if STATIC_URL_BASE:
     STATIC_URL = STATIC_URL_BASE.encode('ascii')
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
-    STATIC_URL += git.revision + "/"
+    STATIC_URL += EDX_PLATFORM_REVISION + "/"
 
 if STATIC_ROOT_BASE:
-    STATIC_ROOT = path(STATIC_ROOT_BASE) / git.revision
+    STATIC_ROOT = path(STATIC_ROOT_BASE) / EDX_PLATFORM_REVISION
 
 
 # Cache used for location mapping -- called many times with the same key/value
