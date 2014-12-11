@@ -3,6 +3,7 @@ Provides a UserPartition driver for cohorts.
 """
 import logging
 
+from courseware import courses
 from .cohorts import get_cohort, get_partition_group_id_for_cohort
 
 log = logging.getLogger(__name__)
@@ -73,3 +74,17 @@ class CohortPartitionScheme(object):
             return None
 
         return group
+
+
+def get_cohorted_user_partition(course_key):
+    """
+    Returns the first user partition from the specified course which uses the CohortPartitionScheme,
+    or None if one is not found. Note that it is currently recommended that each course have only
+    one cohorted user partition.
+    """
+    course = courses.get_course_by_id(course_key)
+    for user_partition in course.user_partitions:
+        if user_partition.scheme == CohortPartitionScheme:
+            return user_partition
+
+    return None

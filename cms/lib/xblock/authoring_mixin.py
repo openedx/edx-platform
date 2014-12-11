@@ -5,7 +5,6 @@ Mixin class that provides authoring capabilities for XBlocks.
 import logging
 
 from xblock.core import XBlock
-
 from xblock.fields import XBlockMixin
 from xblock.fragment import Fragment
 
@@ -23,6 +22,15 @@ class AuthoringMixin(XBlockMixin):
         'i18n': 'need',
     }
 
+    def _get_studio_resource_url(self, relative_url):
+        """
+        Returns the Studio URL to a static resource.
+        """
+        # TODO: is there a cleaner way to do this?
+        from cms.envs.common import STATIC_URL
+        return STATIC_URL + '/js/xblock/authoring.js'
+
+
     def visibility_view(self, context=None):
         """
         Render the view to manage an xblock's visibility settings in Studio.
@@ -32,9 +40,11 @@ class AuthoringMixin(XBlockMixin):
             (Fragment): An HTML fragment for editing the visibility of this XBlock.
         """
         fragment = Fragment()
+        from contentstore.utils import reverse_course_url
         fragment.add_content(self.system.render_template('visibility_editor.html', {
             'xblock': self,
+            'manage_groups_url': reverse_course_url('group_configurations_list_handler', self.location.course_key),
         }))
-        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_author_view.js'))
+        fragment.add_javascript_url(self._get_studio_resource_url('/js/xblock/authoring.js'))
         fragment.initialize_js('VisibilityEditorInit')
         return fragment

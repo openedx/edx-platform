@@ -153,7 +153,9 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             editVisibilitySettings: function(event) {
                 this.editXBlock(event, {
                     view: 'visibility_view',
-                    titleFormat: gettext("Editing visibility for: %(title)s")
+                    titleFormat: gettext("Editing visibility for: %(title)s"),
+                    viewSpecificClasses: '',
+                    modalSize: 'med'
                 });
             },
 
