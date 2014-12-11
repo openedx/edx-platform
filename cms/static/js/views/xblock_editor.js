@@ -89,17 +89,23 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
             },
 
             /**
-             * Returns the data saved for the xmodule. Note that this *does not* work for XBlocks.
+             * Returns the updated field data for the xblock. Note that this works for all
+             * XModules as well as for XBlocks that provide a 'collectFieldData' API.
              */
-            getXModuleData: function() {
+            getXBlockFieldData: function() {
                 var xblock = this.xblock,
                     metadataEditor = this.getMetadataEditor(),
                     data = null;
-                if (xblock.save) {
+                // If the xblock supports returning its field data then collect it
+                if (xblock.collectFieldData) {
+                    data = xblock.collectFieldData();
+                // ... else if this is an XModule then call its save method
+                } else if (xblock.save) {
                     data = xblock.save();
                     if (metadataEditor) {
                         data.metadata = _.extend(data.metadata || {}, this.getChangedMetadata());
                     }
+                // ... else log an error
                 } else {
                     console.error('Cannot save xblock as it has no save method');
                 }

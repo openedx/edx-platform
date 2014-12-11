@@ -21,7 +21,7 @@ from xblock.runtime import Mixologist
 
 from contentstore.utils import get_lms_link_for_item
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from contentstore.views.item import create_xblock_info
+from contentstore.views.item import create_xblock_info, add_container_page_publishing_info
 
 from opaque_keys.edx.keys import UsageKey
 
@@ -186,8 +186,9 @@ def container_handler(request, usage_key_string):
             # about the block's ancestors and siblings for use by the Unit Outline.
             xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
 
-            # Create the link for preview.
-            preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
+            if is_unit_page:
+                add_container_page_publishing_info(xblock, xblock_info)
+
             # need to figure out where this item is in the list of children as the
             # preview will need this
             index = 1
