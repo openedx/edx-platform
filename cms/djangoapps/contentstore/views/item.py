@@ -39,7 +39,7 @@ from util.json_request import expect_json, JsonResponse
 
 from student.auth import has_course_author_access
 from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
-    ancestor_has_staff_lock
+    ancestor_has_staff_lock, has_children_visible_to_specific_content_groups
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock
 from contentstore.views.preview import get_preview_fragment
@@ -757,6 +757,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
         xblock_info["published_by"] = safe_get_username(xblock.published_by)
         xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
+        xblock_info["has_content_group_components"] = has_children_visible_to_specific_content_groups(xblock)
         if release_date:
             xblock_info["release_date_from"] = _get_release_date_from(xblock)
         if visibility_state == VisibilityState.staff_only:

@@ -178,6 +178,18 @@ def is_currently_visible_to_students(xblock):
     return True
 
 
+def has_children_visible_to_specific_content_groups(xblock):
+    """
+    Returns True if this xblock has children that are limited to specific content groups.
+    Note that this method is not recursive (it does not check grandchildren.
+    """
+    for child in xblock.children:
+        if modulestore().get_item(child).group_access:
+            return True
+
+    return False
+
+
 def find_release_date_source(xblock):
     """
     Finds the ancestor of xblock that set its release date.
