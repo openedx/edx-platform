@@ -2,12 +2,18 @@ define([
     'jquery', 'js/collections/asset', 'js/views/assets', 'jquery.fileupload'
 ], function($, AssetCollection, AssetsView) {
     'use strict';
-    return function (assetCallbackUrl) {
+    return function (config) {
         var assets = new AssetCollection(),
             assetsView;
 
-        assets.url = assetCallbackUrl;
-        assetsView = new AssetsView({collection: assets, el: $('.assets-wrapper')});
+        assets.url = config.assetCallbackUrl;
+        assetsView = new AssetsView({
+          collection: assets,
+          el: $('.assets-wrapper'),
+          uploadChunkSizeInMBs: config.uploadChunkSizeInMBs,
+          maxFileSizeInMBs: config.maxFileSizeInMBs,
+          maxFileSizeRedirectUrl: config.maxFileSizeRedirectUrl
+        });
         assetsView.render();
     };
 });
