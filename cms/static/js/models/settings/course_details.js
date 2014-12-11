@@ -5,17 +5,18 @@ var CourseDetails = Backbone.Model.extend({
         org : '',
         course_id: '',
         run: '',
-        start_date: null,	// maps to 'start'
-        end_date: null,		// maps to 'end'
+        start_date: null,   // maps to 'start'
+        end_date: null,     // maps to 'end'
         enrollment_start: null,
         enrollment_end: null,
         syllabus: null,
         short_description: "",
         overview: "",
         intro_video: null,
-        effort: null,	// an int or null,
+        effort: null,   // an int or null,
         course_image_name: '', // the filename
-        course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
+        course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
+        enable_enrollment_email: false
     },
 
     validate: function(newattrs) {
@@ -42,6 +43,18 @@ var CourseDetails = Backbone.Model.extend({
                 errors.intro_video = gettext("Key should only contain letters, numbers, _, or -");
             }
             // TODO check if key points to a real video using google's youtube api
+        }
+        if (newattrs.pre_enrollment_email_subject === "") {
+            errors.pre_enrollment_email_subject = gettext("Subject cannot be empty");
+        }
+        if (newattrs.post_enrollment_email_subject === "") {
+            errors.post_enrollment_email_subject = gettext("Subject cannot be empty");
+        }
+        if (newattrs.pre_enrollment_email === "") {
+            errors.pre_enrollment_email = gettext("Body cannot be empty");
+        }
+        if (newattrs.post_enrollment_email === "") {
+            errors.post_enrollment_email = gettext("Body cannot be empty");
         }
         if (!_.isEmpty(errors)) return errors;
         // NOTE don't return empty errors as that will be interpreted as an error state

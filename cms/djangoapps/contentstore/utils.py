@@ -146,6 +146,30 @@ def get_lms_link_for_about_page(course_key):
     )
 
 
+def get_lms_link_for_dashboard():
+    """Returns the url to the lms dashboard."""
+    if settings.LMS_BASE is None:
+        return None
+    return u"https://{lms_base}/dashboard".format(lms_base=settings.LMS_BASE)
+
+
+def get_lms_link_for_login():
+    """Returns the url to the lms login page."""
+    if settings.LMS_BASE is None:
+        return None
+    return u"https://{lms_base}/login".format(lms_base=settings.LMS_BASE)
+
+
+def get_lms_link_for_course(course_key):
+    """Returns the url to the lms course."""
+    if settings.LMS_BASE is None:
+        return None
+    return u"https://{lms_base}/courses/{course_key}/".format(
+        lms_base=settings.LMS_BASE,
+        course_key=course_key
+    )
+
+
 def course_image_url(course):
     """Returns the image url for the course."""
     loc = StaticContent.compute_location(course.location.course_key, course.course_image)

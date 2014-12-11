@@ -6,10 +6,12 @@ import json
 import copy
 import mock
 from mock import patch
+from smtplib import SMTPException
 
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.conf import settings
+from django.core.management import call_command
 
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
 from models.settings.course_grading import CourseGradingModel
@@ -47,6 +49,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
+        self.assertFalse(details.enable_enrollment_email, "Enrollment Email should be initialized as false")
 
     def test_encoder(self):
         details = CourseDetails.fetch(self.course.id)
@@ -165,6 +168,17 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertContains(response, "Course Overview")
             self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
+
+    def test_send_test_enrollment_email(self):
+        call_command("loaddata", "course_email_template.json")
+        response = self.client.post(reverse_course_url('send_test_enrollment_email', self.course.id), {'subject': 'Test subject', 'message': 'Test body'})
+        self.assertEquals(response.status_code, 200)
+
+    def test_send_test_enrollment_email_failure(self):
+        call_command("loaddata", "course_email_template.json")
+        with patch('django.contrib.auth.models.User.email_user', side_effect=SMTPException):
+            response = self.client.post(reverse_course_url('send_test_enrollment_email', self.course.id), {'subject': 'Test subject', 'message': 'Test body'})
+            self.assertContains(response, 'Error while sending test email.', status_code=400)
 
 
 class CourseDetailsViewTest(CourseTestCase):

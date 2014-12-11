@@ -34,7 +34,7 @@ from instructor_task.tasks_helper import (
     upload_students_csv,
     cohort_students_and_upload
 )
-from bulk_email.tasks import perform_delegate_email_batches
+from bulk_email_lms.tasks import perform_delegate_email_batches
 
 
 @task(base=BaseInstructorTask)  # pylint: disable=not-callable

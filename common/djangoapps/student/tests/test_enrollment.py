@@ -1,13 +1,17 @@
 """
 Tests for student enrollment.
 """
+from datetime import datetime
 import ddt
+import pytz
 import unittest
 from mock import patch
 
 from django.test.utils import override_settings
 from django.conf import settings
+from django.core.management import call_command
 from django.core.urlresolvers import reverse
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
@@ -93,6 +97,63 @@ class EnrollmentTest(ModuleStoreTestCase):
             course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
             self.assertTrue(is_active)
             self.assertEqual(course_mode, enrollment_mode)
+
+    def _create_about_item(self, about_key):
+        """Create specified about item. Uses key as the data."""
+        store = modulestore()
+        about_item = store.create_xblock(self.course.runtime, self.course.id, 'about', about_key, {'data': about_key})
+        store.update_item(about_item, self.user.id, allow_not_found=True)
+
+    def assertEnrollmentEmail(self, expected_subject, expected_msg):
+        """Assert that enrollment email was sent with expected subject and msg."""
+        self.course.enable_enrollment_email = True
+        self.course = self.update_course(self.course, self.user.id)
+        call_command('loaddata', 'course_email_template.json')
+
+        with patch('django.contrib.auth.models.User.email_user') as mock_email_user:
+            resp = self._change_enrollment('enroll')
+            self.assertEqual(resp.status_code, 200)
+            (subject, msg, from_addr) = mock_email_user.call_args[0]
+            self.assertEquals(subject, expected_subject)
+            self.assertIn(expected_msg, msg)
+            self.assertEquals(from_addr, settings.DEFAULT_FROM_EMAIL)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_AUTH_FOR_TESTING': False})
+    def test_pre_enrollment_email(self):
+        """
+        Test sending automated emails to users upon course enrollment before it starts.
+        """
+        self._create_about_item('pre_enrollment_email_subject')
+        self._create_about_item('pre_enrollment_email')
+
+        self.assertEnrollmentEmail('pre_enrollment_email_subject', 'pre_enrollment_email')
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_AUTH_FOR_TESTING': False})
+    def test_post_enrollment_email(self):
+        """
+        Test sending automated emails to users upon course enrollment after it starts.
+        """
+        self.course.start = datetime.now(pytz.UTC)
+        self._create_about_item('post_enrollment_email_subject')
+        self._create_about_item('post_enrollment_email')
+
+        self.assertEnrollmentEmail('post_enrollment_email_subject', 'post_enrollment_email')
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_AUTH_FOR_TESTING': False})
+    @patch('student.views.log.error')
+    def test_enrollment_email_failure(self, error_log):
+        """
+        Test that enrollment email failure logs an error
+        """
+        self.course.enable_enrollment_email = True
+        self.course = self.update_course(self.course, self.user.id)
+        call_command('loaddata', 'course_email_template.json')
+
+        with patch('django.contrib.auth.models.User.email_user', side_effect=Exception):
+            resp = self._change_enrollment('enroll')
+            self.assertEqual(resp.status_code, 200)
+            error_log.assert_called_with('Unable to send course enrollment verification email to user from "{from_address}"'.format(
+                from_address=settings.DEFAULT_FROM_EMAIL), exc_info=True)
 
     def test_unenroll(self):
         # Enroll the student in the course

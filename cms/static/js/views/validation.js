@@ -76,11 +76,23 @@ var ValidatingView = BaseView.extend({
     getInputElements: function(ele) {
         var inputElements = 'input, textarea';
         if ($(ele).is(inputElements)) {
+            // put error on CodeMirror sibling of textarea if it exists
+            if ($(ele).is('textarea') && $(ele).next().hasClass('CodeMirror')) {
+                return $(ele).next();
+            }
             return $(ele);
         }
         else {
             // put error on the contained inputs
-            return $(ele).find(inputElements);
+            var elements = $(ele).find(inputElements);
+            // put error on CodeMirror sibling of textareas if it exists
+            for (var i=0; i<elements.length; i++) {
+                var e = elements[i];
+                if ($(e).is('textarea') && $(e).next().hasClass('CodeMirror')) {
+                    elements[i] = $(e).next()[0];
+                }
+            }
+            return elements;
         }
     },
 

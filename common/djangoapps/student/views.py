@@ -68,7 +68,7 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
-from courseware.courses import get_courses, sort_by_announcement
+from courseware.courses import get_courses, sort_by_announcement, get_course_about_section  # pylint: disable=import-error
 from courseware.access import has_access
 
 from django_comment_common.models import Role
@@ -76,7 +76,7 @@ from django_comment_common.models import Role
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 
-from bulk_email.models import Optout, CourseAuthorization
+from bulk_email.models import Optout, CourseEmailTemplate, CourseAuthorization
 import shoppingcart
 from shoppingcart.models import DonationConfiguration
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -869,6 +869,11 @@ def change_enrollment(request, check_access=True):
             except Exception:
                 return HttpResponseBadRequest(_("Could not enroll"))
 
+            # notify the user of the enrollment via email
+            course = modulestore().get_course(course_id)
+            if (course.enable_enrollment_email and not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'))):
+                notify_enrollment_by_email(course, user)
+
         # If we have more than one course mode or professional ed is enabled,
         # then send the user to the choose your track page.
         # (In the case of professional ed, this will redirect to a page that
@@ -901,6 +906,45 @@ def change_enrollment(request, check_access=True):
         return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
+
+
+def notify_enrollment_by_email(course, user):
+    """
+    Updates the user about the course enrollment by email.
+
+    If the Course has already started, use post_enrollment_email
+    If the Course has not yet started, use pre_enrollment_email
+    """
+    template_name = microsite.get_value('course_email_template_name')
+    template = CourseEmailTemplate.get_template(template_name)
+    from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+    try:
+        # Check if the course has already started and set subject & message accordingly
+        if course.has_started():
+            subject = get_course_about_section(course, 'post_enrollment_email_subject')
+            message = get_course_about_section(course, 'post_enrollment_email')
+        else:
+            subject = get_course_about_section(course, 'pre_enrollment_email_subject')
+            message = get_course_about_section(course, 'pre_enrollment_email')
+
+        subject = ''.join(subject.splitlines())
+        email_context = {
+            'course_title': course.display_name,
+            'course_url': 'https://{}{}'.format(
+                settings.SITE_NAME,
+                reverse('course_root', kwargs={'course_id': course.id.to_deprecated_string()})
+            ),
+            'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
+            'platform_name': settings.PLATFORM_NAME,
+            'email': user.email
+        }
+        message = template.render_plaintext(message, email_context)
+        user.email_user(subject, message, from_address)
+
+    except Exception:  # pylint: disable=broad-except
+        log.error('Unable to send course enrollment verification email to user from "{from_address}"'.format(
+            from_address=from_address), exc_info=True)
 
 
 # pylint: disable=fixme

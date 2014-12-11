@@ -33,7 +33,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.urlresolvers import reverse
 
 from bulk_email.models import (
-    CourseEmail, Optout, CourseEmailTemplate,
+    CourseEmail, Optout,
     SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
 )
 from courseware.courses import get_course, course_image_url
@@ -91,7 +91,7 @@ BULK_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def _get_recipient_queryset(user_id, to_option, course_id, course_location):
+def _get_recipient_queryset(user_id, to_option, course_id):
     """
     Returns a query set of email recipients corresponding to the requested to_option category.
 
@@ -229,7 +229,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         )
         return new_subtask
 
-    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id, course.location)
+    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id)
     recipient_fields = ['profile__name', 'email']
 
     log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",
@@ -389,6 +389,7 @@ def _get_source_address(course_id, course_title):
     return from_addr
 
 
+# pylint: disable=too-many-statements
 def _send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status):
     """
     Performs the email sending task.

@@ -36,7 +36,7 @@ from courseware.courses import get_course_by_id, course_image_url
 
 from ...models import LinkedIn
 
-# The following is blatantly cribbed from bulk_email/tasks.py
+# The following is blatantly cribbed from bulk_email_lms/tasks.py
 
 # Errors that an individual email is failing to be sent, and should just
 # be treated as a fail.

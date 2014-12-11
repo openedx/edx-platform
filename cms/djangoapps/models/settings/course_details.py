@@ -4,12 +4,21 @@ import datetime
 import json
 from json.encoder import JSONEncoder
 
+from django.conf import settings
+from mako.template import Template
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from contentstore.utils import course_image_url
+from contentstore.utils import (
+    course_image_url,
+    get_lms_link_for_about_page,
+    get_lms_link_for_dashboard,
+    get_lms_link_for_login,
+)
 from models.settings import course_grading
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
+from edxmako.shortcuts import render_to_string
 
 # This list represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be
@@ -19,6 +28,10 @@ ABOUT_ATTRIBUTES = [
     'short_description',
     'overview',
     'effort',
+    'pre_enrollment_email',
+    'post_enrollment_email',
+    'pre_enrollment_email_subject',
+    'post_enrollment_email_subject',
 ]
 
 
@@ -26,7 +39,7 @@ class CourseDetails(object):
     def __init__(self, org, course_id, run):
         # still need these for now b/c the client's screen shows these 3 fields
         self.org = org
-        self.course_id = course_id
+        self.course_id = course_id  # This actually holds the course number.
         self.run = run
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
@@ -35,10 +48,15 @@ class CourseDetails(object):
         self.syllabus = None  # a pdf file asset
         self.short_description = ""
         self.overview = ""  # html to render as the overview
+        self.pre_enrollment_email = CourseDetails.get_default_pre_enrollment_email(CourseKey.from_string(u'/'.join([self.org, self.course_id, self.run])))
+        self.post_enrollment_email = CourseDetails.get_default_post_enrollment_email()
+        self.pre_enrollment_email_subject = "Thanks for Enrolling in {}".format(self.course_id)
+        self.post_enrollment_email_subject = "Thanks for Enrolling in {}".format(self.course_id)
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
+        self.enable_enrollment_email = False
 
     @classmethod
     def _fetch_about_attribute(cls, course_key, attribute):
@@ -66,6 +84,7 @@ class CourseDetails(object):
         course_details.enrollment_end = descriptor.enrollment_end
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.enable_enrollment_email = descriptor.enable_enrollment_email
 
         for attribute in ABOUT_ATTRIBUTES:
             value = cls._fetch_about_attribute(course_key, attribute)
@@ -115,6 +134,11 @@ class CourseDetails(object):
         # into the model is nasty, convert the JSON Date to a Python date, which is what the
         # setter expects as input.
         date = Date()
+
+        # Added to allow admins to enable/disable enrollment emails
+        if 'enable_enrollment_email' in jsondict:
+            descriptor.enable_enrollment_email = jsondict['enable_enrollment_email']
+            dirty = True
 
         if 'start_date' in jsondict:
             converted = date.from_json(jsondict['start_date'])
@@ -199,6 +223,34 @@ class CourseDetails(object):
             result = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + \
                 video_key + '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
         return result
+
+    @staticmethod
+    def get_default_pre_enrollment_email(course_key):
+        """
+        Returns the rendered default email body on enrolling before course starts.
+        """
+        enroll_email_dict = {
+            'dashboard_url': get_lms_link_for_dashboard(),
+            'about_url': u"https:{}".format(get_lms_link_for_about_page(course_key)),
+        }
+        if settings.DEFAULT_PRE_ENROLLMENT_EMAIL:
+            return Template(settings.DEFAULT_PRE_ENROLLMENT_EMAIL).render_unicode(**enroll_email_dict)
+        else:
+            return render_to_string('emails/default_pre_enrollment_message.txt', enroll_email_dict)
+
+    @staticmethod
+    def get_default_post_enrollment_email():
+        """
+        Returns the rendered default email body on enrolling after course starts.
+        """
+        enroll_email_dict = {
+            'dashboard_url': get_lms_link_for_dashboard(),
+            'signin_url': get_lms_link_for_login(),
+        }
+        if settings.DEFAULT_POST_ENROLLMENT_EMAIL:
+            return Template(settings.DEFAULT_POST_ENROLLMENT_EMAIL).render_unicode(**enroll_email_dict)
+        else:
+            return render_to_string('emails/default_post_enrollment_message.txt', enroll_email_dict)
 
 
 # TODO move to a more general util?
