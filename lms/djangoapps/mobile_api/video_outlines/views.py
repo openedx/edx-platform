@@ -10,21 +10,18 @@ from functools import partial
 
 from django.http import Http404, HttpResponse
 
-from rest_framework import generics, permissions
-from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
+from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 
-from mobile_api.utils import mobile_available_when_enrolled
-
+from ..utils import MobileView, mobile_course_access
 from .serializers import BlockOutline, video_summary
 
 
+@MobileView()
 class VideoSummaryList(generics.ListAPIView):
     """
     **Use Case**
@@ -78,16 +75,12 @@ class VideoSummaryList(generics.ListAPIView):
 
                 * size: The size of the video file
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated,)
 
-    def list(self, request, *args, **kwargs):
-        course_id = CourseKey.from_string(kwargs['course_id'])
-        course = get_mobile_course(course_id, request.user)
-
+    @mobile_course_access(depth=None)
+    def list(self, request, course, *args, **kwargs):
         video_outline = list(
             BlockOutline(
-                course_id,
+                course.id,
                 course,
                 {"video": partial(video_summary, course)},
                 request,
@@ -96,6 +89,7 @@ class VideoSummaryList(generics.ListAPIView):
         return Response(video_outline)
 
 
+@MobileView()
 class VideoTranscripts(generics.RetrieveAPIView):
     """
     **Use Case**
@@ -111,16 +105,14 @@ class VideoTranscripts(generics.RetrieveAPIView):
         An HttpResponse with an SRT file download.
 
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request, *args, **kwargs):
-        course_key = CourseKey.from_string(kwargs['course_id'])
+    @mobile_course_access()
+    def get(self, request, course, *args, **kwargs):
         block_id = kwargs['block_id']
         lang = kwargs['lang']
 
         usage_key = BlockUsageLocator(
-            course_key, block_type="video", block_id=block_id
+            course.id, block_type="video", block_id=block_id
         )
         try:
             video_descriptor = modulestore().get_item(usage_key)
@@ -132,15 +124,3 @@ class VideoTranscripts(generics.RetrieveAPIView):
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
 
         return response
-
-
-def get_mobile_course(course_id, user):
-    """
-    Return only a CourseDescriptor if the course is mobile-ready or if the
-    requesting user is a staff member.
-    """
-    course = modulestore().get_course(course_id, depth=None)
-    if mobile_available_when_enrolled(course, user):
-        return course
-
-    raise PermissionDenied(detail="Course not available on mobile.")
