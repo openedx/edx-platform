@@ -13,6 +13,7 @@ from django.contrib.sites.models import get_current_site
 from django.conf import settings
 from microsite_configuration import microsite
 
+
 class PasswordResetFormNoActive(PasswordResetForm):
     def clean_email(self):
         """
@@ -57,7 +58,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
                 'uid': int_to_base36(user.id),
                 'user': user,
                 'token': token_generator.make_token(user),
-                'protocol': use_https and 'https' or 'http',
+                'protocol': 'https' if use_https else 'http',
                 'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME)
             }
             subject = loader.render_to_string(subject_template_name, context)
