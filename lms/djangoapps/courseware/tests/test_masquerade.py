@@ -1,19 +1,17 @@
 """
-Unit tests for masquerade
-
-Based on (and depends on) unit tests for courseware.
-
-Notes for running by hand:
-
-./manage.py lms --settings test test lms/djangoapps/courseware
+Unit tests for masquerade.
 """
 import json
+from mock import patch
+from datetime import datetime
+from django.utils.timezone import UTC
 
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.tests.factories import StaffFactory
+from student.tests.factories import UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
@@ -22,21 +20,23 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    Base class for masquerade tests that sets up a test course.
+    Base class for masquerade tests that sets up a test course and enrolls a user in the course.
     """
-    COURSE_NUMBER = 'masquerade-test'
-
     def setUp(self):
-        self.course = CourseFactory.create(number=self.COURSE_NUMBER)
+        # By default, tests run with DISABLE_START_DATES=True. To test that masquerading as a student is
+        # working properly, we must use start dates and set a start date in the past (otherwise the access
+        # checks exist prematurely).
+        self.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC())})
         self.chapter = ItemFactory.create(
             parent_location=self.course.location,
             category="chapter",
             display_name="Test Section",
         )
+        self.sequential_display_name = "Test Masquerade Subsection"
         self.sequential = ItemFactory.create(
             parent_location=self.chapter.location,
             category="sequential",
-            display_name="Test Subsection",
+            display_name=self.sequential_display_name,
         )
         self.vertical = ItemFactory.create(
             parent_location=self.sequential.location,
@@ -50,22 +50,17 @@ class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             options=['Correct', 'Incorrect'],
             correct_option='Correct'
         )
+        self.problem_display_name = "Test Masquerade Problem"
         self.problem = ItemFactory.create(
             parent_location=self.vertical.location,
             category='problem',
             data=problem_xml,
-            display_name='Option Response Problem'
+            display_name=self.problem_display_name
         )
+        self.test_user = self.create_test_user()
+        self.login(self.test_user.email, 'test')
+        self.enroll(self.course, True)
 
-        self.staff = StaffFactory(course_key=self.course.id)
-        self.login(self.staff.email, 'test')
-        self.enroll(self.course)
-
-
-class TestStaffMasqueradeAsStudent(MasqueradeTestCase):
-    """
-    Check for staff being able to masquerade as student.
-    """
     def get_courseware_page(self):
         """
         Returns the HTML rendering for the courseware page.
@@ -80,31 +75,18 @@ class TestStaffMasqueradeAsStudent(MasqueradeTestCase):
         )
         return self.client.get(url)
 
-    def test_staff_debug_for_staff(self):
-        courseware_response = self.get_courseware_page()
-        self.assertTrue('Staff Debug Info' in courseware_response.content)
-
-    def update_masquerade(self, role, group_id=None):
+    def verify_staff_debug_present(self, staff_debug_expected):
         """
-        Toggle masquerade state.
+        Verifies that the staff debug control visibility is as expected (for staff only).
         """
-        masquerade_url = reverse(
-            'masquerade_update',
-            kwargs={
-                'course_key_string': unicode(self.course.id),
-            }
-        )
-        return self.client.post(masquerade_url, {"role": role, "group_id": group_id})
-
-    def test_no_staff_debug_for_student(self):
-        masquerade_response = self.update_masquerade(role='student')
-        self.assertEqual(masquerade_response.status_code, 204)
-
-        courseware_response = self.get_courseware_page()
-
-        self.assertFalse('Staff Debug Info' in courseware_response.content)
+        content = self.get_courseware_page().content
+        self.assertTrue(self.sequential_display_name in content, "Subsection should be visible")
+        self.assertEqual(staff_debug_expected, 'Staff Debug Info' in content)
 
     def get_problem(self):
+        """
+        Returns the JSON content for the problem in the course.
+        """
         problem_url = reverse(
             'xblock_handler',
             kwargs={
@@ -116,23 +98,96 @@ class TestStaffMasqueradeAsStudent(MasqueradeTestCase):
         )
         return self.client.get(problem_url)
 
+    def verify_show_answer_present(self, show_answer_expected):
+        """
+        Verifies that "Show Answer" is only present when expected (for staff only).
+        """
+        problem_html = json.loads(self.get_problem().content)['html']
+        self.assertTrue(self.problem_display_name in problem_html)
+        self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
+
+
+class NormalStudentVisibilityTest(MasqueradeTestCase):
+    """
+    Verify the course displays as expected for a "normal" student (to ensure test setup is correct).
+    """
+    def create_test_user(self):
+        """
+        Creates a normal student user.
+        """
+        return UserFactory()
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_staff_debug_not_visible(self):
+        """
+        Tests that staff debug control is not present for a student.
+        """
+        self.verify_staff_debug_present(False)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_show_answer_not_visible(self):
+        """
+        Tests that "Show Answer" is not visible for a student.
+        """
+        self.verify_show_answer_present(False)
+
+
+class TestStaffMasqueradeAsStudent(MasqueradeTestCase):
+    """
+    Check for staff being able to masquerade as student.
+    """
+    def create_test_user(self):
+        """
+        Creates a staff user.
+        """
+        return StaffFactory(course_key=self.course.id)
+
+    def update_masquerade(self, role, group_id=None):
+        """
+        Toggle masquerade state.
+        """
+        masquerade_url = reverse(
+            'masquerade_update',
+            kwargs={
+                'course_key_string': unicode(self.course.id),
+            }
+        )
+        response = self.client.post(
+            masquerade_url,
+            json.dumps({"role": role, "group_id": group_id}),
+            "application/json"
+        )
+        self.assertEqual(response.status_code, 204)
+        return response
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_staff_debug_with_masquerade(self):
+        """
+        Tests that staff debug control is not visible when masquerading as a student.
+        """
+        # Verify staff initially can see staff debug
+        self.verify_staff_debug_present(True)
+
+        # Toggle masquerade to student
+        self.update_masquerade(role='student')
+        self.verify_staff_debug_present(False)
+
+        # Toggle masquerade back to staff
+        self.update_masquerade(role='staff')
+        self.verify_staff_debug_present(True)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_show_answer_for_staff(self):
-        problem_response = self.get_problem()
-        html = json.loads(problem_response.content)['html']
-        expected_html = (
-            '<button class="show"><span class="show-label">Show Answer</span> '
-            '<span class="sr">Reveal Answer</span></button>'
-        )
-        self.assertTrue(expected_html in html)
+        """
+        Tests that "Show Answer" is not visible when masquerading as a student.
+        """
+        # Verify that staff initially can see "Show Answer".
+        self.verify_show_answer_present(True)
 
-    def test_no_show_answer_for_student(self):
-        masquerade_response = self.update_masquerade(role='student')
-        self.assertEqual(masquerade_response.status_code, 204)
+         # Toggle masquerade to student
+        self.update_masquerade(role='student')
+        self.verify_show_answer_present(False)
 
-        problem_response = self.get_problem()
-        html = json.loads(problem_response.content)['html']
-        expected_html = (
-            '<button class="show"><span class="show-label" aria-hidden="true">Show Answer</span> '
-            '<span class="sr">Reveal answer above</span></button>'
-        )
-        self.assertFalse(expected_html in html)
+        # Toggle masquerade back to staff
+        self.update_masquerade(role='staff')
+        self.verify_show_answer_present(True)

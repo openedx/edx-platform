@@ -19,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
+from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
@@ -765,6 +766,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         user,
         descriptor
     )
+    setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
