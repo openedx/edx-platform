@@ -15,7 +15,9 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'edit-xblock',
                 addSaveButton: true,
-                viewSpecificClasses: 'modal-editor confirm'
+                view: 'studio_view',
+                viewSpecificClasses: 'modal-editor confirm',
+                titleFormat: gettext("Editing: %(title)s")
             }),
 
             initialize: function() {
@@ -56,7 +58,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
             displayXBlock: function() {
                 this.editorView = new XBlockEditorView({
                     el: this.$('.xblock-editor'),
-                    model: this.xblockInfo
+                    model: this.xblockInfo,
+                    view: this.options.view
                 });
                 this.editorView.render({
                     success: _.bind(this.onDisplayXBlock, this)
@@ -111,7 +114,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 if (!displayName) {
                     displayName = gettext('Component');
                 }
-                return interpolate(gettext("Editing: %(title)s"), { title: displayName }, true);
+                return interpolate(this.options.titleFormat, { title: displayName }, true);
             },
 
             addDefaultModes: function() {
