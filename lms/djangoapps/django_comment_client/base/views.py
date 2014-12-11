@@ -26,6 +26,7 @@ from edx_notifications.lib.publisher import (
 from edx_notifications.data import NotificationMessage
 from courseware.courses import get_course_with_access, get_course_by_id
 from openedx.core.djangoapps.course_groups.tasks import publish_course_group_notification_task
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id
 import django_comment_client.settings as cc_settings
 from django_comment_common.signals import (
     thread_created,
@@ -314,6 +315,12 @@ def create_thread(request, course_id, commentable_id):
 
     add_courseware_context([data], course, user)
     add_thread_group_name(data, course_key)
+    if thread.get('group_id') and not thread.get('group_name'):
+        thread['group_name'] = get_cohort_by_id(course_key, thread.get('group_id')).name
+
+    data = thread.to_dict()
+
+    add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:
