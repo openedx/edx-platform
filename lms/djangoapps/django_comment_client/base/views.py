@@ -18,7 +18,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
+from course_groups.cohorts import get_cohort_id, is_commentable_cohorted, get_cohort_by_id
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,
@@ -142,7 +142,12 @@ def create_thread(request, course_id, commentable_id):
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
+
+    if thread.get('group_id') and not thread.get('group_name'):
+        thread['group_name'] = get_cohort_by_id(course_key, thread.get('group_id')).name
+
     data = thread.to_dict()
+
     add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
