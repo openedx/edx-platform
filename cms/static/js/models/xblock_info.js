@@ -120,7 +120,12 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * True iff this xblock should display a "Contains staff only content" message.
              */
-            'staff_only_message': null
+            'staff_only_message': null,
+            /**
+             * True iff this xblock is a unit, and it has children that are only visible to certain
+             * content groups. Note that this is not a recursive property.
+             */
+            'has_content_group_components': null
         },
 
         initialize: function () {
