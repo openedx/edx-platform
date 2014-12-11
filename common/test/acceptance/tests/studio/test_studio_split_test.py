@@ -8,7 +8,7 @@ from unittest import skip
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import Select
 
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.partitions.partitions import Group
 from bok_choy.promise import Promise, EmptyPromise
 
 from ...fixtures.course import XBlockFixtureDesc
@@ -217,36 +217,13 @@ class SettingsMenuTest(StudioCourseTest):
         )
         self.advanced_settings.visit()
 
-    def test_link_exist_if_split_test_enabled(self):
+    def test_link_exist(self):
         """
         Ensure that the link to the "Group Configurations" page is shown in the
         Settings menu.
         """
         link_css = 'li.nav-course-settings-group-configurations a'
-        self.assertFalse(self.advanced_settings.q(css=link_css).present)
-
-        self.advanced_settings.set('Advanced Module List', '["split_test"]')
-
-        self.browser.refresh()
-        self.advanced_settings.wait_for_page()
-
-        self.assertIn(
-            "split_test",
-            json.loads(self.advanced_settings.get('Advanced Module List')),
-        )
-
         self.assertTrue(self.advanced_settings.q(css=link_css).present)
-
-    def test_link_does_not_exist_if_split_test_disabled(self):
-        """
-        Ensure that the link to the "Group Configurations" page does not exist
-        in the Settings menu.
-        """
-        link_css = 'li.nav-course-settings-group-configurations a'
-        self.advanced_settings.set('Advanced Module List', '[]')
-        self.browser.refresh()
-        self.advanced_settings.wait_for_page()
-        self.assertFalse(self.advanced_settings.q(css=link_css).present)
 
 
 @attr('shard_1')

@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_helpers",
         "js/common_helpers/template_helpers", "js/spec_helpers/edit_helpers",
-        "js/views/pages/container", "js/views/pages/paged_container", "js/models/xblock_info"],
+        "js/views/pages/container", "js/views/pages/paged_container", "js/models/xblock_info", "jquery.simulate"],
     function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, ContainerPage, PagedContainerPage, XBlockInfo) {
 
         function parameterized_suite(label, global_page_options, fixtures) {
@@ -14,6 +14,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                     mockBadXBlockContainerXBlockHtml = readFixtures('mock/mock-bad-xblock-container-xblock.underscore'),
                     mockUpdatedContainerXBlockHtml = readFixtures('mock/mock-updated-container-xblock.underscore'),
                     mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore'),
+                    mockXBlockVisibilityEditorHtml = readFixtures('mock/mock-xblock-visibility-editor.underscore'),
                     PageClass = fixtures.page;
 
                 beforeEach(function () {
@@ -215,6 +216,21 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         editButtons[0].click();
                         AjaxHelpers.respondWithJson(requests, {
                             html: mockXBlockEditorHtml,
+                            resources: []
+                        });
+                        expect(EditHelpers.isShowingModal()).toBeTruthy();
+                    });
+
+                    it('can show a visibility modal for a child xblock', function() {
+                        var visibilityButtons;
+                        renderContainerPage(this, mockContainerXBlockHtml);
+                        visibilityButtons = containerPage.$('.wrapper-xblock .visibility-button');
+                        expect(visibilityButtons.length).toBe(6);
+                        visibilityButtons[0].click();
+                        expect(str.startsWith(lastRequest().url, '/xblock/locator-component-A1/visibility_view'))
+                            .toBeTruthy();
+                        AjaxHelpers.respondWithJson(requests, {
+                            html: mockXBlockVisibilityEditorHtml,
                             resources: []
                         });
                         expect(EditHelpers.isShowingModal()).toBeTruthy();

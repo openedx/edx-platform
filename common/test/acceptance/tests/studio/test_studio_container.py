@@ -1,20 +1,22 @@
 """
 Acceptance tests for Studio related to the container page.
-The container page is used both for display units, and for
-displaying containers within units.
+The container page is used both for displaying units, and
+for displaying containers within units.
 """
 from nose.plugins.attrib import attr
 
 from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
 from ...pages.studio.html_component_editor import HtmlComponentEditorView
 from ...pages.studio.utils import add_discussion, drag
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.staff_view import StaffPage
+from ...tests.helpers import create_user_partition_json
 
 import datetime
 from bok_choy.promise import Promise, EmptyPromise
 from base_studio_test import ContainerBase
+from xmodule.partitions.partitions import Group
 
 
 class NestedVerticalTest(ContainerBase):
@@ -287,6 +289,265 @@ class EditContainerTest(NestedVerticalTest):
         """
         container = self.go_to_nested_container_page()
         self.modify_display_name_and_verify(container)
+
+
+class EditVisibilityModalTest(ContainerBase):
+    """
+    Tests of the visibility settings modal for components on the unit
+    page.
+    """
+    VISIBILITY_LABEL_ALL = 'All Students and Staff'
+    VISIBILITY_LABEL_SPECIFIC = 'Specific Content Groups'
+    MISSING_GROUP_LABEL = 'Deleted Content Group\nContent group no longer exists. Please choose another or allow access to All Students and staff'
+    VALIDATION_ERROR_LABEL = 'This component has validation issues.'
+    VALIDATION_ERROR_MESSAGE = 'Error:\nThis component refers to deleted or invalid content groups.'
+    GROUP_VISIBILITY_MESSAGE = 'Some content in this unit is only visible to particular groups'
+
+    def setUp(self):
+        super(EditVisibilityModalTest, self).setUp()
+
+        # Set up a cohort-schemed user partition
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    create_user_partition_json(
+                        0,
+                        'Configuration Dogs, Cats',
+                        'Content Group Partition',
+                        [Group("0", 'Dogs'), Group("1", 'Cats')],
+                        scheme="cohort"
+                    )
+                ],
+            },
+        })
+
+        self.container_page = self.go_to_unit_page()
+        self.html_component = self.container_page.xblocks[1]
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Populate a simple course a section, subsection, and unit, and HTML component.
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('html', 'Html Component')
+                    )
+                )
+            )
+        )
+
+    def edit_component_visibility(self, component):
+        """
+        Edit the visibility of an xblock on the container page.
+        """
+        component.edit_visibility()
+        return ComponentVisibilityEditorView(self.browser, component.locator)
+
+    def verify_selected_labels(self, visibility_editor, expected_labels):
+        """
+        Verify that a visibility editor's selected labels match the
+        expected ones.
+        """
+        # If anything other than 'All Students and Staff', is selected,
+        # 'Specific Content Groups' should be selected as well.
+        if expected_labels != [self.VISIBILITY_LABEL_ALL]:
+            expected_labels.append(self.VISIBILITY_LABEL_SPECIFIC)
+        self.assertItemsEqual(expected_labels, [option.text for option in visibility_editor.selected_options])
+
+    def select_and_verify_saved(self, component, labels, expected_labels=None):
+        """
+        Edit the visibility of an xblock on the container page and
+        verify that the edit persists.  If provided, verify that
+        `expected_labels` are selected after save, otherwise expect
+        that `labels` are selected after save.  Note that `labels`
+        are labels which should be clicked, but not necessarily checked.
+        """
+        if expected_labels is None:
+            expected_labels = labels
+
+        # Make initial edit(s) and save
+        visibility_editor = self.edit_component_visibility(component)
+        for label in labels:
+            visibility_editor.select_option(label, save=False)
+        visibility_editor.save()
+
+        # Re-open the modal and inspect its selected inputs
+        visibility_editor = self.edit_component_visibility(component)
+        self.verify_selected_labels(visibility_editor, expected_labels)
+
+    def verify_component_validation_error(self, component):
+        """
+        Verify that we see validation errors for the given component.
+        """
+        self.assertTrue(component.has_validation_error)
+        self.assertEqual(component.validation_error_text, self.VALIDATION_ERROR_LABEL)
+        self.assertEqual([self.VALIDATION_ERROR_MESSAGE], component.validation_error_messages)
+
+    def verify_visibility_set(self, component, is_set):
+        """
+        Verify that the container page shows that component visibility
+        settings have been edited if `is_set` is True; otherwise
+        verify that the container page shows no such information.
+        """
+        if is_set:
+            self.assertIn(self.GROUP_VISIBILITY_MESSAGE, self.container_page.sidebar_visibility_message)
+            self.assertTrue(component.has_group_visibility_set)
+        else:
+            self.assertNotIn(self.GROUP_VISIBILITY_MESSAGE, self.container_page.sidebar_visibility_message)
+            self.assertFalse(component.has_group_visibility_set)
+
+    def update_component(self, component, metadata):
+        """
+        Update a component's metadata and refresh the page.
+        """
+        self.course_fixture._update_xblock(component.locator, {'metadata': metadata})
+        self.browser.refresh()
+        self.container_page.wait_for_page()
+
+    def remove_missing_groups(self, component):
+        """
+        Deselect the missing groups for a component.  After save,
+        verify that there are no missing group messages in the modal
+        and that there is no validation error on the component.
+        """
+        visibility_editor = self.edit_component_visibility(component)
+        for option in self.edit_component_visibility(component).selected_options:
+            if option.text == self.MISSING_GROUP_LABEL:
+                option.click()
+        visibility_editor.save()
+        visibility_editor = self.edit_component_visibility(component)
+        self.assertNotIn(self.MISSING_GROUP_LABEL, [item.text for item in visibility_editor.all_options])
+        visibility_editor.cancel()
+        self.assertFalse(component.has_validation_error)
+
+    def test_default_selection(self):
+        """
+        Scenario: The component visibility modal selects visible to all by default.
+            Given I have a unit with one component
+            When I go to the container page for that unit
+            And I open the visibility editor modal for that unit's component
+            Then the default visibility selection should be 'All Students and Staff'
+            And the container page should not display 'Some content in this unit is only visible to particular groups'
+        """
+        self.verify_selected_labels(self.edit_component_visibility(self.html_component), [self.VISIBILITY_LABEL_ALL])
+        self.verify_visibility_set(self.html_component, False)
+
+    def test_reset_to_all_students_and_staff(self):
+        """
+        Scenario: The component visibility modal can be set to be visible to all students and staff.
+            Given I have a unit with one component
+            When I go to the container page for that unit
+            And I open the visibility editor modal for that unit's component
+            And I select 'Dogs'
+            And I save the modal
+            Then the container page should display 'Some content in this unit is only visible to particular groups'
+            And I re-open the visibility editor modal for that unit's component
+            And I select 'All Students and Staff'
+            And I save the modal
+            Then the visibility selection should be 'All Students and Staff'
+            And the container page should not display 'Some content in this unit is only visible to particular groups'
+        """
+        self.select_and_verify_saved(self.html_component, ['Dogs'])
+        self.verify_visibility_set(self.html_component, True)
+        self.select_and_verify_saved(self.html_component, [self.VISIBILITY_LABEL_ALL])
+        self.verify_visibility_set(self.html_component, False)
+
+    def test_select_single_content_group(self):
+        """
+        Scenario: The component visibility modal can be set to be visible to one content group.
+            Given I have a unit with one component
+            When I go to the container page for that unit
+            And I open the visibility editor modal for that unit's component
+            And I select 'Dogs'
+            And I save the modal
+            Then the visibility selection should be 'Dogs' and 'Specific Content Groups'
+            And the container page should display 'Some content in this unit is only visible to particular groups'
+        """
+        self.select_and_verify_saved(self.html_component, ['Dogs'])
+        self.verify_visibility_set(self.html_component, True)
+
+    def test_select_multiple_content_groups(self):
+        """
+        Scenario: The component visibility modal can be set to be visible to multiple content groups.
+            Given I have a unit with one component
+            When I go to the container page for that unit
+            And I open the visibility editor modal for that unit's component
+            And I select 'Dogs' and 'Cats'
+            And I save the modal
+            Then the visibility selection should be 'Dogs', 'Cats', and 'Specific Content Groups'
+            And the container page should display 'Some content in this unit is only visible to particular groups'
+        """
+        self.select_and_verify_saved(self.html_component, ['Dogs', 'Cats'])
+        self.verify_visibility_set(self.html_component, True)
+
+    def test_select_zero_content_groups(self):
+        """
+        Scenario: The component visibility modal can not be set to be visible to 'Specific Content Groups' without
+                selecting those specific groups.
+            Given I have a unit with one component
+            When I go to the container page for that unit
+            And I open the visibility editor modal for that unit's component
+            And I select 'Specific Content Groups'
+            And I save the modal
+            Then the visibility selection should be 'All Students and Staff'
+            And the container page should not display 'Some content in this unit is only visible to particular groups'
+        """
+        self.select_and_verify_saved(
+            self.html_component, [self.VISIBILITY_LABEL_SPECIFIC], expected_labels=[self.VISIBILITY_LABEL_ALL]
+        )
+        self.verify_visibility_set(self.html_component, False)
+
+    def test_missing_groups(self):
+        """
+        Scenario: The component visibility modal shows a validation error when visibility is set to multiple unknown
+                group ids.
+            Given I have a unit with one component
+            And that component's group access specifies multiple invalid group ids
+            When I go to the container page for that unit
+            Then I should see a validation error message on that unit's component
+            And I open the visibility editor modal for that unit's component
+            Then I should see that I have selected multiple deleted groups
+            And the container page should display 'Some content in this unit is only visible to particular groups'
+            And I de-select the missing groups
+            And I save the modal
+            Then the visibility selection should be 'All Students and Staff'
+            And I should not see any validation errors on the component
+            And the container page should not display 'Some content in this unit is only visible to particular groups'
+        """
+        self.update_component(self.html_component, {'group_access': {0: [2, 3]}})
+        self.verify_component_validation_error(self.html_component)
+        visibility_editor = self.edit_component_visibility(self.html_component)
+        self.verify_selected_labels(visibility_editor, [self.MISSING_GROUP_LABEL] * 2)
+        self.remove_missing_groups(self.html_component)
+        self.verify_visibility_set(self.html_component, False)
+
+    def test_found_and_missing_groups(self):
+        """
+        Scenario: The component visibility modal shows a validation error when visibility is set to multiple unknown
+                group ids and multiple known group ids.
+            Given I have a unit with one component
+            And that component's group access specifies multiple invalid and valid group ids
+            When I go to the container page for that unit
+            Then I should see a validation error message on that unit's component
+            And I open the visibility editor modal for that unit's component
+            Then I should see that I have selected multiple deleted groups
+            And the container page should display 'Some content in this unit is only visible to particular groups'
+            And I de-select the missing groups
+            And I save the modal
+            Then the visibility selection should be the names of the valid groups.
+            And I should not see any validation errors on the component
+            And the container page should display 'Some content in this unit is only visible to particular groups'
+        """
+        self.update_component(self.html_component, {'group_access': {0: [0, 1, 2, 3]}})
+        self.verify_component_validation_error(self.html_component)
+        visibility_editor = self.edit_component_visibility(self.html_component)
+        self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'] + [self.MISSING_GROUP_LABEL] * 2)
+        self.remove_missing_groups(self.html_component)
+        visibility_editor = self.edit_component_visibility(self.html_component)
+        self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'])
+        self.verify_visibility_set(self.html_component, True)
 
 
 @attr('shard_1')
