@@ -41,7 +41,7 @@ define([
 
         tabInfo: {
             name: gettext('Course Structure'),
-            class_name: 'view-course-structure',
+            identifier: 'view-course-structure',
             icon: 'icon-list-ul'
         }
     });
