@@ -1,8 +1,8 @@
-<div class="search-info">
-  Searching Course
-  <span class="search-count"><%- totalCount %> results</span>
-</div>
-<ol class='search-results'>
-    <%= searchResults %>
-</ol>
-<a class="search-more" href=""><%- gettext("Load next %s results").replace("%s", pageSize) %></a>
+<% _.each(items, function (item) { %>
+    <li class='search-results-item' role="region" aria-label="search result">
+        <div class='sri-excerpt'><%- item.excerpt %> &hellip;</div>
+        <span class='sri-type'><%- item.contentType %></span>
+        <span class='sri-location'><%- stringifyLocation(item.location) %></span>
+        <a class="sri-link" href="<%- item.url %>"><%= gettext("View") %> <i class="icon-arrow-right"></i></a>
+    </li>
+<% }); %>

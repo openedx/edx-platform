@@ -43,13 +43,16 @@
     }
   }
 
-  .search-more {
+  .search-load-next {
     display: block;
     text-transform: uppercase;
     color: $base-font-color;
     border: 2px solid $link-color;
     @include border-radius(3px);
     padding: 1rem;
+    .icon-spin {
+      display: none;
+    }
   }
 
 }

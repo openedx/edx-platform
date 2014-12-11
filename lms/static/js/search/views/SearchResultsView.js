@@ -7,62 +7,78 @@ var edx = edx || {};
 
     edx.search.SearchResultsView = Backbone.View.extend({
         el: '#search-content',
-        tpl: '#search_result_list-tpl',
-        itemTpl: '#search_result_item-tpl',
+        events: {
+            'click .search-load-next': 'loadNext'
+        },
+        tpl: {
+            view: '#search_view-tpl',
+            loading: '#search_loading-tpl',
+            list: '#search_result_list-tpl'
+        },
 
         initialize: function (options) {
-            this.tpl = $(this.tpl).html();
-            this.itemTpl = $(this.itemTpl).html();
+            for (var key in this.tpl) {
+                this.tpl[key] = $(this.tpl[key]).html();
+            }
             this.collection = options.collection || {};
-            this.collection.on('change reset add remove', this.render, this);
-            this.$courseContent = $('#course-content')
+            this.collection.on('searchRequest', this.renderLoadingMessage, this);
+            this.collection.on('search', this.renderInitial, this);
+            this.collection.on('next', this.renderNextPage, this);
+            this.$courseContent = $('#course-content');
         },
 
-        renderItem: function (searchItem) {
-            var item = searchItem.attributes;
-            item.locationPathString = '';
-            _.each(_.keys(item.location).sort(), function(key, i, list) {
-                item.locationPathString += item.location[key];
-                if (i + 1 < list.length) {
-                    item.locationPathString += ' ▸ ';
-                }
-            });
-            return _.template(this.itemTpl, { item: item });
-        },
-
-        render: function () {
-            if (_.isEmpty(this.collection.models)) {
-                this.renderEmptyMessage();
-            }
-            else {
-                this.renderSearchResults();
-            }
-            this.$courseContent.hide();
-            this.$el.show();
-        },
-
-        renderEmptyMessage: function () {
-
-        },
-
-        renderSearchResults: function () {
-            var self = this;
-            var listHtml = '';
-            _.each(self.collection.models, function (searchItem) {
-                listHtml += self.renderItem(searchItem);
-            });
-            self.$el.html(_.template(self.tpl, {
-                totalCount: self.collection.totalCount,
-                pageSize: self.collection.pageSize,
-                searchResults: listHtml
+        renderInitial: function () {
+            var listHtml = this.renderSearchList();
+            this.$el.html(_.template(this.tpl.view, {
+                totalCount: this.collection.totalCount,
+                pageSize: this.collection.pageSize,
+                list: listHtml
             }));
-            console.log('hahaha')
+        },
+
+        renderNextPage: function () {
+            var listHtml = this.renderSearchList();
+            this.$el.find('.search-results').append(listHtml);
+            this.$el.find('.icon-spin').hide();
+        },
+
+        renderSearchList: function () {
+            var self = this;
+            var list = _.map(this.collection.models, function (model) {
+                return model.attributes;
+            });
+            return _.template(this.tpl.list, {
+                items: list,
+                stringifyLocation: this.stringifyLocation
+            });
+        },
+
+        renderLoadingMessage: function () {
+            this.$courseContent.hide();
+            this.$el.html(_.template(this.tpl.loading)).show();
         },
 
         clearSearchResults: function () {
             this.$el.hide().empty();
             this.$courseContent.show();
-        }
+        },
+
+        loadNext: function (event) {
+            event.preventDefault();
+            this.$el.find('.icon-spin').show();
+            this.collection.loadNextPage();
+        },
+
+        stringifyLocation: function (location) {
+            var locationString = '';
+            _.each(_.keys(location).sort(), function(key, i, list) {
+                locationString += location[key];
+                if (i + 1 < list.length) {
+                    locationString += ' ▸ ';
+                }
+            });
+            return locationString;
+        },
 
     });
 

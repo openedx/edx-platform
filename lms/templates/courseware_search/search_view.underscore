@@ -1,0 +1,19 @@
+<div class="search-info">
+    Searching Course
+    <span class="search-count"><%- totalCount %> results</span>
+</div>
+
+<% if (totalCount > 0 ) { %>
+
+    <ol class='search-results'><%= list %></ol>
+    <a class="search-load-next" href="javascript:void(0);">
+        <%- gettext("Load next %s results").replace("%s", pageSize) %>
+        <i class="icon-refresh icon-spin"></i>
+    </a>
+
+<% } else { %>
+
+    <p><%- gettext("Sorry, no results were found.") %></p>
+
+<% } %>
+

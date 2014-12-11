@@ -50,6 +50,7 @@ var edx = edx || {};
         },
 
         clearSearch: function () {
+            this.collection.cancelSearch();
             this.$searchField.val('');
             this.setInitialStyle();
             this.trigger('SearchFormView:clearSearch');
