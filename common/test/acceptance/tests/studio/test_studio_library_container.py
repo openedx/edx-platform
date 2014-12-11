@@ -136,19 +136,29 @@ class StudioLibraryContainerTest(ContainerBase, StudioLibraryTest):
         """
         Scenario: Given I have a library, a course and library content xblock in a course
         When I go to studio unit page for library content block
+        Then I update the library being used
+        Then I refresh the page
         Then I can see that library content block needs to be updated
         When I click on the update link
         Then I can see that the content no longer needs to be updated
         """
         expected_text = "This component is out of date. The library has new content."
-        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+        library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
 
-        self.assertTrue(library_container.has_validation_warning)
-        self.assertIn(expected_text, library_container.validation_warning_text)
+        self.assertFalse(library_block.has_validation_warning)
+        self.assertIn("3 matching components", library_block.author_content)
 
-        library_container.refresh_children()
+        self.library_fixture.create_xblock(self.library_fixture.library_location, XBlockFixtureDesc("html", "Html4"))
+
+        self.unit_page.visit()  # Reload the page
+
+        self.assertTrue(library_block.has_validation_warning)
+        self.assertIn(expected_text, library_block.validation_warning_text)
+
+        library_block.refresh_children()
 
         self.unit_page.wait_for_page()  # Wait for the page to reload
-        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+        library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
 
-        self.assertFalse(library_container.has_validation_message)
+        self.assertFalse(library_block.has_validation_message)
+        self.assertIn("4 matching components", library_block.author_content)
