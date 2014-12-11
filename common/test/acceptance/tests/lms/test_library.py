@@ -92,7 +92,6 @@ class LibraryContentTest(UniqueCourseTest):
         modal = StudioLibraryContentXBlockEditModal(library_container_block.edit())
         modal.count = count
         library_container_block.save_settings()
-        library_container_block.refresh_children()
         self._go_to_unit_page(change_login=False)
         unit_page.wait_for_page()
         unit_page.publish_action.click()
