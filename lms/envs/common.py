@@ -1385,6 +1385,9 @@ INSTALLED_APPS = (
 
     # Entrance/Exit Survey
     'survey',
+
+    # Certificate generator
+    'pdfgen',
 )
 
 ######################### MARKETING SITE ###############################
