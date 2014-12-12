@@ -8,7 +8,7 @@
  */
  var edx = edx || {};
 
- (function( $, Backbone ) {
+ (function( $, _, Backbone ) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
@@ -17,16 +17,38 @@
 
         defaults: {
             fullName: null,
-            facePhoto: "",
-            identificationPhoto: ""
-        },
-
-        initialize: function( obj ) {
+            faceImage: "",
+            identificationImage: ""
         },
 
         sync: function( method, model ) {
+            var headers = { 'X-CSRFToken': $.cookie('csrftoken') },
+                data = {
+                    face_image: model.get('faceImage'),
+                    photo_id_image: model.get('identificationImage')
+                };
 
+            // Full name is an optional parameter; if not provided,
+            // it won't be changed.
+            if ( !_.isNull( model.get('fullName') ) ) {
+                data.full_name = model.get('fullName');
+            }
+
+            // Submit the request to the server,
+            // triggering events on success and error.
+            $.ajax({
+                url: '/verify_student/submit-photos/',
+                type: 'POST',
+                data: data,
+                headers: headers,
+                success: function() {
+                    model.trigger( 'sync' );
+                },
+                error: function( error ) {
+                    model.trigger( 'error', error );
+                }
+            });
         }
     });
 
- })( jQuery, Backbone );
+ })( jQuery, _, Backbone );
