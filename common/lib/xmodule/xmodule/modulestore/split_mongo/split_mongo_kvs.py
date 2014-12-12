@@ -76,12 +76,14 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         # set the field
         self._fields[key.field_name] = value
 
-        # handle any side effects -- story STUD-624
+        # This function is currently incomplete: it doesn't handle side effects.
+        # To complete this function, here is some pseudocode for what should happen:
+        #
         # if key.scope == Scope.children:
-            # STUD-624 remove inheritance from any exchildren
-            # STUD-624 add inheritance to any new children
+        #     remove inheritance from any exchildren
+        #     add inheritance to any new children
         # if key.scope == Scope.settings:
-            # STUD-624 if inheritable, push down to children
+        #     if inheritable, push down to children
 
     def delete(self, key):
         # handle any special cases
@@ -93,12 +95,6 @@ class SplitMongoKVS(InheritanceKeyValueStore):
         # delete the field value
         if key.field_name in self._fields:
             del self._fields[key.field_name]
-
-        # handle any side effects
-        # if key.scope == Scope.children:
-            # STUD-624 remove inheritance from any exchildren
-        # if key.scope == Scope.settings:
-            # STUD-624 if inheritable, push down _inherited_settings value to children
 
     def has(self, key):
         """

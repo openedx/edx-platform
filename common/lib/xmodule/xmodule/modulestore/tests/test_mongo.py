@@ -89,7 +89,6 @@ class TestMongoModuleStoreBase(unittest.TestCase):
 
     @classmethod
     def teardownClass(cls):
-#         cls.patcher.stop()
         if cls.connection:
             cls.connection.drop_database(DB)
             cls.connection.close()

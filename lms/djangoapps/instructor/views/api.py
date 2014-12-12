@@ -649,7 +649,7 @@ def modify_access(request, course_id):
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
-    if not rolename in ['instructor', 'staff', 'beta']:
+    if rolename not in ['instructor', 'staff', 'beta']:
         return HttpResponseBadRequest(strip_tags(
             "unknown rolename '{}'".format(rolename)
         ))
@@ -712,7 +712,7 @@ def list_course_role_members(request, course_id):
 
     rolename = request.GET.get('rolename')
 
-    if not rolename in ['instructor', 'staff', 'beta']:
+    if rolename not in ['instructor', 'staff', 'beta']:
         return HttpResponseBadRequest()
 
     def extract_user_info(user):
@@ -1336,7 +1336,7 @@ def get_distribution(request, course_id):
 
     available_features = instructor_analytics.distributions.AVAILABLE_PROFILE_FEATURES
     # allow None so that requests for no feature can list available features
-    if not feature in available_features + (None,):
+    if feature not in available_features + (None,):
         return HttpResponseBadRequest(strip_tags(
             "feature '{}' not available.".format(feature)
         ))
@@ -1349,7 +1349,7 @@ def get_distribution(request, course_id):
     }
 
     p_dist = None
-    if not feature is None:
+    if feature is not None:
         p_dist = instructor_analytics.distributions.profile_distribution(course_id, feature)
         response_payload['feature_results'] = {
             'feature': p_dist.feature,
@@ -1683,7 +1683,7 @@ def list_forum_members(request, course_id):
         return HttpResponseBadRequest("Operation requires instructor access.")
 
     # filter out unsupported for roles
-    if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
+    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
         return HttpResponseBadRequest(strip_tags(
             "Unrecognized rolename '{}'.".format(rolename)
         ))
@@ -1807,7 +1807,7 @@ def update_forum_role_membership(request, course_id):
     if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
         return HttpResponseBadRequest("Operation requires instructor access.")
 
-    if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
+    if rolename not in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
         return HttpResponseBadRequest(strip_tags(
             "Unrecognized rolename '{}'.".format(rolename)
         ))

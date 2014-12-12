@@ -41,13 +41,13 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         self.url = reverse('dashboard')
         # URL for email settings modal
         self.email_modal_link = (
-            ('<a href="#email-settings-modal" class="email-settings" rel="leanModal" '
-             'data-course-id="{0}/{1}/{2}" data-course-number="{1}" '
-             'data-optout="False">Email Settings</a>').format(
-                 self.course.org,
-                 self.course.number,
-                 self.course.display_name.replace(' ', '_')
-             )
+            '<a href="#email-settings-modal" class="email-settings" rel="leanModal" '
+            'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
+            'data-optout="False">Email Settings</a>'
+        ).format(
+            org=self.course.org,
+            num=self.course.number,
+            name=self.course.display_name.replace(' ', '_'),
         )
 
     def tearDown(self):
@@ -111,13 +111,13 @@ class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
 
         # URL for email settings modal
         self.email_modal_link = (
-            ('<a href="#email-settings-modal" class="email-settings" rel="leanModal" '
-             'data-course-id="{0}/{1}/{2}" data-course-number="{1}" '
-             'data-optout="False">Email Settings</a>').format(
-                 'edX',
-                 'toy',
-                 '2012_Fall'
-             )
+            '<a href="#email-settings-modal" class="email-settings" rel="leanModal" '
+            'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
+            'data-optout="False">Email Settings</a>'
+        ).format(
+            org='edX',
+            num='toy',
+            name='2012_Fall',
         )
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})

@@ -90,7 +90,7 @@ def _check_conditions_permissions(user, permissions, course_id, content):
             if operator == "or":
                 return True in results
             elif operator == "and":
-                return not False in results
+                return False not in results
     return test(user, permissions, operator="or")
 
 

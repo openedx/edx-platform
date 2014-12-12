@@ -119,8 +119,8 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
 
     for thread in threads:
-        #patch for backward compatibility to comments service
-        if not 'pinned' in thread:
+        # patch for backward compatibility to comments service
+        if 'pinned' not in thread:
             thread['pinned'] = False
 
     query_params['page'] = page
@@ -286,8 +286,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
             add_courseware_context(threads, course)
 
         for thread in threads:
-            #patch for backward compatibility with comments service
-            if not "pinned" in thread:
+            # patch for backward compatibility with comments service
+            if "pinned" not in thread:
                 thread["pinned"] = False
 
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]

@@ -127,7 +127,7 @@ mock==1.0.1
 nose-exclude
 nose-ignore-docstring
 nosexcover==1.0.7
-pep8==1.4.5
+pep8==1.5.7
 pylint==0.28
 python-subunit==0.0.16
 rednose==0.3

@@ -930,9 +930,10 @@ class PaidCourseRegistration(OrderItem):
 
         Returns the order item
         """
-        # First a bunch of sanity checks
-        course = modulestore().get_course(course_id)  # actually fetch the course to make sure it exists, use this to
-                                                # throw errors if it doesn't
+        # First a bunch of sanity checks:
+        # actually fetch the course to make sure it exists, use this to
+        # throw errors if it doesn't.
+        course = modulestore().get_course(course_id)
         if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
@@ -1075,9 +1076,10 @@ class CourseRegCodeItem(OrderItem):
 
         Returns the order item
         """
-        # First a bunch of sanity checks
-        course = modulestore().get_course(course_id)  # actually fetch the course to make sure it exists, use this to
-                                                # throw errors if it doesn't
+        # First a bunch of sanity checks:
+        # actually fetch the course to make sure it exists, use this to
+        # throw errors if it doesn't.
+        course = modulestore().get_course(course_id)
         if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))

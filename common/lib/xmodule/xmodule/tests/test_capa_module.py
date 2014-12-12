@@ -13,7 +13,7 @@ import textwrap
 import unittest
 import ddt
 
-from mock import Mock, patch
+from mock import Mock, patch, DEFAULT
 import webob
 from webob.multidict import MultiDict
 
@@ -582,19 +582,20 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(attempts=1)
 
         # Simulate that the problem is queued
-        with patch('capa.capa_problem.LoncapaProblem.is_queued') \
-                as mock_is_queued, \
-            patch('capa.capa_problem.LoncapaProblem.get_recentmost_queuetime') \
-                as mock_get_queuetime:
-
-            mock_is_queued.return_value = True
-            mock_get_queuetime.return_value = datetime.datetime.now(UTC)
+        multipatch = patch.multiple(
+            'capa.capa_problem.LoncapaProblem',
+            is_queued=DEFAULT,
+            get_recentmost_queuetime=DEFAULT
+        )
+        with multipatch as values:
+            values['is_queued'].return_value = True
+            values['get_recentmost_queuetime'].return_value = datetime.datetime.now(UTC)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = module.check_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
-            self.assertTrue('You must wait' in result['success'])
+            self.assertIn('You must wait', result['success'])
 
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)

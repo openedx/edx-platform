@@ -339,7 +339,7 @@ def instructor_dashboard(request, course_id):
         msg2, datatable = _do_remote_gradebook(request.user, course, 'get-membership', dict(section=section))
         msg += msg2
 
-        if not 'List' in action:
+        if 'List' not in action:
             students = ','.join([x['email'] for x in datatable['retdata']])
             overload = 'Overload' in action
             secure = request.is_secure()

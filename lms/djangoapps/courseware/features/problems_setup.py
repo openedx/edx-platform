@@ -361,7 +361,7 @@ def add_problem_to_course(course, problem_type, extra_meta=None):
     # Generate the problem XML using capa.tests.response_xml_factory
     factory_dict = PROBLEM_DICT[problem_type]
     problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
-    metadata = {'rerandomize': 'always'} if not 'metadata' in factory_dict else factory_dict['metadata']
+    metadata = {'rerandomize': 'always'} if 'metadata' not in factory_dict else factory_dict['metadata']
     if extra_meta:
         metadata = dict(metadata, **extra_meta)
 

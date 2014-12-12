@@ -74,5 +74,4 @@ class MathRenderTest(unittest.TestCase):
         self.check_parse('$abc', '$abc')
         self.check_parse(r'$\displaystyle 2+2$', '[mathjax] 2+2[/mathjax]')
 
-
     # NOTE: not testing get_html yet because I don't understand why it's doing what it's doing.
