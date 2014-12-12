@@ -1,7 +1,7 @@
 define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_helpers",
         "js/common_helpers/template_helpers", "js/spec_helpers/edit_helpers",
-        "js/views/pages/container", "js/models/xblock_info", "jquery.simulate"],
-    function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, ContainerPage, XBlockInfo) {
+        "js/views/pages/container", "js/views/pages/paged_container", "js/models/xblock_info"],
+    function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, ContainerPage, PagedContainerPage, XBlockInfo) {
 
         function parameterized_suite(label, global_page_options, fixtures) {
             describe(label + " ContainerPage", function () {
@@ -13,7 +13,8 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                     mockBadContainerXBlockHtml = readFixtures('mock/mock-bad-javascript-container-xblock.underscore'),
                     mockBadXBlockContainerXBlockHtml = readFixtures('mock/mock-bad-xblock-container-xblock.underscore'),
                     mockUpdatedContainerXBlockHtml = readFixtures('mock/mock-updated-container-xblock.underscore'),
-                    mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
+                    mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore'),
+                    PageClass = fixtures.page;
 
                 beforeEach(function () {
                     var newDisplayName = 'New Display Name';
@@ -62,7 +63,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         templates: EditHelpers.mockComponentTemplates,
                         el: $('#content')
                     };
-                    return new ContainerPage(_.extend(options || {}, global_page_options, default_options));
+                    return new PageClass(_.extend(options || {}, global_page_options, default_options));
                 };
 
                 renderContainerPage = function (test, html, options) {
@@ -273,7 +274,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                 });
 
                 describe("xblock operations", function () {
-                    var getGroupElement, paginated,
+                    var getGroupElement, paginated, getDeleteOffset,
                         NUM_COMPONENTS_PER_GROUP = 3, GROUP_TO_TEST = "A",
                         allComponentsInGroup = _.map(
                             _.range(NUM_COMPONENTS_PER_GROUP),
@@ -283,9 +284,13 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         );
 
                     paginated = function () {
-                        return containerPage.enable_paging;
+                        return containerPage instanceof PagedContainerPage;
                     };
 
+                    getDeleteOffset = function () {
+                        // Paginated containers will make an additional AJAX request.
+                        return paginated() ? 3 : 2;
+                    };
 
                     getGroupElement = function () {
                         return containerPage.$("[data-locator='locator-group-" + GROUP_TO_TEST + "']");
@@ -316,8 +321,6 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         deleteComponent = function (componentIndex, requestOffset) {
                             clickDelete(componentIndex);
                             AjaxHelpers.respondWithJson(requests, {});
-
-                            // second to last request contains given component's id (to delete the component)
                             AjaxHelpers.expectJsonRequest(requests, 'DELETE',
                                     '/xblock/locator-component-' + GROUP_TO_TEST + (componentIndex + 1),
                                 null, requests.length - requestOffset);
@@ -329,8 +332,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         deleteComponentWithSuccess = function (componentIndex) {
                             var deleteOffset;
 
-                            deleteOffset = paginated() ? 3 : 2;
-
+                            deleteOffset = getDeleteOffset();
                             deleteComponent(componentIndex, deleteOffset);
 
                             // verify the new list of components within the group
@@ -356,17 +358,12 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         });
 
                         it("can delete an xblock with broken JavaScript", function () {
+                            var deleteOffset = getDeleteOffset();
                             renderContainerPage(this, mockBadContainerXBlockHtml);
                             containerPage.$('.delete-button').first().click();
                             EditHelpers.confirmPrompt(promptSpy);
                             AjaxHelpers.respondWithJson(requests, {});
-                            var deleteOffset;
 
-                            if (paginated()) {
-                                deleteOffset = 3;
-                            } else {
-                                deleteOffset = 2;
-                            }
                             // expect the second to last request to be a delete of the xblock
                             AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/locator-broken-javascript',
                                 null, requests.length - deleteOffset);
@@ -528,7 +525,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                         });
 
                         describe('Template Picker', function () {
-                            var showTemplatePicker, verifyCreateHtmlComponent, call_count;
+                            var showTemplatePicker, verifyCreateHtmlComponent;
 
                             showTemplatePicker = function () {
                                 containerPage.$('.new-component .new-component-type a.multiple-templates')[0].click();
@@ -536,7 +533,6 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
 
                             verifyCreateHtmlComponent = function (test, templateIndex, expectedRequest) {
                                 var xblockCount;
-                                // call_count = paginated() ? 18: 10;
                                 renderContainerPage(test, mockContainerXBlockHtml);
                                 showTemplatePicker();
                                 xblockCount = containerPage.$('.studio-xblock-wrapper').length;
@@ -568,12 +564,17 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
         }
 
         parameterized_suite("Non paged",
-            { enable_paging: false },
-            { initial: 'mock/mock-container-xblock.underscore', add_response: 'mock/mock-xblock.underscore' }
+            { },
+            {
+                page: ContainerPage,
+                initial: 'mock/mock-container-xblock.underscore',
+                add_response: 'mock/mock-xblock.underscore'
+            }
         );
         parameterized_suite("Paged",
-            { enable_paging: true, page_size: 42 },
+            { page_size: 42 },
             {
+                page: PagedContainerPage,
                 initial: 'mock/mock-container-paged-xblock.underscore',
                 add_response: 'mock/mock-xblock-paged.underscore'
             });

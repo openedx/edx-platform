@@ -205,8 +205,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
     if 'application/json' in accept_header:
         store = modulestore()
         xblock = store.get_item(usage_key)
-        container_views = ['container_preview', 'reorderable_container_child_preview']
-        library = isinstance(usage_key, LibraryUsageLocator)
+        container_views = ['container_preview', 'reorderable_container_child_preview', 'container_child_preview']
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -235,7 +234,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # are being shown in a reorderable container, so the xblock is automatically
             # added to the list.
             reorderable_items = set()
-            if not library and view_name == 'reorderable_container_child_preview':
+            if view_name == 'reorderable_container_child_preview':
                 reorderable_items.add(xblock.location)
 
             paging = None
@@ -246,11 +245,15 @@ def xblock_view_handler(request, usage_key_string, view_name):
                         'page_size': int(request.REQUEST.get('page_size', 0)),
                     }
             except ValueError:
-                log.exception(
-                    "Couldn't parse paging parameters: enable_paging: %s, page_number: %s, page_size: %s",
-                    request.REQUEST.get('enable_paging', 'false'),
-                    request.REQUEST.get('page_number', 0),
-                    request.REQUEST.get('page_size', 0)
+                return HttpResponse(
+                    content="Couldn't parse paging parameters: enable_paging: "
+                            "%s, page_number: %s, page_size: %s".format(
+                                request.REQUEST.get('enable_paging', 'false'),
+                                request.REQUEST.get('page_number', 0),
+                                request.REQUEST.get('page_size', 0)
+                            ),
+                    status=400,
+                    content_type="text/plain",
                 )
 
             # Set up the context to be passed to each XBlock's render method.
