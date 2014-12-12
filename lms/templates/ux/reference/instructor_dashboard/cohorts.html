@@ -1,0 +1,189 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">Instructor Dashboard</%block>
+<%block name="nav_skip">#instructor-dashboard-content</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-vendor-tinymce-content'/>
+<%static:css group='style-vendor-tinymce-skin'/>
+<%static:css group='style-course'/>
+<script type="text/javascript">
+    // This is a hack to get tinymce to work correctly in Firefox until the annotator tool is refactored to not include
+    // tinymce globally.
+    if (typeof window.Range.prototype === "undefined") {
+      window.Range.prototype = { };
+    }
+    </script>
+    <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drag-2.2.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drop-2.2.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/slick.core.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/slick.grid.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
+    <link type="text/css" href="${static.url('css/vendor/slickgrid/smoothness/jquery-ui-1.8.16.custom.css')}" rel="stylesheet">
+    <link type="text/css" href="${static.url('css/vendor/slickgrid/slick.grid.css')}" rel="stylesheet">
+    <%static:js group='module-descriptor-js'/>
+    <%static:js group='instructor_dash'/>
+    </%block>
+
+    <section class="container">
+      <div class="instructor-dashboard-wrapper-2">
+        <section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
+          <h1>Instructor Dashboard</h1>
+          <section class="idash-section active-section" id="membership">
+            
+            <div class="cohort-management membership-section">
+              <h2 class="section-title">
+                <span class="value">Cohort Group Management</span>
+                <span class="description">Cohorts are such and such and are used for this and that to do all the things</span>
+              </h2>
+
+              <div class="cohort-management-nav">
+                <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
+                  <div class="form-fields">
+                    <div class="cohort-management-nav-form-select field field-select">
+                      <label for="cohort-select" class="label">Assign students to cohort groups manually</label>
+                      <select class="input input-lg cohort-select" name="cohort-select" id="cohort-select">
+                        <option>Select a cohort group</option>
+                        <option value="cohort-name-1" selected="selected">Cohort Name is Placed Here and Should Accommodate Almost Everything (12,546)</option>
+                        <option value="cohort-name-2">Cras mattis consectetur purus sit amet fermentum (8,546)</option>
+                        <option value="cohort-name-3">Donec id elit non mi porta gravida at eget metus. (4)</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+
+                <button type="button" class="action-primary action-create"><i class="icon-plus"></i> New Cohort Group</button>
+              </div>
+
+              <!-- Message: Warning -->
+              <div class="msg msg-warning">
+                <h3 class="message-title">You currently have no cohort groups configured</h3>
+                <div class="message-copy">
+                    <p>Please complete your cohort group configuration by creating groups within Studio</p>
+                </div>
+                <div class="message-actions">
+                    <button class="action-primary action-create"><i class="icon icon-plus"></i> Add a Cohort Group</button>
+                </div>
+              </div>
+
+              <!-- Message: Error -->
+              <div class="msg msg-error">
+                <h3 class="message-title">There's currently an error with your cohorts configuration within this course.</h3>
+                <div class="message-copy">
+                    <p>Error output (if any and near-human legible/comprehendable can be displayed here)</p>
+                </div>
+                <div class="message-actions">
+                    <a href="#" class="action-primary action-review">Review Configuration in Studio</a>
+                </div>
+              </div>
+
+              <!-- Managing cohorts -->
+              <section class="cohort-management-settings has-tabs">
+                <h2 class="group-header-title"><span class="title-value">Cohort Name Can be Placed Here and Should Accommodate Almost Everything</span> <span class="group-count">(contains 12,546 students)</span></h2>
+                <div class="cohort-management-group-setup">
+                  <p class="cohort-management-group-text">Students are added to this group only when you provide their email addresses or usernames on this page.<br /><a href="#">What does this mean?</a></p>
+                  <div class="cohort-management-group-actions">
+                    <span class="float-right"><a href="#">Edit settings in Studio</a></a>
+                  </div>
+                </div>
+                <ul class="wrapper-tabs">
+                  <li class="tab"><a href="#">Manage Students in Cohort Groups</a></li>
+                  <li class="tab is-selected"><a href="#">Cohort Group Settings</a></li>
+                </ul>
+
+                <div class="cohort-management-details">
+                  <form action="" method="post" name="" id="cohort-management-details-form" class="cohort-management-details-form">
+                    <h3 class="form-title sr">Cohort Group Details</h3>
+                    <div class="form-fields">
+                      <div class="cohort-management-details-name field field-text">
+                        <h4 class="cohort-section-header no-top-margin">Cohort Group Name:</h4>
+                        <label for="cohort-details-name" class="label sr">Cohort Group Name</label>
+                        <input type="text" name="cohort-details-name" value="Cohort Name is Placed Here and Should Accommodate Almost Everything" class="input cohort-details-name" id="cohort-details-name" placeholder="Enter Your Cohort's Name" required />
+                      </div>
+                    </div>
+
+                    <h4 class="cohort-section-header divider-lv2">Students in this cohort group are:</h4>
+                    <div class="form-fields">
+                      <div class="cohort-management-details-assignment field field-radio">
+                        <label for="cohort-assign-random"><input type="radio" name="cohort-assignment" value="random" /> Randomly Assigned</label>
+                        <label for="cohort-assign-manual"><input type="radio" name="cohort-assignment" value="menual" checked="checked" /> Manually Assigned</label>
+                      </div>
+                    </div>
+
+                    <!-- When options are available but a deleted one is selected. -->
+                    <h4 class="cohort-section-header divider-lv2">Is this cohort group associated with course-based content groups?</h4>
+                    <div class="form-fields">
+                      <div class="cohort-management-details-assn-course field field-radio">
+                        <label for="cohort-assn-course-no"><input type="radio" name="cohort-assn-course" value="no" /> No</label>
+                        <div class="input-group has-other">
+                          <label for="cohort-assn-course-yes"><input type="radio" name="cohort-assn-course" value="yes" checked="checked" /> Yes</label>
+                          <div class="input-group-other is-visible">
+                            <label class="sr" for="cohort-group-assn">Choose a content group to associate</label>
+                            <select name="cohort-group-assn" id="cohort-group-assn" class="input input-lg has-option-unavailable">
+                              <optgroup label="Available content groups">
+                                <option>Choose a content group to associate</option>
+                              </optgroup>
+                              <optgroup label="Deleted content groups">
+                                <option class="option-unavailable" selected="selected">Some content group that's been deleted</option>
+                                <option class="option-unavailable">Another deleted content group</option>
+                              </optgroup>
+                            </select>
+
+                            <div class="msg error inline">
+                              <p class="copy-error"><i class="icon icon-warning-sign"></i> The selected content group has been deleted, you may wish to reassign this cohort group.</p>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <!-- // -->
+
+                    <!-- When no options are available. -->
+                    <h4 class="cohort-section-header divider-lv2">Is this cohort group associated with course-based content groups?</h4>
+                    <div class="form-fields">
+                      <div class="cohort-management-details-assn-course field field-radio">
+                        <label for="cohort-assn-course-no"><input type="radio" name="cohort-assn-course-2" value="no" /> No</label>
+                        <div class="input-group has-other">
+                          <label for="cohort-assn-course-yes"><input type="radio" name="cohort-assn-course-2" value="yes" checked="checked" /> Yes</label>
+                          <div class="input-group-other is-visible">
+                            <div class="msg error inline">
+                              <p class="copy-error"><i class="icon icon-warning-sign"></i> You haven't configured any content groups yet. You need to create a content group before you can create assignments. <a href="#">Create a content group</a></p>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                    <!-- // -->
+
+                    <div class="form-actions">
+                        <button type="submit" class="form-submit action-primary">Save</button>
+                        <button type="button" class="button-link action-tertiary">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="wrapper-cohort-supplemental">
+                  <hr class="divider divider-lv1">
+                  <a class="toggle-cohort-management-secondary" href="#cohort-management-file-upload">Assign students to cohort groups by uploading a CSV file</a>
+                  <div class="cohort-management-file-upload csv-upload is-hidden" id="cohort-management-file-upload"></div>
+
+                  <div class="cohort-management-supplemental">
+                      <p class=""><i class="icon icon-info-sign"></i> To review student cohort group assignments or see the results of uploading a CSV file, download course profile information or cohort results on <a href="" class="link-cross-reference" data-section="data_download"> the Data Download page</a>.</p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+        </section>
+      </div>
+    </section>
