@@ -1,5 +1,5 @@
-define(["jquery", "underscore"],
-    function ($, _) {
+define([],
+    function () {
         var PagedMixin = {
             setPage: function (page) {
                 var self = this,

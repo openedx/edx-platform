@@ -5,9 +5,13 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
             initialize: function(options){
                 var self = this;
                 ContainerView.prototype.initialize.call(this);
-                this.page_size = this.options.page_size || 10;
-                this.page_reload_callback = options.page_reload_callback || function () {};
-                // emulating Backbone.paginator interface
+                this.page_size = this.options.page_size;
+                // Reference to the page model
+                this.page = options.page;
+                // XBlocks are rendered via Django views and templates rather than underscore templates, and so don't
+                // have a Backbone model for us to manipulate in a backbone collection. Here, we emulate the interface
+                // of backbone.paginator so that we can use the Paging Header and Footer with this page. As a
+                // consequence, however, we have to manipulate its members manually.
                 this.collection = {
                     currentPage: 0,
                     totalPages: 0,
@@ -15,18 +19,23 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
                     sortDirection: "desc",
                     start: 0,
                     _size: 0,
-
-                    bind: function() {},  // no-op
+                    // Paging header and footer expect this to be a Backbone model they can listen to for changes, but
+                    // they cannot. Provide the bind function for them, but have it do nothing.
+                    bind: function() {},
+                    // size() on backbone collections shows how many objects are in the collection, or in the case
+                    // of paginator, on the current page.
                     size: function() { return self.collection._size; }
                 };
             },
 
+            new_child_view: 'container_child_preview',
+
             render: function(options) {
-                var eff_options = options || {};
-                eff_options.page_number = typeof eff_options.page_number !== "undefined"
-                    ? eff_options.page_number
+                options = options || {};
+                options.page_number = typeof options.page_number !== "undefined"
+                    ? options.page_number
                     : this.collection.currentPage;
-                return this.renderPage(eff_options);
+                return this.renderPage(options);
             },
 
             renderPage: function(options){
@@ -43,16 +52,15 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
                     success: function(fragment) {
                         self.handleXBlockFragment(fragment, options);
                         self.processPaging({ requested_page: options.page_number });
-                        // This is expected to render the add xblock components menu.
-                        self.page_reload_callback(self.$el)
+                        self.page.renderAddXBlockComponents()
                     }
                 });
             },
 
             getRenderParameters: function(page_number) {
                 return {
-                    enable_paging: true,
                     page_size: this.page_size,
+                    enable_paging: true,
                     page_number: page_number
                 };
             },
@@ -67,6 +75,8 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
             },
 
             processPaging: function(options){
+                // We have the Django template sneak us the pagination information,
+                // and we load it from a div here.
                 var $element = this.$el.find('.xblock-container-paging-parameters'),
                     total = $element.data('total'),
                     displayed = $element.data('displayed'),
@@ -82,6 +92,8 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
             },
 
             processPagingHeaderAndFooter: function(){
+                // Rendering the container view detaches the header and footer from the DOM.
+                // It's just as easy to recreate them as it is to try to shove them back into the tree.
                 if (this.pagingHeader)
                     this.pagingHeader.undelegateEvents();
                 if (this.pagingFooter)
@@ -98,12 +110,6 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
 
                 this.pagingHeader.render();
                 this.pagingFooter.render();
-            },
-
-            xblockReady: function () {
-                ContainerView.prototype.xblockReady.call(this);
-
-                this.requestToken = this.$('div.xblock').first().data('request-token');
             },
 
             refresh: function(block_added) {
@@ -150,7 +156,7 @@ define(["jquery", "underscore", "js/views/container", "js/utils/module", "gettex
             },
 
             sortDisplayName: function() {
-                return "Date added";  // TODO add support for sorting
+                return gettext("Date added");  // TODO add support for sorting
             }
         });
 

@@ -3,10 +3,10 @@
  * This page allows the user to understand and manipulate the xblock and its children.
  */
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/view_utils",
-        "js/views/container", "js/views/library_container", "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock",
+        "js/views/container", "js/views/xblock", "js/views/components/add_xblock", "js/views/modals/edit_xblock",
         "js/models/xblock_info", "js/views/xblock_string_field_editor", "js/views/pages/container_subviews",
         "js/views/unit_outline", "js/views/utils/xblock_utils"],
-    function ($, _, gettext, BasePage, ViewUtils, ContainerView, PagedContainerView, XBlockView, AddXBlockComponent,
+    function ($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
               EditXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews, UnitOutlineView,
               XBlockUtils) {
         'use strict';
@@ -25,12 +25,16 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             view: 'container_preview',
 
+            defaultViewClass: ContainerView,
+
+            // Overridable by subclasses-- determines whether the XBlock component
+            // addition menu is added on initialization. You may set this to false
+            // if your subclass handles it.
+            components_on_init: true,
+
             initialize: function(options) {
                 BasePage.prototype.initialize.call(this, options);
-                this.enable_paging = options.enable_paging || false;
-                if (this.enable_paging) {
-                    this.page_size = options.page_size || 10;
-                }
+                this.viewClass = options.viewClass || this.defaultViewClass;
                 this.nameEditor = new XBlockStringFieldEditor({
                     el: this.$('.wrapper-xblock-field'),
                     model: this.model
@@ -75,26 +79,16 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 }
             },
 
-            getXBlockView: function(){
-                var self = this,
-                    parameters = {
-                        el: this.$('.wrapper-xblock'),
-                        model: this.model,
-                        view: this.view
-                    };
+            getViewParameters: function () {
+                return {
+                    el: this.$('.wrapper-xblock'),
+                    model: this.model,
+                    view: this.view
+                }
+            },
 
-                if (this.enable_paging) {
-                    parameters = _.extend(parameters, {
-                        page_size: this.page_size,
-                        page_reload_callback: function($element) {
-                            self.renderAddXBlockComponents();
-                        }
-                    });
-                    return new PagedContainerView(parameters);
-                }
-                else {
-                    return new ContainerView(parameters);
-                }
+            getXBlockView: function(){
+                return new this.viewClass(this.getViewParameters());
             },
 
             render: function(options) {
@@ -120,7 +114,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                         xblockView.notifyRuntime('page-shown', self);
 
                         // Render the add buttons. Paged containers should do this on their own.
-                        if (!self.enable_paging) {
+                        if (self.components_on_init) {
                             // Render the add buttons
                             self.renderAddXBlockComponents();
                         }
@@ -277,7 +271,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     rootLocator = this.xblockView.model.id;
                 if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
                     this.render({refresh: true, block_added: block_added});
-                } else if (parentElement.hasClass('reorderable-container') || this.enable_paging) {
+                } else if (parentElement.hasClass('reorderable-container')) {
                     this.refreshChildXBlock(xblockElement, block_added);
                 } else {
                     this.refreshXBlock(this.findXBlockElement(parentElement));
@@ -313,7 +307,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
                 temporaryView = new TemporaryXBlockView({
                     model: xblockInfo,
-                    view: 'reorderable_container_child_preview',
+                    view: self.xblockView.new_child_view,
                     el: xblockElement
                 });
                 return temporaryView.render({
