@@ -1033,7 +1033,15 @@ instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/ins
 student_account_js = [
     'js/utils/rwd_header_footer.js',
     'js/utils/edx.utils.validate.js',
+    'js/form.ext.js',
+    'js/my_courses_dropdown.js',
+    'js/toggle_login_modal.js',
+    'js/sticky_filter.js',
+    'js/query-params.js',
     'js/src/utility.js',
+    'js/src/accessibility_tools.js',
+    'js/src/ie_shim.js',
+    'js/src/string_utils.js',
     'js/student_account/enrollment.js',
     'js/student_account/emailoptin.js',
     'js/student_account/shoppingcart.js',
@@ -1051,7 +1059,15 @@ student_account_js = [
 student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
 
 verify_student_js = [
+    'js/form.ext.js',
     'js/my_courses_dropdown.js',
+    'js/toggle_login_modal.js',
+    'js/sticky_filter.js',
+    'js/query-params.js',
+    'js/src/utility.js',
+    'js/src/accessibility_tools.js',
+    'js/src/ie_shim.js',
+    'js/src/string_utils.js',
     'js/verify_student/models/verification_model.js',
     'js/verify_student/views/webcam_photo_view.js',
     'js/verify_student/views/step_view.js',

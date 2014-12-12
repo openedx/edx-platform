@@ -54,7 +54,7 @@
 
             <ul class="list-actions">
               <li class="action action-retakephotos">
-                <a class="retake-photos" href="javascript:void(0);" onclick="document.location.reload(true);">
+                <a id="retake_photos_button" class="retake-photos">
                   <%- gettext( "Retake Your Photos" ) %>
                 </a>
               </li>
@@ -97,7 +97,7 @@
 
       <ol class="wizard-steps">
         <li class="wizard-step step-proceed">
-          <a id="next_step_button" class="next action-primary" aria-hidden="true" title="Next">
+          <a id="next_step_button" class="next action-primary is-disabled" aria-hidden="true" title="Next">
             <%- _.sprintf( gettext( "Go to Step %s" ), nextStepNum ) %>: <%- nextStepTitle %>
           </a>
         </li>

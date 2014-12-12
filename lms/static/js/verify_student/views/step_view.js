@@ -77,6 +77,10 @@
 
         nextStep: function() {
             this.trigger('next-step');
+        },
+
+        goToStep: function( stepName ) {
+            this.trigger( 'go-to-step', stepName );
         }
 
     });

@@ -108,8 +108,9 @@ var edx = edx || {};
                     // For photo verification steps, set the model
                     // to the shared photo model.
 
-                    // Listen for next step events
-                    this.listenTo(this.subviews[stepName], 'next-step', this.nextStep);
+                    // Listen for events to change the current step
+                    this.listenTo( this.subviews[stepName], 'next-step', this.nextStep );
+                    this.listenTo( this.subviews[stepName], 'go-to-step', this.goToStep );
                 }
             }
         },
@@ -154,6 +155,18 @@ var edx = edx || {};
         nextStep: function() {
             this.currentStepIndex = Math.min( this.currentStepIndex + 1, this.displaySteps.length - 1 );
             this.render();
+        },
+
+        goToStep: function( stepName ) {
+            var stepIndex = _.indexOf(
+                _.pluck( this.displaySteps, 'name' ),
+                stepName
+            );
+
+            if ( stepIndex >= 0 ) {
+                this.currentStepIndex = stepIndex;
+                this.render();
+            }
         },
 
         steps: function() {
