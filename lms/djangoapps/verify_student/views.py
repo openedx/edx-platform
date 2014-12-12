@@ -375,6 +375,7 @@ class PayAndVerifyView(View):
     # need to complete the verification steps,
     # then the photo ID and webcam requirements are hidden.
     #
+    ACCOUNT_ACTIVATION_REQ = "account-activation-required"
     PHOTO_ID_REQ = "photo-id-required"
     WEBCAM_REQ = "webcam-required"
     CREDIT_CARD_REQ = "credit-card-required"
@@ -454,7 +455,7 @@ class PayAndVerifyView(View):
             already_verified,
             already_paid
         )
-        requirements = self._requirements(display_steps)
+        requirements = self._requirements(display_steps, request.user.is_active)
 
         if current_step is None:
             current_step = display_steps[0]['name']
@@ -484,24 +485,25 @@ class PayAndVerifyView(View):
 
         # Render the top-level page
         context = {
-            'disable_courseware_js': True,
             'user_full_name': full_name,
-            'platform_name': settings.PLATFORM_NAME,
-            'course_key': unicode(course_key),
             'course': course,
-            'courseware_url': courseware_url,
+            'course_key': unicode(course_key),
             'course_mode': course_mode,
-            'purchase_endpoint': get_purchase_endpoint(),
-            'display_steps': display_steps,
+            'courseware_url': courseware_url,
             'current_step': current_step,
-            'requirements': requirements,
-            'message_key': message,
+            'disable_courseware_js': True,
+            'display_steps': display_steps,
+            'is_active': request.user.is_active,
             'messages': self._messages(
                 message,
                 course.display_name,
                 course_mode,
                 requirements
             ),
+            'message_key': message,
+            'platform_name': settings.PLATFORM_NAME,
+            'purchase_endpoint': get_purchase_endpoint(),
+            'requirements': requirements,
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -582,6 +584,7 @@ class PayAndVerifyView(View):
         if the user has already completed them.
 
         Arguments:
+
             always_show_payment (bool): If True, display the payment steps
                 even if the user has already paid.
 
@@ -618,7 +621,7 @@ class PayAndVerifyView(View):
             if step not in remove_steps
         ]
 
-    def _requirements(self, display_steps):
+    def _requirements(self, display_steps, is_active):
         """Determine which requirements to show the user.
 
         For example, if the user needs to submit a photo
@@ -627,6 +630,7 @@ class PayAndVerifyView(View):
 
         Arguments:
             display_steps (list): The steps to display to the user.
+            is_active (bool): If False, adds a requirement to activate the user account.
 
         Returns:
             dict: Keys are requirement names, values are booleans
@@ -634,6 +638,7 @@ class PayAndVerifyView(View):
 
         """
         all_requirements = {
+            self.ACCOUNT_ACTIVATION_REQ: not is_active,
             self.PHOTO_ID_REQ: False,
             self.WEBCAM_REQ: False,
             self.CREDIT_CARD_REQ: False

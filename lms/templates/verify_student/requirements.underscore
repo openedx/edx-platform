@@ -1,4 +1,23 @@
-<ul class="list-reqs">
+<ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
+
+  <% if ( requirements['account-activation-required'] ) { %>
+  <li class="req req-0 req-activate">
+    <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
+    <div class="placeholder-art">
+      <i class="icon-envelope-alt"></i>
+    </div>
+
+    <div class="copy">
+      <p>
+        <span class="copy-super"><%- gettext( "Check your email." ) %></span>
+        <span class="copy-sub"><%-
+            gettext( "You need to activate your account before you can register for courses. Check your inbox for an activation email." )
+          %>
+        </span>
+      </p>
+    </div>
+  </li>
+  <% } %>
 
   <% if ( requirements['photo-id-required'] ) { %>
   <li class="req req-1 req-id">
