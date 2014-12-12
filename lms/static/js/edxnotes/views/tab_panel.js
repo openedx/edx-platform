@@ -12,7 +12,7 @@ function (gettext, _, Backbone, NoteItemView) {
         },
 
         initialize: function () {
-            this.notes = [];
+            this.children = [];
         },
 
         render: function () {
@@ -26,12 +26,14 @@ function (gettext, _, Backbone, NoteItemView) {
         },
 
         getNotes: function (collection) {
-            var container = document.createDocumentFragment();
-            this.notes = _.each(collection, function (model) {
-                var note = new NoteItemView({model: model});
-                container.appendChild(note.render().el);
-                return note;
-            });
+            var container = document.createDocumentFragment(),
+                notes = _.map(collection, function (model) {
+                    var note = new NoteItemView({model: model});
+                    container.appendChild(note.render().el);
+                    return note;
+                });
+
+            this.children = this.children.concat(notes);
             return container;
         },
 
@@ -40,8 +42,8 @@ function (gettext, _, Backbone, NoteItemView) {
         },
 
         remove: function () {
-            _.invoke(this.notes, 'remove');
-            this.notes = [];
+            _.invoke(this.children, 'remove');
+            this.children = null;
             Backbone.View.prototype.remove.call(this);
             return this;
         }

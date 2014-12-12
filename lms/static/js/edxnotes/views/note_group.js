@@ -25,10 +25,7 @@ define([
                 chapterName: this.getChapterName(),
                 sectionName: this.getSectionName()
             }));
-
-            _.each(this.children, function (child) {
-                this.$el.append(child);
-            }, this);
+            this.$el.append(this.children);
 
             return this;
         },
@@ -43,6 +40,12 @@ define([
 
         addChild: function (child) {
             this.children.push(child);
+        },
+
+        remove: function () {
+            this.children = null;
+            Backbone.View.prototype.remove.call(this);
+            return this;
         }
     });
 

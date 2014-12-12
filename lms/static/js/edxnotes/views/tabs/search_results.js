@@ -5,7 +5,7 @@ define([
     'js/edxnotes/views/search_box', 'jquery.highlight'
 ], function (gettext, TabPanelView, TabView, SearchBoxView) {
     var SearchResultsView = TabView.extend({
-        SubViewConstructor: TabPanelView.extend({
+        PanelConstructor: TabPanelView.extend({
             id: 'search-results-panel',
             title: 'Search Results',
             highlightMatchedText: true,
@@ -75,7 +75,7 @@ define([
             var collection = this.getCollection();
             if (collection) {
                 if (collection.length) {
-                    return new this.SubViewConstructor({
+                    return new this.PanelConstructor({
                         collection: collection,
                         searchQuery: this.searchResults.searchQuery
                     });

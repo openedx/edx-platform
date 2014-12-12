@@ -5,7 +5,7 @@ define([
     'js/edxnotes/views/tab_view'
 ], function (gettext, NoteGroupView, TabPanelView, TabView) {
     var CourseStructureView = TabView.extend({
-        SubViewConstructor: TabPanelView.extend({
+        PanelConstructor: TabPanelView.extend({
             id: 'structure-panel',
             title: 'Course Structure',
 
@@ -17,6 +17,7 @@ define([
                             group;
                         if (section) {
                             group = this.getGroup(chapter, section);
+                            this.children.push(group);
                             _.each(section.children, function (location) {
                                 var notes = courseStructure.units[location];
                                 if (notes) {

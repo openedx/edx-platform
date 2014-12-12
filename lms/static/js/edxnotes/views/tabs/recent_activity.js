@@ -4,7 +4,7 @@ define([
     'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view'
 ], function (gettext, TabPanelView, TabView) {
     var RecentActivityView = TabView.extend({
-        SubViewConstructor: TabPanelView.extend({
+        PanelConstructor: TabPanelView.extend({
             id: 'recent-panel',
             title: 'Recent Activity',
             renderContent: function () {
