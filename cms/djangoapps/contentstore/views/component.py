@@ -76,11 +76,9 @@ def subsection_handler(request, usage_key_string):
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         usage_key = UsageKey.from_string(usage_key_string)
         try:
-            course, item, lms_link = _get_item_in_course(request, usage_key)
+            course, item, lms_link, preview_link = _get_item_in_course(request, usage_key)
         except ItemNotFoundError:
             return HttpResponseBadRequest()
-
-        preview_link = get_lms_link_for_item(item.location, preview=True)
 
         # make sure that location references a 'sequential', otherwise return
         # BadRequest
@@ -150,7 +148,7 @@ def container_handler(request, usage_key_string):
         usage_key = UsageKey.from_string(usage_key_string)
         with modulestore().bulk_operations(usage_key.course_key):
             try:
-                course, xblock, lms_link = _get_item_in_course(request, usage_key)
+                course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
 
@@ -188,18 +186,6 @@ def container_handler(request, usage_key_string):
                 if child.location == unit.location:
                     break
                 index += 1
-            preview_lms_link = (
-                u'//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'
-            ).format(
-                preview_lms_base=preview_lms_base,
-                lms_base=settings.LMS_BASE,
-                org=course.location.org,
-                course=course.location.course,
-                course_name=course.location.name,
-                section=section.location.name,
-                subsection=subsection.location.name,
-                index=index
-            )
 
             return render_to_response('container.html', {
                 'context_course': course,  # Needed only for display of menus at top of page.
@@ -340,7 +326,7 @@ def get_component_templates(course):
 def _get_item_in_course(request, usage_key):
     """
     Helper method for getting the old location, containing course,
-    item, and lms_link for a given locator.
+    item, lms_link, and preview_lms_link for a given locator.
 
     Verifies that the caller has permission to access this item.
     """
@@ -355,8 +341,9 @@ def _get_item_in_course(request, usage_key):
     course = modulestore().get_course(course_key)
     item = modulestore().get_item(usage_key, depth=1)
     lms_link = get_lms_link_for_item(item.location)
+    preview_lms_link = get_lms_link_for_item(item.location, preview=True)
 
-    return course, item, lms_link
+    return course, item, lms_link, preview_lms_link
 
 
 @login_required
