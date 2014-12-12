@@ -11,8 +11,14 @@ var edx = edx || {};
     edx.verify_student.IDPhotoStepView = edx.verify_student.StepView.extend({
 
         postRender: function() {
+            new edx.verify_student.WebcamPhotoView({
+                el: $("#idcam"),
+                model: this.model,
+                submitButton: '#next_step_button'
+            }).render();
+
             $('#next_step_button').click( _.bind( this.nextStep, this ) );
-        }
+        },
     });
 
 })( jQuery );

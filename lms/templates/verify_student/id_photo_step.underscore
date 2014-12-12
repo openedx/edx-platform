@@ -6,39 +6,7 @@
     </div>
 
     <div class="wrapper-task">
-      <div id="idcam" class="task cam">
-        <div class="placeholder-cam" id="photo_id_capture_div">
-
-          <div class="placeholder-art">
-            <p class="copy"><%- gettext( "Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission." ) %></p>
-          </div>
-
-          <video id="photo_id_video" autoplay></video><br/>
-          <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
-        </div>
-
-        <div class="controls photo-controls">
-          <ul class="list-controls">
-            <li class="control control-redo" id="photo_id_reset_button">
-              <a class="action action-redo" href="">
-                <i class="icon-undo"></i> <span class="sr"><%- gettext( "Retake" ) %></span>
-              </a>
-            </li>
-
-            <li class="control control-do" id="photo_id_capture_button">
-              <a class="action action-do" href="">
-                <i class="icon-camera"></i> <span class="sr"><%- gettext( "Take photo" ) %></span>
-              </a>
-            </li>
-
-            <li class="control control-approve" id="photo_id_approve_button">
-              <a class="action action-approve" href="">
-                <i class="icon-ok"></i> <span class="sr"><%- gettext( "Looks good" ) %></span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <div id="idcam" class="task cam"></div>
 
       <div class="wrapper-help">
         <div class="help help-task photo-tips idtips">
@@ -81,7 +49,7 @@
 
       <ol class="wizard-steps">
         <li class="wizard-step">
-          <a id="next_step_button" class="next action-primary" aria-hidden="true" title="Next">
+          <a id="next_step_button" class="next action-primary is-disabled" aria-hidden="true" title="Next">
             <%- _.sprintf( gettext( "Go to Step %s" ), nextStepNum ) %>: <%- nextStepTitle %>
           </a>
         </li>
