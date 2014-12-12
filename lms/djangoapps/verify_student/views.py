@@ -466,7 +466,7 @@ class PayAndVerifyView(View):
         # Allow the caller to skip the first page
         # This is useful if we want the user to be able to
         # use the "back" button to return to the previous step.
-        if request.GET.get('skip-first-step'):
+        if request.GET.get('skip-first-step') and request.user.is_active:
             display_step_names = [step['name'] for step in display_steps]
             current_step_idx = display_step_names.index(current_step)
             if (current_step_idx + 1) < len(display_steps):
@@ -487,24 +487,25 @@ class PayAndVerifyView(View):
 
         # Render the top-level page
         context = {
-            'disable_courseware_js': True,
             'user_full_name': full_name,
-            'platform_name': settings.PLATFORM_NAME,
-            'course_key': unicode(course_key),
             'course': course,
-            'courseware_url': courseware_url,
+            'course_key': unicode(course_key),
             'course_mode': course_mode,
-            'purchase_endpoint': get_purchase_endpoint(),
-            'display_steps': display_steps,
+            'courseware_url': courseware_url,
             'current_step': current_step,
-            'requirements': requirements,
-            'message_key': message,
+            'disable_courseware_js': True,
+            'display_steps': display_steps,
+            'is_active': request.user.is_active,
             'messages': self._messages(
                 message,
                 course.display_name,
                 course_mode,
                 requirements
             ),
+            'message_key': message,
+            'platform_name': settings.PLATFORM_NAME,
+            'purchase_endpoint': get_purchase_endpoint(),
+            'requirements': requirements,
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -585,6 +586,7 @@ class PayAndVerifyView(View):
         if the user has already completed them.
 
         Arguments:
+
             always_show_payment (bool): If True, display the payment steps
                 even if the user has already paid.
 

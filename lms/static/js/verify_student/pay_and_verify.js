@@ -36,8 +36,10 @@ var edx = edx || {};
         currentStep: el.data('current-step'),
         stepInfo: {
             'intro-step': {
+                isActive: el.data('is-active'),
                 introTitle: el.data('intro-title'),
                 introMsg: el.data('intro-msg'),
+                platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
             },
             'make-payment-step': {
