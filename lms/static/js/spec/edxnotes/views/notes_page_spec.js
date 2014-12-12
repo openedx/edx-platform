@@ -11,18 +11,25 @@ define([
             customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
-                'templates/edxnotes/note-item',
-                'templates/edxnotes/tab-item'
+                'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
             this.view = new NotesFactory({notesList: notes});
         });
 
 
         it('should be displayed properly', function() {
-            var requests = AjaxHelpers.requests(this);
+            var requests = AjaxHelpers.requests(this),
+                tab;
 
             expect(this.view.$('#view-search-results')).not.toExist();
-            expect(this.view.$('#view-recent-activity')).toHaveClass('is-active');
+            tab = this.view.$('#view-recent-activity');
+            expect(tab).toHaveClass('is-active');
+            expect(tab.index()).toBe(0);
+
+            tab = this.view.$('#view-course-structure');
+            expect(tab).toExist();
+            expect(tab.index()).toBe(1);
+
             expect(this.view.$('.tab-panel')).toExist();
 
             this.view.$('.search-notes-input').val('test_query');
@@ -33,6 +40,7 @@ define([
             });
             expect(this.view.$('#view-search-results')).toHaveClass('is-active');
             expect(this.view.$('#view-recent-activity')).toExist();
+            expect(this.view.$('#view-course-structure')).toExist();
         });
     });
 });

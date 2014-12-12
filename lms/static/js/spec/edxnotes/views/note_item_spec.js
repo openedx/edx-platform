@@ -18,9 +18,7 @@ define([
 
         beforeEach(function() {
             customMatchers(this);
-            TemplateHelpers.installTemplates([
-                'templates/edxnotes/note-item'
-            ]);
+            TemplateHelpers.installTemplate('templates/edxnotes/note-item');
         });
 
         it('can be rendered properly', function() {
