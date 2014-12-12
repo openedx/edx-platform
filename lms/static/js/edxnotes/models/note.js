@@ -4,18 +4,30 @@ define(['backbone', 'underscore.string'], function (Backbone) {
     var NoteModel = Backbone.Model.extend({
         defaults: {
             'id': null,
-            'created': null,
-            'updated': null,
-            'user': null,
-            'usage_id': null,
-            'course_id': null,
-            'text': null,
+            'created': '',
+            'updated': '',
+            'user': '',
+            'usage_id': '',
+            'course_id': '',
+            'text': '',
             'quote': '',
-            'unit': {
-                'display_name': null,
-                'url': null
-            },
             'ranges': [],
+            'unit': {
+                'display_name': '',
+                'url': '',
+                'location': ''
+            },
+            'section': {
+                'display_name': '',
+                'location': '',
+                'children': []
+            },
+            'chapter': {
+                'display_name': '',
+                'location': '',
+                'index': 0,
+                'children': []
+            },
             // Flag indicating current state of the note: expanded or collapsed.
             'is_expanded': false,
             // Flag indicating whether `More` link should be shown.

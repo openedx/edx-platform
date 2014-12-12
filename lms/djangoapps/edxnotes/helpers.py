@@ -102,7 +102,7 @@ def send_request(user, course_id, path="", query_string=""):
     return response
 
 
-def preprocess_collection(user, course, collection):
+def preprocess_collection(user, course, collection, add_course_structure=False):
     """
     Reprocess provided `collection(list)`: adds information about ancestor,
     converts "updated" date, sorts the collection in descending order.
@@ -129,23 +129,26 @@ def preprocess_collection(user, course, collection):
             except (NoPathToItem, ValueError):
                 continue
 
-            chapter = store.get_item(chapter)
-            chapter_dict = get_ancestor_context(course, store, course, chapter)
-
-            section = store.get_item(section)
-            section_dict = get_ancestor_context(course, store, chapter, section)
-
             unit = get_ancestor(store, usage_key)
-            unit_dict = get_ancestor_context(course, store, section, unit)
+            unit_dict = get_ancestor_context(store, course, unit)
 
             model.update({
                 u"text": markupsafe.escape(model["text"]),
                 u"quote": markupsafe.escape(model["quote"]),
                 u"unit": unit_dict,
-                u"chapter": chapter_dict,
-                u"section": section_dict,
                 u"updated": dateutil_parse(model["updated"]),
             })
+
+            if add_course_structure:
+                chapter = store.get_item(chapter)
+                chapter_dict = get_ancestor_context(store, course, chapter, course)
+                section = store.get_item(section)
+                section_dict = get_ancestor_context(store, course, section)
+                model.update({
+                    u"chapter": chapter_dict,
+                    u"section": section_dict,
+                })
+
             filtered_collection.append(model)
 
     return filtered_collection
@@ -183,7 +186,7 @@ def get_notes(user, course):
     if not collection:
         return None
 
-    return json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder)
+    return json.dumps(preprocess_collection(user, course, collection, add_course_structure=True), cls=NoteJSONEncoder)
 
 
 def get_ancestor(store, usage_key):
@@ -201,21 +204,28 @@ def get_ancestor(store, usage_key):
         return
 
 
-def get_ancestor_context(course, store, ancestor, item):
+def get_ancestor_context(store, course, item, ancestor=None):
     """
     Returns dispay_name and url for the parent module.
     """
-    ancestor_children = [child.to_deprecated_string() for child in ancestor.children]
     item_dict = {
         'location': item.location.to_deprecated_string(),
-        'children': [child.to_deprecated_string() for child in item.children],
         'display_name': item.display_name_with_default,
-        'url': reverse("jump_to", kwargs={
+
+    }
+
+    if item.category == 'chapter' and ancestor:
+        ancestor_children = [child.to_deprecated_string() for child in ancestor.children]
+        item_dict['index'] = ancestor_children.index(item_dict['location'])
+    elif item.category == 'vertical':
+        item_dict['url'] = reverse("jump_to", kwargs={
             "course_id": course.id.to_deprecated_string(),
             "location": item.location.to_deprecated_string(),
         })
-    }
-    item_dict['index'] = ancestor_children.index(item_dict['location'])
+
+    if item.category in ('chapter', 'sequential'):
+        item_dict['children'] = [child.to_deprecated_string() for child in item.children]
+
     return item_dict
 
 
