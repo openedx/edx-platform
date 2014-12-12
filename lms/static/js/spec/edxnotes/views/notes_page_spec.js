@@ -1,30 +1,11 @@
 define([
     'jquery', 'underscore', 'js/common_helpers/template_helpers',
-    'js/common_helpers/ajax_helpers', 'js/edxnotes/views/page_factory',
-    'js/spec/edxnotes/custom_matchers'
-], function($, _, TemplateHelpers, AjaxHelpers, NotesFactory, customMatchers) {
+    'js/common_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
+    'js/edxnotes/views/page_factory', 'js/spec/edxnotes/custom_matchers'
+], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory, customMatchers) {
     'use strict';
     describe('EdxNotes NotesPage', function() {
-        var notes = [
-            {
-                created: 'December 11, 2014 at 11:12AM',
-                updated: 'December 11, 2014 at 11:12AM',
-                text: 'Third added model',
-                quote: 'Should be listed first'
-            },
-            {
-                created: 'December 11, 2014 at 11:11AM',
-                updated: 'December 11, 2014 at 11:11AM',
-                text: 'Second added model',
-                quote: 'Should be listed second'
-            },
-            {
-                created: 'December 11, 2014 at 11:10AM',
-                updated: 'December 11, 2014 at 11:10AM',
-                text: 'First added model',
-                quote: 'Should be listed third'
-            }
-        ];
+        var notes = Helpers.getDefaultNotes();
 
         beforeEach(function() {
             customMatchers(this);

@@ -1,42 +1,16 @@
 define([
-    'jquery', 'underscore', 'js/common_helpers/template_helpers', 'js/edxnotes/collections/notes',
-    'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/course_structure',
-    'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
+    'jquery', 'underscore', 'js/common_helpers/template_helpers', 'js/spec/edxnotes/helpers',
+    'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs',
+    'js/edxnotes/views/tabs/course_structure', 'js/spec/edxnotes/custom_matchers',
+    'jasmine-jquery'
 ], function(
-    $, _, TemplateHelpers, NotesCollection, TabsCollection, CourseStructureView, customMatchers
+    $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView,
+    customMatchers
 ) {
     'use strict';
     describe('EdxNotes CourseStructureView', function() {
-        var getChapter, getSection, getUnit, getView, getText, notes;
-
-        getChapter = function (name, location, index, children) {
-            return {
-                display_name: name,
-                location: 'i4x://chapter/' + location,
-                index: index,
-                children: _.map(children, function (i) {
-                    return 'i4x://section/' + i;
-                })
-            };
-        };
-
-        getSection = function (name, location, children) {
-            return {
-                display_name: name,
-                location: 'i4x://section/' + location,
-                children: _.map(children, function (i) {
-                    return 'i4x://unit/' + i;
-                })
-            };
-        };
-
-        getUnit = function (name, location) {
-            return {
-                display_name: name,
-                location: 'i4x://unit/' + location,
-                url: 'http://example.com'
-            };
-        };
+        var notes = Helpers.getDefaultNotes(),
+            getView, getText;
 
         getText = function (selector) {
             return $(selector).map(function () {
@@ -59,54 +33,6 @@ define([
             return view;
         };
 
-        notes = [
-            {
-                chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
-                section: getSection('Third Section', 0, ['w_n', 1, 0]),
-                unit: getUnit('Fourth Unit', 0),
-                created: 'December 11, 2014 at 11:12AM',
-                updated: 'December 11, 2014 at 11:12AM',
-                text: 'Third added model',
-                quote: 'Note 4'
-            },
-            {
-                chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
-                section: getSection('Third Section', 0, ['w_n', 1, 0]),
-                unit: getUnit('Fourth Unit', 0),
-                created: 'December 11, 2014 at 11:11AM',
-                updated: 'December 11, 2014 at 11:11AM',
-                text: 'Third added model',
-                quote: 'Note 5'
-            },
-            {
-                chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
-                section: getSection('Third Section', 0, ['w_n', 1, 0]),
-                unit: getUnit('Third Unit', 1),
-                created: 'December 11, 2014 at 11:11AM',
-                updated: 'December 11, 2014 at 11:11AM',
-                text: 'Second added model',
-                quote: 'Note 3'
-            },
-            {
-                chapter: getChapter('Second Chapter', 0, 1, [1, 'w_n', 0]),
-                section: getSection('Second Section', 1, [3]),
-                unit: getUnit('Second Unit', 3),
-                created: 'December 11, 2014 at 11:10AM',
-                updated: 'December 11, 2014 at 11:10AM',
-                text: 'First added model',
-                quote: 'Note 2'
-            },
-            {
-                chapter: getChapter('First Chapter', 1, 0, [2]),
-                section: getSection('First Section', 2, [4]),
-                unit: getUnit('First Unit', 4),
-                created: 'December 11, 2014 at 11:10AM',
-                updated: 'December 11, 2014 at 11:10AM',
-                text: 'First added model',
-                quote: 'Note 1'
-            }
-        ];
-
         beforeEach(function () {
             customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
@@ -125,7 +51,7 @@ define([
                 notes = getText('.note-excerpt-p');
 
             expect(this.tabsCollection).toHaveLength(1);
-            expect(this.tabsCollection.at(0).attributes).toEqual({
+            expect(this.tabsCollection.at(0).toJSON()).toEqual({
                 name: 'Course Structure',
                 identifier: 'view-course-structure',
                 icon: 'icon-list-ul',
