@@ -239,7 +239,7 @@ define([
     "js/spec/views/assets_spec",
     "js/spec/views/baseview_spec",
     "js/spec/views/container_spec",
-    "js/spec/views/library_container_spec",
+    "js/spec/views/paged_container_spec",
     "js/spec/views/group_configuration_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/unit_outline_spec",

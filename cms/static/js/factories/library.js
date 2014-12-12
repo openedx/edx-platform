@@ -1,20 +1,21 @@
 define([
-    'jquery', 'underscore', 'js/models/xblock_info', 'js/views/pages/container',
-    'js/collections/component_template', 'xmodule', 'coffee/src/main',
+    'jquery', 'underscore', 'js/models/xblock_info', 'js/views/pages/paged_container',
+    'js/views/library_container', 'js/collections/component_template', 'xmodule', 'coffee/src/main',
     'xblock/cms.runtime.v1'
 ],
-function($, _, XBlockInfo, ContainerPage, ComponentTemplates, xmoduleLoader) {
+function($, _, XBlockInfo, PagedContainerPage, LibraryContainerView, ComponentTemplates, xmoduleLoader) {
     'use strict';
     return function (componentTemplates, XBlockInfoJson, options) {
         var main_options = {
             el: $('#content'),
             model: new XBlockInfo(XBlockInfoJson, {parse: true}),
             templates: new ComponentTemplates(componentTemplates, {parse: true}),
-            action: 'view'
+            action: 'view',
+            viewClass: LibraryContainerView
         };
 
         xmoduleLoader.done(function () {
-            var view = new ContainerPage(_.extend(main_options, options));
+            var view = new PagedContainerPage(_.extend(main_options, options));
             view.render();
         });
     };

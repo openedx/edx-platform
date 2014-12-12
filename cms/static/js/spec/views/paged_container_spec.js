@@ -1,6 +1,6 @@
 define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "URI", "js/models/xblock_info",
-    "js/views/library_container", "js/views/paging_header", "js/views/paging_footer"],
-    function ($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingContainer, PagingFooter) {
+    "js/views/paged_container", "js/views/paging_header", "js/views/paging_footer"],
+    function ($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter) {
 
         var htmlResponseTpl = _.template('' +
             '<div class="xblock-container-paging-parameters" data-start="<%= start %>" data-displayed="<%= displayed %>" data-total="<%= total %>"/>'
