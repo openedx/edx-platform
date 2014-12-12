@@ -11,6 +11,10 @@ var edx = edx || {};
     edx.verify_student.ReviewPhotosStepView = edx.verify_student.StepView.extend({
 
         postRender: function() {
+            // Load the photos from the previous steps
+            $( "#face_image")[0].src = this.model.get('faceImage');
+            $( "#photo_id_image")[0].src = this.model.get('identificationImage');
+
             // Disable the submit button until user confirmation
             $( "#confirm_pics_good" ).click( this.toggleSubmitEnabled );
 
