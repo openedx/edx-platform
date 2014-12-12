@@ -16,6 +16,7 @@
     edx.verify_student.VerificationModel = Backbone.Model.extend({
 
         defaults: {
+            fullName: null,
             facePhoto: "",
             identificationPhoto: ""
         },

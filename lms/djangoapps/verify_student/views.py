@@ -15,6 +15,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import (
     HttpResponse, HttpResponseBadRequest,
+    HttpResponseServerError,
     HttpResponseRedirect, Http404
 )
 from django.shortcuts import redirect
@@ -26,6 +27,8 @@ from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 
 from staticfiles.storage import staticfiles_storage
+
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -837,6 +840,66 @@ def create_order(request):
 
     params['success'] = True
     return HttpResponse(json.dumps(params), content_type="text/json")
+
+
+@require_POST
+@login_required
+def submit_photos_for_verification(request):
+    """Submit a photo verification attempt.
+
+    If the user already has a valid or pending verification,
+    this call is a no-op.
+
+    Arguments:
+        request (HttpRequest): The request to submit photos.
+
+    Returns:
+        HttpResponse: 200 on success, 400 if there are errors.
+
+    """
+    # Check the required parameters
+    missing_params = set(['face_image', 'photo_id_image']) - set(request.POST.keys())
+    if len(missing_params) > 0:
+        msg = _("Missing required parameters: {missing}").format(missing=", ".join(missing_params))
+        return HttpResponseBadRequest(msg)
+
+    # If the user already has valid or pending request, the UI will hide
+    # the verification steps.  For this reason, we reject any requests
+    # for users that already have a valid or pending verification.
+    if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
+        return HttpResponseBadRequest(_("You already have a valid or pending verification."))
+
+    # If the user wants to change his/her full name,
+    # then try to do that before creating the attempt.
+    if request.POST.get('full_name'):
+        try:
+            profile_api.update_profile(
+                request.user.username,
+                full_name=request.POST.get('full_name')
+            )
+        except profile_api.ProfileUserNotFound:
+            return HttpResponseBadRequest(_("No profile found for user"))
+        except profile_api.ProfileInvalidField:
+            msg = _(
+                "Name must be at least {min_length} characters long."
+            ).format(min_length=profile_api.FULL_NAME_MIN_LENGTH)
+            return HttpResponseBadRequest(msg)
+
+    # Create the attempt
+    attempt = SoftwareSecurePhotoVerification(user=request.user)
+    try:
+        b64_face_image = request.POST['face_image'].split(",")[1]
+        b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
+    except IndexError:
+        msg = _("Image data is not valid.")
+        return HttpResponseBadRequest(msg)
+
+    attempt.upload_face_image(b64_face_image.decode('base64'))
+    attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
+    attempt.mark_ready()
+    attempt.submit()
+
+    return HttpResponse(200)
 
 
 @require_POST

@@ -90,6 +90,12 @@ if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
     urlpatterns += patterns(
         '',
 
+        url(
+            r'^submit-photos/$',
+            views.submit_photos_for_verification,
+            name="verify_student_submit_photos"
+        ),
+
         # The user is starting the verification / payment process,
         # most likely after enrolling in a course and selecting
         # a "verified" track.

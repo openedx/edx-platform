@@ -29,6 +29,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from bs4 import BeautifulSoup
 
 from util.testing import UrlResetMixin
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
@@ -792,6 +793,103 @@ class TestCreateOrder(ModuleStoreTestCase):
         attempt.submit()
         attempt.approve()
 
+
+@ddt.ddt
+@patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
+    """Tests for submitting photos for verification. """
+
+    USERNAME = "test_user"
+    PASSWORD = "test_password"
+    IMAGE_DATA = "abcd,1234"
+    FULL_NAME = u"Ḟüḷḷ Ṅäṁë"
+
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
+    def setUp(self):
+        super(TestSubmitPhotosForVerification, self).setUp('verify_student.urls')
+        self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
+        result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
+        self.assertTrue(result, msg="Could not log in")
+
+    def test_submit_photos(self):
+        # Submit the photos
+        response = self._submit_photos(
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA
+        )
+
+        # Verify that the attempt is created in the database
+        attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+        self.assertEqual(attempt.status, "submitted")
+
+        # Verify that the user's name wasn't changed
+        self._assert_full_name(self.user.profile.name)
+
+    def test_submit_photos_and_change_name(self):
+        # Submit the photos, along with a name change
+        response = self._submit_photos(
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA,
+            full_name=self.FULL_NAME
+        )
+
+        # Check that the user's name was changed in the database
+        self._assert_full_name(self.FULL_NAME)
+
+    @ddt.data('face_image', 'photo_id_image')
+    def test_invalid_image_data(self, invalid_param):
+        params = {
+            'face_image': self.IMAGE_DATA,
+            'photo_id_image': self.IMAGE_DATA
+        }
+        params[invalid_param] = ""
+        response = self._submit_photos(expected_status_code=400, **params)
+        self.assertEqual(response.content, "Image data is not valid.")
+
+    def test_invalid_name(self):
+        response = self._submit_photos(
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA,
+            full_name="a",
+            expected_status_code=400
+        )
+        self.assertEqual(response.content, "Name must be at least 2 characters long.")
+
+    @ddt.data('face_image', 'photo_id_image')
+    def test_missing_required_params(self, missing_param):
+        params = {
+            'face_image': self.IMAGE_DATA,
+            'photo_id_image': self.IMAGE_DATA
+        }
+        del params[missing_param]
+        response = self._submit_photos(expected_status_code=400, **params)
+        self.assertEqual(
+            response.content,
+            "Missing required parameters: {missing}".format(missing=missing_param)
+        )
+
+    def _submit_photos(self, face_image=None, photo_id_image=None, full_name=None, expected_status_code=200):
+        """TODO """
+        url = reverse("verify_student_submit_photos")
+        params = {}
+
+        if face_image is not None:
+            params['face_image'] = face_image
+
+        if photo_id_image is not None:
+            params['photo_id_image'] = photo_id_image
+
+        if full_name is not None:
+            params['full_name'] = full_name
+
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, expected_status_code)
+        return response
+
+    def _assert_full_name(self, full_name):
+        """TODO """
+        info = profile_api.profile_info(self.user.username)
+        self.assertEqual(info['full_name'], full_name)
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
