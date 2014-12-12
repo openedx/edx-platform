@@ -9,8 +9,12 @@
     <nav class="nav-wizard is-ready">
       <ol class="wizard-steps">
         <li class="wizard-step">
-        <a class="next action-primary" id="next_step_button" href="?skip-first-step=1">
-          <%- _.sprintf( gettext( "Go to Step %s" ), nextStepNum ) %>: <%- nextStepTitle %>
+        <a class="next action-primary" <% if (isActive == "False") { %>disabled="true"<% } %> id="next_step_button" href="?skip-first-step=1">
+          <% if ( isActive == "False" ) { %>
+            <%- gettext( "Activate Your Account" ) %>
+          <% } else { %>
+            <%- _.sprintf( gettext( "Go to Step %s" ), nextStepNum ) %>: <%- nextStepTitle %>
+          <% } %>
         </a>
         </li>
       </ol>

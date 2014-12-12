@@ -1456,6 +1456,23 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             expected_status_code=404
         )
 
+    def test_account_not_active(self):
+        self.user.is_active = False
+        self.user.save()
+        course = self._create_course("verified")
+        response = self._get_page('verify_student_start_flow', course.id)
+        self._assert_steps_displayed(
+            response,
+            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
+        )
+        self._assert_requirements_displayed(response, [
+            PayAndVerifyView.ACCOUNT_ACTIVATION_REQ,
+            PayAndVerifyView.CREDIT_CARD_REQ,
+            PayAndVerifyView.PHOTO_ID_REQ,
+            PayAndVerifyView.WEBCAM_REQ,
+        ])
+
     def _create_course(self, *course_modes, **kwargs):
         """Create a new course with the specified course modes. """
         course = CourseFactory.create()
