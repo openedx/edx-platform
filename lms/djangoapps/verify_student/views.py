@@ -489,6 +489,7 @@ class PayAndVerifyView(View):
         context = {
             'disable_courseware_js': True,
             'user_full_name': full_name,
+            'platform_name': settings.PLATFORM_NAME,
             'course_key': unicode(course_key),
             'course': course,
             'courseware_url': courseware_url,

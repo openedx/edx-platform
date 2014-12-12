@@ -29,6 +29,7 @@
             this.stepData = obj.stepData || {};
             this.nextStepNum = obj.nextStepNum || "";
             this.nextStepTitle = obj.nextStepTitle || "";
+            this.model = obj.model || {};
 
             /* Mix non-conflicting functions from underscore.string
              * (all but include, contains, and reverse) into the

@@ -66,15 +66,25 @@
           <h4 class="title"><%- gettext( "Check Your Name" ) %></h4>
 
           <div class="copy">
-              <p><%- _.sprintf( gettext( "Make sure your full name on your edX account (%(fullName)s) matches your ID. We will also use this as the name on your certificate." ), { fullName: fullName } ) %></p>
+              <p><%- _.sprintf( gettext( "Make sure your full name on your %(platformName)s account (%(fullName)s) matches your ID. We will also use this as the name on your certificate." ), { platformName: platformName, fullName: fullName } ) %></p>
           </div>
 
-          <ul class="list-actions">
-            <li class="action action-editname">
-              <a class="edit-name" rel="leanModal" href="#edit-name"><%- gettext( "Edit your name" ) %></a>
-            </li>
-          </ul>
-        </li>
+          <div class="msg msg-followup">
+            <div class="help-tip is-expandable">
+              <h5 class="title title-expand" aria-expanded="false" role="link">
+                <i class="icon-caret-down expandable-icon"></i>
+                  <%- gettext( "What if the name on my account doesn't match the name on my ID?" ) %>
+              </h5>
+
+              <div class="copy expandable-area">
+                <p><%- gettext( "You should change the name on your account to match." ) %></p>
+                <input type="text" name="new-name" id="new-name" placeholder="New name">
+                <a id="new-name-button" class="action-primary">
+                  <%- gettext( "Change Name" ) %>
+                </a>
+              </div>
+            </div>
+          </div>
 
       </ol>
     </div>
