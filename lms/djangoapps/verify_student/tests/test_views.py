@@ -991,6 +991,12 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         )
         self._assert_redirects_to_dashboard(response)
 
+    def test_verify_now_user_details(self):
+        course = self._create_course("verified")
+        self._enroll(course.id, "verified")
+        response = self._get_page('verify_student_verify_now', course.id)
+        self._assert_user_details(response, self.user.profile.name)
+
     @ddt.data(
         "verify_student_verify_now",
         "verify_student_verify_later",
@@ -1380,11 +1386,25 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             else:
                 self.assertFalse(displayed, msg="Expected '{req}' requirement to be hidden".format(req=req))
 
+    def _assert_course_details(self, response, course_key, display_name, start_text, url):
+        """Check the course information on the page. """
+        response_dict = self._get_page_data(response)
+        self.assertEqual(response_dict['course_key'], course_key)
+        self.assertEqual(response_dict['course_name'], display_name)
+        self.assertEqual(response_dict['course_start_date'], start_text)
+        self.assertEqual(response_dict['courseware_url'], url)
+
+    def _assert_user_details(self, response, full_name):
+        """Check the user detail information on the page. """
+        response_dict = self._get_page_data(response)
+        self.assertEqual(response_dict['full_name'], full_name)
+
     def _get_page_data(self, response):
         """Retrieve the data attributes rendered on the page. """
         soup = BeautifulSoup(response.content)
         pay_and_verify_div = soup.find(id="pay-and-verify-container")
         return {
+            'full_name': pay_and_verify_div['data-full-name'],
             'course_key': pay_and_verify_div['data-course-key'],
             'course_name': pay_and_verify_div['data-course-name'],
             'course_start_date': pay_and_verify_div['data-course-start-date'],
@@ -1396,14 +1416,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             'requirements': json.loads(pay_and_verify_div['data-requirements']),
             'message_key': pay_and_verify_div['data-msg-key']
         }
-
-    def _assert_course_details(self, response, course_key, display_name, start_text, url):
-        """Check the course information on the page. """
-        response_dict = self._get_page_data(response)
-        self.assertEqual(response_dict['course_key'], course_key)
-        self.assertEqual(response_dict['course_name'], display_name)
-        self.assertEqual(response_dict['course_start_date'], start_text)
-        self.assertEqual(response_dict['courseware_url'], url)
 
     def _assert_redirects_to_dashboard(self, response):
         self.assertRedirects(response, reverse('dashboard'))

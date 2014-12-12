@@ -44,6 +44,9 @@ var edx = edx || {};
                 courseName: el.data('course-name'),
                 courseStartDate: el.data('course-start-date'),
                 coursewareUrl: el.data('courseware-url')
+            },
+            'review-photos-step': {
+                fullName: el.data('full-name')
             }
         }
     }).render();

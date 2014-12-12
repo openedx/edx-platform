@@ -476,9 +476,16 @@ class PayAndVerifyView(View):
                 kwargs={'course_id': unicode(course_key)}
             )
 
+        full_name = (
+            request.user.profile.name
+            if request.user.profile.name
+            else ""
+        )
+
         # Render the top-level page
         context = {
             'disable_courseware_js': True,
+            'user_full_name': full_name,
             'course_key': unicode(course_key),
             'course': course,
             'courseware_url': courseware_url,

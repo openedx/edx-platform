@@ -9,7 +9,7 @@ from verify_student.views import PayAndVerifyView
 <%block name="bodyclass">register verification-process step-requirements</%block>
 <%block name="pagetitle">${messages.page_title}</%block>
 <%block name="header_extras">
-    % for template_name in ["progress"]:
+    % for template_name in ["progress", "webcam_photo"]:
         <script type="text/template" id="${template_name}-tpl">
             <%static:include path="verify_student/${template_name}.underscore" />
         </script>
@@ -44,6 +44,7 @@ from verify_student.views import PayAndVerifyView
     ## the steps, but some are just useful for A/B test setup.
     <div
       id="pay-and-verify-container"
+      data-full-name='${user_full_name}'
       data-course-key='${course_key}'
       data-course-name='${course.display_name}'
       data-course-start-date='${course.start_datetime_text()}'

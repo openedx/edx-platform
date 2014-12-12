@@ -1052,7 +1052,8 @@ student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_pro
 
 verify_student_js = [
     'js/my_courses_dropdown.js',
-    'js/verify_student/views/pay_and_verify_view.js',
+    'js/verify_student/models/verification_model.js',
+    'js/verify_student/views/webcam_photo_view.js',
     'js/verify_student/views/step_view.js',
     'js/verify_student/views/intro_step_view.js',
     'js/verify_student/views/make_payment_step_view.js',
@@ -1061,6 +1062,7 @@ verify_student_js = [
     'js/verify_student/views/id_photo_step_view.js',
     'js/verify_student/views/review_photos_step_view.js',
     'js/verify_student/views/enrollment_confirmation_step_view.js',
+    'js/verify_student/views/pay_and_verify_view.js',
     'js/verify_student/pay_and_verify.js',
 ]
 

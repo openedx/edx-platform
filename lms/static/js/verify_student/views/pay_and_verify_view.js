@@ -20,22 +20,33 @@ var edx = edx || {};
 
         subviews: {},
 
+        VERIFICATION_VIEW_NAMES: [
+            'face-photo-step',
+            'id-photo-step',
+            'review-photos-step'
+        ],
+
         initialize: function( obj ) {
+            this.displaySteps = obj.displaySteps || [];
+            this.initializeSubviews( obj.currentStep, obj.stepInfo );
+        },
+
+        initializeSubviews: function( currentStep, stepInfo ) {
             var i,
                 stepName,
                 stepData,
                 subview,
+                subviewConfig,
                 nextStepTitle,
-                subviewConstructors;
-
-            this.displaySteps = obj.displaySteps || [];
+                subviewConstructors,
+                verificationModel;
 
             // Determine which step we're starting on
             // Depending on how the user enters the flow,
             // this could be anywhere in the sequence of steps.
             this.currentStepIndex = _.indexOf(
                 _.pluck( this.displaySteps, 'name' ),
-                obj.currentStep
+                currentStep
             );
 
             // We need to initialize this here, because
@@ -50,6 +61,12 @@ var edx = edx || {};
                 'review-photos-step': edx.verify_student.ReviewPhotosStepView,
                 'enrollment-confirmation-step': edx.verify_student.EnrollmentConfirmationStepView
             };
+
+            // Create the verification model, which is shared
+            // among the different steps.  This allows
+            // one step to save photos and another step
+            // to submit them.
+            verificationModel = new edx.verify_student.VerificationModel();
 
             for ( i = 0; i < this.displaySteps.length; i++ ) {
                 stepName = this.displaySteps[i].name;
@@ -66,20 +83,30 @@ var edx = edx || {};
                     stepData = {};
 
                     // Add any info specific to this step
-                    if ( obj.stepInfo.hasOwnProperty( stepName ) ) {
-                        _.extend( stepData, obj.stepInfo[ stepName ] );
+                    if ( stepInfo.hasOwnProperty( stepName ) ) {
+                        _.extend( stepData, stepInfo[ stepName ] );
+                    }
+
+                    subviewConfig = {
+                        templateUrl: this.displaySteps[i].templateUrl,
+                        nextStepNum: (i + 2), // Next index, starting from 1
+                        nextStepTitle: nextStepTitle,
+                        stepData: stepData
+                    };
+
+                    // For photo verification steps, set the shared photo model
+                    if ( this.VERIFICATION_VIEW_NAMES.indexOf(stepName) >= 0 ) {
+                        _.extend( subviewConfig, { model: verificationModel } );
                     }
 
                     // Create the subview instance
                     // Note that we are NOT yet rendering the view,
                     // so this doesn't trigger GET requests or modify
                     // the DOM.
-                    this.subviews[stepName] = new subviewConstructors[stepName]({
-                        templateUrl: this.displaySteps[i].templateUrl,
-                        nextStepNum: (i + 2), // Next index, starting from 1
-                        nextStepTitle: nextStepTitle,
-                        stepData: stepData
-                    });
+                    this.subviews[stepName] = new subviewConstructors[stepName]( subviewConfig );
+
+                    // For photo verification steps, set the model
+                    // to the shared photo model.
 
                     // Listen for next step events
                     this.listenTo(this.subviews[stepName], 'next-step', this.nextStep);
